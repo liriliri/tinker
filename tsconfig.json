@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "outDir": "./out",
+    "jsx": "react",
+    "esModuleInterop": true,
+  },
+  "include": ["./src/**/*"]
+}
