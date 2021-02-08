@@ -21,12 +21,18 @@
   "devDependencies": {
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.0",
+    "@types/react-redux": "^7.1.16",
+    "@types/styled-components": "^5.1.7",
     "electron": "^11.2.3",
     "typescript": "^4.1.3"
   },
   "dependencies": {
     "licia": "^1.28.0",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "react-redux": "^7.2.2",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.2.1"
   }
 }

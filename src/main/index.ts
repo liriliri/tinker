@@ -8,6 +8,9 @@ class App {
       webPreferences: {
         nodeIntegration: true,
       },
+      maximizable: false,
+      width: 800,
+      height: 500,
     })
 
     this.init()
