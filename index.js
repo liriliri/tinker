@@ -1,1 +1,1 @@
-require('./out/main/')
+require('./dist/main/')

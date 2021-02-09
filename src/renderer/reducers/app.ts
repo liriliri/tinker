@@ -1,9 +1,22 @@
 import { Reducer } from 'redux'
 import { IAction } from '../types'
 
-export interface IAppState {}
+interface ITool {
+  icon: string
+  title: string
+  description: string
+}
 
-const appReducer: Reducer<IAppState> = function (state = {}, action: IAction) {
+export interface IAppState {
+  tools: ITool[]
+}
+
+const appReducer: Reducer<IAppState> = function (
+  state = {
+    tools: [],
+  },
+  action: IAction
+) {
   return state
 }
 

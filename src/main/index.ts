@@ -11,6 +11,7 @@ class App {
       maximizable: false,
       width: 800,
       height: 500,
+      resizable: false,
     })
 
     this.init()

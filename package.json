@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsc -w --inlineSourceMap",
     "start": "electron ./index",
-    "format": "lsla prettier src/**/*.ts *.js --write"
+    "format": "lsla prettier src/**/*.{ts,tsx} *.js --write"
   },
   "repository": {
     "type": "git",
