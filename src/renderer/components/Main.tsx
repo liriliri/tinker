@@ -1,5 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
+import { IRootState } from '../reducers'
+import { ITool } from '../reducers/app'
+import map from 'licia/map'
 
 const ToolContainer = styled.div`
   display: flex;
@@ -26,15 +30,27 @@ const ToolDesc = styled.div`
   color: #aaa;
 `
 
-export default class Main extends React.Component {
+interface IProps {
+  tools: ITool[]
+}
+
+class Main extends React.Component<IProps> {
   render() {
-    return (
-      <ToolContainer>
+    const tools = map(this.props.tools, (tool) => {
+      return (
         <Tool>
-          <ToolTitle>BASE64</ToolTitle>
-          <ToolDesc>Base64 Decode and Encode</ToolDesc>
+          <ToolTitle>{tool.title}</ToolTitle>
+          <ToolDesc>{tool.description}</ToolDesc>
         </Tool>
-      </ToolContainer>
-    )
+      )
+    })
+
+    return <ToolContainer>{tools}</ToolContainer>
   }
 }
+
+const mapStateToProps = (state: IRootState): IProps => ({
+  tools: state.app.tools,
+})
+
+export default connect(mapStateToProps)(Main)

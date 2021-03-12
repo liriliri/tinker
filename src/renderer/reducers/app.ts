@@ -1,7 +1,7 @@
 import { Reducer } from 'redux'
 import { IAction } from '../types'
 
-interface ITool {
+export interface ITool {
   icon: string
   title: string
   description: string
@@ -13,7 +13,13 @@ export interface IAppState {
 
 const appReducer: Reducer<IAppState> = function (
   state = {
-    tools: [],
+    tools: [
+      {
+        title: 'Password',
+        icon: '',
+        description: 'Generate Passwords',
+      },
+    ],
   },
   action: IAction
 ) {
