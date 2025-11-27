@@ -17,10 +17,5 @@ export const getSettingsStore = memoize(function () {
 })
 
 export const getMainStore = memoize(function () {
-  return new FileStore(getUserDataPath('data/main.json'), {
-    bounds: {
-      width: 960,
-      height: 640,
-    },
-  })
+  return new FileStore(getUserDataPath('data/main.json'), {})
 })

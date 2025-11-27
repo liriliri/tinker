@@ -12,8 +12,8 @@
     "dev:renderer": "vite",
     "start": "electron ./dist/main/index.js",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "format": "lsla prettier \"src/**/*.{ts,tsx,scss,css,json}\" \"*.{js,ts,json}\" \"script/*.mjs\" --write",
-    "genTheme": "lsla genTheme --input src/common/theme.json --output src/renderer/theme.scss && lsla genTheme --input src/common/theme.json --output src/common/theme.ts"
+    "format": "lsla prettier \"{src,plugins}/**/*.{ts,tsx,scss,css,json}\" \"*.{js,ts,json}\" \"script/*.mjs\" --write",
+    "gen:theme": "lsla genTheme --input src/common/theme.json --output src/renderer/theme.scss && lsla genTheme --input src/common/theme.json --output src/common/theme.ts"
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,8 @@
     "eslint-config-prettier": "^10.1.8",
     "fs-extra": "^11.3.0",
     "licia": "^1.48.0",
+    "mobx": "^6.15.0",
+    "mobx-react-lite": "^4.1.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "sass": "^1.89.2",

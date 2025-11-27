@@ -1,0 +1,17 @@
+{
+  "name": "tinker-markdown-editor",
+  "version": "0.1.0",
+  "description": "Markdown Editor Plugin for Tinker",
+  "tinker": {
+    "name": "Markdown Editor",
+    "description": "A simple Markdown editor with live preview and syntax highlighting",
+    "icon": "icon.png",
+    "main": "index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "Markdown 编辑器",
+        "description": "简易的 Markdown 编辑器，支持实时预览和语法高亮"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "tinker-plugins",
+  "devDependencies": {
+    "lerna": "^8.2.4"
+  }
+}

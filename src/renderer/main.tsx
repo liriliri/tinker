@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import log from 'share/common/log'
 import pkg from '../../package.json'
+import 'share/renderer/main'
 
 const logger = log('renderer')
 logger.info('start')
