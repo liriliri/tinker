@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
+import Style from './Titlebar.module.scss'
 
 export default observer(function Titlebar() {
-  return <div></div>
+  return <div className={Style.container}></div>
 })

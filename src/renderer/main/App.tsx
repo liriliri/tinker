@@ -1,3 +1,11 @@
+import Titlebar from './components/Titlebar'
+import AppList from './components/AppList'
+
 export default function App() {
-  return <div>App</div>
+  return (
+    <>
+      <Titlebar />
+      <AppList />
+    </>
+  )
 }
