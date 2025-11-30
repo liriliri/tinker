@@ -1,10 +1,10 @@
-import Titlebar from './components/Titlebar'
+import TitleBar from './components/TitleBar'
 import AppList from './components/AppList'
 
 export default function App() {
   return (
     <>
-      <Titlebar />
+      <TitleBar />
       <AppList />
     </>
   )
