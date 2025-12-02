@@ -27,5 +27,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
       mainFields: ['main', 'module'],
       alias,
     },
+    define: {
+      PRODUCT_NAME: JSON.stringify(pkg.productName),
+      VERSION: JSON.stringify(pkg.version),
+    },
   }
 })
