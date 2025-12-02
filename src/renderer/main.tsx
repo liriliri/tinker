@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client'
 import log from 'share/common/log'
 import pkg from '../../package.json'
 import 'share/renderer/main'
+import 'share/renderer/luna.scss'
+import 'share/renderer/main.scss'
+import './icon.css'
+import { i18n } from 'common/util'
 
 const logger = log('renderer')
 logger.info('start')
@@ -21,5 +25,8 @@ function renderApp() {
 }
 
 ;(async function () {
+  const language = await main.getLanguage()
+  i18n.locale(language)
+
   renderApp()
 })()

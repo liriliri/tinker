@@ -1,2 +1,43 @@
+@use '../../theme' as *;
+
 .container {
+  display: flex;
+  height: 50px;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-size: #{$font-size-x-l}px;
+  background-color: var(--color-bg-container);
+}
+
+.more {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.3s;
+  span {
+    font-size: 28px;
+  }
+  &:hover {
+    color: var(--color-primary);
+  }
 }
