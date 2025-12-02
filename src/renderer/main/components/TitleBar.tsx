@@ -2,11 +2,9 @@ import { observer } from 'mobx-react-lite'
 import Style from './Titlebar.module.scss'
 import icon from '../../assets/icon.png'
 import { t } from 'common/util'
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 
 export default observer(function Titlebar() {
-  const inputRef = useRef<HTMLInputElement>(null)
-
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     const onMouseMove = () => {
       main.dragMain(e.clientX, e.clientY)
@@ -28,8 +26,8 @@ export default observer(function Titlebar() {
       </div>
       <input
         className={Style.input}
-        ref={inputRef}
         placeholder={t('searchTool')}
+        autoFocus={true}
       />
       <div className={Style.more}>
         <span className="icon-more" />

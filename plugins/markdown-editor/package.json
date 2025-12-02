@@ -2,6 +2,10 @@
   "name": "tinker-markdown-editor",
   "version": "0.1.0",
   "description": "Markdown Editor Plugin for Tinker",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\"",
+    "dev:renderer": "vite --config ../vite.config.ts"
+  },
   "tinker": {
     "name": "Markdown Editor",
     "description": "A simple Markdown editor with live preview and syntax highlighting",
