@@ -1,5 +1,8 @@
 {
   "name": "tinker-plugins",
+  "scripts": {
+    "format": "lsla prettier \"tinker-*/src/**/*.{ts,tsx,json}\" \"*.{js,ts,json}\" --write"
+  },
   "devDependencies": {
     "lerna": "^8.2.4"
   }
