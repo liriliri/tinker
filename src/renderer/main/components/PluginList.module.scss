@@ -5,4 +5,7 @@
   left: 0;
   right: 0;
   overflow: auto;
+  :global(.luna-icon-list) {
+    height: 100%;
+  }
 }

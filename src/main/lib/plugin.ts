@@ -28,8 +28,6 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
     }
   }
 
-  console.log(plugins)
-
   return plugins
 })
 

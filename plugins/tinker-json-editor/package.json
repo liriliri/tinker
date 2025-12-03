@@ -1,21 +1,21 @@
 {
-  "name": "tinker-image-compressor",
+  "name": "tinker-json-editor",
   "version": "0.1.0",
-  "description": "Image Compressor Plugin for Tinker",
+  "description": "JSON Editor Plugin for Tinker",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\"",
     "dev:renderer": "vite --config ../vite.config.ts"
   },
   "tinker": {
-    "name": "Image Compressor",
-    "description": "An image compressor with support for multiple formats",
+    "name": "JSON Editor",
+    "description": "A simple JSON editor with syntax highlighting and validation",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "图片压缩",
-        "description": "图片压缩工具，支持多种格式"
+        "name": "JSON 编辑器",
+        "description": "JSON 编辑器，支持语法高亮和校验"
       }
     }
   }

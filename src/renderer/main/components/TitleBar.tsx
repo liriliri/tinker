@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import Style from './Titlebar.module.scss'
-import icon from '../../assets/icon.png'
+import logo from '../../assets/logo.png'
 import { t } from 'common/util'
 import { useCallback } from 'react'
 
@@ -22,7 +22,7 @@ export default observer(function Titlebar() {
   return (
     <div className={Style.container} onMouseDown={onMouseDown}>
       <div className={Style.icon}>
-        <img src={icon} draggable={false} />
+        <img src={logo} draggable={false} />
       </div>
       <input
         className={Style.input}
