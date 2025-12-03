@@ -1,4 +1,4 @@
-import { IpcGetPlugins, IPlugin } from 'common/types'
+import { IpcGetPlugins, IPlugin, IRawPlugin } from 'common/types'
 import { handleEvent } from 'share/main/lib/util'
 import singleton from 'licia/singleton'
 import { isDev } from 'share/common/util'
@@ -34,18 +34,27 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
 async function getPlugin(dir: string): Promise<IPlugin> {
   const pkgPath = path.join(dir, 'package.json')
   const pkg = await fs.readJson(pkgPath)
-  const plugin = pkg.tinker as IPlugin
+  const rawPlugin = pkg.tinker as IRawPlugin
+  const plugin: IPlugin = {
+    id: pkg.name,
+    name: rawPlugin.name,
+    description: rawPlugin.description,
+    icon: rawPlugin.icon,
+    main: rawPlugin.main,
+    preload: rawPlugin.preload,
+  }
   plugin.icon = path.join(dir, plugin.icon)
   plugin.main = path.join(dir, plugin.main)
-  plugin.preload = path.join(dir, plugin.preload)
+  if (plugin.preload) {
+    plugin.preload = path.join(dir, plugin.preload)
+  }
   const lang = language.get()
-  if (plugin.locales) {
-    const locale = plugin.locales[lang]
+  if (rawPlugin.locales) {
+    const locale = rawPlugin.locales[lang]
     if (locale) {
       extend(plugin, locale)
     }
   }
-  delete plugin.locales
 
   return plugin
 }

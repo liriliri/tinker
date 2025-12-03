@@ -17,7 +17,7 @@ export default observer(function PluginList() {
 
   return (
     <div className={Style.container}>
-      <LunaIconList icons={icons} size={48} />
+      <LunaIconList icons={icons} size={48} filter={store.filter} />
     </div>
   )
 })

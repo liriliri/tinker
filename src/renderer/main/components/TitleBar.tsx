@@ -3,6 +3,7 @@ import Style from './Titlebar.module.scss'
 import logo from '../../assets/logo.png'
 import { t } from 'common/util'
 import { useCallback } from 'react'
+import store from '../store'
 
 export default observer(function Titlebar() {
   const onMouseDown = useCallback((e: React.MouseEvent) => {
@@ -28,6 +29,8 @@ export default observer(function Titlebar() {
         className={Style.input}
         placeholder={t('searchTool')}
         autoFocus={true}
+        value={store.filter}
+        onChange={(e) => store.setFilter(e.target.value)}
       />
       <div className={Style.more}>
         <span className="icon-more" />
