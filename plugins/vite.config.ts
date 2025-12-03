@@ -12,10 +12,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
     base: '',
     plugins: [react()],
     build: {
-      outDir: path.join(cwd, 'dist/renderer'),
+      outDir: 'dist',
       rollupOptions: {
         input: {
-          app: path.join(cwd, 'index.html'),
+          app: 'index.html',
         },
       },
     },

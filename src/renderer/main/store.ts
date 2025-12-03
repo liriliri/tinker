@@ -21,7 +21,6 @@ class Store extends BaseStore {
   }
   private async init() {
     const plugins = await main.getPlugins()
-    console.log(plugins)
     runInAction(() => {
       this.plugins = plugins
     })

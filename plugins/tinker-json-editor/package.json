@@ -3,15 +3,14 @@
   "version": "0.1.0",
   "description": "JSON Editor Plugin for Tinker",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\"",
-    "dev:renderer": "vite --config ../vite.config.ts"
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "JSON Editor",
     "description": "A simple JSON editor with syntax highlighting and validation",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
-    "preload": "dist/preload/index.js",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "JSON 编辑器",

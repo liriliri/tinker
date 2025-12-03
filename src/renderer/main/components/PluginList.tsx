@@ -8,6 +8,7 @@ import { borderRadius } from 'common/theme'
 
 export default observer(function PluginList() {
   const icons = map(store.plugins, (plugin) => ({
+    id: plugin.id,
     src: fileUrl(plugin.icon),
     name: plugin.name,
     style: {
@@ -17,7 +18,14 @@ export default observer(function PluginList() {
 
   return (
     <div className={Style.container}>
-      <LunaIconList icons={icons} size={48} filter={store.filter} />
+      <LunaIconList
+        onClick={(e: any, icon) => {
+          main.openPlugin((icon.data as any).id)
+        }}
+        icons={icons}
+        size={48}
+        filter={store.filter}
+      />
     </div>
   )
 })

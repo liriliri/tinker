@@ -3,6 +3,7 @@ import { BrowserWindow, screen } from 'electron'
 import once from 'licia/once'
 import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
+import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 
 let win: BrowserWindow | null = null
 
@@ -24,8 +25,23 @@ export function showWin() {
   })
 
   win.on('close', () => {
-    win?.destroy()
+    if (win) {
+      const plugin = getAttachedPlugin(win)
+      if (plugin) {
+        closePlugin(plugin.id)
+      }
+      win.destroy()
+    }
     win = null
+  })
+
+  win.on('resize', () => {
+    if (win) {
+      const plugin = getAttachedPlugin(win)
+      if (plugin) {
+        layoutPlugin(plugin.id)
+      }
+    }
   })
 
   win.webContents.on('before-input-event', (event, input) => {
