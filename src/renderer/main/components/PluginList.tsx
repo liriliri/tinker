@@ -3,7 +3,7 @@ import store from '../store'
 import LunaIconList from 'luna-icon-list/react'
 import map from 'licia/map'
 import fileUrl from 'licia/fileUrl'
-import Style from './Plugin.module.scss'
+import Style from './PluginList.module.scss'
 
 export default observer(function PluginList() {
   const icons = map(store.plugins, (plugin) => ({
