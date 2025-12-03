@@ -10,7 +10,8 @@
     "name": "Markdown Editor",
     "description": "A simple Markdown editor with live preview and syntax highlighting",
     "icon": "icon.png",
-    "main": "index.html",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
         "name": "Markdown 编辑器",
