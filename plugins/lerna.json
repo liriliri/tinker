@@ -1,3 +1,4 @@
 {
-  "packages": ["image-compressor", "markdown-editor"]
+  "version": "1.0.0",
+  "packages": ["tinker-*"]
 }
