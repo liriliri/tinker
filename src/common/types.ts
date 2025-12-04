@@ -23,5 +23,6 @@ export interface IPlugin {
 
 export type IpcDragMain = (x: number, y: number) => void
 export type IpcGetPlugins = () => Promise<IPlugin[]>
-export type IpcOpenPlugin = (id: string) => void
+export type IpcOpenPlugin = (id: string) => Promise<boolean>
 export type IpcClosePlugin = (id: string) => void
+export type IpcDetachPlugin = IpcClosePlugin

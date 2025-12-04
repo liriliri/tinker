@@ -1,9 +1,11 @@
 import { IPlugin } from 'common/types'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
+import find from 'licia/find'
 
 class Store extends BaseStore {
   plugins: IPlugin[] = []
+  plugin: IPlugin | null = null
   filter = ''
   constructor() {
     super()
@@ -11,6 +13,7 @@ class Store extends BaseStore {
     makeObservable(this, {
       plugins: observable,
       filter: observable,
+      plugin: observable,
       setFilter: action,
     })
 
@@ -18,6 +21,38 @@ class Store extends BaseStore {
   }
   setFilter(filter: string) {
     this.filter = filter
+  }
+  openPlugin(id: string) {
+    const plugin = this.getPlugin(id)
+    if (!plugin) {
+      return
+    }
+
+    main.openPlugin(id).then((opened) => {
+      if (opened) {
+        runInAction(() => {
+          this.plugin = plugin
+          this.filter = plugin.name
+        })
+      }
+    })
+  }
+  closePlugin() {
+    if (!this.plugin) {
+      return
+    }
+    main.closePlugin(this.plugin.id)
+    this.plugin = null
+  }
+  detachPlugin() {
+    if (!this.plugin) {
+      return
+    }
+    main.detachPlugin(this.plugin.id)
+    this.plugin = null
+  }
+  private getPlugin(id: string) {
+    return find(this.plugins, (plugin) => plugin.id === id)
   }
   private async init() {
     const plugins = await main.getPlugins()

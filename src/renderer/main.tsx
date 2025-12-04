@@ -8,6 +8,7 @@ import 'share/renderer/luna.scss'
 import 'share/renderer/main.scss'
 import './icon.css'
 import { i18n } from 'common/util'
+import getUrlParam from 'licia/getUrlParam'
 
 const logger = log('renderer')
 logger.info('start')
@@ -18,11 +19,19 @@ function renderApp() {
   const container: HTMLElement = document.getElementById('app') as HTMLElement
 
   const App = lazy(() => import('./main/App.js') as Promise<any>)
-  const title = pkg.productName
+  let title = pkg.productName
+
+  const page = getUrlParam('page')
+
+  if (page === 'plugin') {
+    title = getUrlParam('title') || ''
+  }
 
   preload.setTitle(title)
 
-  createRoot(container).render(<App />)
+  if (page !== 'plugin') {
+    createRoot(container).render(<App />)
+  }
 }
 
 ;(async function () {

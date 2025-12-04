@@ -20,7 +20,7 @@ export default observer(function PluginList() {
     <div className={Style.container}>
       <LunaIconList
         onClick={(e: any, icon) => {
-          main.openPlugin((icon.data as any).id)
+          store.openPlugin((icon.data as any).id)
         }}
         icons={icons}
         size={48}

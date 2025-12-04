@@ -4,7 +4,9 @@
   "description": "Image Compressor Plugin for Tinker",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\"",
-    "dev:renderer": "vite --config ../vite.config.ts"
+    "dev:renderer": "vite --config ../vite.config.ts",
+    "build": "concurrently \"npm run build:renderer\"",
+    "build:renderer": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Image Compressor",

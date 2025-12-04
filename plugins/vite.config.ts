@@ -12,7 +12,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     base: '',
     plugins: [react()],
     build: {
-      outDir: 'dist',
+      outDir: pkg.tinker.main.replace('/index.html', ''),
       rollupOptions: {
         input: {
           app: 'index.html',

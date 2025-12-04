@@ -11,7 +11,10 @@ const logger = log('main')
 logger.info('start', process.argv)
 
 window.setDefaultOptions({
-  customTitlebar: false,
+  minWidth: 800,
+  minHeight: 600,
+  width: 800,
+  height: 600,
 })
 
 app.on('ready', () => {

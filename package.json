@@ -44,6 +44,7 @@
     "fs-extra": "^11.3.0",
     "licia": "^1.48.0",
     "luna-icon-list": "^0.2.6",
+    "luna-menu": "^0.2.0",
     "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",
     "react": "^19.1.1",

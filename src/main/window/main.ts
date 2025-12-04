@@ -17,10 +17,6 @@ export function showWin() {
 
   win = window.create({
     name: 'main',
-    minWidth: 800,
-    minHeight: 600,
-    width: 800,
-    height: 600,
     titlebar: false,
   })
 

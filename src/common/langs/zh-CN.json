@@ -1,5 +1,7 @@
 {
   "quitTinker": "退出 Tinker",
   "searchTool": "搜索工具",
-  "show": "显示"
+  "show": "显示",
+  "close": "关闭",
+  "detachWin": "分离窗口"
 }

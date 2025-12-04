@@ -1,5 +1,6 @@
 import {
   IpcClosePlugin,
+  IpcDetachPlugin,
   IpcDragMain,
   IpcGetPlugins,
   IpcOpenPlugin,
@@ -12,4 +13,5 @@ export default Object.assign(mainObj, {
   getPlugins: invoke<IpcGetPlugins>('getPlugins'),
   openPlugin: invoke<IpcOpenPlugin>('openPlugin'),
   closePlugin: invoke<IpcClosePlugin>('closePlugin'),
+  detachPlugin: invoke<IpcDetachPlugin>('detachPlugin'),
 })
