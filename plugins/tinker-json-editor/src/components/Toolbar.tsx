@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react-lite'
 import {
   AlignJustify,
   ChevronsLeft,
@@ -6,28 +7,9 @@ import {
   FileText,
   Network,
 } from 'lucide-react'
+import store from '../store'
 
-type EditorMode = 'text' | 'tree'
-
-interface ToolbarProps {
-  onFormat: () => void
-  onMinify: () => void
-  onCopy: () => void
-  onClear: () => void
-  disabled: boolean
-  mode: EditorMode
-  onModeChange: (mode: EditorMode) => void
-}
-
-export default function Toolbar({
-  onFormat,
-  onMinify,
-  onCopy,
-  onClear,
-  disabled,
-  mode,
-  onModeChange,
-}: ToolbarProps) {
+export default observer(function Toolbar() {
   const iconSize = 18
 
   const baseButtonClass = 'p-2 rounded transition-colors'
@@ -42,16 +24,16 @@ export default function Toolbar({
   return (
     <div className="bg-gray-100 border-b border-gray-300 px-2 py-1 flex gap-1">
       <button
-        onClick={() => onModeChange('text')}
-        className={getModeButtonClass(mode === 'text')}
+        onClick={() => store.setMode('text')}
+        className={getModeButtonClass(store.mode === 'text')}
         title="Text Mode"
       >
         <FileText size={iconSize} />
       </button>
 
       <button
-        onClick={() => onModeChange('tree')}
-        className={getModeButtonClass(mode === 'tree')}
+        onClick={() => store.setMode('tree')}
+        className={getModeButtonClass(store.mode === 'tree')}
         title="Tree Mode"
       >
         <Network size={iconSize} />
@@ -60,8 +42,8 @@ export default function Toolbar({
       <div className="w-px bg-gray-300 mx-1" />
 
       <button
-        onClick={onFormat}
-        disabled={disabled || mode === 'tree'}
+        onClick={() => store.formatJson()}
+        disabled={store.isEmpty || store.mode === 'tree'}
         className={actionButtonClass}
         title="Format JSON"
       >
@@ -69,8 +51,8 @@ export default function Toolbar({
       </button>
 
       <button
-        onClick={onMinify}
-        disabled={disabled || mode === 'tree'}
+        onClick={() => store.minifyJson()}
+        disabled={store.isEmpty || store.mode === 'tree'}
         className={actionButtonClass}
         title="Minify JSON"
       >
@@ -80,8 +62,8 @@ export default function Toolbar({
       <div className="w-px bg-gray-300 mx-1" />
 
       <button
-        onClick={onCopy}
-        disabled={disabled}
+        onClick={() => store.copyToClipboard()}
+        disabled={store.isEmpty}
         className={actionButtonClass}
         title="Copy to clipboard"
       >
@@ -89,8 +71,8 @@ export default function Toolbar({
       </button>
 
       <button
-        onClick={onClear}
-        disabled={disabled}
+        onClick={() => store.clearJson()}
+        disabled={store.isEmpty}
         className={actionButtonClass}
         title="Clear all"
       >
@@ -98,4 +80,4 @@ export default function Toolbar({
       </button>
     </div>
   )
-}
+})

@@ -1,34 +1,22 @@
+import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
+import store from '../store'
 
-interface TextEditorProps {
-  value: string
-  onChange?: (value: string) => void
-  readOnly?: boolean
-  language?: string
-  className?: string
-}
-
-export default function TextEditor({
-  value,
-  onChange,
-  readOnly = false,
-  language = 'json',
-  className = '',
-}: TextEditorProps) {
+export default observer(function TextEditor() {
   const handleEditorChange = (value: string | undefined) => {
-    if (onChange && value !== undefined) {
-      onChange(value)
+    if (value !== undefined) {
+      store.setJsonInput(value)
     }
   }
 
   return (
-    <div className={className}>
+    <div className="h-full w-full">
       <Editor
-        value={value}
-        language={language}
+        value={store.jsonInput}
+        language="json"
         onChange={handleEditorChange}
         options={{
-          readOnly,
+          readOnly: false,
           minimap: { enabled: false },
           fontSize: 14,
           lineNumbers: 'on',
@@ -43,4 +31,4 @@ export default function TextEditor({
       />
     </div>
   )
-}
+})

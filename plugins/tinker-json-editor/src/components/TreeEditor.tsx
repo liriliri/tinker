@@ -1,18 +1,10 @@
 import { useEffect, useRef } from 'react'
+import { observer } from 'mobx-react-lite'
 import JSONEditor, { JSONEditorOptions } from 'jsoneditor'
 import 'jsoneditor/dist/jsoneditor.css'
+import store from '../store'
 
-interface TreeEditorProps {
-  value: string
-  onChange?: (value: string) => void
-  readOnly?: boolean
-}
-
-export default function TreeEditor({
-  value,
-  onChange,
-  readOnly = false,
-}: TreeEditorProps) {
+export default observer(function TreeEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<JSONEditor | null>(null)
 
@@ -26,9 +18,7 @@ export default function TreeEditor({
       navigationBar: false,
       statusBar: false,
       onChangeText: (jsonString: string) => {
-        if (onChange && !readOnly) {
-          onChange(jsonString)
-        }
+        store.setJsonInput(jsonString)
       },
     }
 
@@ -36,7 +26,7 @@ export default function TreeEditor({
 
     // Set initial value
     try {
-      const json = value ? JSON.parse(value) : {}
+      const json = store.jsonInput ? JSON.parse(store.jsonInput) : {}
       editorRef.current.set(json)
     } catch (err) {
       console.error('Invalid JSON:', err)
@@ -52,9 +42,9 @@ export default function TreeEditor({
 
   // Update editor when value changes externally
   useEffect(() => {
-    if (editorRef.current && value) {
+    if (editorRef.current && store.jsonInput) {
       try {
-        const json = JSON.parse(value)
+        const json = JSON.parse(store.jsonInput)
         const currentJson = editorRef.current.get()
 
         // Only update if content is different to avoid cursor jumps
@@ -65,7 +55,7 @@ export default function TreeEditor({
         console.error('Invalid JSON:', err)
       }
     }
-  }, [value])
+  }, [store.jsonInput])
 
   return (
     <div
@@ -76,4 +66,4 @@ export default function TreeEditor({
       }}
     />
   )
-}
+})
