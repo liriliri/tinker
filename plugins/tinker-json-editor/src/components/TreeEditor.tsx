@@ -44,9 +44,9 @@ export default observer(function TreeEditor() {
 
   // Update editor when value changes externally
   useEffect(() => {
-    if (editorRef.current && store.jsonInput) {
+    if (editorRef.current) {
       try {
-        const json = JSON.parse(store.jsonInput)
+        const json = store.jsonInput ? JSON.parse(store.jsonInput) : {}
         const currentJson = editorRef.current.get()
 
         // Only update if content is different to avoid cursor jumps
