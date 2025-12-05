@@ -54,8 +54,10 @@ class Store extends BaseStore {
     if (!this.plugin) {
       return
     }
-    main.detachPlugin(this.plugin.id)
-    this.plugin = null
+    main.detachPlugin(this.plugin.id).then(() => {
+      this.plugin = null
+      main.closeWin()
+    })
   }
   togglePluginDevtools() {
     if (!this.plugin) {
