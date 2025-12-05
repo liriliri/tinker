@@ -10,9 +10,12 @@ export default defineConfig({
   build: {
     outDir: 'dist/preload',
     lib: {
-      entry: resolve(__dirname, 'src/preload/index.ts'),
+      entry: [
+        resolve(__dirname, 'src/preload/index.ts'),
+        resolve(__dirname, 'src/preload/plugin.ts'),
+      ],
       name: 'Main',
-      fileName: 'index',
+      fileName: (format, entryName) => `${entryName}.js`,
       formats: ['cjs'],
     },
     rollupOptions: {

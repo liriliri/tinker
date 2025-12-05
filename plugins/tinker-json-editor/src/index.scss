@@ -1,0 +1,90 @@
+@use 'tailwindcss';
+
+/* Remove jsoneditor border */
+.jsoneditor-react-container {
+  .jsoneditor,
+  .jsoneditor-outer {
+    border: none !important;
+  }
+
+  /* Dark mode styles for jsoneditor */
+  :is(.dark *) & {
+    .jsoneditor,
+    .jsoneditor-outer,
+    .jsoneditor-tree {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+    }
+
+    .jsoneditor-menu {
+      background-color: #2d2d2d;
+      border-bottom-color: #3e3e3e;
+    }
+
+    div.jsoneditor-tree button.jsoneditor-button {
+      background-color: #2d2d2d;
+
+      &:hover {
+        background-color: #3e3e3e;
+      }
+    }
+
+    .jsoneditor-field,
+    .jsoneditor-value {
+      color: #d4d4d4;
+
+      &[contenteditable='true'] {
+        &:focus,
+        &:hover {
+          background-color: #2d2d2d;
+          border-color: #3e3e3e;
+        }
+      }
+    }
+
+    .jsoneditor-string {
+      color: #ce9178;
+    }
+
+    .jsoneditor-number {
+      color: #b5cea8;
+    }
+
+    .jsoneditor-boolean,
+    .jsoneditor-null {
+      color: #569cd6;
+    }
+
+    .jsoneditor-separator {
+      color: #d4d4d4;
+    }
+
+    .jsoneditor-contextmenu {
+      background-color: #2d2d2d;
+      border-color: #3e3e3e;
+
+      ul li button {
+        color: #d4d4d4;
+        background-color: #2d2d2d;
+
+        &:hover,
+        &:focus {
+          background-color: #3e3e3e;
+          color: #fff;
+        }
+      }
+    }
+
+    div.jsoneditor-tree button.jsoneditor-expand {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23d4d4d4' d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+    }
+
+    tr.jsoneditor-selected {
+      background-color: #2d2d2d;
+
+      .jsoneditor-tree-editor {
+        background-color: #2d2d2d;
+      }
+    }
+  }
+}

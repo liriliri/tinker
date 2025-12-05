@@ -98,8 +98,9 @@ const openPlugin: IpcOpenPlugin = async function (id) {
 
   const pluginView = new WebContentsView({
     webPreferences: {
-      preload: plugin.preload,
+      preload: path.join(__dirname, '../preload/plugin.js'),
       partition: `persist:${id}`,
+      sandbox: false,
     },
   })
   pluginViews[id] = {
@@ -127,6 +128,7 @@ function updatePluginTheme(id: string) {
     return
   }
 
+  view.webContents.send('changeTheme')
   view.setBackgroundColor(
     theme.get() === 'dark' ? colorBgContainerDark : colorBgContainer
   )

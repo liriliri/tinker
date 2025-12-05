@@ -19,5 +19,12 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern',
+        },
+      },
+    },
   }
 })

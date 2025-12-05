@@ -60,7 +60,7 @@ export default observer(function TreeEditor() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full jsoneditor-react-container"
+      className="w-full h-full jsoneditor-react-container dark:dark-mode"
       style={{
         border: 'none',
       }}

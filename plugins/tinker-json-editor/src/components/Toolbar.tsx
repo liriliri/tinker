@@ -13,16 +13,16 @@ export default observer(function Toolbar() {
   const iconSize = 18
 
   const baseButtonClass = 'p-2 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed`
+  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed`
   const getModeButtonClass = (isActive: boolean) =>
     `${baseButtonClass} ${
       isActive
         ? 'bg-blue-500 text-white hover:bg-blue-600'
-        : 'hover:bg-gray-200'
+        : 'hover:bg-gray-200 dark:hover:bg-gray-700'
     }`
 
   return (
-    <div className="bg-gray-100 border-b border-gray-300 px-2 py-1 flex gap-1">
+    <div className="bg-gray-100 dark:bg-[#2d2d2d] border-b border-gray-300 dark:border-gray-700 dark:text-gray-200 px-2 py-1 flex gap-1">
       <button
         onClick={() => store.setMode('text')}
         className={getModeButtonClass(store.mode === 'text')}
