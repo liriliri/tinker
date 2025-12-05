@@ -17,5 +17,10 @@
         "description": "JSON 编辑器，支持语法高亮和校验"
       }
     }
+  },
+  "devDependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@types/jsoneditor": "^9.9.6",
+    "jsoneditor": "^10.4.2"
   }
 }

@@ -1,1 +1,10 @@
 @import 'tailwindcss';
+
+/* Remove jsoneditor border */
+.jsoneditor-react-container .jsoneditor {
+  border: none !important;
+}
+
+.jsoneditor-react-container .jsoneditor-outer {
+  border: none !important;
+}

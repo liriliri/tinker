@@ -8,6 +8,7 @@
     "@tailwindcss/postcss": "^4.1.17",
     "autoprefixer": "^10.4.22",
     "lerna": "^8.2.4",
+    "lucide-react": "^0.555.0",
     "postcss": "^8.5.6"
   }
 }

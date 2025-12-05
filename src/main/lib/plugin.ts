@@ -99,6 +99,7 @@ const openPlugin: IpcOpenPlugin = async function (id) {
   const pluginView = new WebContentsView({
     webPreferences: {
       preload: plugin.preload,
+      partition: `persist:${id}`,
     },
   })
   pluginViews[id] = {
