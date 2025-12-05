@@ -3,6 +3,7 @@ import {
   IpcDetachPlugin,
   IpcGetPlugins,
   IpcOpenPlugin,
+  IpcReopenPlugin,
   IpcTogglePluginDevtools,
   IPlugin,
   IRawPlugin,
@@ -122,6 +123,15 @@ const openPlugin: IpcOpenPlugin = async function (id) {
   return true
 }
 
+const reopenPlugin: IpcReopenPlugin = async function (id) {
+  const { view } = pluginViews[id]
+  if (!view) {
+    return
+  }
+
+  await view.webContents.reload()
+}
+
 theme.on('change', () => {
   each(pluginViews, (_, id) => {
     updatePluginTheme(id)
@@ -211,6 +221,7 @@ const togglePluginDevtools: IpcTogglePluginDevtools = function (id) {
 export function init() {
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
+  handleEvent('reopenPlugin', reopenPlugin)
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
   handleEvent('togglePluginDevtools', togglePluginDevtools)

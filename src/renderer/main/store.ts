@@ -37,6 +37,12 @@ class Store extends BaseStore {
       }
     })
   }
+  reopenPlugin() {
+    if (!this.plugin) {
+      return
+    }
+    main.reopenPlugin(this.plugin.id)
+  }
   closePlugin() {
     if (!this.plugin) {
       return

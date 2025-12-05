@@ -40,6 +40,12 @@ export default observer(function Titlebar() {
           },
         },
         {
+          label: t('reopen'),
+          click() {
+            store.reopenPlugin()
+          },
+        },
+        {
           label: t('toggleDevtools'),
           click() {
             store.togglePluginDevtools()
