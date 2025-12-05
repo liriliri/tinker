@@ -51,6 +51,12 @@ class Store extends BaseStore {
     main.detachPlugin(this.plugin.id)
     this.plugin = null
   }
+  togglePluginDevtools() {
+    if (!this.plugin) {
+      return
+    }
+    main.togglePluginDevtools(this.plugin.id)
+  }
   private getPlugin(id: string) {
     return find(this.plugins, (plugin) => plugin.id === id)
   }

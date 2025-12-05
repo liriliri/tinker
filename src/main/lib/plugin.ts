@@ -3,6 +3,7 @@ import {
   IpcDetachPlugin,
   IpcGetPlugins,
   IpcOpenPlugin,
+  IpcTogglePluginDevtools,
   IPlugin,
   IRawPlugin,
 } from 'common/types'
@@ -185,9 +186,23 @@ export function layoutPlugin(id: string) {
   })
 }
 
+const togglePluginDevtools: IpcTogglePluginDevtools = function (id) {
+  const { view } = pluginViews[id]
+  if (!view) {
+    return
+  }
+
+  if (view.webContents.isDevToolsOpened()) {
+    view.webContents.closeDevTools()
+  } else {
+    view.webContents.openDevTools({ mode: 'detach' })
+  }
+}
+
 export function init() {
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
+  handleEvent('togglePluginDevtools', togglePluginDevtools)
 }

@@ -4,6 +4,7 @@ import {
   IpcDragMain,
   IpcGetPlugins,
   IpcOpenPlugin,
+  IpcTogglePluginDevtools,
 } from 'common/types'
 import mainObj from 'share/preload/main'
 import { invoke } from 'share/preload/util'
@@ -14,4 +15,5 @@ export default Object.assign(mainObj, {
   openPlugin: invoke<IpcOpenPlugin>('openPlugin'),
   closePlugin: invoke<IpcClosePlugin>('closePlugin'),
   detachPlugin: invoke<IpcDetachPlugin>('detachPlugin'),
+  togglePluginDevtools: invoke<IpcTogglePluginDevtools>('togglePluginDevtools'),
 })

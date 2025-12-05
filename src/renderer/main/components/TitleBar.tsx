@@ -40,6 +40,12 @@ export default observer(function Titlebar() {
           },
         },
         {
+          label: t('toggleDevtools'),
+          click() {
+            store.togglePluginDevtools()
+          },
+        },
+        {
           type: 'separator',
         }
       )

@@ -1,10 +1,13 @@
 {
   "name": "tinker-plugins",
   "scripts": {
-    "format": "lsla prettier \"tinker-*/src/**/*.{ts,tsx,json}\" \"*.{js,ts,json}\" --write",
+    "format": "lsla prettier \"tinker-*/src/**/*.{ts,tsx,json,css}\" \"*.{js,ts,json}\" --write",
     "build": "lerna run build"
   },
   "devDependencies": {
-    "lerna": "^8.2.4"
+    "@tailwindcss/postcss": "^4.1.17",
+    "autoprefixer": "^10.4.22",
+    "lerna": "^8.2.4",
+    "postcss": "^8.5.6"
   }
 }

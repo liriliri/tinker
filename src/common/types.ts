@@ -26,3 +26,4 @@ export type IpcGetPlugins = () => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string) => Promise<boolean>
 export type IpcClosePlugin = (id: string) => void
 export type IpcDetachPlugin = IpcClosePlugin
+export type IpcTogglePluginDevtools = IpcClosePlugin
