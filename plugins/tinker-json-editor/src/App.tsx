@@ -13,7 +13,7 @@ const App = observer(() => {
       <Toolbar />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden bg-white dark:bg-[#1e1e1e]">
         {store.mode === 'text' ? (
           <TextEditor isDark={isDark} />
         ) : (

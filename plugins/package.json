@@ -1,7 +1,7 @@
 {
   "name": "tinker-plugins",
   "scripts": {
-    "format": "lsla prettier \"tinker-*/src/**/*.{ts,tsx,json,css}\" \"*.{js,ts,json}\" --write",
+    "format": "lsla prettier \"tinker-*/src/**/*.{ts,tsx,json,scss}\" \"*.{js,ts,json}\" --write",
     "build": "lerna run build"
   },
   "devDependencies": {

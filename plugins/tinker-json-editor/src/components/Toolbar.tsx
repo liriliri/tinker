@@ -1,17 +1,17 @@
 import { observer } from 'mobx-react-lite'
 import {
   AlignJustify,
-  ChevronsLeft,
   Copy,
   Trash2,
   FileText,
   Network,
-  ChevronDown,
-  ChevronRight,
   Undo,
   Redo,
 } from 'lucide-react'
 import store from '../store'
+import ExpandIcon from '../assets/expand.svg?react'
+import CollapseIcon from '../assets/collapse.svg?react'
+import MinifyIcon from '../assets/minify.svg?react'
 
 export default observer(function Toolbar() {
   const iconSize = 14
@@ -82,7 +82,11 @@ export default observer(function Toolbar() {
             className={actionButtonClass}
             title="Minify JSON"
           >
-            <ChevronsLeft size={iconSize} />
+            <MinifyIcon
+              width={iconSize}
+              height={iconSize}
+              className="fill-current"
+            />
           </button>
         </>
       ) : (
@@ -93,7 +97,11 @@ export default observer(function Toolbar() {
             className={actionButtonClass}
             title="Expand All"
           >
-            <ChevronDown size={iconSize} />
+            <ExpandIcon
+              width={iconSize}
+              height={iconSize}
+              className="fill-current"
+            />
           </button>
 
           <button
@@ -102,7 +110,11 @@ export default observer(function Toolbar() {
             className={actionButtonClass}
             title="Collapse All"
           >
-            <ChevronRight size={iconSize} />
+            <CollapseIcon
+              width={iconSize}
+              height={iconSize}
+              className="fill-current"
+            />
           </button>
         </>
       )}

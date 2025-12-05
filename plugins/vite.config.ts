@@ -1,6 +1,7 @@
 import { defineConfig, UserConfig } from 'vite'
 import path from 'path'
 import react from '@vitejs/plugin-react'
+import svgr from 'vite-plugin-svgr'
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const cwd = process.cwd()
@@ -10,7 +11,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
   return {
     root: cwd,
     base: '',
-    plugins: [react()],
+    plugins: [react(), svgr()],
     build: {
       outDir: pkg.tinker.main.replace('/index.html', ''),
       rollupOptions: {
