@@ -12,20 +12,20 @@
     .jsoneditor,
     .jsoneditor-outer,
     .jsoneditor-tree {
-      background-color: #1e1e1e;
+      background-color: #303133;
       color: #d4d4d4;
     }
 
     .jsoneditor-menu {
-      background-color: #2d2d2d;
-      border-bottom-color: #3e3e3e;
+      background-color: #303133;
+      border-bottom-color: #4a4a4a;
     }
 
     div.jsoneditor-tree button.jsoneditor-button {
-      background-color: #2d2d2d;
+      background-color: #303133;
 
       &:hover {
-        background-color: #3e3e3e;
+        background-color: #3a3a3c;
       }
     }
 
@@ -36,8 +36,8 @@
       &[contenteditable='true'] {
         &:focus,
         &:hover {
-          background-color: #2d2d2d;
-          border-color: #3e3e3e;
+          background-color: #303133;
+          border-color: #4a4a4a;
         }
       }
     }
@@ -60,16 +60,16 @@
     }
 
     .jsoneditor-contextmenu {
-      background-color: #2d2d2d;
-      border-color: #3e3e3e;
+      background-color: #303133;
+      border-color: #181818;
 
       ul li button {
         color: #d4d4d4;
-        background-color: #2d2d2d;
+        background-color: #303133;
 
         &:hover,
         &:focus {
-          background-color: #3e3e3e;
+          background-color: #3a3a3c;
           color: #fff;
         }
       }
@@ -80,10 +80,10 @@
     }
 
     tr.jsoneditor-selected {
-      background-color: #2d2d2d;
+      background-color: #3a3a3c;
 
       .jsoneditor-tree-editor {
-        background-color: #2d2d2d;
+        background-color: #3a3a3c;
       }
     }
   }

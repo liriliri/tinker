@@ -23,6 +23,7 @@ export default observer(function TreeEditor() {
     }
 
     editorRef.current = new JSONEditor(containerRef.current, options)
+    store.setTreeEditorInstance(editorRef.current)
 
     // Set initial value
     try {
@@ -36,6 +37,7 @@ export default observer(function TreeEditor() {
       if (editorRef.current) {
         editorRef.current.destroy()
         editorRef.current = null
+        store.setTreeEditorInstance(null)
       }
     }
   }, [])

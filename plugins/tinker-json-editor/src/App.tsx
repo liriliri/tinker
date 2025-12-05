@@ -9,7 +9,7 @@ const App = observer(() => {
   const isDark = useDarkMode()
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-[#1e1e1e]">
+    <div className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133]">
       <Toolbar />
 
       {/* Main Content */}

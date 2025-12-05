@@ -63,7 +63,9 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     preload: rawPlugin.preload,
   }
   plugin.icon = path.join(dir, plugin.icon)
-  plugin.main = path.join(dir, plugin.main)
+  if (!startWith(plugin.main, 'http')) {
+    plugin.main = path.join(dir, plugin.main)
+  }
   if (plugin.preload) {
     plugin.preload = path.join(dir, plugin.preload)
   }
@@ -108,7 +110,11 @@ const openPlugin: IpcOpenPlugin = async function (id) {
     win,
   }
   updatePluginTheme(id)
-  await pluginView.webContents.loadFile(plugin.main)
+  if (startWith(plugin.main, 'http')) {
+    await pluginView.webContents.loadURL(plugin.main)
+  } else {
+    await pluginView.webContents.loadFile(plugin.main)
+  }
 
   win.contentView.addChildView(pluginView)
   layoutPlugin(id)
