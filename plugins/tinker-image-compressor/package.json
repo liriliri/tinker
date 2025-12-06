@@ -10,14 +10,12 @@
   },
   "tinker": {
     "name": "Image Compressor",
-    "description": "An image compressor with support for multiple formats",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "图片压缩",
-        "description": "图片压缩工具，支持多种格式"
+        "name": "图片压缩"
       }
     }
   }

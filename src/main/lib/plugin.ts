@@ -58,7 +58,6 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
   const plugin: IPlugin = {
     id: pkg.name,
     name: rawPlugin.name,
-    description: rawPlugin.description,
     icon: rawPlugin.icon,
     main: rawPlugin.main,
     preload: rawPlugin.preload,

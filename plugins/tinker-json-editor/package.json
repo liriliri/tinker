@@ -8,13 +8,11 @@
   },
   "tinker": {
     "name": "JSON Editor",
-    "description": "A simple JSON editor with syntax highlighting and validation",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "JSON 编辑器",
-        "description": "JSON 编辑器，支持语法高亮和校验"
+        "name": "JSON 编辑器"
       }
     }
   },
