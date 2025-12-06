@@ -4,11 +4,8 @@ import TextEditor from './components/TextEditor'
 import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
 import store from './store'
-import { useDarkMode } from './hooks/useDarkMode'
 
 const App = observer(() => {
-  const isDark = useDarkMode()
-
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault()
@@ -53,11 +50,7 @@ const App = observer(() => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden bg-white dark:bg-[#1e1e1e]">
-        {store.mode === 'text' ? (
-          <TextEditor isDark={isDark} />
-        ) : (
-          <TreeEditor />
-        )}
+        {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
       </div>
     </div>
   )

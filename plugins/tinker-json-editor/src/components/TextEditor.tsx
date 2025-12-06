@@ -2,11 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
 import store from '../store'
 
-interface TextEditorProps {
-  isDark: boolean
-}
-
-export default observer(function TextEditor({ isDark }: TextEditorProps) {
+export default observer(function TextEditor() {
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       store.setJsonInput(value)
@@ -31,7 +27,7 @@ export default observer(function TextEditor({ isDark }: TextEditorProps) {
           formatOnPaste: true,
           formatOnType: true,
         }}
-        theme={isDark ? 'vs-dark' : 'vs'}
+        theme={store.isDark ? 'vs-dark' : 'vs'}
       />
     </div>
   )

@@ -13,10 +13,12 @@ class Store {
   history: string[] = []
   historyIndex: number = -1
   isUndoRedo: boolean = false
+  isDark: boolean = false
 
   constructor() {
     makeAutoObservable(this)
     this.loadFromStorage()
+    this.initTheme()
   }
 
   get isEmpty() {
@@ -29,6 +31,25 @@ class Store {
 
   get canRedo() {
     return this.historyIndex < this.history.length - 1
+  }
+
+  setIsDark(isDark: boolean) {
+    this.isDark = isDark
+  }
+
+  private async initTheme() {
+    try {
+      const theme = await tinker.getTheme()
+      this.isDark = theme === 'dark'
+
+      // Listen for theme changes
+      tinker.on('changeTheme', async () => {
+        const newTheme = await tinker.getTheme()
+        this.setIsDark(newTheme === 'dark')
+      })
+    } catch (err) {
+      console.error('Failed to initialize theme:', err)
+    }
   }
 
   private loadFromStorage() {
