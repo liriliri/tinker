@@ -1,0 +1,12 @@
+{
+  "editMode": "Edit Mode",
+  "diffMode": "Diff Mode",
+  "original": "Original",
+  "modified": "Modified",
+  "undo": "Undo",
+  "redo": "Redo",
+  "swap": "Swap texts",
+  "copy": "Copy to clipboard",
+  "paste": "Paste from clipboard",
+  "clear": "Clear all"
+}

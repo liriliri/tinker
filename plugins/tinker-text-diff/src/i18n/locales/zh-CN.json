@@ -1,0 +1,12 @@
+{
+  "editMode": "编辑模式",
+  "diffMode": "对比模式",
+  "original": "原始文本",
+  "modified": "修改后",
+  "undo": "撤销",
+  "redo": "重做",
+  "swap": "交换文本",
+  "copy": "复制到剪贴板",
+  "paste": "从剪贴板粘贴",
+  "clear": "清空"
+}
