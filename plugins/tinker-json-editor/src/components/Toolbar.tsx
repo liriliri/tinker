@@ -8,12 +8,14 @@ import {
   Undo,
   Redo,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import store from '../store'
 import ExpandIcon from '../assets/expand.svg?react'
 import CollapseIcon from '../assets/collapse.svg?react'
 import MinifyIcon from '../assets/minify.svg?react'
 
 export default observer(function Toolbar() {
+  const { t } = useTranslation()
   const iconSize = 14
 
   const baseButtonClass = 'p-1.5 rounded transition-colors'
@@ -30,7 +32,7 @@ export default observer(function Toolbar() {
       <button
         onClick={() => store.setMode('text')}
         className={getModeButtonClass(store.mode === 'text')}
-        title="Text Mode"
+        title={t('textMode')}
       >
         <FileText size={iconSize} />
       </button>
@@ -38,7 +40,7 @@ export default observer(function Toolbar() {
       <button
         onClick={() => store.setMode('tree')}
         className={getModeButtonClass(store.mode === 'tree')}
-        title="Tree Mode"
+        title={t('treeMode')}
       >
         <Network size={iconSize} />
       </button>
@@ -49,7 +51,7 @@ export default observer(function Toolbar() {
         onClick={() => store.undo()}
         disabled={!store.canUndo}
         className={actionButtonClass}
-        title="Undo"
+        title={t('undo')}
       >
         <Undo size={iconSize} />
       </button>
@@ -58,7 +60,7 @@ export default observer(function Toolbar() {
         onClick={() => store.redo()}
         disabled={!store.canRedo}
         className={actionButtonClass}
-        title="Redo"
+        title={t('redo')}
       >
         <Redo size={iconSize} />
       </button>
@@ -71,7 +73,7 @@ export default observer(function Toolbar() {
             onClick={() => store.formatJson()}
             disabled={store.isEmpty}
             className={actionButtonClass}
-            title="Format JSON"
+            title={t('format')}
           >
             <AlignJustify size={iconSize} />
           </button>
@@ -80,7 +82,7 @@ export default observer(function Toolbar() {
             onClick={() => store.minifyJson()}
             disabled={store.isEmpty}
             className={actionButtonClass}
-            title="Minify JSON"
+            title={t('minify')}
           >
             <MinifyIcon
               width={iconSize}
@@ -95,7 +97,7 @@ export default observer(function Toolbar() {
             onClick={() => store.expandAll()}
             disabled={store.isEmpty}
             className={actionButtonClass}
-            title="Expand All"
+            title={t('expandAll')}
           >
             <ExpandIcon
               width={iconSize}
@@ -108,7 +110,7 @@ export default observer(function Toolbar() {
             onClick={() => store.collapseAll()}
             disabled={store.isEmpty}
             className={actionButtonClass}
-            title="Collapse All"
+            title={t('collapseAll')}
           >
             <CollapseIcon
               width={iconSize}
@@ -125,7 +127,7 @@ export default observer(function Toolbar() {
         onClick={() => store.copyToClipboard()}
         disabled={store.isEmpty}
         className={actionButtonClass}
-        title="Copy to clipboard"
+        title={t('copy')}
       >
         <Copy size={iconSize} />
       </button>
@@ -134,7 +136,7 @@ export default observer(function Toolbar() {
         onClick={() => store.clearJson()}
         disabled={store.isEmpty}
         className={actionButtonClass}
-        title="Clear all"
+        title={t('clear')}
       >
         <Trash2 size={iconSize} />
       </button>

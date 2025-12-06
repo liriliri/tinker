@@ -20,6 +20,13 @@ export default observer(function TreeEditor() {
       onChangeText: (jsonString: string) => {
         store.setJsonInput(jsonString)
       },
+      onCreateMenu: (items) => {
+        return items.filter(
+          (item) =>
+            item.className !== 'jsoneditor-sort-asc' &&
+            item.className !== 'jsoneditor-transform'
+        )
+      },
     }
 
     editorRef.current = new JSONEditor(containerRef.current, options)

@@ -1,0 +1,12 @@
+{
+  "textMode": "Text Mode",
+  "treeMode": "Tree Mode",
+  "undo": "Undo",
+  "redo": "Redo",
+  "format": "Format JSON",
+  "minify": "Minify JSON",
+  "expandAll": "Expand All",
+  "collapseAll": "Collapse All",
+  "copy": "Copy to clipboard",
+  "clear": "Clear all"
+}

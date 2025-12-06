@@ -17,6 +17,7 @@ async function updateTheme() {
 
 const tinkerObj = {
   getTheme: mainObj.getTheme,
+  getLanguage: mainObj.getLanguage,
   on: mainObj.on,
 }
 

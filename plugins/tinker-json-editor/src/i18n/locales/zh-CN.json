@@ -1,0 +1,12 @@
+{
+  "textMode": "文本模式",
+  "treeMode": "树形模式",
+  "undo": "撤销",
+  "redo": "重做",
+  "format": "格式化 JSON",
+  "minify": "压缩 JSON",
+  "expandAll": "全部展开",
+  "collapseAll": "全部折叠",
+  "copy": "复制到剪贴板",
+  "clear": "清空"
+}
