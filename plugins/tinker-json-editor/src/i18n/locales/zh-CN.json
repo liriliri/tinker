@@ -8,5 +8,6 @@
   "expandAll": "全部展开",
   "collapseAll": "全部折叠",
   "copy": "复制到剪贴板",
+  "paste": "从剪贴板粘贴",
   "clear": "清空"
 }

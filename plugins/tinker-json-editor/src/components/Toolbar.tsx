@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import {
   AlignJustify,
   Copy,
+  Clipboard,
   Trash2,
   FileText,
   Network,
@@ -130,6 +131,14 @@ export default observer(function Toolbar() {
         title={t('copy')}
       >
         <Copy size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.pasteFromClipboard()}
+        className={actionButtonClass}
+        title={t('paste')}
+      >
+        <Clipboard size={iconSize} />
       </button>
 
       <button

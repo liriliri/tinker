@@ -103,6 +103,15 @@ class Store {
     }
   }
 
+  async pasteFromClipboard() {
+    try {
+      const text = await navigator.clipboard.readText()
+      this.setJsonInput(text)
+    } catch (err) {
+      console.error('Failed to paste:', err)
+    }
+  }
+
   clearJson() {
     this.setJsonInput('')
   }

@@ -8,5 +8,6 @@
   "expandAll": "Expand All",
   "collapseAll": "Collapse All",
   "copy": "Copy to clipboard",
+  "paste": "Paste from clipboard",
   "clear": "Clear all"
 }

@@ -18,10 +18,11 @@ export function useDarkMode() {
       setIsDark(theme === 'dark')
     }
 
-    tinker.on('changeTheme', handleThemeChange)
+    const unsubscribe = tinker.on('changeTheme', handleThemeChange)
 
-    // Note: tinker.on doesn't return an unsubscribe function,
-    // so we can't clean up the listener in the return statement
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   return isDark
