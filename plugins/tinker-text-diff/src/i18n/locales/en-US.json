@@ -8,5 +8,7 @@
   "swap": "Swap texts",
   "copy": "Copy to clipboard",
   "paste": "Paste from clipboard",
-  "clear": "Clear all"
+  "clear": "Clear all",
+  "lines": "lines",
+  "openFile": "Open file"
 }

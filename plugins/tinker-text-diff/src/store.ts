@@ -5,18 +5,49 @@ type ViewMode = 'edit' | 'diff'
 const STORAGE_KEY = 'tinker-text-diff-content'
 const MODE_STORAGE_KEY = 'tinker-text-diff-mode'
 
+interface DiffStats {
+  additions: number
+  deletions: number
+}
+
 class Store {
   originalText: string = ''
   modifiedText: string = ''
   mode: ViewMode = 'edit'
+  diffStats: DiffStats = { additions: 0, deletions: 0 }
+  isDark: boolean = false
 
   constructor() {
     makeAutoObservable(this)
     this.loadFromStorage()
+    this.initTheme()
   }
 
   get isEmpty() {
     return !this.originalText.trim() && !this.modifiedText.trim()
+  }
+
+  setDiffStats(stats: DiffStats) {
+    this.diffStats = stats
+  }
+
+  setIsDark(isDark: boolean) {
+    this.isDark = isDark
+  }
+
+  private async initTheme() {
+    try {
+      const theme = await tinker.getTheme()
+      this.isDark = theme === 'dark'
+
+      // Listen for theme changes
+      tinker.on('changeTheme', async () => {
+        const newTheme = await tinker.getTheme()
+        this.setIsDark(newTheme === 'dark')
+      })
+    } catch (err) {
+      console.error('Failed to initialize theme:', err)
+    }
   }
 
   private loadFromStorage() {
@@ -65,6 +96,34 @@ class Store {
     } catch (err) {
       console.error('Failed to paste:', err)
     }
+  }
+
+  async pasteToOriginal() {
+    try {
+      const text = await navigator.clipboard.readText()
+      this.setOriginalText(text)
+    } catch (err) {
+      console.error('Failed to paste:', err)
+    }
+  }
+
+  async pasteToModified() {
+    try {
+      const text = await navigator.clipboard.readText()
+      this.setModifiedText(text)
+    } catch (err) {
+      console.error('Failed to paste:', err)
+    }
+  }
+
+  clearOriginal() {
+    this.originalText = ''
+    this.saveToStorage()
+  }
+
+  clearModified() {
+    this.modifiedText = ''
+    this.saveToStorage()
   }
 
   clearText() {

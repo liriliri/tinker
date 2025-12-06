@@ -8,5 +8,7 @@
   "swap": "交换文本",
   "copy": "复制到剪贴板",
   "paste": "从剪贴板粘贴",
-  "clear": "清空"
+  "clear": "清空",
+  "lines": "行",
+  "openFile": "打开文件"
 }

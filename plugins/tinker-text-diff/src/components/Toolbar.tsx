@@ -1,11 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import {
-  Clipboard,
-  Trash2,
-  ArrowLeftRight,
-  GitCompare,
-  PenLine,
-} from 'lucide-react'
+import { ArrowLeftRight, GitCompare, PenLine, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 
@@ -24,53 +18,57 @@ export default observer(function Toolbar() {
     }`
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1">
-      <button
-        onClick={() => store.setMode('edit')}
-        className={getModeButtonClass(store.mode === 'edit')}
-        title={t('editMode')}
-      >
-        <PenLine size={iconSize} />
-      </button>
+    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center justify-between">
+      <div className="flex gap-1 items-center">
+        <button
+          onClick={() => store.setMode('edit')}
+          className={getModeButtonClass(store.mode === 'edit')}
+          title={t('editMode')}
+        >
+          <PenLine size={iconSize} />
+        </button>
 
-      <button
-        onClick={() => store.setMode('diff')}
-        className={getModeButtonClass(store.mode === 'diff')}
-        title={t('diffMode')}
-      >
-        <GitCompare size={iconSize} />
-      </button>
+        <button
+          onClick={() => store.setMode('diff')}
+          className={getModeButtonClass(store.mode === 'diff')}
+          title={t('diffMode')}
+        >
+          <GitCompare size={iconSize} />
+        </button>
 
-      <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+        <div className="w-px h-5 bg-[#d0d0d0] dark:bg-[#555555] mx-1.5" />
 
-      <button
-        onClick={() => store.swapTexts()}
-        disabled={isDiffMode || store.isEmpty}
-        className={actionButtonClass}
-        title={t('swap')}
-      >
-        <ArrowLeftRight size={iconSize} />
-      </button>
+        <button
+          onClick={() => store.swapTexts()}
+          disabled={isDiffMode || store.isEmpty}
+          className={actionButtonClass}
+          title={t('swap')}
+        >
+          <ArrowLeftRight size={iconSize} />
+        </button>
 
-      <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+        <div className="w-px h-5 bg-[#d0d0d0] dark:bg-[#555555] mx-1.5" />
 
-      <button
-        onClick={() => store.pasteFromClipboard()}
-        disabled={isDiffMode}
-        className={actionButtonClass}
-        title={t('paste')}
-      >
-        <Clipboard size={iconSize} />
-      </button>
+        <button
+          onClick={() => store.clearText()}
+          disabled={isDiffMode || store.isEmpty}
+          className={actionButtonClass}
+          title={t('clear')}
+        >
+          <Trash2 size={iconSize} />
+        </button>
+      </div>
 
-      <button
-        onClick={() => store.clearText()}
-        disabled={isDiffMode || store.isEmpty}
-        className={actionButtonClass}
-        title={t('clear')}
-      >
-        <Trash2 size={iconSize} />
-      </button>
+      {isDiffMode && (
+        <div className="flex gap-3 text-xs mr-1">
+          <span className="text-green-600 dark:text-green-400">
+            +{store.diffStats.additions}
+          </span>
+          <span className="text-red-600 dark:text-red-400">
+            -{store.diffStats.deletions}
+          </span>
+        </div>
+      )}
     </div>
   )
 })
