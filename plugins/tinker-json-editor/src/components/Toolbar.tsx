@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import {
   AlignJustify,
   Copy,
@@ -8,6 +9,7 @@ import {
   Network,
   Undo,
   Redo,
+  Check,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
@@ -18,6 +20,7 @@ import MinifyIcon from '../assets/minify.svg?react'
 export default observer(function Toolbar() {
   const { t } = useTranslation()
   const iconSize = 14
+  const [copied, setCopied] = useState(false)
 
   const baseButtonClass = 'p-1.5 rounded transition-colors'
   const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
@@ -27,6 +30,12 @@ export default observer(function Toolbar() {
         ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
         : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]'
     }`
+
+  const handleCopy = async () => {
+    await store.copyToClipboard()
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1">
@@ -125,12 +134,16 @@ export default observer(function Toolbar() {
       <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 
       <button
-        onClick={() => store.copyToClipboard()}
+        onClick={handleCopy}
         disabled={store.isEmpty}
-        className={actionButtonClass}
+        className={
+          copied
+            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
+            : actionButtonClass
+        }
         title={t('copy')}
       >
-        <Copy size={iconSize} />
+        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
       </button>
 
       <button
