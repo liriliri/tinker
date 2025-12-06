@@ -112,6 +112,10 @@ class Store {
     }
   }
 
+  loadFromFile(content: string) {
+    this.setJsonInput(content)
+  }
+
   clearJson() {
     this.setJsonInput('')
   }

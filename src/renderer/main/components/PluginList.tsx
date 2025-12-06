@@ -23,7 +23,7 @@ export default observer(function PluginList() {
           store.openPlugin((icon.data as any).id)
         }}
         icons={icons}
-        size={48}
+        size={64}
         filter={store.filter}
       />
     </div>
