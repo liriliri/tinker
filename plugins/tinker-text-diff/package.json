@@ -1,24 +1,22 @@
 {
-  "name": "tinker-json-editor",
+  "name": "tinker-text-diff",
   "version": "0.1.0",
-  "description": "JSON Editor Plugin for Tinker",
+  "description": "Text Diff Plugin for Tinker",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
-    "name": "JSON Editor",
+    "name": "Text Diff",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "JSON 编辑器"
+        "name": "文本对比"
       }
     }
   },
   "devDependencies": {
-    "@monaco-editor/react": "^4.7.0",
-    "@types/jsoneditor": "^9.9.6",
-    "jsoneditor": "^10.4.2"
+    "@monaco-editor/react": "^4.7.0"
   }
 }
