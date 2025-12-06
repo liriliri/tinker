@@ -3,6 +3,12 @@
 /* Remove jsoneditor border */
 .jsoneditor-react-container {
   .jsoneditor,
+  .jsoneditor-outer,
+  .jsoneditor-tree {
+    background: transparent;
+  }
+
+  .jsoneditor,
   .jsoneditor-outer {
     border: none !important;
   }
@@ -25,7 +31,6 @@
     .jsoneditor,
     .jsoneditor-outer,
     .jsoneditor-tree {
-      background-color: #1e1e1e;
       color: #d4d4d4;
     }
 

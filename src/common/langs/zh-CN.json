@@ -1,8 +1,9 @@
 {
-  "quitTinker": "退出 Tinker",
+  "quit": "退出",
   "searchTool": "搜索工具",
   "show": "显示",
   "close": "关闭",
   "detachWin": "分离窗口",
-  "reopen": "重新打开"
+  "reopen": "重新打开",
+  "restart": "重启"
 }

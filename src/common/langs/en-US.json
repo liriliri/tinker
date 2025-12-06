@@ -1,8 +1,9 @@
 {
-  "quitTinker": "Quit Tinker",
+  "quit": "Quit",
   "searchTool": "Search Tool",
   "show": "Show",
   "close": "Close",
   "detachWin": "Detach Window",
-  "reopen": "Reopen"
+  "reopen": "Reopen",
+  "restart": "Restart"
 }
