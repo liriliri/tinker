@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import JSONEditor, { JSONEditorOptions } from 'jsoneditor'
 import 'jsoneditor/dist/jsoneditor.css'
 import store from '../store'
@@ -7,9 +8,18 @@ import store from '../store'
 export default observer(function TreeEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<JSONEditor | null>(null)
+  const { i18n } = useTranslation()
 
   useEffect(() => {
     if (!containerRef.current) return
+
+    // Map i18n language to jsoneditor language
+    // jsoneditor uses 'en' for English, but i18n uses 'en-US'
+    const languageMap: Record<string, string> = {
+      'en-US': 'en',
+      'zh-CN': 'zh-CN',
+    }
+    const editorLanguage = languageMap[i18n.language] || 'en'
 
     const options: JSONEditorOptions = {
       mode: 'tree',
@@ -17,6 +27,7 @@ export default observer(function TreeEditor() {
       mainMenuBar: false,
       navigationBar: false,
       statusBar: false,
+      language: editorLanguage,
       onChangeText: (jsonString: string) => {
         store.setJsonInput(jsonString)
       },
