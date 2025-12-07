@@ -10,5 +10,6 @@
   "copy": "复制到剪贴板",
   "paste": "从剪贴板粘贴",
   "openFile": "打开 JSON 文件",
-  "clear": "清空"
+  "clear": "清空",
+  "lines": "{{count}} 行"
 }

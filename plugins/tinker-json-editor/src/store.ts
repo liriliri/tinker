@@ -33,6 +33,21 @@ class Store {
     return this.historyIndex < this.history.length - 1
   }
 
+  get lineCount() {
+    if (!this.jsonInput) return 0
+    return this.jsonInput.split('\n').length
+  }
+
+  get jsonError() {
+    if (!this.jsonInput.trim()) return null
+    try {
+      JSON.parse(this.jsonInput)
+      return null
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Invalid JSON'
+    }
+  }
+
   setIsDark(isDark: boolean) {
     this.isDark = isDark
   }

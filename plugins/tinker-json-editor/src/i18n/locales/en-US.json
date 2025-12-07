@@ -10,5 +10,6 @@
   "copy": "Copy to clipboard",
   "paste": "Paste from clipboard",
   "openFile": "Open JSON file",
-  "clear": "Clear all"
+  "clear": "Clear all",
+  "lines": "{{count}} lines"
 }

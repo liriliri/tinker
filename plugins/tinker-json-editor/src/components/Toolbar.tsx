@@ -11,6 +11,7 @@ import {
   Redo,
   Check,
   FolderOpen,
+  AlertCircle,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
@@ -39,7 +40,7 @@ export default observer(function Toolbar() {
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1">
+    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
       <button
         onClick={() => store.setMode('text')}
         className={getModeButtonClass(store.mode === 'text')}
@@ -56,7 +57,7 @@ export default observer(function Toolbar() {
         <Network size={iconSize} />
       </button>
 
-      <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 
       <button
         onClick={() => store.undo()}
@@ -76,7 +77,7 @@ export default observer(function Toolbar() {
         <Redo size={iconSize} />
       </button>
 
-      <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 
       {store.mode === 'text' ? (
         <>
@@ -132,7 +133,7 @@ export default observer(function Toolbar() {
         </>
       )}
 
-      <div className="w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 
       <button
         onClick={handleCopy}
@@ -171,6 +172,23 @@ export default observer(function Toolbar() {
       >
         <Trash2 size={iconSize} />
       </button>
+
+      {store.jsonError && (
+        <div
+          className="text-red-600 dark:text-red-400 ml-1"
+          title={store.jsonError}
+        >
+          <AlertCircle size={16} />
+        </div>
+      )}
+
+      <div className="flex-1" />
+
+      {store.lineCount > 0 && (
+        <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
+          {t('lines', { count: store.lineCount })}
+        </div>
+      )}
     </div>
   )
 })
