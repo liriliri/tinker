@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "description": "Markdown Editor Plugin for Tinker",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\"",
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",
-    "build": "concurrently \"npm run build:renderer\"",
-    "build:renderer": "vite build --config ../vite.config.ts" 
+    "dev:preload": "vite --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
   },
   "tinker": {
     "name": "Markdown Editor",

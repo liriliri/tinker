@@ -13,7 +13,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     base: '',
     plugins: [react(), svgr()],
     build: {
-      outDir: pkg.tinker.main.replace('/index.html', ''),
+      outDir: path.dirname(pkg.tinker.main),
       rollupOptions: {
         input: {
           app: 'index.html',

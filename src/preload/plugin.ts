@@ -1,10 +1,19 @@
 import { contextBridge } from 'electron'
 import mainObj from './main'
+import { IPlugin } from 'common/types'
+import { pathToFileURL } from 'url'
 
 window.addEventListener('DOMContentLoaded', () => {
   updateTheme()
+  mainObj.on('loadPluginPreload', loadPluginPreload)
   mainObj.on('changeTheme', updateTheme)
 })
+
+async function loadPluginPreload(plugin: IPlugin) {
+  if (plugin.preload) {
+    await import(pathToFileURL(plugin.preload).href)
+  }
+}
 
 async function updateTheme() {
   const theme = await mainObj.getTheme()
