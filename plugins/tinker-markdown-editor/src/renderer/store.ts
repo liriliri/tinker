@@ -8,6 +8,7 @@ class Store {
   historyIndex: number = -1
   isUndoRedo: boolean = false
   isDark: boolean = false
+  scrollPercent: number = 0
 
   constructor() {
     makeAutoObservable(this)
@@ -159,6 +160,10 @@ class Store {
       this.markdownInput = this.history[this.historyIndex]
       localStorage.setItem(STORAGE_KEY, this.markdownInput)
     }
+  }
+
+  setScrollPercent(percent: number) {
+    this.scrollPercent = percent
   }
 }
 
