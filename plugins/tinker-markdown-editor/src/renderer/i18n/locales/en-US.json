@@ -1,0 +1,9 @@
+{
+  "undo": "Undo",
+  "redo": "Redo",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear",
+  "openFile": "Open File",
+  "lines": "{{count}} lines"
+}

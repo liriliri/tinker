@@ -20,5 +20,11 @@
         "name": "Markdown 编辑器"
       }
     }
+  },
+  "devDependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1"
   }
 }

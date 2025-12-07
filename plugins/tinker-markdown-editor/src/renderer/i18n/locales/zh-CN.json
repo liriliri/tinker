@@ -1,0 +1,9 @@
+{
+  "undo": "撤销",
+  "redo": "重做",
+  "copy": "复制",
+  "paste": "粘贴",
+  "clear": "清空",
+  "openFile": "打开文件",
+  "lines": "{{count}} 行"
+}
