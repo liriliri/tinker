@@ -110,7 +110,7 @@ const openPlugin: IpcOpenPlugin = async function (id) {
     win,
   }
   updatePluginTheme(id)
-  pluginView.webContents.on('did-finish-load', () => {
+  pluginView.webContents.on('did-start-loading', () => {
     pluginView.webContents.send('loadPluginPreload', plugin)
   })
   if (startWith(plugin.main, 'http')) {

@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
+const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
 
 class Store {
   markdownInput: string = ''
@@ -9,11 +10,42 @@ class Store {
   isUndoRedo: boolean = false
   isDark: boolean = false
   scrollPercent: number = 0
+  currentFilePath: string | null = null
+  savedContent: string = ''
 
   constructor() {
     makeAutoObservable(this)
-    this.loadFromStorage()
-    this.initTheme()
+    this.init()
+  }
+
+  private async init() {
+    // Wait for preload to be ready before loading from file
+    tinker.on('preloadReady', () => {
+      this.loadSavedFile()
+    })
+
+    // Load from localStorage first (as fallback)
+    this.loadFromLocalStorage()
+    await this.initTheme()
+  }
+
+  private loadSavedFile() {
+    const savedFilePath = localStorage.getItem(FILE_PATH_KEY)
+
+    if (savedFilePath) {
+      try {
+        const content = markdownEditor.readFile(savedFilePath)
+        this.currentFilePath = savedFilePath
+        this.savedContent = content
+        this.markdownInput = content
+        this.history = [content]
+        this.historyIndex = 0
+      } catch (err) {
+        // File no longer exists or can't be read, clear the saved path
+        localStorage.removeItem(FILE_PATH_KEY)
+        console.log('Failed to load saved file')
+      }
+    }
   }
 
   get isEmpty() {
@@ -31,6 +63,15 @@ class Store {
   get lineCount() {
     if (!this.markdownInput) return 0
     return this.markdownInput.split('\n').length
+  }
+
+  get currentFileName() {
+    if (!this.currentFilePath) return null
+    return markdownEditor.getFileName(this.currentFilePath)
+  }
+
+  get hasUnsavedChanges() {
+    return this.markdownInput !== this.savedContent
   }
 
   setIsDark(isDark: boolean) {
@@ -52,7 +93,7 @@ class Store {
     }
   }
 
-  private loadFromStorage() {
+  private loadFromLocalStorage() {
     const savedContent = localStorage.getItem(STORAGE_KEY)
 
     if (savedContent) {
@@ -106,37 +147,77 @@ class Store {
     this.setMarkdownInput(content)
   }
 
+  newFile() {
+    this.currentFilePath = null
+    this.savedContent = ''
+    localStorage.removeItem(FILE_PATH_KEY)
+    this.clearMarkdown()
+  }
+
   async openFile() {
     try {
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.md,.markdown,text/markdown'
-
-      return new Promise<void>((resolve, reject) => {
-        input.onchange = async (e) => {
-          const file = (e.target as HTMLInputElement).files?.[0]
-          if (file) {
-            try {
-              const text = await file.text()
-              this.loadFromFile(text)
-              resolve()
-            } catch (err) {
-              console.error('Failed to read file:', err)
-              reject(err)
-            }
-          } else {
-            resolve()
-          }
-        }
-
-        input.oncancel = () => {
-          resolve()
-        }
-
-        input.click()
+      const result = await tinker.showOpenDialog({
+        filters: [
+          { name: 'Markdown Files', extensions: ['md', 'markdown'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+        properties: ['openFile'],
       })
+
+      if (
+        result.canceled ||
+        !result.filePaths ||
+        result.filePaths.length === 0
+      ) {
+        return
+      }
+
+      const filePath = result.filePaths[0]
+      const content = markdownEditor.readFile(filePath)
+      this.currentFilePath = filePath
+      this.savedContent = content
+      localStorage.setItem(FILE_PATH_KEY, filePath)
+      this.loadFromFile(content)
     } catch (err) {
       console.error('Failed to open file:', err)
+    }
+  }
+
+  async saveFile() {
+    try {
+      if (this.currentFilePath) {
+        // Save to existing file
+        markdownEditor.writeFile(this.currentFilePath, this.markdownInput)
+        this.savedContent = this.markdownInput
+      } else {
+        // Show save dialog
+        await this.saveFileAs()
+      }
+    } catch (err) {
+      console.error('Failed to save file:', err)
+    }
+  }
+
+  async saveFileAs() {
+    try {
+      const result = await tinker.showSaveDialog({
+        defaultPath: this.currentFileName || 'untitled.md',
+        filters: [
+          { name: 'Markdown Files', extensions: ['md'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      })
+
+      if (result.canceled || !result.filePath) {
+        return
+      }
+
+      markdownEditor.writeFile(result.filePath, this.markdownInput)
+      this.currentFilePath = result.filePath
+      this.savedContent = this.markdownInput
+      localStorage.setItem(FILE_PATH_KEY, result.filePath)
+    } catch (err) {
+      console.error('Failed to save file as:', err)
     }
   }
 

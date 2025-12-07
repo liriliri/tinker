@@ -73,6 +73,10 @@ export default observer(function MarkdownEditor() {
           wordWrap: 'on',
           formatOnPaste: true,
           formatOnType: false,
+          unicodeHighlight: {
+            ambiguousCharacters: false,
+            invisibleCharacters: false,
+          },
         }}
         theme={store.isDark ? 'vs-dark' : 'vs'}
       />

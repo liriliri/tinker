@@ -8,6 +8,8 @@ import {
   Redo,
   Check,
   FolderOpen,
+  FilePlus,
+  Save,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
@@ -28,6 +30,33 @@ export default observer(function Toolbar() {
 
   return (
     <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
+      <button
+        onClick={() => store.newFile()}
+        className={actionButtonClass}
+        title={t('newFile')}
+      >
+        <FilePlus size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.openFile()}
+        className={actionButtonClass}
+        title={t('openFile')}
+      >
+        <FolderOpen size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.saveFile()}
+        disabled={store.isEmpty || !store.hasUnsavedChanges}
+        className={actionButtonClass}
+        title={t('save')}
+      >
+        <Save size={iconSize} />
+      </button>
+
+      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+
       <button
         onClick={() => store.undo()}
         disabled={!store.canUndo}
@@ -70,14 +99,6 @@ export default observer(function Toolbar() {
       </button>
 
       <button
-        onClick={() => store.openFile()}
-        className={actionButtonClass}
-        title={t('openFile')}
-      >
-        <FolderOpen size={iconSize} />
-      </button>
-
-      <button
         onClick={() => store.clearMarkdown()}
         disabled={store.isEmpty}
         className={actionButtonClass}
@@ -87,6 +108,12 @@ export default observer(function Toolbar() {
       </button>
 
       <div className="flex-1" />
+
+      {store.currentFileName && (
+        <div className="text-gray-600 dark:text-gray-400 text-xs mr-2 whitespace-nowrap">
+          {store.currentFileName}
+        </div>
+      )}
 
       {store.lineCount > 0 && (
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">

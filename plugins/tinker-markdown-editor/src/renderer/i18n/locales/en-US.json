@@ -5,5 +5,7 @@
   "paste": "Paste",
   "clear": "Clear",
   "openFile": "Open File",
-  "lines": "{{count}} lines"
+  "lines": "{{count}} lines",
+  "newFile": "New File",
+  "save": "Save"
 }

@@ -5,5 +5,7 @@
   "paste": "粘贴",
   "clear": "清空",
   "openFile": "打开文件",
-  "lines": "{{count}} 行"
+  "lines": "{{count}} 行",
+  "newFile": "新建",
+  "save": "保存"
 }

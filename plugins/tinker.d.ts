@@ -1,7 +1,16 @@
+import type {
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+  SaveDialogOptions,
+  SaveDialogReturnValue,
+} from 'electron'
+
 declare global {
   const tinker: {
     getTheme(): Promise<string>
     getLanguage(): Promise<string>
+    showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue>
+    showSaveDialog(options: SaveDialogOptions): Promise<SaveDialogReturnValue>
     on(event: string, callback: (...args: any[]) => void): () => void
   }
 }
