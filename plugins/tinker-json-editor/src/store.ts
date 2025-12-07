@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import slice from 'licia/slice'
+import openFile from 'licia/openFile'
 
 type EditorMode = 'text' | 'tree'
 
@@ -156,33 +157,11 @@ class Store {
 
   async openFile() {
     try {
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.json,application/json'
-
-      return new Promise<void>((resolve, reject) => {
-        input.onchange = async (e) => {
-          const file = (e.target as HTMLInputElement).files?.[0]
-          if (file) {
-            try {
-              const text = await file.text()
-              this.loadFromFile(text)
-              resolve()
-            } catch (err) {
-              console.error('Failed to read file:', err)
-              reject(err)
-            }
-          } else {
-            resolve()
-          }
-        }
-
-        input.oncancel = () => {
-          resolve()
-        }
-
-        input.click()
-      })
+      const files = await openFile({ accept: '.json,application/json' })
+      if (files && files.length > 0) {
+        const text = await files[0].text()
+        this.loadFromFile(text)
+      }
     } catch (err) {
       console.error('Failed to open file:', err)
     }

@@ -5,14 +5,13 @@ import { Clipboard, Trash2, FolderOpen } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
+import openFile from 'licia/openFile'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
 export default observer(function DualEditor() {
   const { t } = useTranslation()
   const iconSize = 14
-  const originalFileInputRef = useRef<HTMLInputElement>(null)
-  const modifiedFileInputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleOriginalChange = (value: string | undefined) => {
@@ -27,12 +26,11 @@ export default observer(function DualEditor() {
     }
   }
 
-  const handleOriginalFileOpen = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      try {
+  const handleOriginalFileOpen = async () => {
+    try {
+      const files = await openFile({ accept: 'text/*' })
+      if (files && files.length > 0) {
+        const file = files[0]
         const content = await file.text()
         store.setOriginalText(content)
         store.setOriginalFileName(file.name)
@@ -40,22 +38,17 @@ export default observer(function DualEditor() {
         // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
-      } catch (err) {
-        console.error('Failed to read file:', err)
       }
-    }
-    // Reset input value to allow selecting the same file again
-    if (originalFileInputRef.current) {
-      originalFileInputRef.current.value = ''
+    } catch (err) {
+      console.error('Failed to read file:', err)
     }
   }
 
-  const handleModifiedFileOpen = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      try {
+  const handleModifiedFileOpen = async () => {
+    try {
+      const files = await openFile({ accept: 'text/*' })
+      if (files && files.length > 0) {
+        const file = files[0]
         const content = await file.text()
         store.setModifiedText(content)
         store.setModifiedFileName(file.name)
@@ -63,13 +56,9 @@ export default observer(function DualEditor() {
         // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
-      } catch (err) {
-        console.error('Failed to read file:', err)
       }
-    }
-    // Reset input value to allow selecting the same file again
-    if (modifiedFileInputRef.current) {
-      modifiedFileInputRef.current.value = ''
+    } catch (err) {
+      console.error('Failed to read file:', err)
     }
   }
 
@@ -145,15 +134,8 @@ export default observer(function DualEditor() {
             </span>
           </div>
           <div className="flex gap-1">
-            <input
-              ref={originalFileInputRef}
-              type="file"
-              accept="text/*"
-              onChange={handleOriginalFileOpen}
-              className="hidden"
-            />
             <button
-              onClick={() => originalFileInputRef.current?.click()}
+              onClick={handleOriginalFileOpen}
               className={buttonClass}
               title={t('openFile')}
             >
@@ -206,15 +188,8 @@ export default observer(function DualEditor() {
             </span>
           </div>
           <div className="flex gap-1">
-            <input
-              ref={modifiedFileInputRef}
-              type="file"
-              accept="text/*"
-              onChange={handleModifiedFileOpen}
-              className="hidden"
-            />
             <button
-              onClick={() => modifiedFileInputRef.current?.click()}
+              onClick={handleModifiedFileOpen}
               className={buttonClass}
               title={t('openFile')}
             >
