@@ -5,10 +5,9 @@ import { pathToFileURL } from 'url'
 
 window.addEventListener('DOMContentLoaded', () => {
   updateTheme()
+  mainObj.on('loadPluginPreload', loadPluginPreload)
   mainObj.on('changeTheme', updateTheme)
 })
-
-mainObj.on('loadPluginPreload', loadPluginPreload)
 
 async function loadPluginPreload(plugin: IPlugin) {
   if (plugin.preload) {
