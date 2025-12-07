@@ -9,5 +9,6 @@
   "collapseAll": "Collapse All",
   "copy": "Copy to clipboard",
   "paste": "Paste from clipboard",
+  "openFile": "Open JSON file",
   "clear": "Clear all"
 }

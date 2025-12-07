@@ -137,6 +137,40 @@ class Store {
     this.setJsonInput(content)
   }
 
+  async openFile() {
+    try {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json,application/json'
+
+      return new Promise<void>((resolve, reject) => {
+        input.onchange = async (e) => {
+          const file = (e.target as HTMLInputElement).files?.[0]
+          if (file) {
+            try {
+              const text = await file.text()
+              this.loadFromFile(text)
+              resolve()
+            } catch (err) {
+              console.error('Failed to read file:', err)
+              reject(err)
+            }
+          } else {
+            resolve()
+          }
+        }
+
+        input.oncancel = () => {
+          resolve()
+        }
+
+        input.click()
+      })
+    } catch (err) {
+      console.error('Failed to open file:', err)
+    }
+  }
+
   clearJson() {
     this.setJsonInput('')
   }

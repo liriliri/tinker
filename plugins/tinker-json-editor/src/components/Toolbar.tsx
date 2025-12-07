@@ -10,6 +10,7 @@ import {
   Undo,
   Redo,
   Check,
+  FolderOpen,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
@@ -152,6 +153,14 @@ export default observer(function Toolbar() {
         title={t('paste')}
       >
         <Clipboard size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.openFile()}
+        className={actionButtonClass}
+        title={t('openFile')}
+      >
+        <FolderOpen size={iconSize} />
       </button>
 
       <button
