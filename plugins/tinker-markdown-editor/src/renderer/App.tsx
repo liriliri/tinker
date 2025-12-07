@@ -51,12 +51,12 @@ const App = observer(() => {
       {/* Main Content - Split View */}
       <div className="flex-1 overflow-hidden flex">
         {/* Editor Panel */}
-        <div className="flex-1 border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
+        <div className="flex-1 min-w-0 border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
           <MarkdownEditor />
         </div>
 
         {/* Preview Panel */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <MarkdownPreview />
         </div>
       </div>

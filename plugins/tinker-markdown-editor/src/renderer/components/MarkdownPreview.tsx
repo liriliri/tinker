@@ -32,9 +32,12 @@ export default observer(function MarkdownPreview() {
   }, [store.markdownInput])
 
   return (
-    <div className="h-full w-full overflow-auto bg-white dark:bg-[#1e1e1e] p-4">
+    <div
+      className="markdown-preview-container h-full w-full overflow-auto p-6 bg-white dark:bg-[#1e1e1e]"
+      data-color-mode={store.isDark ? 'dark' : 'light'}
+    >
       <div
-        className="markdown-preview prose dark:prose-invert max-w-none"
+        className="markdown-body"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
