@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, Trash2, FileUp } from 'lucide-react'
+import { Clipboard, Trash2, FolderOpen } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
@@ -155,7 +155,7 @@ export default observer(function DualEditor() {
               className={buttonClass}
               title={t('openFile')}
             >
-              <FileUp size={iconSize} />
+              <FolderOpen size={iconSize} />
             </button>
             <button
               onClick={() => store.pasteToOriginal()}
@@ -216,7 +216,7 @@ export default observer(function DualEditor() {
               className={buttonClass}
               title={t('openFile')}
             >
-              <FileUp size={iconSize} />
+              <FolderOpen size={iconSize} />
             </button>
             <button
               onClick={() => store.pasteToModified()}
