@@ -4,6 +4,7 @@ type ViewMode = 'edit' | 'diff'
 
 const STORAGE_KEY = 'tinker-text-diff-content'
 const MODE_STORAGE_KEY = 'tinker-text-diff-mode'
+const LANGUAGE_STORAGE_KEY = 'tinker-text-diff-language'
 
 interface DiffStats {
   additions: number
@@ -16,6 +17,9 @@ class Store {
   mode: ViewMode = 'edit'
   diffStats: DiffStats = { additions: 0, deletions: 0 }
   isDark: boolean = false
+  language: string = 'plaintext'
+  originalFileName: string = ''
+  modifiedFileName: string = ''
 
   constructor() {
     makeAutoObservable(this)
@@ -53,6 +57,7 @@ class Store {
   private loadFromStorage() {
     const savedContent = localStorage.getItem(STORAGE_KEY)
     const savedMode = localStorage.getItem(MODE_STORAGE_KEY)
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY)
 
     if (savedContent) {
       try {
@@ -66,6 +71,10 @@ class Store {
 
     if (savedMode) {
       this.mode = savedMode as ViewMode
+    }
+
+    if (savedLanguage) {
+      this.language = savedLanguage
     }
   }
 
@@ -142,6 +151,19 @@ class Store {
   setMode(mode: ViewMode) {
     this.mode = mode
     localStorage.setItem(MODE_STORAGE_KEY, mode)
+  }
+
+  setLanguage(language: string) {
+    this.language = language
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+  }
+
+  setOriginalFileName(fileName: string) {
+    this.originalFileName = fileName
+  }
+
+  setModifiedFileName(fileName: string) {
+    this.modifiedFileName = fileName
   }
 }
 

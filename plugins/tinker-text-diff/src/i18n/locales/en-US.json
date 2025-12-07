@@ -10,5 +10,6 @@
   "paste": "Paste from clipboard",
   "clear": "Clear all",
   "lines": "lines",
-  "openFile": "Open file"
+  "openFile": "Open file",
+  "selectLanguage": "Select programming language"
 }

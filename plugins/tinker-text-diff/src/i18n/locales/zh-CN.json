@@ -10,5 +10,6 @@
   "paste": "从剪贴板粘贴",
   "clear": "清空",
   "lines": "行",
-  "openFile": "打开文件"
+  "openFile": "打开文件",
+  "selectLanguage": "选择编程语言"
 }

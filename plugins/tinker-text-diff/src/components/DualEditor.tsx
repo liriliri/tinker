@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Clipboard, Trash2, FileUp } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import store from '../store'
+import { detectLanguageFromFileName } from '../lib/languageDetector'
 
 export default observer(function DualEditor() {
   const { t } = useTranslation()
@@ -32,6 +33,11 @@ export default observer(function DualEditor() {
       try {
         const content = await file.text()
         store.setOriginalText(content)
+        store.setOriginalFileName(file.name)
+
+        // Auto-detect language from file extension
+        const detectedLanguage = detectLanguageFromFileName(file.name)
+        store.setLanguage(detectedLanguage)
       } catch (err) {
         console.error('Failed to read file:', err)
       }
@@ -50,6 +56,11 @@ export default observer(function DualEditor() {
       try {
         const content = await file.text()
         store.setModifiedText(content)
+        store.setModifiedFileName(file.name)
+
+        // Auto-detect language from file extension
+        const detectedLanguage = detectLanguageFromFileName(file.name)
+        store.setLanguage(detectedLanguage)
       } catch (err) {
         console.error('Failed to read file:', err)
       }
@@ -91,11 +102,17 @@ export default observer(function DualEditor() {
         const mouseX = e.clientX - containerRect.left
         const containerWidth = containerRect.width
 
+        // Auto-detect language from file extension
+        const detectedLanguage = detectLanguageFromFileName(file.name)
+        store.setLanguage(detectedLanguage)
+
         // If dropped on left half, set as original; right half, set as modified
         if (mouseX < containerWidth / 2) {
           store.setOriginalText(content)
+          store.setOriginalFileName(file.name)
         } else {
           store.setModifiedText(content)
+          store.setModifiedFileName(file.name)
         }
       } catch (err) {
         console.error('Failed to read file:', err)
@@ -160,7 +177,7 @@ export default observer(function DualEditor() {
         <div className="h-[calc(100%-2rem)]">
           <Editor
             value={store.originalText}
-            language="plaintext"
+            language={store.language}
             onChange={handleOriginalChange}
             options={{
               readOnly: false,
@@ -221,7 +238,7 @@ export default observer(function DualEditor() {
         <div className="h-[calc(100%-2rem)]">
           <Editor
             value={store.modifiedText}
-            language="plaintext"
+            language={store.language}
             onChange={handleModifiedChange}
             options={{
               readOnly: false,

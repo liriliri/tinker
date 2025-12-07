@@ -3,6 +3,7 @@ import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
 import { useEffect, useRef } from 'react'
 import type { editor } from 'monaco-editor'
 import store from '../store'
+import { detectLanguageFromFileName } from '../lib/languageDetector'
 
 export default observer(function DiffEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -104,11 +105,18 @@ export default observer(function DiffEditor() {
 
       try {
         const content = await file.text()
+
+        // Auto-detect language from file extension
+        const detectedLanguage = detectLanguageFromFileName(file.name)
+        store.setLanguage(detectedLanguage)
+
         // In diff mode, if original is empty, set as original; otherwise set as modified
         if (!store.originalText.trim()) {
           store.setOriginalText(content)
+          store.setOriginalFileName(file.name)
         } else {
           store.setModifiedText(content)
+          store.setModifiedFileName(file.name)
         }
       } catch (err) {
         console.error('Failed to read file:', err)
@@ -129,7 +137,7 @@ export default observer(function DiffEditor() {
       <MonacoDiffEditor
         original={store.originalText}
         modified={store.modifiedText}
-        language="plaintext"
+        language={store.language}
         theme={store.isDark ? 'vs-dark' : 'vs'}
         onMount={handleEditorDidMount}
         options={{
