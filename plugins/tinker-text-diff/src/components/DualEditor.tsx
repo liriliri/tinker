@@ -3,6 +3,8 @@ import { Editor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import { Clipboard, Trash2, FolderOpen } from 'lucide-react'
 import { useRef, useEffect } from 'react'
+import isEmpty from 'licia/isEmpty'
+import isStrBlank from 'licia/isStrBlank'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
@@ -72,7 +74,7 @@ export default observer(function DualEditor() {
   }
 
   const getLineCount = (text: string) => {
-    if (!text) return 0
+    if (isEmpty(text)) return 0
     return text.split('\n').length
   }
 
@@ -166,7 +168,7 @@ export default observer(function DualEditor() {
             </button>
             <button
               onClick={() => store.clearOriginal()}
-              disabled={!store.originalText.trim()}
+              disabled={isStrBlank(store.originalText)}
               className={buttonClass}
               title={t('clear')}
             >
@@ -227,7 +229,7 @@ export default observer(function DualEditor() {
             </button>
             <button
               onClick={() => store.clearModified()}
-              disabled={!store.modifiedText.trim()}
+              disabled={isStrBlank(store.modifiedText)}
               className={buttonClass}
               title={t('clear')}
             >

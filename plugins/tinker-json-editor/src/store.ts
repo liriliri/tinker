@@ -1,5 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
+import isStrBlank from 'licia/isStrBlank'
+import slice from 'licia/slice'
 
 type EditorMode = 'text' | 'tree'
 
@@ -22,7 +24,7 @@ class Store {
   }
 
   get isEmpty() {
-    return !this.jsonInput.trim()
+    return isStrBlank(this.jsonInput)
   }
 
   get canUndo() {
@@ -39,7 +41,7 @@ class Store {
   }
 
   get jsonError() {
-    if (!this.jsonInput.trim()) return null
+    if (isStrBlank(this.jsonInput)) return null
     try {
       JSON.parse(this.jsonInput)
       return null
@@ -91,7 +93,7 @@ class Store {
     // Add to history if not from undo/redo
     if (!this.isUndoRedo) {
       // Remove any history after current index
-      this.history = this.history.slice(0, this.historyIndex + 1)
+      this.history = slice(this.history, 0, this.historyIndex + 1)
       // Add new state
       this.history.push(value)
       // Limit history size to 50 entries

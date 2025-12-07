@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
+import endWith from 'licia/endWith'
 import TextEditor from './components/TextEditor'
 import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
@@ -22,7 +23,7 @@ const App = observer(() => {
       const file = files[0]
 
       // Check if the file is a JSON file
-      if (!file.name.endsWith('.json')) {
+      if (!endWith(file.name, '.json')) {
         console.warn('Only .json files are supported')
         return
       }

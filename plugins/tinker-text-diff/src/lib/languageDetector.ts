@@ -1,3 +1,6 @@
+import lowerCase from 'licia/lowerCase'
+import has from 'licia/has'
+
 // Common programming languages supported by Monaco Editor
 export const SUPPORTED_LANGUAGES = [
   { id: 'plaintext', label: 'Plain Text' },
@@ -122,12 +125,14 @@ export function detectLanguageFromFileName(fileName: string): string {
   const lastDotIndex = fileName.lastIndexOf('.')
   if (lastDotIndex === -1 || lastDotIndex === fileName.length - 1) {
     // Check for special filenames without extension
-    const lowerFileName = fileName.toLowerCase()
+    const lowerFileName = lowerCase(fileName)
     if (lowerFileName === 'dockerfile') return 'dockerfile'
     if (lowerFileName === 'makefile') return 'makefile'
     return 'plaintext'
   }
 
-  const extension = fileName.slice(lastDotIndex + 1).toLowerCase()
-  return extensionToLanguage[extension] || 'plaintext'
+  const extension = lowerCase(fileName.slice(lastDotIndex + 1))
+  return has(extensionToLanguage, extension)
+    ? extensionToLanguage[extension]
+    : 'plaintext'
 }

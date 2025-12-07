@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
 import { useEffect, useRef } from 'react'
 import type { editor } from 'monaco-editor'
+import isStrBlank from 'licia/isStrBlank'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
@@ -111,7 +112,7 @@ export default observer(function DiffEditor() {
         store.setLanguage(detectedLanguage)
 
         // In diff mode, if original is empty, set as original; otherwise set as modified
-        if (!store.originalText.trim()) {
+        if (isStrBlank(store.originalText)) {
           store.setOriginalText(content)
           store.setOriginalFileName(file.name)
         } else {

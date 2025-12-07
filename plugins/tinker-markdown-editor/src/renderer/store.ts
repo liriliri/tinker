@@ -1,4 +1,6 @@
 import { makeAutoObservable } from 'mobx'
+import isStrBlank from 'licia/isStrBlank'
+import slice from 'licia/slice'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
 const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
@@ -49,7 +51,7 @@ class Store {
   }
 
   get isEmpty() {
-    return !this.markdownInput.trim()
+    return isStrBlank(this.markdownInput)
   }
 
   get canUndo() {
@@ -113,7 +115,7 @@ class Store {
     // Add to history if not from undo/redo
     if (!this.isUndoRedo) {
       // Remove any history after current index
-      this.history = this.history.slice(0, this.historyIndex + 1)
+      this.history = slice(this.history, 0, this.historyIndex + 1)
       // Add new state
       this.history.push(value)
       // Limit history size to 50 entries

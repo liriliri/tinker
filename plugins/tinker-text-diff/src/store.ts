@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import isStrBlank from 'licia/isStrBlank'
 
 type ViewMode = 'edit' | 'diff'
 
@@ -28,7 +29,7 @@ class Store {
   }
 
   get isEmpty() {
-    return !this.originalText.trim() && !this.modifiedText.trim()
+    return isStrBlank(this.originalText) && isStrBlank(this.modifiedText)
   }
 
   setDiffStats(stats: DiffStats) {

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
+import endWith from 'licia/endWith'
 import MarkdownEditor from './components/MarkdownEditor'
 import MarkdownPreview from './components/MarkdownPreview'
 import Toolbar from './components/Toolbar'
@@ -22,7 +23,7 @@ const App = observer(() => {
       const file = files[0]
 
       // Check if the file is a Markdown file
-      if (!file.name.endsWith('.md') && !file.name.endsWith('.markdown')) {
+      if (!endWith(file.name, '.md') && !endWith(file.name, '.markdown')) {
         console.warn('Only .md and .markdown files are supported')
         return
       }

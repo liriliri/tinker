@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import JSONEditor, { JSONEditorOptions } from 'jsoneditor'
 import 'jsoneditor/dist/jsoneditor.css'
+import filter from 'licia/filter'
 import store from '../store'
 
 export default observer(function TreeEditor() {
@@ -32,7 +33,8 @@ export default observer(function TreeEditor() {
         store.setJsonInput(jsonString)
       },
       onCreateMenu: (items) => {
-        return items.filter(
+        return filter(
+          items,
           (item) =>
             item.className !== 'jsoneditor-sort-asc' &&
             item.className !== 'jsoneditor-transform'
