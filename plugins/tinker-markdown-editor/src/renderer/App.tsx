@@ -49,17 +49,27 @@ const App = observer(() => {
     <div className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133]">
       <Toolbar />
 
-      {/* Main Content - Split View */}
+      {/* Main Content */}
       <div className="flex-1 overflow-hidden flex">
         {/* Editor Panel */}
-        <div className="flex-1 min-w-0 border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
-          <MarkdownEditor />
-        </div>
+        {(store.viewMode === 'split' || store.viewMode === 'editor') && (
+          <div
+            className={`${
+              store.viewMode === 'split'
+                ? 'flex-1 min-w-0 border-r border-[#e0e0e0] dark:border-[#4a4a4a]'
+                : 'flex-1 min-w-0'
+            }`}
+          >
+            <MarkdownEditor />
+          </div>
+        )}
 
         {/* Preview Panel */}
-        <div className="flex-1 min-w-0">
-          <MarkdownPreview />
-        </div>
+        {(store.viewMode === 'split' || store.viewMode === 'preview') && (
+          <div className="flex-1 min-w-0">
+            <MarkdownPreview />
+          </div>
+        )}
       </div>
     </div>
   )

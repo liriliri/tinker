@@ -10,9 +10,12 @@ import {
   FolderOpen,
   FilePlus,
   Save,
+  Columns2,
+  FileEdit,
+  Eye,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import store from '../store'
+import store, { type ViewMode } from '../store'
 
 export default observer(function Toolbar() {
   const { t } = useTranslation()
@@ -73,6 +76,44 @@ export default observer(function Toolbar() {
         title={t('redo')}
       >
         <Redo size={iconSize} />
+      </button>
+
+      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+
+      <button
+        onClick={() => store.setViewMode('split')}
+        className={
+          store.viewMode === 'split'
+            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
+            : actionButtonClass
+        }
+        title={t('splitView')}
+      >
+        <Columns2 size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.setViewMode('editor')}
+        className={
+          store.viewMode === 'editor'
+            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
+            : actionButtonClass
+        }
+        title={t('editorOnly')}
+      >
+        <FileEdit size={iconSize} />
+      </button>
+
+      <button
+        onClick={() => store.setViewMode('preview')}
+        className={
+          store.viewMode === 'preview'
+            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
+            : actionButtonClass
+        }
+        title={t('previewOnly')}
+      >
+        <Eye size={iconSize} />
       </button>
 
       <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />

@@ -7,5 +7,8 @@
   "openFile": "打开文件",
   "lines": "{{count}} 行",
   "newFile": "新建",
-  "save": "保存"
+  "save": "保存",
+  "splitView": "双栏",
+  "editorOnly": "仅编辑",
+  "previewOnly": "仅预览"
 }

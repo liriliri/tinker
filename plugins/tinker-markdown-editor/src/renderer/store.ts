@@ -4,6 +4,9 @@ import slice from 'licia/slice'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
 const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
+const VIEW_MODE_KEY = 'tinker-markdown-editor-view-mode'
+
+export type ViewMode = 'split' | 'editor' | 'preview'
 
 class Store {
   markdownInput: string = ''
@@ -14,6 +17,7 @@ class Store {
   scrollPercent: number = 0
   currentFilePath: string | null = null
   savedContent: string = ''
+  viewMode: ViewMode = 'split'
 
   constructor() {
     makeAutoObservable(this)
@@ -28,7 +32,19 @@ class Store {
 
     // Load from localStorage first (as fallback)
     this.loadFromLocalStorage()
+    this.loadViewMode()
     await this.initTheme()
+  }
+
+  private loadViewMode() {
+    const savedMode = localStorage.getItem(VIEW_MODE_KEY)
+    if (
+      savedMode === 'split' ||
+      savedMode === 'editor' ||
+      savedMode === 'preview'
+    ) {
+      this.viewMode = savedMode
+    }
   }
 
   private loadSavedFile() {
@@ -247,6 +263,11 @@ class Store {
 
   setScrollPercent(percent: number) {
     this.scrollPercent = percent
+  }
+
+  setViewMode(mode: ViewMode) {
+    this.viewMode = mode
+    localStorage.setItem(VIEW_MODE_KEY, mode)
   }
 }
 

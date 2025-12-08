@@ -7,5 +7,8 @@
   "openFile": "Open File",
   "lines": "{{count}} lines",
   "newFile": "New File",
-  "save": "Save"
+  "save": "Save",
+  "splitView": "Split View",
+  "editorOnly": "Editor Only",
+  "previewOnly": "Preview Only"
 }
