@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   Copy,
   Clipboard,
-  Trash2,
+  Eraser,
   Undo,
   Redo,
   Check,
@@ -145,7 +145,7 @@ export default observer(function Toolbar() {
         className={actionButtonClass}
         title={t('clear')}
       >
-        <Trash2 size={iconSize} />
+        <Eraser size={iconSize} />
       </button>
 
       <div className="flex-1" />

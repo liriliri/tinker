@@ -1,0 +1,12 @@
+@use 'tailwindcss';
+
+:root {
+  --toast-bg: #fff;
+  --toast-text: #333;
+}
+
+body.dark {
+  color-scheme: dark;
+  --toast-bg: #333;
+  --toast-text: #fff;
+}

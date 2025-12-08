@@ -1,0 +1,8 @@
+{
+  "clear": "Clear all",
+  "clearCurrent": "Clear current line",
+  "copyResult": "Copy result",
+  "copySuccess": "Copied successfully",
+  "copyFailed": "Failed to copy",
+  "placeholder": "Enter formula"
+}

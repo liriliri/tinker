@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, Trash2, FolderOpen } from 'lucide-react'
+import { Clipboard, Eraser, FolderOpen } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
@@ -154,7 +154,7 @@ export default observer(function DualEditor() {
               className={buttonClass}
               title={t('clear')}
             >
-              <Trash2 size={iconSize} />
+              <Eraser size={iconSize} />
             </button>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default observer(function DualEditor() {
               className={buttonClass}
               title={t('clear')}
             >
-              <Trash2 size={iconSize} />
+              <Eraser size={iconSize} />
             </button>
           </div>
         </div>

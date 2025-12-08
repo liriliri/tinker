@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { ArrowLeftRight, GitCompare, PenLine, Trash2 } from 'lucide-react'
+import { ArrowLeftRight, GitCompare, PenLine, Eraser } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import { SUPPORTED_LANGUAGES } from '../lib/languageDetector'
@@ -67,7 +67,7 @@ export default observer(function Toolbar() {
           className={actionButtonClass}
           title={t('clear')}
         >
-          <Trash2 size={iconSize} />
+          <Eraser size={iconSize} />
         </button>
       </div>
 

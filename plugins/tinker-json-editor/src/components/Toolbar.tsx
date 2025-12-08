@@ -4,7 +4,7 @@ import {
   AlignJustify,
   Copy,
   Clipboard,
-  Trash2,
+  Eraser,
   FileText,
   Network,
   Undo,
@@ -170,7 +170,7 @@ export default observer(function Toolbar() {
         className={actionButtonClass}
         title={t('clear')}
       >
-        <Trash2 size={iconSize} />
+        <Eraser size={iconSize} />
       </button>
 
       {store.jsonError && (
