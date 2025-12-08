@@ -1,11 +1,24 @@
 import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
 import store from '../store'
+import type { editor } from 'monaco-editor'
 
 export default observer(function TextEditor() {
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       store.setJsonInput(value)
+    }
+  }
+
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    store.setTextEditorInstance(editor)
+
+    // Listen to model content changes to update undo/redo state
+    const model = editor.getModel()
+    if (model) {
+      model.onDidChangeContent(() => {
+        store.updateUndoRedoState()
+      })
     }
   }
 
@@ -15,6 +28,7 @@ export default observer(function TextEditor() {
         value={store.jsonInput}
         language="json"
         onChange={handleEditorChange}
+        onMount={handleEditorDidMount}
         options={{
           readOnly: false,
           minimap: { enabled: false },

@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
-import slice from 'licia/slice'
 import openFile from 'licia/openFile'
+import type { editor } from 'monaco-editor'
 
 type EditorMode = 'text' | 'tree'
 
@@ -13,9 +13,8 @@ class Store {
   jsonInput: string = ''
   mode: EditorMode = 'text'
   treeEditorInstance: JSONEditor | null = null
-  history: string[] = []
-  historyIndex: number = -1
-  isUndoRedo: boolean = false
+  textEditorInstance: editor.IStandaloneCodeEditor | null = null
+  undoRedoVersion: number = 0
   isDark: boolean = false
 
   constructor() {
@@ -29,11 +28,15 @@ class Store {
   }
 
   get canUndo() {
-    return this.historyIndex > 0
+    // Access undoRedoVersion to make this reactive
+    this.undoRedoVersion
+    return this.textEditorInstance?.getModel()?.canUndo() ?? false
   }
 
   get canRedo() {
-    return this.historyIndex < this.history.length - 1
+    // Access undoRedoVersion to make this reactive
+    this.undoRedoVersion
+    return this.textEditorInstance?.getModel()?.canRedo() ?? false
   }
 
   get lineCount() {
@@ -76,11 +79,6 @@ class Store {
 
     if (savedContent) {
       this.jsonInput = savedContent
-      this.history = [savedContent]
-      this.historyIndex = 0
-    } else {
-      this.history = ['']
-      this.historyIndex = 0
     }
     if (savedMode) {
       this.mode = savedMode as EditorMode
@@ -90,21 +88,6 @@ class Store {
   setJsonInput(value: string) {
     this.jsonInput = value
     localStorage.setItem(STORAGE_KEY, value)
-
-    // Add to history if not from undo/redo
-    if (!this.isUndoRedo) {
-      // Remove any history after current index
-      this.history = slice(this.history, 0, this.historyIndex + 1)
-      // Add new state
-      this.history.push(value)
-      // Limit history size to 50 entries
-      if (this.history.length > 50) {
-        this.history.shift()
-      } else {
-        this.historyIndex++
-      }
-    }
-    this.isUndoRedo = false
   }
 
   setMode(mode: EditorMode) {
@@ -175,6 +158,14 @@ class Store {
     this.treeEditorInstance = instance
   }
 
+  setTextEditorInstance(instance: editor.IStandaloneCodeEditor | null) {
+    this.textEditorInstance = instance
+  }
+
+  updateUndoRedoState() {
+    this.undoRedoVersion++
+  }
+
   expandAll() {
     if (this.treeEditorInstance) {
       this.treeEditorInstance.expandAll()
@@ -188,20 +179,14 @@ class Store {
   }
 
   undo() {
-    if (this.canUndo) {
-      this.historyIndex--
-      this.isUndoRedo = true
-      this.jsonInput = this.history[this.historyIndex]
-      localStorage.setItem(STORAGE_KEY, this.jsonInput)
+    if (this.textEditorInstance) {
+      this.textEditorInstance.trigger('keyboard', 'undo', null)
     }
   }
 
   redo() {
-    if (this.canRedo) {
-      this.historyIndex++
-      this.isUndoRedo = true
-      this.jsonInput = this.history[this.historyIndex]
-      localStorage.setItem(STORAGE_KEY, this.jsonInput)
+    if (this.textEditorInstance) {
+      this.textEditorInstance.trigger('keyboard', 'redo', null)
     }
   }
 }
