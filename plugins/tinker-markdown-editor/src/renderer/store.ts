@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import slice from 'licia/slice'
+import type { editor } from 'monaco-editor'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
 const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
@@ -10,9 +10,8 @@ export type ViewMode = 'split' | 'editor' | 'preview'
 
 class Store {
   markdownInput: string = ''
-  history: string[] = []
-  historyIndex: number = -1
-  isUndoRedo: boolean = false
+  editorInstance: editor.IStandaloneCodeEditor | null = null
+  undoRedoVersion: number = 0
   isDark: boolean = false
   scrollPercent: number = 0
   currentFilePath: string | null = null
@@ -56,8 +55,6 @@ class Store {
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.markdownInput = content
-        this.history = [content]
-        this.historyIndex = 0
       } catch (err) {
         // File no longer exists or can't be read, clear the saved path
         localStorage.removeItem(FILE_PATH_KEY)
@@ -71,11 +68,15 @@ class Store {
   }
 
   get canUndo() {
-    return this.historyIndex > 0
+    // Access undoRedoVersion to make this reactive
+    this.undoRedoVersion
+    return this.editorInstance?.getModel()?.canUndo() ?? false
   }
 
   get canRedo() {
-    return this.historyIndex < this.history.length - 1
+    // Access undoRedoVersion to make this reactive
+    this.undoRedoVersion
+    return this.editorInstance?.getModel()?.canRedo() ?? false
   }
 
   get lineCount() {
@@ -116,32 +117,20 @@ class Store {
 
     if (savedContent) {
       this.markdownInput = savedContent
-      this.history = [savedContent]
-      this.historyIndex = 0
-    } else {
-      this.history = ['']
-      this.historyIndex = 0
     }
   }
 
   setMarkdownInput(value: string) {
     this.markdownInput = value
     localStorage.setItem(STORAGE_KEY, value)
+  }
 
-    // Add to history if not from undo/redo
-    if (!this.isUndoRedo) {
-      // Remove any history after current index
-      this.history = slice(this.history, 0, this.historyIndex + 1)
-      // Add new state
-      this.history.push(value)
-      // Limit history size to 50 entries
-      if (this.history.length > 50) {
-        this.history.shift()
-      } else {
-        this.historyIndex++
-      }
-    }
-    this.isUndoRedo = false
+  setEditorInstance(editor: editor.IStandaloneCodeEditor | null) {
+    this.editorInstance = editor
+  }
+
+  updateUndoRedoState() {
+    this.undoRedoVersion++
   }
 
   async copyToClipboard() {
@@ -244,20 +233,14 @@ class Store {
   }
 
   undo() {
-    if (this.canUndo) {
-      this.historyIndex--
-      this.isUndoRedo = true
-      this.markdownInput = this.history[this.historyIndex]
-      localStorage.setItem(STORAGE_KEY, this.markdownInput)
+    if (this.editorInstance) {
+      this.editorInstance.trigger('keyboard', 'undo', null)
     }
   }
 
   redo() {
-    if (this.canRedo) {
-      this.historyIndex++
-      this.isUndoRedo = true
-      this.markdownInput = this.history[this.historyIndex]
-      localStorage.setItem(STORAGE_KEY, this.markdownInput)
+    if (this.editorInstance) {
+      this.editorInstance.trigger('keyboard', 'redo', null)
     }
   }
 

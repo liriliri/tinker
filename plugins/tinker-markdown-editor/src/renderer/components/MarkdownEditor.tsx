@@ -15,6 +15,7 @@ export default observer(function MarkdownEditor() {
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
     editorRef.current = editor
+    store.setEditorInstance(editor)
 
     // Listen to scroll events
     editor.onDidScrollChange((e) => {
@@ -30,6 +31,14 @@ export default observer(function MarkdownEditor() {
         store.setScrollPercent(scrollPercent)
       }
     })
+
+    // Listen to model content changes to update undo/redo state
+    const model = editor.getModel()
+    if (model) {
+      model.onDidChangeContent(() => {
+        store.updateUndoRedoState()
+      })
+    }
   }
 
   // Sync scroll from preview to editor
