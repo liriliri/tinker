@@ -1,5 +1,9 @@
 @use 'tailwindcss';
 
+body.dark {
+  color-scheme: dark;
+}
+
 /* Remove jsoneditor border */
 .jsoneditor-react-container {
   .jsoneditor,

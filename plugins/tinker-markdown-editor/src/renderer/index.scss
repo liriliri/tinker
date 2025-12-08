@@ -1,6 +1,10 @@
 @use 'tailwindcss';
 @import 'github-markdown-css/github-markdown.css';
 
+body.dark {
+  color-scheme: dark;
+}
+
 /* Override markdown-body styles */
 .markdown-body {
   box-sizing: border-box;
