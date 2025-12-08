@@ -2,12 +2,21 @@ import { observer } from 'mobx-react-lite'
 import Style from './Titlebar.module.scss'
 import logo from '../../assets/logo.png'
 import { t } from 'common/util'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import store from '../store'
 import fileUrl from 'licia/fileUrl'
 import contextMenu from 'share/renderer/lib/contextMenu'
 
 export default observer(function Titlebar() {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const offShowWin = main.on('showWin', () => inputRef.current?.focus())
+    return () => {
+      offShowWin()
+    }
+  }, [])
+
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     const onMouseMove = () => {
       main.dragMain(e.clientX, e.clientY)
@@ -57,12 +66,20 @@ export default observer(function Titlebar() {
       )
     }
 
-    template.push({
-      label: t('close'),
-      click() {
-        main.closeWin()
+    template.push(
+      {
+        label: t('hide'),
+        click() {
+          main.hideWin()
+        },
       },
-    })
+      {
+        label: t('close'),
+        click() {
+          main.closeWin()
+        },
+      }
+    )
 
     contextMenu(e, template)
   }
@@ -77,6 +94,7 @@ export default observer(function Titlebar() {
         placeholder={t('searchTool')}
         autoFocus={true}
         value={store.filter}
+        ref={inputRef}
         onChange={(e) => {
           if (store.plugin) {
             store.closePlugin()

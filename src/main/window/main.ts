@@ -9,6 +9,7 @@ let win: BrowserWindow | null = null
 
 export function showWin() {
   if (win) {
+    win.show()
     win.focus()
     return
   }
