@@ -20,6 +20,14 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
+    worker: {
+      format: 'es',
+      rollupOptions: {
+        output: {
+          format: 'es',
+        },
+      },
+    },
     css: {
       preprocessorOptions: {
         scss: {
