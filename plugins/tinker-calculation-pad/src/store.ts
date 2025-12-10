@@ -9,8 +9,6 @@ interface CalculationLine {
   result: string
 }
 
-const STORAGE_KEY = 'tinker-calculation-pad-lines'
-
 class Store {
   lines: CalculationLine[] = [{ id: 0, expression: '', result: '' }]
   activeLineId: number = 0
@@ -18,7 +16,6 @@ class Store {
 
   constructor() {
     makeAutoObservable(this)
-    this.loadFromStorage()
     // Ensure activeLineId always points to the first line
     if (this.lines.length > 0) {
       this.activeLineId = this.lines[0].id
@@ -27,24 +24,6 @@ class Store {
 
   get isEmpty() {
     return this.lines.length === 1 && isStrBlank(this.lines[0].expression)
-  }
-
-  private loadFromStorage() {
-    const savedLines = localStorage.getItem(STORAGE_KEY)
-    if (savedLines) {
-      try {
-        const parsed = JSON.parse(savedLines)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          this.lines = parsed
-        }
-      } catch (err) {
-        console.error('Failed to load from storage:', err)
-      }
-    }
-  }
-
-  private saveToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.lines))
   }
 
   private calculateResult(expression: string): string {
@@ -80,8 +59,6 @@ class Store {
       const newId = Date.now()
       this.lines.push({ id: newId, expression: '', result: '' })
     }
-
-    this.saveToStorage()
   }
 
   addNewLine(afterId: number) {
@@ -93,7 +70,6 @@ class Store {
       result: '',
     })
     this.activeLineId = newId
-    this.saveToStorage()
 
     // Focus the new input
     setTimeout(() => {
@@ -117,15 +93,12 @@ class Store {
         this.inputRefs[prevLineId]?.focus()
       }, 0)
     }
-
-    this.saveToStorage()
   }
 
   clear() {
     const newId = Date.now()
     this.lines = [{ id: newId, expression: '', result: '' }]
     this.activeLineId = newId
-    this.saveToStorage()
   }
 
   focusActiveLine() {

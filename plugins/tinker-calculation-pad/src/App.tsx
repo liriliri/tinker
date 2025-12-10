@@ -11,7 +11,7 @@ const App = observer(() => {
   }, [])
 
   return (
-    <div className="h-screen bg-white dark:bg-[#1e1e1e] flex flex-col">
+    <div className="h-screen bg-[#f0f1f2] dark:bg-[#303133] flex flex-col">
       <Toaster
         position="top-center"
         toastOptions={{

@@ -14,7 +14,38 @@ export default observer(function CalculationList() {
   ) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      store.addNewLine(id)
+      const currentLine = find(store.lines, (line) => line.id === id)
+
+      // If current line is empty, do nothing
+      if (currentLine && isStrBlank(currentLine.expression)) {
+        return
+      }
+
+      const currentIndex = store.lines.findIndex((line) => line.id === id)
+      const nextIndex = currentIndex + 1
+
+      if (nextIndex < store.lines.length) {
+        // If there's a next line, check if it's empty and fill with result if so
+        const nextLine = store.lines[nextIndex]
+        const nextLineId = nextLine.id
+
+        if (
+          currentLine &&
+          currentLine.result &&
+          isStrBlank(nextLine.expression)
+        ) {
+          // Fill next line with current result
+          store.updateExpression(nextLineId, currentLine.result)
+        }
+
+        store.setActiveLineId(nextLineId)
+        setTimeout(() => {
+          store.inputRefs[nextLineId]?.focus()
+        }, 0)
+      } else {
+        // If it's the last line, create a new one
+        store.addNewLine(id)
+      }
     } else if (e.key === 'Backspace') {
       const currentLine = find(store.lines, (line) => line.id === id)
       if (
@@ -74,10 +105,10 @@ export default observer(function CalculationList() {
             key={line.id}
             onClick={() => handleLineClick(line.id)}
             style={isActive ? { borderLeftColor: '#0fc25e' } : undefined}
-            className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 transition-colors cursor-text ${
+            className={`px-4 py-3 border-b border-[#e0e0e0] dark:border-[#4a4a4a] transition-colors cursor-text ${
               isActive
-                ? 'border-l-4 bg-gray-50 dark:bg-[#252525]'
-                : 'border-l-4 border-l-transparent hover:bg-gray-50 dark:hover:bg-[#252525]'
+                ? 'border-l-4 bg-white dark:bg-[#1e1e1e]'
+                : 'border-l-4 border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]'
             }`}
           >
             <textarea
