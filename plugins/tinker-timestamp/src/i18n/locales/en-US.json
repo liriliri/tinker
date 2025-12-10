@@ -1,0 +1,11 @@
+{
+  "millisecond": "Millisecond",
+  "second": "Second",
+  "dateToTimestamp": "Date → (Beijing) Timestamp:",
+  "timestampToDate": "Timestamp → (Beijing) Date",
+  "currentTimestamp": "Current Timestamp",
+  "selectDate": "Select Date",
+  "enterTimestamp": "Enter Timestamp",
+  "copy": "Copy",
+  "reload": "Reload Data"
+}

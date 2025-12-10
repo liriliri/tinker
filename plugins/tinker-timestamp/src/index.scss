@@ -1,0 +1,83 @@
+@use 'tailwindcss';
+
+body.dark {
+  color-scheme: dark;
+}
+
+/* MUI DatePicker dark theme customization */
+body.dark .MuiPickersPopper-root {
+  .MuiPaper-root {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .MuiPickersCalendarHeader-root {
+    color: #e5e7eb;
+  }
+
+  .MuiPickersCalendarHeader-label {
+    color: #e5e7eb;
+  }
+
+  .MuiPickersDay-root {
+    color: #e5e7eb;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+
+    &.Mui-selected {
+      background-color: #0fc25e;
+
+      &:hover {
+        background-color: #0db054;
+      }
+    }
+  }
+
+  .MuiPickersDay-today {
+    border-color: #0fc25e;
+  }
+
+  .MuiClock-root {
+    background-color: #374151;
+  }
+
+  .MuiClockNumber-root {
+    color: #e5e7eb;
+  }
+
+  .MuiClockPointer-root {
+    background-color: #0fc25e;
+  }
+
+  .MuiClockPointer-thumb {
+    background-color: #0fc25e;
+    border-color: #0fc25e;
+  }
+
+  .MuiPickersYear-yearButton,
+  .MuiPickersMonth-monthButton {
+    color: #e5e7eb;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+
+    &.Mui-selected {
+      background-color: #0fc25e;
+
+      &:hover {
+        background-color: #0db054;
+      }
+    }
+  }
+
+  .MuiIconButton-root {
+    color: #9ca3af;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+}

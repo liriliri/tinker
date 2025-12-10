@@ -1,0 +1,26 @@
+{
+  "name": "tinker-timestamp",
+  "version": "0.1.0",
+  "description": "Timestamp Converter Plugin for Tinker",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Timestamp Converter",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "时间戳转换"
+      }
+    }
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
+    "@mui/x-date-pickers": "^8.21.0",
+    "date-fns": "^4.1.0"
+  }
+}

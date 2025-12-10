@@ -1,0 +1,11 @@
+{
+  "millisecond": "毫秒",
+  "second": "秒",
+  "dateToTimestamp": "日期 → （北京）时间戳:",
+  "timestampToDate": "时间戳 → （北京）日期",
+  "currentTimestamp": "当前时间戳",
+  "selectDate": "请选择日期",
+  "enterTimestamp": "请输入时间戳",
+  "copy": "复制",
+  "reload": "重置数据"
+}
