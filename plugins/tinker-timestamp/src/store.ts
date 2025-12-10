@@ -10,31 +10,31 @@ const storage = safeStorage('local')
 
 // Timezone key mapping
 const TIMEZONE_KEYS: Record<string, string> = {
-  'UTC+00:00': 'utc_p_00_00',
-  'UTC+01:00': 'utc_p_01_00',
-  'UTC+02:00': 'utc_p_02_00',
-  'UTC+03:00': 'utc_p_03_00',
-  'UTC+04:00': 'utc_p_04_00',
-  'UTC+05:00': 'utc_p_05_00',
-  'UTC+05:30': 'utc_p_05_30',
-  'UTC+06:00': 'utc_p_06_00',
-  'UTC+07:00': 'utc_p_07_00',
-  'UTC+08:00': 'utc_p_08_00',
-  'UTC+09:00': 'utc_p_09_00',
-  'UTC+10:00': 'utc_p_10_00',
-  'UTC+11:00': 'utc_p_11_00',
-  'UTC+12:00': 'utc_p_12_00',
-  'UTC-11:00': 'utc_m_11_00',
-  'UTC-10:00': 'utc_m_10_00',
-  'UTC-09:00': 'utc_m_09_00',
-  'UTC-08:00': 'utc_m_08_00',
-  'UTC-07:00': 'utc_m_07_00',
-  'UTC-06:00': 'utc_m_06_00',
-  'UTC-05:00': 'utc_m_05_00',
-  'UTC-04:00': 'utc_m_04_00',
-  'UTC-03:00': 'utc_m_03_00',
-  'UTC-02:00': 'utc_m_02_00',
-  'UTC-01:00': 'utc_m_01_00',
+  'UTC+00:00': 'utcLondon',
+  'UTC+01:00': 'utcBerlin',
+  'UTC+02:00': 'utcCairo',
+  'UTC+03:00': 'utcMoscow',
+  'UTC+04:00': 'utcDubai',
+  'UTC+05:00': 'utcKarachi',
+  'UTC+05:30': 'utcNewDelhi',
+  'UTC+06:00': 'utcDhaka',
+  'UTC+07:00': 'utcBangkok',
+  'UTC+08:00': 'utcBeijing',
+  'UTC+09:00': 'utcTokyo',
+  'UTC+10:00': 'utcSydney',
+  'UTC+11:00': 'utcSolomonIslands',
+  'UTC+12:00': 'utcAuckland',
+  'UTC-11:00': 'utcSamoa',
+  'UTC-10:00': 'utcHawaii',
+  'UTC-09:00': 'utcAlaska',
+  'UTC-08:00': 'utcLosAngeles',
+  'UTC-07:00': 'utcDenver',
+  'UTC-06:00': 'utcChicago',
+  'UTC-05:00': 'utcNewYork',
+  'UTC-04:00': 'utcSantiago',
+  'UTC-03:00': 'utcBuenosAires',
+  'UTC-02:00': 'utcGreenland',
+  'UTC-01:00': 'utcAzores',
 }
 
 class Store {
@@ -150,7 +150,14 @@ class Store {
   }
 
   dateToTimestamp(date: Date): string {
-    const timestamp = date.getTime()
+    // Apply timezone offset
+    const localOffset = date.getTimezoneOffset() / 60 // Local timezone offset in hours
+    const targetOffset = this.timezoneOffset // Target timezone offset
+    const offsetDiff = targetOffset - -localOffset // Difference in hours
+
+    const adjustedDate = new Date(date.getTime() + offsetDiff * 60 * 60 * 1000)
+    const timestamp = adjustedDate.getTime()
+
     switch (this.timestampUnit) {
       case 'millisecond':
         return timestamp.toString()
@@ -172,7 +179,14 @@ class Store {
         break
     }
 
-    return new Date(ts)
+    const date = new Date(ts)
+
+    // Apply timezone offset in reverse
+    const localOffset = date.getTimezoneOffset() / 60
+    const targetOffset = this.timezoneOffset
+    const offsetDiff = targetOffset - -localOffset
+
+    return new Date(date.getTime() - offsetDiff * 60 * 60 * 1000)
   }
 }
 
