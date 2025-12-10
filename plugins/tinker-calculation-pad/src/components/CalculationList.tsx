@@ -119,7 +119,7 @@ export default observer(function CalculationList() {
               onKeyDown={(e) => handleKeyDown(line.id, e as any)}
               placeholder={t('placeholder')}
               rows={1}
-              className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-200 text-base font-mono resize-none overflow-hidden pointer-events-auto"
+              className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-200 text-xl font-mono resize-none overflow-hidden pointer-events-auto"
             />
             {line.result && (
               <div className="flex items-center justify-end mt-2">

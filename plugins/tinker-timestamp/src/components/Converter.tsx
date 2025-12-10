@@ -81,7 +81,7 @@ const Converter = observer(() => {
   return (
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={zhCN}>
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col bg-[#f0f1f2] dark:bg-[#303133]">
           {/* Date to Timestamp */}
           <div className="flex-1 border-b border-[#e0e0e0] dark:border-[#4a4a4a]">
             <div className="h-full flex flex-col p-6">

@@ -64,7 +64,7 @@ export default observer(function Toolbar() {
       >
         {store.timezones.map((tz) => (
           <option key={tz} value={tz}>
-            {tz}
+            {t(store.getTimezoneKey(tz))}
           </option>
         ))}
       </select>
