@@ -4,6 +4,7 @@ import * as tray from './lib/tray'
 import * as main from './window/main'
 import * as plugin from './lib/plugin'
 import * as window from 'share/main/lib/window'
+import * as terminal from 'share/main/window/terminal'
 import noop from 'licia/noop'
 import 'share/main'
 
@@ -20,6 +21,7 @@ window.setDefaultOptions({
 app.on('ready', () => {
   logger.info('app ready')
 
+  terminal.init()
   plugin.init()
   tray.init()
   main.showWin()

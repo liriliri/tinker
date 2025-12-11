@@ -12,6 +12,8 @@ import { t } from 'common/util'
 import { getSettingsStore } from './store'
 import log from 'share/common/log'
 import map from 'licia/map'
+import * as terminal from 'share/main/window/terminal'
+import * as process from 'share/main/window/process'
 
 const logger = log('tray')
 let tray: Tray | null = null
@@ -94,12 +96,34 @@ async function updateContextMenu() {
       type: 'separator',
     },
     {
-      label: t('theme'),
-      submenu: themeMenu,
+      label: t('tools'),
+      submenu: [
+        {
+          label: t('terminal'),
+          click() {
+            terminal.showWin()
+          },
+        },
+        {
+          label: t('processManager'),
+          click() {
+            process.showWin()
+          },
+        },
+      ],
     },
     {
-      label: t('language'),
-      submenu: langMenu,
+      label: t('settings'),
+      submenu: [
+        {
+          label: t('theme'),
+          submenu: themeMenu,
+        },
+        {
+          label: t('language'),
+          submenu: langMenu,
+        },
+      ],
     },
     {
       type: 'separator',

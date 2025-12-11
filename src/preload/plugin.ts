@@ -5,11 +5,12 @@ import { pathToFileURL } from 'url'
 
 window.addEventListener('DOMContentLoaded', () => {
   updateTheme()
-  mainObj.on('loadPluginPreload', loadPluginPreload)
+  mainObj.on('preparePlugin', preparePlugin)
   mainObj.on('changeTheme', updateTheme)
 })
 
-async function loadPluginPreload(plugin: IPlugin) {
+async function preparePlugin(plugin: IPlugin) {
+  document.title = plugin.name
   if (plugin.preload) {
     await import(pathToFileURL(plugin.preload).href)
     ipcRenderer.emit('preloadReady')
