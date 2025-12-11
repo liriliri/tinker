@@ -1,0 +1,23 @@
+{
+  "viewSystemHosts": "View System Hosts",
+  "common": "Common",
+  "custom": "Custom",
+  "addConfig": "Add Config",
+  "newConfig": "New Config",
+  "configName": "Config Name",
+  "configNamePlaceholder": "e.g., Development",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "saving": "Saving...",
+  "readonly": "Readonly",
+  "saveSuccess": "✓ Configuration applied successfully to system hosts file",
+  "saveFailed": "✗ Failed to apply: {{message}}",
+  "applying": "Applying...",
+  "applyConfig": "Apply Config ({{count}} active)",
+  "delete": "Delete",
+  "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
+  "applyHint": "Tip: After modifying the configuration, you need to click \"Apply Config\" button to apply it to the system hosts file",
+  "noActiveConfig": "No active configurations. Please activate at least one configuration.",
+  "emptyConfig": "Active configurations are empty. Please add content to at least one active configuration."
+}

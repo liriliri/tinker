@@ -5,7 +5,11 @@ declare const window: any
 
 export default function () {
   window.tinker = {
-    ..._tinker,
+    getTheme: _tinker.getTheme,
+    getLanguage: _tinker.getLanguage,
+    showOpenDialog: _tinker.showOpenDialog,
+    showSaveDialog: _tinker.showSaveDialog,
+    on: _tinker.on,
     showContextMenu,
   }
 

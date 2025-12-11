@@ -1,10 +1,13 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
+import safeStorage from 'licia/safeStorage'
 import type { editor } from 'monaco-editor'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
 const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
 const VIEW_MODE_KEY = 'tinker-markdown-editor-view-mode'
+
+const storage = safeStorage('local')
 
 export type ViewMode = 'split' | 'editor' | 'preview'
 
@@ -24,19 +27,16 @@ class Store {
   }
 
   private async init() {
-    // Wait for preload to be ready before loading from file
-    tinker.on('preloadReady', () => {
-      this.loadSavedFile()
-    })
-
     // Load from localStorage first (as fallback)
     this.loadFromLocalStorage()
+    // Load saved file if exists
+    this.loadSavedFile()
     this.loadViewMode()
     await this.initTheme()
   }
 
   private loadViewMode() {
-    const savedMode = localStorage.getItem(VIEW_MODE_KEY)
+    const savedMode = storage.getItem(VIEW_MODE_KEY)
     if (
       savedMode === 'split' ||
       savedMode === 'editor' ||
@@ -47,7 +47,7 @@ class Store {
   }
 
   private loadSavedFile() {
-    const savedFilePath = localStorage.getItem(FILE_PATH_KEY)
+    const savedFilePath = storage.getItem(FILE_PATH_KEY)
 
     if (savedFilePath) {
       try {
@@ -55,9 +55,11 @@ class Store {
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.markdownInput = content
+        // Clear localStorage content since we're loading from a file
+        storage.removeItem(STORAGE_KEY)
       } catch (err) {
         // File no longer exists or can't be read, clear the saved path
-        localStorage.removeItem(FILE_PATH_KEY)
+        storage.removeItem(FILE_PATH_KEY)
         console.log('Failed to load saved file')
       }
     }
@@ -113,7 +115,7 @@ class Store {
   }
 
   private loadFromLocalStorage() {
-    const savedContent = localStorage.getItem(STORAGE_KEY)
+    const savedContent = storage.getItem(STORAGE_KEY)
 
     if (savedContent) {
       this.markdownInput = savedContent
@@ -122,7 +124,11 @@ class Store {
 
   setMarkdownInput(value: string) {
     this.markdownInput = value
-    localStorage.setItem(STORAGE_KEY, value)
+    // Only save to localStorage if there's no file path
+    // When editing a file, content is managed by the file system
+    if (!this.currentFilePath) {
+      storage.setItem(STORAGE_KEY, value)
+    }
   }
 
   setEditorInstance(editor: editor.IStandaloneCodeEditor | null) {
@@ -157,7 +163,9 @@ class Store {
   newFile() {
     this.currentFilePath = null
     this.savedContent = ''
-    localStorage.removeItem(FILE_PATH_KEY)
+    storage.removeItem(FILE_PATH_KEY)
+    // Clear localStorage content when creating new file
+    storage.removeItem(STORAGE_KEY)
     this.clearMarkdown()
   }
 
@@ -183,7 +191,9 @@ class Store {
       const content = markdownEditor.readFile(filePath)
       this.currentFilePath = filePath
       this.savedContent = content
-      localStorage.setItem(FILE_PATH_KEY, filePath)
+      storage.setItem(FILE_PATH_KEY, filePath)
+      // Clear localStorage content since we're now editing a file
+      storage.removeItem(STORAGE_KEY)
       this.loadFromFile(content)
     } catch (err) {
       console.error('Failed to open file:', err)
@@ -222,7 +232,9 @@ class Store {
       markdownEditor.writeFile(result.filePath, this.markdownInput)
       this.currentFilePath = result.filePath
       this.savedContent = this.markdownInput
-      localStorage.setItem(FILE_PATH_KEY, result.filePath)
+      storage.setItem(FILE_PATH_KEY, result.filePath)
+      // Clear localStorage content since we now have a file path
+      storage.removeItem(STORAGE_KEY)
     } catch (err) {
       console.error('Failed to save file as:', err)
     }
@@ -250,7 +262,7 @@ class Store {
 
   setViewMode(mode: ViewMode) {
     this.viewMode = mode
-    localStorage.setItem(VIEW_MODE_KEY, mode)
+    storage.setItem(VIEW_MODE_KEY, mode)
   }
 }
 

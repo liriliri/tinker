@@ -1,0 +1,23 @@
+{
+  "viewSystemHosts": "查看系统 hosts 文件内容",
+  "common": "共用",
+  "custom": "自定义",
+  "addConfig": "新增配置",
+  "newConfig": "新增配置",
+  "configName": "配置名称",
+  "configNamePlaceholder": "例如：开发环境",
+  "cancel": "取消",
+  "confirm": "确定",
+  "save": "保存",
+  "saving": "保存中...",
+  "readonly": "只读",
+  "saveSuccess": "✓ 配置已成功应用到系统 hosts 文件",
+  "saveFailed": "✗ 应用失败: {{message}}",
+  "applying": "应用中...",
+  "applyConfig": "应用配置 ({{count}} 个激活)",
+  "delete": "删除",
+  "deleteConfirm": "确定要删除 \"{{name}}\" 吗？",
+  "applyHint": "提示：修改配置后需点击\"应用配置\"按钮才会生效到系统 hosts 文件",
+  "noActiveConfig": "没有激活的配置，请至少激活一个配置。",
+  "emptyConfig": "激活的配置内容为空，请至少为一个激活的配置添加内容。"
+}

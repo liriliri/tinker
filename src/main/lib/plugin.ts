@@ -21,7 +21,7 @@ import types from 'licia/types'
 import isEmpty from 'licia/isEmpty'
 import map from 'licia/map'
 import identity from 'licia/identity'
-import { BrowserWindow, WebContentsView } from 'electron'
+import { BrowserWindow, ipcMain, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
 import { colorBgContainer, colorBgContainerDark } from 'common/theme'
@@ -112,9 +112,6 @@ const openPlugin: IpcOpenPlugin = async function (id) {
     win,
   }
   updatePluginTheme(id)
-  pluginView.webContents.on('did-finish-load', () => {
-    pluginView.webContents.send('preparePlugin', plugin)
-  })
   if (startWith(plugin.main, 'http')) {
     await pluginView.webContents.loadURL(plugin.main)
   } else {
@@ -247,4 +244,11 @@ export function init() {
   handleEvent('detachPlugin', detachPlugin)
   handleEvent('togglePluginDevtools', togglePluginDevtools)
   handleEvent('showPluginContextMenu', showPluginContextMenu)
+  ipcMain.handle('getAttachedPlugin', (event) => {
+    for (const id in pluginViews) {
+      if (pluginViews[id].view.webContents === event.sender) {
+        return plugins[id]
+      }
+    }
+  })
 }

@@ -1,16 +1,23 @@
-const App = () => {
+import { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import store from './store'
+import { Sidebar, Editor } from './components'
+
+const App = observer(() => {
+  useEffect(() => {
+    const init = async () => {
+      await store.loadConfig()
+      await store.loadSystemHosts()
+    }
+    init()
+  }, [])
+
   return (
-    <div className="h-screen flex items-center justify-center bg-[#f0f1f2] dark:bg-[#303133]">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200">
-          Hello World
-        </h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          Tinker Hosts Manager
-        </p>
-      </div>
+    <div className="h-screen flex overflow-hidden bg-white dark:bg-[#1e1e1e]">
+      <Sidebar />
+      <Editor />
     </div>
   )
-}
+})
 
 export default App

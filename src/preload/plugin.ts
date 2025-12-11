@@ -1,14 +1,16 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 import mainObj from './main'
-import { IpcShowPluginContextMenu, IPlugin } from 'common/types'
+import {
+  IpcGetAttachedPlugin,
+  IpcShowPluginContextMenu,
+  IPlugin,
+} from 'common/types'
 import { pathToFileURL } from 'url'
 import pluginRenderer from './pluginRenderer'
 import { invoke } from 'share/preload/util'
 
 window.addEventListener('DOMContentLoaded', () => {
-  injectRendererScript()
   updateTheme()
-  mainObj.on('preparePlugin', preparePlugin)
   mainObj.on('changeTheme', updateTheme)
 })
 
@@ -23,7 +25,6 @@ async function preparePlugin(plugin: IPlugin) {
   document.title = plugin.name
   if (plugin.preload) {
     await import(pathToFileURL(plugin.preload).href)
-    ipcRenderer.emit('preloadReady')
   }
 }
 
@@ -44,6 +45,7 @@ const tinkerObj = {
   showPluginContextMenu: invoke<IpcShowPluginContextMenu>(
     'showPluginContextMenu'
   ),
+  getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
   on: mainObj.on,
 }
 
@@ -55,6 +57,12 @@ const observer = new MutationObserver(() => {
   }
 })
 observer.observe(document, { childList: true })
+;(async function () {
+  const plugin = await tinkerObj.getAttachedPlugin()
+  if (plugin) {
+    preparePlugin(plugin)
+  }
+})()
 
 declare global {
   const _tinker: typeof tinkerObj

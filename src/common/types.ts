@@ -32,3 +32,4 @@ export type IpcShowPluginContextMenu = (
   y: number,
   options: MenuItemConstructorOptions[]
 ) => void
+export type IpcGetAttachedPlugin = () => Promise<IPlugin | undefined>
