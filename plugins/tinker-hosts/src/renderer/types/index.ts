@@ -4,9 +4,4 @@ export interface HostsConfig {
   content: string
 }
 
-export interface AppConfig {
-  configs: HostsConfig[]
-  activeIds: string[]
-}
-
 export type ViewMode = 'system' | 'config'

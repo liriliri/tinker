@@ -14,11 +14,9 @@ import { HostsConfig } from '../types'
 
 export default observer(function Sidebar() {
   const { t } = useTranslation()
-  const { config, selectedId, viewMode } = store
+  const { configs, activeIds, selectedId, viewMode } = store
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newConfigName, setNewConfigName] = useState('')
-
-  if (!config) return null
 
   const handleSelect = (id: string) => {
     store.setSelectedId(id)
@@ -59,7 +57,7 @@ export default observer(function Sidebar() {
   }
 
   const renderConfigItem = (cfg: HostsConfig) => {
-    const isActive = config.activeIds.includes(cfg.id)
+    const isActive = activeIds.includes(cfg.id)
     const isSelected = selectedId === cfg.id
 
     return (
@@ -95,7 +93,7 @@ export default observer(function Sidebar() {
   }
 
   return (
-    <div className="w-64 bg-[#f0f1f2] dark:bg-[#252526] border-r border-[#e0e0e0] dark:border-[#4a4a4a] flex flex-col relative">
+    <div className="w-64 flex-shrink-0 bg-[#f0f1f2] dark:bg-[#252526] border-r border-[#e0e0e0] dark:border-[#4a4a4a] flex flex-col relative">
       <div className="flex-1 overflow-y-auto">
         <div
           className={`px-3 py-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-[#3a3a3c] ${
@@ -108,7 +106,7 @@ export default observer(function Sidebar() {
           </span>
         </div>
 
-        {config.configs.map(renderConfigItem)}
+        {configs.map(renderConfigItem)}
       </div>
 
       <div className="p-3 border-t border-[#e0e0e0] dark:border-[#4a4a4a]">

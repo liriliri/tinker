@@ -6,7 +6,7 @@ import store from '../store'
 
 export default observer(function Editor() {
   const { t } = useTranslation()
-  const { config, systemHosts, selectedId, viewMode } = store
+  const { configs, systemHosts, selectedId, viewMode } = store
   const [content, setContent] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const editorRef = useRef<any>(null)
@@ -14,13 +14,13 @@ export default observer(function Editor() {
   useEffect(() => {
     if (viewMode === 'system') {
       setContent(systemHosts)
-    } else if (config && selectedId !== 'system') {
-      const selectedConfig = config.configs.find((c) => c.id === selectedId)
+    } else if (selectedId !== 'system') {
+      const selectedConfig = configs.find((c) => c.id === selectedId)
       if (selectedConfig) {
         setContent(selectedConfig.content)
       }
     }
-  }, [viewMode, systemHosts, config, selectedId])
+  }, [viewMode, systemHosts, configs, selectedId])
 
   const handleSave = async () => {
     if (selectedId === 'system' || viewMode === 'system') return
@@ -28,7 +28,6 @@ export default observer(function Editor() {
     setIsSaving(true)
     try {
       store.updateConfig(selectedId as string, content)
-      await store.saveConfig()
     } catch (error) {
       console.error('Failed to save:', error)
     } finally {
@@ -45,13 +44,13 @@ export default observer(function Editor() {
   }
 
   const isReadonly = viewMode === 'system'
-  const selectedConfig = config?.configs.find((c) => c.id === selectedId)
+  const selectedConfig = configs.find((c) => c.id === selectedId)
   const title =
     viewMode === 'system' ? t('viewSystemHosts') : selectedConfig?.name || ''
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#1e1e1e]">
-      <div className="flex-1 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#1e1e1e] min-h-0 min-w-0">
+      <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
         <MonacoEditor
           value={content}
           onChange={handleEditorChange}
@@ -72,14 +71,14 @@ export default observer(function Editor() {
         />
       </div>
 
-      <div className="px-4 py-3 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex justify-end">
+      <div className="h-[60px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-end flex-shrink-0 min-w-0 overflow-x-auto">
         {isReadonly ? (
           <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-300 dark:bg-[#4a4a4a] px-2 py-1 rounded">
             {t('readonly')}
           </span>
         ) : (
           <button
-            className={`px-4 py-2 text-sm rounded ${
+            className={`px-4 py-2 text-sm rounded whitespace-nowrap ${
               isSaving
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-[#0fc25e] hover:bg-[#0db350]'

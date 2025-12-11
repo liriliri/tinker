@@ -1,13 +1,15 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import safeStorage from 'licia/safeStorage'
-import { AppConfig, HostsConfig, ViewMode } from './types'
+import { HostsConfig, ViewMode } from './types'
 
-const STORAGE_KEY = 'tinker-hosts-config'
+const STORAGE_KEY_CONFIGS = 'tinker-hosts-configs'
+const STORAGE_KEY_ACTIVE_IDS = 'tinker-hosts-active-ids'
 
 const storage = safeStorage('local')
 
 class HostsStore {
-  config: AppConfig | null = null
+  configs: HostsConfig[] = []
+  activeIds: string[] = []
   systemHosts: string = ''
   selectedId: string | 'system' = 'system'
   viewMode: ViewMode = 'system'
@@ -21,18 +23,20 @@ class HostsStore {
   async loadConfig() {
     try {
       console.log('Loading config from localStorage...')
-      const savedConfig = storage.getItem(STORAGE_KEY)
+      const savedConfigs = storage.getItem(STORAGE_KEY_CONFIGS)
+      const savedActiveIds = storage.getItem(STORAGE_KEY_ACTIVE_IDS)
 
-      if (savedConfig) {
-        this.config = JSON.parse(savedConfig)
-        console.log('Config loaded from localStorage:', this.config)
-      } else {
-        const defaultConfig: AppConfig = {
-          configs: [],
-          activeIds: [],
-        }
-        this.config = defaultConfig
-        this.saveConfig()
+      if (savedConfigs) {
+        this.configs = JSON.parse(savedConfigs)
+        console.log('Configs loaded from localStorage:', this.configs)
+      }
+
+      if (savedActiveIds) {
+        this.activeIds = JSON.parse(savedActiveIds)
+        console.log('Active IDs loaded from localStorage:', this.activeIds)
+      }
+
+      if (!savedConfigs && !savedActiveIds) {
         console.log('Created default config')
       }
     } catch (error) {
@@ -43,13 +47,24 @@ class HostsStore {
     }
   }
 
-  async saveConfig() {
-    if (!this.config) return
+  saveConfigs() {
     try {
-      storage.setItem(STORAGE_KEY, JSON.stringify(this.config))
-      console.log('Config saved to localStorage')
+      storage.setItem(STORAGE_KEY_CONFIGS, JSON.stringify(this.configs))
+      console.log('Configs saved to localStorage')
     } catch (error) {
-      console.error('Failed to save config:', error)
+      console.error('Failed to save configs:', error)
+      this.error = `保存配置失败: ${
+        error instanceof Error ? error.message : '未知错误'
+      }`
+    }
+  }
+
+  saveActiveIds() {
+    try {
+      storage.setItem(STORAGE_KEY_ACTIVE_IDS, JSON.stringify(this.activeIds))
+      console.log('Active IDs saved to localStorage')
+    } catch (error) {
+      console.error('Failed to save active IDs:', error)
       this.error = `保存配置失败: ${
         error instanceof Error ? error.message : '未知错误'
       }`
@@ -86,58 +101,39 @@ class HostsStore {
   }
 
   updateConfig(id: string, content: string) {
-    if (!this.config) return
-
-    const newConfigs = this.config.configs.map((c) =>
+    const newConfigs = this.configs.map((c) =>
       c.id === id ? { ...c, content } : c
     )
-    this.config = { ...this.config, configs: newConfigs }
-    this.saveConfig()
+    this.configs = newConfigs
+    this.saveConfigs()
   }
 
   addConfig(name: string) {
-    if (!this.config) return
-
     const newConfig: HostsConfig = {
       id: Date.now().toString(),
       name,
       content: '',
     }
 
-    this.config = {
-      ...this.config,
-      configs: [...this.config.configs, newConfig],
-    }
-    this.saveConfig()
+    this.configs = [...this.configs, newConfig]
+    this.saveConfigs()
   }
 
   deleteConfig(id: string) {
-    if (!this.config) return
+    this.configs = this.configs.filter((c) => c.id !== id)
+    this.activeIds = this.activeIds.filter((aid) => aid !== id)
 
-    const newConfigs = this.config.configs.filter((c) => c.id !== id)
-    const newActiveIds = this.config.activeIds.filter((aid) => aid !== id)
-
-    this.config = {
-      ...this.config,
-      configs: newConfigs,
-      activeIds: newActiveIds,
-    }
-    this.saveConfig()
+    this.saveConfigs()
+    this.saveActiveIds()
   }
 
   toggleActive(id: string) {
-    if (!this.config) return
+    const isActive = this.activeIds.includes(id)
+    this.activeIds = isActive
+      ? this.activeIds.filter((aid) => aid !== id)
+      : [...this.activeIds, id]
 
-    const isActive = this.config.activeIds.includes(id)
-    const newActiveIds = isActive
-      ? this.config.activeIds.filter((aid) => aid !== id)
-      : [...this.config.activeIds, id]
-
-    this.config = {
-      ...this.config,
-      activeIds: newActiveIds,
-    }
-    this.saveConfig()
+    this.saveActiveIds()
 
     // Auto-apply hosts when toggling
     this.applyHosts().catch((error) => {
@@ -146,10 +142,8 @@ class HostsStore {
   }
 
   async applyHosts() {
-    if (!this.config) return
-
     try {
-      hosts.applyHosts(toJS(this.config.activeIds), toJS(this.config.configs))
+      hosts.applyHosts(toJS(this.activeIds), toJS(this.configs))
       await this.loadSystemHosts()
     } catch (error) {
       console.error('Failed to apply hosts:', error)

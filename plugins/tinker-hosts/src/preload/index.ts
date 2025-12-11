@@ -1,11 +1,10 @@
 import { contextBridge } from 'electron'
 import { readFileSync, writeFileSync } from 'fs'
-import { platform } from 'os'
+import isWindows from 'licia/isWindows'
 
-const HOSTS_PATH =
-  platform() === 'win32'
-    ? 'C:\\Windows\\System32\\drivers\\etc\\hosts'
-    : '/etc/hosts'
+const HOSTS_PATH = isWindows
+  ? 'C:\\Windows\\System32\\drivers\\etc\\hosts'
+  : '/etc/hosts'
 
 interface HostsConfig {
   id: string
