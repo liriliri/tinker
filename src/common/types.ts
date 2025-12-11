@@ -1,3 +1,4 @@
+import { MenuItemConstructorOptions } from 'electron'
 import types from 'licia/types'
 
 export interface IRawPlugin {
@@ -26,3 +27,8 @@ export type IpcClosePlugin = (id: string) => void
 export type IpcDetachPlugin = IpcClosePlugin
 export type IpcReopenPlugin = IpcClosePlugin
 export type IpcTogglePluginDevtools = IpcClosePlugin
+export type IpcShowPluginContextMenu = (
+  x: number,
+  y: number,
+  options: MenuItemConstructorOptions[]
+) => void

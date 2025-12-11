@@ -12,6 +12,11 @@ declare global {
     showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue>
     showSaveDialog(options: SaveDialogOptions): Promise<SaveDialogReturnValue>
     on(event: string, callback: (...args: any[]) => void): () => void
+    showContextMenu: (
+      x: number,
+      y: number,
+      options: MenuItemConstructorOptions[]
+    ) => void
   }
 }
 

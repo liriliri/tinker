@@ -4,6 +4,7 @@ import {
   IpcGetPlugins,
   IpcOpenPlugin,
   IpcReopenPlugin,
+  IpcShowPluginContextMenu,
   IpcTogglePluginDevtools,
   IPlugin,
   IRawPlugin,
@@ -27,6 +28,7 @@ import { colorBgContainer, colorBgContainerDark } from 'common/theme'
 import each from 'licia/each'
 import * as pluginWin from '../window/plugin'
 import isMac from 'licia/isMac'
+import contextMenu from './contextMenu'
 
 const plugins: types.PlainObj<IPlugin> = {}
 
@@ -220,6 +222,23 @@ const togglePluginDevtools: IpcTogglePluginDevtools = function (id) {
   }
 }
 
+const showPluginContextMenu: IpcShowPluginContextMenu = function (
+  x,
+  y,
+  options
+) {
+  const plugin = getAttachedPlugin(window.getFocusedWin()!)
+  if (plugin) {
+    const { view } = pluginViews[plugin.id]
+
+    const bounds = view.getBounds()
+    x += bounds.x
+    y += bounds.y
+
+    contextMenu(view, x, y, options)
+  }
+}
+
 export function init() {
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
@@ -227,4 +246,5 @@ export function init() {
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
   handleEvent('togglePluginDevtools', togglePluginDevtools)
+  handleEvent('showPluginContextMenu', showPluginContextMenu)
 }

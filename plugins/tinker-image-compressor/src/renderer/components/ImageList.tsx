@@ -1,11 +1,20 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { X } from 'lucide-react'
 import fileSize from 'licia/fileSize'
 import store from '../store'
 
 const ImageList = observer(() => {
   const { t } = useTranslation()
+
+  const handleContextMenu = (e: React.MouseEvent, imageId: string) => {
+    e.preventDefault()
+    tinker.showContextMenu(e.clientX, e.clientY, [
+      {
+        label: t('remove'),
+        click: () => store.removeImage(imageId),
+      },
+    ])
+  }
 
   return (
     <div className="flex-1 overflow-auto p-4">
@@ -18,18 +27,10 @@ const ImageList = observer(() => {
         {store.images.map((image) => (
           <div
             key={image.id}
-            className="bg-white dark:bg-[#252526] rounded-lg border border-[#e0e0e0] dark:border-[#3e3e42] overflow-hidden relative group flex flex-col"
+            className="bg-white dark:bg-[#252526] rounded-lg border border-[#e0e0e0] dark:border-[#3e3e42] overflow-hidden relative group flex flex-col hover:border-[#0fc25e] transition-all duration-100"
             style={{ aspectRatio: '1 / 1' }}
+            onContextMenu={(e) => handleContextMenu(e, image.id)}
           >
-            {/* Remove button */}
-            <button
-              onClick={() => store.removeImage(image.id)}
-              className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              title={t('remove')}
-            >
-              <X size={14} />
-            </button>
-
             {/* Image preview - rectangular container */}
             <div className="flex-1 bg-[repeating-conic-gradient(#f0f0f0_0%_25%,#ffffff_0%_50%)] dark:bg-[repeating-conic-gradient(#2d2d30_0%_25%,#252526_0%_50%)] bg-[length:20px_20px] flex items-center justify-center p-2 relative overflow-hidden">
               <img
