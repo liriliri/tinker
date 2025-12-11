@@ -15,9 +15,26 @@ class HostsStore {
   viewMode: ViewMode = 'system'
   loading: boolean = false
   error: string | null = null
+  isDark: boolean = false
 
   constructor() {
     makeAutoObservable(this)
+    this.initTheme()
+  }
+
+  private async initTheme() {
+    try {
+      const theme = await tinker.getTheme()
+      this.isDark = theme === 'dark'
+
+      // Listen for theme changes
+      tinker.on('changeTheme', async () => {
+        const newTheme = await tinker.getTheme()
+        this.isDark = newTheme === 'dark'
+      })
+    } catch (err) {
+      console.error('Failed to initialize theme:', err)
+    }
   }
 
   async loadConfig() {
@@ -116,6 +133,13 @@ class HostsStore {
     }
 
     this.configs = [...this.configs, newConfig]
+    this.saveConfigs()
+  }
+
+  renameConfig(id: string, newName: string) {
+    this.configs = this.configs.map((c) =>
+      c.id === id ? { ...c, name: newName } : c
+    )
     this.saveConfigs()
   }
 
