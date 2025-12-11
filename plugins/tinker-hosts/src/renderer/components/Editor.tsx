@@ -4,7 +4,7 @@ import MonacoEditor from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 
-export const Editor: React.FC = observer(() => {
+export default observer(function Editor() {
   const { t } = useTranslation()
   const { config, systemHosts, selectedId, viewMode } = store
   const [content, setContent] = useState('')
@@ -72,9 +72,9 @@ export const Editor: React.FC = observer(() => {
         />
       </div>
 
-      <div className="px-4 py-3 border-t border-gray-300 dark:border-gray-700 flex justify-end">
+      <div className="px-4 py-3 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex justify-end">
         {isReadonly ? (
-          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-300 dark:bg-[#4a4a4a] px-2 py-1 rounded">
             {t('readonly')}
           </span>
         ) : (
@@ -82,7 +82,7 @@ export const Editor: React.FC = observer(() => {
             className={`px-4 py-2 text-sm rounded ${
               isSaving
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600'
+                : 'bg-[#0fc25e] hover:bg-[#0db350]'
             } text-white`}
             onClick={handleSave}
             disabled={isSaving}

@@ -1,6 +1,6 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import safeStorage from 'licia/safeStorage'
-import { AppConfig, HostsConfig, ViewMode } from '../types'
+import { AppConfig, HostsConfig, ViewMode } from './types'
 
 const STORAGE_KEY = 'tinker-hosts-config'
 
@@ -59,7 +59,7 @@ class HostsStore {
   async loadSystemHosts() {
     try {
       console.log('Loading system hosts...')
-      const systemHosts = window.hosts.readSystemHosts()
+      const systemHosts = hosts.readSystemHosts()
       console.log('System hosts loaded, length:', systemHosts.length)
       this.systemHosts = systemHosts
     } catch (error) {
@@ -95,14 +95,13 @@ class HostsStore {
     this.saveConfig()
   }
 
-  addConfig(name: string, group: 'common' | 'custom') {
+  addConfig(name: string) {
     if (!this.config) return
 
     const newConfig: HostsConfig = {
       id: Date.now().toString(),
       name,
       content: '',
-      group,
     }
 
     this.config = {
@@ -119,6 +118,7 @@ class HostsStore {
     const newActiveIds = this.config.activeIds.filter((aid) => aid !== id)
 
     this.config = {
+      ...this.config,
       configs: newConfigs,
       activeIds: newActiveIds,
     }
@@ -138,16 +138,18 @@ class HostsStore {
       activeIds: newActiveIds,
     }
     this.saveConfig()
+
+    // Auto-apply hosts when toggling
+    this.applyHosts().catch((error) => {
+      console.error('Failed to auto-apply hosts after toggle:', error)
+    })
   }
 
   async applyHosts() {
     if (!this.config) return
 
     try {
-      window.hosts.applyHosts(
-        toJS(this.config.activeIds),
-        toJS(this.config.configs)
-      )
+      hosts.applyHosts(toJS(this.config.activeIds), toJS(this.config.configs))
       await this.loadSystemHosts()
     } catch (error) {
       console.error('Failed to apply hosts:', error)

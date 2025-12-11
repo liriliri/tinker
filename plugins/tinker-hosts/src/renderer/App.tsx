@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import store from './store'
 import { Sidebar, Editor } from './components'
 
-const App = observer(() => {
+export default observer(function App() {
   useEffect(() => {
     const init = async () => {
       await store.loadConfig()
@@ -19,5 +19,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App

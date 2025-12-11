@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import store from '../store'
 
-export const Toolbar: React.FC = observer(() => {
+export default observer(function Toolbar() {
   const { config } = store
   const [isApplying, setIsApplying] = useState(false)
   const [message, setMessage] = useState<{
@@ -37,12 +37,12 @@ export const Toolbar: React.FC = observer(() => {
   )
 
   return (
-    <div className="h-12 bg-[#f8f8f8] dark:bg-[#2d2d30] border-b border-gray-300 dark:border-gray-700 flex items-center px-4 gap-4">
+    <div className="h-12 bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center px-4 gap-4">
       <button
         className={`px-4 py-2 text-sm rounded font-semibold ${
           isApplying
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-green-500 hover:bg-green-600'
+            : 'bg-[#0fc25e] hover:bg-[#0db350]'
         } text-white`}
         onClick={handleApply}
         disabled={isApplying || activeConfigs.length === 0}
@@ -59,7 +59,7 @@ export const Toolbar: React.FC = observer(() => {
             {activeConfigs.map((cfg) => (
               <span
                 key={cfg.id}
-                className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
+                className="px-2 py-1 bg-gray-300 dark:bg-[#4a4a4a] text-gray-800 dark:text-gray-200 rounded text-xs"
               >
                 {cfg.name}
               </span>
@@ -72,8 +72,8 @@ export const Toolbar: React.FC = observer(() => {
         <div
           className={`ml-auto px-3 py-1 rounded text-sm ${
             message.type === 'success'
-              ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-              : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+              ? 'bg-[#0fc25e] bg-opacity-20 text-[#0fc25e]'
+              : 'bg-red-500 bg-opacity-20 text-red-500'
           }`}
         >
           {message.text}
