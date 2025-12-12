@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import Dialog from './Dialog'
 
 export interface AlertOptions {
-  title?: string
-  message: string
+  title: string
+  message?: string
   confirmText?: string
 }
 
@@ -42,11 +42,13 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
         <Dialog
           open={true}
           onClose={handleClose}
-          title={alertState.title || '提示'}
+          title={alertState.title}
         >
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
-            {alertState.message}
-          </p>
+          {alertState.message && (
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
+              {alertState.message}
+            </p>
+          )}
           <div className="flex justify-end">
             <button
               className="px-4 py-2 text-sm bg-[#0fc25e] hover:bg-[#0db350] text-white rounded"

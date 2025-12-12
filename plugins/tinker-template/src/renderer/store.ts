@@ -1,4 +1,7 @@
 import { makeAutoObservable } from 'mobx'
+import safeStorage from 'licia/safeStorage'
+
+const storage = safeStorage('localStorage')
 
 class TemplateStore {
   // UI state
@@ -34,7 +37,7 @@ class TemplateStore {
   }
 
   private loadSavedData() {
-    const saved = localStorage.getItem('template-saved-data')
+    const saved = storage.getItem('template-saved-data')
     if (saved) {
       this.savedData = saved
     }
@@ -70,12 +73,12 @@ class TemplateStore {
   }
 
   saveData() {
-    localStorage.setItem('template-saved-data', this.savedData)
+    storage.setItem('template-saved-data', this.savedData)
     alert('Data saved to localStorage!')
   }
 
   clearData() {
-    localStorage.removeItem('template-saved-data')
+    storage.removeItem('template-saved-data')
     this.savedData = ''
     alert('Data cleared!')
   }

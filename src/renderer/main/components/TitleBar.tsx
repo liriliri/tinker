@@ -89,22 +89,36 @@ export default observer(function Titlebar() {
       <div className={Style.icon}>
         <img src={icon} draggable={false} />
       </div>
-      <input
-        className={Style.input}
-        placeholder={t('searchTool')}
-        autoFocus={true}
-        value={store.filter}
-        ref={inputRef}
-        onChange={(e) => {
-          if (store.plugin) {
-            store.closePlugin()
-            store.setFilter('')
-          } else {
-            store.setFilter(e.target.value)
-          }
-        }}
+      <div
+        className={Style.inputContainer}
         onDoubleClick={() => main.toggleWinMaximize()}
-      />
+      >
+        <input
+          className={Style.input}
+          placeholder={t('searchTool')}
+          autoFocus={true}
+          value={store.filter}
+          ref={inputRef}
+          onChange={(e) => {
+            if (store.plugin) {
+              store.closePlugin()
+              store.setFilter('')
+            } else {
+              store.setFilter(e.target.value)
+            }
+          }}
+        />
+        {store.plugin && (
+          <span
+            className="icon-close"
+            onClick={() => {
+              store.closePlugin()
+              store.setFilter('')
+              inputRef.current?.focus()
+            }}
+          />
+        )}
+      </div>
       <div className={Style.more} onClick={onMoreClick}>
         <span className="icon-more" />
       </div>

@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import Dialog from './Dialog'
 
 export interface ConfirmOptions {
-  title?: string
-  message: string
+  title: string
+  message?: string
   confirmText?: string
   cancelText?: string
 }
@@ -53,11 +53,13 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
         <Dialog
           open={true}
           onClose={handleCancel}
-          title={confirmState.title || '确认'}
+          title={confirmState.title}
         >
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
-            {confirmState.message}
-          </p>
+          {confirmState.message && (
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
+              {confirmState.message}
+            </p>
+          )}
           <div className="flex gap-2 justify-end">
             <button
               className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"

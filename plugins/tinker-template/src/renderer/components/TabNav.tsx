@@ -12,7 +12,7 @@ interface TabNavProps {
 
 export default observer(function TabNav({ tabs }: TabNavProps) {
   return (
-    <div className="flex gap-2 mb-6 border-b border-[#e0e0e0] dark:border-[#4a4a4a]">
+    <div className="flex gap-2 border-b border-[#e0e0e0] dark:border-[#4a4a4a]">
       {tabs.map((tab) => (
         <button
           key={tab.id}

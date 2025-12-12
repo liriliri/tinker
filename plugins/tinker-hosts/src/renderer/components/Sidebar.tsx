@@ -1,7 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { confirm, prompt } from 'share/renderer/components'
+import { confirm } from 'share/components/Confirm'
+import { prompt } from 'share/components/Prompt'
+import { alert } from 'share/components/Alert'
 import { FileText, Monitor, Plus, Upload, Download } from 'lucide-react'
 import contain from 'licia/contain'
 import each from 'licia/each'
@@ -74,7 +76,7 @@ export default observer(function Sidebar() {
         hosts.writeFile(result.filePath, dataStr)
       } catch (error) {
         console.error('Failed to export configs:', error)
-        alert('导出失败')
+        alert({ title: '导出失败' })
       }
     }
   }
@@ -106,7 +108,7 @@ export default observer(function Sidebar() {
             }
           } catch (error) {
             console.error('Failed to import configs:', error)
-            alert('导入失败：文件格式不正确')
+            alert({ title: '导入失败', message: '文件格式不正确' })
           }
         }
         reader.readAsText(file)

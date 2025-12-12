@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  AlertProvider,
-  ConfirmProvider,
-  PromptProvider,
-} from 'share/renderer/components'
+import { AlertProvider } from 'share/components/Alert'
+import { ConfirmProvider } from 'share/components/Confirm'
+import { PromptProvider } from 'share/components/Prompt'
 import store from './store'
 import { Sidebar, Editor } from './components'
 

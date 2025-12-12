@@ -20,8 +20,32 @@
   }
 }
 
-.input {
+.input-container {
   flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  :global(.icon-close) {
+    position: absolute;
+    right: 0;
+    background: var(--color-fill-tertiary);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    &:hover {
+      background: var(--color-fill-secondary);
+    }
+  }
+}
+
+.input {
+  width: 100%;
   border: none;
   outline: none;
   text-align: center;

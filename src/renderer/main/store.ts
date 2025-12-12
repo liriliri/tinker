@@ -22,14 +22,14 @@ class Store extends BaseStore {
   setFilter(filter: string) {
     this.filter = filter
   }
-  openPlugin(id: string) {
+  openPlugin(id: string, detached = false) {
     const plugin = this.getPlugin(id)
     if (!plugin) {
       return
     }
 
-    main.openPlugin(id).then((opened) => {
-      if (opened) {
+    main.openPlugin(id, detached).then((opened) => {
+      if (opened && !detached) {
         runInAction(() => {
           this.plugin = plugin
           this.filter = plugin.name

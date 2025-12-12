@@ -22,6 +22,9 @@ export default observer(function PluginList() {
         onClick={(e: any, icon) => {
           store.openPlugin((icon.data as any).id)
         }}
+        onDoubleClick={(e: any, icon) => {
+          store.openPlugin((icon.data as any).id, true)
+        }}
         icons={icons}
         size={64}
         filter={store.filter}

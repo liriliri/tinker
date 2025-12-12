@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import Dialog from './Dialog'
 
 export interface PromptOptions {
-  title?: string
-  message: string
+  title: string
+  message?: string
   defaultValue?: string
   placeholder?: string
   confirmText?: string
@@ -67,11 +67,13 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
         <Dialog
           open={true}
           onClose={handleCancel}
-          title={promptState.title || '输入'}
+          title={promptState.title}
         >
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-            {promptState.message}
-          </p>
+          {promptState.message && (
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+              {promptState.message}
+            </p>
+          )}
           <input
             type="text"
             className="w-full px-3 py-2 mb-6 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fc25e]"

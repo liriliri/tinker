@@ -22,7 +22,9 @@ function injectRendererScript() {
 }
 
 async function preparePlugin(plugin: IPlugin) {
-  document.title = plugin.name
+  window.addEventListener('DOMContentLoaded', () => {
+    document.title = plugin.name
+  })
   if (plugin.preload) {
     await import(pathToFileURL(plugin.preload).href)
   }

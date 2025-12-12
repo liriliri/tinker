@@ -87,7 +87,7 @@ const pluginViews: types.PlainObj<{
   win: BrowserWindow
 }> = {}
 
-const openPlugin: IpcOpenPlugin = async function (id) {
+const openPlugin: IpcOpenPlugin = async function (id, detached) {
   const plugin = plugins[id]
   if (!plugin) {
     return false
@@ -118,8 +118,12 @@ const openPlugin: IpcOpenPlugin = async function (id) {
     await pluginView.webContents.loadFile(plugin.main)
   }
 
-  win.contentView.addChildView(pluginView)
-  layoutPlugin(id)
+  if (detached) {
+    detachPlugin(id)
+  } else {
+    win.contentView.addChildView(pluginView)
+    layoutPlugin(id)
+  }
 
   return true
 }

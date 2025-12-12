@@ -1,4 +1,5 @@
 .claude/
 node_modules/
 dist/
+release/
 package-lock.json

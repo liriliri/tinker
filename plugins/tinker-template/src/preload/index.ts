@@ -54,8 +54,7 @@ const templateObj = {
 
   // Get app data path
   getAppDataPath(): string {
-    const appDataPath = join(homedir(), '.tinker-template')
-    return appDataPath
+    return join(homedir(), '.tinker-template')
   },
 }
 
