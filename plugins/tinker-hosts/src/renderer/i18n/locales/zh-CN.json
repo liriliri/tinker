@@ -17,6 +17,8 @@
   "applyConfig": "应用配置 ({{count}} 个激活)",
   "edit": "编辑",
   "delete": "删除",
+  "apply": "应用",
+  "deactivate": "停用",
   "deleteConfirmTitle": "确认删除",
   "deleteConfirm": "确定要删除 \"{{name}}\" 吗？",
   "applyHint": "提示：修改配置后需点击\"应用配置\"按钮才会生效到系统 hosts 文件",

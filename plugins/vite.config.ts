@@ -35,5 +35,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
+    resolve: {
+      alias: {
+        share: path.join(cwd, '../share/'),
+      },
+    },
   }
 })

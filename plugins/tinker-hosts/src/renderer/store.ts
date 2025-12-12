@@ -123,6 +123,13 @@ class HostsStore {
     )
     this.configs = newConfigs
     this.saveConfigs()
+
+    // Auto-apply hosts if this config is active
+    if (this.activeIds.includes(id)) {
+      this.applyHosts().catch((error) => {
+        console.error('Failed to auto-apply hosts after update:', error)
+      })
+    }
   }
 
   addConfig(name: string) {

@@ -17,6 +17,8 @@
   "applyConfig": "Apply Config ({{count}} active)",
   "edit": "Edit",
   "delete": "Delete",
+  "apply": "Apply",
+  "deactivate": "Deactivate",
   "deleteConfirmTitle": "Confirm Delete",
   "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
   "applyHint": "Tip: After modifying the configuration, you need to click \"Apply Config\" button to apply it to the system hosts file",

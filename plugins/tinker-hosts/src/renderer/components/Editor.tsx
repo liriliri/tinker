@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import MonacoEditor, { Monaco } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
+import debounce from 'licia/debounce'
 
 // Register custom hosts language
 const registerHostsLanguage = (monaco: Monaco) => {
@@ -81,9 +82,24 @@ export default observer(function Editor() {
   const { t } = useTranslation()
   const { configs, systemHosts, selectedId, viewMode, isDark } = store
   const [content, setContent] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<Monaco | null>(null)
+  const currentIdRef = useRef<string | 'system'>(selectedId)
+
+  // Update current ID ref when selectedId changes
+  useEffect(() => {
+    currentIdRef.current = selectedId
+  }, [selectedId])
+
+  // Create debounced save function
+  const debouncedSave = useCallback(
+    debounce((id: string, newContent: string) => {
+      if (id !== 'system') {
+        store.updateConfig(id, newContent)
+      }
+    }, 500),
+    []
+  )
 
   useEffect(() => {
     if (viewMode === 'system') {
@@ -96,19 +112,6 @@ export default observer(function Editor() {
     }
   }, [viewMode, systemHosts, configs, selectedId])
 
-  const handleSave = async () => {
-    if (selectedId === 'system' || viewMode === 'system') return
-
-    setIsSaving(true)
-    try {
-      store.updateConfig(selectedId as string, content)
-    } catch (error) {
-      console.error('Failed to save:', error)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
@@ -119,7 +122,12 @@ export default observer(function Editor() {
   }
 
   const handleEditorChange = (value: string | undefined) => {
-    setContent(value || '')
+    const newContent = value || ''
+    setContent(newContent)
+    // Auto-save after debounce if not readonly
+    if (viewMode !== 'system' && currentIdRef.current !== 'system') {
+      debouncedSave(currentIdRef.current, newContent)
+    }
   }
 
   const isReadonly = viewMode === 'system'
@@ -150,23 +158,12 @@ export default observer(function Editor() {
         />
       </div>
 
-      <div className="h-[60px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-end flex-shrink-0 min-w-0 overflow-x-auto">
-        {isReadonly ? (
-          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-300 dark:bg-[#4a4a4a] px-2 py-1 rounded">
+      {/* Bottom bar */}
+      <div className="h-[36px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-end flex-shrink-0">
+        {isReadonly && (
+          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#3a3a3c] px-2 py-1 rounded">
             {t('readonly')}
           </span>
-        ) : (
-          <button
-            className={`px-4 py-2 text-sm rounded whitespace-nowrap ${
-              isSaving
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-[#0fc25e] hover:bg-[#0db350]'
-            } text-white`}
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? t('saving') : t('save')}
-          </button>
         )}
       </div>
     </div>
