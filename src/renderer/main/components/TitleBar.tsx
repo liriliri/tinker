@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import Style from './Titlebar.module.scss'
+import Style from './TitleBar.module.scss'
 import logo from '../../assets/logo.png'
 import { t } from 'common/util'
 import { useCallback, useEffect, useRef } from 'react'
