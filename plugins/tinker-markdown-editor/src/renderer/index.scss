@@ -1,7 +1,7 @@
 @use 'tailwindcss';
 @import 'github-markdown-css/github-markdown.css';
 
-body.dark {
+html.dark {
   color-scheme: dark;
 }
 

@@ -26,7 +26,6 @@ export default observer(function Sidebar() {
   const handleAddConfig = async () => {
     const name = await prompt({
       title: t('newConfig'),
-      message: t('configNamePlaceholder'),
       placeholder: t('configNamePlaceholder'),
     })
 
@@ -38,7 +37,6 @@ export default observer(function Sidebar() {
   const handleEditConfig = async (id: string, name: string) => {
     const newName = await prompt({
       title: t('editConfig'),
-      message: t('configNamePlaceholder'),
       defaultValue: name,
       placeholder: t('configNamePlaceholder'),
     })
