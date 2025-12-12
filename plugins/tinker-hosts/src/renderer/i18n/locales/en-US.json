@@ -23,5 +23,6 @@
   "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
   "applyHint": "Tip: After modifying the configuration, you need to click \"Apply Config\" button to apply it to the system hosts file",
   "noActiveConfig": "No active configurations. Please activate at least one configuration.",
-  "emptyConfig": "Active configurations are empty. Please add content to at least one active configuration."
+  "emptyConfig": "Active configurations are empty. Please add content to at least one active configuration.",
+  "openHostsFile": "Open Hosts File"
 }

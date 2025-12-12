@@ -1,5 +1,8 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import safeStorage from 'licia/safeStorage'
+import uuid from 'licia/uuid'
+import contain from 'licia/contain'
+import remove from 'licia/remove'
 import { HostsConfig, ViewMode } from './types'
 
 const STORAGE_KEY_CONFIGS = 'tinker-hosts-configs'
@@ -125,7 +128,7 @@ class HostsStore {
     this.saveConfigs()
 
     // Auto-apply hosts if this config is active
-    if (this.activeIds.includes(id)) {
+    if (contain(this.activeIds, id)) {
       this.applyHosts().catch((error) => {
         console.error('Failed to auto-apply hosts after update:', error)
       })
@@ -134,7 +137,7 @@ class HostsStore {
 
   addConfig(name: string) {
     const newConfig: HostsConfig = {
-      id: Date.now().toString(),
+      id: uuid(),
       name,
       content: '',
     }
@@ -151,18 +154,20 @@ class HostsStore {
   }
 
   deleteConfig(id: string) {
-    this.configs = this.configs.filter((c) => c.id !== id)
-    this.activeIds = this.activeIds.filter((aid) => aid !== id)
+    remove(this.configs, (c) => c.id === id)
+    remove(this.activeIds, (aid) => aid === id)
 
     this.saveConfigs()
     this.saveActiveIds()
   }
 
   toggleActive(id: string) {
-    const isActive = this.activeIds.includes(id)
-    this.activeIds = isActive
-      ? this.activeIds.filter((aid) => aid !== id)
-      : [...this.activeIds, id]
+    const isActive = contain(this.activeIds, id)
+    if (isActive) {
+      remove(this.activeIds, (aid) => aid === id)
+    } else {
+      this.activeIds = [...this.activeIds, id]
+    }
 
     this.saveActiveIds()
 

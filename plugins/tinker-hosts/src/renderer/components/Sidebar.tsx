@@ -1,7 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Dialog, confirm, prompt } from 'share/renderer/components'
+import { confirm, prompt } from 'share/renderer/components'
+import { FileText, Monitor, Plus, Upload, Download } from 'lucide-react'
+import contain from 'licia/contain'
+import each from 'licia/each'
+import isArr from 'licia/isArr'
 import store from '../store'
 import { HostsConfig } from '../types'
 
@@ -57,17 +61,24 @@ export default observer(function Sidebar() {
     }
   }
 
-  const handleExport = () => {
-    const dataStr = JSON.stringify(configs, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(dataBlob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `hosts-configs-${Date.now()}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+  const handleExport = async () => {
+    const result = await tinker.showSaveDialog({
+      defaultPath: 'hosts-configs.json',
+      filters: [
+        { name: 'JSON Files', extensions: ['json'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+    })
+
+    if (!result.canceled && result.filePath) {
+      try {
+        const dataStr = JSON.stringify(configs, null, 2)
+        hosts.writeFile(result.filePath, dataStr)
+      } catch (error) {
+        console.error('Failed to export configs:', error)
+        alert('导出失败')
+      }
+    }
   }
 
   const handleImport = () => {
@@ -81,9 +92,17 @@ export default observer(function Sidebar() {
         reader.onload = (event) => {
           try {
             const importedConfigs = JSON.parse(event.target?.result as string)
-            if (Array.isArray(importedConfigs)) {
+            if (isArr(importedConfigs)) {
               // Merge imported configs with existing ones
-              const newConfigs = [...configs, ...importedConfigs]
+              // If id exists, replace; if not, add new
+              const configMap: Record<string, HostsConfig> = {}
+              each(configs, (c) => {
+                configMap[c.id] = c
+              })
+              each(importedConfigs, (imported) => {
+                configMap[imported.id] = imported
+              })
+              const newConfigs = Object.values(configMap)
               store.configs = newConfigs
               store.saveConfigs()
             }
@@ -102,7 +121,7 @@ export default observer(function Sidebar() {
     e.preventDefault()
     e.stopPropagation()
 
-    const isActive = activeIds.includes(cfg.id)
+    const isActive = contain(activeIds, cfg.id)
 
     tinker.showContextMenu(e.clientX, e.clientY, [
       {
@@ -127,7 +146,7 @@ export default observer(function Sidebar() {
   }
 
   const renderConfigItem = (cfg: HostsConfig) => {
-    const isActive = activeIds.includes(cfg.id)
+    const isActive = contain(activeIds, cfg.id)
     const isSelected = selectedId === cfg.id
 
     return (
@@ -139,19 +158,7 @@ export default observer(function Sidebar() {
         onClick={() => handleSelect(cfg.id)}
         onContextMenu={(e) => handleConfigContextMenu(e, cfg)}
       >
-        <svg
-          className="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
+        <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0" />
         <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 truncate">
           {cfg.name}
         </span>
@@ -180,19 +187,7 @@ export default observer(function Sidebar() {
         onClick={handleSystemView}
       >
         <div className="flex items-center gap-2">
-          <svg
-            className="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
+          <Monitor className="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0" />
           <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
             {t('viewSystemHosts')}
           </span>
@@ -211,57 +206,21 @@ export default observer(function Sidebar() {
           onClick={handleAddConfig}
           title="新增配置"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
+          <Plus className="w-5 h-5" />
         </button>
         <button
           className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a3c] rounded transition-colors"
           onClick={handleExport}
           title="导出配置"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
+          <Upload className="w-5 h-5" />
         </button>
         <button
           className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a3c] rounded transition-colors"
           onClick={handleImport}
           title="导入配置"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-            />
-          </svg>
+          <Download className="w-5 h-5" />
         </button>
       </div>
     </div>

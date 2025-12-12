@@ -9,6 +9,7 @@ export default function () {
     getLanguage: _tinker.getLanguage,
     showOpenDialog: _tinker.showOpenDialog,
     showSaveDialog: _tinker.showSaveDialog,
+    showItemInPath: _tinker.showItemInPath,
     on: _tinker.on,
     showContextMenu,
   }

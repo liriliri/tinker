@@ -11,6 +11,7 @@ declare global {
     getLanguage(): Promise<string>
     showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue>
     showSaveDialog(options: SaveDialogOptions): Promise<SaveDialogReturnValue>
+    showItemInPath(path: string): void
     on(event: string, callback: (...args: any[]) => void): () => void
     showContextMenu: (
       x: number,

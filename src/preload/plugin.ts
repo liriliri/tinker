@@ -45,6 +45,7 @@ const tinkerObj = {
   showPluginContextMenu: invoke<IpcShowPluginContextMenu>(
     'showPluginContextMenu'
   ),
+  showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
   on: mainObj.on,
 }

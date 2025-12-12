@@ -13,6 +13,11 @@ interface HostsConfig {
 }
 
 const hostsObj = {
+  // Get system hosts file path
+  getHostsPath(): string {
+    return HOSTS_PATH
+  },
+
   // Read system hosts file
   readSystemHosts(): string {
     try {
@@ -92,6 +97,16 @@ const hostsObj = {
     } catch (error) {
       console.error('Failed to apply hosts:', error)
       throw error
+    }
+  },
+
+  // Write file to specified path
+  writeFile(filePath: string, content: string): void {
+    try {
+      writeFileSync(filePath, content, 'utf-8')
+    } catch (error) {
+      console.error('Failed to write file:', error)
+      throw new Error('Failed to write file.')
     }
   },
 }

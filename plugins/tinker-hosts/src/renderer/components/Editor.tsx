@@ -131,9 +131,11 @@ export default observer(function Editor() {
   }
 
   const isReadonly = viewMode === 'system'
-  const selectedConfig = configs.find((c) => c.id === selectedId)
-  const title =
-    viewMode === 'system' ? t('viewSystemHosts') : selectedConfig?.name || ''
+
+  const handleOpenHostsFile = () => {
+    const hostsPath = hosts.getHostsPath()
+    tinker.showItemInPath(hostsPath)
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-[#1e1e1e] min-h-0 min-w-0">
@@ -158,14 +160,27 @@ export default observer(function Editor() {
         />
       </div>
 
-      {/* Bottom bar */}
-      <div className="h-[36px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-end flex-shrink-0">
-        {isReadonly && (
-          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#3a3a3c] px-2 py-1 rounded">
-            {t('readonly')}
-          </span>
-        )}
-      </div>
+      {/* Bottom bar - only show in system view */}
+      {isReadonly && (
+        <div className="h-[36px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-between flex-shrink-0">
+          {/* Left side - Open Hosts File button */}
+          <div>
+            <button
+              onClick={handleOpenHostsFile}
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-[#3a3a3c] transition-colors cursor-pointer"
+            >
+              {t('openHostsFile')}
+            </button>
+          </div>
+
+          {/* Right side - Readonly badge */}
+          <div>
+            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#3a3a3c] px-2 py-1 rounded">
+              {t('readonly')}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 })
