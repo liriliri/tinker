@@ -9,8 +9,8 @@ import map from 'licia/map'
 import type { ImageFormat, ImageItem } from './types/codecs'
 import BaseStore from 'share/BaseStore'
 
-const STORAGE_KEY_QUALITY = 'imageCompressor.quality'
-const STORAGE_KEY_OVERWRITE = 'imageCompressor.overwriteOriginal'
+const STORAGE_KEY_QUALITY = 'quality'
+const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
 const storage = new LocalStore('tinker-image-compressor')
 
 class Store extends BaseStore {

@@ -5,9 +5,9 @@ import BaseStore from 'share/BaseStore'
 
 type ViewMode = 'edit' | 'diff'
 
-const STORAGE_KEY = 'tinker-text-diff-content'
-const MODE_STORAGE_KEY = 'tinker-text-diff-mode'
-const LANGUAGE_STORAGE_KEY = 'tinker-text-diff-language'
+const STORAGE_KEY = 'content'
+const MODE_STORAGE_KEY = 'mode'
+const LANGUAGE_STORAGE_KEY = 'language'
 
 const storage = new LocalStore('tinker-text-diff')
 

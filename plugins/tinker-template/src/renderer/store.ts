@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import { alert } from 'share/components/Alert'
 
 const storage = new LocalStore('tinker-template')
 
@@ -39,7 +40,7 @@ class Store extends BaseStore {
       const info = template.getSystemInfo()
       this.systemInfo = info
     } catch (error) {
-      alert('Failed to get system info')
+      alert({ title: 'Failed to get system info' })
     }
   }
 
@@ -48,7 +49,7 @@ class Store extends BaseStore {
       const time = template.getCurrentTime()
       this.currentTime = time
     } catch (error) {
-      alert('Failed to get current time')
+      alert({ title: 'Failed to get current time' })
     }
   }
 
@@ -59,13 +60,13 @@ class Store extends BaseStore {
 
   saveData() {
     storage.set('template-saved-data', this.savedData)
-    alert('Data saved to localStorage!')
+    alert({ title: 'Data saved to localStorage!' })
   }
 
   clearData() {
     storage.remove('template-saved-data')
     this.savedData = ''
-    alert('Data cleared!')
+    alert({ title: 'Data cleared!' })
   }
 }
 

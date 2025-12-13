@@ -5,8 +5,8 @@ import BaseStore from 'share/BaseStore'
 type TimestampUnit = 'millisecond' | 'second'
 type Timezone = string
 
-const STORAGE_KEY_UNIT = 'timestamp.unit'
-const STORAGE_KEY_TIMEZONE = 'timestamp.timezone'
+const STORAGE_KEY_UNIT = 'unit'
+const STORAGE_KEY_TIMEZONE = 'timezone'
 const storage = new LocalStore('tinker-timestamp')
 
 // Timezone key mapping

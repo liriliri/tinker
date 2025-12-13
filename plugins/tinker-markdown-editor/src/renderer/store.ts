@@ -4,9 +4,9 @@ import LocalStore from 'licia/LocalStore'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
-const STORAGE_KEY = 'tinker-markdown-editor-content'
-const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
-const VIEW_MODE_KEY = 'tinker-markdown-editor-view-mode'
+const STORAGE_KEY = 'content'
+const FILE_PATH_KEY = 'file-path'
+const VIEW_MODE_KEY = 'view-mode'
 
 const storage = new LocalStore('tinker-markdown-editor')
 

@@ -6,8 +6,8 @@ import remove from 'licia/remove'
 import { HostsConfig, ViewMode } from './types'
 import BaseStore from 'share/BaseStore'
 
-const STORAGE_KEY_CONFIGS = 'tinker-hosts-configs'
-const STORAGE_KEY_ACTIVE_IDS = 'tinker-hosts-active-ids'
+const STORAGE_KEY_CONFIGS = 'configs'
+const STORAGE_KEY_ACTIVE_IDS = 'active-ids'
 
 const storage = new LocalStore('tinker-hosts')
 
