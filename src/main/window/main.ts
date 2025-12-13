@@ -4,6 +4,7 @@ import once from 'licia/once'
 import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
+import isMac from 'licia/isMac'
 
 let win: BrowserWindow | null = null
 
@@ -18,6 +19,7 @@ export function showWin() {
 
   win = window.create({
     name: 'main',
+    skipTaskbar: true,
     titlebar: false,
   })
 
@@ -51,11 +53,13 @@ export function showWin() {
     }
   })
 
-  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-  win.focus()
-  win.setVisibleOnAllWorkspaces(false, {
-    visibleOnFullScreen: true,
-  })
+  if (isMac) {
+    win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    win.focus()
+    win.setVisibleOnAllWorkspaces(false, {
+      visibleOnFullScreen: true,
+    })
+  }
   window.loadPage(win)
 }
 
