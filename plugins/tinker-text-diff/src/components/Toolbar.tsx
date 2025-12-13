@@ -2,22 +2,18 @@ import { observer } from 'mobx-react-lite'
 import { ArrowLeftRight, GitCompare, PenLine, Eraser } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 import { SUPPORTED_LANGUAGES } from '../lib/languageDetector'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
   const isDiffMode = store.mode === 'diff'
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
-  const getModeButtonClass = (isActive: boolean) =>
-    `${baseButtonClass} ${
-      isActive
-        ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
-        : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]'
-    }`
 
   const languageOptions = SUPPORTED_LANGUAGES.map((lang) => ({
     label: lang.label,
@@ -25,25 +21,27 @@ export default observer(function Toolbar() {
   }))
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center justify-between">
+    <Toolbar className="justify-between">
       <div className="flex gap-1 items-center">
-        <button
+        <ToolbarButton
+          variant="toggle"
+          active={store.mode === 'edit'}
           onClick={() => store.setMode('edit')}
-          className={getModeButtonClass(store.mode === 'edit')}
           title={t('editMode')}
         >
-          <PenLine size={iconSize} />
-        </button>
+          <PenLine size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-        <button
+        <ToolbarButton
+          variant="toggle"
+          active={store.mode === 'diff'}
           onClick={() => store.setMode('diff')}
-          className={getModeButtonClass(store.mode === 'diff')}
           title={t('diffMode')}
         >
-          <GitCompare size={iconSize} />
-        </button>
+          <GitCompare size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-        <div className="w-px h-5 bg-[#d0d0d0] dark:bg-[#555555] mx-1.5" />
+        <ToolbarSeparator />
 
         <Select
           value={store.language}
@@ -52,23 +50,21 @@ export default observer(function Toolbar() {
           title={t('selectLanguage')}
         />
 
-        <button
+        <ToolbarButton
           onClick={() => store.swapTexts()}
           disabled={isDiffMode || store.isEmpty}
-          className={actionButtonClass}
           title={t('swap')}
         >
-          <ArrowLeftRight size={iconSize} />
-        </button>
+          <ArrowLeftRight size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-        <button
+        <ToolbarButton
           onClick={() => store.clearText()}
           disabled={isDiffMode || store.isEmpty}
-          className={actionButtonClass}
           title={t('clear')}
         >
-          <Eraser size={iconSize} />
-        </button>
+          <Eraser size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
       </div>
 
       {isDiffMode && (
@@ -81,6 +77,6 @@ export default observer(function Toolbar() {
           </span>
         </div>
       )}
-    </div>
+    </Toolbar>
   )
 })

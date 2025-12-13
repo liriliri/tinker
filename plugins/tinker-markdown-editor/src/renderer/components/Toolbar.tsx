@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
 import {
   Copy,
   Clipboard,
@@ -15,140 +14,121 @@ import {
   Eye,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import store, { type ViewMode } from '../store'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
-  const [copied, setCopied] = useState(false)
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleCopy = async () => {
     await store.copyToClipboard()
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    await copyToClipboard('') // Trigger the copied state
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
-      <button
-        onClick={() => store.newFile()}
-        className={actionButtonClass}
-        title={t('newFile')}
-      >
-        <FilePlus size={iconSize} />
-      </button>
+    <Toolbar>
+      <ToolbarButton onClick={() => store.newFile()} title={t('newFile')}>
+        <FilePlus size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
-        onClick={() => store.openFile()}
-        className={actionButtonClass}
-        title={t('openFile')}
-      >
-        <FolderOpen size={iconSize} />
-      </button>
+      <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
+        <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.saveFile()}
         disabled={store.isEmpty || !store.hasUnsavedChanges}
-        className={actionButtonClass}
         title={t('save')}
       >
-        <Save size={iconSize} />
-      </button>
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
         onClick={() => store.undo()}
         disabled={!store.canUndo}
-        className={actionButtonClass}
         title={t('undo')}
       >
-        <Undo size={iconSize} />
-      </button>
+        <Undo size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.redo()}
         disabled={!store.canRedo}
-        className={actionButtonClass}
         title={t('redo')}
       >
-        <Redo size={iconSize} />
-      </button>
+        <Redo size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.viewMode === 'split'}
         onClick={() => store.setViewMode('split')}
-        className={
-          store.viewMode === 'split'
-            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
-            : actionButtonClass
-        }
         title={t('splitView')}
       >
-        <Columns2 size={iconSize} />
-      </button>
+        <Columns2 size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.viewMode === 'editor'}
         onClick={() => store.setViewMode('editor')}
-        className={
-          store.viewMode === 'editor'
-            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
-            : actionButtonClass
-        }
         title={t('editorOnly')}
       >
-        <FileEdit size={iconSize} />
-      </button>
+        <FileEdit size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.viewMode === 'preview'}
         onClick={() => store.setViewMode('preview')}
-        className={
-          store.viewMode === 'preview'
-            ? `${baseButtonClass} bg-gray-300 dark:bg-[#4a4a4a]`
-            : actionButtonClass
-        }
         title={t('previewOnly')}
       >
-        <Eye size={iconSize} />
-      </button>
+        <Eye size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
         onClick={handleCopy}
         disabled={store.isEmpty}
-        className={
-          copied
-            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
-            : actionButtonClass
-        }
+        className={copied ? 'text-[#0fc25e]' : ''}
         title={t('copy')}
       >
-        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      </button>
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.pasteFromClipboard()}
-        className={actionButtonClass}
         title={t('paste')}
       >
-        <Clipboard size={iconSize} />
-      </button>
+        <Clipboard size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.clearMarkdown()}
         disabled={store.isEmpty}
-        className={actionButtonClass}
         title={t('clear')}
       >
-        <Eraser size={iconSize} />
-      </button>
+        <Eraser size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
       {store.currentFileName && (
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-2 whitespace-nowrap">
@@ -161,6 +141,6 @@ export default observer(function Toolbar() {
           {t('lines', { count: store.lineCount })}
         </div>
       )}
-    </div>
+    </Toolbar>
   )
 })

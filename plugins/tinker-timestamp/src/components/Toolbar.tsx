@@ -1,33 +1,23 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
 import { Clock, Copy, RotateCcw, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import store from '../store'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
-  const [copied, setCopied] = useState(false)
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const getUnitButtonClass = (isActive: boolean) =>
-    `px-2 py-1 text-xs rounded transition-colors ${
-      isActive
-        ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
-        : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]'
-    }`
-
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const copyCurrentTimestamp = async () => {
-    try {
-      await navigator.clipboard.writeText(store.currentTimestampDisplay)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy:', err)
-    }
+    await copyToClipboard(store.currentTimestampDisplay)
   }
 
   const resetData = () => {
@@ -42,25 +32,29 @@ export default observer(function Toolbar() {
   }))
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
+    <Toolbar>
       {/* Unit Selection */}
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.timestampUnit === 'millisecond'}
         onClick={() => store.setTimestampUnit('millisecond')}
-        className={getUnitButtonClass(store.timestampUnit === 'millisecond')}
+        className="px-2 py-1 text-xs"
         title={t('millisecond')}
       >
         {t('millisecond')}
-      </button>
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.timestampUnit === 'second'}
         onClick={() => store.setTimestampUnit('second')}
-        className={getUnitButtonClass(store.timestampUnit === 'second')}
+        className="px-2 py-1 text-xs"
         title={t('second')}
       >
         {t('second')}
-      </button>
+      </ToolbarButton>
 
-      <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
       {/* Timezone Selector */}
       <Select
@@ -69,7 +63,7 @@ export default observer(function Toolbar() {
         options={timezoneOptions}
       />
 
-      <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
       {/* Current Timestamp Display */}
       <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-[#1e1e1e] rounded text-xs font-mono">
@@ -78,28 +72,24 @@ export default observer(function Toolbar() {
       </div>
 
       {/* Copy */}
-      <button
+      <ToolbarButton
         onClick={copyCurrentTimestamp}
-        className={
-          copied
-            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
-            : actionButtonClass
-        }
+        className={copied ? 'text-[#0fc25e]' : ''}
         title={t('copy')}
       >
-        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      </button>
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
       {/* Reset */}
-      <button
-        onClick={resetData}
-        className={actionButtonClass}
-        title={t('reload')}
-      >
-        <RotateCcw size={iconSize} />
-      </button>
-    </div>
+      <ToolbarButton onClick={resetData} title={t('reload')}>
+        <RotateCcw size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+    </Toolbar>
   )
 })

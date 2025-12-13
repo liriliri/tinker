@@ -1,18 +1,20 @@
 import { observer } from 'mobx-react-lite'
 import { ListX, Eraser, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
+import {
+  Toolbar,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import store from '../store'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
-  const [copied, setCopied] = useState(false)
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const getCurrentLine = () => {
     return find(store.lines, (line) => line.id === store.activeLineId)
@@ -30,13 +32,7 @@ export default observer(function Toolbar() {
   const handleCopyResult = async () => {
     const currentLine = getCurrentLine()
     if (currentLine && currentLine.result) {
-      try {
-        await navigator.clipboard.writeText(currentLine.result)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-      } catch (err) {
-        console.error('Failed to copy:', err)
-      }
+      await copyToClipboard(currentLine.result)
     }
   }
 
@@ -46,39 +42,37 @@ export default observer(function Toolbar() {
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
-      <button
+    <Toolbar>
+      <ToolbarButton
         onClick={handleClearCurrentLine}
         disabled={isCurrentLineEmpty()}
-        className={actionButtonClass}
         title={t('clearCurrent')}
       >
-        <Eraser size={iconSize} />
-      </button>
+        <Eraser size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={handleCopyResult}
         disabled={!hasResult()}
-        className={
-          copied
-            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
-            : actionButtonClass
-        }
+        className={copied ? 'text-[#0fc25e]' : ''}
         title={t('copyResult')}
       >
-        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      </button>
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
-      <button
+      <ToolbarButton
         onClick={() => store.clear()}
         disabled={store.isEmpty}
-        className={actionButtonClass}
         title={t('clear')}
       >
-        <ListX size={iconSize} />
-      </button>
-    </div>
+        <ListX size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+    </Toolbar>
   )
 })

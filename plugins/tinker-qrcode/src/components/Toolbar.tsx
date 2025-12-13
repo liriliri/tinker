@@ -1,14 +1,20 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
 import { Download, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import Select from 'share/components/Select'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
-  const [copied, setCopied] = useState(false)
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const CUSTOM_VALUE = 'custom'
   const sizeOptions = [
@@ -44,9 +50,6 @@ export default observer(function Toolbar() {
     }
   }
 
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
-
   const handleDownload = () => {
     if (!store.qrCodeDataURL) return
 
@@ -65,8 +68,7 @@ export default observer(function Toolbar() {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob }),
         ])
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+        await copyToClipboard('') // Trigger the copied state
       })
     } catch (err) {
       console.error('Failed to copy:', err)
@@ -74,7 +76,7 @@ export default observer(function Toolbar() {
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
+    <Toolbar>
       {/* Size Control */}
       <div className="flex items-center gap-1.5 px-1">
         <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
@@ -96,7 +98,7 @@ export default observer(function Toolbar() {
         />
       </div>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
       {/* Foreground Color */}
       <div className="flex items-center gap-1.5 px-1">
@@ -124,32 +126,31 @@ export default observer(function Toolbar() {
         />
       </div>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
       {/* Action Buttons */}
-      <button
+      <ToolbarButton
         onClick={handleCopy}
         disabled={!store.text}
-        className={
-          copied
-            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
-            : actionButtonClass
-        }
+        className={copied ? 'text-[#0fc25e]' : ''}
         title={t('copy')}
       >
-        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      </button>
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={handleDownload}
         disabled={!store.text}
-        className={actionButtonClass}
         title={t('download')}
       >
-        <Download size={iconSize} />
-      </button>
+        <Download size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
       {/* Info */}
       {store.text && (
@@ -157,6 +158,6 @@ export default observer(function Toolbar() {
           {store.text.length} {t('characters')}
         </div>
       )}
-    </div>
+    </Toolbar>
   )
 })

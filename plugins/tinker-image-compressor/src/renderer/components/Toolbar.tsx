@@ -4,6 +4,13 @@ import { FolderOpen, Save, ListX, Info } from 'lucide-react'
 import { useState } from 'react'
 import fileSize from 'licia/fileSize'
 import Select from 'share/components/Select'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 
 const QUALITY_LEVELS = [
@@ -14,13 +21,9 @@ const QUALITY_LEVELS = [
   { label: 'qualityExcellent', value: 95 },
 ]
 
-const Toolbar = observer(() => {
+const ToolbarComponent = observer(() => {
   const { t } = useTranslation()
-  const iconSize = 14
   const [showStats, setShowStats] = useState(false)
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
 
   const handleQualityChange = (value: number) => {
     store.setQuality(value)
@@ -60,34 +63,28 @@ const Toolbar = observer(() => {
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
-      <button
-        onClick={handleOpenImage}
-        className={actionButtonClass}
-        title={t('openImage')}
-      >
-        <FolderOpen size={iconSize} />
-      </button>
+    <Toolbar>
+      <ToolbarButton onClick={handleOpenImage} title={t('openImage')}>
+        <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={handleClear}
         disabled={!store.hasImages}
-        className={actionButtonClass}
         title={t('clear')}
       >
-        <ListX size={iconSize} />
-      </button>
+        <ListX size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
         onClick={handleSaveImage}
         disabled={!store.hasUnsaved}
-        className={actionButtonClass}
         title={t('saveImage')}
       >
-        <Save size={iconSize} />
-      </button>
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
       <label className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-80">
         <input
@@ -99,19 +96,18 @@ const Toolbar = observer(() => {
         <span>{t('overwriteOriginal')}</span>
       </label>
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
       {/* Statistics Info */}
       <div className="relative">
-        <button
+        <ToolbarButton
           onMouseEnter={() => setShowStats(true)}
           onMouseLeave={() => setShowStats(false)}
-          className={actionButtonClass}
           title={t('statistics')}
           disabled={!store.hasImages}
         >
-          <Info size={iconSize} />
-        </button>
+          <Info size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
         {/* Statistics Tooltip */}
         {showStats && store.hasImages && (
@@ -162,7 +158,7 @@ const Toolbar = observer(() => {
         )}
       </div>
 
-      <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-2" />
+      <ToolbarSeparator />
 
       {/* Quality Select */}
       <div className="flex gap-2 items-center">
@@ -177,7 +173,7 @@ const Toolbar = observer(() => {
         />
       </div>
 
-      <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-2" />
+      <ToolbarSeparator />
 
       {/* Compress Button */}
       <button
@@ -189,8 +185,8 @@ const Toolbar = observer(() => {
       >
         {store.isCompressing ? t('compressing') : t('compress')}
       </button>
-    </div>
+    </Toolbar>
   )
 })
 
-export default Toolbar
+export default ToolbarComponent

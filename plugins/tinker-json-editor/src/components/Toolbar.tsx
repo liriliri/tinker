@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
 import {
   AlignJustify,
   Copy,
@@ -14,164 +13,151 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import store from '../store'
 import ExpandIcon from '../assets/expand.svg?react'
 import CollapseIcon from '../assets/collapse.svg?react'
 import MinifyIcon from '../assets/minify.svg?react'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const iconSize = 14
-  const [copied, setCopied] = useState(false)
-
-  const baseButtonClass = 'p-1.5 rounded transition-colors'
-  const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
-  const getModeButtonClass = (isActive: boolean) =>
-    `${baseButtonClass} ${
-      isActive
-        ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
-        : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]'
-    }`
+  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleCopy = async () => {
     await store.copyToClipboard()
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    await copyToClipboard('') // Trigger the copied state
   }
 
   return (
-    <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
-      <button
+    <Toolbar>
+      <ToolbarButton
+        variant="toggle"
+        active={store.mode === 'text'}
         onClick={() => store.setMode('text')}
-        className={getModeButtonClass(store.mode === 'text')}
         title={t('textMode')}
       >
-        <FileText size={iconSize} />
-      </button>
+        <FileText size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
+        variant="toggle"
+        active={store.mode === 'tree'}
         onClick={() => store.setMode('tree')}
-        className={getModeButtonClass(store.mode === 'tree')}
         title={t('treeMode')}
       >
-        <Network size={iconSize} />
-      </button>
+        <Network size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
         onClick={() => store.undo()}
         disabled={!store.canUndo}
-        className={actionButtonClass}
         title={t('undo')}
       >
-        <Undo size={iconSize} />
-      </button>
+        <Undo size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.redo()}
         disabled={!store.canRedo}
-        className={actionButtonClass}
         title={t('redo')}
       >
-        <Redo size={iconSize} />
-      </button>
+        <Redo size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
       {store.mode === 'text' ? (
         <>
-          <button
+          <ToolbarButton
             onClick={() => store.formatJson()}
             disabled={store.isEmpty}
-            className={actionButtonClass}
             title={t('format')}
           >
-            <AlignJustify size={iconSize} />
-          </button>
+            <AlignJustify size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
 
-          <button
+          <ToolbarButton
             onClick={() => store.minifyJson()}
             disabled={store.isEmpty}
-            className={actionButtonClass}
             title={t('minify')}
           >
             <MinifyIcon
-              width={iconSize}
-              height={iconSize}
+              width={TOOLBAR_ICON_SIZE}
+              height={TOOLBAR_ICON_SIZE}
               className="fill-current"
             />
-          </button>
+          </ToolbarButton>
         </>
       ) : (
         <>
-          <button
+          <ToolbarButton
             onClick={() => store.expandAll()}
             disabled={store.isEmpty}
-            className={actionButtonClass}
             title={t('expandAll')}
           >
             <ExpandIcon
-              width={iconSize}
-              height={iconSize}
+              width={TOOLBAR_ICON_SIZE}
+              height={TOOLBAR_ICON_SIZE}
               className="fill-current"
             />
-          </button>
+          </ToolbarButton>
 
-          <button
+          <ToolbarButton
             onClick={() => store.collapseAll()}
             disabled={store.isEmpty}
-            className={actionButtonClass}
             title={t('collapseAll')}
           >
             <CollapseIcon
-              width={iconSize}
-              height={iconSize}
+              width={TOOLBAR_ICON_SIZE}
+              height={TOOLBAR_ICON_SIZE}
               className="fill-current"
             />
-          </button>
+          </ToolbarButton>
         </>
       )}
 
-      <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
+      <ToolbarSeparator />
 
-      <button
+      <ToolbarButton
         onClick={handleCopy}
         disabled={store.isEmpty}
-        className={
-          copied
-            ? `${baseButtonClass} text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c]`
-            : actionButtonClass
-        }
+        className={copied ? 'text-[#0fc25e]' : ''}
         title={t('copy')}
       >
-        {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      </button>
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.pasteFromClipboard()}
-        className={actionButtonClass}
         title={t('paste')}
       >
-        <Clipboard size={iconSize} />
-      </button>
+        <Clipboard size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
-        onClick={() => store.openFile()}
-        className={actionButtonClass}
-        title={t('openFile')}
-      >
-        <FolderOpen size={iconSize} />
-      </button>
+      <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
+        <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
-      <button
+      <ToolbarButton
         onClick={() => store.clearJson()}
         disabled={store.isEmpty}
-        className={actionButtonClass}
         title={t('clear')}
       >
-        <Eraser size={iconSize} />
-      </button>
+        <Eraser size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
       {store.jsonError && (
         <div
@@ -182,13 +168,13 @@ export default observer(function Toolbar() {
         </div>
       )}
 
-      <div className="flex-1" />
+      <ToolbarSpacer />
 
       {store.lineCount > 0 && (
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
           {t('lines', { count: store.lineCount })}
         </div>
       )}
-    </div>
+    </Toolbar>
   )
 })
