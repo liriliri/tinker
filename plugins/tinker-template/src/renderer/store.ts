@@ -3,7 +3,7 @@ import safeStorage from 'licia/safeStorage'
 
 const storage = safeStorage('localStorage')
 
-class TemplateStore {
+class Store {
   // UI state
   activeTab: string = 'ui'
   isDark: boolean = false
@@ -84,6 +84,6 @@ class TemplateStore {
   }
 }
 
-const store = new TemplateStore()
+const store = new Store()
 
 export default store

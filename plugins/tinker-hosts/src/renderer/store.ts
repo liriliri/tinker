@@ -10,7 +10,7 @@ const STORAGE_KEY_ACTIVE_IDS = 'tinker-hosts-active-ids'
 
 const storage = safeStorage('local')
 
-class HostsStore {
+class Store {
   configs: HostsConfig[] = []
   activeIds: string[] = []
   systemHosts: string = ''
@@ -188,6 +188,6 @@ class HostsStore {
   }
 }
 
-const store = new HostsStore()
+const store = new Store()
 
 export default store
