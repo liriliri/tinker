@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
+import BaseStore from 'share/BaseStore'
 
 type ViewMode = 'edit' | 'diff'
 
@@ -12,20 +13,19 @@ interface DiffStats {
   deletions: number
 }
 
-class Store {
+class Store extends BaseStore {
   originalText: string = ''
   modifiedText: string = ''
   mode: ViewMode = 'edit'
   diffStats: DiffStats = { additions: 0, deletions: 0 }
-  isDark: boolean = false
   language: string = 'plaintext'
   originalFileName: string = ''
   modifiedFileName: string = ''
 
   constructor() {
+    super()
     makeAutoObservable(this)
     this.loadFromStorage()
-    this.initTheme()
   }
 
   get isEmpty() {
@@ -34,25 +34,6 @@ class Store {
 
   setDiffStats(stats: DiffStats) {
     this.diffStats = stats
-  }
-
-  setIsDark(isDark: boolean) {
-    this.isDark = isDark
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.setIsDark(newTheme === 'dark')
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
-    }
   }
 
   private loadFromStorage() {

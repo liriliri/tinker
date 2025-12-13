@@ -1,12 +1,12 @@
 import { makeAutoObservable } from 'mobx'
 import safeStorage from 'licia/safeStorage'
+import BaseStore from 'share/BaseStore'
 
 const storage = safeStorage('localStorage')
 
-class Store {
+class Store extends BaseStore {
   // UI state
   activeTab: string = 'ui'
-  isDark: boolean = false
 
   // Preload API Tab
   systemInfo: any = null
@@ -16,24 +16,9 @@ class Store {
   savedData: string = ''
 
   constructor() {
+    super()
     makeAutoObservable(this)
-    this.initTheme()
     this.loadSavedData()
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.isDark = newTheme === 'dark'
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
-    }
   }
 
   private loadSavedData() {

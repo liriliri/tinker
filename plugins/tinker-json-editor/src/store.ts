@@ -3,24 +3,24 @@ import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import openFile from 'licia/openFile'
 import type { editor } from 'monaco-editor'
+import BaseStore from 'share/BaseStore'
 
 type EditorMode = 'text' | 'tree'
 
 const STORAGE_KEY = 'tinker-json-editor-content'
 const MODE_STORAGE_KEY = 'tinker-json-editor-mode'
 
-class Store {
+class Store extends BaseStore {
   jsonInput: string = ''
   mode: EditorMode = 'text'
   treeEditorInstance: JSONEditor | null = null
   textEditorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
-  isDark: boolean = false
 
   constructor() {
+    super()
     makeAutoObservable(this)
     this.loadFromStorage()
-    this.initTheme()
   }
 
   get isEmpty() {
@@ -51,25 +51,6 @@ class Store {
       return null
     } catch (err) {
       return err instanceof Error ? err.message : 'Invalid JSON'
-    }
-  }
-
-  setIsDark(isDark: boolean) {
-    this.isDark = isDark
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.setIsDark(newTheme === 'dark')
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
     }
   }
 

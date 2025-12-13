@@ -4,13 +4,14 @@ import uuid from 'licia/uuid'
 import contain from 'licia/contain'
 import remove from 'licia/remove'
 import { HostsConfig, ViewMode } from './types'
+import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_CONFIGS = 'tinker-hosts-configs'
 const STORAGE_KEY_ACTIVE_IDS = 'tinker-hosts-active-ids'
 
 const storage = safeStorage('local')
 
-class Store {
+class Store extends BaseStore {
   configs: HostsConfig[] = []
   activeIds: string[] = []
   systemHosts: string = ''
@@ -18,26 +19,10 @@ class Store {
   viewMode: ViewMode = 'system'
   loading: boolean = false
   error: string | null = null
-  isDark: boolean = false
 
   constructor() {
+    super()
     makeAutoObservable(this)
-    this.initTheme()
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.isDark = newTheme === 'dark'
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
-    }
   }
 
   async loadConfig() {

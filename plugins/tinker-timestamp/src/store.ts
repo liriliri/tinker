@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import safeStorage from 'licia/safeStorage'
+import BaseStore from 'share/BaseStore'
 
 type TimestampUnit = 'millisecond' | 'second'
 type Timezone = string
@@ -37,8 +38,7 @@ const TIMEZONE_KEYS: Record<string, string> = {
   'UTC-01:00': 'utcAzores',
 }
 
-class Store {
-  isDark: boolean = false
+class Store extends BaseStore {
   currentTimestamp: number = Date.now()
   timestampUnit: TimestampUnit = 'millisecond'
   selectedDate: Date = new Date()
@@ -73,9 +73,9 @@ class Store {
   ]
 
   constructor() {
+    super()
     makeAutoObservable(this)
     this.loadSettings()
-    this.initTheme()
     this.updateCurrentTimestamp()
   }
 
@@ -89,20 +89,6 @@ class Store {
     if (savedTimezone && this.timezones.includes(savedTimezone)) {
       this.timezone = savedTimezone
     }
-  }
-
-  initTheme() {
-    const updateTheme = () => {
-      this.isDark = document.body.classList.contains('dark')
-    }
-
-    updateTheme()
-
-    const observer = new MutationObserver(updateTheme)
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
   }
 
   updateCurrentTimestamp() {

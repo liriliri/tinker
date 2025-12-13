@@ -1,10 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import type { RefObject } from 'react'
+import BaseStore from 'share/BaseStore'
 
-class Store {
-  // UI state
-  isDark: boolean = false
-
+class Store extends BaseStore {
   // QR Code data
   text: string = ''
   qrCodeDataURL: string = ''
@@ -18,29 +16,10 @@ class Store {
   canvasRef: RefObject<HTMLCanvasElement> | null = null
 
   constructor() {
+    super()
     makeAutoObservable(this, {
       canvasRef: false, // Don't make canvasRef observable
     })
-    this.initTheme()
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.isDark = newTheme === 'dark'
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
-    }
-  }
-
-  private loadSavedData() {
-    // Not used in QR Code plugin
   }
 
   // QR Code text update

@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
 import safeStorage from 'licia/safeStorage'
 import type { editor } from 'monaco-editor'
+import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY = 'tinker-markdown-editor-content'
 const FILE_PATH_KEY = 'tinker-markdown-editor-file-path'
@@ -11,17 +12,17 @@ const storage = safeStorage('local')
 
 export type ViewMode = 'split' | 'editor' | 'preview'
 
-class Store {
+class Store extends BaseStore {
   markdownInput: string = ''
   editorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
-  isDark: boolean = false
   scrollPercent: number = 0
   currentFilePath: string | null = null
   savedContent: string = ''
   viewMode: ViewMode = 'split'
 
   constructor() {
+    super()
     makeAutoObservable(this)
     this.init()
   }
@@ -32,7 +33,6 @@ class Store {
     // Load saved file if exists
     this.loadSavedFile()
     this.loadViewMode()
-    await this.initTheme()
   }
 
   private loadViewMode() {
@@ -93,25 +93,6 @@ class Store {
 
   get hasUnsavedChanges() {
     return this.markdownInput !== this.savedContent
-  }
-
-  setIsDark(isDark: boolean) {
-    this.isDark = isDark
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      // Listen for theme changes
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.setIsDark(newTheme === 'dark')
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
-    }
   }
 
   private loadFromLocalStorage() {

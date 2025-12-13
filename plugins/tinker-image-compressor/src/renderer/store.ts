@@ -7,12 +7,13 @@ import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
 import map from 'licia/map'
 import type { ImageFormat, ImageItem } from './types/codecs'
+import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_QUALITY = 'imageCompressor.quality'
 const STORAGE_KEY_OVERWRITE = 'imageCompressor.overwriteOriginal'
 const storage = safeStorage('local')
 
-class Store {
+class Store extends BaseStore {
   // Image list
   images: ImageItem[] = []
 
@@ -21,7 +22,6 @@ class Store {
   overwriteOriginal: boolean = true
 
   // UI state
-  isDark: boolean = false
   compareImageId: string | null = null
 
   // Worker
@@ -29,6 +29,7 @@ class Store {
   private workerCallbacks: Map<string, (result: any) => void> = new Map()
 
   constructor() {
+    super()
     makeAutoObservable(this)
     this.init()
   }
@@ -36,7 +37,6 @@ class Store {
   private async init() {
     this.loadQuality()
     this.loadOverwriteSetting()
-    await this.initTheme()
     this.initWorker()
   }
 
@@ -54,20 +54,6 @@ class Store {
     const savedOverwrite = storage.getItem(STORAGE_KEY_OVERWRITE)
     if (savedOverwrite !== null) {
       this.overwriteOriginal = savedOverwrite === 'true'
-    }
-  }
-
-  private async initTheme() {
-    try {
-      const theme = await tinker.getTheme()
-      this.isDark = theme === 'dark'
-
-      tinker.on('changeTheme', async () => {
-        const newTheme = await tinker.getTheme()
-        this.setIsDark(newTheme === 'dark')
-      })
-    } catch (err) {
-      console.error('Failed to initialize theme:', err)
     }
   }
 
@@ -95,10 +81,6 @@ class Store {
         this.workerCallbacks.delete(id)
       }
     }
-  }
-
-  setIsDark(isDark: boolean) {
-    this.isDark = isDark
   }
 
   setCompareImageId(id: string | null) {
