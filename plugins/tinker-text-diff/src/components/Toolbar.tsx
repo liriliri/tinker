@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { ArrowLeftRight, GitCompare, PenLine, Eraser } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import Select from 'share/components/Select'
 import store from '../store'
 import { SUPPORTED_LANGUAGES } from '../lib/languageDetector'
 
@@ -17,6 +18,11 @@ export default observer(function Toolbar() {
         ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
         : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]'
     }`
+
+  const languageOptions = SUPPORTED_LANGUAGES.map((lang) => ({
+    label: lang.label,
+    value: lang.id,
+  }))
 
   return (
     <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center justify-between">
@@ -39,18 +45,13 @@ export default observer(function Toolbar() {
 
         <div className="w-px h-5 bg-[#d0d0d0] dark:bg-[#555555] mx-1.5" />
 
-        <select
+        <Select
           value={store.language}
-          onChange={(e) => store.setLanguage(e.target.value)}
-          className="px-2 py-1 text-xs rounded bg-white dark:bg-[#3a3a3c] border border-[#d0d0d0] dark:border-[#555555] hover:border-[#0fc25e] dark:hover:border-[#0fc25e] transition-colors cursor-pointer focus:outline-none focus:border-[#0fc25e]"
+          onChange={(value) => store.setLanguage(value)}
+          options={languageOptions}
+          className="hover:border-[#0fc25e] dark:hover:border-[#0fc25e] border-[#d0d0d0] dark:border-[#555555] bg-white dark:bg-[#3a3a3c]"
           title={t('selectLanguage')}
-        >
-          {SUPPORTED_LANGUAGES.map((lang) => (
-            <option key={lang.id} value={lang.id}>
-              {lang.label}
-            </option>
-          ))}
-        </select>
+        />
 
         <button
           onClick={() => store.swapTexts()}

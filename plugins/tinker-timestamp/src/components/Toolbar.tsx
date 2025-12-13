@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Clock, Copy, RotateCcw, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import Select from 'share/components/Select'
 import store from '../store'
 
 export default observer(function Toolbar() {
@@ -35,6 +36,11 @@ export default observer(function Toolbar() {
     store.setTimestampInput(store.currentTimestampDisplay)
   }
 
+  const timezoneOptions = store.timezones.map((tz) => ({
+    label: t(store.getTimezoneKey(tz)),
+    value: tz,
+  }))
+
   return (
     <div className="bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] dark:text-gray-200 px-1.5 py-1.5 flex gap-1 items-center">
       {/* Unit Selection */}
@@ -57,17 +63,11 @@ export default observer(function Toolbar() {
       <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 
       {/* Timezone Selector */}
-      <select
+      <Select
         value={store.timezone}
-        onChange={(e) => store.setTimezone(e.target.value)}
-        className="text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded cursor-pointer focus:outline-none focus:border-[#0fc25e] dark:text-gray-200"
-      >
-        {store.timezones.map((tz) => (
-          <option key={tz} value={tz}>
-            {t(store.getTimezoneKey(tz))}
-          </option>
-        ))}
-      </select>
+        onChange={(value) => store.setTimezone(value)}
+        options={timezoneOptions}
+      />
 
       <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
 

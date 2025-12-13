@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { FolderOpen, Save, ListX, Info } from 'lucide-react'
 import { useState } from 'react'
 import fileSize from 'licia/fileSize'
+import Select from 'share/components/Select'
 import store from '../store'
 
 const QUALITY_LEVELS = [
@@ -21,9 +22,14 @@ const Toolbar = observer(() => {
   const baseButtonClass = 'p-1.5 rounded transition-colors'
   const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
 
-  const handleQualityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    store.setQuality(Number(e.target.value))
+  const handleQualityChange = (value: number) => {
+    store.setQuality(value)
   }
+
+  const qualityOptions = QUALITY_LEVELS.map((level) => ({
+    label: t(level.label),
+    value: level.value,
+  }))
 
   const handleOverwriteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     store.setOverwriteOriginal(e.target.checked)
@@ -163,18 +169,12 @@ const Toolbar = observer(() => {
         <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
           {t('quality')}:
         </label>
-        <select
+        <Select
           value={store.quality}
           onChange={handleQualityChange}
+          options={qualityOptions}
           disabled={store.isCompressing}
-          className="text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded cursor-pointer focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {QUALITY_LEVELS.map((level) => (
-            <option key={level.value} value={level.value}>
-              {t(level.label)}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       <div className="h-5 w-px bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-2" />
