@@ -7,5 +7,6 @@
   "characters": "个字符",
   "placeholder": "输入文本或 URL 生成二维码...",
   "emptyTitle": "在左侧输入文本或 URL",
-  "emptySubtitle": "以生成二维码"
+  "emptySubtitle": "以生成二维码",
+  "custom": "自定义"
 }

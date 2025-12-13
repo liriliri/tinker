@@ -10,7 +10,7 @@ class Store {
   qrCodeDataURL: string = ''
 
   // QR Code options
-  size: number = 256
+  size: number = 100
   fgColor: string = '#000000'
   bgColor: string = '#ffffff'
 

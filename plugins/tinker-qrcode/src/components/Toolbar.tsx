@@ -3,11 +3,46 @@ import { useState } from 'react'
 import { Download, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
+import Select from 'share/components/Select'
 
 export default observer(function Toolbar() {
   const { t } = useTranslation()
   const iconSize = 14
   const [copied, setCopied] = useState(false)
+
+  const CUSTOM_VALUE = 'custom'
+  const sizeOptions = [
+    { label: '300', value: 300 },
+    { label: '400', value: 400 },
+    { label: '500', value: 500 },
+    { label: '600', value: 600 },
+    { label: t('custom'), value: CUSTOM_VALUE as any },
+  ]
+
+  // Determine current select value
+  const getCurrentSizeValue = () => {
+    const presetSizes = [300, 400, 500, 600]
+    if (presetSizes.includes(store.size)) {
+      return store.size
+    }
+    return CUSTOM_VALUE as any
+  }
+
+  const isCustomSize = getCurrentSizeValue() === CUSTOM_VALUE
+
+  const handleSizeChange = (value: number | string) => {
+    if (value !== CUSTOM_VALUE) {
+      store.setSize(value as number)
+    }
+  }
+
+  const handleCustomInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    const numValue = Number(value)
+    if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
+      store.setSize(numValue)
+    }
+  }
 
   const baseButtonClass = 'p-1.5 rounded transition-colors'
   const actionButtonClass = `${baseButtonClass} hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed`
@@ -45,18 +80,20 @@ export default observer(function Toolbar() {
         <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
           {t('size')}:
         </label>
-        <input
-          type="range"
-          min="128"
-          max="512"
-          step="32"
-          value={store.size}
-          onChange={(e) => store.setSize(Number(e.target.value))}
-          className="w-20"
+        <Select
+          value={getCurrentSizeValue()}
+          onChange={handleSizeChange}
+          options={sizeOptions}
         />
-        <span className="text-xs text-gray-600 dark:text-gray-400 w-9 text-right">
-          {store.size}
-        </span>
+        <input
+          type="number"
+          value={store.size}
+          onChange={handleCustomInputChange}
+          disabled={!isCustomSize}
+          min="100"
+          max="2000"
+          className="w-16 text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        />
       </div>
 
       <div className="w-px h-5 bg-[#e0e0e0] dark:bg-[#4a4a4a] mx-1" />
