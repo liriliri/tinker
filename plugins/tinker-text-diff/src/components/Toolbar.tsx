@@ -49,7 +49,6 @@ export default observer(function Toolbar() {
           value={store.language}
           onChange={(value) => store.setLanguage(value)}
           options={languageOptions}
-          className="hover:border-[#0fc25e] dark:hover:border-[#0fc25e] border-[#d0d0d0] dark:border-[#555555] bg-white dark:bg-[#3a3a3c]"
           title={t('selectLanguage')}
         />
 

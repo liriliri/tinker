@@ -37,7 +37,7 @@ export default function Select<T extends string | number = string>({
       value={String(value)}
       onChange={handleChange}
       disabled={disabled}
-      className={`text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded cursor-pointer focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`text-xs px-2 py-1 bg-white dark:bg-[#3a3a3c] border border-[#d0d0d0] dark:border-[#555555] rounded cursor-pointer focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       title={title}
     >
       {options.map((option) => (
