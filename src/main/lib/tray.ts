@@ -129,6 +129,25 @@ async function updateContextMenu() {
             relaunchApp()
           },
         },
+        {
+          type: 'separator',
+        },
+        {
+          label: t('openAtLogin'),
+          type: 'checkbox',
+          checked: settingsStore.get('openAtLogin'),
+          click(item) {
+            settingsStore.set('openAtLogin', item.checked)
+          },
+        },
+        {
+          label: t('silentStart'),
+          type: 'checkbox',
+          checked: settingsStore.get('silentStart'),
+          click(item) {
+            settingsStore.set('silentStart', item.checked)
+          },
+        },
       ],
     },
     {

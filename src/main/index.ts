@@ -5,6 +5,7 @@ import * as main from './window/main'
 import * as plugin from './lib/plugin'
 import * as window from 'share/main/lib/window'
 import * as terminal from 'share/main/window/terminal'
+import * as autoLaunch from 'share/main/lib/autoLaunch'
 import noop from 'licia/noop'
 import { getSettingsStore } from './lib/store'
 import 'share/main'
@@ -25,10 +26,13 @@ window.setDefaultOptions({
 app.on('ready', () => {
   logger.info('app ready')
 
+  autoLaunch.init()
   terminal.init()
   plugin.init()
   tray.init()
-  main.showWin()
+  if (!autoLaunch.wasOpenedAtLogin() && !settingsStore.get('silentStart')) {
+    main.showWin()
+  }
 })
 
 app.on('window-all-closed', noop)

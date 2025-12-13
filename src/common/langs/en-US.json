@@ -7,5 +7,5 @@
   "reopen": "Reopen",
   "restart": "Restart",
   "hide": "Hide",
-  "useNativeTitlebar": "Use Native Titlebar"
+  "silentStart": "Silent Start"
 }
