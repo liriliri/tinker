@@ -7,7 +7,7 @@ const storage = new LocalStore('tinker-template')
 
 class Store extends BaseStore {
   // UI state
-  activeTab: string = 'ui'
+  activeTab: string = 'preload'
 
   // Preload API Tab
   systemInfo: any = null
