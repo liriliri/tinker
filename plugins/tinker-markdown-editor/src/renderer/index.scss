@@ -1,5 +1,6 @@
 @use 'tailwindcss';
 @import 'github-markdown-css/github-markdown.css';
+@config "../../tailwind.config.js";
 
 html.dark {
   color-scheme: dark;

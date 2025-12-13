@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import Toolbar from './components/Toolbar'
 import ImageUpload from './components/ImageUpload'
 import ImageList from './components/ImageList'
+import CompareModal from './components/CompareModal'
 import store from './store'
 
 const App = observer(() => {
@@ -50,6 +51,9 @@ const App = observer(() => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {!store.hasImages ? <ImageUpload /> : <ImageList />}
       </div>
+
+      {/* Compare Modal */}
+      <CompareModal />
     </div>
   )
 })

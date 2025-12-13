@@ -4,7 +4,6 @@
   "clear": "Clear",
   "uploadTitle": "Drop image here or click to upload",
   "supportedFormats": "Supports PNG, JPG, WebP",
-  "outputFormat": "Output Format",
   "quality": "Quality",
   "qualityVeryLow": "Very Low",
   "qualityLow": "Low",
@@ -15,19 +14,12 @@
   "compressing": "Compressing...",
   "original": "Original",
   "compressed": "Compressed",
-  "size": "Size",
-  "saved": "Saved",
   "remove": "Remove",
-  "image": "image",
-  "images": "images",
-  "loadFailed": "Failed to load image",
-  "compressFailed": "Failed to compress image",
-  "unsupportedFormat": "Unsupported image format",
   "statistics": "Statistics",
   "totalImages": "Total Images",
   "totalOriginalSize": "Total Original Size",
   "totalCompressedSize": "Total Compressed Size",
   "totalReduction": "Total Reduction",
   "overwriteOriginal": "Overwrite Original",
-  "useToolbarToOpen": "Please use the \"Open Image\" button in the toolbar"
+  "compareImages": "Compare Images"
 }

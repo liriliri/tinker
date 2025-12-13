@@ -6,6 +6,7 @@ import {
   Transition,
   TransitionChild,
 } from '@headlessui/react'
+import { X } from 'lucide-react'
 
 export interface DialogProps {
   open: boolean
@@ -13,6 +14,7 @@ export interface DialogProps {
   title?: string
   children: ReactNode
   className?: string
+  showCloseIcon?: boolean
 }
 
 export default function Dialog({
@@ -21,6 +23,7 @@ export default function Dialog({
   title,
   children,
   className = '',
+  showCloseIcon = false,
 }: DialogProps) {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -34,7 +37,7 @@ export default function Dialog({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 bg-black/50" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -49,17 +52,47 @@ export default function Dialog({
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel
-                className={`w-full max-w-md transform overflow-hidden rounded-lg bg-white dark:bg-[#303133] p-6 shadow-xl transition-all ${className}`}
+                className={`max-h-[90vh] flex flex-col transform rounded-lg bg-white dark:bg-[#303133] shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
-                {title && (
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200"
-                  >
-                    {title}
-                  </DialogTitle>
-                )}
-                {children}
+                <div className="p-6 pb-0 flex-shrink-0">
+                  {title && !showCloseIcon && (
+                    <DialogTitle
+                      as="h3"
+                      className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200"
+                    >
+                      {title}
+                    </DialogTitle>
+                  )}
+                  {title && showCloseIcon && (
+                    <div className="flex items-center justify-between mb-4">
+                      <DialogTitle
+                        as="h3"
+                        className="text-lg font-semibold text-gray-800 dark:text-gray-200"
+                      >
+                        {title}
+                      </DialogTitle>
+                      <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                  {!title && showCloseIcon && (
+                    <div className="flex justify-end mb-2">
+                      <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="px-6 pb-6 overflow-y-auto flex-1 min-h-0">
+                  {children}
+                </div>
               </DialogPanel>
             </TransitionChild>
           </div>

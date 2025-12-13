@@ -8,12 +8,33 @@ const ImageList = observer(() => {
 
   const handleContextMenu = (e: React.MouseEvent, imageId: string) => {
     e.preventDefault()
-    tinker.showContextMenu(e.clientX, e.clientY, [
-      {
-        label: t('remove'),
-        click: () => store.removeImage(imageId),
-      },
-    ])
+    const image = store.images.find((img) => img.id === imageId)
+    if (!image) return
+
+    const menuItems = []
+
+    // Show compress option if image hasn't been compressed yet
+    if (!image.compressedBlob && !image.isCompressing) {
+      menuItems.push({
+        label: t('compress'),
+        click: () => store.compressImage(imageId),
+      })
+    }
+
+    // Only show compare option if image has been compressed
+    if (image.compressedDataUrl) {
+      menuItems.push({
+        label: t('compareImages'),
+        click: () => store.setCompareImageId(imageId),
+      })
+    }
+
+    menuItems.push({
+      label: t('remove'),
+      click: () => store.removeImage(imageId),
+    })
+
+    tinker.showContextMenu(e.clientX, e.clientY, menuItems)
   }
 
   return (

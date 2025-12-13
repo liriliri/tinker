@@ -35,37 +35,7 @@ const Toolbar = observer(() => {
 
   const handleOpenImage = async () => {
     try {
-      const result = await tinker.showOpenDialog({
-        filters: [
-          {
-            name: 'Images',
-            extensions: ['png', 'jpg', 'jpeg', 'webp'],
-          },
-        ],
-        properties: ['openFile', 'multiSelections'],
-      })
-
-      if (
-        result.canceled ||
-        !result.filePaths ||
-        result.filePaths.length === 0
-      ) {
-        return
-      }
-
-      const files: Array<{ file: File; filePath: string }> = []
-      for (const filePath of result.filePaths) {
-        const buffer = await imageCompressor.readFile(filePath)
-        const fileName = imageCompressor.getFileName(filePath)
-
-        // Convert buffer to file
-        // Note: Uint8Array from contextBridge needs to be converted to work with File API
-        const uint8Array = new Uint8Array(buffer)
-        const file = new File([uint8Array], fileName, { type: 'image/*' })
-        files.push({ file, filePath })
-      }
-
-      await store.loadImages(files)
+      await store.openImageDialog()
     } catch (err) {
       console.error('Failed to open image:', err)
     }
@@ -166,7 +136,16 @@ const Toolbar = observer(() => {
                   </div>
                   <div className="flex justify-between gap-4">
                     <span>{t('totalReduction')}:</span>
-                    <span className="font-medium text-green-600 dark:text-green-400">
+                    <span
+                      className={`font-medium ${
+                        store.totalCompressedSize >= store.totalOriginalSize
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-green-600 dark:text-green-400'
+                      }`}
+                    >
+                      {store.totalCompressedSize >= store.totalOriginalSize
+                        ? '+'
+                        : ''}
                       {store.totalCompressionRatio}%
                     </span>
                   </div>
@@ -203,7 +182,9 @@ const Toolbar = observer(() => {
       {/* Compress Button */}
       <button
         onClick={handleCompress}
-        disabled={!store.hasImages || store.isCompressing}
+        disabled={
+          !store.hasImages || store.isCompressing || !store.hasUncompressed
+        }
         className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors"
       >
         {store.isCompressing ? t('compressing') : t('compress')}

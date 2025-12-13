@@ -7,35 +7,7 @@ const ImageUpload = observer(() => {
 
   const handleClick = async () => {
     try {
-      const result = await tinker.showOpenDialog({
-        filters: [
-          {
-            name: 'Images',
-            extensions: ['png', 'jpg', 'jpeg', 'webp'],
-          },
-        ],
-        properties: ['openFile', 'multiSelections'],
-      })
-
-      if (
-        result.canceled ||
-        !result.filePaths ||
-        result.filePaths.length === 0
-      ) {
-        return
-      }
-
-      const files: Array<{ file: File; filePath: string }> = []
-      for (const filePath of result.filePaths) {
-        const buffer = await imageCompressor.readFile(filePath)
-        const fileName = imageCompressor.getFileName(filePath)
-
-        const uint8Array = new Uint8Array(buffer)
-        const file = new File([uint8Array], fileName, { type: 'image/*' })
-        files.push({ file, filePath })
-      }
-
-      await store.loadImages(files)
+      await store.openImageDialog()
     } catch (err) {
       console.error('Failed to open image:', err)
     }

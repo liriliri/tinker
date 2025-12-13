@@ -20,5 +20,8 @@
         "name": "图片压缩"
       }
     }
+  },
+  "devDependencies": {
+    "@img-comparison-slider/react": "^8.0.2"
   }
 }

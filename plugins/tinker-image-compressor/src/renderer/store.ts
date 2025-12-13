@@ -22,6 +22,7 @@ class Store {
 
   // UI state
   isDark: boolean = false
+  compareImageId: string | null = null
 
   // Worker
   private worker: Worker | null = null
@@ -100,6 +101,10 @@ class Store {
     this.isDark = isDark
   }
 
+  setCompareImageId(id: string | null) {
+    this.compareImageId = id
+  }
+
   setQuality(quality: number) {
     this.quality = quality
     storage.setItem(STORAGE_KEY_QUALITY, String(quality))
@@ -131,6 +136,71 @@ class Store {
     if (ext === 'png') return 'png'
     if (ext === 'webp') return 'webp'
     return 'jpeg' // Default to jpeg for jpg, jpeg and unknown formats
+  }
+
+  private getFormatMimeType(format: ImageFormat): string {
+    switch (format) {
+      case 'jpeg':
+        return 'image/jpeg'
+      case 'png':
+        return 'image/png'
+      case 'webp':
+        return 'image/webp'
+    }
+  }
+
+  private getFormatExtension(format: ImageFormat): string {
+    switch (format) {
+      case 'jpeg':
+        return 'jpg'
+      case 'png':
+        return 'png'
+      case 'webp':
+        return 'webp'
+    }
+  }
+
+  private isCompressedSmaller(image: ImageItem): boolean {
+    return image.compressedSize < image.originalSize
+  }
+
+  async openImageDialog() {
+    try {
+      const result = await tinker.showOpenDialog({
+        filters: [
+          {
+            name: 'Images',
+            extensions: ['png', 'jpg', 'jpeg', 'webp'],
+          },
+        ],
+        properties: ['openFile', 'multiSelections'],
+      })
+
+      if (
+        result.canceled ||
+        !result.filePaths ||
+        result.filePaths.length === 0
+      ) {
+        return
+      }
+
+      const files: Array<{ file: File; filePath: string }> = []
+      for (const filePath of result.filePaths) {
+        const buffer = await imageCompressor.readFile(filePath)
+        const fileName = imageCompressor.getFileName(filePath)
+
+        // Convert buffer to file
+        // Note: Uint8Array from contextBridge needs to be converted to work with File API
+        const uint8Array = new Uint8Array(buffer)
+        const file = new File([uint8Array], fileName, { type: 'image/*' })
+        files.push({ file, filePath })
+      }
+
+      await this.loadImages(files)
+    } catch (err) {
+      console.error('Failed to open image:', err)
+      throw err
+    }
   }
 
   async loadImage(file: File, filePath?: string) {
@@ -243,12 +313,7 @@ class Store {
     image.isSaved = false // Reset saved status when recompressing
 
     // Create blob
-    const mimeType =
-      image.originalFormat === 'jpeg'
-        ? 'image/jpeg'
-        : image.originalFormat === 'png'
-        ? 'image/png'
-        : 'image/webp'
+    const mimeType = this.getFormatMimeType(image.originalFormat)
 
     image.compressedBlob = new Blob([new Uint8Array(result.data)], {
       type: mimeType,
@@ -280,7 +345,7 @@ class Store {
           }
 
           // If compressed size is larger than or equal to original, skip saving (keep original)
-          if (image.compressedSize >= image.originalSize) {
+          if (!this.isCompressedSmaller(image)) {
             console.log(
               `Compressed size (${image.compressedSize}) >= original size (${image.originalSize}) for ${image.fileName}, keeping original file`
             )
@@ -317,19 +382,13 @@ class Store {
         for (const image of compressedImages) {
           if (!image.compressedBlob) continue
 
-          const extension =
-            image.originalFormat === 'jpeg'
-              ? 'jpg'
-              : image.originalFormat === 'png'
-              ? 'png'
-              : 'webp'
-
+          const extension = this.getFormatExtension(image.originalFormat)
           const fileName = image.fileName.replace(/\.[^.]+$/, `.${extension}`)
           const filePath = `${directory}/${fileName}`
 
           // If compressed is larger, save original instead
           let buffer: Uint8Array
-          if (image.compressedSize >= image.originalSize && image.filePath) {
+          if (!this.isCompressedSmaller(image) && image.filePath) {
             console.log(
               `Compressed size (${image.compressedSize}) >= original size (${image.originalSize}) for ${image.fileName}, saving original file`
             )
@@ -380,12 +439,16 @@ class Store {
     return this.images.some((img) => img.compressedBlob !== null)
   }
 
+  get hasUncompressed() {
+    return this.images.some((img) => img.compressedBlob === null)
+  }
+
   get hasUnsaved() {
     return this.images.some(
       (img) =>
         img.compressedBlob !== null &&
         !img.isSaved &&
-        img.compressedSize < img.originalSize // Only count if compressed is smaller
+        this.isCompressedSmaller(img) // Only count if compressed is smaller
     )
   }
 
@@ -403,9 +466,8 @@ class Store {
 
   get totalCompressionRatio() {
     if (!this.totalOriginalSize || !this.totalCompressedSize) return 0
-    return (
-      (1 - this.totalCompressedSize / this.totalOriginalSize) *
-      100
+    return Math.abs(
+      (1 - this.totalCompressedSize / this.totalOriginalSize) * 100
     ).toFixed(1)
   }
 }
