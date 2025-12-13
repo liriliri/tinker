@@ -48,7 +48,7 @@ const QRGenerator = observer(() => {
     <div className="h-full flex">
       {/* Left Panel - Text Input */}
       <div className="w-1/2 flex flex-col border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <div className="flex-1 p-4 bg-white dark:bg-[#1e1e1e]">
+        <div className="flex-1 bg-white dark:bg-[#1e1e1e]">
           <textarea
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}

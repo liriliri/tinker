@@ -6,6 +6,6 @@
   "download": "下载",
   "characters": "个字符",
   "placeholder": "输入文本或 URL 生成二维码...",
-  "emptyTitle": "在上方输入文本或 URL",
+  "emptyTitle": "在左侧输入文本或 URL",
   "emptySubtitle": "以生成二维码"
 }

@@ -6,6 +6,6 @@
   "download": "Download",
   "characters": "characters",
   "placeholder": "Enter text or URL to generate QR code...",
-  "emptyTitle": "Enter text or URL above",
+  "emptyTitle": "Enter text or URL on the left",
   "emptySubtitle": "to generate QR code"
 }
