@@ -6,5 +6,6 @@
   "detachWin": "分离窗口",
   "reopen": "重新打开",
   "restart": "重启",
-  "hide": "隐藏"
+  "hide": "隐藏",
+  "useNativeTitlebar": "使用原生标题栏"
 }

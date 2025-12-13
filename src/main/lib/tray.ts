@@ -76,10 +76,7 @@ async function updateContextMenu() {
         checked: settingsStore.get('language') === lang,
         click() {
           settingsStore.set('language', lang)
-          setTimeout(() => {
-            app.relaunch()
-            app.exit()
-          }, 500)
+          relaunchApp()
         },
       }
     }
@@ -123,6 +120,15 @@ async function updateContextMenu() {
           label: t('language'),
           submenu: langMenu,
         },
+        {
+          label: t('useNativeTitlebar'),
+          type: 'checkbox',
+          checked: settingsStore.get('useNativeTitlebar'),
+          click(item) {
+            settingsStore.set('useNativeTitlebar', item.checked)
+            relaunchApp()
+          },
+        },
       ],
     },
     {
@@ -143,4 +149,11 @@ async function updateContextMenu() {
     },
   ])
   tray.setContextMenu(contextMenu)
+}
+
+function relaunchApp() {
+  setTimeout(() => {
+    app.relaunch()
+    app.exit()
+  }, 500)
 }

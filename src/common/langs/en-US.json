@@ -6,5 +6,6 @@
   "detachWin": "Detach Window",
   "reopen": "Reopen",
   "restart": "Restart",
-  "hide": "Hide"
+  "hide": "Hide",
+  "useNativeTitlebar": "Use Native Titlebar"
 }
