@@ -168,6 +168,7 @@ export const closePlugin: IpcClosePlugin = async function (id) {
 
   win.contentView.removeChildView(view)
   view.webContents.close()
+  view.webContents.session.clearCache()
   delete pluginViews[id]
 }
 
