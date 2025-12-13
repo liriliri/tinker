@@ -139,11 +139,29 @@ class Store extends BaseStore {
   }
 
   deleteConfig(id: string) {
+    // Check if this config was active
+    const wasActive = contain(this.activeIds, id)
+
+    // If the deleted config is currently selected, switch to system view
+    if (this.selectedId === id) {
+      this.setViewMode('system')
+    }
+
     remove(this.configs, (c) => c.id === id)
     remove(this.activeIds, (aid) => aid === id)
 
     this.saveConfigs()
     this.saveActiveIds()
+
+    // If the deleted config was active, apply hosts to update system
+    if (wasActive) {
+      this.applyHosts().catch((error) => {
+        console.error(
+          'Failed to apply hosts after deleting active config:',
+          error
+        )
+      })
+    }
   }
 
   toggleActive(id: string) {
