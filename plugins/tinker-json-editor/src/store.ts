@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import openFile from 'licia/openFile'
+import LocalStore from 'licia/LocalStore'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
@@ -9,6 +10,8 @@ type EditorMode = 'text' | 'tree'
 
 const STORAGE_KEY = 'tinker-json-editor-content'
 const MODE_STORAGE_KEY = 'tinker-json-editor-mode'
+
+const storage = new LocalStore('tinker-json-editor')
 
 class Store extends BaseStore {
   jsonInput: string = ''
@@ -55,8 +58,8 @@ class Store extends BaseStore {
   }
 
   private loadFromStorage() {
-    const savedContent = localStorage.getItem(STORAGE_KEY)
-    const savedMode = localStorage.getItem(MODE_STORAGE_KEY)
+    const savedContent = storage.get(STORAGE_KEY)
+    const savedMode = storage.get(MODE_STORAGE_KEY)
 
     if (savedContent) {
       this.jsonInput = savedContent
@@ -68,12 +71,12 @@ class Store extends BaseStore {
 
   setJsonInput(value: string) {
     this.jsonInput = value
-    localStorage.setItem(STORAGE_KEY, value)
+    storage.set(STORAGE_KEY, value)
   }
 
   setMode(mode: EditorMode) {
     this.mode = mode
-    localStorage.setItem(MODE_STORAGE_KEY, mode)
+    storage.set(MODE_STORAGE_KEY, mode)
   }
 
   formatJson() {

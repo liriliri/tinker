@@ -24,12 +24,13 @@ export default function Select<T extends string | number = string>({
 }: SelectProps<T>) {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value
-    // Try to parse as number if the original value type is number
-    const parsedValue =
-      typeof options[0]?.value === 'number'
-        ? (Number(selectedValue) as T)
-        : (selectedValue as T)
-    onChange(parsedValue)
+    // Find the matching option and use its original value
+    const matchedOption = options.find(
+      (opt) => String(opt.value) === selectedValue
+    )
+    if (matchedOption) {
+      onChange(matchedOption.value)
+    }
   }
 
   return (

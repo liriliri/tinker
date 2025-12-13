@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import safeStorage from 'licia/safeStorage'
+import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
 import clamp from 'licia/clamp'
 import each from 'licia/each'
@@ -11,7 +11,7 @@ import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_QUALITY = 'imageCompressor.quality'
 const STORAGE_KEY_OVERWRITE = 'imageCompressor.overwriteOriginal'
-const storage = safeStorage('local')
+const storage = new LocalStore('tinker-image-compressor')
 
 class Store extends BaseStore {
   // Image list
@@ -41,7 +41,7 @@ class Store extends BaseStore {
   }
 
   private loadQuality() {
-    const savedQuality = storage.getItem(STORAGE_KEY_QUALITY)
+    const savedQuality = storage.get(STORAGE_KEY_QUALITY)
     if (savedQuality !== null) {
       const quality = clamp(toNum(savedQuality), 1, 100)
       if (quality > 0) {
@@ -51,7 +51,7 @@ class Store extends BaseStore {
   }
 
   private loadOverwriteSetting() {
-    const savedOverwrite = storage.getItem(STORAGE_KEY_OVERWRITE)
+    const savedOverwrite = storage.get(STORAGE_KEY_OVERWRITE)
     if (savedOverwrite !== null) {
       this.overwriteOriginal = savedOverwrite === 'true'
     }
@@ -89,7 +89,7 @@ class Store extends BaseStore {
 
   setQuality(quality: number) {
     this.quality = quality
-    storage.setItem(STORAGE_KEY_QUALITY, String(quality))
+    storage.set(STORAGE_KEY_QUALITY, String(quality))
 
     // Reset compressed images when quality changes
     for (const image of this.images) {
@@ -104,7 +104,7 @@ class Store extends BaseStore {
 
   setOverwriteOriginal(overwrite: boolean) {
     this.overwriteOriginal = overwrite
-    storage.setItem(STORAGE_KEY_OVERWRITE, String(overwrite))
+    storage.set(STORAGE_KEY_OVERWRITE, String(overwrite))
   }
 
   async loadImages(files: Array<{ file: File; filePath?: string }>) {

@@ -1,5 +1,5 @@
 import { makeAutoObservable, toJS } from 'mobx'
-import safeStorage from 'licia/safeStorage'
+import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
 import contain from 'licia/contain'
 import remove from 'licia/remove'
@@ -9,7 +9,7 @@ import BaseStore from 'share/BaseStore'
 const STORAGE_KEY_CONFIGS = 'tinker-hosts-configs'
 const STORAGE_KEY_ACTIVE_IDS = 'tinker-hosts-active-ids'
 
-const storage = safeStorage('local')
+const storage = new LocalStore('tinker-hosts')
 
 class Store extends BaseStore {
   configs: HostsConfig[] = []
@@ -28,8 +28,8 @@ class Store extends BaseStore {
   async loadConfig() {
     try {
       console.log('Loading config from localStorage...')
-      const savedConfigs = storage.getItem(STORAGE_KEY_CONFIGS)
-      const savedActiveIds = storage.getItem(STORAGE_KEY_ACTIVE_IDS)
+      const savedConfigs = storage.get(STORAGE_KEY_CONFIGS)
+      const savedActiveIds = storage.get(STORAGE_KEY_ACTIVE_IDS)
 
       if (savedConfigs) {
         this.configs = JSON.parse(savedConfigs)
@@ -54,7 +54,7 @@ class Store extends BaseStore {
 
   saveConfigs() {
     try {
-      storage.setItem(STORAGE_KEY_CONFIGS, JSON.stringify(this.configs))
+      storage.set(STORAGE_KEY_CONFIGS, JSON.stringify(this.configs))
       console.log('Configs saved to localStorage')
     } catch (error) {
       console.error('Failed to save configs:', error)
@@ -66,7 +66,7 @@ class Store extends BaseStore {
 
   saveActiveIds() {
     try {
-      storage.setItem(STORAGE_KEY_ACTIVE_IDS, JSON.stringify(this.activeIds))
+      storage.set(STORAGE_KEY_ACTIVE_IDS, JSON.stringify(this.activeIds))
       console.log('Active IDs saved to localStorage')
     } catch (error) {
       console.error('Failed to save active IDs:', error)

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import safeStorage from 'licia/safeStorage'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
 type TimestampUnit = 'millisecond' | 'second'
@@ -7,7 +7,7 @@ type Timezone = string
 
 const STORAGE_KEY_UNIT = 'timestamp.unit'
 const STORAGE_KEY_TIMEZONE = 'timestamp.timezone'
-const storage = safeStorage('local')
+const storage = new LocalStore('tinker-timestamp')
 
 // Timezone key mapping
 const TIMEZONE_KEYS: Record<string, string> = {
@@ -80,12 +80,12 @@ class Store extends BaseStore {
   }
 
   loadSettings() {
-    const savedUnit = storage.getItem(STORAGE_KEY_UNIT)
+    const savedUnit = storage.get(STORAGE_KEY_UNIT)
     if (savedUnit === 'millisecond' || savedUnit === 'second') {
       this.timestampUnit = savedUnit
     }
 
-    const savedTimezone = storage.getItem(STORAGE_KEY_TIMEZONE)
+    const savedTimezone = storage.get(STORAGE_KEY_TIMEZONE)
     if (savedTimezone && this.timezones.includes(savedTimezone)) {
       this.timezone = savedTimezone
     }
@@ -99,12 +99,12 @@ class Store extends BaseStore {
 
   setTimestampUnit(unit: TimestampUnit) {
     this.timestampUnit = unit
-    storage.setItem(STORAGE_KEY_UNIT, unit)
+    storage.set(STORAGE_KEY_UNIT, unit)
   }
 
   setTimezone(timezone: Timezone) {
     this.timezone = timezone
-    storage.setItem(STORAGE_KEY_TIMEZONE, timezone)
+    storage.set(STORAGE_KEY_TIMEZONE, timezone)
   }
 
   setSelectedDate(date: Date) {

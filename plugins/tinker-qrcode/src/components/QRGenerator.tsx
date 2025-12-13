@@ -71,7 +71,7 @@ const QRGenerator = observer(() => {
               aspectRatio: '1',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
             <canvas
@@ -82,7 +82,7 @@ const QRGenerator = observer(() => {
                 maxHeight: '100%',
                 width: 'auto',
                 height: 'auto',
-                objectFit: 'contain'
+                objectFit: 'contain',
               }}
             />
           </div>

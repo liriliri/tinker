@@ -27,6 +27,9 @@ export default observer(function ToolbarComponent() {
 
   // Determine current select value
   const getCurrentSizeValue = () => {
+    if (store.isCustomSize) {
+      return CUSTOM_VALUE as any
+    }
     const presetSizes = [300, 400, 500, 600]
     if (presetSizes.includes(store.size)) {
       return store.size
@@ -34,11 +37,14 @@ export default observer(function ToolbarComponent() {
     return CUSTOM_VALUE as any
   }
 
-  const isCustomSize = getCurrentSizeValue() === CUSTOM_VALUE
-
   const handleSizeChange = (value: number | string) => {
-    if (value !== CUSTOM_VALUE) {
+    if (value === CUSTOM_VALUE) {
+      // 用户选择了自定义选项
+      store.setIsCustomSize(true)
+    } else {
+      // 用户选择了预设值
       store.setSize(value as number)
+      store.setIsCustomSize(false)
     }
   }
 
@@ -91,7 +97,7 @@ export default observer(function ToolbarComponent() {
           type="number"
           value={store.size}
           onChange={handleCustomInputChange}
-          disabled={!isCustomSize}
+          disabled={!store.isCustomSize}
           min="100"
           max="2000"
           className="w-16 text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"

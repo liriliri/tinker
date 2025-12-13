@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
 type ViewMode = 'edit' | 'diff'
@@ -7,6 +8,8 @@ type ViewMode = 'edit' | 'diff'
 const STORAGE_KEY = 'tinker-text-diff-content'
 const MODE_STORAGE_KEY = 'tinker-text-diff-mode'
 const LANGUAGE_STORAGE_KEY = 'tinker-text-diff-language'
+
+const storage = new LocalStore('tinker-text-diff')
 
 interface DiffStats {
   additions: number
@@ -37,9 +40,9 @@ class Store extends BaseStore {
   }
 
   private loadFromStorage() {
-    const savedContent = localStorage.getItem(STORAGE_KEY)
-    const savedMode = localStorage.getItem(MODE_STORAGE_KEY)
-    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+    const savedContent = storage.get(STORAGE_KEY)
+    const savedMode = storage.get(MODE_STORAGE_KEY)
+    const savedLanguage = storage.get(LANGUAGE_STORAGE_KEY)
 
     if (savedContent) {
       try {
@@ -61,7 +64,7 @@ class Store extends BaseStore {
   }
 
   private saveToStorage() {
-    localStorage.setItem(
+    storage.set(
       STORAGE_KEY,
       JSON.stringify({
         original: this.originalText,
@@ -132,12 +135,12 @@ class Store extends BaseStore {
 
   setMode(mode: ViewMode) {
     this.mode = mode
-    localStorage.setItem(MODE_STORAGE_KEY, mode)
+    storage.set(MODE_STORAGE_KEY, mode)
   }
 
   setLanguage(language: string) {
     this.language = language
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+    storage.set(LANGUAGE_STORAGE_KEY, language)
   }
 
   setOriginalFileName(fileName: string) {

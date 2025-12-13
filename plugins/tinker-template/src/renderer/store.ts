@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx'
-import safeStorage from 'licia/safeStorage'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
-const storage = safeStorage('localStorage')
+const storage = new LocalStore('tinker-template')
 
 class Store extends BaseStore {
   // UI state
@@ -22,7 +22,7 @@ class Store extends BaseStore {
   }
 
   private loadSavedData() {
-    const saved = storage.getItem('template-saved-data')
+    const saved = storage.get('template-saved-data')
     if (saved) {
       this.savedData = saved
     }
@@ -58,12 +58,12 @@ class Store extends BaseStore {
   }
 
   saveData() {
-    storage.setItem('template-saved-data', this.savedData)
+    storage.set('template-saved-data', this.savedData)
     alert('Data saved to localStorage!')
   }
 
   clearData() {
-    storage.removeItem('template-saved-data')
+    storage.remove('template-saved-data')
     this.savedData = ''
     alert('Data cleared!')
   }
