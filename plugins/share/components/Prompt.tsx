@@ -76,7 +76,7 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
           )}
           <input
             type="text"
-            className="w-full px-3 py-2 mb-6 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fc25e]"
+            className="w-full px-3 py-2 mb-6 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
