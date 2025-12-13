@@ -47,7 +47,7 @@ const QRGenerator = observer(() => {
   return (
     <div className="h-full flex">
       {/* Left Panel - Text Input */}
-      <div className="w-1/2 flex flex-col border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
+      <div className="flex-1 min-w-0 flex flex-col border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
         <div className="flex-1 bg-white dark:bg-[#1e1e1e]">
           <textarea
             value={store.text}
@@ -59,15 +59,32 @@ const QRGenerator = observer(() => {
       </div>
 
       {/* Right Panel - QR Code Display */}
-      <div className="w-1/2 flex items-center justify-center bg-white dark:bg-[#1e1e1e]">
+      <div className="flex-1 min-w-0 flex items-center justify-center bg-white dark:bg-[#1e1e1e] p-4">
         {store.text ? (
-          <div className="p-8">
-            <div
-              className="rounded-lg inline-block"
-              style={{ padding: '12px', backgroundColor: store.bgColor }}
-            >
-              <canvas ref={canvasRef} />
-            </div>
+          <div
+            className="rounded-lg"
+            style={{
+              padding: '12px',
+              backgroundColor: store.bgColor,
+              maxWidth: '100%',
+              maxHeight: '100%',
+              aspectRatio: '1',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <canvas
+              ref={canvasRef}
+              style={{
+                display: 'block',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+            />
           </div>
         ) : (
           <div className="text-center text-gray-400 dark:text-gray-600 px-4">
