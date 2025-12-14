@@ -4,6 +4,7 @@ import { FolderOpen, Save, ListX, Info } from 'lucide-react'
 import { useState } from 'react'
 import fileSize from 'licia/fileSize'
 import Select from 'share/components/Select'
+import Checkbox from 'share/components/Checkbox'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -34,8 +35,8 @@ const ToolbarComponent = observer(() => {
     value: level.value,
   }))
 
-  const handleOverwriteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    store.setOverwriteOriginal(e.target.checked)
+  const handleOverwriteChange = (checked: boolean) => {
+    store.setOverwriteOriginal(checked)
   }
 
   const handleCompress = async () => {
@@ -86,15 +87,12 @@ const ToolbarComponent = observer(() => {
         <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <label className="flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-80">
-        <input
-          type="checkbox"
-          checked={store.overwriteOriginal}
-          onChange={handleOverwriteChange}
-          className="cursor-pointer accent-[#0fc25e]"
-        />
-        <span>{t('overwriteOriginal')}</span>
-      </label>
+      <Checkbox
+        checked={store.overwriteOriginal}
+        onChange={handleOverwriteChange}
+      >
+        {t('overwriteOriginal')}
+      </Checkbox>
 
       <ToolbarSpacer />
 
