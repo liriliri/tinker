@@ -7,7 +7,7 @@ import Style from './PluginList.module.scss'
 import { borderRadius } from 'common/theme'
 
 export default observer(function PluginList() {
-  const icons = map(store.plugins, (plugin) => ({
+  const icons = map(store.visiblePlugins, (plugin) => ({
     id: plugin.id,
     src: fileUrl(plugin.icon),
     name: plugin.name,
@@ -27,7 +27,6 @@ export default observer(function PluginList() {
         }}
         icons={icons}
         size={64}
-        filter={store.filter}
       />
     </div>
   )

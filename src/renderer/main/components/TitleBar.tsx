@@ -84,6 +84,18 @@ export default observer(function Titlebar() {
     contextMenu(e, template)
   }
 
+  const onInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key !== 'Enter' || store.plugin) {
+        return
+      }
+      if (store.visiblePlugins.length > 0) {
+        store.openPlugin(store.visiblePlugins[0].id)
+      }
+    },
+    []
+  )
+
   return (
     <div className={Style.container} onMouseDown={onMouseDown}>
       <div className={Style.icon}>
@@ -99,6 +111,7 @@ export default observer(function Titlebar() {
           autoFocus={true}
           value={store.filter}
           ref={inputRef}
+          onKeyDown={onInputKeyDown}
           onChange={(e) => {
             if (store.plugin) {
               store.closePlugin()
