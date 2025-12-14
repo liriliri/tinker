@@ -16,6 +16,7 @@ export const getSettingsStore = memoize(function () {
     useNativeTitlebar: false,
     openAtLogin: false,
     silentStart: false,
+    showShortcut: 'Option+Space',
   })
 })
 

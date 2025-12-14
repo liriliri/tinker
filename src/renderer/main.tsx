@@ -42,6 +42,10 @@ function renderApp() {
       App = lazy(() => import('share/renderer/process/App.js') as Promise<any>)
       title = t('processManager')
       break
+    case 'about':
+      App = lazy(() => import('share/renderer/about/App.js') as Promise<any>)
+      title = t('aboutTinker')
+      break
   }
 
   preload.setTitle(title)

@@ -1,10 +1,13 @@
 import { IpcDragMain } from 'common/types'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, globalShortcut, screen } from 'electron'
 import once from 'licia/once'
 import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 import isMac from 'licia/isMac'
+import { getSettingsStore } from '../lib/store'
+
+const settingsStore = getSettingsStore()
 
 let win: BrowserWindow | null = null
 
@@ -75,4 +78,5 @@ const initIpc = once(() => {
       y: cursorPos.y - y,
     })
   }))
+  globalShortcut.register(settingsStore.get('showShortcut'), () => showWin())
 })

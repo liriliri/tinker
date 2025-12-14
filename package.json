@@ -20,7 +20,7 @@
     "build:preload": "vite build --config vite.preload.ts",
     "build:plugin": "lerna run build",
     "pack": "zx script/pack.mjs",
-    "start": "electron ./dist/main/index.js",
+    "start": "electron ./dist/main/index.js --inspect=9229",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "lsla prettier \"src/**/*.{ts,tsx,scss,css,json}\" \"*.{js,ts,json}\" \"script/*.mjs\" --write && npm run format:plugin",
     "format:plugin": "lsla prettier \"plugins/tinker-*/src/**/*.{ts,tsx,json,scss}\" \"plugins/*.{js,ts,json}\" --write",

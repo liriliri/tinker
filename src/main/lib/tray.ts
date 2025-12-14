@@ -4,8 +4,9 @@ import {
   MenuItemConstructorOptions,
   nativeImage,
   Tray,
+  shell,
 } from 'electron'
-import { resolveResources } from 'share/main/lib/util'
+import { getUserDataPath, resolveResources } from 'share/main/lib/util'
 import * as main from '../window/main'
 import isMac from 'licia/isMac'
 import { t } from 'common/util'
@@ -14,6 +15,8 @@ import log from 'share/common/log'
 import map from 'licia/map'
 import * as terminal from 'share/main/window/terminal'
 import * as process from 'share/main/window/process'
+import * as about from 'share/main/window/about'
+import { isDev } from 'share/common/util'
 
 const logger = log('tray')
 let tray: Tray | null = null
@@ -82,6 +85,44 @@ async function updateContextMenu() {
     }
   )
 
+  const helpMenu: MenuItemConstructorOptions = {
+    role: 'help',
+    label: t('help'),
+    submenu: [
+      {
+        label: t('donate'),
+        click() {
+          shell.openExternal('http://surunzi.com/wechatpay.html')
+        },
+      },
+      {
+        label: t('reportIssue'),
+        click() {
+          shell.openExternal('https://github.com/liriliri/tinker/issues')
+        },
+      },
+      {
+        type: 'separator',
+      },
+      ...(isDev()
+        ? [
+            {
+              label: t('openUserDataDir'),
+              click() {
+                shell.openPath(getUserDataPath(''))
+              },
+            },
+            {
+              label: t('debugMainProcess'),
+              click() {
+                process.debugMainProcess()
+              },
+            },
+          ]
+        : []),
+    ],
+  }
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: t('show'),
@@ -91,23 +132,6 @@ async function updateContextMenu() {
     },
     {
       type: 'separator',
-    },
-    {
-      label: t('tools'),
-      submenu: [
-        {
-          label: t('terminal'),
-          click() {
-            terminal.showWin()
-          },
-        },
-        {
-          label: t('processManager'),
-          click() {
-            process.showWin()
-          },
-        },
-      ],
     },
     {
       label: t('settings'),
@@ -149,6 +173,33 @@ async function updateContextMenu() {
           },
         },
       ],
+    },
+    {
+      label: t('tools'),
+      submenu: [
+        {
+          label: t('terminal'),
+          click() {
+            terminal.showWin()
+          },
+        },
+        {
+          label: t('processManager'),
+          click() {
+            process.showWin()
+          },
+        },
+      ],
+    },
+    helpMenu,
+    {
+      type: 'separator',
+    },
+    {
+      label: t('aboutTinker'),
+      click() {
+        about.showWin()
+      },
     },
     {
       type: 'separator',

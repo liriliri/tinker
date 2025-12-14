@@ -29,11 +29,15 @@ class Store extends BaseStore {
     }
 
     main.openPlugin(id, detached).then((opened) => {
-      if (opened && !detached) {
-        runInAction(() => {
-          this.plugin = plugin
-          this.filter = plugin.name
-        })
+      if (opened) {
+        if (!detached) {
+          runInAction(() => {
+            this.plugin = plugin
+            this.filter = plugin.name
+          })
+        } else {
+          main.closeWin()
+        }
       }
     })
   }
