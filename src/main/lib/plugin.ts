@@ -108,7 +108,7 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
   const pluginView = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, '../preload/plugin.js'),
-      partition: `persist:plugin`,
+      partition: `persist:${id}`,
       sandbox: false,
     },
   })
@@ -168,7 +168,6 @@ export const closePlugin: IpcClosePlugin = async function (id) {
 
   win.contentView.removeChildView(view)
   view.webContents.close()
-  view.webContents.session.clearCache()
   delete pluginViews[id]
 }
 
