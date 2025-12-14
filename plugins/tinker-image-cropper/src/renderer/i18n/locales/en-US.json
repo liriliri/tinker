@@ -1,0 +1,11 @@
+{
+  "openImage": "Open Image",
+  "saveImage": "Save Image",
+  "clear": "Clear",
+  "crop": "Crop",
+  "uploadTitle": "Drop image here or click to upload",
+  "supportedFormats": "Supports PNG, JPG, WebP, GIF, BMP",
+  "originalSize": "Original Size",
+  "croppedSize": "Cropped Size",
+  "dimensions": "Dimensions"
+}

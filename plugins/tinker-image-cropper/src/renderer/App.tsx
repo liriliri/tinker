@@ -1,0 +1,76 @@
+import { observer } from 'mobx-react-lite'
+import { useRef } from 'react'
+import { CropperRef } from 'react-advanced-cropper'
+import Toolbar from './components/Toolbar'
+import ImageUpload from './components/ImageUpload'
+import ImageCropper from './components/ImageCropper'
+import store from './store'
+
+const App = observer(() => {
+  const cropperRef = useRef<CropperRef>(null)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const files = e.dataTransfer.files
+    if (!files || files.length === 0) return
+
+    // Only take the first file
+    const file = files[0]
+    if (!file.type.startsWith('image/')) {
+      console.warn('Only image files are supported')
+      return
+    }
+
+    try {
+      // In Electron, the File object has a path property
+      const filePath = (file as any).path
+      await store.loadImage(file, filePath)
+    } catch (err) {
+      console.error('Failed to load image:', err)
+    }
+  }
+
+  const handleCrop = () => {
+    const cropper = cropperRef.current
+    if (!cropper) return
+
+    const canvas = cropper.getCanvas()
+    if (!canvas) return
+
+    // Convert canvas to blob
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const dataUrl = canvas.toDataURL()
+        store.setCroppedImage(blob, dataUrl, canvas.width, canvas.height)
+      }
+    })
+  }
+
+  return (
+    <div
+      className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133]"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <Toolbar onCrop={handleCrop} />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {!store.hasImage ? (
+          <ImageUpload />
+        ) : (
+          <ImageCropper cropperRef={cropperRef} />
+        )}
+      </div>
+    </div>
+  )
+})
+
+export default App

@@ -1,0 +1,11 @@
+{
+  "openImage": "打开图片",
+  "saveImage": "保存图片",
+  "clear": "清空",
+  "crop": "裁剪",
+  "uploadTitle": "拖拽图片到此处或点击上传",
+  "supportedFormats": "支持 PNG、JPG、WebP、GIF、BMP 格式",
+  "originalSize": "原始尺寸",
+  "croppedSize": "裁剪后尺寸",
+  "dimensions": "尺寸"
+}
