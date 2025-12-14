@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
+import { useTranslation } from 'react-i18next'
 import Toolbar from './components/Toolbar'
-import ImageUpload from './components/ImageUpload'
+import ImageUpload from 'share/components/ImageUpload'
 import ImageCropper from './components/ImageCropper'
 import store from './store'
 
 const App = observer(() => {
+  const { t } = useTranslation()
   const cropperRef = useRef<CropperRef>(null)
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -64,7 +66,11 @@ const App = observer(() => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {!store.hasImage ? (
-          <ImageUpload />
+          <ImageUpload
+            onOpenImage={() => store.openImageDialog()}
+            uploadTitle={t('uploadTitle')}
+            supportedFormats={t('supportedFormats')}
+          />
         ) : (
           <ImageCropper cropperRef={cropperRef} />
         )}

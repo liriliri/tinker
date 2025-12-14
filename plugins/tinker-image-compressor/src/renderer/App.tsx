@@ -1,11 +1,13 @@
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import Toolbar from './components/Toolbar'
-import ImageUpload from './components/ImageUpload'
+import ImageUpload from 'share/components/ImageUpload'
 import ImageList from './components/ImageList'
 import CompareModal from './components/CompareModal'
 import store from './store'
 
 const App = observer(() => {
+  const { t } = useTranslation()
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -49,7 +51,15 @@ const App = observer(() => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {!store.hasImages ? <ImageUpload /> : <ImageList />}
+        {!store.hasImages ? (
+          <ImageUpload
+            onOpenImage={() => store.openImageDialog()}
+            uploadTitle={t('uploadTitle')}
+            supportedFormats={t('supportedFormats')}
+          />
+        ) : (
+          <ImageList />
+        )}
       </div>
 
       {/* Compare Modal */}
