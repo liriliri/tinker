@@ -20,7 +20,7 @@
   "totalOriginalSize": "Total Original Size",
   "totalCompressedSize": "Total Compressed Size",
   "totalReduction": "Total Reduction",
-  "overwriteOriginal": "Overwrite Original",
+  "overwriteOriginal": "Overwrite",
   "compareImages": "Compare Images",
   "copy": "Copy"
 }

@@ -9,8 +9,8 @@ import {
   Redo,
   RotateCcw,
   RotateCw,
-  ZoomIn,
-  ZoomOut,
+  FlipHorizontal,
+  FlipVertical,
 } from 'lucide-react'
 import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
@@ -72,14 +72,14 @@ const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
     cropperRef.current.rotateImage(90)
   }
 
-  const handleZoomIn = () => {
+  const handleFlipHorizontal = () => {
     if (!cropperRef?.current) return
-    cropperRef.current.zoomImage(1.2)
+    cropperRef.current.flipImage(true, false)
   }
 
-  const handleZoomOut = () => {
+  const handleFlipVertical = () => {
     if (!cropperRef?.current) return
-    cropperRef.current.zoomImage(0.8)
+    cropperRef.current.flipImage(false, true)
   }
 
   const handleAspectRatioChange = (value: number) => {
@@ -229,19 +229,23 @@ const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
 
           {/* Aspect Ratio Select */}
           <div className="flex gap-2 items-center">
-            <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-              {t('aspectRatio')}:
-            </label>
             <Select
               value={store.aspectRatio ?? 0}
               onChange={handleAspectRatioChange}
               options={[
                 { label: t('aspectRatioFree'), value: 0 },
+                ...(store.originalAspectRatio
+                  ? [
+                      {
+                        label: t('aspectRatioOriginal'),
+                        value: store.originalAspectRatio,
+                      },
+                    ]
+                  : []),
                 { label: '1:1', value: 1 },
                 { label: '4:3', value: 4 / 3 },
+                { label: '3:2', value: 3 / 2 },
                 { label: '16:9', value: 16 / 9 },
-                { label: '3:4', value: 3 / 4 },
-                { label: '9:16', value: 9 / 16 },
               ]}
             />
           </div>
@@ -257,12 +261,15 @@ const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
             <RotateCw size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
 
-          <ToolbarButton onClick={handleZoomIn} title={t('zoomIn')}>
-            <ZoomIn size={TOOLBAR_ICON_SIZE} />
+          <ToolbarButton
+            onClick={handleFlipHorizontal}
+            title={t('flipHorizontal')}
+          >
+            <FlipHorizontal size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
 
-          <ToolbarButton onClick={handleZoomOut} title={t('zoomOut')}>
-            <ZoomOut size={TOOLBAR_ICON_SIZE} />
+          <ToolbarButton onClick={handleFlipVertical} title={t('flipVertical')}>
+            <FlipVertical size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
 
           <ToolbarButton

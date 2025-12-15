@@ -324,6 +324,11 @@ class Store extends BaseStore {
   get canRedo() {
     return this.historyIndex < this.history.length - 1
   }
+
+  get originalAspectRatio() {
+    if (!this.image) return null
+    return this.image.width / this.image.height
+  }
 }
 
 export default new Store()
