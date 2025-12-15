@@ -9,5 +9,16 @@
   "aspectRatio": "Aspect Ratio",
   "aspectRatioFree": "Free",
   "uploadTitle": "Drop image here or click to upload",
-  "supportedFormats": "Supports PNG, JPG, WebP, GIF, BMP"
+  "supportedFormats": "Supports PNG, JPG, WebP, GIF, BMP",
+  "rotateLeft": "Rotate Left",
+  "rotateRight": "Rotate Right",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "setCropSize": "Set Crop Size",
+  "width": "Width",
+  "height": "Height",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "resizeImage": "Resize Image",
+  "keepAspectRatio": "Keep Aspect Ratio"
 }

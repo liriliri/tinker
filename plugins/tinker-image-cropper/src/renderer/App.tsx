@@ -63,7 +63,7 @@ const App = observer(() => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <Toolbar onCrop={handleCrop} />
+      <Toolbar onCrop={handleCrop} cropperRef={cropperRef} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">

@@ -96,93 +96,94 @@ const ToolbarComponent = observer(() => {
 
       <ToolbarSpacer />
 
-      {/* Statistics Info */}
-      <div className="relative">
-        <ToolbarButton
-          onMouseEnter={() => setShowStats(true)}
-          onMouseLeave={() => setShowStats(false)}
-          title={t('statistics')}
-          disabled={!store.hasImages}
-        >
-          <Info size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+      {store.hasImages && (
+        <>
+          {/* Statistics Info */}
+          <div className="relative">
+            <ToolbarButton
+              onMouseEnter={() => setShowStats(true)}
+              onMouseLeave={() => setShowStats(false)}
+              title={t('statistics')}
+            >
+              <Info size={TOOLBAR_ICON_SIZE} />
+            </ToolbarButton>
 
-        {/* Statistics Tooltip */}
-        {showStats && store.hasImages && (
-          <div className="absolute right-0 top-full mt-2 bg-white dark:bg-[#252526] border border-[#e0e0e0] dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap">
-            <div className="font-medium mb-2 text-gray-800 dark:text-gray-200">
-              {t('statistics')}
-            </div>
-            <div className="space-y-1.5 text-gray-600 dark:text-gray-400">
-              <div className="flex justify-between gap-4">
-                <span>{t('totalImages')}:</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">
-                  {store.images.length}
-                </span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span>{t('totalOriginalSize')}:</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">
-                  {fileSize(store.totalOriginalSize)}
-                </span>
-              </div>
-              {store.hasCompressed && (
-                <>
+            {/* Statistics Tooltip */}
+            {showStats && (
+              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-[#252526] border border-[#e0e0e0] dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap">
+                <div className="font-medium mb-2 text-gray-800 dark:text-gray-200">
+                  {t('statistics')}
+                </div>
+                <div className="space-y-1.5 text-gray-600 dark:text-gray-400">
                   <div className="flex justify-between gap-4">
-                    <span>{t('totalCompressedSize')}:</span>
+                    <span>{t('totalImages')}:</span>
                     <span className="font-medium text-gray-800 dark:text-gray-200">
-                      {fileSize(store.totalCompressedSize)}
+                      {store.images.length}
                     </span>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <span>{t('totalReduction')}:</span>
-                    <span
-                      className={`font-medium ${
-                        store.totalCompressedSize >= store.totalOriginalSize
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-green-600 dark:text-green-400'
-                      }`}
-                    >
-                      {store.totalCompressedSize >= store.totalOriginalSize
-                        ? '+'
-                        : ''}
-                      {store.totalCompressionRatio}%
+                    <span>{t('totalOriginalSize')}:</span>
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {fileSize(store.totalOriginalSize)}
                     </span>
                   </div>
-                </>
-              )}
-            </div>
+                  {store.hasCompressed && (
+                    <>
+                      <div className="flex justify-between gap-4">
+                        <span>{t('totalCompressedSize')}:</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">
+                          {fileSize(store.totalCompressedSize)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span>{t('totalReduction')}:</span>
+                        <span
+                          className={`font-medium ${
+                            store.totalCompressedSize >= store.totalOriginalSize
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-green-600 dark:text-green-400'
+                          }`}
+                        >
+                          {store.totalCompressedSize >= store.totalOriginalSize
+                            ? '+'
+                            : ''}
+                          {store.totalCompressionRatio}%
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <ToolbarSeparator />
+          <ToolbarSeparator />
 
-      {/* Quality Select */}
-      <div className="flex gap-2 items-center">
-        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-          {t('quality')}:
-        </label>
-        <Select
-          value={store.quality}
-          onChange={handleQualityChange}
-          options={qualityOptions}
-          disabled={store.isCompressing}
-        />
-      </div>
+          {/* Quality Select */}
+          <div className="flex gap-2 items-center">
+            <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+              {t('quality')}:
+            </label>
+            <Select
+              value={store.quality}
+              onChange={handleQualityChange}
+              options={qualityOptions}
+              disabled={store.isCompressing}
+            />
+          </div>
 
-      <ToolbarSeparator />
+          <ToolbarSeparator />
 
-      {/* Compress Button */}
-      <button
-        onClick={handleCompress}
-        disabled={
-          !store.hasImages || store.isCompressing || !store.hasUncompressed
-        }
-        className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors"
-      >
-        {store.isCompressing ? t('compressing') : t('compress')}
-      </button>
+          {/* Compress Button */}
+          <button
+            onClick={handleCompress}
+            disabled={store.isCompressing || !store.hasUncompressed}
+            className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors"
+          >
+            {store.isCompressing ? t('compressing') : t('compress')}
+          </button>
+        </>
+      )}
     </Toolbar>
   )
 })
