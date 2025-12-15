@@ -51,6 +51,8 @@ const App = observer(() => {
       if (blob) {
         const dataUrl = canvas.toDataURL()
         store.setCroppedImage(blob, dataUrl, canvas.width, canvas.height)
+        // Apply cropped image as new original
+        store.applyCroppedImage()
       }
     })
   }
