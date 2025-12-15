@@ -40,5 +40,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
         share: path.join(cwd, '../share/'),
       },
     },
+    optimizeDeps: {
+      include: ['shiki'],
+    },
   }
 })

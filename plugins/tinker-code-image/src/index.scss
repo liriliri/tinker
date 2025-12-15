@@ -1,0 +1,29 @@
+@use 'tailwindcss';
+@config "../tailwind.config.js";
+
+html.dark {
+  color-scheme: dark;
+}
+
+.code-editor-container::after {
+  content: attr(data-value) ' ';
+  visibility: hidden;
+  grid-area: 1 / 1 / 2 / 2;
+  padding: 16px;
+  margin: 0;
+  font-family: monospace;
+  font-size: 15px;
+  line-height: 22.5px;
+  white-space: pre-wrap;
+}
+
+.code-editor-highlighted pre {
+  margin: 0 !important;
+  background-color: transparent !important;
+  font-family: inherit !important;
+  white-space: pre-wrap !important;
+}
+
+.code-editor-highlighted code {
+  font-family: inherit !important;
+}

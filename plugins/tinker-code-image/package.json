@@ -1,0 +1,23 @@
+{
+  "name": "tinker-code-image",
+  "version": "0.1.0",
+  "description": "Generate shareable images from code snippets",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Code Image",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "代码图片"
+      }
+    }
+  },
+  "devDependencies": {
+    "html-to-image": "^1.11.13",
+    "shiki": "^1.22.0"
+  }
+}
