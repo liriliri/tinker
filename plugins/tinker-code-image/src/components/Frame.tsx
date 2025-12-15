@@ -15,22 +15,62 @@ const Frame = observer(() => {
           }}
         >
           <div
-            className="flex items-center gap-2 px-4 py-3"
             style={{
               backgroundColor: store.darkMode ? '#374151' : '#f3f4f6',
+              display: 'grid',
+              gridTemplateColumns: '80px 1fr 80px',
+              gap: '12px',
+              alignItems: 'center',
+              padding: '0 16px',
+              height: '48px',
             }}
           >
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+              <div className="w-3 h-3 rounded-full bg-green-500" />
+            </div>
             <div
-              className="flex-1 text-center text-sm"
               style={{
-                color: store.darkMode ? '#9ca3af' : '#6b7280',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Untitled-1
+              <input
+                type="text"
+                value={store.fileName}
+                onChange={(e) => store.setFileName(e.target.value)}
+                spellCheck={false}
+                tabIndex={-1}
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  border: 'none',
+                  margin: 0,
+                  background: 'transparent',
+                  color: store.darkMode ? '#9ca3af' : '#6b7280',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  outline: 'none',
+                }}
+              />
+              {store.fileName.length === 0 && (
+                <span
+                  style={{
+                    color: store.darkMode ? '#9ca3af' : '#6b7280',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  Untitled-1
+                </span>
+              )}
             </div>
+            <div />
           </div>
           <CodeEditor />
         </div>

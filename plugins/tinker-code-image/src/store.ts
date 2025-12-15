@@ -88,6 +88,9 @@ class Store extends BaseStore {
   // Theme state
   darkMode: boolean = true
 
+  // Window title
+  fileName: string = ''
+
   constructor() {
     super()
     makeAutoObservable(this)
@@ -107,6 +110,10 @@ class Store extends BaseStore {
 
   setDarkMode(darkMode: boolean) {
     this.darkMode = darkMode
+  }
+
+  setFileName(fileName: string) {
+    this.fileName = fileName
   }
 }
 
