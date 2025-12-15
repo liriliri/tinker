@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import { readFileSync, writeFileSync } from 'fs'
+import * as fs from 'fs'
 import isWindows from 'licia/isWindows'
 
 const HOSTS_PATH = isWindows
@@ -97,6 +98,16 @@ const hostsObj = {
     } catch (error) {
       console.error('Failed to apply hosts:', error)
       throw error
+    }
+  },
+
+  // Read file from specified path
+  async readFile(filePath: string): Promise<string> {
+    try {
+      return await fs.promises.readFile(filePath, 'utf-8')
+    } catch (error) {
+      console.error('Failed to read file:', error)
+      throw new Error('Failed to read file.')
     }
   },
 

@@ -398,6 +398,23 @@ class Store extends BaseStore {
     }
   }
 
+  async copyCompressedImage(id: string) {
+    const image = this.images.find((img) => img.id === id)
+    if (!image || !image.compressedBlob) return
+
+    try {
+      // Use Clipboard API to copy image
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [image.compressedBlob.type]: image.compressedBlob,
+        }),
+      ])
+    } catch (err) {
+      console.error('Failed to copy image:', err)
+      throw err
+    }
+  }
+
   removeImage(id: string) {
     const index = this.images.findIndex((img) => img.id === id)
     if (index !== -1) {

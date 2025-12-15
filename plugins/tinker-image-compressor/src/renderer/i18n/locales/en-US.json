@@ -21,5 +21,6 @@
   "totalCompressedSize": "Total Compressed Size",
   "totalReduction": "Total Reduction",
   "overwriteOriginal": "Overwrite Original",
-  "compareImages": "Compare Images"
+  "compareImages": "Compare Images",
+  "copy": "Copy"
 }

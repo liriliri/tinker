@@ -81,40 +81,40 @@ export default observer(function Sidebar() {
     }
   }
 
-  const handleImport = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.json'
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          try {
-            const importedConfigs = JSON.parse(event.target?.result as string)
-            if (isArr(importedConfigs)) {
-              // Merge imported configs with existing ones
-              // If id exists, replace; if not, add new
-              const configMap: Record<string, HostsConfig> = {}
-              each(configs, (c) => {
-                configMap[c.id] = c
-              })
-              each(importedConfigs, (imported) => {
-                configMap[imported.id] = imported
-              })
-              const newConfigs = Object.values(configMap)
-              store.configs = newConfigs
-              store.saveConfigs()
-            }
-          } catch (error) {
-            console.error('Failed to import configs:', error)
-            alert({ title: '导入失败', message: '文件格式不正确' })
-          }
+  const handleImport = async () => {
+    const result = await tinker.showOpenDialog({
+      filters: [
+        { name: 'JSON Files', extensions: ['json'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+      properties: ['openFile'],
+    })
+
+    if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
+      try {
+        const filePath = result.filePaths[0]
+        const dataStr = await hosts.readFile(filePath)
+        const importedConfigs = JSON.parse(dataStr)
+
+        if (isArr(importedConfigs)) {
+          // Merge imported configs with existing ones
+          // If id exists, replace; if not, add new
+          const configMap: Record<string, HostsConfig> = {}
+          each(configs, (c) => {
+            configMap[c.id] = c
+          })
+          each(importedConfigs, (imported) => {
+            configMap[imported.id] = imported
+          })
+          const newConfigs = Object.values(configMap)
+          store.configs = newConfigs
+          store.saveConfigs()
         }
-        reader.readAsText(file)
+      } catch (error) {
+        console.error('Failed to import configs:', error)
+        alert({ title: '导入失败', message: '文件格式不正确' })
       }
     }
-    input.click()
   }
 
   const handleConfigContextMenu = (e: React.MouseEvent, cfg: HostsConfig) => {

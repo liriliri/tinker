@@ -21,5 +21,6 @@
   "totalCompressedSize": "压缩后总大小",
   "totalReduction": "总减少",
   "overwriteOriginal": "覆盖原图",
-  "compareImages": "图片对比"
+  "compareImages": "图片对比",
+  "copy": "复制"
 }

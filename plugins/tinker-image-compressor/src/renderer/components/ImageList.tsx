@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import fileSize from 'licia/fileSize'
 import store from '../store'
+import { MenuItemConstructorOptions } from 'electron'
 
 const ImageList = observer(() => {
   const { t } = useTranslation()
@@ -11,7 +12,7 @@ const ImageList = observer(() => {
     const image = store.images.find((img) => img.id === imageId)
     if (!image) return
 
-    const menuItems = []
+    const menuItems: MenuItemConstructorOptions[] = []
 
     // Show compress option if image hasn't been compressed yet
     if (!image.compressedBlob && !image.isCompressing) {
@@ -26,6 +27,14 @@ const ImageList = observer(() => {
       menuItems.push({
         label: t('compareImages'),
         click: () => store.setCompareImageId(imageId),
+      })
+    }
+
+    // Only show copy option if image has been compressed
+    if (image.compressedBlob) {
+      menuItems.push({
+        label: t('copy'),
+        click: () => store.copyCompressedImage(imageId),
       })
     }
 
