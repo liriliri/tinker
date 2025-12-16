@@ -11,6 +11,8 @@ import {
   convertToShikiTheme,
   shikiTheme,
 } from './lib/themes'
+import isStrBlank from 'licia/isStrBlank'
+import isUndef from 'licia/isUndef'
 
 const storage = new LocalStore('tinker-code-image')
 const STORAGE_KEY_LANGUAGE = 'language'
@@ -83,12 +85,12 @@ class Store extends BaseStore {
     }
 
     const savedCode = storage.get(STORAGE_KEY_CODE)
-    if (savedCode !== undefined && savedCode !== null) {
+    if (!isUndef(savedCode) && !isStrBlank(savedCode)) {
       this.code = savedCode
     }
 
     const savedFileName = storage.get(STORAGE_KEY_FILE_NAME)
-    if (savedFileName !== undefined && savedFileName !== null) {
+    if (!isUndef(savedFileName) && !isStrBlank(savedFileName)) {
       this.fileName = savedFileName
     }
   }

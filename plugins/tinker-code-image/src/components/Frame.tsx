@@ -6,6 +6,12 @@ const Frame = observer(() => {
   const frameColors = store.frameColors
   const checkColor = store.darkMode ? '#333' : '#e8e8e8'
 
+  const titleTextStyle = {
+    color: frameColors.title,
+    fontSize: '14px',
+    fontWeight: 500,
+  }
+
   return (
     <div
       className="h-full flex items-center justify-center overflow-auto"
@@ -66,14 +72,12 @@ const Frame = observer(() => {
                 spellCheck={false}
                 tabIndex={-1}
                 style={{
+                  ...titleTextStyle,
                   position: 'absolute',
                   width: '100%',
                   border: 'none',
                   margin: 0,
                   background: 'transparent',
-                  color: frameColors.title,
-                  fontSize: '14px',
-                  fontWeight: 500,
                   textAlign: 'center',
                   outline: 'none',
                 }}
@@ -81,9 +85,7 @@ const Frame = observer(() => {
               {store.fileName.length === 0 && (
                 <span
                   style={{
-                    color: frameColors.title,
-                    fontSize: '14px',
-                    fontWeight: 500,
+                    ...titleTextStyle,
                     pointerEvents: 'none',
                   }}
                 >

@@ -18,8 +18,16 @@ export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
-  const handleExport = async () => {
+  const getFrameElement = () => {
     const frameElement = document.getElementById('code-frame')
+    if (!frameElement) {
+      console.error('Frame element not found')
+    }
+    return frameElement
+  }
+
+  const handleExport = async () => {
+    const frameElement = getFrameElement()
     if (!frameElement) return
 
     try {
@@ -27,7 +35,6 @@ export default observer(function ToolbarComponent() {
         pixelRatio: 2,
       })
 
-      // Create download link
       const link = document.createElement('a')
       link.download = 'code-image.png'
       link.href = dataUrl
@@ -38,7 +45,7 @@ export default observer(function ToolbarComponent() {
   }
 
   const handleCopy = async () => {
-    const frameElement = document.getElementById('code-frame')
+    const frameElement = getFrameElement()
     if (!frameElement) return
 
     try {

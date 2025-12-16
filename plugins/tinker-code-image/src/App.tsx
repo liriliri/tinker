@@ -22,16 +22,18 @@ export default observer(function App() {
     })
   }, [])
 
+  const bgClass = 'bg-[#f0f1f2] dark:bg-[#303133]'
+
   if (!store.highlighter) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#f0f1f2] dark:bg-[#303133]">
+      <div className={`h-screen flex items-center justify-center ${bgClass}`}>
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133] overflow-hidden">
+    <div className={`h-screen flex flex-col ${bgClass} overflow-hidden`}>
       <Toolbar />
       <div className="flex-1 min-h-0">
         <Frame />

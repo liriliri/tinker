@@ -54,6 +54,20 @@ const CodeEditor = observer(() => {
       : '3rem'
     : '16px'
 
+  const sharedStyles = {
+    gridArea: '1 / 1 / 2 / 2',
+    paddingLeft: lineNumberPadding,
+    paddingRight: '16px',
+    paddingTop: '16px',
+    paddingBottom: '16px',
+    margin: 0,
+    fontFamily: 'monospace',
+    fontSize: '15px',
+    lineHeight: '22.5px',
+    whiteSpace: 'pre-wrap' as const,
+    transition: 'padding 0.2s',
+  }
+
   return (
     <div
       className={`code-editor-container ${
@@ -77,16 +91,7 @@ const CodeEditor = observer(() => {
         autoCorrect="off"
         autoCapitalize="off"
         style={{
-          gridArea: '1 / 1 / 2 / 2',
-          paddingLeft: lineNumberPadding,
-          paddingRight: '16px',
-          paddingTop: '16px',
-          paddingBottom: '16px',
-          margin: 0,
-          fontFamily: 'monospace',
-          fontSize: '15px',
-          lineHeight: '22.5px',
-          whiteSpace: 'pre-wrap',
+          ...sharedStyles,
           overflow: 'hidden',
           minHeight: 'min-content',
           border: 'none',
@@ -97,24 +102,13 @@ const CodeEditor = observer(() => {
           outline: 'none',
           zIndex: 2,
           tabSize: 2,
-          transition: 'padding 0.2s',
         }}
       />
       <div
         className="code-editor-highlighted"
         style={{
-          gridArea: '1 / 1 / 2 / 2',
-          paddingLeft: lineNumberPadding,
-          paddingRight: '16px',
-          paddingTop: '16px',
-          paddingBottom: '16px',
-          margin: 0,
-          fontFamily: 'monospace',
-          fontSize: '15px',
-          lineHeight: '22.5px',
-          whiteSpace: 'pre-wrap',
+          ...sharedStyles,
           pointerEvents: 'none',
-          transition: 'padding 0.2s',
           ...store.themeCSS,
         }}
         dangerouslySetInnerHTML={{
