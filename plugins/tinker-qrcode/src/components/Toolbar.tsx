@@ -11,6 +11,7 @@ import {
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import { tw } from 'share/theme'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
@@ -39,10 +40,10 @@ export default observer(function ToolbarComponent() {
 
   const handleSizeChange = (value: number | string) => {
     if (value === CUSTOM_VALUE) {
-      // 用户选择了自定义选项
+      // User selected custom option
       store.setIsCustomSize(true)
     } else {
-      // 用户选择了预设值
+      // User selected preset value
       store.setSize(value as number)
       store.setIsCustomSize(false)
     }
@@ -100,7 +101,7 @@ export default observer(function ToolbarComponent() {
           disabled={!store.isCustomSize}
           min="100"
           max="2000"
-          className="w-16 text-xs px-2 py-1 bg-white dark:bg-[#3e3e42] border border-[#e0e0e0] dark:border-[#4a4a4a] rounded focus:outline-none focus:border-[#0fc25e] dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`w-16 text-xs px-2 py-1 ${tw.bg.light.input} ${tw.bg.dark.select} border ${tw.border.both} rounded focus:outline-none ${tw.primary.focusBorder} dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed`}
         />
       </div>
 
@@ -138,7 +139,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         onClick={handleCopy}
         disabled={!store.text}
-        className={copied ? 'text-[#0fc25e]' : ''}
+        className={copied ? tw.primary.text : ''}
         title={t('copy')}
       >
         {copied ? (

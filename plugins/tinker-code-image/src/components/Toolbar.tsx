@@ -11,6 +11,7 @@ import {
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
+import { tw } from 'share/theme'
 import store, { LANGUAGES, THEMES } from '../store'
 import * as htmlToImage from 'html-to-image'
 
@@ -137,7 +138,7 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarButton
         onClick={handleCopy}
-        className={copied ? 'text-[#0fc25e]' : ''}
+        className={copied ? tw.primary.text : ''}
         title={t('copyImage')}
       >
         {copied ? (
@@ -149,7 +150,7 @@ export default observer(function ToolbarComponent() {
 
       <button
         onClick={handleExport}
-        className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] text-white font-medium rounded transition-colors flex items-center gap-1.5"
+        className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} text-white font-medium rounded transition-colors flex items-center gap-1.5`}
       >
         <Download size={TOOLBAR_ICON_SIZE} />
         {t('exportImage')}

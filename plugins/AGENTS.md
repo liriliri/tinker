@@ -109,60 +109,32 @@ Reference: `tinker-image-cropper`, `tinker-hosts`, `tinker-markdown-editor`
 
 ## State Management - MobX Pattern
 
-### BaseStore Inheritance Pattern
+### BaseStore Inheritance
 
-All plugin Stores must extend `share/BaseStore.ts`:
+All plugin Stores must extend `share/BaseStore`, which provides theme management functionality.
 
+**Quick Example**:
 ```typescript
-// src/store.ts
-import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-
-const storage = new LocalStore('tinker-plugin-name')
-const STORAGE_KEY = 'data'
+import { makeAutoObservable } from 'mobx'
 
 class Store extends BaseStore {
-  // State properties
-  someValue: string = ''
-
   constructor() {
-    super() // Call parent constructor (initialize theme)
-    makeAutoObservable(this) // Must explicitly call in subclass
-    this.loadFromStorage() // Load persisted data
-  }
-
-  // Computed properties (use getter)
-  get isEmpty() {
-    return this.someValue.length === 0
-  }
-
-  // Actions (methods that modify state)
-  setSomeValue(value: string) {
-    this.someValue = value
-    storage.set(STORAGE_KEY, value) // Persist
-  }
-
-  private loadFromStorage() {
-    const saved = storage.get(STORAGE_KEY)
-    if (saved) {
-      this.someValue = saved
-    }
+    super() // Initialize theme management
+    makeAutoObservable(this)
   }
 }
 
-// Singleton export
 export default new Store()
 ```
 
-Reference: `tinker-json-editor/src/store.ts:16-178`
+**Key Requirements**:
+- Must extend `BaseStore`
+- Call `super()` in constructor
+- Call `makeAutoObservable(this)` explicitly
+- Export as singleton
 
-### Key Rules
-1. **Must extend BaseStore**: Provides theme management and auto-listening
-2. **Explicitly call makeAutoObservable**: Call in subclass constructor
-3. **Singleton export**: `export default new Store()`
-4. **Use getter for computed properties**: MobX automatically tracks dependencies
-5. **Use LocalStore for persistence**: From licia library
+**Detailed Documentation**: See `share/README.md` for complete BaseStore usage, store method naming conventions, and persistence patterns
 
 ## Component Design Patterns
 
@@ -190,51 +162,60 @@ function renderApp() {
 ```
 
 ### Component Writing Rules
-1. **Components that access store use observer**: `const Component = observer(() => {...})` - Only components that read from or react to store state need observer. Pure presentation components without store access don't need it.
+1. **Components that access store use observer**: `const Component = observer(() => {...})`
 2. **Read state from store**: `store.property`
 3. **Call store actions**: `store.action(value)`
 4. **Props definition**: Use interface
 
-## Shared Components Usage
+**Detailed Patterns**: See `share/README.md` for observer usage and component props patterns
 
-The `share/` directory provides reusable components, BaseStore, and utilities.
+## Shared Resources (`share/` directory)
 
-**Available Components**:
-- `Toolbar` / `ToolbarButton` - Toolbar components
-- `Alert` / `Confirm` / `Prompt` - Dialog components
-- `Select` / `Checkbox` / `ImageUpload` - Form components
-- `Dialog` - General dialog
+The `share/` directory provides reusable components, utilities, and base classes.
 
-**Detailed Documentation**: See `share/README.md`
+**Available Resources**:
+- **BaseStore** - MobX Store base class with theme management
+- **theme.ts** - Unified theme configuration (colors, utilities)
+- **Components**: Toolbar, Dialog, Alert, Confirm, Prompt, Select, Checkbox, ImageUpload
+- **Hooks**: useCopyToClipboard
 
-**Important**: When updating components or tools in `plugins/share` directory, you must synchronously update the `share/README.md` documentation
+**Complete Documentation**: See `share/README.md` for detailed usage of all shared resources
+
+**Important**: When adding or updating components/tools in `plugins/share`, you must synchronously update `share/README.md`
 
 ## Tailwind CSS Style Conventions
 
-### Color Conventions
+### Theme Configuration
+
+**All plugins must use the unified theme configuration from `share/theme.ts`**.
+
+**Quick Example**:
 ```typescript
-// Primary colors
-'bg-[#0fc25e]'          // Primary green
-'hover:bg-[#0db054]'    // Hover state
+import { tw, THEME_COLORS } from 'share/theme'
 
-// Light mode backgrounds
-'bg-[#f0f1f2]'          // Page background
-'bg-white'              // Content background
-'border-[#e0e0e0]'      // Border
-
-// Dark mode backgrounds
-'dark:bg-[#303133]'     // Page background
-'dark:bg-[#1e1e1e]'     // Editor background
-'dark:bg-[#3a3a3c]'     // Hover background
-'dark:border-[#4a4a4a]' // Border
-'dark:text-gray-200'    // Text
+// Use predefined utilities
+<button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
+<div className={tw.border.both}>
+<span className={copied ? tw.primary.text : ''}>
 ```
 
-Reference: `share/components/Toolbar.tsx:10`, `tinker-code-image/src/components/Frame.tsx:12-13`
+**Key Rules**:
+- **Never hardcode colors**: `bg-[#0fc25e]`, `border-[#e0e0e0]`
+- **Always use theme utilities**: `tw.primary.bg`, `tw.border.both`
+- Support both light and dark modes using `tw.*` utilities
+- Use `THEME_COLORS.*` for inline styles when needed
+
+**Complete Documentation**: See `share/README.md` for:
+- Complete API reference of all available utilities
+- Common usage patterns (buttons, inputs, lists, etc.)
+- Migration guide from hardcoded colors
+- Color constants reference
 
 ### Layout Patterns
 ```tsx
-// Full-screen layout
+import { tw } from 'share/theme'
+
+// Full-screen layout with Toolbar
 <div className="h-screen flex flex-col">
   <Toolbar /> {/* Fixed height */}
   <div className="flex-1 overflow-hidden"> {/* Takes remaining space */}
@@ -242,9 +223,9 @@ Reference: `share/components/Toolbar.tsx:10`, `tinker-code-image/src/components/
   </div>
 </div>
 
-// Responsive dark mode
-<div className="bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-200">
-  Content
+// Responsive layout with theme colors
+<div className={`${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
+  Content with theme-aware background
 </div>
 ```
 
@@ -259,16 +240,19 @@ html.dark {
 }
 
 /* Third-party library style overrides */
+/* Use theme colors for consistency */
 .custom-library {
   /* Light mode */
   background: white;
 
   /* Dark mode */
   :is(.dark *) & {
-    background: #1e1e1e;
+    background: #1e1e1e; // Match tw.bg.dark.primary
   }
 }
 ```
+
+**Note**: For custom styles, prefer using Tailwind utilities. Only use SCSS for third-party library overrides or complex selectors.
 
 ## TypeScript Conventions
 
@@ -438,12 +422,8 @@ Tinker provides global `tinker` object to access system features.
 ### 1. Single Responsibility Components
 Each component is responsible for one functional module. Break complex features into multiple sub-components.
 
-### 2. Store Method Naming
-- `set*`: Directly set state (`setContent`, `setMode`)
-- `toggle*`: Toggle boolean values (`toggleDarkMode`)
-- `load*`: Load data from external sources (`loadFromFile`)
-- `save*`: Save to external sources (`saveToFile`)
-- `update*`: Update complex state (`updateUndoRedoState`)
+### 2. Follow Naming Conventions
+Follow established naming patterns for store methods, components, and files. See `share/README.md` for store method naming conventions.
 
 ### 3. Error Handling
 Use try-catch to capture async operation errors. Use `alert()` to display error messages when necessary.
@@ -458,8 +438,9 @@ Use try-catch to capture async operation errors. Use `alert()` to display error 
 - Props must define interfaces
 
 ### 6. Style Consistency
-- Use Tailwind class names and colors defined in documentation
-- Support both light and dark modes: `bg-white dark:bg-[#1e1e1e]`
+- Always use `tw` utilities from `share/theme` instead of hardcoding colors
+- Support both light and dark modes
+- See "Tailwind CSS Style Conventions" section and `share/README.md` for theme usage
 
 ### 7. Prioritize Licia
 Visit [Licia Official Documentation](https://licia.liriliri.io/) for complete function list. Prioritize using existing utility functions.

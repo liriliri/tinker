@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Copy, Check } from 'lucide-react'
 import dateFormat from 'licia/dateFormat'
+import { tw } from 'share/theme'
 import store from '../store'
 
 const Converter = observer(() => {
@@ -51,9 +52,11 @@ const Converter = observer(() => {
   const cityName = currentTimezoneLabel.split(' | ')[1] || currentTimezoneLabel
 
   return (
-    <div className="h-full flex flex-col bg-[#f0f1f2] dark:bg-[#303133]">
+    <div
+      className={`h-full flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+    >
       {/* Date to Timestamp */}
-      <div className="flex-1 border-b border-[#e0e0e0] dark:border-[#4a4a4a]">
+      <div className={`flex-1 border-b ${tw.border.both}`}>
         <div className="h-full flex flex-col p-6">
           <h2 className="text-sm font-medium mb-3 text-gray-600 dark:text-gray-400">
             {t('dateToTimestamp')} ({cityName}) {t('timestamp')}
@@ -64,9 +67,11 @@ const Converter = observer(() => {
               step="1"
               value={dateFormat(store.selectedDate, 'yyyy-mm-dd"T"HH:MM:ss')}
               onChange={(e) => handleDateTimeChange(e.target.value)}
-              className="px-3 py-2 text-sm rounded bg-white dark:bg-[#2d2d2d] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-[#4a4a4a] focus:outline-none focus:border-[#0fc25e] dark:focus:border-[#0fc25e]"
+              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
             />
-            <div className="flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 dark:bg-[#252526]">
+            <div
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.dark.tertiary}`}
+            >
               <div className="flex-1 text-gray-800 dark:text-gray-100 font-mono">
                 {dateToTimestampResult}
               </div>
@@ -74,8 +79,8 @@ const Converter = observer(() => {
                 onClick={() => copyToClipboard(dateToTimestampResult, 'date')}
                 className={
                   copiedDate
-                    ? 'p-1 rounded text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c] transition-colors'
-                    : 'p-1 rounded hover:bg-gray-200 dark:hover:bg-[#3a3a3c] transition-colors dark:text-gray-200'
+                    ? `p-1 rounded ${tw.primary.text} ${tw.hover.both} transition-colors`
+                    : `p-1 rounded ${tw.hover.both} transition-colors dark:text-gray-200`
                 }
                 title={t('copy')}
               >
@@ -98,9 +103,11 @@ const Converter = observer(() => {
               value={store.timestampInput}
               onChange={(e) => handleTimestampInput(e.target.value)}
               placeholder={t('enterTimestamp')}
-              className="px-3 py-2 text-sm rounded bg-white dark:bg-[#2d2d2d] text-gray-700 dark:text-gray-300 font-mono border border-gray-300 dark:border-[#4a4a4a] focus:outline-none focus:border-[#0fc25e] dark:focus:border-[#0fc25e]"
+              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 font-mono border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
             />
-            <div className="flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 dark:bg-[#252526]">
+            <div
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.dark.tertiary}`}
+            >
               <div className="flex-1 text-gray-800 dark:text-gray-100">
                 {timestampToDateResult
                   ? timestampToDateResult.toLocaleString(locale, {
@@ -133,8 +140,8 @@ const Converter = observer(() => {
                 disabled={!timestampToDateResult}
                 className={
                   copiedTimestamp
-                    ? 'p-1 rounded text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed'
-                    : 'p-1 rounded hover:bg-gray-200 dark:hover:bg-[#3a3a3c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-200'
+                    ? `p-1 rounded ${tw.primary.text} ${tw.hover.both} transition-colors disabled:opacity-30 disabled:cursor-not-allowed`
+                    : `p-1 rounded ${tw.hover.both} transition-colors disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-200`
                 }
                 title={t('copy')}
               >

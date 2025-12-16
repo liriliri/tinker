@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
 import toast from 'react-hot-toast'
+import { THEME_COLORS, tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function CalculationList() {
@@ -104,11 +105,15 @@ export default observer(function CalculationList() {
           <div
             key={line.id}
             onClick={() => handleLineClick(line.id)}
-            style={isActive ? { borderLeftColor: '#0fc25e' } : undefined}
-            className={`px-4 py-3 border-b border-[#e0e0e0] dark:border-[#4a4a4a] transition-colors cursor-text ${
+            style={
+              isActive ? { borderLeftColor: THEME_COLORS.primary } : undefined
+            }
+            className={`px-4 py-3 border-b ${
+              tw.border.both
+            } transition-colors cursor-text ${
               isActive
-                ? 'border-l-4 bg-white dark:bg-[#1e1e1e]'
-                : 'border-l-4 border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]'
+                ? `border-l-4 ${tw.bg.light.primary} ${tw.bg.dark.primary}`
+                : `border-l-4 border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]`
             }`}
           >
             <textarea
@@ -128,7 +133,14 @@ export default observer(function CalculationList() {
                 </span>
                 <span
                   onClick={(e) => handleResultClick(e, line.result)}
-                  className="text-gray-800 dark:text-gray-200 text-2xl font-mono font-medium cursor-pointer hover:text-[#0fc25e] dark:hover:text-[#0fc25e] transition-colors"
+                  className={`text-gray-800 dark:text-gray-200 text-2xl font-mono font-medium cursor-pointer ${tw.primary.text} transition-colors`}
+                  style={{
+                    ['--tw-text-opacity' as any]: undefined,
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = THEME_COLORS.primary)
+                  }
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                   title={t('clickToCopy')}
                 >
                   {formatNumber(line.result)}

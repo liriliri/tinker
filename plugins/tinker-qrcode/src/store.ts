@@ -46,7 +46,7 @@ class Store extends BaseStore {
     if (savedIsCustomSize !== null) {
       this.isCustomSize = savedIsCustomSize === 'true'
     } else {
-      // 如果没有保存过，根据 size 是否是预设值来判断
+      // If not saved before, determine based on whether size is a preset value
       this.isCustomSize = !PRESET_SIZES.includes(this.size)
     }
 
@@ -70,7 +70,7 @@ class Store extends BaseStore {
   setSize(size: number) {
     this.size = size
     storage.set(STORAGE_KEY_SIZE, String(size))
-    // 当设置 size 时，自动判断是否是自定义值
+    // Automatically determine if it's a custom value when setting size
     const wasCustom = this.isCustomSize
     this.isCustomSize = !PRESET_SIZES.includes(size)
     if (wasCustom !== this.isCustomSize) {

@@ -22,6 +22,7 @@ import {
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import { tw } from 'share/theme'
 import store, { type ViewMode } from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -103,7 +104,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         onClick={handleCopy}
         disabled={store.isEmpty}
-        className={copied ? 'text-[#0fc25e]' : ''}
+        className={copied ? tw.primary.text : ''}
         title={t('copy')}
       >
         {copied ? (

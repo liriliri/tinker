@@ -21,6 +21,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
+import { tw } from 'share/theme'
 import { RefObject, useState } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
 import store from '../store'
@@ -288,7 +289,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
           {/* Crop Button */}
           <button
             onClick={onCrop}
-            className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] text-white font-medium rounded transition-colors flex items-center gap-1.5"
+            className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} text-white font-medium rounded transition-colors flex items-center gap-1.5`}
           >
             <Crop size={TOOLBAR_ICON_SIZE} />
             {t('crop')}

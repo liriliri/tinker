@@ -10,6 +10,7 @@ import {
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -74,7 +75,7 @@ export default observer(function ToolbarComponent() {
       {/* Copy */}
       <ToolbarButton
         onClick={copyCurrentTimestamp}
-        className={copied ? 'text-[#0fc25e]' : ''}
+        className={copied ? tw.primary.text : ''}
         title={t('copy')}
       >
         {copied ? (

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { confirm } from 'share/components/Confirm'
 import { prompt } from 'share/components/Prompt'
 import { alert } from 'share/components/Alert'
+import { tw, THEME_COLORS } from 'share/theme'
 import { FileText, Monitor, Plus, Upload, Download } from 'lucide-react'
 import contain from 'licia/contain'
 import each from 'licia/each'
@@ -152,9 +153,9 @@ export default observer(function Sidebar() {
     return (
       <div
         key={cfg.id}
-        className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-[#3a3a3c] ${
-          isSelected ? 'bg-gray-300 dark:bg-[#4a4a4a]' : ''
-        }`}
+        className={`flex items-center gap-2 px-3 py-2 cursor-pointer ${
+          tw.hover.both
+        } ${isSelected ? `${tw.active.both}` : ''}`}
         onClick={() => handleSelect(cfg.id)}
         onContextMenu={(e) => handleConfigContextMenu(e, cfg)}
       >
@@ -165,7 +166,7 @@ export default observer(function Sidebar() {
         <div
           className={`w-3 h-3 rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors ${
             isActive
-              ? 'border-[#0fc25e] bg-[#0fc25e]'
+              ? `${tw.primary.border} ${tw.primary.bg}`
               : 'border-gray-400 dark:border-gray-500'
           }`}
           onClick={(e: React.MouseEvent) => {
@@ -178,12 +179,14 @@ export default observer(function Sidebar() {
   }
 
   return (
-    <div className="w-64 flex-shrink-0 bg-[#f0f1f2] dark:bg-[#252526] border-r border-[#e0e0e0] dark:border-[#4a4a4a] flex flex-col relative">
+    <div
+      className={`w-64 flex-shrink-0 ${tw.bg.light.secondary} ${tw.bg.dark.tertiary} border-r ${tw.border.both} flex flex-col relative`}
+    >
       {/* System Hosts - Fixed at top */}
       <div
-        className={`px-3 py-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-[#3a3a3c] border-b border-[#e0e0e0] dark:border-[#4a4a4a] flex-shrink-0 ${
-          viewMode === 'system' ? 'bg-gray-300 dark:bg-[#4a4a4a]' : ''
-        }`}
+        className={`px-3 py-2 cursor-pointer ${tw.hover.both} border-b ${
+          tw.border.both
+        } flex-shrink-0 ${viewMode === 'system' ? `${tw.active.both}` : ''}`}
         onClick={handleSystemView}
       >
         <div className="flex items-center gap-2">
@@ -202,21 +205,21 @@ export default observer(function Sidebar() {
       {/* Action buttons - Fixed at bottom */}
       <div className="p-3 flex justify-center gap-2 flex-shrink-0">
         <button
-          className="p-2 text-[#0fc25e] hover:bg-gray-200 dark:hover:bg-[#3a3a3c] rounded transition-colors"
+          className={`p-2 ${tw.primary.text} ${tw.hover.both} rounded transition-colors`}
           onClick={handleAddConfig}
           title="新增配置"
         >
           <Plus className="w-5 h-5" />
         </button>
         <button
-          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a3c] rounded transition-colors"
+          className={`p-2 text-gray-600 dark:text-gray-400 ${tw.hover.both} rounded transition-colors`}
           onClick={handleExport}
           title="导出配置"
         >
           <Upload className="w-5 h-5" />
         </button>
         <button
-          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a3c] rounded transition-colors"
+          className={`p-2 text-gray-600 dark:text-gray-400 ${tw.hover.both} rounded transition-colors`}
           onClick={handleImport}
           title="导入配置"
         >
