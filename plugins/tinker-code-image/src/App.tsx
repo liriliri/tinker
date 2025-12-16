@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { getHighlighterCore } from 'shiki'
 import getWasm from 'shiki/wasm'
-import store, { LANGUAGES } from './store'
+import store, { LANGUAGES, shikiTheme } from './store'
 import Frame from './components/Frame'
 import Toolbar from './components/Toolbar'
 
@@ -10,13 +10,10 @@ export default observer(function App() {
   useEffect(() => {
     // Initialize Shiki highlighter
     getHighlighterCore({
-      themes: [
-        import('shiki/themes/github-dark.mjs'),
-        import('shiki/themes/github-light.mjs'),
-      ],
+      themes: [shikiTheme],
       langs: [
         LANGUAGES.javascript.src(),
-        LANGUAGES.tsx.src(),
+        LANGUAGES.typescript.src(),
         LANGUAGES.python.src(),
       ],
       loadWasm: getWasm,

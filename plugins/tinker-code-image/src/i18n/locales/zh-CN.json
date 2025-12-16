@@ -3,6 +3,19 @@
   "theme": "主题",
   "darkMode": "深色模式",
   "lightMode": "浅色模式",
+  "lineNumbers": "行号",
   "exportImage": "导出图片",
-  "loading": "加载中..."
+  "copyImage": "复制图片",
+  "loading": "加载中...",
+  "theme.candy": "糖果",
+  "theme.breeze": "微风",
+  "theme.crimson": "绯红",
+  "theme.midnight": "午夜",
+  "theme.sunset": "日落",
+  "theme.mono": "单色",
+  "theme.raindrop": "雨滴",
+  "theme.meadow": "草地",
+  "theme.falcon": "猎鹰",
+  "theme.sand": "沙漠",
+  "theme.ice": "冰雪"
 }

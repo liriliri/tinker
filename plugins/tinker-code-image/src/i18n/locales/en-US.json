@@ -3,6 +3,19 @@
   "theme": "Theme",
   "darkMode": "Dark Mode",
   "lightMode": "Light Mode",
+  "lineNumbers": "Line Numbers",
   "exportImage": "Export Image",
-  "loading": "Loading..."
+  "copyImage": "Copy Image",
+  "loading": "Loading...",
+  "theme.candy": "Candy",
+  "theme.breeze": "Breeze",
+  "theme.crimson": "Crimson",
+  "theme.midnight": "Midnight",
+  "theme.sunset": "Sunset",
+  "theme.mono": "Mono",
+  "theme.raindrop": "Raindrop",
+  "theme.meadow": "Meadow",
+  "theme.falcon": "Falcon",
+  "theme.sand": "Sand",
+  "theme.ice": "Ice"
 }

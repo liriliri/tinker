@@ -15,7 +15,7 @@ import {
 import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
 import {
-  Toolbar as ToolbarContainer,
+  Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
@@ -33,7 +33,7 @@ interface ToolbarProps {
   cropperRef?: RefObject<CropperRef>
 }
 
-const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
+export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
   const { t } = useTranslation()
   const [showSizeDialog, setShowSizeDialog] = useState(false)
   const [showResizeDialog, setShowResizeDialog] = useState(false)
@@ -158,7 +158,7 @@ const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
   }
 
   return (
-    <ToolbarContainer>
+    <Toolbar>
       <ToolbarButton onClick={handleOpenImage} title={t('openImage')}>
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
@@ -315,8 +315,6 @@ const Toolbar = observer(({ onCrop, cropperRef }: ToolbarProps) => {
         currentWidth={store.image?.width || 0}
         currentHeight={store.image?.height || 0}
       />
-    </ToolbarContainer>
+    </Toolbar>
   )
 })
-
-export default Toolbar

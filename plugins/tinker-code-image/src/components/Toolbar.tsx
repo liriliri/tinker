@@ -1,19 +1,21 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Download, Moon, Sun } from 'lucide-react'
+import { Download, Moon, Sun, ListOrdered, Copy, Check } from 'lucide-react'
+import { useState } from 'react'
 import {
-  Toolbar as ToolbarContainer,
+  Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Select from 'share/components/Select'
-import store, { LANGUAGES } from '../store'
+import store, { LANGUAGES, THEMES } from '../store'
 import * as htmlToImage from 'html-to-image'
 
-const Toolbar = observer(() => {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
+  const [copied, setCopied] = useState(false)
 
   const handleExport = async () => {
     const frameElement = document.getElementById('code-frame')
@@ -34,8 +36,28 @@ const Toolbar = observer(() => {
     }
   }
 
-  const handleToggleDarkMode = () => {
-    store.setDarkMode(!store.darkMode)
+  const handleCopy = async () => {
+    const frameElement = document.getElementById('code-frame')
+    if (!frameElement) return
+
+    try {
+      const blob = await htmlToImage.toBlob(frameElement, {
+        pixelRatio: 2,
+      })
+
+      if (blob) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': blob,
+          }),
+        ])
+
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }
+    } catch (error) {
+      console.error('Failed to copy image:', error)
+    }
   }
 
   const languageOptions = Object.values(LANGUAGES).map((lang) => ({
@@ -43,8 +65,13 @@ const Toolbar = observer(() => {
     value: lang.name,
   }))
 
+  const themeOptions = Object.values(THEMES).map((theme) => ({
+    label: t(`theme.${theme.id}`),
+    value: theme.id,
+  }))
+
   return (
-    <ToolbarContainer>
+    <Toolbar>
       <Select
         value={store.selectedLanguage.name}
         onChange={(value) => {
@@ -56,8 +83,17 @@ const Toolbar = observer(() => {
 
       <ToolbarSeparator />
 
+      <Select
+        value={store.selectedTheme.id}
+        onChange={(value) => {
+          const theme = Object.values(THEMES).find((t) => t.id === value)
+          if (theme) store.setTheme(theme)
+        }}
+        options={themeOptions}
+      />
+
       <ToolbarButton
-        onClick={handleToggleDarkMode}
+        onClick={() => store.toggleDarkMode()}
         title={store.darkMode ? t('lightMode') : t('darkMode')}
       >
         {store.darkMode ? (
@@ -67,7 +103,28 @@ const Toolbar = observer(() => {
         )}
       </ToolbarButton>
 
+      <ToolbarButton
+        onClick={() => store.toggleLineNumbers()}
+        title={t('lineNumbers')}
+        variant="toggle"
+        active={store.showLineNumbers}
+      >
+        <ListOrdered size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
       <ToolbarSpacer />
+
+      <ToolbarButton
+        onClick={handleCopy}
+        className={copied ? 'text-[#0fc25e]' : ''}
+        title={t('copyImage')}
+      >
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
       <button
         onClick={handleExport}
@@ -76,8 +133,6 @@ const Toolbar = observer(() => {
         <Download size={TOOLBAR_ICON_SIZE} />
         {t('exportImage')}
       </button>
-    </ToolbarContainer>
+    </Toolbar>
   )
 })
-
-export default Toolbar

@@ -1,66 +1,26 @@
 import { makeAutoObservable } from 'mobx'
 import type { Highlighter } from 'shiki'
+import { CSSProperties } from 'react'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import { type Language, LANGUAGES } from './lib/languages'
+import {
+  type Theme,
+  type FrameColors,
+  THEMES,
+  convertToShikiTheme,
+  shikiTheme,
+} from './lib/themes'
 
-export interface Language {
-  name: string
-  src: () => Promise<any>
-}
+const storage = new LocalStore('tinker-code-image')
+const STORAGE_KEY_LANGUAGE = 'language'
+const STORAGE_KEY_THEME = 'theme'
+const STORAGE_KEY_DARK_MODE = 'darkMode'
+const STORAGE_KEY_SHOW_LINE_NUMBERS = 'showLineNumbers'
+const STORAGE_KEY_CODE = 'code'
+const STORAGE_KEY_FILE_NAME = 'fileName'
 
-export const LANGUAGES: { [index: string]: Language } = {
-  javascript: {
-    name: 'JavaScript',
-    src: () => import('shiki/langs/javascript.mjs'),
-  },
-  typescript: {
-    name: 'TypeScript',
-    src: () => import('shiki/langs/typescript.mjs'),
-  },
-  tsx: {
-    name: 'TSX',
-    src: () => import('shiki/langs/tsx.mjs'),
-  },
-  jsx: {
-    name: 'JSX',
-    src: () => import('shiki/langs/jsx.mjs'),
-  },
-  python: {
-    name: 'Python',
-    src: () => import('shiki/langs/python.mjs'),
-  },
-  java: {
-    name: 'Java',
-    src: () => import('shiki/langs/java.mjs'),
-  },
-  go: {
-    name: 'Go',
-    src: () => import('shiki/langs/go.mjs'),
-  },
-  rust: {
-    name: 'Rust',
-    src: () => import('shiki/langs/rust.mjs'),
-  },
-  cpp: {
-    name: 'C++',
-    src: () => import('shiki/langs/cpp.mjs'),
-  },
-  html: {
-    name: 'HTML',
-    src: () => import('shiki/langs/html.mjs'),
-  },
-  css: {
-    name: 'CSS',
-    src: () => import('shiki/langs/css.mjs'),
-  },
-  json: {
-    name: 'JSON',
-    src: () => import('shiki/langs/json.mjs'),
-  },
-  shell: {
-    name: 'Shell',
-    src: () => import('shiki/langs/bash.mjs'),
-  },
-}
+export { Language, Theme, LANGUAGES, THEMES, shikiTheme }
 
 const defaultCode = `import { useState } from 'react';
 
@@ -83,17 +43,54 @@ class Store extends BaseStore {
 
   // Code state
   code: string = defaultCode
-  selectedLanguage: Language = LANGUAGES.tsx
+  selectedLanguage: Language = LANGUAGES.javascript
 
   // Theme state
+  selectedTheme: Theme = THEMES.candy
   darkMode: boolean = true
 
   // Window title
   fileName: string = ''
 
+  // Line numbers
+  showLineNumbers: boolean = false
+
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadFromStorage()
+  }
+
+  private loadFromStorage() {
+    const savedLanguage = storage.get(STORAGE_KEY_LANGUAGE)
+    if (savedLanguage && LANGUAGES[savedLanguage]) {
+      this.selectedLanguage = LANGUAGES[savedLanguage]
+    }
+
+    const savedTheme = storage.get(STORAGE_KEY_THEME)
+    if (savedTheme && THEMES[savedTheme]) {
+      this.selectedTheme = THEMES[savedTheme]
+    }
+
+    const savedDarkMode = storage.get(STORAGE_KEY_DARK_MODE)
+    if (savedDarkMode !== undefined) {
+      this.darkMode = savedDarkMode
+    }
+
+    const savedShowLineNumbers = storage.get(STORAGE_KEY_SHOW_LINE_NUMBERS)
+    if (savedShowLineNumbers !== undefined) {
+      this.showLineNumbers = savedShowLineNumbers
+    }
+
+    const savedCode = storage.get(STORAGE_KEY_CODE)
+    if (savedCode !== undefined && savedCode !== null) {
+      this.code = savedCode
+    }
+
+    const savedFileName = storage.get(STORAGE_KEY_FILE_NAME)
+    if (savedFileName !== undefined && savedFileName !== null) {
+      this.fileName = savedFileName
+    }
   }
 
   setHighlighter(highlighter: Highlighter) {
@@ -102,18 +99,53 @@ class Store extends BaseStore {
 
   setCode(code: string) {
     this.code = code
+    storage.set(STORAGE_KEY_CODE, code)
   }
 
   setLanguage(language: Language) {
     this.selectedLanguage = language
+    // Find and save language key
+    const langKey = Object.keys(LANGUAGES).find(
+      (key) => LANGUAGES[key] === language
+    )
+    if (langKey) {
+      storage.set(STORAGE_KEY_LANGUAGE, langKey)
+    }
   }
 
-  setDarkMode(darkMode: boolean) {
-    this.darkMode = darkMode
+  setTheme(theme: Theme) {
+    this.selectedTheme = theme
+    storage.set(STORAGE_KEY_THEME, theme.id)
+  }
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode
+    storage.set(STORAGE_KEY_DARK_MODE, this.darkMode)
+  }
+
+  toggleLineNumbers() {
+    this.showLineNumbers = !this.showLineNumbers
+    storage.set(STORAGE_KEY_SHOW_LINE_NUMBERS, this.showLineNumbers)
   }
 
   setFileName(fileName: string) {
     this.fileName = fileName
+    storage.set(STORAGE_KEY_FILE_NAME, fileName)
+  }
+
+  // Get current theme CSS properties
+  get themeCSS(): CSSProperties {
+    const syntaxColors = this.darkMode
+      ? this.selectedTheme.syntax.dark
+      : this.selectedTheme.syntax.light
+    return convertToShikiTheme(syntaxColors)
+  }
+
+  // Get current frame colors
+  get frameColors(): FrameColors {
+    return this.darkMode
+      ? this.selectedTheme.frame.dark
+      : this.selectedTheme.frame.light
   }
 }
 

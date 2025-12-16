@@ -15,6 +15,7 @@ html.dark {
   font-size: 15px;
   line-height: 22.5px;
   white-space: pre-wrap;
+  transition: padding 0.2s;
 }
 
 .code-editor-highlighted pre {
@@ -26,4 +27,44 @@ html.dark {
 
 .code-editor-highlighted code {
   font-family: inherit !important;
+}
+
+/* Line numbers */
+.code-editor-container .line {
+  display: inline-block;
+  width: calc(100% + 32px);
+  padding: 0 16px;
+  margin: 0 -16px;
+  transition: width 0.2s, padding 0.2s, margin 0.2s;
+}
+
+.code-editor-container .line::before {
+  position: relative;
+  display: inline-block;
+  width: 1.5rem;
+  margin-right: 1.5rem;
+  margin-left: -3rem;
+  color: var(--shiki-foreground, #999);
+  opacity: 0;
+  content: attr(data-line);
+  text-align: right;
+  transition: opacity 0.2s;
+  user-select: none;
+  pointer-events: none;
+}
+
+.code-editor-container.show-line-numbers::after {
+  padding-left: 3rem;
+}
+
+.code-editor-container.show-line-numbers .line {
+  width: calc(100% + 16px + 3rem);
+  padding-left: 3rem;
+  padding-right: 16px;
+  margin-left: -3rem;
+  margin-right: -16px;
+}
+
+.code-editor-container.show-line-numbers .line::before {
+  opacity: 0.4;
 }

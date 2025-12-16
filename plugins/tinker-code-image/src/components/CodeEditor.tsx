@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import store from '../store'
+import store, { shikiTheme } from '../store'
 
 const CodeEditor = observer(() => {
   const [highlightedHtml, setHighlightedHtml] = useState('')
+  const numberOfLines = (store.code.match(/\n/g) || []).length + 1
 
   useEffect(() => {
     const generateHighlightedHtml = async () => {
@@ -18,25 +19,46 @@ const CodeEditor = observer(() => {
         await store.highlighter.loadLanguage(store.selectedLanguage.src)
       }
 
-      let lang = store.selectedLanguage.name.toLowerCase()
-      if (lang === 'typescript') {
-        lang = 'tsx'
-      }
+      const lang = store.selectedLanguage.name.toLowerCase()
 
       return store.highlighter.codeToHtml(store.code, {
         lang: lang,
-        theme: store.darkMode ? 'github-dark' : 'github-light',
+        theme: shikiTheme,
+        transformers: [
+          {
+            line(node, line) {
+              node.properties['data-line'] = line
+              this.addClassToHast(node, 'line')
+            },
+          },
+        ],
       })
     }
 
     generateHighlightedHtml().then((html) => {
       setHighlightedHtml(html)
     })
-  }, [store.code, store.selectedLanguage, store.highlighter, store.darkMode])
+  }, [
+    store.code,
+    store.selectedLanguage,
+    store.highlighter,
+    store.darkMode,
+    store.selectedTheme,
+    store.showLineNumbers,
+  ])
+
+  const showLineNumbers = store.showLineNumbers
+  const lineNumberPadding = showLineNumbers
+    ? numberOfLines > 99
+      ? '3.5rem'
+      : '3rem'
+    : '16px'
 
   return (
     <div
-      className="code-editor-container"
+      className={`code-editor-container ${
+        showLineNumbers ? 'show-line-numbers' : ''
+      }`}
       data-value={store.code}
       style={{
         display: 'grid',
@@ -56,7 +78,10 @@ const CodeEditor = observer(() => {
         autoCapitalize="off"
         style={{
           gridArea: '1 / 1 / 2 / 2',
-          padding: '16px',
+          paddingLeft: lineNumberPadding,
+          paddingRight: '16px',
+          paddingTop: '16px',
+          paddingBottom: '16px',
           margin: 0,
           fontFamily: 'monospace',
           fontSize: '15px',
@@ -72,19 +97,25 @@ const CodeEditor = observer(() => {
           outline: 'none',
           zIndex: 2,
           tabSize: 2,
+          transition: 'padding 0.2s',
         }}
       />
       <div
         className="code-editor-highlighted"
         style={{
           gridArea: '1 / 1 / 2 / 2',
-          padding: '16px',
+          paddingLeft: lineNumberPadding,
+          paddingRight: '16px',
+          paddingTop: '16px',
+          paddingBottom: '16px',
           margin: 0,
           fontFamily: 'monospace',
           fontSize: '15px',
           lineHeight: '22.5px',
           whiteSpace: 'pre-wrap',
           pointerEvents: 'none',
+          transition: 'padding 0.2s',
+          ...store.themeCSS,
         }}
         dangerouslySetInnerHTML={{
           __html: highlightedHtml,
