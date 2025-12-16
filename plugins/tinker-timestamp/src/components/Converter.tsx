@@ -6,7 +6,7 @@ import dateFormat from 'licia/dateFormat'
 import store from '../store'
 
 const Converter = observer(() => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [copiedDate, setCopiedDate] = useState(false)
   const [copiedTimestamp, setCopiedTimestamp] = useState(false)
 
@@ -42,6 +42,9 @@ const Converter = observer(() => {
   const timestampToDateResult = store.timestampInput
     ? store.timestampToDate(store.timestampInput)
     : null
+
+  // Get locale based on current language
+  const locale = i18n.language === 'zh-CN' ? 'zh-CN' : 'en-US'
 
   // Extract city name from timezone label (e.g., "UTC+08:00 | Beijing" -> "Beijing")
   const currentTimezoneLabel = t(store.getTimezoneKey(store.timezone))
@@ -100,7 +103,7 @@ const Converter = observer(() => {
             <div className="flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 dark:bg-[#252526]">
               <div className="flex-1 text-gray-800 dark:text-gray-100">
                 {timestampToDateResult
-                  ? timestampToDateResult.toLocaleString('zh-CN', {
+                  ? timestampToDateResult.toLocaleString(locale, {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',
@@ -115,7 +118,7 @@ const Converter = observer(() => {
                 onClick={() =>
                   timestampToDateResult &&
                   copyToClipboard(
-                    timestampToDateResult.toLocaleString('zh-CN', {
+                    timestampToDateResult.toLocaleString(locale, {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',

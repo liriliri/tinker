@@ -1,5 +1,4 @@
 import { contextBridge } from 'electron'
-import { readFileSync, writeFileSync } from 'fs'
 import * as fs from 'fs'
 import isWindows from 'licia/isWindows'
 
@@ -20,9 +19,9 @@ const hostsObj = {
   },
 
   // Read system hosts file
-  readSystemHosts(): string {
+  async readSystemHosts(): Promise<string> {
     try {
-      return readFileSync(HOSTS_PATH, 'utf-8')
+      return await fs.promises.readFile(HOSTS_PATH, 'utf-8')
     } catch (error) {
       console.error('Failed to read hosts file:', error)
       throw new Error(
@@ -32,9 +31,9 @@ const hostsObj = {
   },
 
   // Write to system hosts file
-  writeSystemHosts(content: string): void {
+  async writeSystemHosts(content: string): Promise<void> {
     try {
-      writeFileSync(HOSTS_PATH, content, 'utf-8')
+      await fs.promises.writeFile(HOSTS_PATH, content, 'utf-8')
     } catch (error) {
       console.error('Failed to write hosts file:', error)
       throw new Error(
@@ -44,7 +43,7 @@ const hostsObj = {
   },
 
   // Apply hosts configuration in append mode
-  applyHosts(configIds: string[], configs: HostsConfig[]): void {
+  async applyHosts(configIds: string[], configs: HostsConfig[]): Promise<void> {
     const CONTENT_START = '# --- TINKER-HOSTS_CONTENT_START ---'
     const CONTENT_END = '# --- TINKER-HOSTS_CONTENT_END ---'
 
@@ -53,7 +52,7 @@ const hostsObj = {
       const mergedContent = activeConfigs.map((c) => c.content).join('\n\n')
 
       // Read current hosts
-      const currentHosts = hostsObj.readSystemHosts()
+      const currentHosts = await hostsObj.readSystemHosts()
       const startIndex = currentHosts.indexOf(CONTENT_START)
       const endIndex = currentHosts.indexOf(CONTENT_END)
 
@@ -82,7 +81,7 @@ const hostsObj = {
           afterContent.length > 0
             ? `${beforeContent}\n\n${afterContent}`
             : beforeContent
-        hostsObj.writeSystemHosts(finalContent)
+        await hostsObj.writeSystemHosts(finalContent)
         return
       }
 
@@ -94,7 +93,7 @@ const hostsObj = {
       }
 
       const finalContent = parts.join('\n\n')
-      hostsObj.writeSystemHosts(finalContent)
+      await hostsObj.writeSystemHosts(finalContent)
     } catch (error) {
       console.error('Failed to apply hosts:', error)
       throw error
@@ -112,9 +111,9 @@ const hostsObj = {
   },
 
   // Write file to specified path
-  writeFile(filePath: string, content: string): void {
+  async writeFile(filePath: string, content: string): Promise<void> {
     try {
-      writeFileSync(filePath, content, 'utf-8')
+      await fs.promises.writeFile(filePath, content, 'utf-8')
     } catch (error) {
       console.error('Failed to write file:', error)
       throw new Error('Failed to write file.')

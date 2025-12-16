@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { evaluate } from 'mathjs'
 import isStrBlank from 'licia/isStrBlank'
 import find from 'licia/find'
+import BaseStore from 'share/BaseStore'
 
 interface CalculationLine {
   id: number
@@ -9,12 +10,13 @@ interface CalculationLine {
   result: string
 }
 
-class Store {
+class Store extends BaseStore {
   lines: CalculationLine[] = [{ id: 0, expression: '', result: '' }]
   activeLineId: number = 0
   inputRefs: { [key: number]: HTMLTextAreaElement | null } = {}
 
   constructor() {
+    super()
     makeAutoObservable(this)
     // Ensure activeLineId always points to the first line
     if (this.lines.length > 0) {

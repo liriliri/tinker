@@ -4,7 +4,7 @@ import QRCode from 'qrcode'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 
-const QRGenerator = observer(() => {
+export default observer(function QRGenerator() {
   const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -96,5 +96,3 @@ const QRGenerator = observer(() => {
     </div>
   )
 })
-
-export default QRGenerator

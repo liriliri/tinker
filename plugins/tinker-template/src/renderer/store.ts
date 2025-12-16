@@ -5,12 +5,19 @@ import { alert } from 'share/components/Alert'
 
 const storage = new LocalStore('tinker-template')
 
+type SystemInfo = {
+  platform: string
+  arch: string
+  homeDir: string
+  nodeVersion: string
+}
+
 class Store extends BaseStore {
   // UI state
   activeTab: string = 'preload'
 
   // Preload API Tab
-  systemInfo: any = null
+  systemInfo: SystemInfo | null = null
   currentTime: string = ''
 
   // Storage Tab

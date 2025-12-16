@@ -2,17 +2,17 @@
 
 Guidelines that AI coding assistants must follow when developing code for the Tinker plugin system.
 
-## 🚫 Core Constraints
+## Core Constraints
 
 Before starting any development work, you must adhere to the following constraints:
 
-### 1. No npm Dependency Installation ⛔
+### 1. No npm Dependency Installation
 
 **AI is absolutely prohibited from installing any npm packages on its own!**
 
-- ❌ **Forbidden**: `npm install`, `npm add`, `pnpm add`, `yarn add` commands
-- ❌ **Forbidden**: Modifying `dependencies` or `devDependencies` in `package.json`
-- ⚠️ **Must Ask**: If a feature requires a new dependency, you must ask the developer first
+- **Forbidden**: `npm install`, `npm add`, `pnpm add`, `yarn add` commands
+- **Forbidden**: Modifying `dependencies` or `devDependencies` in `package.json`
+- **Must Ask**: If a feature requires a new dependency, you must ask the developer first
 
 **Correct Approach**:
 ```
@@ -190,7 +190,7 @@ function renderApp() {
 ```
 
 ### Component Writing Rules
-1. **All components use observer**: `const Component = observer(() => {...})`
+1. **Components that access store use observer**: `const Component = observer(() => {...})` - Only components that read from or react to store state need observer. Pure presentation components without store access don't need it.
 2. **Read state from store**: `store.property`
 3. **Call store actions**: `store.action(value)`
 4. **Props definition**: Use interface
@@ -207,7 +207,7 @@ The `share/` directory provides reusable components, BaseStore, and utilities.
 
 **Detailed Documentation**: See `share/README.md`
 
-⚠️ **Important**: When updating components or tools in `plugins/share` directory, you must synchronously update the `share/README.md` documentation
+**Important**: When updating components or tools in `plugins/share` directory, you must synchronously update the `share/README.md` documentation
 
 ## Tailwind CSS Style Conventions
 
@@ -363,9 +363,8 @@ import { contextBridge } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
 
-const apiName = 'pluginAPI' // Custom API name
-
-const api = {
+// Define API object with all methods
+const pluginAPI = {
   async readFile(filePath: string): Promise<Buffer> {
     return fs.promises.readFile(filePath)
   },
@@ -380,27 +379,24 @@ const api = {
   },
 }
 
-contextBridge.exposeInMainWorld(apiName, api)
-```
+// Expose to renderer process
+contextBridge.exposeInMainWorld('pluginAPI', pluginAPI)
 
-**Type definitions**:
-```typescript
-// src/renderer/global.d.ts
+// Declare global type for TypeScript
 declare global {
-  interface Window {
-    pluginAPI: {
-      readFile(filePath: string): Promise<Buffer>
-      writeFile(filePath: string, data: Uint8Array): Promise<void>
-      getFileName(filePath: string): string
-      getDirName(filePath: string): string
-    }
-  }
+  const pluginAPI: typeof pluginAPI
 }
-
-export {}
 ```
 
-Reference: `tinker-image-cropper/src/preload/index.ts`
+**Type Usage in Renderer**:
+```typescript
+// src/renderer/App.tsx or other files
+// Direct access to global API (no window. prefix needed)
+const fileName = pluginAPI.getFileName('/path/to/file')
+const content = await pluginAPI.readFile('/path/to/file')
+```
+
+Reference: `tinker-hosts/src/preload/index.ts:16-129`
 
 ## Package.json Configuration
 

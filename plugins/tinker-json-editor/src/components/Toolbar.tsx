@@ -26,7 +26,7 @@ import ExpandIcon from '../assets/expand.svg?react'
 import CollapseIcon from '../assets/collapse.svg?react'
 import MinifyIcon from '../assets/minify.svg?react'
 
-export default observer(function ToolbarComponent() {
+export default observer(function Toolbar() {
   const { t } = useTranslation()
   const { copied, copyToClipboard } = useCopyToClipboard()
 

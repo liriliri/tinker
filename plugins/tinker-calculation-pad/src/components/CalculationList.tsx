@@ -129,7 +129,7 @@ export default observer(function CalculationList() {
                 <span
                   onClick={(e) => handleResultClick(e, line.result)}
                   className="text-gray-800 dark:text-gray-200 text-2xl font-mono font-medium cursor-pointer hover:text-[#0fc25e] dark:hover:text-[#0fc25e] transition-colors"
-                  title="点击复制"
+                  title={t('clickToCopy')}
                 >
                   {formatNumber(line.result)}
                 </span>

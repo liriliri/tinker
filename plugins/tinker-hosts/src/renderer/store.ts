@@ -5,6 +5,7 @@ import contain from 'licia/contain'
 import remove from 'licia/remove'
 import { HostsConfig, ViewMode } from './types'
 import BaseStore from 'share/BaseStore'
+import i18n from './i18n'
 
 const STORAGE_KEY_CONFIGS = 'configs'
 const STORAGE_KEY_ACTIVE_IDS = 'active-ids'
@@ -23,73 +24,67 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadFromStorage()
   }
 
-  async loadConfig() {
+  private loadFromStorage() {
     try {
-      console.log('Loading config from localStorage...')
       const savedConfigs = storage.get(STORAGE_KEY_CONFIGS)
       const savedActiveIds = storage.get(STORAGE_KEY_ACTIVE_IDS)
 
       if (savedConfigs) {
         this.configs = JSON.parse(savedConfigs)
-        console.log('Configs loaded from localStorage:', this.configs)
       }
 
       if (savedActiveIds) {
         this.activeIds = JSON.parse(savedActiveIds)
-        console.log('Active IDs loaded from localStorage:', this.activeIds)
-      }
-
-      if (!savedConfigs && !savedActiveIds) {
-        console.log('Created default config')
       }
     } catch (error) {
       console.error('Failed to load config:', error)
-      this.error = `加载配置失败: ${
-        error instanceof Error ? error.message : '未知错误'
-      }`
+      this.error = i18n.t('loadConfigFailed', {
+        message:
+          error instanceof Error ? error.message : i18n.t('unknownError'),
+      })
     }
   }
 
   saveConfigs() {
     try {
       storage.set(STORAGE_KEY_CONFIGS, JSON.stringify(this.configs))
-      console.log('Configs saved to localStorage')
     } catch (error) {
       console.error('Failed to save configs:', error)
-      this.error = `保存配置失败: ${
-        error instanceof Error ? error.message : '未知错误'
-      }`
+      this.error = i18n.t('saveConfigFailed', {
+        message:
+          error instanceof Error ? error.message : i18n.t('unknownError'),
+      })
     }
   }
 
   saveActiveIds() {
     try {
       storage.set(STORAGE_KEY_ACTIVE_IDS, JSON.stringify(this.activeIds))
-      console.log('Active IDs saved to localStorage')
     } catch (error) {
       console.error('Failed to save active IDs:', error)
-      this.error = `保存配置失败: ${
-        error instanceof Error ? error.message : '未知错误'
-      }`
+      this.error = i18n.t('saveConfigFailed', {
+        message:
+          error instanceof Error ? error.message : i18n.t('unknownError'),
+      })
     }
   }
 
   async loadSystemHosts() {
     try {
-      console.log('Loading system hosts...')
-      const systemHosts = hosts.readSystemHosts()
-      console.log('System hosts loaded, length:', systemHosts.length)
+      const systemHosts = await hosts.readSystemHosts()
       this.systemHosts = systemHosts
     } catch (error) {
       console.error('Failed to load system hosts:', error)
-      this.error = `读取系统 hosts 文件失败: ${
-        error instanceof Error ? error.message : '未知错误'
-      }`
-      this.systemHosts = `# 无法读取系统 hosts 文件\n# 错误: ${
-        error instanceof Error ? error.message : '未知错误'
-      }`
+      const errorMsg =
+        error instanceof Error ? error.message : i18n.t('unknownError')
+      this.error = i18n.t('readSystemHostsFailed', { message: errorMsg })
+      this.systemHosts = `# ${i18n.t('cannotReadSystemHosts')}\n# ${i18n.t(
+        'readSystemHostsFailed',
+        { message: errorMsg }
+      )}`
     }
   }
 
@@ -182,7 +177,7 @@ class Store extends BaseStore {
 
   async applyHosts() {
     try {
-      hosts.applyHosts(toJS(this.activeIds), toJS(this.configs))
+      await hosts.applyHosts(toJS(this.activeIds), toJS(this.configs))
       await this.loadSystemHosts()
     } catch (error) {
       console.error('Failed to apply hosts:', error)

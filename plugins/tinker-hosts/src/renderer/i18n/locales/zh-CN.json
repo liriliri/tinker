@@ -24,5 +24,10 @@
   "applyHint": "提示：修改配置后需点击\"应用配置\"按钮才会生效到系统 hosts 文件",
   "noActiveConfig": "没有激活的配置，请至少激活一个配置。",
   "emptyConfig": "激活的配置内容为空，请至少为一个激活的配置添加内容。",
-  "openHostsFile": "打开 Hosts 文件"
+  "openHostsFile": "打开 Hosts 文件",
+  "loadConfigFailed": "加载配置失败: {{message}}",
+  "saveConfigFailed": "保存配置失败: {{message}}",
+  "readSystemHostsFailed": "读取系统 hosts 文件失败: {{message}}",
+  "cannotReadSystemHosts": "无法读取系统 hosts 文件",
+  "unknownError": "未知错误"
 }

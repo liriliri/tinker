@@ -4,5 +4,6 @@
   "copyResult": "Copy result",
   "copySuccess": "Copied successfully",
   "copyFailed": "Failed to copy",
-  "placeholder": "Enter formula"
+  "placeholder": "Enter formula",
+  "clickToCopy": "Click to copy"
 }

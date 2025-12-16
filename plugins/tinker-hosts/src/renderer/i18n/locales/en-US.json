@@ -24,5 +24,10 @@
   "applyHint": "Tip: After modifying the configuration, you need to click \"Apply Config\" button to apply it to the system hosts file",
   "noActiveConfig": "No active configurations. Please activate at least one configuration.",
   "emptyConfig": "Active configurations are empty. Please add content to at least one active configuration.",
-  "openHostsFile": "Open Hosts File"
+  "openHostsFile": "Open Hosts File",
+  "loadConfigFailed": "Failed to load configuration: {{message}}",
+  "saveConfigFailed": "Failed to save configuration: {{message}}",
+  "readSystemHostsFailed": "Failed to read system hosts file: {{message}}",
+  "cannotReadSystemHosts": "Cannot read system hosts file",
+  "unknownError": "Unknown error"
 }

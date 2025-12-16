@@ -8,11 +8,7 @@ import { Sidebar, Editor } from './components'
 
 export default observer(function App() {
   useEffect(() => {
-    const init = async () => {
-      await store.loadConfig()
-      await store.loadSystemHosts()
-    }
-    init()
+    store.loadSystemHosts()
   }, [])
 
   return (

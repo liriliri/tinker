@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import store from '../store'
 import Select from 'share/components/Select'
 import {
-  Toolbar,
+  Toolbar as ToolbarContainer,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
@@ -12,7 +12,7 @@ import {
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 
-export default observer(function ToolbarComponent() {
+export default observer(function Toolbar() {
   const { t } = useTranslation()
   const { copied, copyToClipboard } = useCopyToClipboard()
 
@@ -82,7 +82,7 @@ export default observer(function ToolbarComponent() {
   }
 
   return (
-    <Toolbar>
+    <ToolbarContainer>
       {/* Size Control */}
       <div className="flex items-center gap-1.5 px-1">
         <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
@@ -164,6 +164,6 @@ export default observer(function ToolbarComponent() {
           {store.text.length} {t('characters')}
         </div>
       )}
-    </Toolbar>
+    </ToolbarContainer>
   )
 })

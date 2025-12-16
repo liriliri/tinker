@@ -4,5 +4,6 @@
   "copyResult": "复制结果",
   "copySuccess": "复制成功",
   "copyFailed": "复制失败",
-  "placeholder": "计算公式"
+  "placeholder": "计算公式",
+  "clickToCopy": "点击复制"
 }
