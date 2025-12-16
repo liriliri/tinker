@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Download, Moon, Sun, ListOrdered, Copy, Check } from 'lucide-react'
+import { Download, Moon, Sun, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
 import {
   Toolbar,
@@ -9,6 +9,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
+import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
 import store, { LANGUAGES, THEMES } from '../store'
 import * as htmlToImage from 'html-to-image'
@@ -92,25 +93,38 @@ export default observer(function ToolbarComponent() {
         options={themeOptions}
       />
 
-      <ToolbarButton
-        onClick={() => store.toggleDarkMode()}
-        title={store.darkMode ? t('lightMode') : t('darkMode')}
+      <Checkbox
+        checked={store.showLineNumbers}
+        onChange={(checked) => store.setShowLineNumbers(checked)}
+        className="ml-3"
       >
-        {store.darkMode ? (
-          <Sun size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Moon size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+        {t('lineNumbers')}
+      </Checkbox>
 
-      <ToolbarButton
-        onClick={() => store.toggleLineNumbers()}
-        title={t('lineNumbers')}
-        variant="toggle"
-        active={store.showLineNumbers}
+      <button
+        onClick={() => store.toggleDarkMode()}
+        title={store.darkMode ? t('darkMode') : t('lightMode')}
+        className={`
+          ml-3 relative w-10 h-5 rounded-full transition-colors duration-300 ease-in-out
+          ${store.darkMode ? 'bg-gray-700 dark:bg-gray-600' : 'bg-gray-300'}
+        `}
       >
-        <ListOrdered size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+        <div
+          className={`
+            absolute top-0.5 left-0.5 w-4 h-4 rounded-full
+            bg-white shadow-md
+            flex items-center justify-center
+            transition-transform duration-300 ease-in-out
+            ${store.darkMode ? 'translate-x-5' : 'translate-x-0'}
+          `}
+        >
+          {store.darkMode ? (
+            <Moon size={10} className="text-gray-700" />
+          ) : (
+            <Sun size={10} className="text-amber-500" />
+          )}
+        </div>
+      </button>
 
       <ToolbarSpacer />
 

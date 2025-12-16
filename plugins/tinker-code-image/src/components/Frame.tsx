@@ -8,7 +8,7 @@ const Frame = observer(() => {
 
   return (
     <div
-      className="flex-1 flex items-center justify-center p-8"
+      className="h-full flex items-center justify-center overflow-auto"
       style={{
         backgroundImage: `
           linear-gradient(45deg, ${checkColor} 25%, transparent 25%),
@@ -24,7 +24,6 @@ const Frame = observer(() => {
       <div
         id="code-frame"
         className="relative inline-block max-h-full flex flex-col"
-        style={{ padding: '16px' }}
       >
         <div
           className="rounded-lg shadow-2xl flex flex-col overflow-hidden"

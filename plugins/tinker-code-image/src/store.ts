@@ -128,6 +128,11 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_SHOW_LINE_NUMBERS, this.showLineNumbers)
   }
 
+  setShowLineNumbers(show: boolean) {
+    this.showLineNumbers = show
+    storage.set(STORAGE_KEY_SHOW_LINE_NUMBERS, this.showLineNumbers)
+  }
+
   setFileName(fileName: string) {
     this.fileName = fileName
     storage.set(STORAGE_KEY_FILE_NAME, fileName)
