@@ -18,6 +18,14 @@ html.dark {
     border: none !important;
   }
 
+  /* Fix checkbox alignment */
+  input[type='checkbox'] {
+    vertical-align: text-bottom;
+    margin: 0;
+    position: relative;
+    top: 2px;
+  }
+
   .jsoneditor-menu,
   .jsoneditor-contextmenu {
     box-shadow: none !important;
