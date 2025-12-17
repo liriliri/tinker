@@ -108,7 +108,7 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
   const pluginView = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, '../preload/plugin.js'),
-      partition: `persist:plugin`,
+      partition: 'persist:plugin',
       sandbox: false,
     },
   })
