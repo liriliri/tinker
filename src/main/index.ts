@@ -1,4 +1,4 @@
-import { app } from 'electron'
+import { app, Menu } from 'electron'
 import log from 'share/common/log'
 import * as tray from './lib/tray'
 import * as main from './window/main'
@@ -26,6 +26,7 @@ window.setDefaultOptions({
 app.on('ready', () => {
   logger.info('app ready')
 
+  Menu.setApplicationMenu(null)
   autoLaunch.init()
   terminal.init()
   plugin.init()

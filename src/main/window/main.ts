@@ -4,8 +4,8 @@ import once from 'licia/once'
 import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
-import isMac from 'licia/isMac'
 import { getSettingsStore } from '../lib/store'
+import * as dock from '../lib/dock'
 
 const settingsStore = getSettingsStore()
 
@@ -56,13 +56,7 @@ export function showWin() {
     }
   })
 
-  if (isMac) {
-    win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    win.focus()
-    win.setVisibleOnAllWorkspaces(false, {
-      visibleOnFullScreen: true,
-    })
-  }
+  dock.hide()
   window.loadPage(win)
 }
 
