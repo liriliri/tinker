@@ -2,6 +2,7 @@ import fs from 'fs-extra'
 import memoize from 'licia/memoize'
 import FileStore from 'licia/FileStore'
 import { getUserDataPath } from 'share/main/lib/util'
+import isMac from 'licia/isMac'
 
 fs.exists(getUserDataPath('data'), function (exists) {
   if (!exists) {
@@ -16,7 +17,7 @@ export const getSettingsStore = memoize(function () {
     useNativeTitlebar: false,
     openAtLogin: false,
     silentStart: false,
-    showShortcut: 'Option+Space',
+    showShortcut: isMac ? 'Option+Space' : 'Alt+Space',
   })
 })
 
