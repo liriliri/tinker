@@ -1,4 +1,4 @@
-import { app, Menu } from 'electron'
+import { app, globalShortcut, Menu } from 'electron'
 import log from 'share/common/log'
 import * as tray from './lib/tray'
 import * as main from './window/main'
@@ -34,6 +34,9 @@ app.on('ready', () => {
   if (!autoLaunch.wasOpenedAtLogin() && !settingsStore.get('silentStart')) {
     main.showWin()
   }
+  globalShortcut.register(settingsStore.get('showShortcut'), () =>
+    main.showWin()
+  )
 })
 
 app.on('window-all-closed', noop)
