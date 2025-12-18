@@ -60,6 +60,7 @@ class Store extends BaseStore {
     }
     main.closePlugin(this.plugin.id)
     this.plugin = null
+    this.setFilter('')
   }
   detachPlugin() {
     if (!this.plugin) {

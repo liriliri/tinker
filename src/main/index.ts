@@ -6,6 +6,7 @@ import * as plugin from './lib/plugin'
 import * as window from 'share/main/lib/window'
 import * as terminal from 'share/main/window/terminal'
 import * as autoLaunch from 'share/main/lib/autoLaunch'
+import * as dock from './lib/dock'
 import noop from 'licia/noop'
 import { getSettingsStore } from './lib/store'
 import 'share/main'
@@ -33,6 +34,8 @@ app.on('ready', () => {
   tray.init()
   if (!autoLaunch.wasOpenedAtLogin() && !settingsStore.get('silentStart')) {
     main.showWin()
+  } else {
+    dock.hide()
   }
   globalShortcut.register(settingsStore.get('showShortcut'), () =>
     main.showWin()

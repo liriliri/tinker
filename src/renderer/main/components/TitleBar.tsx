@@ -12,8 +12,16 @@ export default observer(function Titlebar() {
 
   useEffect(() => {
     const offShowWin = main.on('showWin', () => inputRef.current?.focus())
+    const offPressEsc = main.on('pressEsc', () => {
+      if (store.plugin) {
+        store.closePlugin()
+      } else {
+        main.closeWin()
+      }
+    })
     return () => {
       offShowWin()
+      offPressEsc()
     }
   }, [])
 
@@ -115,7 +123,6 @@ export default observer(function Titlebar() {
           onChange={(e) => {
             if (store.plugin) {
               store.closePlugin()
-              store.setFilter('')
             } else {
               store.setFilter(e.target.value)
             }
@@ -126,7 +133,6 @@ export default observer(function Titlebar() {
             className="icon-close"
             onClick={() => {
               store.closePlugin()
-              store.setFilter('')
               inputRef.current?.focus()
             }}
           />

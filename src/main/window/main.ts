@@ -58,7 +58,7 @@ export function showWin() {
     }
 
     if (input.key === 'Escape') {
-      win?.close()
+      window.sendTo('main', 'pressEsc')
     }
   })
 
