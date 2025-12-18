@@ -8,5 +8,6 @@
   "restart": "重启",
   "hide": "隐藏",
   "silentStart": "静默启动",
-  "aboutTinker": "关于 TINKER"
+  "aboutTinker": "关于 TINKER",
+  "autoHide": "自动隐藏"
 }

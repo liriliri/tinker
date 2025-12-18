@@ -18,6 +18,7 @@ export const getSettingsStore = memoize(function () {
     openAtLogin: false,
     silentStart: false,
     showShortcut: isMac ? 'Option+Space' : 'Alt+Space',
+    autoHide: true,
   })
 })
 

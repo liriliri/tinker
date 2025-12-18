@@ -5,6 +5,9 @@ import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 import * as dock from '../lib/dock'
+import { getSettingsStore } from '../lib/store'
+
+const settingsStore = getSettingsStore()
 
 let win: BrowserWindow | null = null
 
@@ -40,6 +43,12 @@ export function showWin() {
       if (plugin) {
         layoutPlugin(plugin.id)
       }
+    }
+  })
+
+  win.on('blur', () => {
+    if (settingsStore.get('autoHide')) {
+      win?.hide()
     }
   })
 

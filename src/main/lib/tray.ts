@@ -172,6 +172,17 @@ async function updateContextMenu() {
             settingsStore.set('silentStart', item.checked)
           },
         },
+        {
+          type: 'separator',
+        },
+        {
+          label: t('autoHide'),
+          type: 'checkbox',
+          checked: settingsStore.get('autoHide'),
+          click(item) {
+            settingsStore.set('autoHide', item.checked)
+          },
+        },
       ],
     },
     {

@@ -8,5 +8,6 @@
   "restart": "Restart",
   "hide": "Hide",
   "silentStart": "Silent Start",
-  "aboutTinker": "About TINKER"
+  "aboutTinker": "About TINKER",
+  "autoHide": "Auto Hide"
 }
