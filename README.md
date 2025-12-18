@@ -31,7 +31,7 @@ Toolbox for Everyone.
 
 ## Installation
 
-Click [here](https://github.com/liriliri/tinker/releases/) to download and install AYA. Windows x64, Mac arm64, Mac x64 and Linux x86_64 are supported.
+Click [here](https://github.com/liriliri/tinker/releases/) to download and install TINKER. Windows x64, Mac arm64, Mac x64 and Linux x86_64 are supported.
 
 ## Features
 
