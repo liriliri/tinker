@@ -1,0 +1,15 @@
+{
+  "pickColor": "Pick Color from Screen",
+  "pasteColor": "Paste Color",
+  "copyToClipboard": "Copy to clipboard",
+  "colorVariants": "Color Variants",
+  "complementaryColor": "Complementary Color",
+  "analogousHarmony": "Analogous Harmony",
+  "clickToCopy": "Click to copy {{color}}",
+  "copiedSuccess": "Copied to clipboard!",
+  "copiedFailed": "Failed to copy!",
+  "pasteSuccess": "Color pasted successfully!",
+  "pasteFailed": "Invalid color format!",
+  "saturation": "Saturation",
+  "lightness": "Lightness"
+}

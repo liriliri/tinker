@@ -1,0 +1,15 @@
+{
+  "pickColor": "从屏幕取色",
+  "pasteColor": "粘贴颜色",
+  "copyToClipboard": "复制到剪贴板",
+  "colorVariants": "色彩变化",
+  "complementaryColor": "互补色",
+  "analogousHarmony": "类似色",
+  "clickToCopy": "点击复制 {{color}}",
+  "copiedSuccess": "已复制到剪贴板!",
+  "copiedFailed": "复制失败!",
+  "pasteSuccess": "颜色已粘贴!",
+  "pasteFailed": "无效的颜色格式!",
+  "saturation": "饱和度",
+  "lightness": "明亮度"
+}

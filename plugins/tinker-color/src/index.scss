@@ -1,0 +1,50 @@
+@use 'tailwindcss';
+@config "../tailwind.config.js";
+
+:root {
+  --toast-bg: #fff;
+  --toast-text: #333;
+}
+
+html.dark {
+  color-scheme: dark;
+  --toast-bg: #333;
+  --toast-text: #fff;
+}
+
+/* Custom range slider styles */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+input[type='range']::-moz-range-thumb:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
