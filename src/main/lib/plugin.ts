@@ -30,6 +30,9 @@ import * as pluginWin from '../window/plugin'
 import isMac from 'licia/isMac'
 import contextMenu from './contextMenu'
 import { exec } from 'child_process'
+import log from 'share/common/log'
+
+const logger = log('plugin')
 
 const plugins: types.PlainObj<IPlugin> = {}
 
@@ -39,9 +42,10 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
     pluginDirs.push(getBuiltinPluginDir())
     try {
       pluginDirs.push(await getNpmGlobalDir())
-    } catch {
-      // ignore
+    } catch (e) {
+      logger.warn('failed to get npm global directory:', e)
     }
+    logger.info('loading plugins from directories:', pluginDirs)
     for (const dir of pluginDirs) {
       const files = await fs.readdir(dir, { withFileTypes: true })
       for (const file of files) {
@@ -53,7 +57,7 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
               const stat = await fs.stat(fullPath)
               isDir = stat.isDirectory()
             } catch (e) {
-              console.error(`Failed to stat symlink ${file.name}:`, e)
+              logger.error(`failed to stat symlink ${file.name}:`, e)
               continue
             }
           }
@@ -67,10 +71,10 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
               if (!plugins[file.name]) {
                 plugins[file.name] = await loadPlugin(path.join(dir, file.name))
               } else {
-                console.warn(`Plugin ID conflict: ${file.name}`)
+                logger.warn(`plugin conflict: ${file.name}`)
               }
             } catch (e) {
-              console.error(`Failed to load plugin ${file.name}:`, e)
+              logger.error(`failed to load plugin ${file.name}:`, e)
             }
           }
         }

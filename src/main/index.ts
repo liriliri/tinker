@@ -8,11 +8,14 @@ import * as terminal from 'share/main/window/terminal'
 import * as autoLaunch from 'share/main/lib/autoLaunch'
 import * as dock from './lib/dock'
 import noop from 'licia/noop'
+import fixPath from 'fix-path'
 import { getSettingsStore } from './lib/store'
 import 'share/main'
 
 const logger = log('main')
 logger.info('start', process.argv)
+
+fixPath()
 
 const settingsStore = getSettingsStore()
 

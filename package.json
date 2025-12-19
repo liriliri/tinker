@@ -61,6 +61,7 @@
     "electron-updater": "^6.6.2",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
+    "fix-path": "^5.0.0",
     "fs-extra": "^11.3.0",
     "lerna": "^9.0.3",
     "licia": "^1.48.0",
