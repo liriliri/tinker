@@ -29,27 +29,48 @@ import each from 'licia/each'
 import * as pluginWin from '../window/plugin'
 import isMac from 'licia/isMac'
 import contextMenu from './contextMenu'
+import { exec } from 'child_process'
 
 const plugins: types.PlainObj<IPlugin> = {}
 
 const getPlugins: IpcGetPlugins = singleton(async () => {
   if (isEmpty(plugins)) {
-    const pluginDir = path.join(
-      __dirname,
-      isDev() ? '../../plugins' : '../plugins'
+    const pluginDirs: string[] = []
+    pluginDirs.push(
+      path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
     )
-    const files = await fs.readdir(pluginDir, { withFileTypes: true })
-    for (const file of files) {
-      if (file.isDirectory() && startWith(file.name, 'tinker-')) {
-        try {
-          if (!isDev()) {
-            if (file.name === 'tinker-template') {
+    try {
+      pluginDirs.push(await getNpmGlobalDir())
+    } catch {
+      // ignore
+    }
+    for (const dir of pluginDirs) {
+      const files = await fs.readdir(dir, { withFileTypes: true })
+      for (const file of files) {
+        if (startWith(file.name, 'tinker-')) {
+          let isDir = file.isDirectory()
+          if (file.isSymbolicLink()) {
+            const fullPath = path.join(dir, file.name)
+            try {
+              const stat = await fs.stat(fullPath)
+              isDir = stat.isDirectory()
+            } catch (e) {
+              console.error(`Failed to stat symlink ${file.name}:`, e)
               continue
             }
           }
-          plugins[file.name] = await loadPlugin(path.join(pluginDir, file.name))
-        } catch {
-          // ignore
+          if (isDir) {
+            try {
+              if (!isDev()) {
+                if (file.name === 'tinker-template') {
+                  continue
+                }
+              }
+              plugins[file.name] = await loadPlugin(path.join(dir, file.name))
+            } catch (e) {
+              console.error(`Failed to load plugin ${file.name}:`, e)
+            }
+          }
         }
       }
     }
@@ -57,6 +78,18 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
 
   return map(plugins, identity)
 })
+
+async function getNpmGlobalDir(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    exec('npm root -g', (error: Error | null, stdout: string) => {
+      if (error) {
+        reject(error)
+        return
+      }
+      resolve(stdout.trim())
+    })
+  })
+}
 
 async function loadPlugin(dir: string): Promise<IPlugin> {
   const pkgPath = path.join(dir, 'package.json')
