@@ -21,7 +21,7 @@ import types from 'licia/types'
 import isEmpty from 'licia/isEmpty'
 import map from 'licia/map'
 import identity from 'licia/identity'
-import { BrowserWindow, ipcMain, WebContentsView } from 'electron'
+import { BrowserWindow, ipcMain, session, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
 import { colorBgContainer, colorBgContainerDark } from 'common/theme'
@@ -31,14 +31,13 @@ import isMac from 'licia/isMac'
 import contextMenu from './contextMenu'
 import { exec } from 'child_process'
 import log from 'share/common/log'
-import koa from 'koa'
-import { Server } from 'http'
-import serve from 'koa-static'
-import getPort from 'licia/getPort'
+import mime from 'mime'
 
 const logger = log('plugin')
 
 const plugins: types.PlainObj<IPlugin> = {}
+
+const PLUGIN_PARTITION = 'persist:plugin'
 
 const getPlugins: IpcGetPlugins = singleton(async () => {
   if (isEmpty(plugins)) {
@@ -117,7 +116,6 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     main: rawPlugin.main,
     preload: rawPlugin.preload,
     builtin: startWith(dir, builtinDir),
-    server: rawPlugin.server || false,
   }
   plugin.icon = path.join(dir, plugin.icon)
   if (!startWith(plugin.main, 'http')) {
@@ -140,10 +138,28 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
 const pluginViews: types.PlainObj<{
   view: WebContentsView
   win: BrowserWindow
-  server?: Server
 }> = {}
 
-const openPlugin: IpcOpenPlugin = async function (id, detached) {
+let preloadPluginView: WebContentsView
+function createPluginView() {
+  const view = new WebContentsView({
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/plugin.js'),
+      partition: PLUGIN_PARTITION,
+      sandbox: false,
+    },
+  })
+  view.webContents.loadURL('about:blank')
+  return view
+}
+
+function getPluginView() {
+  const view = preloadPluginView
+  preloadPluginView = createPluginView()
+  return view
+}
+
+const openPlugin: IpcOpenPlugin = function (id, detached) {
   const plugin = plugins[id]
   if (!plugin) {
     return false
@@ -156,30 +172,12 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
 
   const win = window.getWin('main')
 
-  const pluginView = new WebContentsView({
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/plugin.js'),
-      partition: plugin.builtin ? 'persist:plugin' : `persist:${id}`,
-      sandbox: false,
-    },
-  })
+  const pluginView = getPluginView()
   pluginViews[id] = {
     view: pluginView,
     win,
   }
   updatePluginTheme(id)
-
-  if (plugin.server) {
-    const port = await getPort(3000 + Math.floor(Math.random() * 1000))
-    const server = await createPluginServer(plugin, port)
-    const url = `http://127.0.0.1:${port}/${path.basename(plugin.main)}`
-    pluginViews[id].server = server
-    await pluginView.webContents.loadURL(url)
-  } else if (startWith(plugin.main, 'http')) {
-    await pluginView.webContents.loadURL(plugin.main)
-  } else {
-    await pluginView.webContents.loadFile(plugin.main)
-  }
 
   if (detached) {
     detachPlugin(id)
@@ -188,18 +186,15 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
     layoutPlugin(id)
   }
 
-  return true
-}
-
-function createPluginServer(plugin: IPlugin, port: number) {
-  const app = new koa()
-  const pluginDir = path.dirname(plugin.main)
-  app.use(serve(pluginDir))
-  return app.listen(port, '127.0.0.1', () => {
-    logger.info(
-      `plugin server for ${plugin.name} started at http://localhost:${port}`
+  if (startWith(plugin.main, 'http')) {
+    pluginView.webContents.loadURL(plugin.main)
+  } else {
+    pluginView.webContents.loadURL(
+      `plugin://${id}/${path.basename(plugin.main)}`
     )
-  })
+  }
+
+  return true
 }
 
 const reopenPlugin: IpcReopenPlugin = async function (id) {
@@ -230,16 +225,13 @@ function updatePluginTheme(id: string) {
 }
 
 export const closePlugin: IpcClosePlugin = async function (id) {
-  const { view, win, server } = pluginViews[id]
+  const { view, win } = pluginViews[id]
   if (!view) {
     return
   }
 
   win.contentView.removeChildView(view)
   view.webContents.close()
-  if (server) {
-    server.close()
-  }
   delete pluginViews[id]
 }
 
@@ -332,4 +324,22 @@ export function init() {
       }
     }
   })
+
+  preloadPluginView = createPluginView()
+
+  session
+    .fromPartition(PLUGIN_PARTITION)
+    .protocol.handle('plugin', async (request) => {
+      const url = request.url.slice(9)
+      const [pluginId, ...rest] = url.split('/')
+      const plugin = plugins[pluginId]
+      const pluginDir = path.dirname(plugin.main)
+      const filePath = path.join(pluginDir, ...rest)
+      const type = mime.getType(filePath) || 'application/octet-stream'
+
+      return new Response(
+        fs.createReadStream(filePath) as unknown as ReadableStream,
+        { headers: { 'Content-Type': type } }
+      )
+    })
 }

@@ -20,12 +20,11 @@ export interface IPlugin {
   icon: string
   main: string
   builtin: boolean
-  server: boolean
 }
 
 export type IpcDragMain = (x: number, y: number) => void
 export type IpcGetPlugins = () => Promise<IPlugin[]>
-export type IpcOpenPlugin = (id: string, detached?: boolean) => Promise<boolean>
+export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string) => void
 export type IpcDetachPlugin = IpcClosePlugin
 export type IpcReopenPlugin = IpcClosePlugin

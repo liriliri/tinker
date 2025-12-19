@@ -1,4 +1,4 @@
-import { app, globalShortcut, Menu } from 'electron'
+import { app, globalShortcut, Menu, protocol } from 'electron'
 import log from 'share/common/log'
 import * as tray from './lib/tray'
 import * as main from './window/main'
@@ -26,6 +26,19 @@ window.setDefaultOptions({
   height: 600,
   customTitlebar: !settingsStore.get('useNativeTitlebar'),
 })
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'plugin',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      allowServiceWorkers: true,
+    },
+  },
+])
 
 app.on('ready', () => {
   logger.info('app ready')
