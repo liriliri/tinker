@@ -6,6 +6,7 @@ export interface IRawPlugin {
   icon: string
   main: string
   preload?: string
+  server?: boolean
   locales?: types.PlainObj<{
     name?: string
     description?: string
@@ -19,6 +20,7 @@ export interface IPlugin {
   icon: string
   main: string
   builtin: boolean
+  server: boolean
 }
 
 export type IpcDragMain = (x: number, y: number) => void

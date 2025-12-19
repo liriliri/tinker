@@ -31,6 +31,10 @@ import isMac from 'licia/isMac'
 import contextMenu from './contextMenu'
 import { exec } from 'child_process'
 import log from 'share/common/log'
+import koa from 'koa'
+import { Server } from 'http'
+import serve from 'koa-static'
+import getPort from 'licia/getPort'
 
 const logger = log('plugin')
 
@@ -113,6 +117,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     main: rawPlugin.main,
     preload: rawPlugin.preload,
     builtin: startWith(dir, builtinDir),
+    server: rawPlugin.server || false,
   }
   plugin.icon = path.join(dir, plugin.icon)
   if (!startWith(plugin.main, 'http')) {
@@ -135,6 +140,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
 const pluginViews: types.PlainObj<{
   view: WebContentsView
   win: BrowserWindow
+  server?: Server
 }> = {}
 
 const openPlugin: IpcOpenPlugin = async function (id, detached) {
@@ -162,7 +168,14 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
     win,
   }
   updatePluginTheme(id)
-  if (startWith(plugin.main, 'http')) {
+
+  if (plugin.server) {
+    const port = await getPort(3000 + Math.floor(Math.random() * 1000))
+    const server = await createPluginServer(plugin, port)
+    const url = `http://127.0.0.1:${port}/${path.basename(plugin.main)}`
+    pluginViews[id].server = server
+    await pluginView.webContents.loadURL(url)
+  } else if (startWith(plugin.main, 'http')) {
     await pluginView.webContents.loadURL(plugin.main)
   } else {
     await pluginView.webContents.loadFile(plugin.main)
@@ -176,6 +189,17 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
   }
 
   return true
+}
+
+function createPluginServer(plugin: IPlugin, port: number) {
+  const app = new koa()
+  const pluginDir = path.dirname(plugin.main)
+  app.use(serve(pluginDir))
+  return app.listen(port, '127.0.0.1', () => {
+    logger.info(
+      `plugin server for ${plugin.name} started at http://localhost:${port}`
+    )
+  })
 }
 
 const reopenPlugin: IpcReopenPlugin = async function (id) {
@@ -206,13 +230,16 @@ function updatePluginTheme(id: string) {
 }
 
 export const closePlugin: IpcClosePlugin = async function (id) {
-  const { view, win } = pluginViews[id]
+  const { view, win, server } = pluginViews[id]
   if (!view) {
     return
   }
 
   win.contentView.removeChildView(view)
   view.webContents.close()
+  if (server) {
+    server.close()
+  }
   delete pluginViews[id]
 }
 
