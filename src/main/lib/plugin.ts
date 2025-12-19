@@ -36,9 +36,7 @@ const plugins: types.PlainObj<IPlugin> = {}
 const getPlugins: IpcGetPlugins = singleton(async () => {
   if (isEmpty(plugins)) {
     const pluginDirs: string[] = []
-    pluginDirs.push(
-      path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
-    )
+    pluginDirs.push(getBuiltinPluginDir())
     try {
       pluginDirs.push(await getNpmGlobalDir())
     } catch {
@@ -79,6 +77,10 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
   return map(plugins, identity)
 })
 
+function getBuiltinPluginDir() {
+  return path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
+}
+
 async function getNpmGlobalDir(): Promise<string> {
   return new Promise((resolve, reject) => {
     exec('npm root -g', (error: Error | null, stdout: string) => {
@@ -92,6 +94,7 @@ async function getNpmGlobalDir(): Promise<string> {
 }
 
 async function loadPlugin(dir: string): Promise<IPlugin> {
+  const builtinDir = getBuiltinPluginDir()
   const pkgPath = path.join(dir, 'package.json')
   const pkg = await fs.readJson(pkgPath)
   const rawPlugin = pkg.tinker as IRawPlugin
@@ -101,6 +104,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     icon: rawPlugin.icon,
     main: rawPlugin.main,
     preload: rawPlugin.preload,
+    builtin: startWith(dir, builtinDir),
   }
   plugin.icon = path.join(dir, plugin.icon)
   if (!startWith(plugin.main, 'http')) {
@@ -141,7 +145,7 @@ const openPlugin: IpcOpenPlugin = async function (id, detached) {
   const pluginView = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, '../preload/plugin.js'),
-      partition: 'persist:plugin',
+      partition: plugin.builtin ? 'persist:plugin' : `persist:${id}`,
       sandbox: false,
     },
   })

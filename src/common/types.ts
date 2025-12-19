@@ -18,6 +18,7 @@ export interface IPlugin {
   preload?: string
   icon: string
   main: string
+  builtin: boolean
 }
 
 export type IpcDragMain = (x: number, y: number) => void
