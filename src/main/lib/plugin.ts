@@ -64,7 +64,11 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
                   continue
                 }
               }
-              plugins[file.name] = await loadPlugin(path.join(dir, file.name))
+              if (!plugins[file.name]) {
+                plugins[file.name] = await loadPlugin(path.join(dir, file.name))
+              } else {
+                console.warn(`Plugin ID conflict: ${file.name}`)
+              }
             } catch (e) {
               console.error(`Failed to load plugin ${file.name}:`, e)
             }
