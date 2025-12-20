@@ -116,6 +116,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     name: rawPlugin.name,
     icon: rawPlugin.icon,
     main: rawPlugin.main,
+    historyApiFallback: rawPlugin.historyApiFallback || false,
     preload: rawPlugin.preload,
     builtin: startWith(dir, builtinDir),
   }
@@ -363,7 +364,7 @@ export function init() {
         if (stat.isDirectory()) {
           filePath = path.join(filePath, 'index.html')
         }
-      } else {
+      } else if (plugin.historyApiFallback) {
         filePath = path.join(plugin.root, 'index.html')
       }
 

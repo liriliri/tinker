@@ -7,6 +7,7 @@ export interface IRawPlugin {
   main: string
   preload?: string
   server?: boolean
+  historyApiFallback?: boolean
   locales?: types.PlainObj<{
     name?: string
     description?: string
@@ -18,6 +19,7 @@ export interface IPlugin {
   name: string
   dir: string
   root: string
+  historyApiFallback: boolean
   preload?: string
   icon: string
   main: string
