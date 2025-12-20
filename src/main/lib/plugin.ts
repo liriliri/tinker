@@ -111,6 +111,8 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
   const rawPlugin = pkg.tinker as IRawPlugin
   const plugin: IPlugin = {
     id: pkg.name,
+    dir,
+    root: path.join(dir, path.dirname(rawPlugin.main)),
     name: rawPlugin.name,
     icon: rawPlugin.icon,
     main: rawPlugin.main,
@@ -118,9 +120,6 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     builtin: startWith(dir, builtinDir),
   }
   plugin.icon = path.join(dir, plugin.icon)
-  if (!startWith(plugin.main, 'http')) {
-    plugin.main = path.join(dir, plugin.main)
-  }
   if (plugin.preload) {
     plugin.preload = path.join(dir, plugin.preload)
   }
@@ -190,7 +189,7 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
     pluginView.webContents.loadURL(plugin.main)
   } else {
     pluginView.webContents.loadURL(
-      `plugin://${id}/${path.basename(plugin.main)}`
+      `plugin://${id}/${path.basename(plugin.main).replace('index.html', '')}`
     )
   }
 
@@ -309,6 +308,23 @@ const showPluginContextMenu: IpcShowPluginContextMenu = function (
   }
 }
 
+function nodeStreamToWeb(
+  stream: NodeJS.ReadableStream
+): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    start(controller) {
+      stream.on('data', (chunk) => controller.enqueue(new Uint8Array(chunk)))
+      stream.on('end', () => controller.close())
+      stream.on('error', (err) => controller.error(err))
+    },
+    cancel() {
+      if (typeof (stream as any).destroy === 'function') {
+        ;(stream as any).destroy()
+      }
+    },
+  })
+}
+
 export function init() {
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
@@ -330,16 +346,37 @@ export function init() {
   session
     .fromPartition(PLUGIN_PARTITION)
     .protocol.handle('plugin', async (request) => {
-      const url = request.url.slice(9)
-      const [pluginId, ...rest] = url.split('/')
-      const plugin = plugins[pluginId]
-      const pluginDir = path.dirname(plugin.main)
-      const filePath = path.join(pluginDir, ...rest)
-      const type = mime.getType(filePath) || 'application/octet-stream'
+      const urlObj = new URL(request.url)
+      const pluginId = urlObj.host
+      let pathname = urlObj.pathname
 
-      return new Response(
-        fs.createReadStream(filePath) as unknown as ReadableStream,
-        { headers: { 'Content-Type': type } }
-      )
+      const prefix = `/plugin://${pluginId}/`
+      if (pathname.startsWith(prefix)) {
+        pathname = pathname.slice(prefix.length - 1)
+      }
+
+      const plugin = plugins[pluginId]
+
+      let filePath = path.join(plugin.root, pathname)
+      if (await fs.pathExists(filePath)) {
+        const stat = await fs.stat(filePath)
+        if (stat.isDirectory()) {
+          filePath = path.join(filePath, 'index.html')
+        }
+      } else {
+        filePath = path.join(plugin.root, 'index.html')
+      }
+
+      if (!(await fs.pathExists(filePath))) {
+        return new Response('Not Found', { status: 404 })
+      }
+
+      const type = mime.getType(filePath) || 'application/octet-stream'
+      const nodeStream = fs.createReadStream(filePath)
+      const webStream = nodeStreamToWeb(nodeStream)
+
+      return new Response(webStream, {
+        headers: { 'Content-Type': type },
+      })
     })
 }

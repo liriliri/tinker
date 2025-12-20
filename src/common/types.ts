@@ -16,6 +16,8 @@ export interface IRawPlugin {
 export interface IPlugin {
   id: string
   name: string
+  dir: string
+  root: string
   preload?: string
   icon: string
   main: string
