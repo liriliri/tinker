@@ -24,6 +24,10 @@ const files = await fs.readdir('plugins', { withFileTypes: true })
 for (let i = 0, len = files.length; i < len; i++) {
   const file = files[i]
   if (file.isDirectory() && startWith(file.name, 'tinker-')) {
+    const pkg = await fs.readJson('plugins/' + file.name + '/package.json')
+    if (pkg.embedded === false) {
+      continue
+    }
     await fs.copy('plugins/' + file.name, 'dist/plugins/' + file.name, {
       filter(src) {
         const basename = path.basename(src)

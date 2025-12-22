@@ -66,11 +66,6 @@ const getPlugins: IpcGetPlugins = singleton(async () => {
           }
           if (isDir) {
             try {
-              if (!isDev()) {
-                if (file.name === 'tinker-template') {
-                  continue
-                }
-              }
               if (!plugins[file.name]) {
                 plugins[file.name] = await loadPlugin(path.join(dir, file.name))
               } else {
