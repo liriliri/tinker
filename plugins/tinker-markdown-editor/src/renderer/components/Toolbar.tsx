@@ -30,8 +30,7 @@ export default observer(function ToolbarComponent() {
   const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleCopy = async () => {
-    await store.copyToClipboard()
-    await copyToClipboard('') // Trigger the copied state
+    await copyToClipboard(store.markdownInput)
   }
 
   return (

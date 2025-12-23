@@ -120,14 +120,6 @@ class Store extends BaseStore {
     this.undoRedoVersion++
   }
 
-  async copyToClipboard() {
-    try {
-      await navigator.clipboard.writeText(this.markdownInput)
-    } catch (err) {
-      console.error('Failed to copy:', err)
-    }
-  }
-
   async pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText()

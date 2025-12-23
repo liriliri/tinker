@@ -101,14 +101,6 @@ class Store extends BaseStore {
     }
   }
 
-  async copyToClipboard() {
-    try {
-      await navigator.clipboard.writeText(this.jsonInput)
-    } catch (err) {
-      console.error('Failed to copy:', err)
-    }
-  }
-
   async pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText()
