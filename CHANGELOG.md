@@ -1,3 +1,8 @@
+## v0.3.0 (23 Dec 2025)
+
+* feat: add whiteboard
+* feat: add regexp
+
 ## v0.2.1 (19 Dec 2025)
 
 * perf: faster plugin loading

@@ -37,14 +37,17 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 
 * Calcuation Pad 
 * Code Image
+* Color
 * Switch Hosts 
-* Image Compressor 
+* Image Compressor
 * Image Cropper 
 * JSON Eidtor 
 * Markdown Editor 
 * QR Code
+* RegExp
 * Text Diff
 * Timestamp Convertor 
+* Whiteboard
 
 ## Related Projects
 

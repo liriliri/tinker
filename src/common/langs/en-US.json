@@ -9,5 +9,6 @@
   "hide": "Hide",
   "silentStart": "Silent Start",
   "aboutTinker": "About TINKER",
-  "autoHide": "Auto Hide"
+  "autoHide": "Auto Hide",
+  "openInNewWin": "Open in New Window"
 }
