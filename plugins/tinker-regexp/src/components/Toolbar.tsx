@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Clipboard, Eraser, Check } from 'lucide-react'
+import { Copy, Clipboard, Eraser, Check, Flag } from 'lucide-react'
 import {
   Toolbar,
-  ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
@@ -11,10 +11,12 @@ import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import { tw } from 'share/theme'
 import store from '../store'
+import FlagsPanel from './FlagsPanel'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const { copied, copyToClipboard } = useCopyToClipboard()
+  const [showFlags, setShowFlags] = useState(false)
 
   const handleCopy = async () => {
     await copyToClipboard(store.pattern)
@@ -57,8 +59,6 @@ export default observer(function ToolbarComponent() {
         <Eraser size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarSeparator />
-
       <ToolbarSpacer />
       <div
         className={`text-xs mr-1 whitespace-nowrap ${
@@ -70,6 +70,25 @@ export default observer(function ToolbarComponent() {
         }`}
       >
         {matchText}
+      </div>
+
+      <div className="relative">
+        <ToolbarButton
+          onClick={() => setShowFlags(!showFlags)}
+          title={t('flags')}
+        >
+          <Flag size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        {showFlags && (
+          <>
+            <div
+              className="fixed inset-0 z-[5]"
+              onClick={() => setShowFlags(false)}
+            />
+            <FlagsPanel />
+          </>
+        )}
       </div>
     </Toolbar>
   )
