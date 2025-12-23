@@ -8,151 +8,153 @@
  * intentionally hardcoded to maintain consistency with standard code editor conventions.
  */
 
+/* Light theme - darker colors for better contrast on light background */
+
 /* Character classes */
 .exp-charclass {
-  color: #569cd6; /* Blue for character classes like \d \w \s */
+  color: #0066cc; /* Darker blue for light theme */
   font-weight: 500;
 }
 
 .exp-dot {
-  color: #569cd6;
+  color: #0066cc;
   font-weight: 500;
 }
 
 .exp-set {
-  color: #ce9178; /* Orange for character sets */
+  color: #a65e2b; /* Darker orange for character sets */
 }
 
 .exp-setnot {
-  color: #ce9178;
+  color: #a65e2b;
 }
 
 /* Anchors */
 .exp-anchor {
-  color: #c586c0; /* Purple for anchors like ^ $ \b */
+  color: #a31cc0; /* Darker purple for anchors like ^ $ \b */
   font-weight: 500;
 }
 
 /* Groups */
 .exp-group {
-  color: #4ec9b0; /* Teal for groups */
+  color: #008080; /* Darker teal for groups */
 }
 
 .exp-noncapgroup {
-  color: #4ec9b0;
+  color: #008080;
 }
 
 .exp-namedgroup {
-  color: #4ec9b0;
+  color: #008080;
 }
 
 .exp-lookaround {
-  color: #4ec9b0;
+  color: #008080;
 }
 
 /* Group depth highlighting - using green for groups like RegExr */
 .exp-group-0 {
-  background-color: rgba(0, 238, 0, 0.11);
+  background-color: rgba(0, 200, 0, 0.12);
 }
 
 .exp-group-1 {
-  background-color: rgba(0, 238, 0, 0.22);
+  background-color: rgba(0, 200, 0, 0.24);
 }
 
 .exp-group-2 {
-  background-color: rgba(0, 238, 0, 0.33);
+  background-color: rgba(0, 200, 0, 0.36);
 }
 
 .exp-group-3 {
-  background-color: rgba(0, 238, 0, 0.44);
+  background-color: rgba(0, 200, 0, 0.48);
 }
 
 /* Character set highlighting - using yellow for sets like RegExr */
 .exp-group-set {
-  background-color: rgba(255, 238, 0, 0.3);
+  background-color: rgba(255, 230, 0, 0.35);
 }
 
 /* Character set brackets */
 .exp-setclose {
-  color: #ce9178;
+  color: #a65e2b;
 }
 
 /* Quantifiers */
 .exp-quant {
-  color: #b5cea8; /* Light green for quantifiers */
+  color: #2d7a2d; /* Darker green for quantifiers */
   font-weight: 600;
 }
 
 .exp-lazy {
-  color: #b5cea8;
+  color: #2d7a2d;
 }
 
 /* Alternation */
 .exp-alt {
-  color: #dcdcaa; /* Yellow for alternation */
+  color: #8c7600; /* Darker yellow for alternation */
   font-weight: 600;
 }
 
 /* Escape sequences */
 .exp-esc {
-  color: #d7ba7d; /* Gold for escape sequences */
+  color: #9d7928; /* Darker gold for escape sequences */
 }
 
 .exp-escchar {
-  color: #d7ba7d;
+  color: #9d7928;
 }
 
 /* Regular characters */
 .exp-char {
-  color: #d4d4d4; /* Default text color */
+  color: #333333; /* Dark text for light theme */
 }
 
 /* Errors and warnings */
 .exp-error {
-  color: #f48771;
-  background-color: rgba(244, 135, 113, 0.15);
-  border-bottom: 2px solid #f48771;
+  color: #d73a25;
+  background-color: rgba(215, 58, 37, 0.15);
+  border-bottom: 2px solid #d73a25;
   text-decoration: none;
 }
 
 .exp-warning {
-  color: #cca700;
-  background-color: rgba(204, 167, 0, 0.15);
-  border-bottom: 1px dashed #cca700;
+  color: #b58900;
+  background-color: rgba(181, 137, 0, 0.15);
+  border-bottom: 1px dashed #b58900;
 }
 
 /* Hover effects - using negative margins to prevent layout shift */
 .exp-selected {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-top: 2px solid rgba(255, 255, 255, 0.4);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-top: 2px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 }
 
 .exp-selected-left {
-  border-left: 2px solid rgba(255, 255, 255, 0.4);
+  border-left: 2px solid rgba(0, 0, 0, 0.4);
   margin-left: -2px;
 }
 
 .exp-selected-right {
-  border-right: 2px solid rgba(255, 255, 255, 0.4);
+  border-right: 2px solid rgba(0, 0, 0, 0.4);
   margin-right: -2px;
 }
 
 .exp-related {
-  background-color: rgba(100, 200, 255, 0.15);
-  border-top: 1px solid rgba(100, 200, 255, 0.5);
-  border-bottom: 1px solid rgba(100, 200, 255, 0.5);
+  background-color: rgba(0, 100, 200, 0.15);
+  border-top: 1px solid rgba(0, 100, 200, 0.5);
+  border-bottom: 1px solid rgba(0, 100, 200, 0.5);
   margin-top: -1px;
   margin-bottom: -1px;
 }
 
 .exp-related-left {
-  border-left: 1px solid rgba(100, 200, 255, 0.5);
+  border-left: 1px solid rgba(0, 100, 200, 0.5);
   margin-left: -1px;
 }
 
 .exp-related-right {
-  border-right: 1px solid rgba(100, 200, 255, 0.5);
+  border-right: 1px solid rgba(0, 100, 200, 0.5);
   margin-right: -1px;
 }
 
@@ -354,6 +356,24 @@ html.dark {
 
     .CodeMirror-linenumber {
       color: #606266;
+    }
+
+    .CodeMirror-selected {
+      background: rgba(90, 120, 180, 0.4);
+    }
+
+    .CodeMirror-focused .CodeMirror-selected {
+      background: rgba(90, 120, 180, 0.6);
+    }
+  }
+
+  .regexp-editor {
+    .CodeMirror-selected {
+      background: rgba(90, 120, 180, 0.4);
+    }
+
+    .CodeMirror-focused .CodeMirror-selected {
+      background: rgba(90, 120, 180, 0.6);
     }
   }
 }
