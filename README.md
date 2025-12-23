@@ -49,6 +49,8 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 * Timestamp Convertor 
 * Whiteboard
 
+In addition to the built-in plugins, you can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
+
 ## Related Projects
 
 * [licia](https://github.com/liriliri/licia): Utility library used by TINKER.
