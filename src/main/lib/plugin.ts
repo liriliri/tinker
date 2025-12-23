@@ -185,7 +185,7 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
     pluginView.webContents.loadURL(plugin.main)
   } else {
     pluginView.webContents.loadURL(
-      `plugin://${id}/${path.basename(plugin.main).replace('index.html', '')}`
+      `plugin://${id}/${path.basename(plugin.main)}`
     )
   }
 
