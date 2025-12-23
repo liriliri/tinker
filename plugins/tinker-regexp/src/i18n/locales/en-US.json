@@ -1,0 +1,243 @@
+{
+  "regexp": "Regular Expression",
+  "pattern": "Pattern",
+  "testString": "Test String",
+  "flags": "Flags",
+  "matches": "Matches",
+  "matchCount": "{{count}} match",
+  "matchCount_other": "{{count}} matches",
+  "noMatches": "No Matches",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear",
+  "errorLabel": "ERROR",
+  "warningLabel": "WARNING",
+  "unknownError": "Unknown error",
+  "unknownWarning": "Unknown warning",
+  "minOrMore": "{{min}} or more",
+  "times": "{{min}}",
+  "minToMax": "{{min}} to {{max}}",
+  "patternPlaceholder": "Enter regular expression...",
+  "matchLabel": "Match",
+  "positionLabel": "Position",
+  "groupsLabel": "Groups",
+  "emptyGroup": "(empty)",
+  "flagLabels": {
+    "g": "global",
+    "i": "case insensitive",
+    "m": "multiline",
+    "s": "single line (dotall)",
+    "u": "unicode",
+    "y": "sticky"
+  },
+  "flagDescriptions": {
+    "g": "Find all matches",
+    "i": "Ignore case",
+    "m": "^ and $ match line breaks",
+    "s": ". matches newlines",
+    "u": "Unicode mode",
+    "y": "Match from lastIndex only"
+  },
+  "reference": {
+    "dot": {
+      "label": "dot",
+      "tip": "Matches any character except line breaks.",
+      "desc": "The dot matches any single character except line breaks. Equivalent to [^\\n\\r]."
+    },
+    "char": {
+      "label": "character",
+      "tip": "Matches the character \"{{code}}\".",
+      "desc": "Matches a literal character."
+    },
+    "set": {
+      "label": "character set",
+      "tip": "Matches any character in the set.",
+      "desc": "Match any character in the set. For example, [aeiou] matches any vowel."
+    },
+    "setnot": {
+      "label": "negated set",
+      "tip": "Matches any character NOT in the set.",
+      "desc": "Match any character that is not in the set. For example, [^aeiou] matches any consonant."
+    },
+    "range": {
+      "label": "range",
+      "tip": "Matches a character in the range.",
+      "desc": "Matches a character having a character code between the two specified characters inclusive. For example, [a-z] matches any lowercase letter."
+    },
+    "bof": {
+      "label": "beginning",
+      "tip": "Matches the beginning of the string, or the beginning of a line if the multiline flag (m) is enabled.",
+      "desc": "Matches the beginning of the string."
+    },
+    "eof": {
+      "label": "end",
+      "tip": "Matches the end of the string, or the end of a line if the multiline flag (m) is enabled.",
+      "desc": "Matches the end of the string."
+    },
+    "wordboundary": {
+      "label": "word boundary",
+      "tip": "Matches a word boundary position between a word character and non-word character or position (start / end of string).",
+      "desc": "Matches a word boundary. Useful for matching whole words."
+    },
+    "notwordboundary": {
+      "label": "not word boundary",
+      "tip": "Matches any position that is not a word boundary.",
+      "desc": "Matches positions that are not word boundaries."
+    },
+    "digit": {
+      "label": "digit",
+      "tip": "Matches any digit character (0-9).",
+      "desc": "Matches any digit character (0-9). Equivalent to [0-9]."
+    },
+    "notdigit": {
+      "label": "not digit",
+      "tip": "Matches any character that is not a digit.",
+      "desc": "Matches any character that is not a digit (0-9). Equivalent to [^0-9]."
+    },
+    "word": {
+      "label": "word",
+      "tip": "Matches any word character (alphanumeric & underscore).",
+      "desc": "Matches any word character (alphanumeric & underscore). Only matches low-ascii characters. Equivalent to [A-Za-z0-9_]."
+    },
+    "notword": {
+      "label": "not word",
+      "tip": "Matches any character that is not a word character.",
+      "desc": "Matches any character that is not a word character. Equivalent to [^A-Za-z0-9_]."
+    },
+    "whitespace": {
+      "label": "whitespace",
+      "tip": "Matches any whitespace character (spaces, tabs, line breaks).",
+      "desc": "Matches any whitespace character including spaces, tabs, and line breaks."
+    },
+    "notwhitespace": {
+      "label": "not whitespace",
+      "tip": "Matches any character that is not a whitespace character.",
+      "desc": "Matches any character that is not a whitespace character."
+    },
+    "group": {
+      "label": "capturing group",
+      "tip": "Groups multiple tokens together and creates a capture group for extracting a substring or using backreferences.",
+      "desc": "Capturing groups allow you to extract matched substrings and reference them later."
+    },
+    "noncapgroup": {
+      "label": "non-capturing group",
+      "tip": "Groups multiple tokens together without creating a capture group.",
+      "desc": "Non-capturing groups group tokens together without capturing. Useful for applying quantifiers to multiple tokens."
+    },
+    "namedgroup": {
+      "label": "named capturing group",
+      "tip": "Creates a capturing group with the name \"{{name}}\". Can be referenced by name.",
+      "desc": "Named capturing groups can be referenced by name instead of by number."
+    },
+    "poslookahead": {
+      "label": "positive lookahead",
+      "tip": "Matches if the pattern inside matches ahead, but does not include it in the match.",
+      "desc": "Positive lookahead assertion. Matches a position where a pattern can be matched ahead."
+    },
+    "neglookahead": {
+      "label": "negative lookahead",
+      "tip": "Matches if the pattern inside does NOT match ahead.",
+      "desc": "Negative lookahead assertion. Matches a position where a pattern cannot be matched ahead."
+    },
+    "poslookbehind": {
+      "label": "positive lookbehind",
+      "tip": "Matches if the pattern inside matches behind, but does not include it in the match.",
+      "desc": "Positive lookbehind assertion. Matches a position where a pattern can be matched behind."
+    },
+    "neglookbehind": {
+      "label": "negative lookbehind",
+      "tip": "Matches if the pattern inside does NOT match behind.",
+      "desc": "Negative lookbehind assertion. Matches a position where a pattern cannot be matched behind."
+    },
+    "quant": {
+      "label": "quantifier",
+      "tip": "Matches {{min}} of the preceding token.",
+      "desc": "Quantifiers specify how many instances of a character, group, or character class must be present."
+    },
+    "lazy": {
+      "label": "lazy",
+      "tip": "Makes the preceding quantifier lazy, causing it to match as few characters as possible.",
+      "desc": "By default, quantifiers are greedy. Adding ? makes them lazy (match as few as possible)."
+    },
+    "alt": {
+      "label": "alternation",
+      "tip": "Acts like a boolean OR. Matches the expression before or after the |.",
+      "desc": "Alternation acts like a boolean OR, matching the pattern before or after the pipe."
+    },
+    "esc": {
+      "label": "escaped character",
+      "tip": "Matches the escaped character.",
+      "desc": "Escape sequences allow you to match special characters literally or represent special character classes."
+    },
+    "escchar": {
+      "label": "escaped character",
+      "tip": "Matches the character \"{{code}}\".",
+      "desc": "Matches the escaped character literally."
+    },
+    "eschexadecimal": {
+      "label": "hexadecimal escape",
+      "tip": "Matches the character with the hexadecimal code.",
+      "desc": "Hexadecimal escape sequence. For example, \\x41 matches \"A\"."
+    },
+    "escunicodeu": {
+      "label": "unicode escape",
+      "tip": "Matches the unicode character.",
+      "desc": "Unicode escape sequence. For example, \\u0041 matches \"A\"."
+    },
+    "escoctal": {
+      "label": "octal escape",
+      "tip": "Matches the character with the octal code.",
+      "desc": "Octal escape sequence. For example, \\101 matches \"A\"."
+    },
+    "groupclose": {
+      "label": "unmatched closing parenthesis",
+      "tip": "This closing parenthesis does not have a matching opening parenthesis.",
+      "desc": "Unmatched closing parenthesis."
+    },
+    "groupopen": {
+      "label": "unmatched opening parenthesis",
+      "tip": "This opening parenthesis does not have a matching closing parenthesis.",
+      "desc": "Unmatched opening parenthesis."
+    },
+    "setopen": {
+      "label": "unclosed character set",
+      "tip": "This character set is missing its closing bracket ].",
+      "desc": "Unclosed character set."
+    },
+    "quanttarg": {
+      "label": "invalid quantifier target",
+      "tip": "Quantifiers must follow a valid token (a character, character class, or group).",
+      "desc": "This quantifier does not have a valid target to quantify."
+    },
+    "quantrev": {
+      "label": "reversed quantifier range",
+      "tip": "The minimum value cannot be greater than the maximum in a quantifier.",
+      "desc": "Reversed quantifier range. The minimum must be less than or equal to the maximum."
+    },
+    "rangerev": {
+      "label": "reversed range",
+      "tip": "The first character in a range cannot have a higher character code than the second.",
+      "desc": "Reversed character range. The start character must come before the end character."
+    },
+    "esccharopen": {
+      "label": "incomplete escape",
+      "tip": "The escape sequence is incomplete.",
+      "desc": "Incomplete escape sequence. The pattern ends with a backslash."
+    },
+    "esccharbad": {
+      "label": "invalid escape",
+      "tip": "This is not a valid escape sequence.",
+      "desc": "Invalid escape sequence."
+    },
+    "fwdslash": {
+      "label": "unescaped forward slash",
+      "tip": "Forward slashes should be escaped in regular expressions: \\/",
+      "desc": "Unescaped forward slash."
+    },
+    "notsupported": {
+      "label": "not supported",
+      "tip": "This feature is not supported in JavaScript regular expressions.",
+      "desc": "This feature is not supported in JavaScript regex."
+    }
+  }
+}

@@ -22,7 +22,7 @@ const QUALITY_LEVELS = [
   { label: 'qualityExcellent', value: 95 },
 ]
 
-const ToolbarComponent = observer(() => {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const [showStats, setShowStats] = useState(false)
 
@@ -187,5 +187,3 @@ const ToolbarComponent = observer(() => {
     </Toolbar>
   )
 })
-
-export default ToolbarComponent

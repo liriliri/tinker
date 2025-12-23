@@ -17,7 +17,8 @@ share/
 │   ├── Dialog.tsx
 │   ├── Select.tsx
 │   ├── Checkbox.tsx
-│   └── ImageUpload.tsx
+│   ├── ImageUpload.tsx
+│   └── Tooltip.tsx
 ├── hooks/               # Shared React Hooks
 │   └── useCopyToClipboard.ts
 └── README.md           # This document
@@ -531,6 +532,135 @@ import ImageUpload from 'share/components/ImageUpload'
 <ImageUpload
   onImageSelect={(file) => handleImageFile(file)}
 />
+```
+
+### Tooltip
+
+A smart tooltip component that automatically adjusts its position to stay within the viewport.
+
+```typescript
+import Tooltip from 'share/components/Tooltip'
+import { useState } from 'react'
+
+const MyComponent = () => {
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+  })
+
+  const handleMouseEnter = (event: React.MouseEvent) => {
+    setTooltip({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY + 20, // Position below cursor
+    })
+  }
+
+  const handleMouseLeave = () => {
+    setTooltip({
+      visible: false,
+      x: 0,
+      y: 0,
+    })
+  }
+
+  return (
+    <>
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        Hover me
+      </div>
+      <Tooltip
+        visible={tooltip.visible}
+        x={tooltip.x}
+        y={tooltip.y}
+        content="This is a helpful tooltip"
+      />
+    </>
+  )
+}
+```
+
+**Props**:
+- `content`: `ReactNode` - Content to display (supports text, JSX, or HTML)
+- `x`: `number` - X coordinate for tooltip position
+- `y`: `number` - Y coordinate for tooltip position
+- `visible`: `boolean` - Whether the tooltip is visible
+
+**Features**:
+- Automatically adjusts position to stay within viewport
+- Supports any React content (text, JSX, HTML)
+- Built-in dark mode styling
+- Smooth fade-in animation
+- Configurable position with viewport boundary detection
+
+**Usage Example** (with JSX content):
+
+```typescript
+const [hoverItem, setHoverItem] = useState<Item | null>(null)
+const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 })
+
+const handleItemHover = (item: Item, event: React.MouseEvent) => {
+  setHoverItem(item)
+  setTooltip({
+    visible: true,
+    x: event.clientX,
+    y: event.clientY + 10,
+  })
+}
+
+return (
+  <Tooltip
+    visible={tooltip.visible}
+    x={tooltip.x}
+    y={tooltip.y}
+    content={
+      hoverItem && (
+        <div>
+          <strong>{hoverItem.name}</strong>
+          <div className="text-xs">{hoverItem.description}</div>
+        </div>
+      )
+    }
+  />
+)
+```
+
+**Usage Example** (with HTML content):
+
+```typescript
+const [tooltip, setTooltip] = useState({
+  htmlContent: null,
+  visible: false,
+  x: 0,
+  y: 0,
+})
+
+const handleTokenHover = (token: Token, event: MouseEvent) => {
+  const htmlContent = `<strong>${token.type}</strong><br/>${token.description}`
+  setTooltip({
+    htmlContent,
+    visible: true,
+    x: event.clientX,
+    y: event.clientY + 20,
+  })
+}
+
+return (
+  <Tooltip
+    visible={tooltip.visible}
+    x={tooltip.x}
+    y={tooltip.y}
+    content={
+      tooltip.htmlContent && (
+        <div dangerouslySetInnerHTML={{ __html: tooltip.htmlContent }} />
+      )
+    }
+  />
+)
 ```
 
 ## Shared Hooks

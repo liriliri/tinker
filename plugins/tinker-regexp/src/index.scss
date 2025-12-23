@@ -1,0 +1,359 @@
+@use 'tailwindcss';
+@config "../tailwind.config.js";
+
+/* Regex Expression Highlighting Styles
+ * Note: The colors below are specifically chosen for regex syntax highlighting
+ * to provide clear visual distinction between different regex elements.
+ * These colors are based on VS Code's syntax highlighting theme and are
+ * intentionally hardcoded to maintain consistency with standard code editor conventions.
+ */
+
+/* Character classes */
+.exp-charclass {
+  color: #569cd6; /* Blue for character classes like \d \w \s */
+  font-weight: 500;
+}
+
+.exp-dot {
+  color: #569cd6;
+  font-weight: 500;
+}
+
+.exp-set {
+  color: #ce9178; /* Orange for character sets */
+}
+
+.exp-setnot {
+  color: #ce9178;
+}
+
+/* Anchors */
+.exp-anchor {
+  color: #c586c0; /* Purple for anchors like ^ $ \b */
+  font-weight: 500;
+}
+
+/* Groups */
+.exp-group {
+  color: #4ec9b0; /* Teal for groups */
+}
+
+.exp-noncapgroup {
+  color: #4ec9b0;
+}
+
+.exp-namedgroup {
+  color: #4ec9b0;
+}
+
+.exp-lookaround {
+  color: #4ec9b0;
+}
+
+/* Group depth highlighting - using green for groups like RegExr */
+.exp-group-0 {
+  background-color: rgba(0, 238, 0, 0.11);
+}
+
+.exp-group-1 {
+  background-color: rgba(0, 238, 0, 0.22);
+}
+
+.exp-group-2 {
+  background-color: rgba(0, 238, 0, 0.33);
+}
+
+.exp-group-3 {
+  background-color: rgba(0, 238, 0, 0.44);
+}
+
+/* Character set highlighting - using yellow for sets like RegExr */
+.exp-group-set {
+  background-color: rgba(255, 238, 0, 0.3);
+}
+
+/* Character set brackets */
+.exp-setclose {
+  color: #ce9178;
+}
+
+/* Quantifiers */
+.exp-quant {
+  color: #b5cea8; /* Light green for quantifiers */
+  font-weight: 600;
+}
+
+.exp-lazy {
+  color: #b5cea8;
+}
+
+/* Alternation */
+.exp-alt {
+  color: #dcdcaa; /* Yellow for alternation */
+  font-weight: 600;
+}
+
+/* Escape sequences */
+.exp-esc {
+  color: #d7ba7d; /* Gold for escape sequences */
+}
+
+.exp-escchar {
+  color: #d7ba7d;
+}
+
+/* Regular characters */
+.exp-char {
+  color: #d4d4d4; /* Default text color */
+}
+
+/* Errors and warnings */
+.exp-error {
+  color: #f48771;
+  background-color: rgba(244, 135, 113, 0.15);
+  border-bottom: 2px solid #f48771;
+  text-decoration: none;
+}
+
+.exp-warning {
+  color: #cca700;
+  background-color: rgba(204, 167, 0, 0.15);
+  border-bottom: 1px dashed #cca700;
+}
+
+/* Hover effects - using negative margins to prevent layout shift */
+.exp-selected {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.exp-selected-left {
+  border-left: 2px solid rgba(255, 255, 255, 0.4);
+  margin-left: -2px;
+}
+
+.exp-selected-right {
+  border-right: 2px solid rgba(255, 255, 255, 0.4);
+  margin-right: -2px;
+}
+
+.exp-related {
+  background-color: rgba(100, 200, 255, 0.15);
+  border-top: 1px solid rgba(100, 200, 255, 0.5);
+  border-bottom: 1px solid rgba(100, 200, 255, 0.5);
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
+.exp-related-left {
+  border-left: 1px solid rgba(100, 200, 255, 0.5);
+  margin-left: -1px;
+}
+
+.exp-related-right {
+  border-right: 1px solid rgba(100, 200, 255, 0.5);
+  margin-right: -1px;
+}
+
+/* Tooltip styles */
+.regexp-tooltip {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.regexp-tooltip b {
+  color: #4ec9b0;
+  font-weight: 600;
+}
+
+.regexp-tooltip code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 12px;
+}
+
+.regexp-tooltip .error {
+  color: #f48771;
+  font-weight: 600;
+}
+
+.regexp-tooltip .warning {
+  color: #cca700;
+  font-weight: 600;
+}
+
+/* Dark theme adjustments */
+.dark .exp-charclass {
+  color: #4ec9b0;
+}
+
+.dark .exp-dot {
+  color: #4ec9b0;
+}
+
+.dark .exp-set {
+  color: #ce9178;
+}
+
+.dark .exp-setclose {
+  color: #ce9178;
+}
+
+.dark .exp-anchor {
+  color: #c586c0;
+}
+
+.dark .exp-group,
+.dark .exp-noncapgroup,
+.dark .exp-namedgroup,
+.dark .exp-lookaround {
+  color: #569cd6;
+}
+
+.dark .exp-quant {
+  color: #b5cea8;
+}
+
+.dark .exp-alt {
+  color: #dcdcaa;
+}
+
+.dark .exp-esc,
+.dark .exp-escchar {
+  color: #d7ba7d;
+}
+
+.dark .exp-char {
+  color: #d4d4d4;
+}
+
+.dark .exp-group-0 {
+  background-color: rgba(0, 238, 0, 0.11);
+}
+
+.dark .exp-group-1 {
+  background-color: rgba(0, 238, 0, 0.22);
+}
+
+.dark .exp-group-2 {
+  background-color: rgba(0, 238, 0, 0.33);
+}
+
+.dark .exp-group-3 {
+  background-color: rgba(0, 238, 0, 0.44);
+}
+
+.dark .exp-group-set {
+  background-color: rgba(255, 238, 0, 0.3);
+}
+
+.dark .exp-selected {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-top: 2px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .exp-selected-left {
+  border-left: 2px solid rgba(255, 255, 255, 0.5);
+  margin-left: -2px;
+}
+
+.dark .exp-selected-right {
+  border-right: 2px solid rgba(255, 255, 255, 0.5);
+  margin-right: -2px;
+}
+
+.dark .exp-related {
+  background-color: rgba(100, 200, 255, 0.2);
+  border-top: 1px solid rgba(100, 200, 255, 0.6);
+  border-bottom: 1px solid rgba(100, 200, 255, 0.6);
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
+.dark .exp-related-left {
+  border-left: 1px solid rgba(100, 200, 255, 0.6);
+  margin-left: -1px;
+}
+
+.dark .exp-related-right {
+  border-right: 1px solid rgba(100, 200, 255, 0.6);
+  margin-right: -1px;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* CodeMirror styles */
+.regexp-editor {
+  .CodeMirror {
+    height: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    background: transparent;
+    color: inherit;
+  }
+
+  .CodeMirror-lines {
+    padding: 0;
+  }
+
+  .CodeMirror-line {
+    padding: 0;
+  }
+
+  .CodeMirror-cursor {
+    border-left: 2px solid #409eff;
+  }
+}
+
+.regexp-text-editor {
+  height: 100%;
+
+  .CodeMirror {
+    height: 100%;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background: transparent;
+    color: inherit;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+  }
+
+  .CodeMirror-cursor {
+    border-left: 2px solid #409eff;
+  }
+
+  .CodeMirror-gutters {
+    background: #f5f7fa;
+    border-right: 1px solid #dcdfe6;
+  }
+
+  .CodeMirror-linenumber {
+    color: #909399;
+    padding: 0 8px;
+  }
+}
+
+/* Dark mode styles */
+.dark {
+  .regexp-text-editor {
+    .CodeMirror {
+      border-color: #4c4d50;
+      color: #c0c4cc;
+    }
+
+    .CodeMirror-gutters {
+      background: #1e1e1e;
+      border-right-color: #4c4d50;
+    }
+
+    .CodeMirror-linenumber {
+      color: #606266;
+    }
+  }
+}

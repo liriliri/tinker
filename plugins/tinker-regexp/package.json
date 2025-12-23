@@ -1,0 +1,23 @@
+{
+  "name": "tinker-regexp",
+  "version": "0.1.0",
+  "description": "Regular Expression Tool for Tinker",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "RegExp",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "正则表达式"
+      }
+    }
+  },
+  "devDependencies": {
+    "codemirror": "^5.65.20"
+  }
+}
