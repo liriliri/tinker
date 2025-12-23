@@ -46,7 +46,7 @@ class Store extends BaseStore {
     try {
       const info = template.getSystemInfo()
       this.systemInfo = info
-    } catch (error) {
+    } catch {
       alert({ title: 'Failed to get system info' })
     }
   }
@@ -55,7 +55,7 @@ class Store extends BaseStore {
     try {
       const time = template.getCurrentTime()
       this.currentTime = time
-    } catch (error) {
+    } catch {
       alert({ title: 'Failed to get current time' })
     }
   }

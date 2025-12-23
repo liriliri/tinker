@@ -9,7 +9,7 @@ function test(expr: string, flag?: string): boolean {
   try {
     new RegExp(expr, flag)
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }

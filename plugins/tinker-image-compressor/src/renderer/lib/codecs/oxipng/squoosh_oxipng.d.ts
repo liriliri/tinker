@@ -1,5 +1,4 @@
 /* tslint:disable */
-/* eslint-disable */
 /**
 * @param {Uint8ClampedArray} data
 * @param {number} width

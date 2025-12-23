@@ -37,6 +37,6 @@ export interface WebPModule extends EmscriptenWasm.Module {
   ): Uint8Array | null;
 }
 
-declare var moduleFactory: EmscriptenWasm.ModuleFactory<WebPModule>;
+declare const moduleFactory: EmscriptenWasm.ModuleFactory<WebPModule>;
 
 export default moduleFactory;

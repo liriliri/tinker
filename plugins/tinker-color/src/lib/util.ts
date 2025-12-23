@@ -277,7 +277,7 @@ export function parseColorToHex(
       default:
         return null
     }
-  } catch (error) {
+  } catch {
     return null
   }
 }

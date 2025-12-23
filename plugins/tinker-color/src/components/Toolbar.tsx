@@ -27,7 +27,7 @@ export default observer(function ToolbarComponent() {
       if (result.sRGBHex) {
         store.setColor(result.sRGBHex)
       }
-    } catch (err) {
+    } catch {
       // User cancelled the eyedropper
       console.log('EyeDropper cancelled')
     }

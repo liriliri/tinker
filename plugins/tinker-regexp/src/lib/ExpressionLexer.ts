@@ -75,11 +75,10 @@ export class ExpressionLexer {
     this._modes = {}
     this.string = str
     this.errors = []
-    const capgroups = (this.captureGroups = [])
-    const namedgroups = (this.namedGroups = {})
+    this.captureGroups = []
+    this.namedGroups = {}
     const brgroups = (this.branchResetGroups = [])
     const groups: Token[] = []
-    const refs: Token[] = []
     let i = 0
     const l = str.length
     let token: Token
@@ -110,7 +109,7 @@ export class ExpressionLexer {
           token.depth = groups.length
           groups.push(token)
         }
-        if (token.capture) this.addCaptureGroup(token, groups)
+        if (token.capture) this.addCaptureGroup(token)
       } else if (c === ')' && !charset) {
         token.type = 'groupclose'
         if (groups.length) {
@@ -218,7 +217,7 @@ export class ExpressionLexer {
     this.errors.push(token)
   }
 
-  private addCaptureGroup(token: Token, groups: Token[]) {
+  private addCaptureGroup(token: Token) {
     const capgroups = this.captureGroups
     const namedgroups = this.namedGroups
     token.num = capgroups.length + 1

@@ -32,13 +32,13 @@ class Store extends BaseStore {
 
   get canUndo() {
     // Access undoRedoVersion to make this reactive
-    this.undoRedoVersion
+    void this.undoRedoVersion
     return this.textEditorInstance?.getModel()?.canUndo() ?? false
   }
 
   get canRedo() {
     // Access undoRedoVersion to make this reactive
-    this.undoRedoVersion
+    void this.undoRedoVersion
     return this.textEditorInstance?.getModel()?.canRedo() ?? false
   }
 

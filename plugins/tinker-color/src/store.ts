@@ -44,7 +44,7 @@ class Store extends BaseStore {
     try {
       await navigator.clipboard.writeText(text)
       toast.success(i18n.t('copiedSuccess'))
-    } catch (error) {
+    } catch {
       toast.error(i18n.t('copiedFailed'))
     }
   }

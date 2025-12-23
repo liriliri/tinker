@@ -23,7 +23,7 @@ import {
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import { tw } from 'share/theme'
-import store, { type ViewMode } from '../store'
+import store from '../store'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()

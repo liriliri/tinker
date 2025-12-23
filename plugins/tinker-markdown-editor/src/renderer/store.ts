@@ -57,7 +57,7 @@ class Store extends BaseStore {
         this.markdownInput = content
         // Clear localStorage content since we're loading from a file
         storage.remove(STORAGE_KEY)
-      } catch (err) {
+      } catch {
         // File no longer exists or can't be read, clear the saved path
         storage.remove(FILE_PATH_KEY)
         console.log('Failed to load saved file')
@@ -71,13 +71,13 @@ class Store extends BaseStore {
 
   get canUndo() {
     // Access undoRedoVersion to make this reactive
-    this.undoRedoVersion
+    void this.undoRedoVersion
     return this.editorInstance?.getModel()?.canUndo() ?? false
   }
 
   get canRedo() {
     // Access undoRedoVersion to make this reactive
-    this.undoRedoVersion
+    void this.undoRedoVersion
     return this.editorInstance?.getModel()?.canRedo() ?? false
   }
 

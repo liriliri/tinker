@@ -33,7 +33,7 @@ class Store extends BaseStore {
     try {
       const result = evaluate(expression)
       return String(result)
-    } catch (error) {
+    } catch {
       return ''
     }
   }

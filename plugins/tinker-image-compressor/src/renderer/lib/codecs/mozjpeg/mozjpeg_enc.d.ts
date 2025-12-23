@@ -32,6 +32,6 @@ export interface MozJPEGModule extends EmscriptenWasm.Module {
   ): Uint8Array;
 }
 
-declare var moduleFactory: EmscriptenWasm.ModuleFactory<MozJPEGModule>;
+declare const moduleFactory: EmscriptenWasm.ModuleFactory<MozJPEGModule>;
 
 export default moduleFactory;

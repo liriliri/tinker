@@ -49,7 +49,7 @@ class Store extends BaseStore {
         const { original, modified } = JSON.parse(savedContent)
         this.originalText = original || ''
         this.modifiedText = modified || ''
-      } catch (err) {
+      } catch {
         // Ignore parsing errors
       }
     }
