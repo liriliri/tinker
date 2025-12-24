@@ -39,8 +39,6 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
 
 * Color
 * Markdown Editor 
-* QR Code
-* RegExp
 * Text Diff
 * Timestamp Convertor 
 * Whiteboard
@@ -52,31 +50,39 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
   </colgroup>
   <tbody>
     <tr>
-      <td colspan="2" style="text-align:center">Embedded Plugins</td>
+      <th colspan="2">Embedded Plugins</th>
     </tr>
     <tr>
-      <td>Calculation Pad</td>
-      <td>Code Image</td>
+      <th>Calculation Pad</th>
+      <th>Code Image</th>
     </tr>
     <tr>
-      <td><img src="https://tinker.liriliri.io/calculation_pad.png"/></td>
-      <td><img src="https://tinker.liriliri.io/code_image.png"/></td>
+      <th><img src="https://tinker.liriliri.io/calculation_pad.png"/></th>
+      <th><img src="https://tinker.liriliri.io/code_image.png"/></th>
     </tr>
     <tr>
-      <td>Switch Hosts</td>
-      <td>Image Compressor</td>
+      <th>Switch Hosts</th>
+      <th>Image Compressor</th>
     </tr>
     <tr>
-      <td><img src="https://tinker.liriliri.io/hosts.png"/></td>
-      <td><img src="https://tinker.liriliri.io/image_compressor.png"/></td>
+      <th><img src="https://tinker.liriliri.io/hosts.png"/></th>
+      <th><img src="https://tinker.liriliri.io/image_compressor.png"/></th>
     </tr>
     <tr>
-      <td>Image Cropper</td>
-      <td>JSON Eidtor</td>
+      <th>Image Cropper</th>
+      <th>JSON Eidtor</th>
     </tr>
     <tr>
-      <td><img src="https://tinker.liriliri.io/image_cropper.png"/></td>
-      <td><img src="https://tinker.liriliri.io/json_editor.png"/></td>
+      <th><img src="https://tinker.liriliri.io/image_cropper.png"/></th>
+      <th><img src="https://tinker.liriliri.io/json_editor.png"/></th>
+    </tr>
+    <tr>
+      <th>QR Code</th>
+      <th>RegExp</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/qrcode.png"/></th>
+      <th><img src="https://tinker.liriliri.io/regexp.png"/></th>
     </tr>
   </tbody>
 </table>
