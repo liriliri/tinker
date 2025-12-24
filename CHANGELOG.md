@@ -1,3 +1,8 @@
+## v0.4.0 (24 Dec 2025)
+
+* feat: show shortcut setting
+* feat: check update
+
 ## v0.3.0 (23 Dec 2025)
 
 * feat: add whiteboard
