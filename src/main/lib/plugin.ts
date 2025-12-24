@@ -184,9 +184,11 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
   if (startWith(plugin.main, 'http')) {
     pluginView.webContents.loadURL(plugin.main)
   } else {
-    pluginView.webContents.loadURL(
-      `plugin://${id}/${path.basename(plugin.main)}`
-    )
+    let entry = path.basename(plugin.main)
+    if (plugin.historyApiFallback) {
+      entry = entry.replace('index.html', '')
+    }
+    pluginView.webContents.loadURL(`plugin://${id}/${entry}`)
   }
 
   return true
