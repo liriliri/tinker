@@ -19,6 +19,12 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: '20.x'
+    - name: Install Python distutils (macOS only)
+      if: runner.os == 'macOS'
+      run: |
+        brew install python@3
+        python3 -m ensurepip
+        python3 -m pip install --upgrade pip setuptools
     - run: |
         npm i
         npm run build
