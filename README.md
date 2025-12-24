@@ -52,7 +52,7 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
   </colgroup>
   <tbody>
     <tr>
-      <td colspan="2">Embedded Plugins</td>
+      <td colspan="2" style="text-align:center">Embedded Plugins</td>
     </tr>
     <tr>
       <td>Calculation Pad</td>
