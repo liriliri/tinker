@@ -16,6 +16,7 @@ import './icon.css'
 import { i18n } from 'common/util'
 import getUrlParam from 'licia/getUrlParam'
 import { t } from 'common/util'
+import LunaModal from 'luna-modal'
 
 const logger = log('renderer')
 logger.info('start')
@@ -58,6 +59,12 @@ function renderApp() {
 ;(async function () {
   const language = await main.getLanguage()
   i18n.locale(language)
+
+  LunaModal.i18n.locale('en-US')
+  LunaModal.i18n.set('en-US', {
+    ok: t('ok'),
+    cancel: t('cancel'),
+  })
 
   renderApp()
 })()

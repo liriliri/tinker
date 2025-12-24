@@ -87,5 +87,8 @@
     "vite": "^5.4.19",
     "vite-plugin-svgr": "^4.5.0",
     "zx": "^8.8.5"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.4"
   }
 }

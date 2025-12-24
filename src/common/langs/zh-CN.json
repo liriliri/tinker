@@ -10,5 +10,6 @@
   "silentStart": "静默启动",
   "aboutTinker": "关于 TINKER",
   "autoHide": "自动隐藏",
-  "openInNewWin": "新窗口打开"
+  "openInNewWin": "新窗口打开",
+  "showShortcut": "呼出快捷键"
 }

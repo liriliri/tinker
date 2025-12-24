@@ -6,7 +6,7 @@ import path from 'path'
 import { alias } from './vite.config'
 
 const builtins = builtinModules.filter((e) => !e.startsWith('_'))
-builtins.push('electron', ...builtins.map((m) => `node:${m}`))
+builtins.push('electron', 'uiohook-napi', ...builtins.map((m) => `node:${m}`))
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const pkg = await fs.readJSON(path.resolve(__dirname, 'package.json'))

@@ -17,6 +17,7 @@ import * as terminal from 'share/main/window/terminal'
 import * as process from 'share/main/window/process'
 import * as about from 'share/main/window/about'
 import { isDev } from 'share/common/util'
+import * as updater from 'share/main/lib/updater'
 
 const logger = log('tray')
 let tray: Tray | null = null
@@ -80,6 +81,20 @@ async function updateContextMenu() {
         click() {
           settingsStore.set('language', lang)
           relaunchApp()
+        },
+      }
+    }
+  )
+
+  const shortcutMenu: MenuItemConstructorOptions[] = map(
+    [isMac ? 'Option+Space' : 'Alt+Space', 'Ctrl+Ctrl'],
+    (shortcut) => {
+      return {
+        label: shortcut,
+        type: 'radio',
+        checked: settingsStore.get('showShortcut') === shortcut,
+        click() {
+          settingsStore.set('showShortcut', shortcut)
         },
       }
     }
@@ -176,6 +191,10 @@ async function updateContextMenu() {
           type: 'separator',
         },
         {
+          label: t('showShortcut'),
+          submenu: shortcutMenu,
+        },
+        {
           label: t('autoHide'),
           type: 'checkbox',
           checked: settingsStore.get('autoHide'),
@@ -210,6 +229,13 @@ async function updateContextMenu() {
       label: t('aboutTinker'),
       click() {
         about.showWin()
+      },
+    },
+    {
+      label: `${t('checkUpdate')}...`,
+      click() {
+        main.showWin()
+        updater.checkUpdate()
       },
     },
     {

@@ -9,6 +9,7 @@ pkg.devDependencies = {
   electron,
 }
 delete pkg.scripts
+delete pkg.workspaces
 pkg.scripts = {
   start: 'electron main/index.js',
 }

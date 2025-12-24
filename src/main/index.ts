@@ -1,4 +1,4 @@
-import { app, globalShortcut, Menu, protocol } from 'electron'
+import { app, Menu, protocol } from 'electron'
 import log from 'share/common/log'
 import * as tray from './lib/tray'
 import * as main from './window/main'
@@ -10,6 +10,7 @@ import * as dock from './lib/dock'
 import noop from 'licia/noop'
 import fixPath from 'fix-path'
 import { getSettingsStore } from './lib/store'
+import * as shortcut from './lib/shortcut'
 import 'share/main'
 
 const logger = log('main')
@@ -53,9 +54,13 @@ app.on('ready', () => {
   } else {
     dock.hide()
   }
-  globalShortcut.register(settingsStore.get('showShortcut'), () =>
-    main.showWin()
-  )
+  shortcut.register(settingsStore.get('showShortcut'), () => main.showWin())
+  settingsStore.on('change', (key, val, oldVal) => {
+    if (key === 'showShortcut') {
+      shortcut.unregister(oldVal)
+      shortcut.register(val, () => main.showWin())
+    }
+  })
 })
 
 app.on('window-all-closed', noop)
