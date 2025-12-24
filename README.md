@@ -35,19 +35,51 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 
 ## Features
 
-* Calcuation Pad 
-* Code Image
+TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
+
 * Color
-* Switch Hosts 
-* Image Compressor
-* Image Cropper 
-* JSON Eidtor 
 * Markdown Editor 
 * QR Code
 * RegExp
 * Text Diff
 * Timestamp Convertor 
 * Whiteboard
+
+<table width="100%" style="text-align:center">
+  <colgroup>
+    <col width="50%">
+    <col width="50%">
+  </colgroup>
+  <tbody>
+    <tr>
+      <td colspan="2">Embedded Plugins</td>
+    </tr>
+    <tr>
+      <td>Calculation Pad</td>
+      <td>Code Image</td>
+    </tr>
+    <tr>
+      <td><img src="https://tinker.liriliri.io/calculation_pad.png"/></td>
+      <td><img src="https://tinker.liriliri.io/code_image.png"/></td>
+    </tr>
+    <tr>
+      <td>Switch Hosts</td>
+      <td>Image Compressor</td>
+    </tr>
+    <tr>
+      <td><img src="https://tinker.liriliri.io/hosts.png"/></td>
+      <td><img src="https://tinker.liriliri.io/image_compressor.png"/></td>
+    </tr>
+    <tr>
+      <td>Image Cropper</td>
+      <td>JSON Eidtor</td>
+    </tr>
+    <tr>
+      <td><img src="https://tinker.liriliri.io/image_cropper.png"/></td>
+      <td><img src="https://tinker.liriliri.io/json_editor.png"/></td>
+    </tr>
+  </tbody>
+</table>
 
 In addition to the built-in plugins, you can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
 
