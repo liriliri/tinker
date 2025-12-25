@@ -25,7 +25,9 @@
     "format": "lsla prettier \"src/**/*.{ts,tsx,scss,css,json}\" \"*.{js,ts,json}\" \"script/*.mjs\" --write && npm run format:plugin",
     "format:plugin": "lsla prettier \"plugins/tinker-*/src/**/*.{ts,tsx,json,scss}\" \"plugins/*.{js,ts,json}\" --write",
     "gen:theme": "lsla genTheme --input src/common/theme.json --output src/renderer/theme.scss && lsla genTheme --input src/common/theme.json --output src/common/theme.ts",
-    "gen:icon": "lsla genIcon --input src/renderer/ --output src/renderer/icon.css --name tinker-icon --source src/renderer/icon/"
+    "gen:icon": "lsla genIcon --input src/renderer/ --output src/renderer/icon.css --name tinker-icon --source src/renderer/icon/",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
   },
   "repository": {
     "type": "git",
@@ -89,6 +91,7 @@
     "zx": "^8.8.5"
   },
   "dependencies": {
+    "node-mac-permissions": "github:codebytere/node-mac-permissions",
     "uiohook-napi": "^1.5.4"
   }
 }

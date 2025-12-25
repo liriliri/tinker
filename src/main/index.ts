@@ -54,13 +54,7 @@ app.on('ready', () => {
   } else {
     dock.hide()
   }
-  shortcut.register(settingsStore.get('showShortcut'), () => main.showWin())
-  settingsStore.on('change', (key, val, oldVal) => {
-    if (key === 'showShortcut') {
-      shortcut.unregister(oldVal)
-      shortcut.register(val, () => main.showWin())
-    }
-  })
+  shortcut.init()
 })
 
 app.on('window-all-closed', noop)

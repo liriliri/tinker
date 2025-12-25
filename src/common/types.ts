@@ -26,6 +26,16 @@ export interface IPlugin {
   builtin: boolean
 }
 
+export type NodeMacPermissions = {
+  getAuthStatus: (type: string) => string
+  askForAccessibilityAccess: () => void
+}
+
+declare module 'node-mac-permissions' {
+  export function getAuthStatus(type: string): string
+  export function askForAccessibilityAccess(): void
+}
+
 export type IpcDragMain = (x: number, y: number) => void
 export type IpcGetPlugins = () => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
