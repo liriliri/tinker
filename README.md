@@ -37,10 +37,6 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 
 TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
 
-* Color
-* Markdown Editor 
-* Text Diff
-* Timestamp Convertor 
 * Whiteboard
 
 <table width="100%" style="text-align:center">
