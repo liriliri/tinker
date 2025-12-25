@@ -1,12 +1,17 @@
 import { uIOhook, UiohookKey } from 'uiohook-napi'
 import { globalShortcut } from 'electron'
 import once from 'licia/once'
-import { getSettingsStore } from './store'
+import { getSettingsStore, getMainStore } from './store'
 import * as main from '../window/main'
 import isMac from 'licia/isMac'
 import { NodeMacPermissions } from 'common/types'
+import log from 'share/common/log'
+import waitUntil from 'licia/waitUntil'
+
+const logger = log('shortcut')
 
 const settingsStore = getSettingsStore()
+const mainStore = getMainStore()
 
 let nodeMacPermissions: NodeMacPermissions | null = null
 if (isMac) {
@@ -23,9 +28,13 @@ if (isMac) {
 const callbacks: Record<string, () => void> = {}
 
 function register(accelerator: string, callback: () => void) {
+  logger.info(`register shortcut: ${accelerator}`)
   if (isDoubleShortcut(accelerator)) {
-    startUIOhook()
-    if (nodeMacPermissions?.getAuthStatus('accessibility') === 'denied') {
+    if (
+      isMac &&
+      mainStore.get('uIOhookCalled') &&
+      nodeMacPermissions?.getAuthStatus('accessibility') === 'denied'
+    ) {
       nodeMacPermissions?.askForAccessibilityAccess()
     } else {
       startUIOhook()
@@ -78,10 +87,16 @@ const startUIOhook = once(() => {
     }
   })
 
-  uIOhook.start()
+  if (isMac && !mainStore.get('uIOhookCalled')) {
+    mainStore.set('uIOhookCalled', true)
+  }
+  setTimeout(() => uIOhook.start(), 500)
 })
 
-export function init() {
+export async function init() {
+  if (isMac) {
+    await waitUntil(() => nodeMacPermissions !== null)
+  }
   register(settingsStore.get('showShortcut'), () => main.showWin())
   settingsStore.on('change', (key, val, oldVal) => {
     if (key === 'showShortcut') {
