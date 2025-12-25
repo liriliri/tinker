@@ -90,8 +90,10 @@
     "vite-plugin-svgr": "^4.5.0",
     "zx": "^8.8.5"
   },
+  "optionalDependencies": {
+    "node-mac-permissions": "^2.5.0"
+  },
   "dependencies": {
-    "node-mac-permissions": "github:codebytere/node-mac-permissions",
     "uiohook-napi": "^1.5.4"
   }
 }
