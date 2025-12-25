@@ -84,6 +84,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/qrcode.png"/></th>
       <th><img src="https://tinker.liriliri.io/regexp.png"/></th>
     </tr>
+    <tr>
+      <th>Color</th>
+      <th>Markdown Editor</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/color.png"/></th>
+      <th><img src="https://tinker.liriliri.io/markdown_editor.png"/></th>
+    </tr>
+    <tr>
+      <th>Timestamp Converter</th>
+      <th>Text Diff</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/timestamp.png"/></th>
+      <th><img src="https://tinker.liriliri.io/text_diff.png"/></th>
+    </tr>
   </tbody>
 </table>
 
