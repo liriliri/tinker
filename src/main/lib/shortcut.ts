@@ -19,7 +19,8 @@ if (isMac) {
     try {
       const mod = await import('node-mac-permissions')
       nodeMacPermissions = mod.default || mod
-    } catch {
+    } catch (e) {
+      logger.error('failed to load node-mac-permissions:', e)
       nodeMacPermissions = null
     }
   })()
@@ -90,7 +91,7 @@ const startUIOhook = once(() => {
   if (isMac && !mainStore.get('uIOhookCalled')) {
     mainStore.set('uIOhookCalled', true)
   }
-  setTimeout(() => uIOhook.start(), 500)
+  setTimeout(() => uIOhook.start(), 1000)
 })
 
 export async function init() {
