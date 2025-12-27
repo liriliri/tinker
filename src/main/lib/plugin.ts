@@ -154,6 +154,14 @@ function getPluginView() {
   return view
 }
 
+function getWebPluginView() {
+  return new WebContentsView({
+    webPreferences: {
+      partition: PLUGIN_PARTITION,
+    },
+  })
+}
+
 const openPlugin: IpcOpenPlugin = function (id, detached) {
   const plugin = plugins[id]
   if (!plugin) {
@@ -167,7 +175,9 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
 
   const win = window.getWin('main')
 
-  const pluginView = getPluginView()
+  const pluginView = startWith(plugin.main, 'https://')
+    ? getWebPluginView()
+    : getPluginView()
   pluginViews[id] = {
     view: pluginView,
     win,
