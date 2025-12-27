@@ -37,7 +37,12 @@ declare module 'node-mac-permissions' {
   export function askForAccessibilityAccess(): void
 }
 
-export type IpcDragMain = (x: number, y: number) => void
+export type IpcDragMain = (
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) => void
 export type IpcGetPlugins = () => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string) => void

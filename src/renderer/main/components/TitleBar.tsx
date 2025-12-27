@@ -26,8 +26,11 @@ export default observer(function Titlebar() {
   }, [])
 
   const onMouseDown = useCallback((e: React.MouseEvent) => {
+    const width = window.innerWidth
+    const height = window.innerHeight
+
     const onMouseMove = () => {
-      main.dragMain(e.clientX, e.clientY)
+      main.dragMain(e.clientX, e.clientY, width, height)
     }
 
     const onMouseUp = () => {

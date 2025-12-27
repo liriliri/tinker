@@ -67,7 +67,7 @@ export function showWin() {
 }
 
 const initIpc = once(() => {
-  handleEvent('dragMain', <IpcDragMain>((x, y) => {
+  handleEvent('dragMain', <IpcDragMain>((x, y, width, height) => {
     if (!win) {
       return
     }
@@ -76,6 +76,8 @@ const initIpc = once(() => {
     win.setBounds({
       x: cursorPos.x - x,
       y: cursorPos.y - y,
+      width,
+      height,
     })
   }))
 })
