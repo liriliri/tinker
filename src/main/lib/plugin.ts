@@ -40,40 +40,47 @@ const plugins: types.PlainObj<IPlugin> = {}
 const PLUGIN_PARTITION = 'persist:plugin'
 
 const getPlugins: IpcGetPlugins = singleton(async () => {
+  const pluginDirs: string[] = []
   if (isEmpty(plugins)) {
-    const pluginDirs: string[] = []
     pluginDirs.push(getBuiltinPluginDir())
-    try {
-      pluginDirs.push(await getNpmGlobalDir())
-    } catch (e) {
-      logger.warn('failed to get npm global directory:', e)
+  }
+  try {
+    pluginDirs.push(await getNpmGlobalDir())
+  } catch (e) {
+    logger.warn('failed to get npm global directory:', e)
+  }
+
+  each(plugins, (plugin) => {
+    if (!plugin.builtin) {
+      delete plugins[plugin.id]
     }
-    logger.info('loading plugins from directories:', pluginDirs)
-    for (const dir of pluginDirs) {
-      const files = await fs.readdir(dir, { withFileTypes: true })
-      for (const file of files) {
-        if (startWith(file.name, 'tinker-')) {
-          let isDir = file.isDirectory()
-          if (file.isSymbolicLink()) {
-            const fullPath = path.join(dir, file.name)
-            try {
-              const stat = await fs.stat(fullPath)
-              isDir = stat.isDirectory()
-            } catch (e) {
-              logger.error(`failed to stat symlink ${file.name}:`, e)
-              continue
-            }
+  })
+
+  logger.info('loading plugins from directories:', pluginDirs)
+  for (const dir of pluginDirs) {
+    const files = await fs.readdir(dir, { withFileTypes: true })
+    for (const file of files) {
+      if (startWith(file.name, 'tinker-')) {
+        let isDir = file.isDirectory()
+        if (file.isSymbolicLink()) {
+          const fullPath = path.join(dir, file.name)
+          try {
+            const stat = await fs.stat(fullPath)
+            isDir = stat.isDirectory()
+          } catch (e) {
+            logger.error(`failed to stat symlink ${file.name}:`, e)
+            continue
           }
-          if (isDir) {
-            try {
-              if (!plugins[file.name]) {
-                plugins[file.name] = await loadPlugin(path.join(dir, file.name))
-              } else {
-                logger.warn(`plugin conflict: ${file.name}`)
-              }
-            } catch (e) {
-              logger.error(`failed to load plugin ${file.name}:`, e)
+        }
+        if (isDir) {
+          try {
+            if (!plugins[file.name]) {
+              plugins[file.name] = await loadPlugin(path.join(dir, file.name))
+            } else {
+              logger.warn(`plugin conflict: ${file.name}`)
             }
+          } catch (e) {
+            logger.error(`failed to load plugin ${file.name}:`, e)
           }
         }
       }
