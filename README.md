@@ -33,7 +33,7 @@ Toolbox for Everyone.
 
 Click [here](https://github.com/liriliri/tinker/releases/) to download and install TINKER. Windows x64, Mac arm64, Mac x64 and Linux x86_64 are supported.
 
-## Features
+## Built-in Plugins
 
 TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
 
@@ -45,9 +45,6 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
     <col width="50%">
   </colgroup>
   <tbody>
-    <tr>
-      <th colspan="2">Embedded Plugins</th>
-    </tr>
     <tr>
       <th>Calculation Pad</th>
       <th>Code Image</th>
@@ -99,7 +96,13 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
   </tbody>
 </table>
 
+## Third-party Plugins
+
 In addition to the built-in plugins, you can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
+
+## Web Plugins
+
+If you want to add existing web tools to TINKER, TINKER supports wrapping URLs into plugins directly. In the [tinker-web](https://github.com/liriliri/tinker-web) repository, you can find some pre-packaged web applications that are also installed via npm commands. For example: `npm i -g tinker-deepseek`. Note that these web applications do not support offline use.
 
 ## Related Projects
 
