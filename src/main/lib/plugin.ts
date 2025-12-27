@@ -113,6 +113,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     main: rawPlugin.main,
     historyApiFallback: rawPlugin.historyApiFallback || false,
     preload: rawPlugin.preload,
+    online: startWith(rawPlugin.main, 'https://'),
     builtin: startWith(dir, builtinDir),
   }
   plugin.icon = path.join(dir, plugin.icon)
@@ -175,9 +176,7 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
 
   const win = window.getWin('main')
 
-  const pluginView = startWith(plugin.main, 'https://')
-    ? getWebPluginView()
-    : getPluginView()
+  const pluginView = plugin.online ? getWebPluginView() : getPluginView()
   pluginViews[id] = {
     view: pluginView,
     win,

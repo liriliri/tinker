@@ -72,6 +72,18 @@ export default observer(function Titlebar() {
           type: 'separator',
         }
       )
+    } else {
+      template.push(
+        {
+          label: t('refresh'),
+          click() {
+            store.refresh()
+          },
+        },
+        {
+          type: 'separator',
+        }
+      )
     }
 
     template.push(

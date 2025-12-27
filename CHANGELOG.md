@@ -1,3 +1,7 @@
+## v0.4.1 (27 Dec 2025)
+
+* fix: web plugin script error
+
 ## v0.4.0 (24 Dec 2025)
 
 * feat: show shortcut setting

@@ -23,6 +23,7 @@ export interface IPlugin {
   preload?: string
   icon: string
   main: string
+  online: boolean
   builtin: boolean
 }
 

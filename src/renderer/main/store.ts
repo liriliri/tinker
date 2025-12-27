@@ -23,7 +23,7 @@ class Store extends BaseStore {
       setFilter: action,
     })
 
-    this.init()
+    this.refresh()
   }
   setFilter(filter: string) {
     this.filter = filter
@@ -77,6 +77,13 @@ class Store extends BaseStore {
     }
     main.togglePluginDevtools(this.plugin.id)
   }
+  async refresh() {
+    const plugins = await main.getPlugins()
+    runInAction(() => {
+      this.plugins = plugins
+      this.filterPlugins()
+    })
+  }
   private getPlugin(id: string) {
     return find(this.plugins, (plugin) => plugin.id === id)
   }
@@ -90,13 +97,6 @@ class Store extends BaseStore {
     this.visiblePlugins = this.plugins.filter((plugin) => {
       const name = lowerCase(plugin.name)
       return toBool(PinyinMatch.match(name, filter))
-    })
-  }
-  private async init() {
-    const plugins = await main.getPlugins()
-    runInAction(() => {
-      this.plugins = plugins
-      this.filterPlugins()
     })
   }
 }
