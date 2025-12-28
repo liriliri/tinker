@@ -1,5 +1,6 @@
 import React from 'react'
 import { ImagePlus } from 'lucide-react'
+import { tw } from '../theme'
 
 interface ImageUploadProps {
   onOpenImage: () => Promise<void>
@@ -23,7 +24,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div
       onClick={handleClick}
-      className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-[#8a8a8a] dark:border-[#6e6e6e] rounded-lg cursor-pointer hover:border-[#0fc25e] dark:hover:border-[#0fc25e] transition-colors m-4"
+      className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed border-[#8a8a8a] dark:border-[#6e6e6e] rounded-lg cursor-pointer ${tw.primary.hoverBorder} dark:${tw.primary.hoverBorder} transition-colors m-4`}
     >
       <div className="text-center p-8 pointer-events-none">
         <ImagePlus
@@ -31,7 +32,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           strokeWidth={1.5}
         />
 
-        <p className="text-lg font-medium text-[#333] dark:text-[#cccccc] mb-2">
+        <p className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}>
           {uploadTitle}
         </p>
         <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">

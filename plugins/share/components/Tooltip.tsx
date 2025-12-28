@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, type ReactNode } from 'react'
+import { tw } from '../theme'
 
 interface TooltipProps {
   content: ReactNode
@@ -52,9 +53,9 @@ export default function Tooltip({ content, x, y, visible }: TooltipProps) {
   return (
     <div
       ref={tooltipRef}
-      className="fixed z-50 max-w-md px-3 py-2 text-sm rounded-lg shadow-lg pointer-events-none
-                 bg-white dark:bg-[#2c2d30] border border-[#dcdfe6] dark:border-[#4c4d50]
-                 text-[#303133] dark:text-[#f0f1f2] transition-opacity duration-150"
+      className={`fixed z-50 max-w-md px-3 py-2 text-sm rounded-lg shadow-lg pointer-events-none
+                 ${tw.bg.light.primary} dark:bg-[#2c2d30] border border-[#dcdfe6] dark:border-[#4c4d50]
+                 ${tw.text.light.primary} dark:text-[#f0f1f2] transition-opacity duration-150`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,

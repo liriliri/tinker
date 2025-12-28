@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Dialog from './Dialog'
+import { tw } from '../theme'
 
 export interface PromptOptions {
   title: string
@@ -70,13 +71,13 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
           title={promptState.title}
         >
           {promptState.message && (
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+            <p className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-3`}>
               {promptState.message}
             </p>
           )}
           <input
             type="text"
-            className="w-full px-3 py-2 mb-6 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none"
+            className={`w-full px-3 py-2 mb-6 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none`}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -91,7 +92,7 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
               {promptState.cancelText || '取消'}
             </button>
             <button
-              className="px-4 py-2 text-sm bg-[#0fc25e] hover:bg-[#0db350] text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
               onClick={handleConfirm}
               disabled={!inputValue.trim()}
             >

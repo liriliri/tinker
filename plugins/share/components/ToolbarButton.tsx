@@ -1,4 +1,5 @@
 import { ReactNode, ButtonHTMLAttributes } from 'react'
+import { tw } from '../theme'
 
 interface ToolbarButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,8 +19,8 @@ export function ToolbarButton({
 
   const variantClass =
     variant === 'toggle' && active
-      ? 'bg-[#0fc25e] text-white hover:bg-[#0db054]'
-      : 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed'
+      ? `${tw.primary.bg} text-white ${tw.primary.bgHover}`
+      : `${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
 
   return (
     <button className={`${baseClass} ${variantClass} ${className}`} {...props}>

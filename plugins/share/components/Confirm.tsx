@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Dialog from './Dialog'
+import { tw } from '../theme'
 
 export interface ConfirmOptions {
   title: string
@@ -56,7 +57,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
           title={confirmState.title}
         >
           {confirmState.message && (
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
+            <p className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-6`}>
               {confirmState.message}
             </p>
           )}
@@ -68,7 +69,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               {confirmState.cancelText || '取消'}
             </button>
             <button
-              className="px-4 py-2 text-sm bg-[#0fc25e] hover:bg-[#0db350] text-white rounded"
+              className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}
               onClick={handleConfirm}
             >
               {confirmState.confirmText || '确定'}
