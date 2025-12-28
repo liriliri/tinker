@@ -1,0 +1,23 @@
+{
+  "serviceName": "服务名称",
+  "serviceExample": "例如 \"twitter\"",
+  "passphrase": "密码短语",
+  "passphraseExample": "例如 \"I'm the best 17-year old ever.\"",
+  "show": "显示",
+  "passwordLength": "密码长度",
+  "lengthExample": "例如 12",
+  "maxRepetition": "最大重复",
+  "repetitionExample": "例如 2",
+  "required": "必需",
+  "allowed": "允许",
+  "forbidden": "禁止",
+  "lowercase": "a–z",
+  "uppercase": "A–Z",
+  "numbers": "0–9",
+  "dashUnderscore": "- / _",
+  "space": "空格",
+  "symbols": "!@#$%",
+  "generatedPassword": "生成的密码",
+  "copyToClipboard": "复制",
+  "copied": "已复制!"
+}

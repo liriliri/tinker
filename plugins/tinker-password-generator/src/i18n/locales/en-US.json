@@ -1,0 +1,23 @@
+{
+  "serviceName": "Service name",
+  "serviceExample": "e.g. \"twitter\"",
+  "passphrase": "Passphrase",
+  "passphraseExample": "e.g. \"I'm the best 17-year old ever.\"",
+  "show": "SHOW",
+  "passwordLength": "Password length",
+  "lengthExample": "e.g. 12",
+  "maxRepetition": "Max repetition",
+  "repetitionExample": "e.g. 2",
+  "required": "REQUIRED",
+  "allowed": "ALLOWED",
+  "forbidden": "FORBIDDEN",
+  "lowercase": "a–z",
+  "uppercase": "A–Z",
+  "numbers": "0–9",
+  "dashUnderscore": "- / _",
+  "space": "SPACE",
+  "symbols": "!@#$%",
+  "generatedPassword": "Generated password",
+  "copyToClipboard": "Copy",
+  "copied": "Copied!"
+}
