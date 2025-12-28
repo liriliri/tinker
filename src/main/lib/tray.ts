@@ -58,7 +58,7 @@ async function updateContextMenu() {
         type: 'radio',
         checked: settingsStore.get('theme') === theme,
         click() {
-          settingsStore.set('theme', theme)
+          updateSettings('theme', theme)
         },
       }
     }
@@ -79,8 +79,7 @@ async function updateContextMenu() {
         type: 'radio',
         checked: settingsStore.get('language') === lang,
         click() {
-          settingsStore.set('language', lang)
-          relaunchApp()
+          updateSettings('language', lang, true)
         },
       }
     }
@@ -94,14 +93,13 @@ async function updateContextMenu() {
         type: 'radio',
         checked: settingsStore.get('showShortcut') === shortcut,
         click() {
-          settingsStore.set('showShortcut', shortcut)
+          updateSettings('showShortcut', shortcut)
         },
       }
     }
   )
 
   const helpMenu: MenuItemConstructorOptions = {
-    role: 'help',
     label: t('help'),
     submenu: [
       {
@@ -164,8 +162,7 @@ async function updateContextMenu() {
           type: 'checkbox',
           checked: settingsStore.get('useNativeTitlebar'),
           click(item) {
-            settingsStore.set('useNativeTitlebar', item.checked)
-            relaunchApp()
+            updateSettings('useNativeTitlebar', item.checked, true)
           },
         },
         {
@@ -176,7 +173,7 @@ async function updateContextMenu() {
           type: 'checkbox',
           checked: settingsStore.get('openAtLogin'),
           click(item) {
-            settingsStore.set('openAtLogin', item.checked)
+            updateSettings('openAtLogin', item.checked)
           },
         },
         {
@@ -184,7 +181,7 @@ async function updateContextMenu() {
           type: 'checkbox',
           checked: settingsStore.get('silentStart'),
           click(item) {
-            settingsStore.set('silentStart', item.checked)
+            updateSettings('silentStart', item.checked)
           },
         },
         {
@@ -199,7 +196,7 @@ async function updateContextMenu() {
           type: 'checkbox',
           checked: settingsStore.get('autoHide'),
           click(item) {
-            settingsStore.set('autoHide', item.checked)
+            updateSettings('autoHide', item.checked)
           },
         },
       ],
@@ -258,9 +255,13 @@ async function updateContextMenu() {
   tray.setContextMenu(contextMenu)
 }
 
-function relaunchApp() {
-  setTimeout(() => {
-    app.relaunch()
-    app.exit()
-  }, 500)
+function updateSettings(name: string, value: any, relaunch = false) {
+  settingsStore.set(name, value)
+  updateContextMenu()
+  if (relaunch) {
+    setTimeout(() => {
+      app.relaunch()
+      app.exit()
+    }, 500)
+  }
 }
