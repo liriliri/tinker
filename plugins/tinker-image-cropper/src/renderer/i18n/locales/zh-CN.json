@@ -9,7 +9,7 @@
   "aspectRatio": "比例",
   "aspectRatioFree": "自由",
   "aspectRatioOriginal": "原始比例",
-  "uploadTitle": "拖拽图片到此处或点击上传",
+  "openTitle": "拖拽图片到此处或点击打开",
   "supportedFormats": "支持 PNG、JPG、WebP、GIF、BMP 格式",
   "rotateLeft": "向左旋转",
   "rotateRight": "向右旋转",

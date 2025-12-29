@@ -17,7 +17,7 @@ share/
 │   ├── Dialog.tsx
 │   ├── Select.tsx
 │   ├── Checkbox.tsx
-│   ├── ImageUpload.tsx
+│   ├── ImageOpen.tsx
 │   └── Tooltip.tsx
 ├── hooks/               # Shared React Hooks
 │   └── useCopyToClipboard.ts
@@ -522,15 +522,17 @@ import Checkbox from 'share/components/Checkbox'
 />
 ```
 
-### ImageUpload
+### ImageOpen
 
-Image upload component:
+Image open component for selecting/opening local image files:
 
 ```typescript
-import ImageUpload from 'share/components/ImageUpload'
+import ImageOpen from 'share/components/ImageOpen'
 
-<ImageUpload
-  onImageSelect={(file) => handleImageFile(file)}
+<ImageOpen
+  onOpenImage={() => store.openImageDialog()}
+  openTitle="Drop image here or click to open"
+  supportedFormats="Supports PNG, JPG, WebP"
 />
 ```
 

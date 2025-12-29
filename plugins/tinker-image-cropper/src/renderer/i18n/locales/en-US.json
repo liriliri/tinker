@@ -9,7 +9,7 @@
   "aspectRatio": "Aspect Ratio",
   "aspectRatioFree": "Free",
   "aspectRatioOriginal": "Original",
-  "uploadTitle": "Drop image here or click to upload",
+  "openTitle": "Drop image here or click to open",
   "supportedFormats": "Supports PNG, JPG, WebP, GIF, BMP",
   "rotateLeft": "Rotate Left",
   "rotateRight": "Rotate Right",

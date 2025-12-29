@@ -13,7 +13,7 @@ export function Toolbar({ children, className = '' }: ToolbarProps) {
 }
 
 export function ToolbarSeparator() {
-  return <div className={`w-px h-5 ${tw.border.both} mx-1`} />
+  return <div className={`w-px h-5 ${tw.border.bg} mx-1`} />
 }
 
 export function ToolbarSpacer() {

@@ -1,5 +1,3 @@
-import { makeAutoObservable } from 'mobx'
-
 /**
  * BaseStore - Base store class for all Tinker plugin stores
  * Provides common functionality like theme management

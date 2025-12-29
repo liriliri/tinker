@@ -3,7 +3,7 @@ import { useRef } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
 import { useTranslation } from 'react-i18next'
 import Toolbar from './components/Toolbar'
-import ImageUpload from 'share/components/ImageUpload'
+import ImageOpen from 'share/components/ImageOpen'
 import ImageCropper from './components/ImageCropper'
 import store from './store'
 
@@ -68,9 +68,9 @@ const App = observer(() => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {!store.hasImage ? (
-          <ImageUpload
+          <ImageOpen
             onOpenImage={() => store.openImageDialog()}
-            uploadTitle={t('uploadTitle')}
+            openTitle={t('openTitle')}
             supportedFormats={t('supportedFormats')}
           />
         ) : (

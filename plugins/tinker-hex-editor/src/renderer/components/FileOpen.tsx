@@ -23,11 +23,11 @@ const FileOpen: React.FC<FileOpenProps> = ({
     }
   }
 
-  const handleDragEnter = (e: React.DragEvent) => {
+  const handleDragEnter = () => {
     setIsDragging(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
     setIsDragging(false)
   }
 

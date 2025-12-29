@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { tw } from '../theme'
 
-interface ImageUploadProps {
+interface ImageOpenProps {
   onOpenImage: () => Promise<void>
-  uploadTitle: string
+  openTitle: string
   supportedFormats: string
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({
+const ImageOpen: React.FC<ImageOpenProps> = ({
   onOpenImage,
-  uploadTitle,
+  openTitle,
   supportedFormats,
 }) => {
   const [isDragging, setIsDragging] = useState(false)
@@ -23,11 +23,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   }
 
-  const handleDragEnter = (e: React.DragEvent) => {
+  const handleDragEnter = () => {
     setIsDragging(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
     setIsDragging(false)
   }
 
@@ -54,7 +54,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         />
 
         <p className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}>
-          {uploadTitle}
+          {openTitle}
         </p>
         <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">
           {supportedFormats}
@@ -64,4 +64,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   )
 }
 
-export default ImageUpload
+export default ImageOpen

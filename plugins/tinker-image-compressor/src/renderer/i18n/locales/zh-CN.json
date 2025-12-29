@@ -2,7 +2,7 @@
   "openImage": "打开图片",
   "saveImage": "保存图片",
   "clear": "清空",
-  "uploadTitle": "拖拽图片到此处或点击上传",
+  "openTitle": "拖拽图片到此处或点击打开",
   "supportedFormats": "支持 PNG、JPG、WebP 格式",
   "quality": "质量",
   "qualityVeryLow": "非常低",

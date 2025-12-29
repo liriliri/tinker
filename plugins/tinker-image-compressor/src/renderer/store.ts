@@ -6,7 +6,7 @@ import each from 'licia/each'
 import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
 import map from 'licia/map'
-import type { ImageFormat, ImageItem } from './types/codecs'
+import type { ImageFormat, ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_QUALITY = 'quality'

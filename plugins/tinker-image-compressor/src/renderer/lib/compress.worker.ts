@@ -1,8 +1,4 @@
-import type {
-  ImageData,
-  CompressOptions,
-  CompressResult,
-} from '../types/codecs'
+import type { ImageData, CompressOptions, CompressResult } from '../types'
 
 interface CompressMessage {
   type: 'compress'
