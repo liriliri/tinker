@@ -28,7 +28,9 @@ export interface EncodeOptions {
   use_sharp_yuv: number;
 }
 
-export interface WebPModule extends EmscriptenWasm.Module {
+import type { EmscriptenWasmModule, EmscriptenWasmModuleFactory } from '../../../types';
+
+export interface WebPModule extends EmscriptenWasmModule {
   encode(
     data: BufferSource,
     width: number,
@@ -37,6 +39,6 @@ export interface WebPModule extends EmscriptenWasm.Module {
   ): Uint8Array | null;
 }
 
-declare const moduleFactory: EmscriptenWasm.ModuleFactory<WebPModule>;
+declare const moduleFactory: EmscriptenWasmModuleFactory<WebPModule>;
 
 export default moduleFactory;

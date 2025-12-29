@@ -25,7 +25,7 @@ export default function Checkbox({
       disabled={disabled}
       className={`group flex items-center gap-1.5 text-xs cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
-      <div className={`flex h-4 w-4 items-center justify-center rounded border border-gray-400 dark:border-gray-500 ${tw.bg.light.primary} dark:bg-[#3c3c3c] group-data-[checked]:${tw.primary.bg} group-data-[checked]:${tw.primary.border} transition-colors group-data-[disabled]:opacity-50`}>
+      <div className={`flex h-4 w-4 items-center justify-center rounded border border-gray-400 dark:border-gray-500 ${tw.bg.light.primary} dark:bg-[#3c3c3c] ${tw.primary.checkedBg} ${tw.primary.checkedBorder} transition-colors group-data-[disabled]:opacity-50`}>
         <Check
           size={12}
           strokeWidth={3}

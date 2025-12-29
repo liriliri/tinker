@@ -76,6 +76,8 @@ export const tw = {
     hoverBorder: 'hover:border-[#0fc25e]',
     focusBorder: 'focus:border-[#0fc25e]',
     focusRing: 'focus:ring-[#0fc25e]',
+    checkedBg: 'group-data-[checked]:bg-[#0fc25e]',
+    checkedBorder: 'group-data-[checked]:border-[#0fc25e]',
   },
 
   // Background color utilities

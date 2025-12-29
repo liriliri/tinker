@@ -23,7 +23,9 @@ export interface EncodeOptions {
   chroma_quality: number;
 }
 
-export interface MozJPEGModule extends EmscriptenWasm.Module {
+import type { EmscriptenWasmModule, EmscriptenWasmModuleFactory } from '../../../types';
+
+export interface MozJPEGModule extends EmscriptenWasmModule {
   encode(
     data: BufferSource,
     width: number,
@@ -32,6 +34,6 @@ export interface MozJPEGModule extends EmscriptenWasm.Module {
   ): Uint8Array;
 }
 
-declare const moduleFactory: EmscriptenWasm.ModuleFactory<MozJPEGModule>;
+declare const moduleFactory: EmscriptenWasmModuleFactory<MozJPEGModule>;
 
 export default moduleFactory;
