@@ -1,7 +1,6 @@
 {
-  "clear": "Clear",
-  "import": "Import",
-  "export": "Export",
+  "open": "Open",
+  "save": "Save",
   "openTitle": "Drop file here or click to open",
   "supportedFormats": "Supports all binary files"
 }

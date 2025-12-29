@@ -1,6 +1,5 @@
 import { contextBridge } from 'electron'
 import * as fs from 'fs'
-import * as path from 'path'
 
 const markdownEditorObj = {
   readFile(filePath: string): string {
@@ -9,10 +8,6 @@ const markdownEditorObj = {
 
   writeFile(filePath: string, content: string): void {
     fs.writeFileSync(filePath, content, 'utf-8')
-  },
-
-  getFileName(filePath: string): string {
-    return path.basename(filePath)
   },
 }
 

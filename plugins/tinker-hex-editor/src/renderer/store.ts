@@ -1,48 +1,44 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
+import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
-
-const storage = new LocalStore('tinker-hex-editor')
 
 class Store extends BaseStore {
   // Hex editor data
   data: number[] = []
   nonce: number = 0
+  currentFilePath: string | null = null
+  savedData: number[] = []
 
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadData()
   }
 
   get hasData() {
     return this.data.length > 0
   }
 
-  private loadData() {
-    const saved = storage.get('hex-data')
-    if (saved && Array.isArray(saved)) {
-      this.data = saved
-    }
+  get currentFileName() {
+    if (!this.currentFilePath) return null
+    return splitPath(this.currentFilePath).name
+  }
+
+  get hasUnsavedChanges() {
+    if (this.data.length !== this.savedData.length) return true
+    return !this.data.every((val, idx) => val === this.savedData[idx])
   }
 
   setValue(offset: number, value: number) {
     this.data[offset] = value
     this.nonce += 1
-    this.saveData()
-  }
-
-  private saveData() {
-    storage.set('hex-data', this.data)
   }
 
   clearData() {
     this.data = []
     this.nonce += 1
-    this.saveData()
   }
 
-  async openFileDialog() {
+  async openFile() {
     try {
       const result = await tinker.showOpenDialog({
         properties: ['openFile'],
@@ -51,17 +47,57 @@ class Store extends BaseStore {
       if (result && result.filePaths && result.filePaths.length > 0) {
         const filePath = result.filePaths[0]
         const buffer = await hexEditor.readFile(filePath)
-        this.importData(Array.from(buffer))
+        const data = Array.from(buffer)
+        this.currentFilePath = filePath
+        this.data = data
+        this.savedData = [...data]
+        this.nonce += 1
       }
     } catch (error) {
       console.error('Open file failed:', error)
     }
   }
 
-  importData(newData: number[] | Uint8Array) {
+  async saveFile() {
+    try {
+      if (this.currentFilePath) {
+        // Save to existing file
+        const data = new Uint8Array(this.data)
+        await hexEditor.writeFile(this.currentFilePath, data)
+        this.savedData = [...this.data]
+      } else {
+        // Show save dialog
+        await this.saveFileAs()
+      }
+    } catch (error) {
+      console.error('Save file failed:', error)
+    }
+  }
+
+  async saveFileAs() {
+    try {
+      const result = await tinker.showSaveDialog({
+        defaultPath: this.currentFileName || 'untitled.bin',
+      })
+
+      if (result && result.filePath) {
+        const data = new Uint8Array(this.data)
+        await hexEditor.writeFile(result.filePath, data)
+        this.currentFilePath = result.filePath
+        this.savedData = [...this.data]
+      }
+    } catch (error) {
+      console.error('Save file as failed:', error)
+    }
+  }
+
+  importData(newData: number[] | Uint8Array, filePath?: string) {
     this.data = Array.from(newData)
+    this.savedData = [...this.data]
     this.nonce += 1
-    this.saveData()
+    if (filePath) {
+      this.currentFilePath = filePath
+    }
   }
 }
 

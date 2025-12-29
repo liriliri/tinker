@@ -355,12 +355,6 @@ const pluginAPI = {
   async writeFile(filePath: string, data: Uint8Array): Promise<void> {
     await fs.promises.writeFile(filePath, Buffer.from(data))
   },
-  getFileName(filePath: string): string {
-    return path.basename(filePath)
-  },
-  getDirName(filePath: string): string {
-    return path.dirname(filePath)
-  },
 }
 
 // Expose to renderer process

@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
+import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
@@ -87,7 +88,7 @@ class Store extends BaseStore {
 
   get currentFileName() {
     if (!this.currentFilePath) return null
-    return jsonEditor.getFileName(this.currentFilePath)
+    return splitPath(this.currentFilePath).name
   }
 
   get hasUnsavedChanges() {

@@ -28,7 +28,7 @@ export default observer(function App() {
       const filePath = (file as any).path
       if (filePath) {
         const buffer = await hexEditor.readFile(filePath)
-        store.importData(Array.from(buffer))
+        store.importData(Array.from(buffer), filePath)
       }
     } catch (err) {
       console.error('Failed to load file:', err)
@@ -46,7 +46,7 @@ export default observer(function App() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {!store.hasData ? (
             <FileOpen
-              onOpenFile={() => store.openFileDialog()}
+              onOpenFile={() => store.openFile()}
               openTitle={t('openTitle')}
               supportedFormats={t('supportedFormats')}
             />

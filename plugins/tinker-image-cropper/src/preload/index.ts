@@ -1,6 +1,5 @@
 import { contextBridge } from 'electron'
 import * as fs from 'fs'
-import * as path from 'path'
 
 const imageCropperObj = {
   async readFile(filePath: string): Promise<Buffer> {
@@ -9,14 +8,6 @@ const imageCropperObj = {
 
   async writeFile(filePath: string, buffer: Uint8Array): Promise<void> {
     await fs.promises.writeFile(filePath, Buffer.from(buffer))
-  },
-
-  getFileName(filePath: string): string {
-    return path.basename(filePath)
-  },
-
-  getDirName(filePath: string): string {
-    return path.dirname(filePath)
   },
 }
 
@@ -27,7 +18,5 @@ declare global {
   const imageCropper: {
     readFile(filePath: string): Promise<Uint8Array>
     writeFile(filePath: string, buffer: Uint8Array): Promise<void>
-    getFileName(filePath: string): string
-    getDirName(filePath: string): string
   }
 }

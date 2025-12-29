@@ -6,6 +6,7 @@ import each from 'licia/each'
 import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
 import map from 'licia/map'
+import splitPath from 'licia/splitPath'
 import type { ImageFormat, ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
 
@@ -169,7 +170,7 @@ class Store extends BaseStore {
       const files: Array<{ file: File; filePath: string }> = []
       for (const filePath of result.filePaths) {
         const buffer = await imageCompressor.readFile(filePath)
-        const fileName = imageCompressor.getFileName(filePath)
+        const fileName = splitPath(filePath).name
 
         // Convert buffer to file
         // Note: Uint8Array from contextBridge needs to be converted to work with File API

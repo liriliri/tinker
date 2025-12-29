@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
@@ -92,7 +93,7 @@ class Store extends BaseStore {
 
       const filePath = result.filePaths[0]
       const buffer = await imageCropper.readFile(filePath)
-      const fileName = imageCropper.getFileName(filePath)
+      const fileName = splitPath(filePath).name
 
       // Convert buffer to file
       const uint8Array = new Uint8Array(buffer)
