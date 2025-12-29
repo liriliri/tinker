@@ -1,0 +1,20 @@
+{
+  "name": "tinker-pomodoro",
+  "version": "0.1.0",
+  "description": "Pomodoro Timer Plugin for Tinker",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "Pomodoro",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "番茄钟"
+      }
+    }
+  }
+}
