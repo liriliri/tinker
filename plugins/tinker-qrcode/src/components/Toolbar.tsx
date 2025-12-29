@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Download, Copy, Check } from 'lucide-react'
+import { Save, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import Select from 'share/components/Select'
@@ -133,7 +133,7 @@ export default observer(function ToolbarComponent() {
         />
       </div>
 
-      <ToolbarSeparator />
+      <ToolbarSpacer />
 
       {/* Action Buttons */}
       <ToolbarButton
@@ -152,19 +152,10 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         onClick={handleDownload}
         disabled={!store.text}
-        title={t('download')}
+        title={t('save')}
       >
-        <Download size={TOOLBAR_ICON_SIZE} />
+        <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
-
-      <ToolbarSpacer />
-
-      {/* Info */}
-      {store.text && (
-        <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
-          {store.text.length} {t('characters')}
-        </div>
-      )}
     </Toolbar>
   )
 })
