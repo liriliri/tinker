@@ -129,7 +129,14 @@ class Store extends BaseStore {
     }
   }
 
-  loadFromFile(content: string) {
+  loadFromFile(content: string, filePath?: string) {
+    if (filePath) {
+      this.currentFilePath = filePath
+      this.savedContent = content
+      storage.set(FILE_PATH_KEY, filePath)
+      // Clear localStorage content since we're now editing a file
+      storage.remove(STORAGE_KEY)
+    }
     this.setMarkdownInput(content)
   }
 

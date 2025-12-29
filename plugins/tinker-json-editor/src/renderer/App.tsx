@@ -29,8 +29,9 @@ const App = observer(() => {
       }
 
       try {
+        const filePath = (file as any).path
         const content = await file.text()
-        store.loadFromFile(content)
+        store.loadFromFile(content, filePath)
       } catch (err) {
         console.error('Failed to read file:', err)
       }
