@@ -33,15 +33,15 @@ class Store extends BaseStore {
     // Load from localStorage first (as fallback)
     this.loadFromStorage()
     // Load saved file if exists
-    this.loadSavedFile()
+    await this.loadSavedFile()
   }
 
-  private loadSavedFile() {
+  private async loadSavedFile() {
     const savedFilePath = storage.get(FILE_PATH_KEY)
 
     if (savedFilePath) {
       try {
-        const content = jsonEditor.readFile(savedFilePath)
+        const content = await jsonEditor.readFile(savedFilePath)
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.jsonInput = content
@@ -191,7 +191,7 @@ class Store extends BaseStore {
       }
 
       const filePath = result.filePaths[0]
-      const content = jsonEditor.readFile(filePath)
+      const content = await jsonEditor.readFile(filePath)
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
@@ -207,7 +207,7 @@ class Store extends BaseStore {
     try {
       if (this.currentFilePath) {
         // Save to existing file
-        jsonEditor.writeFile(this.currentFilePath, this.jsonInput)
+        await jsonEditor.writeFile(this.currentFilePath, this.jsonInput)
         this.savedContent = this.jsonInput
       } else {
         // Show save dialog
@@ -232,7 +232,7 @@ class Store extends BaseStore {
         return
       }
 
-      jsonEditor.writeFile(result.filePath, this.jsonInput)
+      await jsonEditor.writeFile(result.filePath, this.jsonInput)
       this.currentFilePath = result.filePath
       this.savedContent = this.jsonInput
       storage.set(FILE_PATH_KEY, result.filePath)

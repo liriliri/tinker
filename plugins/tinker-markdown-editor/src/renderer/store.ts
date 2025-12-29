@@ -32,7 +32,7 @@ class Store extends BaseStore {
     // Load from localStorage first (as fallback)
     this.loadFromLocalStorage()
     // Load saved file if exists
-    this.loadSavedFile()
+    await this.loadSavedFile()
     this.loadViewMode()
   }
 
@@ -47,12 +47,12 @@ class Store extends BaseStore {
     }
   }
 
-  private loadSavedFile() {
+  private async loadSavedFile() {
     const savedFilePath = storage.get(FILE_PATH_KEY)
 
     if (savedFilePath) {
       try {
-        const content = markdownEditor.readFile(savedFilePath)
+        const content = await markdownEditor.readFile(savedFilePath)
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.markdownInput = content
@@ -169,7 +169,7 @@ class Store extends BaseStore {
       }
 
       const filePath = result.filePaths[0]
-      const content = markdownEditor.readFile(filePath)
+      const content = await markdownEditor.readFile(filePath)
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
@@ -185,7 +185,7 @@ class Store extends BaseStore {
     try {
       if (this.currentFilePath) {
         // Save to existing file
-        markdownEditor.writeFile(this.currentFilePath, this.markdownInput)
+        await markdownEditor.writeFile(this.currentFilePath, this.markdownInput)
         this.savedContent = this.markdownInput
       } else {
         // Show save dialog
@@ -210,7 +210,7 @@ class Store extends BaseStore {
         return
       }
 
-      markdownEditor.writeFile(result.filePath, this.markdownInput)
+      await markdownEditor.writeFile(result.filePath, this.markdownInput)
       this.currentFilePath = result.filePath
       this.savedContent = this.markdownInput
       storage.set(FILE_PATH_KEY, result.filePath)

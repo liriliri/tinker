@@ -119,16 +119,18 @@ export default observer(function HexEditorView() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="w-full h-full p-4">
-        <HexEditor
-          columns={0x10}
-          data={store.data}
-          nonce={store.nonce}
-          onSetValue={handleSetValue}
-          showAscii={true}
-          showColumnLabels={true}
-          showRowLabels={true}
-        />
+      <div className="w-full h-full p-4 flex justify-center">
+        <div className="max-w-full">
+          <HexEditor
+            columns={0x10}
+            data={store.data}
+            nonce={store.nonce}
+            onSetValue={handleSetValue}
+            showAscii={true}
+            showColumnLabels={true}
+            showRowLabels={true}
+          />
+        </div>
       </div>
     </ThemeProvider>
   )

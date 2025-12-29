@@ -1,11 +1,11 @@
 import { contextBridge } from 'electron'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFile, writeFile } from 'fs/promises'
 
 const hexEditorAPI = {
   // Read file as buffer
   async readFile(filePath: string): Promise<Buffer> {
     try {
-      return readFileSync(filePath)
+      return await readFile(filePath)
     } catch (error) {
       console.error('Failed to read file:', error)
       throw new Error('Failed to read file')
@@ -15,7 +15,7 @@ const hexEditorAPI = {
   // Write buffer to file
   async writeFile(filePath: string, data: Uint8Array): Promise<void> {
     try {
-      writeFileSync(filePath, Buffer.from(data))
+      await writeFile(filePath, Buffer.from(data))
     } catch (error) {
       console.error('Failed to write file:', error)
       throw new Error('Failed to write file')

@@ -1,5 +1,5 @@
 import { contextBridge } from 'electron'
-import { writeFileSync, readFileSync, existsSync } from 'fs'
+import { readFile, writeFile, access } from 'fs/promises'
 import { homedir, platform, arch } from 'os'
 import { join } from 'path'
 
@@ -30,22 +30,19 @@ const templateObj = {
   },
 
   // Read file from specific path
-  readFile(filePath: string): string {
+  async readFile(filePath: string): Promise<string> {
     try {
-      if (existsSync(filePath)) {
-        return readFileSync(filePath, 'utf-8')
-      }
+      await access(filePath)
+      return await readFile(filePath, 'utf-8')
+    } catch {
       return ''
-    } catch (error) {
-      console.error('Failed to read file:', error)
-      throw new Error('Failed to read file')
     }
   },
 
   // Write file to specific path
-  writeFile(filePath: string, content: string): void {
+  async writeFile(filePath: string, content: string): Promise<void> {
     try {
-      writeFileSync(filePath, content, 'utf-8')
+      await writeFile(filePath, content, 'utf-8')
     } catch (error) {
       console.error('Failed to write file:', error)
       throw new Error('Failed to write file')

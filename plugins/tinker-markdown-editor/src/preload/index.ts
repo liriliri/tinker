@@ -1,13 +1,13 @@
 import { contextBridge } from 'electron'
-import * as fs from 'fs'
+import { readFile, writeFile } from 'fs/promises'
 
 const markdownEditorObj = {
-  readFile(filePath: string): string {
-    return fs.readFileSync(filePath, 'utf-8')
+  async readFile(filePath: string): Promise<string> {
+    return await readFile(filePath, 'utf-8')
   },
 
-  writeFile(filePath: string, content: string): void {
-    fs.writeFileSync(filePath, content, 'utf-8')
+  async writeFile(filePath: string, content: string): Promise<void> {
+    await writeFile(filePath, content, 'utf-8')
   },
 }
 
