@@ -1,25 +1,25 @@
 import React, { useState } from 'react'
-import { ImagePlus } from 'lucide-react'
-import { tw } from '../theme'
+import { FileText } from 'lucide-react'
+import { tw } from 'share/theme'
 
-interface ImageUploadProps {
-  onOpenImage: () => Promise<void>
-  uploadTitle: string
+interface FileOpenProps {
+  onOpenFile: () => Promise<void>
+  openTitle: string
   supportedFormats: string
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({
-  onOpenImage,
-  uploadTitle,
+const FileOpen: React.FC<FileOpenProps> = ({
+  onOpenFile,
+  openTitle,
   supportedFormats,
 }) => {
   const [isDragging, setIsDragging] = useState(false)
 
   const handleClick = async () => {
     try {
-      await onOpenImage()
+      await onOpenFile()
     } catch (err) {
-      console.error('Failed to open image:', err)
+      console.error('Failed to open file:', err)
     }
   }
 
@@ -48,13 +48,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       }`}
     >
       <div className="text-center p-8 pointer-events-none">
-        <ImagePlus
+        <FileText
           className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
           strokeWidth={1.5}
         />
 
-        <p className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}>
-          {uploadTitle}
+        <p
+          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}
+        >
+          {openTitle}
         </p>
         <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">
           {supportedFormats}
@@ -64,4 +66,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   )
 }
 
-export default ImageUpload
+export default FileOpen

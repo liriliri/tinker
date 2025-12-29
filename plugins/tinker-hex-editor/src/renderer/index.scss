@@ -1,0 +1,12 @@
+@use 'tailwindcss';
+@config "../../tailwind.config.js";
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* react-hex-editor theme overrides for styled-components */
+.hex-editor {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro',
+    monospace;
+}
