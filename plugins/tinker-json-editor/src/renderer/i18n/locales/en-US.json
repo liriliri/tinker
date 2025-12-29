@@ -1,4 +1,7 @@
 {
+  "newFile": "New File",
+  "openFile": "Open File",
+  "save": "Save",
   "textMode": "Text Mode",
   "treeMode": "Tree Mode",
   "undo": "Undo",
@@ -9,7 +12,6 @@
   "collapseAll": "Collapse All",
   "copy": "Copy to clipboard",
   "paste": "Paste from clipboard",
-  "openFile": "Open JSON file",
   "clear": "Clear all",
   "lines": "{{count}} lines"
 }

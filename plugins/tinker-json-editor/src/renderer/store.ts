@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
-import openFile from 'licia/openFile'
 import LocalStore from 'licia/LocalStore'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
@@ -10,6 +9,7 @@ type EditorMode = 'text' | 'tree'
 
 const STORAGE_KEY = 'tinker-json-editor-content'
 const MODE_STORAGE_KEY = 'tinker-json-editor-mode'
+const FILE_PATH_KEY = 'file-path'
 
 const storage = new LocalStore('tinker-json-editor')
 
@@ -19,11 +19,39 @@ class Store extends BaseStore {
   treeEditorInstance: JSONEditor | null = null
   textEditorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
+  currentFilePath: string | null = null
+  savedContent: string = ''
 
   constructor() {
     super()
     makeAutoObservable(this)
+    this.init()
+  }
+
+  private async init() {
+    // Load from localStorage first (as fallback)
     this.loadFromStorage()
+    // Load saved file if exists
+    this.loadSavedFile()
+  }
+
+  private loadSavedFile() {
+    const savedFilePath = storage.get(FILE_PATH_KEY)
+
+    if (savedFilePath) {
+      try {
+        const content = jsonEditor.readFile(savedFilePath)
+        this.currentFilePath = savedFilePath
+        this.savedContent = content
+        this.jsonInput = content
+        // Clear localStorage content since we're loading from a file
+        storage.remove(STORAGE_KEY)
+      } catch {
+        // File no longer exists or can't be read, clear the saved path
+        storage.remove(FILE_PATH_KEY)
+        console.log('Failed to load saved file')
+      }
+    }
   }
 
   get isEmpty() {
@@ -57,6 +85,15 @@ class Store extends BaseStore {
     }
   }
 
+  get currentFileName() {
+    if (!this.currentFilePath) return null
+    return jsonEditor.getFileName(this.currentFilePath)
+  }
+
+  get hasUnsavedChanges() {
+    return this.jsonInput !== this.savedContent
+  }
+
   private loadFromStorage() {
     const savedContent = storage.get(STORAGE_KEY)
     const savedMode = storage.get(MODE_STORAGE_KEY)
@@ -71,7 +108,11 @@ class Store extends BaseStore {
 
   setJsonInput(value: string) {
     this.jsonInput = value
-    storage.set(STORAGE_KEY, value)
+    // Only save to localStorage if there's no file path
+    // When editing a file, content is managed by the file system
+    if (!this.currentFilePath) {
+      storage.set(STORAGE_KEY, value)
+    }
   }
 
   setMode(mode: EditorMode) {
@@ -114,15 +155,83 @@ class Store extends BaseStore {
     this.setJsonInput(content)
   }
 
+  newFile() {
+    this.currentFilePath = null
+    this.savedContent = ''
+    storage.remove(FILE_PATH_KEY)
+    // Clear localStorage content when creating new file
+    storage.remove(STORAGE_KEY)
+    this.clearJson()
+  }
+
   async openFile() {
     try {
-      const files = await openFile({ accept: '.json,application/json' })
-      if (files && files.length > 0) {
-        const text = await files[0].text()
-        this.loadFromFile(text)
+      const result = await tinker.showOpenDialog({
+        filters: [
+          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+        properties: ['openFile'],
+      })
+
+      if (
+        result.canceled ||
+        !result.filePaths ||
+        result.filePaths.length === 0
+      ) {
+        return
       }
+
+      const filePath = result.filePaths[0]
+      const content = jsonEditor.readFile(filePath)
+      this.currentFilePath = filePath
+      this.savedContent = content
+      storage.set(FILE_PATH_KEY, filePath)
+      // Clear localStorage content since we're now editing a file
+      storage.remove(STORAGE_KEY)
+      this.loadFromFile(content)
     } catch (err) {
       console.error('Failed to open file:', err)
+    }
+  }
+
+  async saveFile() {
+    try {
+      if (this.currentFilePath) {
+        // Save to existing file
+        jsonEditor.writeFile(this.currentFilePath, this.jsonInput)
+        this.savedContent = this.jsonInput
+      } else {
+        // Show save dialog
+        await this.saveFileAs()
+      }
+    } catch (err) {
+      console.error('Failed to save file:', err)
+    }
+  }
+
+  async saveFileAs() {
+    try {
+      const result = await tinker.showSaveDialog({
+        defaultPath: this.currentFileName || 'untitled.json',
+        filters: [
+          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      })
+
+      if (result.canceled || !result.filePath) {
+        return
+      }
+
+      jsonEditor.writeFile(result.filePath, this.jsonInput)
+      this.currentFilePath = result.filePath
+      this.savedContent = this.jsonInput
+      storage.set(FILE_PATH_KEY, result.filePath)
+      // Clear localStorage content since we now have a file path
+      storage.remove(STORAGE_KEY)
+    } catch (err) {
+      console.error('Failed to save file as:', err)
     }
   }
 

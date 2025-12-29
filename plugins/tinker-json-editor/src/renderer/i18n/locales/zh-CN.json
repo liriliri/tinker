@@ -1,4 +1,7 @@
 {
+  "newFile": "新建",
+  "openFile": "打开",
+  "save": "保存",
   "textMode": "文本模式",
   "treeMode": "树形模式",
   "undo": "撤销",
@@ -9,7 +12,6 @@
   "collapseAll": "全部折叠",
   "copy": "复制到剪贴板",
   "paste": "从剪贴板粘贴",
-  "openFile": "打开 JSON 文件",
   "clear": "清空",
   "lines": "{{count}} 行"
 }

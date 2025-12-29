@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Download, Moon, Sun, Copy, Check } from 'lucide-react'
+import { Save, Moon, Sun, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
 import {
   Toolbar,
@@ -27,7 +27,7 @@ export default observer(function ToolbarComponent() {
     return frameElement
   }
 
-  const handleExport = async () => {
+  const handleSave = async () => {
     const frameElement = getFrameElement()
     if (!frameElement) return
 
@@ -41,7 +41,7 @@ export default observer(function ToolbarComponent() {
       link.href = dataUrl
       link.click()
     } catch (error) {
-      console.error('Failed to export image:', error)
+      console.error('Failed to save image:', error)
     }
   }
 
@@ -148,13 +148,9 @@ export default observer(function ToolbarComponent() {
         )}
       </ToolbarButton>
 
-      <button
-        onClick={handleExport}
-        className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} text-white font-medium rounded transition-colors flex items-center gap-1.5`}
-      >
-        <Download size={TOOLBAR_ICON_SIZE} />
-        {t('exportImage')}
-      </button>
+      <ToolbarButton onClick={handleSave} title={t('saveImage')}>
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
     </Toolbar>
   )
 })

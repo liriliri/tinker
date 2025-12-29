@@ -11,6 +11,8 @@ import {
   Check,
   FolderOpen,
   AlertCircle,
+  FilePlus,
+  Save,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -37,6 +39,24 @@ export default observer(function ToolbarComponent() {
 
   return (
     <Toolbar>
+      <ToolbarButton onClick={() => store.newFile()} title={t('newFile')}>
+        <FilePlus size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
+        <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={() => store.saveFile()}
+        disabled={store.isEmpty || !store.hasUnsavedChanges}
+        title={t('save')}
+      >
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
       <ToolbarButton
         variant="toggle"
         active={store.mode === 'text'}
@@ -147,10 +167,6 @@ export default observer(function ToolbarComponent() {
         <Clipboard size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
-        <FolderOpen size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
       <ToolbarButton
         onClick={() => store.clearJson()}
         disabled={store.isEmpty}
@@ -169,6 +185,12 @@ export default observer(function ToolbarComponent() {
       )}
 
       <ToolbarSpacer />
+
+      {store.currentFileName && (
+        <div className="text-gray-600 dark:text-gray-400 text-xs mr-2 whitespace-nowrap">
+          {store.currentFileName}
+        </div>
+      )}
 
       {store.lineCount > 0 && (
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">

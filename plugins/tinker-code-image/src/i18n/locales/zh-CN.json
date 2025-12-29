@@ -4,7 +4,7 @@
   "darkMode": "深色模式",
   "lightMode": "浅色模式",
   "lineNumbers": "行号",
-  "exportImage": "导出图片",
+  "saveImage": "保存图片",
   "copyImage": "复制图片",
   "loading": "加载中...",
   "theme.candy": "糖果",
