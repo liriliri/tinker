@@ -37,8 +37,6 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 
 TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
 
-* Whiteboard
-
 <table width="100%" style="text-align:center">
   <colgroup>
     <col width="50%">
@@ -92,6 +90,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
     <tr>
       <th><img src="https://tinker.liriliri.io/timestamp.png"/></th>
       <th><img src="https://tinker.liriliri.io/text_diff.png"/></th>
+    </tr>
+    <tr>
+      <th>Hex Editor</th>
+      <th>Password Generator</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/hex_editor.png"/></th>
+      <th><img src="https://tinker.liriliri.io/password_generator.png"/></th>
+    </tr>
+    <tr>
+      <th>Pomodoro</th>
+      <th>Whiteboard</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/pomodoro.png"/></th>
+      <th><img src="https://tinker.liriliri.io/whiteboard.png"/></th>
     </tr>
   </tbody>
 </table>
