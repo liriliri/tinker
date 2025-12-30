@@ -16,8 +16,5 @@
         "name": "密码生成"
       }
     }
-  },
-  "devDependencies": {
-    "vault": "^0.3.0"
   }
 }

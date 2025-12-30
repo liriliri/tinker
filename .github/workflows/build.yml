@@ -26,7 +26,6 @@ jobs:
         npm i
         npm run build
         npm run pack
-      shell: bash  
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
         APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
