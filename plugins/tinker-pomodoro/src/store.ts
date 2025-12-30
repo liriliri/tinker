@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import TimerWorker from './utils/timer.worker?worker'
 
 const storage = new LocalStore('tinker-pomodoro')
 
@@ -23,13 +24,32 @@ class Store extends BaseStore {
   // Audio settings
   volume: number = 100 // 0-100
 
-  // Timer interval ID
-  private timerId: number | null = null
+  // Web Worker
+  private worker: Worker | null = null
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadSettings()
+    this.initWorker()
+  }
+
+  private initWorker() {
+    this.worker = new TimerWorker()
+    this.worker.onmessage = (e: MessageEvent) => {
+      const { type, payload } = e.data
+
+      switch (type) {
+        case 'tick':
+          this.timeLeft = this.getTotalTimeForMode() - payload.elapsed
+          break
+        case 'complete':
+          this.isRunning = false
+          this.timeLeft = 0
+          this.onTimerComplete()
+          break
+      }
+    }
   }
 
   private loadSettings() {
@@ -50,20 +70,24 @@ class Store extends BaseStore {
 
   // Timer controls
   start() {
-    if (this.isRunning) return
+    if (this.isRunning || !this.worker) return
 
     this.isRunning = true
-    this.timerId = window.setInterval(() => {
-      this.tick()
-    }, 1000)
+    const elapsed = this.getTotalTimeForMode() - this.timeLeft
+    this.worker.postMessage({
+      type: 'start',
+      payload: {
+        totalSeconds: this.getTotalTimeForMode(),
+        elapsed,
+      },
+    })
   }
 
   pause() {
+    if (!this.isRunning || !this.worker) return
+
     this.isRunning = false
-    if (this.timerId) {
-      clearInterval(this.timerId)
-      this.timerId = null
-    }
+    this.worker.postMessage({ type: 'pause' })
   }
 
   reset() {
@@ -73,10 +97,16 @@ class Store extends BaseStore {
     this.timeLeft = this.focusTime * 60
     this.totalFocusCompleted = 0
     storage.set('total-focus-completed', 0)
+    if (this.worker) {
+      this.worker.postMessage({ type: 'reset' })
+    }
   }
 
   skip() {
     this.pause()
+    if (this.worker) {
+      this.worker.postMessage({ type: 'reset' })
+    }
     this.nextRound()
   }
 
@@ -90,15 +120,6 @@ class Store extends BaseStore {
       this.setVolume(100)
     } else {
       this.setVolume(0)
-    }
-  }
-
-  private tick() {
-    if (this.timeLeft > 0) {
-      this.timeLeft--
-    } else {
-      this.pause()
-      this.onTimerComplete()
     }
   }
 

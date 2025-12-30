@@ -13,35 +13,7 @@ export default observer(function Footer() {
 
   return (
     <div className="flex items-center justify-between px-6 pb-4 relative">
-      {/* Left: Reset */}
-      <div className="flex items-center">
-        <button
-          onClick={() => store.reset()}
-          className={BUTTON_CLASSES}
-          title={t('reset')}
-        >
-          <RotateCcw size={18} />
-        </button>
-      </div>
-
-      {/* Center: Round counter */}
-      <div className="absolute left-1/2 -translate-x-1/2">
-        <span
-          className={`text-base ${tw.text.light.secondary} ${tw.text.dark.tertiary}`}
-        >
-          {store.currentRound}/{store.totalRounds}
-          {store.totalFocusCompleted > 0 && (
-            <span
-              className="ml-1 text-sm text-gray-500"
-              title="Focus rounds completed"
-            >
-              ({store.totalFocusCompleted})
-            </span>
-          )}
-        </span>
-      </div>
-
-      {/* Right: Skip and Volume */}
+      {/* Left: Skip and Volume */}
       <div className="flex items-center gap-3">
         <button onClick={() => store.skip()} className={BUTTON_CLASSES}>
           <SkipForward size={18} />
@@ -94,6 +66,34 @@ export default observer(function Footer() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Center: Round counter */}
+      <div className="absolute left-1/2 -translate-x-1/2">
+        <span
+          className={`text-base ${tw.text.light.secondary} ${tw.text.dark.tertiary}`}
+        >
+          {store.currentRound}/{store.totalRounds}
+          {store.totalFocusCompleted > 0 && (
+            <span
+              className="ml-1 text-sm text-gray-500"
+              title="Focus rounds completed"
+            >
+              ({store.totalFocusCompleted})
+            </span>
+          )}
+        </span>
+      </div>
+
+      {/* Right: Reset */}
+      <div className="flex items-center">
+        <button
+          onClick={() => store.reset()}
+          className={BUTTON_CLASSES}
+          title={t('reset')}
+        >
+          <RotateCcw size={18} />
+        </button>
       </div>
     </div>
   )

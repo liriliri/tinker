@@ -177,7 +177,9 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
   }
 
   if (pluginViews[id]) {
-    pluginViews[id].win.focus()
+    const { win } = pluginViews[id]
+    win.show()
+    win.focus()
     return false
   }
 
