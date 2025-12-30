@@ -18,7 +18,7 @@
     "build:renderer": "vite build",
     "build:main": "vite build --config vite.main.ts",
     "build:preload": "vite build --config vite.preload.ts",
-    "build:plugin": "lerna run build --concurrency 4",
+    "build:plugin": "lerna run build",
     "pack": "zx script/pack.mjs",
     "start": "electron ./dist/main/index.js --inspect=9229",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"plugins/tinker-*/src/**/*.{ts,tsx}\" \"plugins/share/**/*.{ts,tsx}\"",
