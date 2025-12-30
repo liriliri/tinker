@@ -1,10 +1,17 @@
 import { observer } from 'mobx-react-lite'
+import { THEME_COLORS } from 'share/theme'
 
 interface CircularProgressProps {
   progress: number // 0-100
   mode: 'focus' | 'shortBreak' | 'longBreak'
   children?: React.ReactNode
 }
+
+const MODE_COLORS = {
+  focus: '#ff6b6b',
+  shortBreak: THEME_COLORS.primary,
+  longBreak: THEME_COLORS.primary,
+} as const
 
 export default observer(function CircularProgress({
   progress,
@@ -15,11 +22,9 @@ export default observer(function CircularProgress({
   const strokeWidth = 10
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
-  const offset = circumference - (progress / 100) * circumference
+  const offset = (progress / 100) * circumference
 
-  // Color based on mode
-  const strokeColor =
-    mode === 'focus' ? '#ff6b6b' : mode === 'shortBreak' ? '#4ecdc4' : '#45b7d1'
+  const strokeColor = MODE_COLORS[mode]
 
   return (
     <div className="relative flex items-center justify-center">

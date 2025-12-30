@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Play, Pause } from 'lucide-react'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function ControlButton() {
@@ -20,9 +21,15 @@ export default observer(function ControlButton() {
                    hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         {store.isRunning ? (
-          <Pause size={18} className="text-gray-700 dark:text-gray-300" />
+          <Pause
+            size={18}
+            className={`${tw.text.light.primary} ${tw.text.dark.secondary}`}
+          />
         ) : (
-          <Play size={18} className="text-gray-700 dark:text-gray-300 ml-0.5" />
+          <Play
+            size={18}
+            className={`${tw.text.light.primary} ${tw.text.dark.secondary} ml-0.5`}
+          />
         )}
       </button>
     </div>

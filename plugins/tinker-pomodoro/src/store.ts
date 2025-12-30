@@ -13,11 +13,15 @@ class Store extends BaseStore {
   isRunning: boolean = false
   currentRound: number = 1
   totalRounds: number = 4
+  totalFocusCompleted: number = 0 // Total focus sessions completed
 
   // Timer settings (minutes)
   focusTime: number = 25
   shortBreakTime: number = 5
   longBreakTime: number = 15
+
+  // Audio settings
+  volume: number = 100 // 0-100
 
   // Timer interval ID
   private timerId: number | null = null
@@ -32,10 +36,14 @@ class Store extends BaseStore {
     const savedFocus = storage.get('focus-time')
     const savedShortBreak = storage.get('short-break-time')
     const savedLongBreak = storage.get('long-break-time')
+    const savedTotalFocus = storage.get('total-focus-completed')
+    const savedVolume = storage.get('volume')
 
     if (savedFocus) this.focusTime = savedFocus
     if (savedShortBreak) this.shortBreakTime = savedShortBreak
     if (savedLongBreak) this.longBreakTime = savedLongBreak
+    if (savedTotalFocus) this.totalFocusCompleted = savedTotalFocus
+    if (savedVolume !== undefined) this.volume = savedVolume
 
     this.timeLeft = this.focusTime * 60
   }
@@ -63,11 +71,26 @@ class Store extends BaseStore {
     this.currentRound = 1
     this.mode = 'focus'
     this.timeLeft = this.focusTime * 60
+    this.totalFocusCompleted = 0
+    storage.set('total-focus-completed', 0)
   }
 
   skip() {
     this.pause()
     this.nextRound()
+  }
+
+  setVolume(value: number) {
+    this.volume = Math.max(0, Math.min(100, value))
+    storage.set('volume', this.volume)
+  }
+
+  toggleMute() {
+    if (this.volume === 0) {
+      this.setVolume(100)
+    } else {
+      this.setVolume(0)
+    }
   }
 
   private tick() {
@@ -80,24 +103,64 @@ class Store extends BaseStore {
   }
 
   private onTimerComplete() {
-    // Play notification sound or show notification
+    // Play notification sound
+    this.playCompletionSound()
     this.nextRound()
+  }
+
+  private playCompletionSound() {
+    if (this.volume === 0) return
+
+    try {
+      const audioCtx = new (window.AudioContext ||
+        (window as any).webkitAudioContext)()
+      const oscillator = audioCtx.createOscillator()
+      const gainNode = audioCtx.createGain()
+
+      oscillator.type = 'sine'
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime)
+      const volumeGain = (this.volume / 100) * 0.3
+      gainNode.gain.setValueAtTime(volumeGain, audioCtx.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioCtx.currentTime + 0.5
+      )
+
+      oscillator.connect(gainNode)
+      gainNode.connect(audioCtx.destination)
+
+      oscillator.start()
+      oscillator.stop(audioCtx.currentTime + 0.5)
+    } catch (error) {
+      console.error('Failed to play completion sound:', error)
+    }
   }
 
   private nextRound() {
     if (this.mode === 'focus') {
+      // Completed a focus session, increment total count
+      this.totalFocusCompleted++
+      storage.set('total-focus-completed', this.totalFocusCompleted)
+
       if (this.currentRound >= this.totalRounds) {
+        // After the last focus session, go to long break
         this.mode = 'longBreak'
         this.timeLeft = this.longBreakTime * 60
-        this.currentRound = 1
       } else {
+        // Go to short break, keep current round number
         this.mode = 'shortBreak'
         this.timeLeft = this.shortBreakTime * 60
-        this.currentRound++
       }
-    } else {
+    } else if (this.mode === 'shortBreak') {
+      // Completed short break, start next focus round
       this.mode = 'focus'
       this.timeLeft = this.focusTime * 60
+      this.currentRound++
+    } else {
+      // Completed long break, reset to round 1
+      this.mode = 'focus'
+      this.timeLeft = this.focusTime * 60
+      this.currentRound = 1
     }
   }
 
