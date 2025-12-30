@@ -10,7 +10,6 @@
     "build:renderer": "vite build --config ../vite.config.ts",
     "build:preload": "vite build --config ../vite.preload.ts"
   },
-  "embedded": false,
   "tinker": {
     "name": "Hex Editor",
     "icon": "icon.png",

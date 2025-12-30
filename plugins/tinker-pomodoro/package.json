@@ -6,7 +6,6 @@
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
-  "embedded": false,
   "tinker": {
     "name": "Pomodoro",
     "icon": "icon.png",
