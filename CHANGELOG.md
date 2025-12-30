@@ -1,3 +1,9 @@
+## v0.5.0 (30 Dec 2025)
+
+* feat: add password generator
+* feat: add pomodoro timer
+* feat: add hex editor
+
 ## v0.4.1 (27 Dec 2025)
 
 * fix: web plugin script error
