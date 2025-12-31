@@ -39,7 +39,11 @@ const plugins: types.PlainObj<IPlugin> = {}
 
 const PLUGIN_PARTITION = 'persist:plugin'
 
-const getPlugins: IpcGetPlugins = singleton(async () => {
+const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
+  if (!force && !isEmpty(plugins)) {
+    return map(plugins, identity)
+  }
+
   const pluginDirs: string[] = []
   if (isEmpty(plugins)) {
     pluginDirs.push(getBuiltinPluginDir())

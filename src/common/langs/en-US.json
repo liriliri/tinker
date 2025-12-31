@@ -12,5 +12,6 @@
   "autoHide": "Auto Hide",
   "openInNewWin": "Open in New Window",
   "showShortcut": "Show Shortcut",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "noResult": "Nothing Found"
 }

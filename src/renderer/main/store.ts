@@ -1,4 +1,4 @@
-import { IPlugin } from 'common/types'
+import { IApp, IPlugin } from 'common/types'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
 import find from 'licia/find'
@@ -9,15 +9,17 @@ import toBool from 'licia/toBool'
 
 class Store extends BaseStore {
   plugins: IPlugin[] = []
+  apps: IApp[] = []
   visiblePlugins: IPlugin[] = []
+  visibleApps: IApp[] = []
   plugin: IPlugin | null = null
   filter = ''
   constructor() {
     super()
 
     makeObservable(this, {
-      plugins: observable,
       visiblePlugins: observable,
+      visibleApps: observable,
       filter: observable,
       plugin: observable,
       setFilter: action,
@@ -27,7 +29,7 @@ class Store extends BaseStore {
   }
   setFilter(filter: string) {
     this.filter = filter
-    this.filterPlugins()
+    this.applyFilter()
   }
   openPlugin(id: string, detached = false) {
     const plugin = this.getPlugin(id)
@@ -47,6 +49,10 @@ class Store extends BaseStore {
         }
       }
     })
+  }
+  openApp(path: string) {
+    main.openApp(path)
+    main.closeWin()
   }
   reopenPlugin() {
     if (!this.plugin) {
@@ -77,25 +83,35 @@ class Store extends BaseStore {
     }
     main.togglePluginDevtools(this.plugin.id)
   }
-  async refresh() {
-    const plugins = await main.getPlugins()
+  async refresh(force = false) {
+    const plugins = await main.getPlugins(force)
     runInAction(() => {
       this.plugins = plugins
-      this.filterPlugins()
+      this.applyFilter()
+    })
+    const apps = await main.getApps(force)
+    runInAction(() => {
+      this.apps = apps
+      this.applyFilter()
     })
   }
   private getPlugin(id: string) {
     return find(this.plugins, (plugin) => plugin.id === id)
   }
-  private filterPlugins() {
+  private applyFilter() {
     const filter = lowerCase(trim(this.filter))
     if (!filter) {
       this.visiblePlugins = this.plugins
+      this.visibleApps = this.apps
       return
     }
 
     this.visiblePlugins = this.plugins.filter((plugin) => {
       const name = lowerCase(plugin.name)
+      return toBool(PinyinMatch.match(name, filter))
+    })
+    this.visibleApps = this.apps.filter((app) => {
+      const name = lowerCase(app.name)
       return toBool(PinyinMatch.match(name, filter))
     })
   }

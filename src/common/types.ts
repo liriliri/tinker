@@ -27,6 +27,12 @@ export interface IPlugin {
   builtin: boolean
 }
 
+export interface IApp {
+  name: string
+  icon: string
+  path: string
+}
+
 export type NodeMacPermissions = {
   getAuthStatus: (type: string) => string
   askForAccessibilityAccess: () => void
@@ -43,7 +49,7 @@ export type IpcDragMain = (
   width: number,
   height: number
 ) => void
-export type IpcGetPlugins = () => Promise<IPlugin[]>
+export type IpcGetPlugins = (force?: boolean) => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string) => void
 export type IpcDetachPlugin = IpcClosePlugin
@@ -55,3 +61,5 @@ export type IpcShowPluginContextMenu = (
   options: MenuItemConstructorOptions[]
 ) => void
 export type IpcGetAttachedPlugin = () => Promise<IPlugin | undefined>
+export type IpcGetApps = (force?: boolean) => Promise<IApp[]>
+export type IpcOpenApp = (path: string) => void

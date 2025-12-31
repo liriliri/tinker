@@ -80,7 +80,7 @@ export default observer(function Titlebar() {
         {
           label: t('refresh'),
           click() {
-            store.refresh()
+            store.refresh(true)
           },
         },
         {
@@ -114,6 +114,8 @@ export default observer(function Titlebar() {
       }
       if (store.visiblePlugins.length > 0) {
         store.openPlugin(store.visiblePlugins[0].id)
+      } else if (store.visibleApps.length > 0) {
+        store.openApp(store.visibleApps[0].path)
       }
     },
     []

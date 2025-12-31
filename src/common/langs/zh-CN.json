@@ -12,5 +12,6 @@
   "autoHide": "自动隐藏",
   "openInNewWin": "新窗口打开",
   "showShortcut": "呼出快捷键",
-  "refresh": "刷新"
+  "refresh": "刷新",
+  "noResult": "无结果"
 }

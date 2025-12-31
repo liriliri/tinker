@@ -2,7 +2,9 @@ import {
   IpcClosePlugin,
   IpcDetachPlugin,
   IpcDragMain,
+  IpcGetApps,
   IpcGetPlugins,
+  IpcOpenApp,
   IpcOpenPlugin,
   IpcReopenPlugin,
   IpcTogglePluginDevtools,
@@ -18,4 +20,6 @@ export default Object.assign(mainObj, {
   detachPlugin: invoke<IpcDetachPlugin>('detachPlugin'),
   reopenPlugin: invoke<IpcReopenPlugin>('reopenPlugin'),
   togglePluginDevtools: invoke<IpcTogglePluginDevtools>('togglePluginDevtools'),
+  getApps: invoke<IpcGetApps>('getApps'),
+  openApp: invoke<IpcOpenApp>('openApp'),
 })
