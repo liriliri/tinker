@@ -5,7 +5,7 @@ import { RefObject } from 'react'
 import store from '../store'
 
 interface ImageCropperProps {
-  cropperRef: RefObject<CropperRef>
+  cropperRef: RefObject<CropperRef | null>
 }
 
 const ImageCropper = observer(({ cropperRef }: ImageCropperProps) => {

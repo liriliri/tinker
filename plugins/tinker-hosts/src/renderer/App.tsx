@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
+import { tw } from 'share/theme'
 import store from './store'
 import { Sidebar, Editor } from './components'
 
@@ -15,7 +16,9 @@ export default observer(function App() {
     <AlertProvider>
       <ConfirmProvider>
         <PromptProvider>
-          <div className="h-screen flex overflow-hidden bg-white dark:bg-[#1e1e1e]">
+          <div
+            className={`h-screen flex overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+          >
             <Sidebar />
             <Editor />
           </div>

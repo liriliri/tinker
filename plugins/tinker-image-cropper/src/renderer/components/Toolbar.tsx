@@ -31,7 +31,7 @@ import ImageResizeIcon from '../assets/image-resize.svg?react'
 
 interface ToolbarProps {
   onCrop?: () => void
-  cropperRef?: RefObject<CropperRef>
+  cropperRef?: RefObject<CropperRef | null>
 }
 
 export default observer(({ onCrop, cropperRef }: ToolbarProps) => {

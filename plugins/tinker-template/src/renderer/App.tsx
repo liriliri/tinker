@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
+import { tw } from 'share/theme'
 import store from './store'
 import TabNav from './components/TabNav'
 import PreloadAPITab from './components/PreloadAPITab'
@@ -18,7 +19,9 @@ export default observer(function App() {
 
   return (
     <AlertProvider>
-      <div className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133] transition-colors">
+      <div
+        className={`h-screen flex flex-col transition-colors ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+      >
         <TabNav tabs={tabs} />
 
         <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6">

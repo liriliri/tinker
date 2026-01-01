@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
+import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import CalculationList from './components/CalculationList'
 import store from './store'
@@ -11,7 +12,9 @@ const App = observer(() => {
   }, [])
 
   return (
-    <div className="h-screen bg-[#f0f1f2] dark:bg-[#303133] flex flex-col">
+    <div
+      className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+    >
       <Toaster
         position="top-center"
         toastOptions={{

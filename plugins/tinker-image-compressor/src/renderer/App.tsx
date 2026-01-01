@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageList from './components/ImageList'
@@ -43,7 +44,7 @@ const App = observer(() => {
 
   return (
     <div
-      className="h-screen flex flex-col bg-[#f0f1f2] dark:bg-[#303133]"
+      className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >

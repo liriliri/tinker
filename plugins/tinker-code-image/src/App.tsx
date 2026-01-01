@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { getHighlighterCore } from 'shiki'
 import getWasm from 'shiki/wasm'
+import { tw } from 'share/theme'
 import store, { LANGUAGES, shikiTheme } from './store'
 import Frame from './components/Frame'
 import Toolbar from './components/Toolbar'
@@ -22,18 +23,20 @@ export default observer(function App() {
     })
   }, [])
 
-  const bgClass = 'bg-[#f0f1f2] dark:bg-[#303133]'
-
   if (!store.highlighter) {
     return (
-      <div className={`h-screen flex items-center justify-center ${bgClass}`}>
+      <div
+        className={`h-screen flex items-center justify-center ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+      >
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className={`h-screen flex flex-col ${bgClass} overflow-hidden`}>
+    <div
+      className={`h-screen flex flex-col overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+    >
       <Toolbar />
       <div className="flex-1 min-h-0">
         <Frame />

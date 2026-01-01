@@ -9,7 +9,7 @@ export default observer(function App() {
   return (
     <AlertProvider>
       <div
-        className={`h-screen flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary} transition-colors`}
+        className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary} transition-colors`}
       >
         <Toolbar />
         <ExpressionSection />
