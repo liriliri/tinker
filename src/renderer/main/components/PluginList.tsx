@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import store from '../store'
 import LunaIconList from 'luna-icon-list/react'
+import LunaScrollbar from 'luna-scrollbar/react'
 import map from 'licia/map'
 import fileUrl from 'licia/fileUrl'
 import Style from './PluginList.module.scss'
@@ -64,29 +65,31 @@ export default observer(function PluginList() {
       {isEmpty(icons) && store.filter ? (
         <div className={Style.noResult}>{t('noResult')}</div>
       ) : null}
-      <LunaIconList
-        onClick={(e: any, icon) => {
-          const data = icon.data as any
-          if (data.plugin) {
-            store.openPlugin(data.plugin.id)
-          } else {
-            store.openApp(data.app.path)
-          }
-        }}
-        onDoubleClick={(e: any, icon) => {
-          const data = icon.data as any
-          if (data.plugin) {
-            store.openPlugin(data.plugin.id, true)
-          } else {
-            store.openApp(data.app.path)
-          }
-        }}
-        onContextMenu={(e: any, icon) => {
-          onContextMenu(e, icon.data)
-        }}
-        icons={icons}
-        size={48}
-      />
+      <LunaScrollbar className={Style.scrollbar}>
+        <LunaIconList
+          onClick={(e: any, icon) => {
+            const data = icon.data as any
+            if (data.plugin) {
+              store.openPlugin(data.plugin.id)
+            } else {
+              store.openApp(data.app.path)
+            }
+          }}
+          onDoubleClick={(e: any, icon) => {
+            const data = icon.data as any
+            if (data.plugin) {
+              store.openPlugin(data.plugin.id, true)
+            } else {
+              store.openApp(data.app.path)
+            }
+          }}
+          onContextMenu={(e: any, icon) => {
+            onContextMenu(e, icon.data)
+          }}
+          icons={icons}
+          size={48}
+        />
+      </LunaScrollbar>
     </div>
   )
 })
