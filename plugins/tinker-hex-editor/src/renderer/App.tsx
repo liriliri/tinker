@@ -45,7 +45,9 @@ export default observer(function App() {
         <Toolbar />
         <div className="flex-1 flex flex-col overflow-hidden">
           {!store.hasData ? (
-            <div className={`flex-1 flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}>
+            <div
+              className={`flex-1 flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+            >
               <FileOpen
                 onOpenFile={() => store.openFile()}
                 openTitle={t('openTitle')}
@@ -53,7 +55,9 @@ export default observer(function App() {
               />
             </div>
           ) : (
-            <div className={`flex-1 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
+            <div
+              className={`flex-1 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+            >
               <HexEditorView />
             </div>
           )}

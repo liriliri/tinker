@@ -1,0 +1,11 @@
+{
+  "encoding": "Encoding",
+  "inputType": "Input Type",
+  "uppercase": "Uppercase",
+  "text": "Text",
+  "file": "File",
+  "placeholder": "Enter text to hash...",
+  "utf8": "UTF-8",
+  "base64": "Base64",
+  "hex": "Hex"
+}
