@@ -44,7 +44,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
       className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${
         isDragging
           ? `${tw.primary.border}`
-          : `border-[#8a8a8a] dark:border-[#6e6e6e] ${tw.primary.hoverBorder}`
+          : `border-[#8a8a8a] dark:border-[#6e6e6e] ${tw.primary.hoverBorder} dark:hover:border-[#0fc25e]`
       }`}
     >
       <div className="text-center p-8 pointer-events-none">

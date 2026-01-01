@@ -38,20 +38,24 @@ export default observer(function App() {
   return (
     <AlertProvider>
       <div
-        className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+        className={`h-screen flex flex-col`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
         <Toolbar />
         <div className="flex-1 flex flex-col overflow-hidden">
           {!store.hasData ? (
-            <FileOpen
-              onOpenFile={() => store.openFile()}
-              openTitle={t('openTitle')}
-              supportedFormats={t('supportedFormats')}
-            />
+            <div className={`flex-1 flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}>
+              <FileOpen
+                onOpenFile={() => store.openFile()}
+                openTitle={t('openTitle')}
+                supportedFormats={t('supportedFormats')}
+              />
+            </div>
           ) : (
-            <HexEditorView />
+            <div className={`flex-1 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
+              <HexEditorView />
+            </div>
           )}
         </div>
       </div>

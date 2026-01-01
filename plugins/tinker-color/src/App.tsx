@@ -9,7 +9,7 @@ import Toolbar from './components/Toolbar'
 export default observer(function App() {
   return (
     <div
-      className={`h-screen w-screen flex flex-col overflow-hidden ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+      className={`h-screen w-screen flex flex-col overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
     >
       <Toaster
         position="top-center"
@@ -37,7 +37,7 @@ export default observer(function App() {
 
         {/* Right sidebar - Color Info Blocks */}
         <div
-          className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.light.primary} ${tw.bg.dark.primary} p-6 shadow-lg overflow-y-auto border-l ${tw.border.both}`}
+          className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} p-6 shadow-lg overflow-y-auto border-l ${tw.border.both}`}
         >
           <ColorFormats />
           <div className={`border-t ${tw.border.both}`}></div>
