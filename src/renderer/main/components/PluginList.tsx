@@ -85,7 +85,7 @@ export default observer(function PluginList() {
           onContextMenu(e, icon.data)
         }}
         icons={icons}
-        size={64}
+        size={48}
       />
     </div>
   )
