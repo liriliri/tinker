@@ -70,6 +70,15 @@ declare global {
     showItemInPath(path: string): void
 
     /**
+     * Get file paths from the system clipboard.
+     * @returns Array of file paths
+     * @example
+     * const filePaths = await tinker.getClipboardFilePaths()
+     * console.log(filePaths) // ['/path/to/file1.png', '/path/to/file2.jpg']
+     */
+    getClipboardFilePaths(): Promise<string[]>
+
+    /**
      * Register an event listener.
      * @param event - Event name (e.g., 'changeTheme', 'changeLanguage')
      * @param callback - Event handler function

@@ -10,6 +10,7 @@ export default function () {
     showOpenDialog: _tinker.showOpenDialog,
     showSaveDialog: _tinker.showSaveDialog,
     showItemInPath: _tinker.showItemInPath,
+    getClipboardFilePaths: _tinker.getClipboardFilePaths,
     on: _tinker.on,
     showContextMenu,
   }

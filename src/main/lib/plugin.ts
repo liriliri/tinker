@@ -32,6 +32,7 @@ import contextMenu from './contextMenu'
 import { exec } from 'child_process'
 import log from 'share/common/log'
 import mime from 'mime'
+import { getClipboardFilePaths } from './clipboard'
 
 const logger = log('plugin')
 
@@ -353,6 +354,7 @@ export function init() {
   handleEvent('detachPlugin', detachPlugin)
   handleEvent('togglePluginDevtools', togglePluginDevtools)
   handleEvent('showPluginContextMenu', showPluginContextMenu)
+  handleEvent('getClipboardFilePaths', getClipboardFilePaths)
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

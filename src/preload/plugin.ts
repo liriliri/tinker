@@ -2,6 +2,7 @@ import { contextBridge } from 'electron'
 import mainObj from './main'
 import {
   IpcGetAttachedPlugin,
+  IpcGetClipboardFilePaths,
   IpcShowPluginContextMenu,
   IPlugin,
 } from 'common/types'
@@ -47,6 +48,9 @@ const tinkerObj = {
   showSaveDialog: mainObj.showSaveDialog,
   showPluginContextMenu: invoke<IpcShowPluginContextMenu>(
     'showPluginContextMenu'
+  ),
+  getClipboardFilePaths: invoke<IpcGetClipboardFilePaths>(
+    'getClipboardFilePaths'
   ),
   showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
