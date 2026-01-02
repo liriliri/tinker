@@ -1,6 +1,6 @@
 # Shared Components and Utilities
 
-This directory contains shared components, utility classes, and Hooks for the Tinker plugin system.
+This directory contains shared components, utility classes, and hooks for the Tinker plugin system.
 
 ## Directory Structure
 
@@ -9,20 +9,18 @@ share/
 ├── BaseStore.ts         # MobX Store base class
 ├── theme.ts             # Unified theme configuration
 ├── components/          # Shared UI components
+│   ├── Alert.tsx
+│   ├── Checkbox.tsx
+│   ├── Confirm.tsx
+│   ├── Dialog.tsx
+│   ├── ImageOpen.tsx
+│   ├── Prompt.tsx
+│   ├── Select.tsx
 │   ├── Toolbar.tsx
 │   ├── ToolbarButton.tsx
-│   ├── Alert.tsx
-│   ├── Confirm.tsx
-│   ├── Prompt.tsx
-│   ├── Dialog.tsx
-│   ├── Select.tsx
-│   ├── Checkbox.tsx
-│   ├── ImageOpen.tsx
 │   └── Tooltip.tsx
-├── hooks/               # Shared React Hooks
-│   └── useCopyToClipboard.ts
-└── README.md           # This document
-
+└── hooks/               # Shared React Hooks
+    └── useCopyToClipboard.ts
 ```
 
 ## Theme Configuration
@@ -62,11 +60,15 @@ import { tw, THEME_COLORS } from 'share/theme'
 
 #### Primary Colors
 ```typescript
-tw.primary.bg           // bg-[#0fc25e] - Primary green background
-tw.primary.bgHover      // hover:bg-[#0da84f] - Primary hover state
-tw.primary.text         // text-[#0fc25e] - Primary text color
-tw.primary.border       // border-[#0fc25e] - Primary border color
-tw.primary.focusBorder  // focus:border-[#0fc25e] - Primary focus border
+tw.primary.bg              // bg-[#0fc25e] - Primary green background
+tw.primary.bgHover         // hover:bg-[#0da84f] - Primary hover state
+tw.primary.text            // text-[#0fc25e] - Primary text color
+tw.primary.border          // border-[#0fc25e] - Primary border color
+tw.primary.hoverBorder     // hover:border-[#0fc25e] - Primary hover border
+tw.primary.focusBorder     // focus:border-[#0fc25e] - Primary focus border
+tw.primary.focusRing       // focus:ring-[#0fc25e] - Primary focus ring
+tw.primary.checkedBg       // group-data-[checked]:bg-[#0fc25e] - Checked background
+tw.primary.checkedBorder   // group-data-[checked]:border-[#0fc25e] - Checked border
 ```
 
 #### Background Colors
@@ -74,10 +76,7 @@ tw.primary.focusBorder  // focus:border-[#0fc25e] - Primary focus border
 // Light mode
 tw.bg.light.primary     // bg-white
 tw.bg.light.secondary   // bg-[#f0f1f2]
-tw.bg.light.tertiary    // bg-[#f3e5f5]
 tw.bg.light.input       // bg-white
-tw.bg.light.select      // bg-white
-tw.bg.light.code        // bg-[#252526]
 
 // Dark mode
 tw.bg.dark.primary      // dark:bg-[#1e1e1e]
@@ -85,27 +84,32 @@ tw.bg.dark.secondary    // dark:bg-[#303133]
 tw.bg.dark.tertiary     // dark:bg-[#252526]
 tw.bg.dark.input        // dark:bg-[#2d2d2d]
 tw.bg.dark.select       // dark:bg-[#3e3e42]
-tw.bg.dark.code         // dark:bg-[#252526]
 ```
 
-#### Border, Hover and Active States
+#### Border Utilities
 ```typescript
-// Borders - combined light and dark
-tw.border.both          // border-[#e0e0e0] dark:border-[#4a4a4a]
 tw.border.light         // border-[#e0e0e0]
 tw.border.dark          // dark:border-[#4a4a4a]
+tw.border.both          // border-[#e0e0e0] dark:border-[#4a4a4a]
+tw.border.bg            // bg-[#e0e0e0] dark:bg-[#4a4a4a] - For separators using background
+```
 
-// Hover states - combined light and dark
-tw.hover.both           // hover:bg-gray-200 dark:hover:bg-[#3a3a3c]
+#### Hover States
+```typescript
 tw.hover.light          // hover:bg-gray-200
 tw.hover.dark           // dark:hover:bg-[#3a3a3c]
+tw.hover.both           // hover:bg-gray-200 dark:hover:bg-[#3a3a3c]
+```
 
-// Active states - combined light and dark
-tw.active.both          // bg-gray-300 dark:bg-[#4a4a4a]
+#### Active States
+```typescript
 tw.active.light         // bg-gray-300
 tw.active.dark          // dark:bg-[#4a4a4a]
+tw.active.both          // bg-gray-300 dark:bg-[#4a4a4a]
+```
 
-// Text colors
+#### Text Colors
+```typescript
 tw.text.light.primary   // text-gray-800
 tw.text.light.secondary // text-gray-600
 tw.text.light.tertiary  // text-gray-500
@@ -127,21 +131,36 @@ THEME_COLORS.success          // '#0fc25e'
 // Background colors
 THEME_COLORS.bg.light.primary      // '#ffffff'
 THEME_COLORS.bg.light.secondary    // '#f0f1f2'
+THEME_COLORS.bg.light.tertiary     // '#f3e5f5'
+THEME_COLORS.bg.light.input        // '#ffffff'
+THEME_COLORS.bg.light.select       // '#ffffff'
+THEME_COLORS.bg.light.code         // '#252526'
 THEME_COLORS.bg.dark.primary       // '#1e1e1e'
 THEME_COLORS.bg.dark.secondary     // '#303133'
+THEME_COLORS.bg.dark.tertiary      // '#252526'
+THEME_COLORS.bg.dark.input         // '#2d2d2d'
+THEME_COLORS.bg.dark.select        // '#3e3e42'
+THEME_COLORS.bg.dark.code          // '#252526'
 
 // Borders
-THEME_COLORS.border.light     // '#e0e0e0'
-THEME_COLORS.border.dark      // '#4a4a4a'
+THEME_COLORS.border.light          // '#e0e0e0'
+THEME_COLORS.border.dark           // '#4a4a4a'
 
 // Hover states
-THEME_COLORS.hover.light      // '#e5e5e5'
-THEME_COLORS.hover.dark       // '#3a3a3c'
+THEME_COLORS.hover.light           // '#e5e5e5'
+THEME_COLORS.hover.dark            // '#3a3a3c'
+
+// Active states
+THEME_COLORS.active.light          // '#d5d5d5'
+THEME_COLORS.active.dark           // '#4a4a4a'
 
 // Text colors
 THEME_COLORS.text.light.primary    // '#000000'
+THEME_COLORS.text.light.secondary  // '#6b7280'
+THEME_COLORS.text.light.tertiary   // '#9ca3af'
 THEME_COLORS.text.dark.primary     // '#d4d4d4'
-// ... and more
+THEME_COLORS.text.dark.secondary   // '#9ca3af'
+THEME_COLORS.text.dark.tertiary    // '#6b7280'
 ```
 
 ### Common Usage Patterns
@@ -187,35 +206,33 @@ import { Copy, Check } from 'lucide-react'
 />
 ```
 
-### Migration from Hardcoded Colors
+### Migration Guidelines
 
-When updating existing code, replace hardcoded colors with theme utilities:
+When updating existing code, always use theme utilities instead of hardcoded colors:
 
-**Don't hardcode colors**:
 ```typescript
+// ❌ Bad - hardcoded colors
 <button className="bg-[#0fc25e] hover:bg-[#0da84f]">
 <div className="border-[#e0e0e0] dark:border-[#4a4a4a]">
 <span className={copied ? 'text-[#0fc25e]' : ''}>
-```
 
-**Use theme utilities**:
-```typescript
+// ✅ Good - theme utilities
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
-<div className={tw.border.both}>
+<div className={`border ${tw.border.both}`}>
 <span className={copied ? tw.primary.text : ''}>
 ```
 
-### Advanced: CSS Variables
+### CSS Variables (Advanced)
 
-For non-Tailwind scenarios, you can apply theme as CSS variables:
+For integration with third-party libraries or complex custom styling:
 
 ```typescript
 import { applyThemeVariables } from 'share/theme'
 
-// Call once when theme changes
+// Apply theme as CSS variables
 applyThemeVariables()
 
-// Then use in CSS
+// Use in CSS
 .custom-element {
   background: var(--theme-bg-primary);
   border-color: var(--theme-border);
@@ -223,12 +240,7 @@ applyThemeVariables()
 }
 ```
 
-**Note**: Most plugins should use Tailwind utilities. CSS variables are only needed for third-party libraries or complex custom styling.
-
-### References
-
-- Full implementation: `share/theme.ts`
-- Usage examples: `tinker-code-image/src/components/Toolbar.tsx`, `tinker-hosts/src/renderer/components/Sidebar.tsx`
+**Note**: Most plugins should use Tailwind utilities (`tw.*`). CSS variables are only needed for special cases.
 
 ## BaseStore
 
@@ -237,76 +249,51 @@ All plugin Stores must extend `BaseStore`, which provides theme management funct
 ### Basic Usage
 
 ```typescript
-// src/store.ts
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
-const storage = new LocalStore('tinker-plugin-name')
-const STORAGE_KEY = 'data'
-
 class Store extends BaseStore {
-  // State properties
-  someValue: string = ''
+  input: string = ''
+  uppercase: boolean = false
 
   constructor() {
-    super() // Call parent constructor (initialize theme)
-    makeAutoObservable(this) // Must explicitly call in subclass
-    this.loadFromStorage() // Load persisted data
+    super() // Initialize BaseStore (theme management)
+    makeAutoObservable(this) // Enable MobX reactivity
   }
 
-  // Computed properties (use getter)
+  // Computed property
   get isEmpty() {
-    return this.someValue.length === 0
+    return this.input.length === 0
   }
 
-  // Actions (methods that modify state)
-  setSomeValue(value: string) {
-    this.someValue = value
-    storage.set(STORAGE_KEY, value) // Persist
+  // Actions
+  setInput(value: string) {
+    this.input = value
   }
 
-  private loadFromStorage() {
-    const saved = storage.get(STORAGE_KEY)
-    if (saved) {
-      this.someValue = saved
-    }
+  setUppercase(value: boolean) {
+    this.uppercase = value
   }
 }
 
-// Singleton export
-export default new Store()
+const store = new Store()
+export default store
 ```
-
-Reference: `tinker-json-editor/src/store.ts:16-178`
 
 ### Key Rules
 
-1. **Must extend BaseStore**: Provides theme management and auto-listening
-2. **Explicitly call makeAutoObservable**: Call in subclass constructor
-3. **Call super() first**: Initialize theme management from BaseStore
-4. **Singleton export**: `export default new Store()`
-5. **Use getter for computed properties**: MobX automatically tracks dependencies
-6. **Use LocalStore for persistence**: From licia library
+1. **Extend BaseStore**: All stores must extend `BaseStore` for theme management
+2. **Call super() first**: Initialize BaseStore in constructor before other code
+3. **Call makeAutoObservable()**: Enable MobX reactivity in subclass constructor
+4. **Singleton pattern**: Export a single instance (`export default new Store()`)
+5. **Use getters for computed properties**: MobX automatically tracks dependencies
 
 ### Theme Access
 
-BaseStore provides a reactive `isDark` property:
+BaseStore provides `isDark` property that automatically updates when the theme changes:
 
 ```typescript
-class Store extends BaseStore {
-  constructor() {
-    super()
-    makeAutoObservable(this)
-  }
-
-  // Access theme state
-  get currentTheme() {
-    return this.isDark ? 'dark' : 'light'
-  }
-}
-
-// In components (with observer)
+// In components with observer
 const MyComponent = observer(() => {
   return (
     <div>
@@ -316,79 +303,64 @@ const MyComponent = observer(() => {
 })
 ```
 
-BaseStore automatically listens to Tinker's `changeTheme` event and updates `isDark` accordingly.
+BaseStore listens to Tinker's `changeTheme` event and updates `isDark` automatically.
 
-### Store Method Naming Conventions
+## Component Patterns
 
-Follow these naming patterns for store methods:
+### Observer Wrapper
 
-- `set*`: Directly set state (`setContent`, `setMode`)
-- `toggle*`: Toggle boolean values (`toggleDarkMode`)
-- `load*`: Load data from external sources (`loadFromFile`)
-- `save*`: Save to external sources (`saveToFile`)
-- `update*`: Update complex state (`updateUndoRedoState`)
-
-## Component Design Patterns
-
-### Observer Pattern
-
-Only components that read from or react to store state need the `observer` wrapper. Pure presentation components without store access don't need it.
+Use `observer` only for components that access store state:
 
 ```typescript
 import { observer } from 'mobx-react-lite'
 
-// Component that uses store - needs observer
+// ✅ Needs observer - reads from store
 const Counter = observer(() => {
   return <div>Count: {store.count}</div>
 })
 
-// Pure component - no observer needed
+// ✅ No observer needed - pure component
 const Button = ({ onClick, children }) => {
   return <button onClick={onClick}>{children}</button>
 }
 ```
 
-### Component Props
+### Props Interface
 
-Always define props using interfaces:
+Always define component props with TypeScript interfaces:
 
 ```typescript
-interface ComponentProps {
+interface MyComponentProps {
   value: string
   onChange: (value: string) => void
-  disabled?: boolean // Optional property
+  disabled?: boolean // Optional
 }
 
-export default observer(function Component({
+export default observer(function MyComponent({
   value,
   onChange,
-  disabled = false // Default value
-}: ComponentProps) {
-  // Component implementation
+  disabled = false
+}: MyComponentProps) {
+  // ...
 })
 ```
 
 ## Shared Components
 
-### Toolbar Component
+### Toolbar
 
-Toolbar component that provides consistent toolbar styling.
+Provides consistent toolbar styling across plugins.
 
 ```typescript
-import {
-  Toolbar,
-  ToolbarSeparator,
-  ToolbarSpacer,
-  TOOLBAR_ICON_SIZE,
-} from 'share/components/Toolbar'
+import { Toolbar, ToolbarSeparator, ToolbarSpacer, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { FileText, Copy, Trash } from 'lucide-react'
+import { Copy, Trash } from 'lucide-react'
 
 export default observer(function MyToolbar() {
   return (
     <Toolbar>
-      <ToolbarButton onClick={handleAction}>
-        <FileText size={TOOLBAR_ICON_SIZE} />
+      <ToolbarButton onClick={handleCopy}>
+        <Copy size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSeparator />
@@ -398,7 +370,7 @@ export default observer(function MyToolbar() {
         active={store.isActive}
         onClick={() => store.toggleActive()}
       >
-        <Copy size={TOOLBAR_ICON_SIZE} />
+        Toggle
       </ToolbarButton>
 
       <ToolbarSpacer />
@@ -411,20 +383,18 @@ export default observer(function MyToolbar() {
 })
 ```
 
-**Component Description**:
-- `Toolbar`: Toolbar container
-- `ToolbarButton`: Toolbar button, supports `variant="toggle"` for toggle style
-- `ToolbarSeparator`: Separator line
-- `ToolbarSpacer`: Flexible space to push subsequent buttons to the right
-- `TOOLBAR_ICON_SIZE`: Standard icon size (14)
+**Components**:
+- `Toolbar`: Container
+- `ToolbarButton`: Button (supports `variant="toggle"` and `active` prop)
+- `ToolbarSeparator`: Vertical separator line
+- `ToolbarSpacer`: Flexible space (pushes following buttons to the right)
+- `TOOLBAR_ICON_SIZE`: Standard icon size constant (14)
 
-### Dialog, Alert, Confirm, Prompt
-
-Dialog components for user interaction.
+### Dialog Components
 
 #### Alert
 
-Display informational messages:
+Display messages to users:
 
 ```typescript
 import { alert } from 'share/components/Alert'
@@ -437,7 +407,7 @@ await alert({
 
 #### Confirm
 
-Confirmation dialog:
+Ask for user confirmation:
 
 ```typescript
 import { confirm } from 'share/components/Confirm'
@@ -454,7 +424,7 @@ if (result) {
 
 #### Prompt
 
-Input dialog:
+Get text input from user:
 
 ```typescript
 import { prompt } from 'share/components/Prompt'
@@ -465,23 +435,23 @@ const value = await prompt({
 })
 
 if (value !== null) {
-  // User entered content
+  // User entered value
 }
 ```
 
-**Important**: Must wrap with Providers in App.tsx:
+**Required Setup**: Wrap your app with providers in `App.tsx`:
 
 ```typescript
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 
-const App = observer(() => {
+export default observer(function App() {
   return (
     <AlertProvider>
       <ConfirmProvider>
         <PromptProvider>
-          {/* Your app content */}
+          {/* Your content */}
         </PromptProvider>
       </ConfirmProvider>
     </AlertProvider>
@@ -491,7 +461,7 @@ const App = observer(() => {
 
 ### Select
 
-Dropdown select component:
+Dropdown select:
 
 ```typescript
 import Select, { SelectOption } from 'share/components/Select'
@@ -510,7 +480,7 @@ const options: SelectOption[] = [
 
 ### Checkbox
 
-Checkbox component:
+Checkbox with label:
 
 ```typescript
 import Checkbox from 'share/components/Checkbox'
@@ -524,7 +494,7 @@ import Checkbox from 'share/components/Checkbox'
 
 ### ImageOpen
 
-Image open component for selecting/opening local image files:
+File drop zone for opening images:
 
 ```typescript
 import ImageOpen from 'share/components/ImageOpen'
@@ -538,48 +508,37 @@ import ImageOpen from 'share/components/ImageOpen'
 
 ### Tooltip
 
-A smart tooltip component that automatically adjusts its position to stay within the viewport.
+Smart tooltip with automatic viewport-aware positioning:
 
 ```typescript
 import Tooltip from 'share/components/Tooltip'
 import { useState } from 'react'
 
 const MyComponent = () => {
-  const [tooltip, setTooltip] = useState({
-    visible: false,
-    x: 0,
-    y: 0,
-  })
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 })
 
   const handleMouseEnter = (event: React.MouseEvent) => {
     setTooltip({
       visible: true,
       x: event.clientX,
-      y: event.clientY + 20, // Position below cursor
+      y: event.clientY + 20,
     })
   }
 
   const handleMouseLeave = () => {
-    setTooltip({
-      visible: false,
-      x: 0,
-      y: 0,
-    })
+    setTooltip({ visible: false, x: 0, y: 0 })
   }
 
   return (
     <>
-      <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         Hover me
       </div>
       <Tooltip
         visible={tooltip.visible}
         x={tooltip.x}
         y={tooltip.y}
-        content="This is a helpful tooltip"
+        content="Helpful tooltip"
       />
     </>
   )
@@ -587,89 +546,21 @@ const MyComponent = () => {
 ```
 
 **Props**:
-- `content`: `ReactNode` - Content to display (supports text, JSX, or HTML)
-- `x`: `number` - X coordinate for tooltip position
-- `y`: `number` - Y coordinate for tooltip position
-- `visible`: `boolean` - Whether the tooltip is visible
+- `content`: React content (text, JSX, or HTML)
+- `x`, `y`: Position coordinates
+- `visible`: Visibility toggle
 
 **Features**:
-- Automatically adjusts position to stay within viewport
-- Supports any React content (text, JSX, HTML)
-- Built-in dark mode styling
-- Smooth fade-in animation
-- Configurable position with viewport boundary detection
-
-**Usage Example** (with JSX content):
-
-```typescript
-const [hoverItem, setHoverItem] = useState<Item | null>(null)
-const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 })
-
-const handleItemHover = (item: Item, event: React.MouseEvent) => {
-  setHoverItem(item)
-  setTooltip({
-    visible: true,
-    x: event.clientX,
-    y: event.clientY + 10,
-  })
-}
-
-return (
-  <Tooltip
-    visible={tooltip.visible}
-    x={tooltip.x}
-    y={tooltip.y}
-    content={
-      hoverItem && (
-        <div>
-          <strong>{hoverItem.name}</strong>
-          <div className="text-xs">{hoverItem.description}</div>
-        </div>
-      )
-    }
-  />
-)
-```
-
-**Usage Example** (with HTML content):
-
-```typescript
-const [tooltip, setTooltip] = useState({
-  htmlContent: null,
-  visible: false,
-  x: 0,
-  y: 0,
-})
-
-const handleTokenHover = (token: Token, event: MouseEvent) => {
-  const htmlContent = `<strong>${token.type}</strong><br/>${token.description}`
-  setTooltip({
-    htmlContent,
-    visible: true,
-    x: event.clientX,
-    y: event.clientY + 20,
-  })
-}
-
-return (
-  <Tooltip
-    visible={tooltip.visible}
-    x={tooltip.x}
-    y={tooltip.y}
-    content={
-      tooltip.htmlContent && (
-        <div dangerouslySetInnerHTML={{ __html: tooltip.htmlContent }} />
-      )
-    }
-  />
-)
-```
+- Auto-adjusts to stay within viewport
+- Supports any React content
+- Dark mode support
+- Fade-in animation
 
 ## Shared Hooks
 
 ### useCopyToClipboard
 
-A hook for handling clipboard copy operations with visual feedback.
+Clipboard copy with visual feedback:
 
 ```typescript
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
@@ -679,13 +570,9 @@ import { tw } from 'share/theme'
 const MyComponent = () => {
   const { copied, copyToClipboard } = useCopyToClipboard()
 
-  const handleCopy = async () => {
-    await copyToClipboard('text to copy')
-  }
-
   return (
     <button
-      onClick={handleCopy}
+      onClick={() => copyToClipboard('text to copy')}
       className={copied ? tw.primary.text : ''}
     >
       {copied ? <Check /> : <Copy />}
@@ -694,45 +581,34 @@ const MyComponent = () => {
 }
 ```
 
-The hook automatically resets the `copied` state after 2 seconds.
+Auto-resets `copied` state after 2 seconds.
 
 ## Best Practices
 
-### Performance Optimization
+### Performance
 
-1. **Use MobX computed properties** to cache calculation results:
+Use computed properties for cached calculations:
+
 ```typescript
 class Store extends BaseStore {
   items: Item[] = []
 
-  // Computed property - cached until dependencies change
-  get itemCount() {
-    return this.items.length
-  }
-
-  get expensiveCalculation() {
-    return this.items.reduce((sum, item) => sum + item.value, 0)
-  }
-}
-```
-
-2. **Avoid creating new objects/arrays in render**:
-```typescript
-// Bad - creates new array every render
-<Component items={store.items.filter(x => x.active)} />
-
-// Good - use computed property
-class Store extends BaseStore {
+  // Cached until dependencies change
   get activeItems() {
     return this.items.filter(x => x.active)
   }
 }
+
+// ✅ Good - uses computed property
 <Component items={store.activeItems} />
+
+// ❌ Bad - creates new array every render
+<Component items={store.items.filter(x => x.active)} />
 ```
 
 ### Error Handling
 
-Use try-catch for async operations and show user-friendly error messages:
+Always handle errors in async operations:
 
 ```typescript
 import { alert } from 'share/components/Alert'
@@ -741,10 +617,10 @@ async function handleSave() {
   try {
     await store.saveToFile()
   } catch (error) {
-    console.error('Failed to save:', error)
+    console.error('Save failed:', error)
     await alert({
       title: 'Save Failed',
-      message: 'Could not save the file. Please try again.'
+      message: 'Could not save file. Please try again.'
     })
   }
 }
@@ -752,25 +628,16 @@ async function handleSave() {
 
 ### Type Safety
 
-1. Avoid using `any` - use proper types
-2. Use union types for string literals: `type Mode = 'text' | 'tree'`
-3. Always define interfaces for component props
-4. Leverage TypeScript's type inference when possible
+1. Avoid `any` - use proper types
+2. Use union types: `type Mode = 'text' | 'tree'`
+3. Define interfaces for component props
+4. Leverage TypeScript inference
 
-## Usage Instructions
+## Quick Reference
 
-1. **Import Path**: Use `share/` as the import path prefix
-2. **Theme**: Always import and use `tw` or `THEME_COLORS` from `share/theme` instead of hardcoding colors
-3. **BaseStore**: All stores must extend BaseStore and call super() in constructor
-4. **Observer**: Only wrap components that read from store with observer
-5. **Type Definitions**: Most components export corresponding Props types
-6. **Styling**: Components have built-in dark mode support
-7. **Reference Implementation**: See existing plugins like `tinker-json-editor`, `tinker-code-image` for usage examples
-
-## Maintenance
-
-**Important**: When adding or updating components, utilities, or patterns in `plugins/share`, you must:
-1. Update this README.md with complete documentation
-2. Add usage examples
-3. Document any breaking changes
-4. Test across multiple plugins to ensure compatibility
+- **Import path**: Use `share/` prefix (e.g., `import { tw } from 'share/theme'`)
+- **Theme**: Always use `tw` or `THEME_COLORS` from `share/theme` - never hardcode colors
+- **BaseStore**: All stores must extend `BaseStore` and call `super()` first
+- **Observer**: Only wrap components that access store state
+- **Dark mode**: All components support dark mode automatically
+- **Examples**: See `tinker-hash`, `tinker-hex-editor` for reference implementations
