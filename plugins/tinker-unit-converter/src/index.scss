@@ -1,0 +1,14 @@
+@use 'tailwindcss';
+@config "../tailwind.config.js";
+
+/* Toast colors from share/theme.ts - THEME_COLORS.toast */
+:root {
+  --toast-bg: #ffffff;
+  --toast-text: #333333;
+}
+
+html.dark {
+  color-scheme: dark;
+  --toast-bg: #333333;
+  --toast-text: #ffffff;
+}

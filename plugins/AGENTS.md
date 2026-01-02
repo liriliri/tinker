@@ -40,6 +40,7 @@ tinker-plugin-name/
 │   ├── store.ts             # MobX Store (extends BaseStore)
 │   ├── index.scss           # Global styles
 │   ├── components/          # Components directory
+│   ├── lib/                 # External libraries and utility functions
 │   ├── i18n/                # Internationalization
 │   │   ├── index.ts
 │   │   └── locales/
@@ -60,6 +61,8 @@ tinker-plugin-name/
 │   └── renderer/            # Same structure as basic plugin
 │       ├── App.tsx
 │       ├── main.tsx
+│       ├── components/
+│       ├── lib/             # External libraries and utility functions
 │       └── ...
 ├── index.html
 ├── package.json
@@ -67,6 +70,17 @@ tinker-plugin-name/
 ```
 
 Reference: `tinker-image-cropper`, `tinker-hosts`, `tinker-markdown-editor`
+
+### Library and Utilities (`lib/` directory)
+
+All external libraries, utility functions, and helper modules **must** be placed in `src/lib/`:
+
+- External library wrappers
+- Utility functions and helpers
+- Business logic and algorithms
+- Shared constants and configurations
+
+Use `src/lib/`, not `src/utils/` or `src/helpers/`.
 
 ## Naming Conventions
 
