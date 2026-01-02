@@ -39,3 +39,35 @@ export function calculateAllHashes(
     sha512: calculateHash('sha512', input),
   }
 }
+
+export async function calculateFileHashes(
+  file: File
+): Promise<Record<HashAlgorithm, string>> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      try {
+        const arrayBuffer = e.target?.result as ArrayBuffer
+        const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer)
+
+        const results = {
+          md5: CryptoJS.MD5(wordArray).toString(),
+          sha1: CryptoJS.SHA1(wordArray).toString(),
+          sha256: CryptoJS.SHA256(wordArray).toString(),
+          sha512: CryptoJS.SHA512(wordArray).toString(),
+        }
+
+        resolve(results)
+      } catch (error) {
+        reject(error)
+      }
+    }
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'))
+    }
+
+    reader.readAsArrayBuffer(file)
+  })
+}

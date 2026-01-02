@@ -1,11 +1,9 @@
 {
-  "encoding": "编码",
   "inputType": "输入类型",
   "uppercase": "大写",
   "text": "文本",
   "file": "文件",
   "placeholder": "输入要计算哈希的文本...",
-  "utf8": "UTF-8",
-  "base64": "Base64",
-  "hex": "十六进制"
+  "openFile": "点击或拖拽文件到此处",
+  "allFiles": "支持所有文件格式"
 }

@@ -5,13 +5,16 @@ import { tw } from 'share/theme'
 import store from './store'
 import HashResult from './components/HashResult'
 import HashToolbar from './components/Toolbar'
+import FileOpen from './components/FileOpen'
 
 export default observer(function App() {
   const { t } = useTranslation()
 
   return (
     <AlertProvider>
-      <div className="h-screen flex flex-col transition-colors">
+      <div
+        className={`h-screen flex flex-col transition-colors ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+      >
         {/* Toolbar */}
         <HashToolbar />
 
@@ -19,19 +22,27 @@ export default observer(function App() {
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Input */}
           <div className={`w-1/3 flex flex-col ${tw.border.both} border-r`}>
-            <div className="flex-1">
-              <textarea
-                value={store.input}
-                onChange={(e) => store.setInput(e.target.value)}
-                placeholder={t('placeholder')}
-                className={`w-full h-full px-3 py-2 text-sm font-mono ${tw.bg.light.primary} ${tw.bg.dark.secondary} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} rounded resize-none focus:outline-none focus:border-[#0fc25e]`}
+            {store.inputType === 'text' ? (
+              <div className="flex-1">
+                <textarea
+                  value={store.input}
+                  onChange={(e) => store.setInput(e.target.value)}
+                  placeholder={t('placeholder')}
+                  className={`w-full h-full px-3 py-2 text-sm font-mono ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} rounded resize-none focus:outline-none`}
+                />
+              </div>
+            ) : (
+              <FileOpen
+                onOpenFile={(file) => store.handleFileOpen(file)}
+                openTitle={t('openFile')}
+                supportedFormats={t('allFiles')}
               />
-            </div>
+            )}
           </div>
 
           {/* Right Panel - Results */}
           <div
-            className={`flex-1 overflow-y-auto p-6 ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+            className={`flex-1 p-6 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} flex flex-col justify-evenly`}
           >
             <HashResult label="md5" value={store.hashResults.md5} />
             <HashResult label="sha1" value={store.hashResults.sha1} />

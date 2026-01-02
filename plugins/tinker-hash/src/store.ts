@@ -1,8 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import { calculateAllHashes, type HashAlgorithm } from './lib/hash'
+import {
+  calculateAllHashes,
+  calculateFileHashes,
+  type HashAlgorithm,
+} from './lib/hash'
 
-type Encoding = 'utf-8' | 'base64' | 'hex'
 type InputType = 'text' | 'file'
 
 class Store extends BaseStore {
@@ -14,7 +17,6 @@ class Store extends BaseStore {
     sha512: '',
   }
   uppercase: boolean = false
-  encoding: Encoding = 'utf-8'
   inputType: InputType = 'text'
 
   constructor() {
@@ -32,13 +34,27 @@ class Store extends BaseStore {
     this.calculateHashes()
   }
 
-  setEncoding(value: Encoding) {
-    this.encoding = value
-    this.calculateHashes()
-  }
-
   setInputType(value: InputType) {
     this.inputType = value
+  }
+
+  async handleFileOpen(file: File) {
+    try {
+      const results = await calculateFileHashes(file)
+
+      if (this.uppercase) {
+        this.hashResults = {
+          md5: results.md5.toUpperCase(),
+          sha1: results.sha1.toUpperCase(),
+          sha256: results.sha256.toUpperCase(),
+          sha512: results.sha512.toUpperCase(),
+        }
+      } else {
+        this.hashResults = results
+      }
+    } catch (error) {
+      console.error('Failed to calculate file hashes:', error)
+    }
   }
 
   calculateHashes() {
