@@ -21,7 +21,7 @@ export default observer(function App() {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Input */}
-          <div className={`w-1/3 flex flex-col ${tw.border.both} border-r`}>
+          <div className={`w-2/5 flex flex-col ${tw.border.both} border-r`}>
             {store.inputType === 'text' ? (
               <div className="flex-1">
                 <textarea
@@ -36,6 +36,7 @@ export default observer(function App() {
                 onOpenFile={(file) => store.handleFileOpen(file)}
                 openTitle={t('openFile')}
                 supportedFormats={t('allFiles')}
+                fileName={store.fileName}
               />
             )}
           </div>

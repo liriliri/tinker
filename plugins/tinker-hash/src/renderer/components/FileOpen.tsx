@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
-import { FileText } from 'lucide-react'
+import { File } from 'lucide-react'
 import { tw } from 'share/theme'
 
 interface FileOpenProps {
   onOpenFile: (file: File) => Promise<void>
   openTitle: string
   supportedFormats: string
+  fileName?: string
 }
 
 const FileOpen: React.FC<FileOpenProps> = ({
   onOpenFile,
   openTitle,
   supportedFormats,
+  fileName,
 }) => {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -79,7 +81,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
       }`}
     >
       <div className="text-center p-8 pointer-events-none">
-        <FileText
+        <File
           className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
           strokeWidth={1.5}
         />
@@ -87,10 +89,10 @@ const FileOpen: React.FC<FileOpenProps> = ({
         <p
           className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}
         >
-          {openTitle}
+          {fileName || openTitle}
         </p>
         <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">
-          {supportedFormats}
+          {fileName ? '' : supportedFormats}
         </p>
       </div>
     </div>

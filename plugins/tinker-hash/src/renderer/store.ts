@@ -18,6 +18,7 @@ class Store extends BaseStore {
   }
   uppercase: boolean = false
   inputType: InputType = 'text'
+  fileName: string = ''
 
   constructor() {
     super()
@@ -40,6 +41,7 @@ class Store extends BaseStore {
 
   async handleFileOpen(file: File) {
     try {
+      this.fileName = file.name
       const results = await calculateFileHashes(file)
 
       if (this.uppercase) {

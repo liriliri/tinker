@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FileText } from 'lucide-react'
+import { File } from 'lucide-react'
 import { tw } from 'share/theme'
 
 interface FileOpenProps {
@@ -48,7 +48,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
       }`}
     >
       <div className="text-center p-8 pointer-events-none">
-        <FileText
+        <File
           className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
           strokeWidth={1.5}
         />

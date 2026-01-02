@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js'
+import * as CryptoJS from 'crypto-js'
 
 export type HashAlgorithm = 'md5' | 'sha1' | 'sha256' | 'sha512'
 
