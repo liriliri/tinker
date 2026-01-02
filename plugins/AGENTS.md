@@ -4,40 +4,22 @@ Guidelines that AI coding assistants must follow when developing code for the Ti
 
 ## Core Constraints
 
-Before starting any development work, you must adhere to the following constraints:
-
 ### 1. No npm Dependency Installation
 
 **AI is absolutely prohibited from installing any npm packages on its own!**
 
-- **Forbidden**: `npm install`, `npm add`, `pnpm add`, `yarn add` commands
-- **Forbidden**: Modifying `dependencies` or `devDependencies` in `package.json`
-- **Must Ask**: If a feature requires a new dependency, you must ask the developer first
-
-**Correct Approach**:
-```
-AI: "Implementing this feature requires the XXX library. May I add the dependency 'package-name'?"
-Developer: [After approval] "Yes"
-AI: Then execute npm install package-name
-```
+- **Forbidden**: `npm install`, `npm add`, `pnpm add`, `yarn add` commands or modifying `package.json` dependencies
+- **Must Ask**: If a feature requires a new dependency, ask the developer first
 
 **Preferred Solutions**:
-- Prioritize using **Licia** utility library (already included in the project)
-- Use existing project dependencies
-- Use native JavaScript/TypeScript APIs
-- Use Web Standard APIs
-
-### 2. Dependency Check Process
-
-Before writing code, choose solutions in the following priority:
-
-1. **Licia Library** - Check if [licia.liriliri.io](https://licia.liriliri.io/) provides the required functionality
-2. **Existing Dependencies** - Check existing dependencies in `package.json`
-3. **Shared Code** - Check if `share/` directory has reusable components or tools
-4. **Native Implementation** - Use native JavaScript/TypeScript APIs
-5. **Ask Developer** - If none of the above works, ask if new dependencies can be introduced
+1. **Licia Library** - Check [licia.liriliri.io](https://licia.liriliri.io/) first (already included)
+2. **Existing Dependencies** - Check `package.json`
+3. **Shared Code** - Check `share/` directory
+4. **Native APIs** - Use JavaScript/TypeScript/Web Standard APIs
+5. **Ask Developer** - Only if none of the above works
 
 ## Tech Stack
+
 * React 18
 * MobX (mobx + mobx-react-lite)
 * TypeScript
@@ -47,11 +29,9 @@ Before writing code, choose solutions in the following priority:
 * i18next (Internationalization)
 * **Licia** (Utility library - preferred)
 
-## Project Structure Conventions
+## Project Structure
 
-### Standard Plugin Directory Structure
-
-**Basic Plugin** (No Node.js API required):
+### Basic Plugin (No Node.js API)
 ```
 tinker-plugin-name/
 ├── src/
@@ -60,31 +40,27 @@ tinker-plugin-name/
 │   ├── store.ts             # MobX Store (extends BaseStore)
 │   ├── index.scss           # Global styles
 │   ├── components/          # Components directory
-│   │   └── ComponentName.tsx
 │   ├── i18n/                # Internationalization
 │   │   ├── index.ts
 │   │   └── locales/
 │   │       ├── en-US.json
 │   │       └── zh-CN.json
-│   └── assets/              # Static assets (SVG icons, etc.)
-├── index.html               # HTML entry
-├── package.json             # Plugin configuration
-└── icon.png                 # Plugin icon (required)
+│   └── assets/              # Static assets
+├── index.html
+├── package.json
+└── icon.png                 # Required
 ```
 
-**Advanced Plugin** (Requires Node.js API like filesystem):
+### Advanced Plugin (With Node.js API)
 ```
 tinker-plugin-name/
 ├── src/
 │   ├── preload/             # Electron Preload scripts
 │   │   └── index.ts         # Expose secure Node.js APIs
-│   └── renderer/            # Renderer process code
+│   └── renderer/            # Same structure as basic plugin
 │       ├── App.tsx
 │       ├── main.tsx
-│       ├── store.ts
-│       ├── components/
-│       ├── i18n/
-│       └── assets/
+│       └── ...
 ├── index.html
 ├── package.json
 └── icon.png
@@ -94,26 +70,21 @@ Reference: `tinker-image-cropper`, `tinker-hosts`, `tinker-markdown-editor`
 
 ## Naming Conventions
 
-### File and Directory Naming
 - **Plugin Name**: kebab-case (`tinker-json-editor`, `tinker-code-image`)
-- **Component Files**: PascalCase (`TextEditor.tsx`, `Toolbar.tsx`, `Frame.tsx`)
+- **Component Files**: PascalCase (`TextEditor.tsx`, `Toolbar.tsx`)
 - **Store File**: `store.ts` (lowercase)
 - **Style File**: `index.scss`
-- **i18n Files**: `index.ts` and `locales/en-US.json`, `locales/zh-CN.json`
-
-### Code Naming
 - **Components**: PascalCase (`const Frame = observer(() => {...})`)
 - **Functions/Variables**: camelCase (`setJsonInput`, `isDark`)
 - **Constants**: UPPER_SNAKE_CASE (`const STORAGE_KEY = 'content'`)
 - **Types/Interfaces**: PascalCase (`type EditorMode = 'text' | 'tree'`)
 
-## State Management - MobX Pattern
+## State Management - MobX
 
-### BaseStore Inheritance
+### BaseStore Pattern
 
-All plugin Stores must extend `share/BaseStore`, which provides theme management functionality.
+All plugin Stores **must extend** `share/BaseStore` for automatic theme management.
 
-**Quick Example**:
 ```typescript
 import BaseStore from 'share/BaseStore'
 import { makeAutoObservable } from 'mobx'
@@ -129,14 +100,14 @@ export default new Store()
 ```
 
 **Key Requirements**:
-- Must extend `BaseStore`
+- Extend `BaseStore`
 - Call `super()` in constructor
-- Call `makeAutoObservable(this)` explicitly
+- Call `makeAutoObservable(this)`
 - Export as singleton
 
-**Detailed Documentation**: See `share/README.md` for complete BaseStore usage, store method naming conventions, and persistence patterns
+**More details**: See `share/README.md` for store method naming conventions and persistence patterns.
 
-## Component Design Patterns
+## Component Patterns
 
 ### Entry File Template
 
@@ -147,31 +118,24 @@ import { createRoot } from 'react-dom/client'
 import './index.scss'
 import i18n from './i18n'
 
-function renderApp() {
-  const container = document.getElementById('app') as HTMLElement
-  createRoot(container).render(<App />)
-}
-
 ;(async function () {
-  // Get user language setting from tinker API
   const language = await tinker.getLanguage()
   i18n.changeLanguage(language)
 
-  renderApp()
+  const container = document.getElementById('app') as HTMLElement
+  createRoot(container).render(<App />)
 })()
 ```
 
-### Component Writing Rules
-1. **Components that access store use observer**: `const Component = observer(() => {...})`
-2. **Read state from store**: `store.property`
-3. **Call store actions**: `store.action(value)`
-4. **Props definition**: Use interface
+### Component Rules
 
-**Detailed Patterns**: See `share/README.md` for observer usage and component props patterns
+1. **Use observer for components accessing store**: `const Component = observer(() => {...})`
+2. **Props must have interface definitions**
+3. **Avoid creating new objects/arrays in render**
 
-## Shared Resources (`share/` directory)
+See `share/README.md` for detailed component patterns.
 
-The `share/` directory provides reusable components, utilities, and base classes.
+## Shared Resources (`share/`)
 
 **Available Resources**:
 - **BaseStore** - MobX Store base class with theme management
@@ -179,57 +143,42 @@ The `share/` directory provides reusable components, utilities, and base classes
 - **Components**: Toolbar, Dialog, Alert, Confirm, Prompt, Select, Checkbox, ImageUpload
 - **Hooks**: useCopyToClipboard
 
-**Complete Documentation**: See `share/README.md` for detailed usage of all shared resources
+**Complete Documentation**: See `share/README.md`
 
-**Important**: When adding or updating components/tools in `plugins/share`, you must synchronously update `share/README.md`
+**Important**: When updating `share/`, synchronously update `share/README.md`
 
-## Tailwind CSS Style Conventions
+## Tailwind CSS & Theme
 
-### Theme Configuration
+### Use Unified Theme
 
-**All plugins must use the unified theme configuration from `share/theme.ts`**.
+**Always use theme utilities from `share/theme.ts`**. Never hardcode colors.
 
-**Quick Example**:
 ```typescript
 import { tw, THEME_COLORS } from 'share/theme'
 
-// Use predefined utilities
+// Correct
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
 <div className={tw.border.both}>
-<span className={copied ? tw.primary.text : ''}>
+
+// Wrong - don't hardcode colors
+<button className="bg-[#0fc25e]">
+<div className="border-[#e0e0e0]">
 ```
 
-**Key Rules**:
-- **Never hardcode colors**: `bg-[#0fc25e]`, `border-[#e0e0e0]`
-- **Always use theme utilities**: `tw.primary.bg`, `tw.border.both`
-- Support both light and dark modes using `tw.*` utilities
-- Use `THEME_COLORS.*` for inline styles when needed
-
-**Complete Documentation**: See `share/README.md` for:
-- Complete API reference of all available utilities
-- Common usage patterns (buttons, inputs, lists, etc.)
-- Migration guide from hardcoded colors
-- Color constants reference
-
 ### Layout Patterns
-```tsx
-import { tw } from 'share/theme'
 
+```tsx
 // Full-screen layout with Toolbar
 <div className="h-screen flex flex-col">
-  <Toolbar /> {/* Fixed height */}
-  <div className="flex-1 overflow-hidden"> {/* Takes remaining space */}
+  <Toolbar />
+  <div className="flex-1 overflow-hidden">
     {/* Main content */}
   </div>
-</div>
-
-// Responsive layout with theme colors
-<div className={`${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
-  Content with theme-aware background
 </div>
 ```
 
 ### Style File Structure
+
 ```scss
 // src/index.scss
 @use 'tailwindcss';
@@ -239,55 +188,47 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Third-party library style overrides */
-/* Use theme colors for consistency */
+/* Only use SCSS for third-party library overrides */
 .custom-library {
-  /* Light mode */
   background: white;
 
-  /* Dark mode */
   :is(.dark *) & {
-    background: #1e1e1e; // Match tw.bg.dark.primary
+    background: #1e1e1e;
   }
 }
 ```
 
-**Note**: For custom styles, prefer using Tailwind utilities. Only use SCSS for third-party library overrides or complex selectors.
+**Complete theme API**: See `share/README.md`
 
-## TypeScript Conventions
+## TypeScript
 
 ### Type Definitions
 
-**Local types** (defined in store.ts or component):
 ```typescript
+// Local types (in store.ts or component)
 type EditorMode = 'text' | 'tree'
 interface DiffStats { additions: number; deletions: number }
-```
 
-**Global types**: Tinker API types are defined in `tinker.d.ts`
-
-### Component Props Interface
-```typescript
+// Component Props
 interface ComponentProps {
   value: string
   onChange: (value: string) => void
-  disabled?: boolean // Optional property
+  disabled?: boolean
 }
 
 export default observer(function Component({
   value,
   onChange,
-  disabled = false // Default value
+  disabled = false
 }: ComponentProps) {
   // ...
 })
 ```
 
+**Global types**: See `tinker.d.ts` for Tinker API types
+
 ## Internationalization (i18n)
 
-Use i18next for internationalization, supporting `en-US` and `zh-CN`.
-
-### Basic Usage
 ```typescript
 import { useTranslation } from 'react-i18next'
 
@@ -296,46 +237,32 @@ t('format')  // Translate key
 t('lines', { count: 5 })  // With parameters
 ```
 
-**Configuration**: `src/i18n/index.ts`, Translation files: `src/i18n/locales/{en-US,zh-CN}.json`
+**Files**: `src/i18n/index.ts`, `src/i18n/locales/{en-US,zh-CN}.json`
 
 ## Persistent Storage
 
-Use `licia/LocalStore` for data persistence. See MobX Store pattern section for complete examples.
+Use `licia/LocalStore` for data persistence.
 
 Reference: `tinker-json-editor/src/store.ts:14,64-70,73-74`
 
 ## Icons and Assets
 
-### Lucide React Icon Library
+### Lucide React Icons
+
 ```typescript
-import {
-  FileText,
-  Copy,
-  Trash,
-  Download,
-  Upload,
-  Settings,
-  Check,
-  X
-} from 'lucide-react'
+import { FileText, Copy, Download } from 'lucide-react'
 
 <FileText size={14} />
-<Copy size={TOOLBAR_ICON_SIZE} className="text-gray-600 dark:text-gray-300" />
+<Copy size={14} className="text-gray-600 dark:text-gray-300" />
 ```
 
-**Common icon size**: `TOOLBAR_ICON_SIZE = 14`
-
 ### Custom SVG Icons
-Use `vite-plugin-svgr` to import SVG as React components:
 
 ```typescript
-// src/assets/custom-icon.svg
 import CustomIcon from '../assets/custom-icon.svg?react'
 
 <CustomIcon width={16} height={16} className="fill-current" />
 ```
-
-Configuration is included in `vite.config.ts`.
 
 ## Preload Scripts (Advanced Plugins)
 
@@ -345,9 +272,7 @@ Use when Node.js API access is needed:
 // src/preload/index.ts
 import { contextBridge } from 'electron'
 import * as fs from 'fs'
-import * as path from 'path'
 
-// Define API object with all methods
 const pluginAPI = {
   async readFile(filePath: string): Promise<Buffer> {
     return fs.promises.readFile(filePath)
@@ -357,20 +282,18 @@ const pluginAPI = {
   },
 }
 
-// Expose to renderer process
 contextBridge.exposeInMainWorld('pluginAPI', pluginAPI)
 
-// Declare global type for TypeScript
 declare global {
   const pluginAPI: typeof pluginAPI
 }
 ```
 
-**Type Usage in Renderer**:
+**Important**: The global `tinker` object is also accessible in preload scripts, allowing you to use tinker APIs like `getTheme()`, `showOpenDialog()`, etc.
+
+**Usage in Renderer**:
 ```typescript
-// src/renderer/App.tsx or other files
-// Direct access to global API (no window. prefix needed)
-const fileName = pluginAPI.getFileName('/path/to/file')
+// Direct access (no window. prefix)
 const content = await pluginAPI.readFile('/path/to/file')
 ```
 
@@ -378,15 +301,14 @@ Reference: `tinker-hosts/src/preload/index.ts:16-129`
 
 ## Package.json Configuration
 
-### Required Fields
 ```json
 {
   "name": "tinker-plugin-name",
   "tinker": {
     "name": "Plugin Name",
     "icon": "icon.png",
-    "main": "dist/index.html",  // Basic plugin
-    "preload": "dist/preload/index.js",  // Advanced plugin (optional)
+    "main": "dist/index.html",
+    "preload": "dist/preload/index.js",  // Optional (advanced plugin)
     "locales": {
       "zh-CN": { "name": "插件名称" }
     }
@@ -394,11 +316,9 @@ Reference: `tinker-hosts/src/preload/index.ts:16-129`
 }
 ```
 
-Reference existing plugin `package.json` configurations.
-
 ## Tinker API
 
-Tinker provides global `tinker` object to access system features.
+Global `tinker` object provides system features.
 
 **Available APIs**:
 - `getTheme()` / `getLanguage()` - Get theme and language settings
@@ -407,63 +327,39 @@ Tinker provides global `tinker` object to access system features.
 - `showContextMenu()` - Show context menu
 - `on()` - Event listener (theme/language changes)
 
-**Detailed Documentation**: See TypeScript definitions and examples in `tinker.d.ts`
+**Access Scope**:
+- Renderer Process: `tinker.*`
+- Preload Scripts: `tinker.*`
 
-**Note**: BaseStore automatically handles theme management, no need to manually listen to `changeTheme` events
+**Details**: See `tinker.d.ts`
 
-## Coding Best Practices
+**Note**: BaseStore automatically handles theme management
 
-### 1. Single Responsibility Components
-Each component is responsible for one functional module. Break complex features into multiple sub-components.
+## Best Practices
 
-### 2. Follow Naming Conventions
-Follow established naming patterns for store methods, components, and files. See `share/README.md` for store method naming conventions.
+1. **Single Responsibility** - Each component handles one functional module
+2. **Follow Naming Conventions** - See `share/README.md` for store method naming
+3. **Error Handling** - Use try-catch for async operations, `alert()` for errors
+4. **Performance** - Use MobX computed properties, avoid new objects in render
+5. **Type Safety** - Avoid `any`, use union types, define props interfaces
+6. **Theme Consistency** - Always use `tw` utilities from `share/theme`
+7. **Prioritize Licia** - Check [licia.liriliri.io](https://licia.liriliri.io/) first
 
-### 3. Error Handling
-Use try-catch to capture async operation errors. Use `alert()` to display error messages when necessary.
-
-### 4. Performance Optimization
-- Use MobX computed properties to cache calculation results
-- Avoid creating new objects/arrays in render
-
-### 5. Type Safety
-- Avoid using `any`
-- Use union types instead of strings: `type Mode = 'text' | 'tree'`
-- Props must define interfaces
-
-### 6. Style Consistency
-- Always use `tw` utilities from `share/theme` instead of hardcoding colors
-- Support both light and dark modes
-- See "Tailwind CSS Style Conventions" section and `share/README.md` for theme usage
-
-### 7. Prioritize Licia
-Visit [Licia Official Documentation](https://licia.liriliri.io/) for complete function list. Prioritize using existing utility functions.
-
-## New Plugin Creation Checklist
+## New Plugin Checklist
 
 - [ ] Copy base structure from `tinker-template`
-- [ ] Modify `name`, `description`, `tinker.name` in `package.json`
-- [ ] Create or replace `icon.png` (plugin icon)
+- [ ] Update `name`, `description`, `tinker.name` in `package.json`
+- [ ] Create/replace `icon.png`
 - [ ] Create Store extending BaseStore
 - [ ] Setup i18n translations (en-US, zh-CN)
 - [ ] Implement App component and sub-components
-- [ ] Add Tailwind styles (light/dark mode)
-- [ ] Manually check functionality and interactions
+- [ ] Add Tailwind styles using `tw` utilities
+- [ ] Test functionality
 - [ ] Build test: `npm run build`
 
-## Debugging Tips
+## Reference Examples
 
-- **MobX Debugging**: Use `autorun()` to monitor state changes
-- **React DevTools**: Built-in support in Tinker, available in development mode
-
-## Reference Plugin Examples
-
-- **Simplest**: `tinker-timestamp` - Basic plugin structure
-- **Medium Complexity**: `tinker-json-editor` - Dual editor mode
-- **Complex**: `tinker-code-image` - Code screenshot generation
-- **Preload**: `tinker-image-cropper` - Node.js API usage
-- **File Operations**: `tinker-hosts` - Read/write system files
-
-## Summary
-
-Following these documentation rules ensures code consistency, maintainability, and user experience. Reference existing plugin implementations during development.
+- **Simplest**: `tinker-timestamp` - Basic structure
+- **Medium**: `tinker-json-editor` - Dual editor mode
+- **Complex**: `tinker-code-image` - Code screenshots
+- **Preload**: `tinker-image-cropper`, `tinker-hosts` - Node.js API usage
