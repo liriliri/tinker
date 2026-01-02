@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import CalculationList from './components/CalculationList'
 import store from './store'
@@ -24,8 +24,8 @@ const App = observer(() => {
           },
           success: {
             iconTheme: {
-              primary: '#0fc25e',
-              secondary: '#fff',
+              primary: THEME_COLORS.primary,
+              secondary: THEME_COLORS.bg.light.primary,
             },
           },
         }}

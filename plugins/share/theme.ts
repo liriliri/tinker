@@ -61,6 +61,49 @@ export const THEME_COLORS = {
       tertiary: '#6b7280',
     },
   },
+
+  // Extended gray colors for various UI elements
+  gray: {
+    light: {
+      100: '#f6f8fa',
+      200: '#e0e0e0',
+      300: '#cccccc',
+      400: '#8a8a8a',
+      500: '#6e6e6e',
+      600: '#666666',
+      700: '#333333',
+    },
+    dark: {
+      100: '#3a3a3c',
+      200: '#4a4a4a',
+      300: '#858585',
+      400: '#d4d4d4',
+    },
+  },
+
+  // Toast/Notification colors
+  toast: {
+    light: {
+      bg: '#ffffff',
+      text: '#333333',
+    },
+    dark: {
+      bg: '#333333',
+      text: '#ffffff',
+    },
+  },
+
+  // Checkboard background (for image transparency)
+  checkboard: {
+    light: {
+      light: '#ffffff',
+      dark: '#e8e8e8',
+    },
+    dark: {
+      light: '#2d2d30',
+      dark: '#252526',
+    },
+  },
 } as const
 
 /**
@@ -76,6 +119,7 @@ export const tw = {
     hoverBorder: 'hover:border-[#0fc25e]',
     focusBorder: 'focus:border-[#0fc25e]',
     focusRing: 'focus:ring-[#0fc25e]',
+    accent: 'accent-[#0fc25e]',
     checkedBg: 'group-data-[checked]:bg-[#0fc25e]',
     checkedBorder: 'group-data-[checked]:border-[#0fc25e]',
   },
@@ -131,6 +175,24 @@ export const tw = {
       tertiary: 'dark:text-gray-400',
     },
   },
+
+  // Extended gray utilities
+  gray: {
+    light: {
+      text300: 'text-[#cccccc]',
+      text400: 'text-[#8a8a8a]',
+      text500: 'text-[#6e6e6e]',
+      text600: 'text-[#666666]',
+      border400: 'border-[#8a8a8a]',
+      border500: 'border-[#6e6e6e]',
+    },
+    dark: {
+      text300: 'dark:text-[#858585]',
+      text400: 'dark:text-[#d4d4d4]',
+      border100: 'dark:border-[#3a3a3c]',
+      border200: 'dark:border-[#4a4a4a]',
+    },
+  },
 } as const
 
 // Export for CSS variable usage (for non-Tailwind scenarios)
@@ -156,6 +218,12 @@ export function applyThemeVariables() {
     '--theme-text-secondary': isDark
       ? THEME_COLORS.text.dark.secondary
       : THEME_COLORS.text.light.secondary,
+    '--toast-bg': isDark
+      ? THEME_COLORS.toast.dark.bg
+      : THEME_COLORS.toast.light.bg,
+    '--toast-text': isDark
+      ? THEME_COLORS.toast.dark.text
+      : THEME_COLORS.toast.light.text,
   }
 
   Object.entries(colors).forEach(([key, value]) => {

@@ -6,6 +6,7 @@ import { useRef, useEffect } from 'react'
 import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
 import openFile from 'licia/openFile'
+import { tw } from 'share/theme'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
@@ -119,14 +120,15 @@ export default observer(function DualEditor() {
     }
   }, [])
 
-  const buttonClass =
-    'p-1.5 rounded transition-colors hover:bg-gray-300 dark:hover:bg-[#3a3a3c] disabled:opacity-30 disabled:cursor-not-allowed'
+  const buttonClass = `p-1.5 rounded transition-colors ${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
 
   return (
     <div ref={containerRef} className="h-full w-full flex">
       {/* Left Editor - Original */}
-      <div className="flex-1 min-w-0 border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <div className="h-8 bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300">
+      <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
+        <div
+          className={`h-8 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} border-b ${tw.border.both} flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300`}
+        >
           <div className="flex items-center gap-2">
             <span>{t('original')}</span>
             <span className="text-xs opacity-70">
@@ -180,7 +182,9 @@ export default observer(function DualEditor() {
 
       {/* Right Editor - Modified */}
       <div className="flex-1 min-w-0">
-        <div className="h-8 bg-[#f0f1f2] dark:bg-[#303133] border-b border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300">
+        <div
+          className={`h-8 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} border-b ${tw.border.both} flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300`}
+        >
           <div className="flex items-center gap-2">
             <span>{t('modified')}</span>
             <span className="text-xs opacity-70">

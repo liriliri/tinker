@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import { remark } from 'remark'
 import remarkHtml from 'remark-html'
 import remarkGfm from 'remark-gfm'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function MarkdownPreview() {
@@ -84,7 +85,7 @@ export default observer(function MarkdownPreview() {
   return (
     <div
       ref={containerRef}
-      className="markdown-preview-container h-full w-full overflow-auto p-6 bg-white dark:bg-[#1e1e1e]"
+      className={`markdown-preview-container h-full w-full overflow-auto p-6 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
       data-color-mode={store.isDark ? 'dark' : 'light'}
     >
       <div

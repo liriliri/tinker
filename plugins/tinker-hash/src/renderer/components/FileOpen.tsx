@@ -77,22 +77,24 @@ const FileOpen: React.FC<FileOpenProps> = ({
       className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${
         isDragging
           ? `${tw.primary.border}`
-          : `border-[#8a8a8a] dark:border-[#6e6e6e] ${tw.primary.hoverBorder} dark:hover:border-[#0fc25e]`
+          : `${tw.gray.light.border400} ${tw.gray.dark.border200} ${tw.primary.hoverBorder} dark:hover:border-[#0fc25e]`
       }`}
     >
       <div className="text-center p-8 pointer-events-none">
         <File
-          className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
+          className={`w-16 h-16 mx-auto mb-4 ${tw.gray.light.text400} ${tw.gray.dark.text300}`}
           strokeWidth={1.5}
         />
 
         <p
-          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2 max-w-full break-all px-4`}
+          className={`text-lg font-medium ${tw.text.light.primary} ${tw.gray.dark.text400} mb-2 max-w-full break-all px-4`}
           title={fileName}
         >
           {fileName || openTitle}
         </p>
-        <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">
+        <p
+          className={`text-sm ${tw.gray.light.text500} ${tw.gray.light.text400}`}
+        >
           {fileName ? '' : supportedFormats}
         </p>
       </div>

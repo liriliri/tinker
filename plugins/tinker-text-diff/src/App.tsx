@@ -13,7 +13,9 @@ const App = observer(() => {
       <Toolbar />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden bg-white dark:bg-[#1e1e1e]">
+      <div
+        className={`flex-1 overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+      >
         {store.mode === 'edit' ? <DualEditor /> : <DiffEditor />}
       </div>
     </div>

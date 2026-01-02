@@ -60,7 +60,7 @@ const App = observer(() => {
           <div
             className={`${
               store.viewMode === 'split'
-                ? 'flex-1 min-w-0 border-r border-[#e0e0e0] dark:border-[#4a4a4a]'
+                ? `flex-1 min-w-0 border-r ${tw.border.both}`
                 : 'flex-1 min-w-0'
             }`}
           >

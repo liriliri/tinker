@@ -77,7 +77,9 @@ class Store extends BaseStore {
     this.fileHashResults = { ...EMPTY_HASH_RESULTS }
   }
 
-  private applyCase(results: Record<HashAlgorithm, string>): Record<HashAlgorithm, string> {
+  private applyCase(
+    results: Record<HashAlgorithm, string>
+  ): Record<HashAlgorithm, string> {
     if (!this.uppercase) return results
     return {
       md5: results.md5.toUpperCase(),

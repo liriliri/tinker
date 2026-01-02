@@ -238,7 +238,7 @@ export default observer(function App() {
                           char.setter('required')
                           handleInputChange()
                         }}
-                        className="w-4 h-4 cursor-pointer accent-[#0fc25e]"
+                        className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                       />
                     </td>
                   ))}
@@ -264,7 +264,7 @@ export default observer(function App() {
                           char.setter('allowed')
                           handleInputChange()
                         }}
-                        className="w-4 h-4 cursor-pointer accent-[#0fc25e]"
+                        className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                       />
                     </td>
                   ))}
@@ -290,7 +290,7 @@ export default observer(function App() {
                           char.setter('forbidden')
                           handleInputChange()
                         }}
-                        className="w-4 h-4 cursor-pointer accent-[#0fc25e]"
+                        className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                       />
                     </td>
                   ))}

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import fileSize from 'licia/fileSize'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
+import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -110,7 +111,9 @@ export default observer(function ToolbarComponent() {
 
             {/* Statistics Tooltip */}
             {showStats && (
-              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-[#252526] border border-[#e0e0e0] dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap">
+              <div
+                className={`absolute right-0 top-full mt-2 ${tw.bg.light.primary} ${tw.bg.dark.tertiary} border ${tw.border.both} dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap`}
+              >
                 <div className="font-medium mb-2 text-gray-800 dark:text-gray-200">
                   {t('statistics')}
                 </div>
@@ -178,7 +181,7 @@ export default observer(function ToolbarComponent() {
           <button
             onClick={handleCompress}
             disabled={store.isCompressing || !store.hasUncompressed}
-            className="px-3 py-1 text-xs bg-[#0fc25e] hover:bg-[#0da84f] disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors"
+            className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors`}
           >
             {store.isCompressing ? t('compressing') : t('compress')}
           </button>

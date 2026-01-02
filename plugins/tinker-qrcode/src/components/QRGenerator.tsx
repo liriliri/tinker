@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 import QRCode from 'qrcode'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function QRGenerator() {
@@ -47,8 +48,10 @@ export default observer(function QRGenerator() {
   return (
     <div className="h-full flex">
       {/* Left Panel - Text Input */}
-      <div className="flex-1 min-w-0 flex flex-col border-r border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <div className="flex-1 bg-white dark:bg-[#1e1e1e]">
+      <div
+        className={`flex-1 min-w-0 flex flex-col border-r ${tw.border.both}`}
+      >
+        <div className={`flex-1 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
           <textarea
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
@@ -59,7 +62,9 @@ export default observer(function QRGenerator() {
       </div>
 
       {/* Right Panel - QR Code Display */}
-      <div className="flex-1 min-w-0 flex items-center justify-center bg-white dark:bg-[#1e1e1e] p-4">
+      <div
+        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.light.primary} ${tw.bg.dark.primary} p-4`}
+      >
         {store.text ? (
           <div
             className="rounded-lg"

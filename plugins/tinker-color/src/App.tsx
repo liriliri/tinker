@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Toaster } from 'react-hot-toast'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import ColorPicker from './components/ColorPicker'
 import ColorSchemes from './components/ColorSchemes'
 import ColorFormats from './components/ColorFormats'
@@ -20,8 +20,8 @@ export default observer(function App() {
           },
           success: {
             iconTheme: {
-              primary: '#0fc25e',
-              secondary: '#fff',
+              primary: THEME_COLORS.primary,
+              secondary: THEME_COLORS.bg.light.primary,
             },
           },
         }}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Dialog from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 
 interface ResizeImageDialogProps {
   open: boolean
@@ -91,7 +92,7 @@ export default function ResizeImageDialog({
           </label>
           <input
             type="number"
-            className="flex-1 px-3 py-2 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none"
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
             value={width}
             onChange={(e) => handleWidthChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -106,7 +107,7 @@ export default function ResizeImageDialog({
           </label>
           <input
             type="number"
-            className="flex-1 px-3 py-2 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#252526] text-gray-800 dark:text-gray-200 focus:outline-none"
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
             value={height}
             onChange={(e) => handleHeightChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -129,7 +130,7 @@ export default function ResizeImageDialog({
           {t('cancel')}
         </button>
         <button
-          className="px-4 py-2 text-sm bg-[#0fc25e] hover:bg-[#0db350] text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={handleConfirm}
           disabled={!isValid}
         >

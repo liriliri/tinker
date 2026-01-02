@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import fileSize from 'licia/fileSize'
+import { tw } from 'share/theme'
 import store from '../store'
 import { MenuItemConstructorOptions } from 'electron'
 
@@ -57,12 +58,17 @@ const ImageList = observer(() => {
         {store.images.map((image) => (
           <div
             key={image.id}
-            className="bg-white dark:bg-[#252526] rounded-lg border border-[#e0e0e0] dark:border-[#3e3e42] overflow-hidden relative group flex flex-col hover:border-[#0fc25e] transition-all duration-100"
+            className={`${tw.bg.light.primary} ${tw.bg.dark.tertiary} rounded-lg border ${tw.border.both} dark:border-[#3e3e42] overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
             style={{ aspectRatio: '1 / 1' }}
             onContextMenu={(e) => handleContextMenu(e, image.id)}
           >
             {/* Image preview - rectangular container */}
-            <div className="flex-1 bg-[repeating-conic-gradient(#f0f0f0_0%_25%,#ffffff_0%_50%)] dark:bg-[repeating-conic-gradient(#2d2d30_0%_25%,#252526_0%_50%)] bg-[length:20px_20px] flex items-center justify-center p-2 relative overflow-hidden">
+            <div
+              className="flex-1 bg-[length:20px_20px] flex items-center justify-center p-2 relative overflow-hidden"
+              style={{
+                backgroundImage: `repeating-conic-gradient(#f0f0f0 0% 25%, #ffffff 0% 50%)`,
+              }}
+            >
               <img
                 src={image.compressedDataUrl || image.originalImage.src}
                 alt={image.fileName}
@@ -76,14 +82,18 @@ const ImageList = observer(() => {
             </div>
 
             {/* Info - fixed height */}
-            <div className="p-2 bg-[#f3f3f3] dark:bg-[#2d2d30] flex-shrink-0">
+            <div
+              className={`p-2 ${tw.bg.light.secondary} dark:bg-[#2d2d30] flex-shrink-0`}
+            >
               <p
-                className="text-xs font-medium text-[#333] dark:text-[#cccccc] truncate mb-1"
+                className={`text-xs font-medium ${tw.text.light.primary} ${tw.gray.dark.text400} truncate mb-1`}
                 title={image.fileName}
               >
                 {image.fileName}
               </p>
-              <div className="text-[10px] text-[#6e6e6e] dark:text-[#8a8a8a]">
+              <div
+                className={`text-[10px] ${tw.gray.light.text500} ${tw.gray.light.text400}`}
+              >
                 {image.compressedBlob ? (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
@@ -93,7 +103,9 @@ const ImageList = observer(() => {
                       <span className="text-gray-400 dark:text-gray-600">
                         →
                       </span>
-                      <span className="font-medium text-[#333] dark:text-[#cccccc]">
+                      <span
+                        className={`font-medium ${tw.text.light.primary} ${tw.gray.dark.text400}`}
+                      >
                         {fileSize(image.compressedSize)}
                       </span>
                     </div>

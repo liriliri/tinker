@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Clock, Copy, RotateCcw, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
+import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -10,7 +11,6 @@ import {
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -67,7 +67,9 @@ export default observer(function ToolbarComponent() {
       <ToolbarSeparator />
 
       {/* Current Timestamp Display */}
-      <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-[#1e1e1e] rounded text-xs font-mono">
+      <div
+        className={`flex items-center gap-1 px-2 py-1 ${tw.bg.light.primary} ${tw.bg.dark.primary} rounded text-xs font-mono`}
+      >
         <Clock size={12} className="text-gray-500 dark:text-gray-400" />
         <span>{store.currentTimestampDisplay}</span>
       </div>
