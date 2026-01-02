@@ -1,6 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { CaseUpper, FileText, File as FileIcon, Clipboard } from 'lucide-react'
+import {
+  CaseUpper,
+  FileText,
+  File as FileIcon,
+  Clipboard,
+  Eraser,
+} from 'lucide-react'
 import {
   Toolbar,
   ToolbarSpacer,
@@ -15,10 +21,20 @@ export default observer(function HashToolbar() {
 
   const handlePaste = async () => {
     try {
-      const text = await navigator.clipboard.readText()
-      if (text) {
-        store.setInput(text)
-        store.setInputType('text')
+      // Try to get file paths from clipboard first
+      const filePaths = await tinker.getClipboardFilePaths()
+
+      if (filePaths && filePaths.length > 0) {
+        // If clipboard contains files, switch to file mode and process the first file
+        store.setInputType('file')
+        await store.handleFilePath(filePaths[0])
+      } else {
+        // Otherwise, try to get text from clipboard
+        const text = await navigator.clipboard.readText()
+        if (text) {
+          store.setInput(text)
+          store.setInputType('text')
+        }
       }
     } catch (err) {
       console.error('Failed to paste from clipboard:', err)
@@ -49,6 +65,10 @@ export default observer(function HashToolbar() {
 
       <ToolbarButton onClick={handlePaste} title={t('paste')}>
         <Clipboard size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton onClick={() => store.clear()} title={t('clear')}>
+        <Eraser size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSpacer />

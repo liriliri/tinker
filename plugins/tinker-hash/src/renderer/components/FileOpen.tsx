@@ -87,7 +87,8 @@ const FileOpen: React.FC<FileOpenProps> = ({
         />
 
         <p
-          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}
+          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2 max-w-full break-all px-4`}
+          title={fileName}
         >
           {fileName || openTitle}
         </p>
