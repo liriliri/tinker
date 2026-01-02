@@ -26,6 +26,7 @@ async function preparePlugin(plugin: IPlugin) {
     document.title = plugin.name
   })
   if (plugin.preload) {
+    pluginRenderer()
     await import(pathToFileURL(plugin.preload).href)
   }
 }
@@ -53,6 +54,8 @@ const tinkerObj = {
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)
+window._tinker = tinkerObj
+
 const observer = new MutationObserver(() => {
   if (document.documentElement) {
     observer.disconnect()
@@ -68,5 +71,8 @@ observer.observe(document, { childList: true })
 })()
 
 declare global {
+  interface Window {
+    _tinker: typeof tinkerObj
+  }
   const _tinker: typeof tinkerObj
 }
