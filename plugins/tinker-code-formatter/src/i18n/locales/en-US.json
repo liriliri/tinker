@@ -1,0 +1,14 @@
+{
+  "format": "Format",
+  "tabNone": "No Indent",
+  "tab2": "2 Spaces",
+  "tab4": "4 Spaces",
+  "tab6": "6 Spaces",
+  "tab8": "8 Spaces",
+  "emptyInput": "Please enter code to format",
+  "formatError": "Format failed",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear",
+  "pasteError": "Failed to paste from clipboard"
+}

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
+import type { Monaco } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import { Clipboard, Eraser, FolderOpen } from 'lucide-react'
 import { useRef, useEffect } from 'react'
@@ -14,6 +15,19 @@ export default observer(function DualEditor() {
   const { t } = useTranslation()
   const iconSize = 14
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleEditorWillMount = (monaco: Monaco) => {
+    // 禁用 TypeScript 和 JavaScript 的语法错误提示
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    })
+
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    })
+  }
 
   const handleOriginalChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -165,6 +179,7 @@ export default observer(function DualEditor() {
             value={store.originalText}
             language={store.language}
             onChange={handleOriginalChange}
+            beforeMount={handleEditorWillMount}
             options={{
               readOnly: false,
               minimap: { enabled: false },
@@ -221,6 +236,7 @@ export default observer(function DualEditor() {
             value={store.modifiedText}
             language={store.language}
             onChange={handleModifiedChange}
+            beforeMount={handleEditorWillMount}
             options={{
               readOnly: false,
               minimap: { enabled: false },

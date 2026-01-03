@@ -1,0 +1,14 @@
+{
+  "format": "格式化",
+  "tabNone": "无缩进",
+  "tab2": "2 空格",
+  "tab4": "4 空格",
+  "tab6": "6 空格",
+  "tab8": "8 空格",
+  "emptyInput": "请输入要格式化的代码",
+  "formatError": "格式化失败",
+  "copy": "复制",
+  "paste": "粘贴",
+  "clear": "清除",
+  "pasteError": "粘贴失败"
+}

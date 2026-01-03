@@ -2,12 +2,26 @@ import { observer } from 'mobx-react-lite'
 import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
 import { useEffect, useRef } from 'react'
 import type { editor } from 'monaco-editor'
+import type { Monaco } from '@monaco-editor/react'
 import isStrBlank from 'licia/isStrBlank'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
 export default observer(function DiffEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleEditorWillMount = (monaco: Monaco) => {
+    // 禁用 TypeScript 和 JavaScript 的语法错误提示
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    })
+
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    })
+  }
 
   const handleEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
     const updateDiffStats = () => {
@@ -140,6 +154,7 @@ export default observer(function DiffEditor() {
         modified={store.modifiedText}
         language={store.language}
         theme={store.isDark ? 'vs-dark' : 'vs'}
+        beforeMount={handleEditorWillMount}
         onMount={handleEditorDidMount}
         options={{
           readOnly: true,
