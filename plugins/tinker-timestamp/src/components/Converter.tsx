@@ -67,7 +67,7 @@ const Converter = observer(() => {
               step="1"
               value={dateFormat(store.selectedDate, 'yyyy-mm-dd"T"HH:MM:ss')}
               onChange={(e) => handleDateTimeChange(e.target.value)}
-              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
+              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder}`}
             />
             <div
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.dark.tertiary}`}

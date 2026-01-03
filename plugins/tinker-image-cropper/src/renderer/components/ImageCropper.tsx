@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Cropper, CropperRef } from 'react-advanced-cropper'
 import 'react-advanced-cropper/dist/style.css'
 import { RefObject } from 'react'
+import { tw } from 'share/theme'
 import store from '../store'
 
 interface ImageCropperProps {
@@ -24,7 +25,7 @@ const ImageCropper = observer(({ cropperRef }: ImageCropperProps) => {
           ref={cropperRef}
           src={store.image.originalUrl}
           className="h-full"
-          backgroundClassName="bg-[#f0f1f2] dark:bg-[#303133]"
+          backgroundClassName={`${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
           stencilProps={{
             aspectRatio: store.aspectRatio ?? undefined,
           }}

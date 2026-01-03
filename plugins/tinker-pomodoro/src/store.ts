@@ -3,7 +3,7 @@ import LocalStore from 'licia/LocalStore'
 import durationFormat from 'licia/durationFormat'
 import clamp from 'licia/clamp'
 import BaseStore from 'share/BaseStore'
-import TimerWorker from './utils/timer.worker?worker'
+import TimerWorker from './lib/timer.worker?worker'
 
 const storage = new LocalStore('tinker-pomodoro')
 

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function StorageTab() {
@@ -7,8 +8,12 @@ export default observer(function StorageTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-lg p-6 border border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-[#d4d4d4]">
+      <div
+        className={`${tw.bg.light.primary} ${tw.bg.dark.primary} rounded-lg p-6 border ${tw.border.both}`}
+      >
+        <h2
+          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
+        >
           {t('localStorageDemo')}
         </h2>
         <div className="space-y-4">
@@ -21,7 +26,7 @@ export default observer(function StorageTab() {
               onChange={(e) => store.setSavedData(e.target.value)}
               rows={4}
               placeholder={t('typeToSave')}
-              className="w-full px-3 py-2 border border-[#e0e0e0] dark:border-[#4a4a4a] rounded bg-white dark:bg-[#303133] text-gray-900 dark:text-[#d4d4d4] focus:outline-none focus:ring-2 focus:ring-[#0fc25e]"
+              className={`w-full px-3 py-2 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.secondary} text-gray-900 ${tw.text.dark.primary} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
             />
           </div>
           <div className="flex gap-3">
@@ -39,7 +44,9 @@ export default observer(function StorageTab() {
             </button>
           </div>
           <div className="bg-[#0fc25e]/10 dark:bg-[#0fc25e]/20 rounded p-4 border border-[#0fc25e]/30">
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p
+              className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+            >
               {t('dataPersistedNote')}
             </p>
           </div>

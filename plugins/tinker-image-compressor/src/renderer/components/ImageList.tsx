@@ -58,7 +58,7 @@ const ImageList = observer(() => {
         {store.images.map((image) => (
           <div
             key={image.id}
-            className={`${tw.bg.light.primary} ${tw.bg.dark.tertiary} rounded-lg border ${tw.border.both} dark:border-[#3e3e42] overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
+            className={`${tw.bg.light.primary} ${tw.bg.dark.tertiary} rounded-lg border ${tw.border.both} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
             style={{ aspectRatio: '1 / 1' }}
             onContextMenu={(e) => handleContextMenu(e, image.id)}
           >
@@ -83,7 +83,7 @@ const ImageList = observer(() => {
 
             {/* Info - fixed height */}
             <div
-              className={`p-2 ${tw.bg.light.secondary} dark:bg-[#2d2d30] flex-shrink-0`}
+              className={`p-2 ${tw.bg.light.secondary} ${tw.bg.dark.input} flex-shrink-0`}
             >
               <p
                 className={`text-xs font-medium ${tw.text.light.primary} ${tw.gray.dark.text400} truncate mb-1`}

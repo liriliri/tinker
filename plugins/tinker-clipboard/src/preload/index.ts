@@ -48,11 +48,7 @@ function checkClipboard() {
     // Check for image
     const image = clipboard.readImage()
     if (!image.isEmpty()) {
-      // Use image size as a quick check to avoid expensive toDataURL when possible
-      const size = image.getSize()
-      const sizeHash = `${size.width}x${size.height}`
-
-      // If size changed or no previous image, definitely need to check
+      // If no previous image, definitely need to check
       if (!lastClipboardImage || !lastClipboardImage.startsWith('data:image')) {
         const imageData = image.toDataURL()
         if (imageData !== lastClipboardImage) {

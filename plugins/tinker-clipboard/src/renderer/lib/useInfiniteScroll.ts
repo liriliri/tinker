@@ -17,9 +17,12 @@ export function useInfiniteScroll({
     const handleScroll = () => {
       if (isLoadingRef.current || !hasMore) return
 
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-      const windowHeight = document.documentElement.clientHeight || document.body.clientHeight
-      const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+      const scrollTop =
+        document.documentElement.scrollTop || document.body.scrollTop
+      const windowHeight =
+        document.documentElement.clientHeight || document.body.clientHeight
+      const scrollHeight =
+        document.documentElement.scrollHeight || document.body.scrollHeight
 
       // Check if near bottom
       if (scrollTop + windowHeight >= scrollHeight - threshold) {

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function ThemeTab() {
@@ -7,12 +8,18 @@ export default observer(function ThemeTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-lg p-6 border border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-[#d4d4d4]">
+      <div
+        className={`${tw.bg.light.primary} ${tw.bg.dark.primary} rounded-lg p-6 border ${tw.border.both}`}
+      >
+        <h2
+          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
+        >
           {t('currentTheme')}
         </h2>
         <div className="flex items-center gap-4">
-          <div className="px-6 py-3 bg-[#0fc25e] text-white rounded-lg font-medium">
+          <div
+            className={`px-6 py-3 ${tw.primary.bg} text-white rounded-lg font-medium`}
+          >
             {store.isDark ? t('darkMode') : t('lightMode')}
           </div>
           <span className="text-gray-600 dark:text-gray-400">
@@ -21,13 +28,17 @@ export default observer(function ThemeTab() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-lg p-6 border border-[#e0e0e0] dark:border-[#4a4a4a]">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-[#d4d4d4]">
+      <div
+        className={`${tw.bg.light.primary} ${tw.bg.dark.primary} rounded-lg p-6 border ${tw.border.both}`}
+      >
+        <h2
+          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
+        >
           {t('colorPalette')}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <div className="w-full h-20 bg-[#0fc25e] rounded mb-2"></div>
+            <div className={`w-full h-20 ${tw.primary.bg} rounded mb-2`}></div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {t('primary')}
             </p>
