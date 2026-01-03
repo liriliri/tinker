@@ -1,4 +1,5 @@
 import { create, all } from 'mathjs'
+import find from 'licia/find'
 
 const math = create(all, {
   number: 'BigNumber',
@@ -355,30 +356,24 @@ export const config: ConfigType[] = [
 ]
 
 export const getType = (name: string): ConfigType => {
-  for (const type of config) {
-    if (name === type.key) {
-      return type
-    }
+  const type = find(config, (t) => name === t.key)
+  if (!type) {
+    throw new Error(`${name} type not found`)
   }
-  throw new Error(`${name} type not found`)
+  return type
 }
 
 export const getUnit = (type: string, unitKey: string): UnitConfig => {
-  for (const unit of getType(type).unit) {
-    if (unitKey === unit.key) {
-      return unit
-    }
+  const unit = find(getType(type).unit, (u) => unitKey === u.key)
+  if (!unit) {
+    throw new Error(`${type} - ${unitKey} unit not found`)
   }
-  throw new Error(`${type} - ${unitKey} unit not found`)
+  return unit
 }
 
 export const getGroupByUnit = (type: string, unit: string): string => {
-  for (const group of getType(type).group) {
-    if (group.list.includes(unit)) {
-      return group.key
-    }
-  }
-  return ''
+  const group = find(getType(type).group, (g) => g.list.includes(unit))
+  return group ? group.key : ''
 }
 
 const getSpecial = (name: string, from: string, to: string): string | null => {

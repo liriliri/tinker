@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import durationFormat from 'licia/durationFormat'
+import clamp from 'licia/clamp'
 import BaseStore from 'share/BaseStore'
 import TimerWorker from './utils/timer.worker?worker'
 
@@ -112,7 +113,7 @@ class Store extends BaseStore {
   }
 
   setVolume(value: number) {
-    this.volume = Math.max(0, Math.min(100, value))
+    this.volume = clamp(value, 0, 100)
     storage.set('volume', this.volume)
   }
 

@@ -7,6 +7,7 @@ import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
 import map from 'licia/map'
 import splitPath from 'licia/splitPath'
+import last from 'licia/last'
 import type { ImageFormat, ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
 
@@ -115,7 +116,7 @@ class Store extends BaseStore {
   }
 
   private detectImageFormat(fileName: string): ImageFormat {
-    const ext = fileName.toLowerCase().split('.').pop() || ''
+    const ext = last(fileName.toLowerCase().split('.')) || ''
     if (ext === 'png') return 'png'
     if (ext === 'webp') return 'webp'
     return 'jpeg' // Default to jpeg for jpg, jpeg and unknown formats

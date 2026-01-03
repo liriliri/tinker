@@ -1,6 +1,7 @@
 // Reference content for regex tokens with i18n support
 import type { Token } from './ExpressionLexer'
 import i18n from '../i18n'
+import capitalize from 'licia/capitalize'
 
 function fillTags(str: string, token: Token): string {
   return str.replace(/{{(\w+)}}/g, (match, key) => {
@@ -67,7 +68,7 @@ export function getTipForToken(token: Token | null): string | null {
     label += ` #${token.num}`
   }
 
-  label = label[0].toUpperCase() + label.substr(1)
+  label = capitalize(label)
 
   if (token.error && token.error.warning) {
     const warningLabel = i18n.t('warningLabel')

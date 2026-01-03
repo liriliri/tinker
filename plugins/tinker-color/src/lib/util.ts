@@ -1,5 +1,6 @@
 // Color conversion utilities using 'color' package
 import Color from 'color'
+import trim from 'licia/trim'
 
 export interface RGB {
   r: number
@@ -204,7 +205,7 @@ export function parseColorToHex(
 
       case 'rgb': {
         // Parse "255, 0, 0" format
-        const parts = trimmed.split(',').map((p) => parseInt(p.trim()))
+        const parts = trimmed.split(',').map((p) => parseInt(trim(p)))
         if (parts.length !== 3 || parts.some((p) => isNaN(p))) {
           return null
         }
@@ -213,7 +214,7 @@ export function parseColorToHex(
 
       case 'hsl': {
         // Parse "180, 50%, 50%" format
-        const parts = trimmed.split(',').map((p) => p.trim().replace('%', ''))
+        const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 3) {
           return null
         }
@@ -226,7 +227,7 @@ export function parseColorToHex(
 
       case 'hsv': {
         // Parse "180, 50%, 50%" format
-        const parts = trimmed.split(',').map((p) => p.trim().replace('%', ''))
+        const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 3) {
           return null
         }
@@ -239,7 +240,7 @@ export function parseColorToHex(
 
       case 'cmyk': {
         // Parse "0%, 100%, 100%, 0%" format
-        const parts = trimmed.split(',').map((p) => p.trim().replace('%', ''))
+        const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 4) {
           return null
         }
