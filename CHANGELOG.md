@@ -1,3 +1,10 @@
+## v0.6.0 (3 Jan 2026)
+
+* feat: add unit converter
+* feat: add code formatter
+* feat: add clipboard
+* feat: add hash
+
 ## v0.5.0 (30 Dec 2025)
 
 * feat: add password generator

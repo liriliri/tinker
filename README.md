@@ -122,4 +122,3 @@ If you want to add existing web tools to TINKER, TINKER supports wrapping URLs i
 
 * [licia](https://github.com/liriliri/licia): Utility library used by TINKER.
 * [luna](https://github.com/liriliri/luna): UI components used by TINKER.
-* [vivy](https://github.com/liriliri/vivy): Icon image generation.
