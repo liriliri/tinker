@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import durationFormat from 'licia/durationFormat'
 import BaseStore from 'share/BaseStore'
 import TimerWorker from './utils/timer.worker?worker'
 
@@ -192,11 +193,7 @@ class Store extends BaseStore {
   }
 
   get formattedTime(): string {
-    const minutes = Math.floor(this.timeLeft / 60)
-    const seconds = this.timeLeft % 60
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`
+    return durationFormat(this.timeLeft * 1000, 'mm:ss')
   }
 
   private getTotalTimeForMode(): number {
