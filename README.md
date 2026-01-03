@@ -107,6 +107,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/pomodoro.png"/></th>
       <th><img src="https://tinker.liriliri.io/whiteboard.png"/></th>
     </tr>
+    <tr>
+      <th>Clipboard</th>
+      <th>Code Formatter</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/clipboard.png"/></th>
+      <th><img src="https://tinker.liriliri.io/code_formatter.png"/></th>
+    </tr>
+    <tr>
+      <th>Hash</th>
+      <th>Unit Converter</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/hash.png"/></th>
+      <th><img src="https://tinker.liriliri.io/unit_converter.png"/></th>
+    </tr>
   </tbody>
 </table>
 
