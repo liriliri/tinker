@@ -16,7 +16,7 @@ import {
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 
-export default observer(function HashToolbar() {
+export default observer(function ToolbarCompoent() {
   const { t } = useTranslation()
 
   const handlePaste = async () => {

@@ -1,0 +1,20 @@
+{
+  "all": "全部",
+  "text": "文本",
+  "image": "图片",
+  "file": "文件",
+  "search": "筛选剪切板内容",
+  "clearAll": "清空全部",
+  "delete": "删除",
+  "noItems": "暂无剪贴板记录",
+  "noResults": "未找到结果",
+  "confirmClearAll": "确定要清空所有剪贴板历史记录吗？",
+  "copied": "已复制到剪贴板",
+  "copyFailed": "复制失败",
+  "itemCount": "{{count}} 项",
+  "timeJustNow": "刚刚",
+  "timeMinutesAgo": "{{count}} 分钟前",
+  "timeHoursAgo": "{{count}} 小时前",
+  "timeDaysAgo": "{{count}} 天前",
+  "loadingMore": "向下滚动加载更多..."
+}
