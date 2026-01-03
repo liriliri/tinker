@@ -1,8 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import LocalStore from 'licia/LocalStore'
-// The npm package fails to build on Windows, so use a local import instead
-import Vault from './lib/vault/vault'
+import Vault from './lib/vault'
 
 export type CharsetState = 'required' | 'allowed' | 'forbidden'
 

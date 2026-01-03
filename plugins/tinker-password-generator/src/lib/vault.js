@@ -1,4 +1,4 @@
-import CryptoJS from './crypto-js-3.1.2.js';
+import CryptoJS from 'crypto-js';
 
 var Vault = function(settings) {
   this._phrase   = settings.phrase || '';
