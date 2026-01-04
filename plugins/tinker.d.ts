@@ -70,6 +70,18 @@ declare global {
     showItemInPath(path: string): void
 
     /**
+     * Set the window title.
+     * @param title - The title text. If empty, will use the plugin name. If non-empty, will be formatted as "{title} - {plugin name}"
+     * @example
+     * tinker.setTitle('My Custom Title')
+     * // Window title becomes: "My Custom Title - Plugin Name"
+     *
+     * tinker.setTitle('')
+     * // Window title becomes: "Plugin Name"
+     */
+    setTitle(title: string): void
+
+    /**
      * Get file paths from the system clipboard.
      * @returns Array of file paths
      * @example

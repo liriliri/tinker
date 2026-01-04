@@ -26,6 +26,7 @@ class Store extends BaseStore {
     })
 
     this.refresh()
+    this.bindEvent()
   }
   setFilter(filter: string) {
     this.filter = filter
@@ -113,6 +114,13 @@ class Store extends BaseStore {
     this.visibleApps = this.apps.filter((app) => {
       const name = lowerCase(app.name)
       return toBool(PinyinMatch.match(name, filter))
+    })
+  }
+  private bindEvent() {
+    main.on('updateTitle', (title: string) => {
+      if (this.plugin) {
+        runInAction(() => (this.filter = title))
+      }
     })
   }
 }

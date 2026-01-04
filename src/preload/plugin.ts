@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import mainObj from './main'
+import preloadObj from 'share/preload/preload'
 import {
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
@@ -9,6 +10,7 @@ import {
 import { pathToFileURL } from 'url'
 import pluginRenderer from './pluginRenderer'
 import { invoke } from 'share/preload/util'
+import isStrBlank from 'licia/isStrBlank'
 
 window.addEventListener('DOMContentLoaded', () => {
   updateTheme()
@@ -22,14 +24,17 @@ function injectRendererScript() {
   document.documentElement.removeChild(script)
 }
 
-async function preparePlugin(plugin: IPlugin) {
+let plugin: IPlugin | null = null
+
+async function preparePlugin(p: IPlugin) {
   window.addEventListener('DOMContentLoaded', () => {
-    document.title = plugin.name
+    document.title = p.name
   })
-  if (plugin.preload) {
+  if (p.preload) {
     pluginRenderer()
-    await import(pathToFileURL(plugin.preload).href)
+    await import(pathToFileURL(p.preload).href)
   }
+  plugin = p
 }
 
 async function updateTheme() {
@@ -52,6 +57,16 @@ const tinkerObj = {
   getClipboardFilePaths: invoke<IpcGetClipboardFilePaths>(
     'getClipboardFilePaths'
   ),
+  setTitle: (title: string) => {
+    if (plugin) {
+      if (!isStrBlank(title)) {
+        title = `${title} - ${plugin.name}`
+      } else {
+        title = plugin.name
+      }
+      preloadObj.setTitle(title)
+    }
+  },
   showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
   on: mainObj.on,

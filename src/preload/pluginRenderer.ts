@@ -11,6 +11,7 @@ export default function () {
     showSaveDialog: _tinker.showSaveDialog,
     showItemInPath: _tinker.showItemInPath,
     getClipboardFilePaths: _tinker.getClipboardFilePaths,
+    setTitle: _tinker.setTitle,
     on: _tinker.on,
     showContextMenu,
   }
