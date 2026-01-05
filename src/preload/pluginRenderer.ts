@@ -143,8 +143,10 @@ export async function importData() {
   location.reload()
 }
 
-export async function exportData() {
-  const files: types.PlainObj<string> = {}
+export async function exportData(id: string) {
+  const files: types.PlainObj<string> = {
+    'plugin.json': JSON.stringify({ id, date: Date.now() }),
+  }
 
   // localStorage
   const localStorageData: types.PlainObj<string> = {}

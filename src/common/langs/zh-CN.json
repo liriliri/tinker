@@ -16,5 +16,7 @@
   "noResult": "无结果",
   "openDir": "打开目录",
   "exportData": "导出数据",
-  "importData": "导入数据"
+  "importData": "导入数据",
+  "importDataConfirm": "导入数据将覆盖您当前的数据，确定要继续吗？",
+  "importDataMismatchErr": "插件 ID 不匹配：预期为 \"{{expected}}\"，实际为 \"{{got}}\""
 }

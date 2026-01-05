@@ -19,17 +19,21 @@ import {
 import types from 'licia/types'
 import fs from 'fs-extra'
 import dateFormat from 'licia/dateFormat'
+import { t, i18n } from 'common/util'
 
 window.addEventListener('DOMContentLoaded', () => {
   tinkerObj.setTitle('')
   updateTheme()
+  mainObj.getLanguage().then((lang) => i18n.locale(lang))
   mainObj.on('changeTheme', updateTheme)
   mainObj.on('exportData', exportData)
   mainObj.on('importData', importData)
 })
 
 function exportData() {
-  injectRendererScript(`(${pluginRenderer.exportData.toString()})()`)
+  injectRendererScript(
+    `(${pluginRenderer.exportData.toString()})('${plugin?.id || ''}')`
+  )
 }
 
 function importData() {
@@ -69,7 +73,7 @@ function setTitle(title: string) {
 async function saveData(files: types.PlainObj<string>) {
   const buf = zipFiles(files)
   const { filePath } = await mainObj.showSaveDialog({
-    title: 'Export Data',
+    title: t('exportData'),
     defaultPath: plugin
       ? `${plugin.id}-${dateFormat('yyyymmdd')}.zip`
       : 'tinker-data.zip',
@@ -82,14 +86,31 @@ async function saveData(files: types.PlainObj<string>) {
 
 async function loadData(): Promise<types.PlainObj<string> | undefined> {
   const { filePaths } = await mainObj.showOpenDialog({
-    title: 'Import Data',
+    title: t('importData'),
     properties: ['openFile'],
     filters: [{ name: 'Zip Files', extensions: ['zip'] }],
   })
   if (filePaths && filePaths.length > 0) {
+    const result = confirm(t('importDataConfirm'))
+    if (!result) {
+      return
+    }
     const filePath = filePaths[0]
     const buf = await fs.readFile(filePath)
     const files = unzipFiles(buf)
+    const pluginData = files['plugin.json']
+    if (pluginData) {
+      const meta = JSON.parse(pluginData)
+      if (plugin && meta.id !== plugin.id) {
+        alert(
+          t('importDataMismatchErr', {
+            expected: plugin.id,
+            got: meta.id,
+          })
+        )
+        return
+      }
+    }
     return files
   }
 }
