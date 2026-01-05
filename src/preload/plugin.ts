@@ -12,6 +12,7 @@ import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
 
 window.addEventListener('DOMContentLoaded', () => {
+  tinkerObj.setTitle('')
   updateTheme()
   mainObj.on('changeTheme', updateTheme)
 })
@@ -26,9 +27,6 @@ function injectRendererScript() {
 let plugin: IPlugin | null = null
 
 async function preparePlugin(p: IPlugin) {
-  window.addEventListener('DOMContentLoaded', () => {
-    document.title = p.name
-  })
   if (p.preload) {
     pluginRenderer()
     await import(pathToFileURL(p.preload).href)

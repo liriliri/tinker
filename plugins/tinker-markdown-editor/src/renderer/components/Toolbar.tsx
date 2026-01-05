@@ -130,12 +130,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
 
-      {store.currentFileName && (
-        <div className="text-gray-600 dark:text-gray-400 text-xs mr-2 whitespace-nowrap">
-          {store.currentFileName}
-        </div>
-      )}
-
       {store.lineCount > 0 && (
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
           {t('lines', { count: store.lineCount })}

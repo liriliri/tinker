@@ -32,7 +32,6 @@ export function showWin(plugin: IPlugin) {
 
   window.loadPage(win, {
     page: 'plugin',
-    title: plugin.name,
   })
 
   return win

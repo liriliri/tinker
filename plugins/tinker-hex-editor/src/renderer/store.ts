@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 
@@ -12,6 +12,17 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.bindEvent()
+  }
+
+  private bindEvent() {
+    // Automatically update title when currentFileName changes
+    reaction(
+      () => this.currentFileName,
+      (fileName) => {
+        tinker.setTitle(fileName || '')
+      }
+    )
   }
 
   get hasData() {

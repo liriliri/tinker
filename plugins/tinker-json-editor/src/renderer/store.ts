@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
@@ -27,6 +27,17 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.init()
+    this.bindEvent()
+  }
+
+  private bindEvent() {
+    // Automatically update title when currentFileName changes
+    reaction(
+      () => this.currentFileName,
+      (fileName) => {
+        tinker.setTitle(fileName || '')
+      }
+    )
   }
 
   private async init() {

@@ -27,12 +27,6 @@ export default observer(function Toolbar() {
       </ToolbarButton>
 
       <ToolbarSpacer />
-
-      {store.currentFileName && (
-        <div className="text-gray-600 dark:text-gray-400 text-xs mr-2 whitespace-nowrap">
-          {store.currentFileName}
-        </div>
-      )}
     </ToolbarContainer>
   )
 })

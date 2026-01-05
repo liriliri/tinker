@@ -33,9 +33,6 @@ function renderApp() {
   const page = getUrlParam('page')
 
   switch (page) {
-    case 'plugin':
-      title = getUrlParam('title') || ''
-      break
     case 'terminal':
       App = lazy(() => import('share/renderer/terminal/App.js') as Promise<any>)
       title = t('terminal')
@@ -50,9 +47,8 @@ function renderApp() {
       break
   }
 
-  preload.setTitle(title)
-
   if (page !== 'plugin') {
+    preload.setTitle(title)
     createRoot(container).render(<App />)
   }
 }

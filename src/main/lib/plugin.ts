@@ -273,6 +273,7 @@ export const detachPlugin: IpcDetachPlugin = async function (id) {
   }
   win.contentView.removeChildView(view)
   const newWin = pluginWin.showWin(plugin)
+  newWin.setTitle(view.webContents.getTitle())
   newWin.contentView.addChildView(view)
   pluginViews[id].win = newWin
   layoutPlugin(id)
