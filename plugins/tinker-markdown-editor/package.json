@@ -24,6 +24,7 @@
   "devDependencies": {
     "@monaco-editor/react": "^4.7.0",
     "github-markdown-css": "^5.8.1",
+    "monaco-editor": "^0.55.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
     "remark-html": "^16.0.1"
