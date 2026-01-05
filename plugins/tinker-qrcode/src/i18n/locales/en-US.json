@@ -2,6 +2,7 @@
   "size": "Size",
   "color": "Color",
   "background": "Background",
+  "correctLevel": "Error Correction",
   "copy": "Copy to Clipboard",
   "save": "Save",
   "placeholder": "Enter text or URL to generate QR code...",

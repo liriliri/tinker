@@ -25,6 +25,7 @@ export default observer(function QRGenerator() {
       {
         width: store.size,
         margin: 2,
+        errorCorrectionLevel: store.correctLevel,
         color: {
           dark: store.fgColor,
           light: store.bgColor,
@@ -43,7 +44,7 @@ export default observer(function QRGenerator() {
         }
       }
     )
-  }, [store.text, store.size, store.fgColor, store.bgColor])
+  }, [store.text, store.size, store.fgColor, store.bgColor, store.correctLevel])
 
   return (
     <div className="h-full flex">

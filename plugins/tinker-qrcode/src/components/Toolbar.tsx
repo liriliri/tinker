@@ -107,6 +107,27 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
+      {/* Error Correction Level */}
+      <div className="flex items-center gap-1.5 px-1">
+        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+          {t('correctLevel')}:
+        </label>
+        <Select
+          value={store.correctLevel}
+          onChange={(value) =>
+            store.setCorrectLevel(value as 'L' | 'M' | 'Q' | 'H')
+          }
+          options={[
+            { label: 'L (7%)', value: 'L' },
+            { label: 'M (15%)', value: 'M' },
+            { label: 'Q (25%)', value: 'Q' },
+            { label: 'H (30%)', value: 'H' },
+          ]}
+        />
+      </div>
+
+      <ToolbarSeparator />
+
       {/* Foreground Color */}
       <div className="flex items-center gap-1.5 px-1">
         <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">

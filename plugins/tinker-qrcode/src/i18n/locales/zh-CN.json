@@ -2,6 +2,7 @@
   "size": "尺寸",
   "color": "颜色",
   "background": "背景",
+  "correctLevel": "容错率",
   "copy": "复制到剪贴板",
   "save": "保存",
   "placeholder": "输入文本或 URL 生成二维码...",
