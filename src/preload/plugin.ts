@@ -7,28 +7,40 @@ import {
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
-import { injectApi } from './pluginRenderer'
+import * as pluginRenderer from './pluginRenderer'
 import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
+import {
+  injectRendererScript,
+  domReady,
+  zipFiles,
+  unzipFiles,
+} from './lib/util'
+import types from 'licia/types'
+import fs from 'fs-extra'
+import dateFormat from 'licia/dateFormat'
 
 window.addEventListener('DOMContentLoaded', () => {
   tinkerObj.setTitle('')
   updateTheme()
   mainObj.on('changeTheme', updateTheme)
+  mainObj.on('exportData', exportData)
+  mainObj.on('importData', importData)
 })
 
-function injectRendererScript(str: string) {
-  const script = document.createElement('script')
-  script.textContent = str
-  document.documentElement.appendChild(script)
-  document.documentElement.removeChild(script)
+function exportData() {
+  injectRendererScript(`(${pluginRenderer.exportData.toString()})()`)
+}
+
+function importData() {
+  injectRendererScript(`(${pluginRenderer.importData.toString()})()`)
 }
 
 let plugin: IPlugin | null = null
 
 async function preparePlugin(p: IPlugin) {
   if (p.preload) {
-    injectApi()
+    pluginRenderer.injectApi()
     await import(pathToFileURL(p.preload).href)
   }
   plugin = p
@@ -43,6 +55,45 @@ async function updateTheme() {
   }
 }
 
+function setTitle(title: string) {
+  if (plugin) {
+    if (!isStrBlank(title)) {
+      title = `${title} - ${plugin.name}`
+    } else {
+      title = plugin.name
+    }
+    document.title = title
+  }
+}
+
+async function saveData(files: types.PlainObj<string>) {
+  const buf = zipFiles(files)
+  const { filePath } = await mainObj.showSaveDialog({
+    title: 'Export Data',
+    defaultPath: plugin
+      ? `${plugin.id}-${dateFormat('yyyymmdd')}.zip`
+      : 'tinker-data.zip',
+    filters: [{ name: 'Zip Files', extensions: ['zip'] }],
+  })
+  if (filePath) {
+    await fs.writeFile(filePath, buf)
+  }
+}
+
+async function loadData(): Promise<types.PlainObj<string> | undefined> {
+  const { filePaths } = await mainObj.showOpenDialog({
+    title: 'Import Data',
+    properties: ['openFile'],
+    filters: [{ name: 'Zip Files', extensions: ['zip'] }],
+  })
+  if (filePaths && filePaths.length > 0) {
+    const filePath = filePaths[0]
+    const buf = await fs.readFile(filePath)
+    const files = unzipFiles(buf)
+    return files
+  }
+}
+
 const tinkerObj = {
   getTheme: mainObj.getTheme,
   getLanguage: mainObj.getLanguage,
@@ -54,31 +105,20 @@ const tinkerObj = {
   getClipboardFilePaths: invoke<IpcGetClipboardFilePaths>(
     'getClipboardFilePaths'
   ),
-  setTitle: (title: string) => {
-    if (plugin) {
-      if (!isStrBlank(title)) {
-        title = `${title} - ${plugin.name}`
-      } else {
-        title = plugin.name
-      }
-      document.title = title
-    }
-  },
+  setTitle,
   showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
+  saveData,
+  loadData,
   on: mainObj.on,
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)
 window._tinker = tinkerObj
 
-const observer = new MutationObserver(() => {
-  if (document.documentElement) {
-    observer.disconnect()
-    injectRendererScript(`(${injectApi.toString()})()`)
-  }
+domReady(() => {
+  injectRendererScript(`(${pluginRenderer.injectApi.toString()})()`)
 })
-observer.observe(document, { childList: true })
 ;(async function () {
   const plugin = await tinkerObj.getAttachedPlugin()
   if (plugin) {

@@ -59,3 +59,146 @@ export function injectApi() {
     )
   }
 }
+
+export async function importData() {
+  const files = await _tinker.loadData()
+  if (!files) return
+
+  // localStorage
+  const localStr = files['localStorage.json']
+  if (localStr) {
+    localStorage.clear()
+    const data = JSON.parse(localStr)
+    for (const key in data) {
+      localStorage.setItem(key, data[key])
+    }
+  }
+
+  // IndexedDB
+  const dbNames = new Set<string>()
+  for (const name in files) {
+    if (name.startsWith('indexedDB/')) {
+      const dbName = name.split('/')[1]
+      if (dbName) dbNames.add(dbName)
+    }
+  }
+
+  for (const dbName of dbNames) {
+    const metaStr = files[`indexedDB/${dbName}/meta.json`]
+    if (!metaStr) continue
+    const meta = JSON.parse(metaStr)
+    const stores = meta.stores || {}
+
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbName, meta.version || 1)
+      req.onupgradeneeded = () => {
+        const upgradeDb = req.result
+        for (const storeName in stores) {
+          const def = stores[storeName]
+          if (!upgradeDb.objectStoreNames.contains(storeName)) {
+            upgradeDb.createObjectStore(storeName, {
+              keyPath: def.keyPath ?? undefined,
+              autoIncrement: !!def.autoIncrement,
+            })
+          }
+        }
+      }
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+
+    const storeNames = Array.from(db.objectStoreNames)
+    if (storeNames.length > 0) {
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(storeNames, 'readwrite')
+        for (const storeName of storeNames) {
+          tx.objectStore(storeName).clear()
+        }
+        tx.oncomplete = () => resolve()
+        tx.onerror = tx.onabort = () => reject(tx.error)
+      })
+    }
+
+    // Import data
+    for (const storeName in stores) {
+      const dataStr = files[`indexedDB/${dbName}/${storeName}.json`]
+      if (!dataStr) continue
+      const items = JSON.parse(dataStr)
+      if (items.length === 0) continue
+
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction([storeName], 'readwrite')
+        const store = tx.objectStore(storeName)
+        for (const item of items) {
+          store.put(item)
+        }
+        tx.oncomplete = () => resolve()
+        tx.onerror = tx.onabort = () => reject(tx.error)
+      })
+    }
+
+    db.close()
+  }
+
+  location.reload()
+}
+
+export async function exportData() {
+  const files: types.PlainObj<string> = {}
+
+  // localStorage
+  const localStorageData: types.PlainObj<string> = {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)!
+    localStorageData[key] = localStorage.getItem(key)!
+  }
+  files['localStorage.json'] = JSON.stringify(localStorageData)
+
+  // IndexedDB
+  const databases = await indexedDB.databases()
+  for (const dbInfo of databases) {
+    if (!dbInfo.name) continue
+    const dbName = dbInfo.name
+
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbName)
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+
+    const meta = {
+      version: db.version,
+      stores: {} as types.PlainObj<any>,
+    }
+
+    const storeNames = Array.from(db.objectStoreNames)
+    if (storeNames.length > 0) {
+      const tx = db.transaction(storeNames, 'readonly')
+
+      for (let i = 0, len = storeNames.length; i < len; i++) {
+        const storeName = storeNames[i]
+        const store = tx.objectStore(storeName)
+
+        meta.stores[storeName] = {
+          keyPath: store.keyPath,
+          autoIncrement: store.autoIncrement,
+        }
+
+        const storeData = await new Promise<any[]>((resolve, reject) => {
+          const req = store.getAll()
+          req.onsuccess = () => resolve(req.result)
+          req.onerror = () => reject(req.error)
+        })
+
+        files[`indexedDB/${dbName}/${storeName}.json`] =
+          JSON.stringify(storeData)
+      }
+    }
+
+    files[`indexedDB/${dbName}/meta.json`] = JSON.stringify(meta)
+
+    db.close()
+  }
+
+  _tinker.saveData(files)
+}

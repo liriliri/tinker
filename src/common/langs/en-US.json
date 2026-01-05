@@ -14,5 +14,7 @@
   "showShortcut": "Show Shortcut",
   "refresh": "Refresh",
   "noResult": "Nothing Found",
-  "openDir": "Open Directory"
+  "openDir": "Open Directory",
+  "exportData": "Export Data",
+  "importData": "Import Data"
 }

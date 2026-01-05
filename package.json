@@ -57,6 +57,7 @@
     "@xterm/addon-unicode11": "^0.8.0",
     "@xterm/addon-webgl": "^0.18.0",
     "@xterm/xterm": "^5.5.0",
+    "adm-zip": "^0.5.16",
     "autoprefixer": "^10.4.22",
     "concurrently": "^9.2.0",
     "custom-electron-titlebar": "^4.2.8",

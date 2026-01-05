@@ -1,7 +1,9 @@
 import {
   IpcClosePlugin,
   IpcDetachPlugin,
+  IpcExportPluginData,
   IpcGetPlugins,
+  IpcImportPluginData,
   IpcOpenPlugin,
   IpcReopenPlugin,
   IpcShowPluginContextMenu,
@@ -336,6 +338,24 @@ const showPluginContextMenu: IpcShowPluginContextMenu = function (
   }
 }
 
+const exportPluginData: IpcExportPluginData = function (id) {
+  const { view } = pluginViews[id]
+  if (!view) {
+    return
+  }
+
+  view.webContents.send('exportData')
+}
+
+const importPluginData: IpcImportPluginData = function (id) {
+  const { view } = pluginViews[id]
+  if (!view) {
+    return
+  }
+
+  view.webContents.send('importData')
+}
+
 function nodeStreamToWeb(
   stream: NodeJS.ReadableStream
 ): ReadableStream<Uint8Array> {
@@ -362,6 +382,8 @@ export function init() {
   handleEvent('togglePluginDevtools', togglePluginDevtools)
   handleEvent('showPluginContextMenu', showPluginContextMenu)
   handleEvent('getClipboardFilePaths', getClipboardFilePaths)
+  handleEvent('exportPluginData', exportPluginData)
+  handleEvent('importPluginData', importPluginData)
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

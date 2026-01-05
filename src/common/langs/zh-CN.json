@@ -14,5 +14,7 @@
   "showShortcut": "呼出快捷键",
   "refresh": "刷新",
   "noResult": "无结果",
-  "openDir": "打开目录"
+  "openDir": "打开目录",
+  "exportData": "导出数据",
+  "importData": "导入数据"
 }

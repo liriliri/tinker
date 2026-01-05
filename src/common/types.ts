@@ -64,3 +64,5 @@ export type IpcGetAttachedPlugin = () => Promise<IPlugin | undefined>
 export type IpcGetApps = (force?: boolean) => Promise<IApp[]>
 export type IpcOpenApp = (path: string) => void
 export type IpcGetClipboardFilePaths = () => string[]
+export type IpcExportPluginData = (id: string) => void
+export type IpcImportPluginData = (id: string) => void
