@@ -10,6 +10,7 @@ import contextMenu from 'share/renderer/lib/contextMenu'
 import { t } from 'common/util'
 import concat from 'licia/concat'
 import isEmpty from 'licia/isEmpty'
+import { IPlugin } from 'common/types'
 
 export default observer(function PluginList() {
   const pluginIcons = map(store.visiblePlugins, (plugin) => ({
@@ -34,20 +35,29 @@ export default observer(function PluginList() {
     const template: any[] = []
 
     if (data.plugin) {
+      const plugin: IPlugin = data.plugin
       template.push(
         {
           label: t('open'),
           click() {
-            store.openPlugin(data.plugin.id)
+            store.openPlugin(plugin.id)
           },
         },
         {
           label: t('openInNewWin'),
           click() {
-            store.openPlugin(data.plugin.id, true)
+            store.openPlugin(plugin.id, true)
           },
         }
       )
+      if (!plugin.builtin) {
+        template.push({
+          label: t('openDir'),
+          click() {
+            main.openPath(plugin.dir)
+          },
+        })
+      }
     } else {
       template.push({
         label: t('open'),

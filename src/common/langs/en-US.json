@@ -13,5 +13,6 @@
   "openInNewWin": "Open in New Window",
   "showShortcut": "Show Shortcut",
   "refresh": "Refresh",
-  "noResult": "Nothing Found"
+  "noResult": "Nothing Found",
+  "openDir": "Open Directory"
 }

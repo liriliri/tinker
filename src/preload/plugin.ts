@@ -7,7 +7,7 @@ import {
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
-import pluginRenderer from './pluginRenderer'
+import { injectApi } from './pluginRenderer'
 import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
 
@@ -17,9 +17,9 @@ window.addEventListener('DOMContentLoaded', () => {
   mainObj.on('changeTheme', updateTheme)
 })
 
-function injectRendererScript() {
+function injectRendererScript(str: string) {
   const script = document.createElement('script')
-  script.textContent = `(${pluginRenderer.toString()})()`
+  script.textContent = str
   document.documentElement.appendChild(script)
   document.documentElement.removeChild(script)
 }
@@ -28,7 +28,7 @@ let plugin: IPlugin | null = null
 
 async function preparePlugin(p: IPlugin) {
   if (p.preload) {
-    pluginRenderer()
+    injectApi()
     await import(pathToFileURL(p.preload).href)
   }
   plugin = p
@@ -75,7 +75,7 @@ window._tinker = tinkerObj
 const observer = new MutationObserver(() => {
   if (document.documentElement) {
     observer.disconnect()
-    injectRendererScript()
+    injectRendererScript(`(${injectApi.toString()})()`)
   }
 })
 observer.observe(document, { childList: true })

@@ -13,5 +13,6 @@
   "openInNewWin": "新窗口打开",
   "showShortcut": "呼出快捷键",
   "refresh": "刷新",
-  "noResult": "无结果"
+  "noResult": "无结果",
+  "openDir": "打开目录"
 }

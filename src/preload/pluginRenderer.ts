@@ -3,7 +3,7 @@ import types from 'licia/types'
 
 declare const window: any
 
-export default function () {
+export function injectApi() {
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
