@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import * as db from './lib/db'
 
@@ -16,6 +17,12 @@ export interface ClipboardItem {
   preview?: string // Preview text (first 200 chars for text, file names for files)
   timestamp: number
 }
+
+// Storage keys
+const STORAGE_KEY_FILTER_TAB = 'filter-tab'
+const STORAGE_KEY_SEARCH_QUERY = 'search-query'
+
+const storage = new LocalStore('tinker-clipboard')
 
 class Store extends BaseStore {
   // Clipboard history items
@@ -75,11 +82,13 @@ class Store extends BaseStore {
   setFilterTab(tab: FilterTab) {
     this.filterTab = tab
     this.resetLazyIndex()
+    this.saveFilters()
   }
 
   setSearchQuery(query: string) {
     this.searchQuery = query
     this.resetLazyIndex()
+    this.saveFilters()
   }
 
   loadMore() {
@@ -124,6 +133,18 @@ class Store extends BaseStore {
   // Persistence
   private async loadFromStorage() {
     try {
+      // Load filter preferences from LocalStore
+      const filterTab = storage.get(STORAGE_KEY_FILTER_TAB)
+      const searchQuery = storage.get(STORAGE_KEY_SEARCH_QUERY)
+
+      if (filterTab) {
+        this.filterTab = filterTab as FilterTab
+      }
+      if (searchQuery) {
+        this.searchQuery = searchQuery
+      }
+
+      // Load clipboard items from IndexedDB
       const items = await db.getAllItems()
       if (items.length > 0) {
         // Sort by timestamp descending
@@ -131,8 +152,17 @@ class Store extends BaseStore {
       }
       this.isLoaded = true
     } catch (error) {
-      console.error('Failed to load items from IndexedDB:', error)
+      console.error('Failed to load from storage:', error)
       this.isLoaded = true
+    }
+  }
+
+  private saveFilters() {
+    try {
+      storage.set(STORAGE_KEY_FILTER_TAB, this.filterTab)
+      storage.set(STORAGE_KEY_SEARCH_QUERY, this.searchQuery)
+    } catch (error) {
+      console.error('Failed to save filters:', error)
     }
   }
 }
