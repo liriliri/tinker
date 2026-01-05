@@ -7,7 +7,6 @@ export function showWin(plugin: IPlugin) {
   const win = window.create({
     name: plugin.id,
   })
-  win.setTitle(plugin.name)
 
   win.on('close', () => {
     if (win) {

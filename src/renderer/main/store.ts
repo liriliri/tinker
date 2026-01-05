@@ -43,7 +43,6 @@ class Store extends BaseStore {
         if (!detached) {
           runInAction(() => {
             this.plugin = plugin
-            this.filter = plugin.name
           })
         } else {
           main.closeWin()
@@ -117,7 +116,7 @@ class Store extends BaseStore {
     })
   }
   private bindEvent() {
-    main.on('updateTitle', (title: string) => {
+    main.on('updatePluginTitle', (title: string) => {
       if (this.plugin) {
         runInAction(() => (this.filter = title))
       }

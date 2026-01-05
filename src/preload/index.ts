@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('preload', preloadObj)
 contextBridge.exposeInMainWorld('main', mainObj)
 contextBridge.exposeInMainWorld('node', nodeObj)
 
+mainObj.on('updatePluginTitle', (title: string) => preloadObj.setTitle(title))
+
 declare global {
   const main: typeof mainObj
   const preload: typeof preloadObj

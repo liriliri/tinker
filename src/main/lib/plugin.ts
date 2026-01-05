@@ -196,8 +196,9 @@ const openPlugin: IpcOpenPlugin = function (id, detached) {
     win,
   }
   pluginView.webContents.on('page-title-updated', (e, title) => {
-    if (plugin === getAttachedPlugin(win)) {
-      window.sendTo('main', 'updateTitle', title)
+    const { win } = pluginViews[id]
+    if (win) {
+      win.webContents.send('updatePluginTitle', title)
     }
   })
   updatePluginTheme(id)

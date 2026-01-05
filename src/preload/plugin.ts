@@ -1,6 +1,5 @@
 import { contextBridge } from 'electron'
 import mainObj from './main'
-import preloadObj from 'share/preload/preload'
 import {
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
@@ -64,7 +63,7 @@ const tinkerObj = {
       } else {
         title = plugin.name
       }
-      preloadObj.setTitle(title)
+      document.title = title
     }
   },
   showItemInPath: mainObj.showItemInFolder,
