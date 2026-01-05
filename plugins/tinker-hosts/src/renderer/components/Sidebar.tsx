@@ -3,12 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { confirm } from 'share/components/Confirm'
 import { prompt } from 'share/components/Prompt'
-import { alert } from 'share/components/Alert'
 import { tw } from 'share/theme'
-import { FileText, Monitor, Plus, Upload, Download } from 'lucide-react'
+import { FileText, Monitor, Plus } from 'lucide-react'
 import contain from 'licia/contain'
-import each from 'licia/each'
-import isArr from 'licia/isArr'
 import store from '../store'
 import { HostsConfig } from '../types'
 
@@ -59,62 +56,6 @@ export default observer(function Sidebar() {
 
     if (result) {
       store.deleteConfig(id)
-    }
-  }
-
-  const handleExport = async () => {
-    const result = await tinker.showSaveDialog({
-      defaultPath: 'hosts-configs.json',
-      filters: [
-        { name: 'JSON Files', extensions: ['json'] },
-        { name: 'All Files', extensions: ['*'] },
-      ],
-    })
-
-    if (!result.canceled && result.filePath) {
-      try {
-        const dataStr = JSON.stringify(configs, null, 2)
-        hosts.writeFile(result.filePath, dataStr)
-      } catch (error) {
-        console.error('Failed to export configs:', error)
-        alert({ title: '导出失败' })
-      }
-    }
-  }
-
-  const handleImport = async () => {
-    const result = await tinker.showOpenDialog({
-      filters: [
-        { name: 'JSON Files', extensions: ['json'] },
-        { name: 'All Files', extensions: ['*'] },
-      ],
-      properties: ['openFile'],
-    })
-
-    if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
-      try {
-        const filePath = result.filePaths[0]
-        const dataStr = await hosts.readFile(filePath)
-        const importedConfigs = JSON.parse(dataStr)
-
-        if (isArr(importedConfigs)) {
-          // Merge imported configs with existing ones
-          // If id exists, replace; if not, add new
-          const configMap: Record<string, HostsConfig> = {}
-          each(configs, (c) => {
-            configMap[c.id] = c
-          })
-          each(importedConfigs, (imported) => {
-            configMap[imported.id] = imported
-          })
-          const newConfigs = Object.values(configMap)
-          store.configs = newConfigs
-          store.saveConfigs()
-        }
-      } catch (error) {
-        console.error('Failed to import configs:', error)
-        alert({ title: '导入失败', message: '文件格式不正确' })
-      }
     }
   }
 
@@ -203,27 +144,14 @@ export default observer(function Sidebar() {
       </div>
 
       {/* Action buttons - Fixed at bottom */}
-      <div className="p-3 flex justify-center gap-2 flex-shrink-0">
+      <div className="p-3 flex justify-center flex-shrink-0">
         <button
-          className={`p-2 ${tw.primary.text} ${tw.hover.both} rounded transition-colors`}
+          className={`${tw.primary.bg} ${tw.primary.bgHover} text-white px-4 py-2 rounded flex items-center gap-2 transition-colors`}
           onClick={handleAddConfig}
-          title="新增配置"
+          title={t('newConfig')}
         >
           <Plus className="w-5 h-5" />
-        </button>
-        <button
-          className={`p-2 text-gray-600 dark:text-gray-400 ${tw.hover.both} rounded transition-colors`}
-          onClick={handleExport}
-          title="导出配置"
-        >
-          <Upload className="w-5 h-5" />
-        </button>
-        <button
-          className={`p-2 text-gray-600 dark:text-gray-400 ${tw.hover.both} rounded transition-colors`}
-          onClick={handleImport}
-          title="导入配置"
-        >
-          <Download className="w-5 h-5" />
+          <span className="text-sm font-medium">{t('newConfig')}</span>
         </button>
       </div>
     </div>

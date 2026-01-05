@@ -25,7 +25,7 @@ class Store extends BaseStore {
   correctLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
 
   // Canvas ref for toolbar access
-  canvasRef: RefObject<HTMLCanvasElement> | null = null
+  canvasRef: RefObject<HTMLCanvasElement | null> | null = null
 
   constructor() {
     super()
