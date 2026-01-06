@@ -13,7 +13,6 @@ import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
-  ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -59,70 +58,65 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <ToolbarButton
-        onClick={() => store.prevPage()}
-        disabled={store.currentPage <= 1 || !store.pdfDoc}
-        title={t('previousPage')}
-      >
-        <ChevronLeft size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      {/* Page navigation group - compact */}
+      <div className="flex items-center gap-0.5">
+        <ToolbarButton
+          onClick={() => store.prevPage()}
+          disabled={store.currentPage <= 1 || !store.pdfDoc}
+          title={t('previousPage')}
+        >
+          <ChevronLeft size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-      <span
-        className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[60px] text-center`}
-      >
-        {store.pdfDoc ? `${store.currentPage} / ${store.numPages}` : '-'}
-      </span>
+        <span
+          className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[50px] text-center px-1`}
+        >
+          {store.pdfDoc ? `${store.currentPage} / ${store.numPages}` : '-'}
+        </span>
 
-      <ToolbarButton
-        onClick={() => store.nextPage()}
-        disabled={store.currentPage >= store.numPages || !store.pdfDoc}
-        title={t('nextPage')}
-      >
-        <ChevronRight size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+        <ToolbarButton
+          onClick={() => store.nextPage()}
+          disabled={store.currentPage >= store.numPages || !store.pdfDoc}
+          title={t('nextPage')}
+        >
+          <ChevronRight size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </div>
 
       <ToolbarSeparator />
 
-      <ToolbarButton
-        onClick={() => store.zoomOut()}
-        disabled={store.scale <= 0.5 || !store.pdfDoc}
-        title={t('zoomOut')}
-      >
-        <ZoomOut size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      {/* Zoom controls group - compact */}
+      <div className="flex items-center gap-0.5">
+        <ToolbarButton
+          onClick={() => store.zoomOut()}
+          disabled={store.scale <= 0.5 || !store.pdfDoc}
+          title={t('zoomOut')}
+        >
+          <ZoomOut size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-      <span
-        className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[50px] text-center`}
-      >
-        {store.pdfDoc ? `${Math.round(store.scale * 100)}%` : '-'}
-      </span>
+        <span
+          className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[40px] text-center px-1`}
+        >
+          {store.pdfDoc ? `${Math.round(store.scale * 100)}%` : '-'}
+        </span>
 
-      <ToolbarButton
-        onClick={() => store.zoomIn()}
-        disabled={store.scale >= 3 || !store.pdfDoc}
-        title={t('zoomIn')}
-      >
-        <ZoomIn size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+        <ToolbarButton
+          onClick={() => store.zoomIn()}
+          disabled={store.scale >= 3 || !store.pdfDoc}
+          title={t('zoomIn')}
+        >
+          <ZoomIn size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        onClick={() => store.resetZoom()}
-        disabled={!store.pdfDoc}
-        title={t('resetZoom')}
-      >
-        <RotateCcw size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      {store.fileName && (
-        <>
-          <ToolbarSpacer />
-          <span
-            className={`text-xs ${tw.text.light.secondary} ${tw.text.dark.secondary} truncate max-w-xs`}
-          >
-            {store.fileName}
-          </span>
-        </>
-      )}
+        <ToolbarButton
+          onClick={() => store.resetZoom()}
+          disabled={!store.pdfDoc}
+          title={t('resetZoom')}
+        >
+          <RotateCcw size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </div>
     </Toolbar>
   )
 })
