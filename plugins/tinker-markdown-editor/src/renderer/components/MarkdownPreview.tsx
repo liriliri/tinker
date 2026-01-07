@@ -1,37 +1,35 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState, useRef } from 'react'
-import { remark } from 'remark'
-import remarkHtml from 'remark-html'
-import remarkGfm from 'remark-gfm'
+import { useEffect, useRef } from 'react'
+import Vditor from 'vditor'
+import 'vditor/dist/index.css'
 import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function MarkdownPreview() {
-  const [html, setHtml] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const convertMarkdown = async () => {
-      if (!store.markdownInput) {
-        setHtml('')
-        return
-      }
+    if (!contentRef.current) return
 
-      try {
-        const result = await remark()
-          .use(remarkGfm)
-          .use(remarkHtml)
-          .process(store.markdownInput)
-
-        setHtml(String(result))
-      } catch (err) {
-        console.error('Failed to convert markdown:', err)
-        setHtml('<p style="color: red;">Failed to render markdown</p>')
-      }
+    if (!store.markdownInput) {
+      contentRef.current.innerHTML = ''
+      return
     }
 
-    convertMarkdown()
-  }, [store.markdownInput])
+    try {
+      Vditor.preview(contentRef.current, store.markdownInput, {
+        mode: store.isDark ? 'dark' : 'light',
+        theme: {
+          current: store.isDark ? 'dark' : 'light',
+        },
+      })
+    } catch (err) {
+      console.error('Failed to convert markdown:', err)
+      contentRef.current.innerHTML =
+        '<p class="text-red-500">Failed to render markdown</p>'
+    }
+  }, [store.markdownInput, store.isDark])
 
   // Handle scroll event from preview
   useEffect(() => {
@@ -62,9 +60,7 @@ export default observer(function MarkdownPreview() {
   // Sync scroll from editor to preview
   useEffect(() => {
     const container = containerRef.current
-    if (!container) {
-      return
-    }
+    if (!container) return
 
     const scrollHeight = container.scrollHeight
     const clientHeight = container.clientHeight
@@ -73,12 +69,11 @@ export default observer(function MarkdownPreview() {
     if (maxScroll <= 0) return
 
     const currentScrollTop = container.scrollTop
-    const currentPercent = maxScroll > 0 ? currentScrollTop / maxScroll : 0
+    const currentPercent = currentScrollTop / maxScroll
 
     // Only sync if there's a meaningful difference
     if (Math.abs(currentPercent - store.scrollPercent) > 0.001) {
-      const targetScrollTop = maxScroll * store.scrollPercent
-      container.scrollTop = targetScrollTop
+      container.scrollTop = maxScroll * store.scrollPercent
     }
   }, [store.scrollPercent])
 
@@ -86,11 +81,10 @@ export default observer(function MarkdownPreview() {
     <div
       ref={containerRef}
       className={`markdown-preview-container h-full w-full overflow-auto p-6 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-      data-color-mode={store.isDark ? 'dark' : 'light'}
     >
       <div
-        className="markdown-body"
-        dangerouslySetInnerHTML={{ __html: html }}
+        ref={contentRef}
+        className={`vditor-reset ${store.isDark ? 'vditor-reset--dark' : ''}`}
       />
     </div>
   )

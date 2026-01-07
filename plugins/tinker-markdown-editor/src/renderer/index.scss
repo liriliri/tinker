@@ -1,42 +1,15 @@
 @use 'tailwindcss';
-@import 'github-markdown-css/github-markdown.css';
 @config "../../tailwind.config.js";
 
 html.dark {
   color-scheme: dark;
 }
 
-/* Override markdown-body styles */
-.markdown-body {
-  box-sizing: border-box;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  width: 100%;
-  word-wrap: break-word;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  background-color: transparent !important;
+/* Override vditor styles for dark mode */
+.vditor-reset--dark {
+  color: #e0e0e0;
 
-  // Prevent child elements from overflowing
-  * {
-    max-width: 100%;
-    word-wrap: break-word;
+  :is(.dark *) & {
+    background-color: transparent;
   }
-
-  // Special handling for tables
-  table {
-    display: block;
-    width: 100% !important;
-    overflow-x: auto;
-  }
-
-  // Special handling for code blocks
-  pre {
-    max-width: 100%;
-    overflow-x: auto;
-  }
-}
-
-.markdown-preview-container {
-  box-sizing: border-box;
 }
