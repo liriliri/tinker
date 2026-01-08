@@ -169,6 +169,38 @@ export function formatHsi(hsi: { h: number; s: number; i: number }): string {
   return `${hsi.h}, ${hsi.s}%, ${hsi.i}%`
 }
 
+// Convert formatted values to CSS-compatible strings for clipboard
+export function toCssHex(hex: string): string {
+  return `#${hex.replace('#', '').toLowerCase()}`
+}
+
+export function toCssRgb(rgb: RGB): string {
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+}
+
+export function toCssHsl(hsl: HSL): string {
+  return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+}
+
+export function toCssHsv(hsv: HSV): string {
+  // HSV doesn't have native CSS support, return as hsv() format for consistency
+  return `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`
+}
+
+export function toCssCmyk(cmyk: CMYK): string {
+  // CMYK doesn't have native CSS support, return as device-cmyk() format
+  return `device-cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`
+}
+
+export function toCssLab(lab: LAB): string {
+  return `lab(${lab.l}% ${lab.a} ${lab.b})`
+}
+
+export function toCssHsi(hsi: { h: number; s: number; i: number }): string {
+  // HSI doesn't have native CSS support, return formatted string
+  return `hsi(${hsi.h}, ${hsi.s}%, ${hsi.i}%)`
+}
+
 // Generate color variants by adjusting lightness
 export function getColorVariants(
   hex: string

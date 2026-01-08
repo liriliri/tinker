@@ -20,6 +20,13 @@ import {
   formatLab,
   formatHsi,
   parseColorToHex,
+  toCssHex,
+  toCssRgb,
+  toCssHsl,
+  toCssHsv,
+  toCssCmyk,
+  toCssLab,
+  toCssHsi,
 } from '../lib/util'
 
 interface FormatRowProps {
@@ -27,15 +34,22 @@ interface FormatRowProps {
   value: string
   copyTitle: string
   format: 'hex' | 'rgb' | 'hsl' | 'hsv' | 'cmyk' | 'lab' | 'hsi'
+  cssValue: string
 }
 
-function FormatRow({ label, value, copyTitle, format }: FormatRowProps) {
+function FormatRow({
+  label,
+  value,
+  copyTitle,
+  format,
+  cssValue,
+}: FormatRowProps) {
   const { copied, copyToClipboard } = useCopyToClipboard()
   const [localValue, setLocalValue] = useState(value)
   const [isEditing, setIsEditing] = useState(false)
 
   const handleCopy = async () => {
-    await copyToClipboard(value)
+    await copyToClipboard(cssValue)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,42 +135,49 @@ export default observer(function ColorFormats() {
           value={formatHex(store.currentColor)}
           copyTitle={t('copyToClipboard')}
           format="hex"
+          cssValue={toCssHex(store.currentColor)}
         />
         <FormatRow
           label="RGB"
           value={formatRgb(rgb)}
           copyTitle={t('copyToClipboard')}
           format="rgb"
+          cssValue={toCssRgb(rgb)}
         />
         <FormatRow
           label="HSV/HSB"
           value={formatHsv(hsv)}
           copyTitle={t('copyToClipboard')}
           format="hsv"
+          cssValue={toCssHsv(hsv)}
         />
         <FormatRow
           label="HSL"
           value={formatHsl(hsl)}
           copyTitle={t('copyToClipboard')}
           format="hsl"
+          cssValue={toCssHsl(hsl)}
         />
         <FormatRow
           label="CMYK"
           value={formatCmyk(cmyk)}
           copyTitle={t('copyToClipboard')}
           format="cmyk"
+          cssValue={toCssCmyk(cmyk)}
         />
         <FormatRow
           label="HSI"
           value={formatHsi(hsi)}
           copyTitle={t('copyToClipboard')}
           format="hsi"
+          cssValue={toCssHsi(hsi)}
         />
         <FormatRow
           label="CIE-LAB"
           value={formatLab(lab)}
           copyTitle={t('copyToClipboard')}
           format="lab"
+          cssValue={toCssLab(lab)}
         />
       </div>
     </div>

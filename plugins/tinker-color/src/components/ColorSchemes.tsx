@@ -6,6 +6,7 @@ import {
   getColorVariants,
   getComplementaryColor,
   getAnalogousColors,
+  toCssHex,
 } from '../lib/util'
 
 export default observer(function ColorSchemes() {
@@ -27,7 +28,9 @@ export default observer(function ColorSchemes() {
               key={variant.lightness}
               className={`aspect-square rounded-lg shadow-sm hover:scale-110 transition-transform cursor-pointer border-2 border-transparent ${tw.primary.hoverBorder} flex flex-col items-center justify-center relative group`}
               style={{ backgroundColor: variant.color }}
-              onClick={() => store.copyToClipboardWithToast(variant.color)}
+              onClick={() =>
+                store.copyToClipboardWithToast(toCssHex(variant.color))
+              }
               title={`${variant.color} - Lightness: ${variant.lightness}%`}
             >
               <span
@@ -55,7 +58,9 @@ export default observer(function ColorSchemes() {
         <button
           className="w-full h-15 rounded-xl shadow-lg hover:scale-[1.02] transition-transform cursor-pointer flex items-center justify-center"
           style={{ backgroundColor: complementary }}
-          onClick={() => store.copyToClipboardWithToast(complementary)}
+          onClick={() =>
+            store.copyToClipboardWithToast(toCssHex(complementary))
+          }
           title={t('clickToCopy', { color: complementary })}
         >
           <div className="bg-black/15 backdrop-blur-sm px-4 py-2 rounded-lg">
@@ -77,7 +82,7 @@ export default observer(function ColorSchemes() {
               key={index}
               className="h-15 rounded-xl shadow-lg hover:scale-[1.02] transition-transform cursor-pointer flex items-center justify-center"
               style={{ backgroundColor: color }}
-              onClick={() => store.copyToClipboardWithToast(color)}
+              onClick={() => store.copyToClipboardWithToast(toCssHex(color))}
               title={t('clickToCopy', { color })}
             >
               <div className="bg-black/20 backdrop-blur-sm px-3 py-2 rounded-lg">
