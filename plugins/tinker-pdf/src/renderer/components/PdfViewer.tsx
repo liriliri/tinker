@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import store from '../store'
 import { tw } from 'share/theme'
+import FileOpen from './FileOpen'
 
 interface PageRenderState {
   rendered: boolean
@@ -11,6 +13,7 @@ interface PageRenderState {
 }
 
 export default observer(function PdfViewer() {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map())
@@ -19,6 +22,31 @@ export default observer(function PdfViewer() {
     new Map()
   )
   const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // Handle drag and drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const files = e.dataTransfer.files
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+
+    try {
+      const filePath = (file as any).path
+      if (filePath) {
+        await store.loadPdfFile(filePath)
+      }
+    } catch (err) {
+      console.error('Failed to load file:', err)
+    }
+  }
 
   // Initialize page states when document loads
   useEffect(() => {
@@ -386,13 +414,15 @@ export default observer(function PdfViewer() {
 
   if (!store.pdfDoc) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div
-          className={`text-center ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-        >
-          <p>No PDF loaded</p>
-          <p className="text-xs mt-2">Click "Open File" to load a PDF</p>
-        </div>
+      <div
+        className="flex-1 flex flex-col"
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <FileOpen
+          onOpenFile={() => store.openFile()}
+          openTitle={t('openTitle')}
+        />
       </div>
     )
   }

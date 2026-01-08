@@ -16,107 +16,93 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { pdfjsLib } from '../lib/pdfjs'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const handleOpenFile = async () => {
-    try {
-      const result = await tinker.showOpenDialog({
-        filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-        properties: ['openFile'],
-      })
-
-      if (result.canceled || !result.filePaths.length) return
-
-      const filePath = result.filePaths[0]
-      store.setLoading(true)
-      store.setFileName(filePath.split('/').pop() || '')
-
-      // Read file using pdf API
-      const fileData = await pdf.readFile(filePath)
-
-      // Load PDF document
-      const loadingTask = pdfjsLib.getDocument({ data: fileData })
-      const pdfDoc = await loadingTask.promise
-
-      store.setPdfDoc(pdfDoc)
-    } catch (error) {
-      console.error('Error loading PDF:', error)
-      store.showError('Failed to load PDF file')
-    } finally {
-      store.setLoading(false)
-    }
-  }
-
   return (
     <Toolbar>
-      <ToolbarButton onClick={handleOpenFile} title={t('openFile')}>
-        <FolderOpen size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarSeparator />
-
-      {/* Page navigation group - compact */}
-      <div className="flex items-center gap-0.5">
-        <ToolbarButton
-          onClick={() => store.prevPage()}
-          disabled={store.currentPage <= 1 || !store.pdfDoc}
-          title={t('previousPage')}
-        >
-          <ChevronLeft size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <span
-          className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[50px] text-center px-1`}
-        >
-          {store.pdfDoc ? `${store.currentPage} / ${store.numPages}` : '-'}
-        </span>
-
-        <ToolbarButton
-          onClick={() => store.nextPage()}
-          disabled={store.currentPage >= store.numPages || !store.pdfDoc}
-          title={t('nextPage')}
-        >
-          <ChevronRight size={TOOLBAR_ICON_SIZE} />
+      {/* Left side */}
+      <div className="flex items-center">
+        <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
+          <FolderOpen size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </div>
 
-      <ToolbarSeparator />
+      {store.pdfDoc && (
+        <>
+          {/* Spacer to push controls to center */}
+          <div className="flex-1" />
 
-      {/* Zoom controls group - compact */}
-      <div className="flex items-center gap-0.5">
-        <ToolbarButton
-          onClick={() => store.zoomOut()}
-          disabled={store.scale <= 0.5 || !store.pdfDoc}
-          title={t('zoomOut')}
-        >
-          <ZoomOut size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+          {/* Center controls */}
+          <div className="flex items-center gap-2">
+            {/* Page navigation group - compact */}
+            <div className="flex items-center gap-0.5">
+              <ToolbarButton
+                onClick={() => store.prevPage()}
+                disabled={store.currentPage <= 1}
+                title={t('previousPage')}
+              >
+                <ChevronLeft size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
 
-        <span
-          className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[40px] text-center px-1`}
-        >
-          {store.pdfDoc ? `${Math.round(store.scale * 100)}%` : '-'}
-        </span>
+              <span
+                className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[80px] text-center px-2`}
+              >
+                {`${store.currentPage} / ${store.numPages}`}
+              </span>
 
-        <ToolbarButton
-          onClick={() => store.zoomIn()}
-          disabled={store.scale >= 3 || !store.pdfDoc}
-          title={t('zoomIn')}
-        >
-          <ZoomIn size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+              <ToolbarButton
+                onClick={() => store.nextPage()}
+                disabled={store.currentPage >= store.numPages}
+                title={t('nextPage')}
+              >
+                <ChevronRight size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+            </div>
 
-        <ToolbarButton
-          onClick={() => store.resetZoom()}
-          disabled={!store.pdfDoc}
-          title={t('resetZoom')}
-        >
-          <RotateCcw size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      </div>
+            <ToolbarSeparator />
+
+            {/* Zoom controls group - compact */}
+            <div className="flex items-center gap-0.5">
+              <ToolbarButton
+                onClick={() => store.zoomOut()}
+                disabled={store.scale <= 0.5}
+                title={t('zoomOut')}
+              >
+                <ZoomOut size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+
+              <span
+                className={`text-xs ${tw.text.light.primary} ${tw.text.dark.primary} min-w-[40px] text-center px-1`}
+              >
+                {`${Math.round(store.scale * 100)}%`}
+              </span>
+
+              <ToolbarButton
+                onClick={() => store.zoomIn()}
+                disabled={store.scale >= 3}
+                title={t('zoomIn')}
+              >
+                <ZoomIn size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+
+              <ToolbarButton
+                onClick={() => store.resetZoom()}
+                title={t('resetZoom')}
+              >
+                <RotateCcw size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+            </div>
+          </div>
+
+          {/* Spacer to balance the layout */}
+          <div className="flex-1" />
+
+          {/* Right side - placeholder to match left side width */}
+          <div className="flex items-center" style={{ width: '32px' }} />
+        </>
+      )}
     </Toolbar>
   )
 })

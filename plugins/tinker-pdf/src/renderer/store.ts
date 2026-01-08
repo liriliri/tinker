@@ -2,6 +2,7 @@ import { makeAutoObservable, reaction } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
+import { pdfjsLib } from './lib/pdfjs'
 
 class Store extends BaseStore {
   // PDF document
@@ -122,6 +123,45 @@ class Store extends BaseStore {
   // Error handling
   showError(message: string) {
     alert({ title: 'Error', message })
+  }
+
+  // Load PDF file
+  async loadPdfFile(filePath: string) {
+    this.setLoading(true)
+    this.setFileName(filePath.split('/').pop() || '')
+
+    try {
+      // Read file using pdf API
+      const fileData = await pdf.readFile(filePath)
+
+      // Load PDF document
+      const loadingTask = pdfjsLib.getDocument({ data: fileData })
+      const pdfDoc = await loadingTask.promise
+
+      this.setPdfDoc(pdfDoc)
+    } catch (error) {
+      console.error('Error loading PDF:', error)
+      this.showError('Failed to load PDF file')
+    } finally {
+      this.setLoading(false)
+    }
+  }
+
+  // Open file dialog
+  async openFile() {
+    try {
+      const result = await tinker.showOpenDialog({
+        filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
+        properties: ['openFile'],
+      })
+
+      if (result.canceled || !result.filePaths.length) return
+
+      const filePath = result.filePaths[0]
+      await this.loadPdfFile(filePath)
+    } catch (error) {
+      console.error('Error opening file:', error)
+    }
   }
 }
 

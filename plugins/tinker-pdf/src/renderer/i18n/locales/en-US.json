@@ -4,5 +4,6 @@
   "nextPage": "Next Page",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",
-  "resetZoom": "Reset Zoom"
+  "resetZoom": "Reset Zoom",
+  "openTitle": "Drop PDF file here or click to open"
 }
