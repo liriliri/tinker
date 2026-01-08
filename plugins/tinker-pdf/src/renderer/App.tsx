@@ -3,6 +3,8 @@ import { AlertProvider } from 'share/components/Alert'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import PdfViewer from './components/PdfViewer'
+import ThumbnailSidebar from './components/ThumbnailSidebar'
+import store from './store'
 
 export default observer(function App() {
   return (
@@ -11,7 +13,10 @@ export default observer(function App() {
         className={`h-screen flex flex-col transition-colors ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
       >
         <Toolbar />
-        <PdfViewer />
+        <div className="flex-1 flex overflow-hidden">
+          {store.sidebarOpen && store.pdfDoc && <ThumbnailSidebar />}
+          <PdfViewer />
+        </div>
       </div>
     </AlertProvider>
   )

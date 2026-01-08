@@ -3,6 +3,13 @@ import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { pdfjsLib } from './lib/pdfjs'
+import LocalStore from 'licia/LocalStore'
+
+const storage = new LocalStore('tinker-pdf')
+const STORAGE_KEY_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_KEY_SIDEBAR_VIEW = 'sidebarView'
+
+export type SidebarView = 'thumbnails' | 'outline'
 
 class Store extends BaseStore {
   // PDF document
@@ -28,10 +35,27 @@ class Store extends BaseStore {
   // Track if user has manually changed scale
   userHasZoomed: boolean = false
 
+  // Sidebar visibility
+  sidebarOpen: boolean = true
+  sidebarView: SidebarView = 'thumbnails'
+
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadFromStorage()
     this.bindEvent()
+  }
+
+  private loadFromStorage() {
+    const savedSidebarOpen = storage.get(STORAGE_KEY_SIDEBAR_OPEN)
+    if (savedSidebarOpen !== undefined) {
+      this.sidebarOpen = savedSidebarOpen
+    }
+
+    const savedSidebarView = storage.get(STORAGE_KEY_SIDEBAR_VIEW)
+    if (savedSidebarView === 'thumbnails' || savedSidebarView === 'outline') {
+      this.sidebarView = savedSidebarView
+    }
   }
 
   private bindEvent() {
@@ -108,6 +132,22 @@ class Store extends BaseStore {
 
   setContainerWidth(width: number) {
     this.containerWidth = width
+  }
+
+  // Sidebar controls
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen
+    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setSidebarOpen(open: boolean) {
+    this.sidebarOpen = open
+    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setSidebarView(view: SidebarView) {
+    this.sidebarView = view
+    storage.set(STORAGE_KEY_SIDEBAR_VIEW, view)
   }
 
   // Loading state

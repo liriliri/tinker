@@ -7,6 +7,7 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
+  PanelLeft,
 } from 'lucide-react'
 import store from '../store'
 import { tw } from 'share/theme'
@@ -23,7 +24,19 @@ export default observer(function ToolbarComponent() {
   return (
     <Toolbar>
       {/* Left side */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-0">
+        <ToolbarButton
+          variant="toggle"
+          active={store.sidebarOpen && !!store.pdfDoc}
+          onClick={() => store.toggleSidebar()}
+          title={t('toggleSidebar')}
+          disabled={!store.pdfDoc}
+        >
+          <PanelLeft size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
         <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
           <FolderOpen size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -100,7 +113,15 @@ export default observer(function ToolbarComponent() {
           <div className="flex-1" />
 
           {/* Right side - placeholder to match left side width */}
-          <div className="flex items-center" style={{ width: '32px' }} />
+          <div className="flex items-center gap-0 invisible">
+            <ToolbarButton disabled>
+              <PanelLeft size={TOOLBAR_ICON_SIZE} />
+            </ToolbarButton>
+            <ToolbarSeparator />
+            <ToolbarButton disabled>
+              <FolderOpen size={TOOLBAR_ICON_SIZE} />
+            </ToolbarButton>
+          </div>
         </>
       )}
     </Toolbar>

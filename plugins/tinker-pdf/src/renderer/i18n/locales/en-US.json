@@ -1,9 +1,11 @@
 {
   "openFile": "Open File",
+  "toggleSidebar": "Toggle Sidebar",
   "previousPage": "Previous Page",
   "nextPage": "Next Page",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",
   "resetZoom": "Reset Zoom",
-  "openTitle": "Drop PDF file here or click to open"
+  "openTitle": "Drop PDF file here or click to open",
+  "noOutline": "No outline available"
 }

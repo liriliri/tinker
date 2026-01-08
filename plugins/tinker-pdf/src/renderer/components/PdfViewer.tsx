@@ -271,12 +271,15 @@ export default observer(function PdfViewer() {
 
     updateDimensionsAndReset()
 
-    // Clear all canvases
+    // Clear all canvases and reset their dimensions
     canvasRefs.current.forEach((canvas) => {
       const context = canvas.getContext('2d')
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height)
       }
+      // Reset canvas dimensions to trigger layout recalculation
+      canvas.width = 0
+      canvas.height = 0
     })
   }, [store.scale])
 
