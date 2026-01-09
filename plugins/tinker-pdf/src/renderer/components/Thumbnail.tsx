@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import type { PDFPageProxy } from 'pdfjs-dist'
-
-const THUMBNAIL_WIDTH = 126
+import { THUMBNAIL_WIDTH } from '../lib/constants'
 
 interface ThumbnailProps {
   pageNum: number
@@ -10,6 +9,7 @@ interface ThumbnailProps {
   scale: number
   isActive: boolean
   onClick: () => void
+  preCalculatedDimensions?: { width: number; height: number }
 }
 
 export default function Thumbnail({
@@ -17,16 +17,56 @@ export default function Thumbnail({
   pdfDoc,
   isActive,
   onClick,
+  preCalculatedDimensions,
 }: ThumbnailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [rendered, setRendered] = useState(false)
   const [rendering, setRendering] = useState(false)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [isVisible, setIsVisible] = useState(false)
+  const [dimensions, setDimensions] = useState(
+    preCalculatedDimensions || { width: THUMBNAIL_WIDTH, height: 100 }
+  )
   const renderTaskRef = useRef<any>(null)
+
+  // Update dimensions when preCalculatedDimensions changes
+  useEffect(() => {
+    if (preCalculatedDimensions) {
+      setDimensions(preCalculatedDimensions)
+    }
+  }, [preCalculatedDimensions])
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true)
+          }
+        })
+      },
+      {
+        root: null,
+        rootMargin: '200px', // Start loading 200px before entering viewport
+        threshold: 0,
+      }
+    )
+
+    observer.observe(container)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
     const renderThumbnail = async () => {
-      if (!pdfDoc || !canvasRef.current || rendered || rendering) return
+      if (!pdfDoc || !canvasRef.current || rendered || rendering || !isVisible)
+        return
 
       setRendering(true)
 
@@ -65,6 +105,7 @@ export default function Thumbnail({
         const renderContext = {
           canvasContext: context,
           viewport: scaledViewport,
+          canvas: canvas,
         }
 
         renderTaskRef.current = page.render(renderContext)
@@ -92,15 +133,12 @@ export default function Thumbnail({
         }
       }
     }
-  }, [pdfDoc, pageNum])
+  }, [pdfDoc, pageNum, isVisible])
 
   return (
     <div
-      className={`
-        flex flex-col items-center p-2 cursor-pointer rounded transition-colors
-        ${isActive ? `${tw.bg.light.active} ${tw.bg.dark.active}` : ''}
-        hover:${tw.bg.light.hover} hover:${tw.bg.dark.hover}
-      `}
+      ref={containerRef}
+      className="flex flex-col items-center p-2 cursor-pointer rounded relative"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -109,12 +147,17 @@ export default function Thumbnail({
     >
       <div
         className={`
-          relative bg-white shadow-md overflow-hidden
-          ${isActive ? 'ring-2 ring-blue-500' : ''}
+          relative bg-white overflow-hidden rounded-lg transition-shadow
+          ${
+            !isActive &&
+            'shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_1px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)] hover:shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_2px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)]'
+          }
         `}
         style={{
-          width: dimensions.width || THUMBNAIL_WIDTH,
-          minHeight: dimensions.height || 100,
+          width: dimensions.width,
+          height: dimensions.height,
+          minHeight: dimensions.height,
+          boxShadow: isActive ? `0 0 0 2px ${THEME_COLORS.primary}` : undefined,
         }}
       >
         <canvas
@@ -126,18 +169,27 @@ export default function Thumbnail({
           }}
         />
         {!rendered && !rendering && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
+          <div className="absolute inset-0 flex items-center justify-center bg-white text-gray-400 text-xs">
             <p>{pageNum}</p>
           </div>
         )}
         {rendering && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
+          <div className="absolute inset-0 flex items-center justify-center bg-white text-gray-400 text-xs">
             <p>...</p>
           </div>
         )}
       </div>
+      {/* Page number overlay */}
       <div
-        className={`mt-1 text-xs ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+        className={`
+          absolute bottom-3 left-1/2 -translate-x-1/2
+          min-w-[32px] h-4 px-2
+          flex items-center justify-center
+          rounded-lg text-xs font-normal
+          pointer-events-none
+          ${tw.bg.light.primary} ${tw.bg.dark.primary}
+          ${tw.text.light.primary} ${tw.text.dark.primary}
+        `}
       >
         {pageNum}
       </div>

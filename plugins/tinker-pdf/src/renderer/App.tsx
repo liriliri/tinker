@@ -4,7 +4,6 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import PdfViewer from './components/PdfViewer'
 import ThumbnailSidebar from './components/ThumbnailSidebar'
-import store from './store'
 
 export default observer(function App() {
   return (
@@ -14,7 +13,7 @@ export default observer(function App() {
       >
         <Toolbar />
         <div className="flex-1 flex overflow-hidden">
-          {store.sidebarOpen && store.pdfDoc && <ThumbnailSidebar />}
+          <ThumbnailSidebar />
           <PdfViewer />
         </div>
       </div>
