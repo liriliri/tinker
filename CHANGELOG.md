@@ -1,3 +1,8 @@
+## v0.7.0 (10 Jan 2026)
+
+* feat: add pdf
+* feat: add text encoder
+
 ## v0.6.0 (3 Jan 2026)
 
 * feat: add unit converter
