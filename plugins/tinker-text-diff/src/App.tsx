@@ -5,7 +5,7 @@ import DualEditor from './components/DualEditor'
 import Toolbar from './components/Toolbar'
 import store from './store'
 
-const App = observer(() => {
+export default observer(function App() {
   return (
     <div
       className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
@@ -21,5 +21,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App

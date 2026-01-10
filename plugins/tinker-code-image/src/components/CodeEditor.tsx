@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import store, { shikiTheme } from '../store'
 
-const CodeEditor = observer(() => {
+export default observer(function CodeEditor() {
   const [highlightedHtml, setHighlightedHtml] = useState('')
   const numberOfLines = (store.code.match(/\n/g) || []).length + 1
 
@@ -38,14 +38,7 @@ const CodeEditor = observer(() => {
     generateHighlightedHtml().then((html) => {
       setHighlightedHtml(html)
     })
-  }, [
-    store.code,
-    store.selectedLanguage,
-    store.highlighter,
-    store.darkMode,
-    store.selectedTheme,
-    store.showLineNumbers,
-  ])
+  }, [store.code, store.selectedLanguage, store.highlighter, store.darkMode, store.selectedTheme, store.showLineNumbers])
 
   const showLineNumbers = store.showLineNumbers
   const lineNumberPadding = showLineNumbers
@@ -118,5 +111,3 @@ const CodeEditor = observer(() => {
     </div>
   )
 })
-
-export default CodeEditor

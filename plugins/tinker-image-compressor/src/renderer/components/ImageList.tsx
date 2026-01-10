@@ -5,7 +5,7 @@ import { tw } from 'share/theme'
 import store from '../store'
 import { MenuItemConstructorOptions } from 'electron'
 
-const ImageList = observer(() => {
+export default observer(function ImageList() {
   const { t } = useTranslation()
 
   const handleContextMenu = (e: React.MouseEvent, imageId: string) => {
@@ -141,5 +141,3 @@ const ImageList = observer(() => {
     </div>
   )
 })
-
-export default ImageList

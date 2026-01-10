@@ -7,7 +7,7 @@ import ImageList from './components/ImageList'
 import CompareModal from './components/CompareModal'
 import store from './store'
 
-const App = observer(() => {
+export default observer(function App() {
   const { t } = useTranslation()
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -68,5 +68,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App

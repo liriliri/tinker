@@ -7,7 +7,7 @@ import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
 import store from './store'
 
-const App = observer(() => {
+export default observer(function App() {
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault()
@@ -62,5 +62,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App

@@ -9,7 +9,9 @@ interface ImageCropperProps {
   cropperRef: RefObject<CropperRef | null>
 }
 
-const ImageCropper = observer(({ cropperRef }: ImageCropperProps) => {
+export default observer(function ImageCropper({
+  cropperRef,
+}: ImageCropperProps) {
   if (!store.image) return null
 
   const handleChange = (cropper: CropperRef) => {
@@ -35,5 +37,3 @@ const ImageCropper = observer(({ cropperRef }: ImageCropperProps) => {
     </div>
   )
 })
-
-export default ImageCropper

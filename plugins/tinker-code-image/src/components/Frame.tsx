@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import store from '../store'
 import CodeEditor from './CodeEditor'
 
-const Frame = observer(() => {
+export default observer(function Frame() {
   const frameColors = store.frameColors
   const checkColor = store.darkMode ? '#333' : '#e8e8e8'
 
@@ -103,5 +103,3 @@ const Frame = observer(() => {
     </div>
   )
 })
-
-export default Frame

@@ -4,7 +4,7 @@ import { ImgComparisonSlider } from '@img-comparison-slider/react'
 import Dialog from 'share/components/Dialog'
 import store from '../store'
 
-const CompareModal = observer(() => {
+export default observer(function CompareModal() {
   const { t } = useTranslation()
 
   const image = store.compareImageId
@@ -48,5 +48,3 @@ const CompareModal = observer(() => {
     </Dialog>
   )
 })
-
-export default CompareModal

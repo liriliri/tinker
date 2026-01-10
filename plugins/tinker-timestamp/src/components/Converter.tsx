@@ -6,7 +6,7 @@ import dateFormat from 'licia/dateFormat'
 import { tw } from 'share/theme'
 import store from '../store'
 
-const Converter = observer(() => {
+export default observer(function Converter() {
   const { t, i18n } = useTranslation()
   const [copiedDate, setCopiedDate] = useState(false)
   const [copiedTimestamp, setCopiedTimestamp] = useState(false)
@@ -154,5 +154,3 @@ const Converter = observer(() => {
     </div>
   )
 })
-
-export default Converter

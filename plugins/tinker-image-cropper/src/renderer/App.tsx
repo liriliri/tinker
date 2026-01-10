@@ -8,7 +8,7 @@ import ImageOpen from 'share/components/ImageOpen'
 import ImageCropper from './components/ImageCropper'
 import store from './store'
 
-const App = observer(() => {
+export default observer(function App() {
   const { t } = useTranslation()
   const cropperRef = useRef<CropperRef>(null)
 
@@ -81,5 +81,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App

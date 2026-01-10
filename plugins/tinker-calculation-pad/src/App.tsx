@@ -6,7 +6,7 @@ import Toolbar from './components/Toolbar'
 import CalculationList from './components/CalculationList'
 import store from './store'
 
-const App = observer(() => {
+export default observer(function App() {
   useEffect(() => {
     store.focusActiveLine()
   }, [])
@@ -37,5 +37,3 @@ const App = observer(() => {
     </div>
   )
 })
-
-export default App
