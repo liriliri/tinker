@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
-export type EncodingType = 'url' | 'morse'
+export type EncodingType = 'url' | 'morse' | 'unicode'
 
 const STORAGE_KEY = 'content'
 const ENCODING_TYPE_KEY = 'encodingType'

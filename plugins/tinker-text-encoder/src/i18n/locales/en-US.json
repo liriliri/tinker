@@ -8,6 +8,7 @@
   "copy": "Copy",
   "urlEncoding": "URL Encoding",
   "morseCode": "Morse Code",
+  "unicode": "Unicode",
   "encodingType": "Encoding Type",
   "inputPlaceholder": "Enter text here...",
   "outputPlaceholder": "Result will appear here..."

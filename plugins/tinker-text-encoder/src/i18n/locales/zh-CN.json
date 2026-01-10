@@ -8,6 +8,7 @@
   "copy": "复制",
   "urlEncoding": "URL 编码",
   "morseCode": "摩斯电码",
+  "unicode": "Unicode",
   "encodingType": "编码类型",
   "inputPlaceholder": "在此输入文本...",
   "outputPlaceholder": "结果将显示在这里..."

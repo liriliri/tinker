@@ -16,5 +16,8 @@
         "name": "文本编码"
       }
     }
+  },
+  "devDependencies": {
+    "xmorse": "^1.0.0"
   }
 }
