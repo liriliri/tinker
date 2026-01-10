@@ -60,19 +60,16 @@ const MORSE_CODE_MAP: Record<string, string> = {
 // Reverse morse code mapping
 const MORSE_TO_CHAR_MAP: Record<string, string> = Object.entries(
   MORSE_CODE_MAP
-).reduce(
-  (acc, [char, morse]) => {
-    acc[morse] = char
-    return acc
-  },
-  {} as Record<string, string>
-)
+).reduce((acc, [char, morse]) => {
+  acc[morse] = char
+  return acc
+}, {} as Record<string, string>)
 
 // URL Encoding
 export function urlEncode(text: string): string {
   try {
     return encodeURIComponent(text)
-  } catch (error) {
+  } catch {
     throw new Error('Failed to encode URL')
   }
 }
@@ -80,7 +77,7 @@ export function urlEncode(text: string): string {
 export function urlDecode(text: string): string {
   try {
     return decodeURIComponent(text)
-  } catch (error) {
+  } catch {
     throw new Error('Failed to decode URL')
   }
 }

@@ -8,12 +8,7 @@ import { Toolbar, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Select from 'share/components/Select'
 import store from '../store'
-import {
-  urlEncode,
-  urlDecode,
-  morseEncode,
-  morseDecode,
-} from '../lib/encoder'
+import { urlEncode, urlDecode, morseEncode, morseDecode } from '../lib/encoder'
 
 export default observer(function DualPanel() {
   const { t } = useTranslation()
@@ -59,7 +54,9 @@ export default observer(function DualPanel() {
   return (
     <div className="h-full w-full flex">
       {/* Left Panel - Input */}
-      <div className={`flex-1 min-w-0 border-r ${tw.border.both} flex flex-col`}>
+      <div
+        className={`flex-1 min-w-0 border-r ${tw.border.both} flex flex-col`}
+      >
         <Toolbar className="justify-between h-8">
           <span className="text-sm text-gray-600 dark:text-gray-300">
             {t('input')}
