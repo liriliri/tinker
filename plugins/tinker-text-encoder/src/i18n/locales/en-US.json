@@ -1,0 +1,14 @@
+{
+  "input": "Input",
+  "output": "Output",
+  "encode": "Encode",
+  "decode": "Decode",
+  "clear": "Clear",
+  "paste": "Paste",
+  "copy": "Copy",
+  "urlEncoding": "URL Encoding",
+  "morseCode": "Morse Code",
+  "encodingType": "Encoding Type",
+  "inputPlaceholder": "Enter text here...",
+  "outputPlaceholder": "Result will appear here..."
+}
