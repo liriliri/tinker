@@ -123,6 +123,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/hash.png"/></th>
       <th><img src="https://tinker.liriliri.io/unit_converter.png"/></th>
     </tr>
+    <tr>
+      <th>PDF</th>
+      <th>Text Encoder</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/pdf.png"/></th>
+      <th><img src="https://tinker.liriliri.io/text_encoder.png"/></th>
+    </tr>
   </tbody>
 </table>
 
