@@ -1,10 +1,13 @@
 import { observer } from 'mobx-react-lite'
+import { THEME_COLORS } from 'share/theme'
 import store from '../store'
 import CodeEditor from './CodeEditor'
 
 export default observer(function Frame() {
   const frameColors = store.frameColors
-  const checkColor = store.darkMode ? '#333' : '#e8e8e8'
+  const checkColors = store.darkMode
+    ? THEME_COLORS.checkboard.dark
+    : THEME_COLORS.checkboard.light
 
   const titleTextStyle = {
     color: frameColors.title,
@@ -17,14 +20,14 @@ export default observer(function Frame() {
       className="h-full flex items-center justify-center overflow-auto"
       style={{
         backgroundImage: `
-          linear-gradient(45deg, ${checkColor} 25%, transparent 25%),
-          linear-gradient(-45deg, ${checkColor} 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, ${checkColor} 75%),
-          linear-gradient(-45deg, transparent 75%, ${checkColor} 75%)
+          linear-gradient(45deg, ${checkColors.dark} 25%, transparent 25%),
+          linear-gradient(-45deg, ${checkColors.dark} 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, ${checkColors.dark} 75%),
+          linear-gradient(-45deg, transparent 75%, ${checkColors.dark} 75%)
         `,
         backgroundSize: '20px 20px',
         backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-        backgroundColor: store.darkMode ? '#1a1a1a' : '#fafafa',
+        backgroundColor: checkColors.light,
       }}
     >
       <div
