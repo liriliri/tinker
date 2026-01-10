@@ -8,12 +8,13 @@ import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
 import openFile from 'licia/openFile'
 import { tw } from 'share/theme'
+import { Toolbar, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 
 export default observer(function DualEditor() {
   const { t } = useTranslation()
-  const iconSize = 14
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleEditorWillMount = (monaco: Monaco) => {
@@ -134,47 +135,11 @@ export default observer(function DualEditor() {
     }
   }, [])
 
-  const buttonClass = `p-1.5 rounded transition-colors ${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
-
   return (
-    <div ref={containerRef} className="h-full w-full flex">
-      {/* Left Editor - Original */}
-      <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
-        <div
-          className={`h-8 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} border-b ${tw.border.both} flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300`}
-        >
-          <div className="flex items-center gap-2">
-            <span>{t('original')}</span>
-            <span className="text-xs opacity-70">
-              {getLineCount(store.originalText)} {t('lines')}
-            </span>
-          </div>
-          <div className="flex gap-1">
-            <button
-              onClick={handleOriginalFileOpen}
-              className={buttonClass}
-              title={t('openFile')}
-            >
-              <FolderOpen size={iconSize} />
-            </button>
-            <button
-              onClick={() => store.pasteToOriginal()}
-              className={buttonClass}
-              title={t('paste')}
-            >
-              <Clipboard size={iconSize} />
-            </button>
-            <button
-              onClick={() => store.clearOriginal()}
-              disabled={isStrBlank(store.originalText)}
-              className={buttonClass}
-              title={t('clear')}
-            >
-              <Eraser size={iconSize} />
-            </button>
-          </div>
-        </div>
-        <div className="h-[calc(100%-2rem)]">
+    <div className="h-full flex flex-col">
+      <div ref={containerRef} className="flex-1 w-full flex overflow-hidden">
+        {/* Left Editor - Original */}
+        <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
           <Editor
             value={store.originalText}
             language={store.language}
@@ -193,45 +158,9 @@ export default observer(function DualEditor() {
             theme={store.isDark ? 'vs-dark' : 'vs'}
           />
         </div>
-      </div>
 
-      {/* Right Editor - Modified */}
-      <div className="flex-1 min-w-0">
-        <div
-          className={`h-8 ${tw.bg.light.secondary} ${tw.bg.dark.secondary} border-b ${tw.border.both} flex items-center justify-between px-3 text-sm text-gray-600 dark:text-gray-300`}
-        >
-          <div className="flex items-center gap-2">
-            <span>{t('modified')}</span>
-            <span className="text-xs opacity-70">
-              {getLineCount(store.modifiedText)} {t('lines')}
-            </span>
-          </div>
-          <div className="flex gap-1">
-            <button
-              onClick={handleModifiedFileOpen}
-              className={buttonClass}
-              title={t('openFile')}
-            >
-              <FolderOpen size={iconSize} />
-            </button>
-            <button
-              onClick={() => store.pasteToModified()}
-              className={buttonClass}
-              title={t('paste')}
-            >
-              <Clipboard size={iconSize} />
-            </button>
-            <button
-              onClick={() => store.clearModified()}
-              disabled={isStrBlank(store.modifiedText)}
-              className={buttonClass}
-              title={t('clear')}
-            >
-              <Eraser size={iconSize} />
-            </button>
-          </div>
-        </div>
-        <div className="h-[calc(100%-2rem)]">
+        {/* Right Editor - Modified */}
+        <div className="flex-1 min-w-0">
           <Editor
             value={store.modifiedText}
             language={store.language}
@@ -249,6 +178,75 @@ export default observer(function DualEditor() {
             }}
             theme={store.isDark ? 'vs-dark' : 'vs'}
           />
+        </div>
+      </div>
+
+      {/* Bottom Toolbars */}
+      <div className="flex">
+        {/* Left Toolbar - Original */}
+        <div className={`flex-1 border-r ${tw.border.both}`}>
+          <Toolbar className="justify-between border-t">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <span>{t('original')}</span>
+              <span className="text-xs opacity-70">
+                {getLineCount(store.originalText)} {t('lines')}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <ToolbarButton
+                onClick={handleOriginalFileOpen}
+                title={t('openFile')}
+              >
+                <FolderOpen size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={() => store.pasteToOriginal()}
+                title={t('paste')}
+              >
+                <Clipboard size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={() => store.clearOriginal()}
+                disabled={isStrBlank(store.originalText)}
+                title={t('clear')}
+              >
+                <Eraser size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+            </div>
+          </Toolbar>
+        </div>
+
+        {/* Right Toolbar - Modified */}
+        <div className="flex-1">
+          <Toolbar className="justify-between border-t">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <span>{t('modified')}</span>
+              <span className="text-xs opacity-70">
+                {getLineCount(store.modifiedText)} {t('lines')}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <ToolbarButton
+                onClick={handleModifiedFileOpen}
+                title={t('openFile')}
+              >
+                <FolderOpen size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={() => store.pasteToModified()}
+                title={t('paste')}
+              >
+                <Clipboard size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+              <ToolbarButton
+                onClick={() => store.clearModified()}
+                disabled={isStrBlank(store.modifiedText)}
+                title={t('clear')}
+              >
+                <Eraser size={TOOLBAR_ICON_SIZE} />
+              </ToolbarButton>
+            </div>
+          </Toolbar>
         </div>
       </div>
     </div>

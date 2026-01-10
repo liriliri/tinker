@@ -64,7 +64,7 @@ export default observer(function QRGenerator() {
 
       {/* Right Panel - QR Code Display */}
       <div
-        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.light.primary} ${tw.bg.dark.primary} p-4`}
+        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.light.secondary} ${tw.bg.dark.secondary} p-4`}
       >
         {store.text ? (
           <div
@@ -93,7 +93,7 @@ export default observer(function QRGenerator() {
             />
           </div>
         ) : (
-          <div className="text-center text-gray-400 dark:text-gray-600 px-4">
+          <div className="text-center text-gray-500 dark:text-gray-400 px-4">
             <div className="text-base mb-1">{t('emptyTitle')}</div>
             <div className="text-sm opacity-75">{t('emptySubtitle')}</div>
           </div>
