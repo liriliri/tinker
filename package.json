@@ -98,6 +98,7 @@
     "zx": "^8.8.5"
   },
   "optionalDependencies": {
+    "file-icon": "^6.0.0",
     "node-mac-permissions": "^2.5.0"
   },
   "dependencies": {

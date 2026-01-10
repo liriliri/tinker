@@ -4,26 +4,25 @@ import once from 'licia/once'
 import { getSettingsStore, getMainStore } from './store'
 import * as main from '../window/main'
 import isMac from 'licia/isMac'
-import { NodeMacPermissions } from 'common/types'
 import log from 'share/common/log'
 import waitUntil from 'licia/waitUntil'
+import { loadMod } from './util'
 
 const logger = log('shortcut')
 
 const settingsStore = getSettingsStore()
 const mainStore = getMainStore()
 
+type NodeMacPermissions = {
+  getAuthStatus: (type: string) => string
+  askForAccessibilityAccess: () => void
+}
+
 let nodeMacPermissions: NodeMacPermissions | null = null
 if (isMac) {
-  ;(async () => {
-    try {
-      const mod = await import('node-mac-permissions')
-      nodeMacPermissions = mod.default || mod
-    } catch (e) {
-      logger.error('failed to load node-mac-permissions:', e)
-      nodeMacPermissions = null
-    }
-  })()
+  loadMod('node-mac-permissions').then((mod) => {
+    nodeMacPermissions = mod
+  })
 }
 
 const callbacks: Record<string, () => void> = {}

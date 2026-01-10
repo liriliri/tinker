@@ -10,7 +10,6 @@
     "build:renderer": "vite build --config ../vite.config.ts",
     "build:preload": "vite build --config ../vite.preload.ts"
   },
-  "embedded": false,
   "tinker": {
     "name": "PDF",
     "icon": "icon.png",

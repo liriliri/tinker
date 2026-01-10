@@ -11,11 +11,24 @@ import startWith from 'licia/startWith'
 import os from 'os'
 import isEmpty from 'licia/isEmpty'
 import trim from 'licia/trim'
+import isMac from 'licia/isMac'
+import { loadMod } from '../util'
 
 const logger = log('macApp')
 
 const DEFAULT_ICNS =
   '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericApplicationIcon.icns'
+
+let fileIconToBuffer:
+  | ((filePath: string, options: { size: number }) => Promise<Buffer>)
+  | null = null
+if (isMac) {
+  loadMod('file-icon').then((mod) => {
+    if (mod) {
+      fileIconToBuffer = mod.fileIconToBuffer
+    }
+  })
+}
 
 const apps: IApp[] = []
 
@@ -65,12 +78,17 @@ async function extractIcon(appPath: string) {
 
 async function generateIcon(appPath: string) {
   const iconPath = getIconPath(appPath)
-  const icnsPath = await getIcnsPath(appPath)
+  if (fileIconToBuffer) {
+    const buffer = await fileIconToBuffer(appPath, { size: 128 })
+    await fs.writeFile(iconPath, buffer)
+  } else {
+    const icnsPath = await getIcnsPath(appPath)
 
-  await sleep(50)
-  await exec(
-    `sips -s format png "${icnsPath}" -o "${iconPath}" --resampleHeightWidth 128 128`
-  )
+    await sleep(50)
+    await exec(
+      `sips -s format png "${icnsPath}" -o "${iconPath}" --resampleHeightWidth 128 128`
+    )
+  }
 }
 
 const getIconPath = memoize(function (appPath: string) {

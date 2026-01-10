@@ -2,6 +2,7 @@ import startWith from 'licia/startWith.js'
 import path from 'path'
 import contain from 'licia/contain.js'
 import isMac from 'licia/isMac.js'
+import each from 'licia/each.js'
 
 const pkg = await fs.readJson('package.json')
 const electron = pkg.devDependencies.electron
@@ -10,8 +11,12 @@ pkg.devDependencies = {
   electron,
 }
 if (isMac) {
-  pkg.dependencies['node-mac-permissions'] =
-    pkg.optionalDependencies['node-mac-permissions']
+  each(['node-mac-permissions', 'file-icon'], (name) => {
+    if (!pkg.optionalDependencies[name]) {
+      return
+    }
+    pkg.dependencies[name] = pkg.optionalDependencies[name]
+  })
 }
 delete pkg.optionalDependencies
 delete pkg.scripts

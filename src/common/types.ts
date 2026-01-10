@@ -33,16 +33,6 @@ export interface IApp {
   path: string
 }
 
-export type NodeMacPermissions = {
-  getAuthStatus: (type: string) => string
-  askForAccessibilityAccess: () => void
-}
-
-declare module 'node-mac-permissions' {
-  export function getAuthStatus(type: string): string
-  export function askForAccessibilityAccess(): void
-}
-
 export type IpcDragMain = (
   x: number,
   y: number,
