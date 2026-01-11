@@ -1,0 +1,30 @@
+{
+  "name": "tinker-password-manager",
+  "version": "0.1.0",
+  "description": "Password Manager Plugin for Tinker",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
+    "dev:renderer": "vite --config ../vite.config.ts",
+    "dev:preload": "vite --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "Password Manager",
+    "icon": "icon.png",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
+    "locales": {
+      "zh-CN": {
+        "name": "密码管理器"
+      }
+    }
+  },
+  "devDependencies": {
+    "ag-grid-community": "^35.0.0",
+    "ag-grid-react": "^35.0.0",
+    "kdbxweb": "^2.1.1"
+  }
+}

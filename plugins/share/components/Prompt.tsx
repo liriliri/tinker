@@ -9,6 +9,7 @@ export interface PromptOptions {
   placeholder?: string
   confirmText?: string
   cancelText?: string
+  inputType?: 'text' | 'password'
 }
 
 let showPromptFn: ((options: PromptOptions) => Promise<string | null>) | null =
@@ -76,7 +77,7 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
             </p>
           )}
           <input
-            type="text"
+            type={promptState.inputType || 'text'}
             className={`w-full px-3 py-2 mb-6 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none`}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

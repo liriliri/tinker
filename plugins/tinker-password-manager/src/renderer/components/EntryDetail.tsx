@@ -1,0 +1,214 @@
+import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff, Copy, Trash2 } from 'lucide-react'
+import { tw } from 'share/theme'
+import store from '../store'
+import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import { confirm } from 'share/components/Confirm'
+import * as kdbxweb from 'kdbxweb'
+
+export default observer(function EntryDetail() {
+  const { t } = useTranslation()
+  const { copyToClipboard } = useCopyToClipboard()
+
+  const entry = store.selectedEntry
+
+  if (!entry) {
+    return (
+      <div
+        className={`h-full flex items-center justify-center text-sm ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+      >
+        {t('noEntries')}
+      </div>
+    )
+  }
+
+  const handleCopyPassword = () => {
+    const password = entry.password.getText()
+    copyToClipboard(password)
+  }
+
+  const handleCopyUsername = () => {
+    copyToClipboard(entry.username)
+  }
+
+  const handleTogglePassword = () => {
+    store.togglePasswordVisibility()
+  }
+
+  const handleUpdateField = (field: string, value: string) => {
+    if (field === 'Password') {
+      store.updateEntry(
+        entry.uuid,
+        field,
+        kdbxweb.ProtectedValue.fromString(value)
+      )
+    } else {
+      store.updateEntry(entry.uuid, field, value)
+    }
+  }
+
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: t('confirmDeleteEntry'),
+      message: t('confirmDelete'),
+    })
+
+    if (confirmed) {
+      store.deleteEntry(entry.uuid)
+    }
+  }
+
+  const passwordText = store.showPassword
+    ? entry.password.getText()
+    : '••••••••'
+
+  return (
+    <div
+      className={`h-full overflow-y-auto ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+    >
+      <div className="p-4">
+        <div className="max-w-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold">{entry.title}</h2>
+            <button
+              onClick={handleDelete}
+              className={`p-2 rounded ${tw.hover.both} text-red-600 dark:text-red-400`}
+              title={t('deleteEntry')}
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label
+                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              >
+                {t('title')}
+              </label>
+              <input
+                type="text"
+                value={entry.title}
+                onChange={(e) => handleUpdateField('Title', e.target.value)}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+              />
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              >
+                {t('username')}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={entry.username}
+                  onChange={(e) =>
+                    handleUpdateField('UserName', e.target.value)
+                  }
+                  className={`flex-1 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                />
+                <button
+                  onClick={handleCopyUsername}
+                  className={`px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
+                  title={t('copyUsername')}
+                >
+                  <Copy size={16} />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              >
+                {t('password')}
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type={store.showPassword ? 'text' : 'password'}
+                    value={passwordText}
+                    onChange={(e) =>
+                      handleUpdateField('Password', e.target.value)
+                    }
+                    className={`w-full px-3 py-2 pr-10 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                  />
+                  <button
+                    onClick={handleTogglePassword}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover.both}`}
+                    title={
+                      store.showPassword ? t('hidePassword') : t('showPassword')
+                    }
+                  >
+                    {store.showPassword ? (
+                      <EyeOff size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                  </button>
+                </div>
+                <button
+                  onClick={handleCopyPassword}
+                  className={`px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
+                  title={t('copyPassword')}
+                >
+                  <Copy size={16} />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              >
+                {t('url')}
+              </label>
+              <input
+                type="text"
+                value={entry.url}
+                onChange={(e) => handleUpdateField('URL', e.target.value)}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+              />
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              >
+                {t('notes')}
+              </label>
+              <textarea
+                value={entry.notes}
+                onChange={(e) => handleUpdateField('Notes', e.target.value)}
+                rows={6}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+              />
+            </div>
+
+            <div className={`pt-4 border-t ${tw.border.both}`}>
+              <div
+                className={`text-xs ${tw.text.light.secondary} ${tw.text.dark.secondary} space-y-1`}
+              >
+                <div>
+                  {t('created')}:{' '}
+                  {new Date(entry.times.creationTime).toLocaleString()}
+                </div>
+                <div>
+                  {t('modified')}:{' '}
+                  {new Date(entry.times.lastModTime).toLocaleString()}
+                </div>
+                <div>
+                  {t('accessed')}:{' '}
+                  {new Date(entry.times.lastAccessTime).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+})

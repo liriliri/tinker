@@ -1,0 +1,6 @@
+@use 'tailwindcss';
+@config "../../tailwind.config.js";
+
+html.dark {
+  color-scheme: dark;
+}
