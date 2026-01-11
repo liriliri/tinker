@@ -238,8 +238,8 @@ class Store extends BaseStore {
   private convertGroup(kdbxGroup: kdbxweb.KdbxGroup): KdbxGroup {
     const group: KdbxGroup = {
       uuid: kdbxGroup.uuid.id,
-      name: kdbxGroup.name,
-      icon: kdbxGroup.icon,
+      name: kdbxGroup.name ?? '',
+      icon: kdbxGroup.icon ?? 0,
       entries: [],
       groups: [],
     }
@@ -258,24 +258,40 @@ class Store extends BaseStore {
   }
 
   private convertEntry(kdbxEntry: kdbxweb.KdbxEntry): KdbxEntry {
+    const getFieldValue = (fieldName: string): string => {
+      const value = kdbxEntry.fields.get(fieldName)
+      if (!value) return ''
+      if (typeof value === 'string') return value
+      if (value instanceof kdbxweb.ProtectedValue) {
+        return value.getText() || ''
+      }
+      return String(value)
+    }
+
+    const getPasswordValue = (): kdbxweb.ProtectedValue => {
+      const value = kdbxEntry.fields.get('Password')
+      if (value instanceof kdbxweb.ProtectedValue) {
+        return value
+      }
+      return kdbxweb.ProtectedValue.fromString('')
+    }
+
     return {
       uuid: kdbxEntry.uuid.id,
-      title: kdbxEntry.fields.get('Title') || '',
-      username: kdbxEntry.fields.get('UserName') || '',
-      password:
-        kdbxEntry.fields.get('Password') ||
-        kdbxweb.ProtectedValue.fromString(''),
-      url: kdbxEntry.fields.get('URL') || '',
-      notes: kdbxEntry.fields.get('Notes') || '',
-      icon: kdbxEntry.icon,
+      title: getFieldValue('Title'),
+      username: getFieldValue('UserName'),
+      password: getPasswordValue(),
+      url: getFieldValue('URL'),
+      notes: getFieldValue('Notes'),
+      icon: kdbxEntry.icon ?? 0,
       tags: kdbxEntry.tags || [],
       customFields: kdbxEntry.fields,
       times: {
-        creationTime: kdbxEntry.times.creationTime,
-        lastModTime: kdbxEntry.times.lastModTime,
-        lastAccessTime: kdbxEntry.times.lastAccessTime,
-        expiryTime: kdbxEntry.times.expiryTime,
-        expires: kdbxEntry.times.expires,
+        creationTime: kdbxEntry.times.creationTime ?? new Date(),
+        lastModTime: kdbxEntry.times.lastModTime ?? new Date(),
+        lastAccessTime: kdbxEntry.times.lastAccessTime ?? new Date(),
+        expiryTime: kdbxEntry.times.expiryTime ?? null,
+        expires: kdbxEntry.times.expires ?? false,
       },
     }
   }
