@@ -49,9 +49,8 @@ class Store extends BaseStore {
         const { original, modified } = JSON.parse(savedContent)
         this.originalText = original || ''
         this.modifiedText = modified || ''
-      } catch {
-        // Ignore parsing errors
-      }
+        // eslint-disable-next-line no-empty
+      } catch {}
     }
 
     if (savedMode) {

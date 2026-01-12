@@ -12,18 +12,14 @@ const STORAGE_KEY_SIDEBAR_VIEW = 'sidebarView'
 export type SidebarView = 'thumbnails' | 'outline'
 
 class Store extends BaseStore {
-  // PDF document
   pdfDoc: PDFDocumentProxy | null = null
   numPages: number = 0
   currentPage: number = 1
 
-  // Zoom and scale
   scale: number = 1.0
 
-  // Loading state
   isLoading: boolean = false
 
-  // File info
   fileName: string = ''
 
   // Scroll trigger for programmatic navigation
@@ -35,7 +31,6 @@ class Store extends BaseStore {
   // Track if user has manually changed scale
   userHasZoomed: boolean = false
 
-  // Sidebar visibility
   sidebarOpen: boolean = true
   sidebarView: SidebarView = 'thumbnails'
 

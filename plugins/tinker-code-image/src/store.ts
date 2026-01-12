@@ -40,21 +40,16 @@ export default function Counter() {
 }`
 
 class Store extends BaseStore {
-  // Shiki highlighter
   highlighter: Highlighter | null = null
 
-  // Code state
   code: string = defaultCode
   selectedLanguage: Language = LANGUAGES.javascript
 
-  // Theme state
   selectedTheme: Theme = THEMES.candy
   darkMode: boolean = true
 
-  // Window title
   fileName: string = ''
 
-  // Line numbers
   showLineNumbers: boolean = false
 
   constructor() {
@@ -106,7 +101,6 @@ class Store extends BaseStore {
 
   setLanguage(language: Language) {
     this.selectedLanguage = language
-    // Find and save language key
     const langKey = Object.keys(LANGUAGES).find(
       (key) => LANGUAGES[key] === language
     )
@@ -140,7 +134,6 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_FILE_NAME, fileName)
   }
 
-  // Get current theme CSS properties
   get themeCSS(): CSSProperties {
     const syntaxColors = this.darkMode
       ? this.selectedTheme.syntax.dark
@@ -148,7 +141,6 @@ class Store extends BaseStore {
     return convertToShikiTheme(syntaxColors)
   }
 
-  // Get current frame colors
   get frameColors(): FrameColors {
     return this.darkMode
       ? this.selectedTheme.frame.dark

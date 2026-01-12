@@ -13,14 +13,11 @@ type SystemInfo = {
 }
 
 class Store extends BaseStore {
-  // UI state
   activeTab: string = 'preload'
 
-  // Preload API Tab
   systemInfo: SystemInfo | null = null
   currentTime: string = ''
 
-  // Storage Tab
   savedData: string = ''
 
   constructor() {
@@ -36,12 +33,10 @@ class Store extends BaseStore {
     }
   }
 
-  // Tab navigation
   setActiveTab(tabId: string) {
     this.activeTab = tabId
   }
 
-  // Preload API Tab
   getSystemInfo() {
     try {
       const info = template.getSystemInfo()
@@ -60,7 +55,6 @@ class Store extends BaseStore {
     }
   }
 
-  // Storage Tab
   setSavedData(data: string) {
     this.savedData = data
   }

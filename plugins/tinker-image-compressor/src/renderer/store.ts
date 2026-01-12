@@ -16,17 +16,13 @@ const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
 const storage = new LocalStore('tinker-image-compressor')
 
 class Store extends BaseStore {
-  // Image list
   images: ImageItem[] = []
 
-  // Compression settings
   quality: number = 80
   overwriteOriginal: boolean = true
 
-  // UI state
   compareImageId: string | null = null
 
-  // Worker
   private worker: Worker | null = null
   private workerCallbacks: Map<string, (result: any) => void> = new Map()
 
@@ -93,7 +89,6 @@ class Store extends BaseStore {
     this.quality = quality
     storage.set(STORAGE_KEY_QUALITY, String(quality))
 
-    // Reset compressed images when quality changes
     for (const image of this.images) {
       if (image.compressedBlob) {
         image.compressedBlob = null
@@ -173,7 +168,6 @@ class Store extends BaseStore {
         const buffer = await imageCompressor.readFile(filePath)
         const fileName = splitPath(filePath).name
 
-        // Convert buffer to file
         // Note: Uint8Array from contextBridge needs to be converted to work with File API
         const uint8Array = new Uint8Array(buffer)
         const file = new File([uint8Array], fileName, { type: 'image/*' })
@@ -189,7 +183,6 @@ class Store extends BaseStore {
 
   async loadImage(file: File, filePath?: string) {
     try {
-      // Check if image with same filePath already exists
       if (filePath && this.images.some((img) => img.filePath === filePath)) {
         console.log(`Image with path "${filePath}" already loaded, skipping`)
         return
@@ -198,7 +191,6 @@ class Store extends BaseStore {
       const id = `${Date.now()}-${Math.random()}`
       const originalFormat = this.detectImageFormat(file.name)
 
-      // Load image
       const img = new Image()
       const url = URL.createObjectURL(file)
 
@@ -213,7 +205,6 @@ class Store extends BaseStore {
         img.src = url
       })
 
-      // Get image data
       const canvas = document.createElement('canvas')
       canvas.width = img.width
       canvas.height = img.height
@@ -223,7 +214,6 @@ class Store extends BaseStore {
       ctx.drawImage(img, 0, 0)
       const imageData = ctx.getImageData(0, 0, img.width, img.height)
 
-      // Create image item
       const imageItem: ImageItem = {
         id,
         fileName: file.name,
@@ -296,14 +286,12 @@ class Store extends BaseStore {
     image.compressedSize = result.size
     image.isSaved = false // Reset saved status when recompressing
 
-    // Create blob
     const mimeType = this.getFormatMimeType(image.originalFormat)
 
     image.compressedBlob = new Blob([new Uint8Array(result.data)], {
       type: mimeType,
     })
 
-    // Create data URL for preview
     const reader = new FileReader()
     reader.onload = () => {
       image.compressedDataUrl = reader.result as string
@@ -318,17 +306,14 @@ class Store extends BaseStore {
 
     try {
       if (this.overwriteOriginal) {
-        // Overwrite mode: save to original file paths
         for (const image of compressedImages) {
           if (!image.compressedBlob) continue
 
-          // If no file path, skip (shouldn't happen when opened from dialog)
           if (!image.filePath) {
             console.warn(`No file path for ${image.fileName}, skipping`)
             continue
           }
 
-          // If compressed size is larger than or equal to original, skip saving (keep original)
           if (!this.isCompressedSmaller(image)) {
             console.log(
               `Compressed size (${image.compressedSize}) >= original size (${image.originalSize}) for ${image.fileName}, keeping original file`
@@ -337,18 +322,14 @@ class Store extends BaseStore {
             continue
           }
 
-          // Convert blob to buffer
           const arrayBuffer = await image.compressedBlob.arrayBuffer()
           const buffer = new Uint8Array(arrayBuffer)
 
-          // Overwrite the original file
           await imageCompressor.writeFile(image.filePath, buffer)
 
-          // Mark as saved
           image.isSaved = true
         }
       } else {
-        // Directory mode: ask user to select a directory
         const result = await tinker.showOpenDialog({
           properties: ['openDirectory'],
         })
@@ -370,27 +351,22 @@ class Store extends BaseStore {
           const fileName = image.fileName.replace(/\.[^.]+$/, `.${extension}`)
           const filePath = `${directory}/${fileName}`
 
-          // If compressed is larger, save original instead
           let buffer: Uint8Array
           if (!this.isCompressedSmaller(image) && image.filePath) {
             console.log(
               `Compressed size (${image.compressedSize}) >= original size (${image.originalSize}) for ${image.fileName}, saving original file`
             )
-            // Read original file and save it
             const originalBuffer = await imageCompressor.readFile(
               image.filePath
             )
             buffer = new Uint8Array(originalBuffer)
           } else {
-            // Convert compressed blob to buffer
             const arrayBuffer = await image.compressedBlob.arrayBuffer()
             buffer = new Uint8Array(arrayBuffer)
           }
 
-          // Save file
           await imageCompressor.writeFile(filePath, buffer)
 
-          // Mark as saved
           image.isSaved = true
         }
       }
@@ -405,7 +381,6 @@ class Store extends BaseStore {
     if (!image || !image.compressedBlob) return
 
     try {
-      // Use Clipboard API to copy image
       await navigator.clipboard.write([
         new ClipboardItem({
           [image.compressedBlob.type]: image.compressedBlob,
@@ -427,7 +402,6 @@ class Store extends BaseStore {
   }
 
   clear() {
-    // Revoke all image URLs to free memory
     each(this.images, (image) => URL.revokeObjectURL(image.originalUrl))
     this.images = []
   }

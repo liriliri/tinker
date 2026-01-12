@@ -13,18 +13,15 @@ const storage = new LocalStore('tinker-qrcode')
 const PRESET_SIZES = [300, 400, 500, 600]
 
 class Store extends BaseStore {
-  // QR Code data
   text: string = ''
   qrCodeDataURL: string = ''
 
-  // QR Code options
   size: number = 300
   isCustomSize: boolean = false
   fgColor: string = '#000000'
   bgColor: string = '#ffffff'
   correctLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
 
-  // Canvas ref for toolbar access
   canvasRef: RefObject<HTMLCanvasElement | null> | null = null
 
   constructor() {
@@ -68,12 +65,10 @@ class Store extends BaseStore {
     }
   }
 
-  // QR Code text update
   setText(text: string) {
     this.text = text
   }
 
-  // Update QR Code options
   setSize(size: number) {
     this.size = size
     storage.set(STORAGE_KEY_SIZE, String(size))
@@ -105,7 +100,6 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_CORRECT_LEVEL, level)
   }
 
-  // Update QR Code data URL
   setQRCodeDataURL(dataURL: string) {
     this.qrCodeDataURL = dataURL
   }

@@ -1,4 +1,3 @@
-// Color conversion utilities using 'color' package
 import Color from 'color'
 import trim from 'licia/trim'
 
@@ -33,7 +32,6 @@ export interface LAB {
   b: number
 }
 
-// Parse hex to RGB
 export function hexToRgb(hex: string): RGB {
   const color = Color(hex)
   const rgb = color.rgb().object()
@@ -44,12 +42,10 @@ export function hexToRgb(hex: string): RGB {
   }
 }
 
-// RGB to Hex
 export function rgbToHex(r: number, g: number, b: number): string {
   return Color.rgb(r, g, b).hex()
 }
 
-// RGB to HSL
 export function rgbToHsl(r: number, g: number, b: number): HSL {
   const hsl = Color.rgb(r, g, b).hsl().object()
   return {
@@ -59,7 +55,6 @@ export function rgbToHsl(r: number, g: number, b: number): HSL {
   }
 }
 
-// RGB to HSV
 export function rgbToHsv(r: number, g: number, b: number): HSV {
   const hsv = Color.rgb(r, g, b).hsv().object()
   return {
@@ -69,7 +64,6 @@ export function rgbToHsv(r: number, g: number, b: number): HSV {
   }
 }
 
-// RGB to CMYK
 export function rgbToCmyk(r: number, g: number, b: number): CMYK {
   const cmyk = Color.rgb(r, g, b).cmyk().object()
   return {
@@ -80,7 +74,6 @@ export function rgbToCmyk(r: number, g: number, b: number): CMYK {
   }
 }
 
-// RGB to LAB
 export function rgbToLab(r: number, g: number, b: number): LAB {
   const lab = Color.rgb(r, g, b).lab().object()
   return {
@@ -90,7 +83,6 @@ export function rgbToLab(r: number, g: number, b: number): LAB {
   }
 }
 
-// HSL to RGB (for color scheme calculations)
 export function hslToRgb(h: number, s: number, l: number): RGB {
   const rgb = Color.hsl(h, s, l).rgb().object()
   return {
@@ -100,18 +92,15 @@ export function hslToRgb(h: number, s: number, l: number): RGB {
   }
 }
 
-// Generate complementary color
 export function getComplementaryColor(hex: string): string {
   return Color(hex).rotate(180).hex()
 }
 
-// Generate analogous colors
 export function getAnalogousColors(hex: string): string[] {
   const color = Color(hex)
   return [-30, 30].map((offset) => color.rotate(offset).hex())
 }
 
-// RGB to HSI (Hue, Saturation, Intensity)
 export function rgbToHsi(
   r: number,
   g: number,
@@ -140,7 +129,6 @@ export function rgbToHsi(
   }
 }
 
-// Format color values for display
 export function formatHex(hex: string): string {
   return hex.replace('#', '').toUpperCase()
 }
@@ -169,7 +157,6 @@ export function formatHsi(hsi: { h: number; s: number; i: number }): string {
   return `${hsi.h}, ${hsi.s}%, ${hsi.i}%`
 }
 
-// Convert formatted values to CSS-compatible strings for clipboard
 export function toCssHex(hex: string): string {
   return `#${hex.replace('#', '').toLowerCase()}`
 }
@@ -201,7 +188,6 @@ export function toCssHsi(hsi: { h: number; s: number; i: number }): string {
   return `hsi(${hsi.h}, ${hsi.s}%, ${hsi.i}%)`
 }
 
-// Generate color variants by adjusting lightness
 export function getColorVariants(
   hex: string
 ): Array<{ color: string; lightness: number }> {
@@ -219,7 +205,6 @@ export function getColorVariants(
   return variants
 }
 
-// Parse color string and return hex format
 export function parseColorToHex(
   value: string,
   format: 'hex' | 'rgb' | 'hsl' | 'hsv' | 'cmyk' | 'lab' | 'hsi'
@@ -229,14 +214,12 @@ export function parseColorToHex(
 
     switch (format) {
       case 'hex': {
-        // Add # if missing
         const hex = trimmed.startsWith('#') ? trimmed : `#${trimmed}`
         const color = Color(hex)
         return color.hex()
       }
 
       case 'rgb': {
-        // Parse "255, 0, 0" format
         const parts = trimmed.split(',').map((p) => parseInt(trim(p)))
         if (parts.length !== 3 || parts.some((p) => isNaN(p))) {
           return null
@@ -245,7 +228,6 @@ export function parseColorToHex(
       }
 
       case 'hsl': {
-        // Parse "180, 50%, 50%" format
         const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 3) {
           return null
@@ -258,7 +240,6 @@ export function parseColorToHex(
       }
 
       case 'hsv': {
-        // Parse "180, 50%, 50%" format
         const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 3) {
           return null
@@ -271,7 +252,6 @@ export function parseColorToHex(
       }
 
       case 'cmyk': {
-        // Parse "0%, 100%, 100%, 0%" format
         const parts = trimmed.split(',').map((p) => trim(p).replace('%', ''))
         if (parts.length !== 4) {
           return null
@@ -284,7 +264,6 @@ export function parseColorToHex(
       }
 
       case 'lab': {
-        // Parse "50, 50, 50" format
         const parts = trimmed.split(',').map((p) => parseFloat(p.trim()))
         if (parts.length !== 3 || parts.some((p) => isNaN(p))) {
           return null
@@ -293,7 +272,6 @@ export function parseColorToHex(
       }
 
       case 'hsi': {
-        // Parse "180, 50%, 50%" format and convert HSI to RGB then to HEX
         const parts = trimmed.split(',').map((p) => p.trim().replace('%', ''))
         if (parts.length !== 3) {
           return null
@@ -302,7 +280,6 @@ export function parseColorToHex(
         if ([h, s, i].some((p) => isNaN(p))) {
           return null
         }
-        // Convert HSI to RGB
         const rgb = hsiToRgb(h, s / 100, i / 100)
         return rgbToHex(rgb.r, rgb.g, rgb.b)
       }
@@ -315,7 +292,6 @@ export function parseColorToHex(
   }
 }
 
-// HSI to RGB conversion
 function hsiToRgb(h: number, s: number, i: number): RGB {
   const hRad = (h * Math.PI) / 180
   let r: number, g: number, b: number

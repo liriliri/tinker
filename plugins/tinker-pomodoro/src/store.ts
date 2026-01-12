@@ -10,7 +10,6 @@ const storage = new LocalStore('tinker-pomodoro')
 type TimerMode = 'focus' | 'shortBreak' | 'longBreak'
 
 class Store extends BaseStore {
-  // Timer state
   mode: TimerMode = 'focus'
   timeLeft: number = 25 * 60 // seconds
   isRunning: boolean = false
@@ -18,15 +17,12 @@ class Store extends BaseStore {
   totalRounds: number = 4
   totalFocusCompleted: number = 0 // Total focus sessions completed
 
-  // Timer settings (minutes)
   focusTime: number = 25
   shortBreakTime: number = 5
   longBreakTime: number = 15
 
-  // Audio settings
   volume: number = 100 // 0-100
 
-  // Web Worker
   private worker: Worker | null = null
 
   constructor() {
@@ -70,7 +66,6 @@ class Store extends BaseStore {
     this.timeLeft = this.focusTime * 60
   }
 
-  // Timer controls
   start() {
     if (this.isRunning || !this.worker) return
 
@@ -126,7 +121,6 @@ class Store extends BaseStore {
   }
 
   private onTimerComplete() {
-    // Play notification sound
     this.playCompletionSound()
     this.nextRound()
   }
@@ -161,33 +155,27 @@ class Store extends BaseStore {
 
   private nextRound() {
     if (this.mode === 'focus') {
-      // Completed a focus session, increment total count
       this.totalFocusCompleted++
       storage.set('total-focus-completed', this.totalFocusCompleted)
 
       if (this.currentRound >= this.totalRounds) {
-        // After the last focus session, go to long break
         this.mode = 'longBreak'
         this.timeLeft = this.longBreakTime * 60
       } else {
-        // Go to short break, keep current round number
         this.mode = 'shortBreak'
         this.timeLeft = this.shortBreakTime * 60
       }
     } else if (this.mode === 'shortBreak') {
-      // Completed short break, start next focus round
       this.mode = 'focus'
       this.timeLeft = this.focusTime * 60
       this.currentRound++
     } else {
-      // Completed long break, reset to round 1
       this.mode = 'focus'
       this.timeLeft = this.focusTime * 60
       this.currentRound = 1
     }
   }
 
-  // Getters
   get progress(): number {
     const totalTime = this.getTotalTimeForMode()
     return ((totalTime - this.timeLeft) / totalTime) * 100

@@ -10,7 +10,6 @@ const STORAGE_KEY = 'current'
 const storage = new LocalStore('tinker-color')
 
 class Store extends BaseStore {
-  // Current selected color
   currentColor: string = '#5a9020'
 
   constructor() {
@@ -19,7 +18,6 @@ class Store extends BaseStore {
     this.loadFromStorage()
   }
 
-  // Load color from storage
   private loadFromStorage() {
     const savedColor = storage.get(STORAGE_KEY)
     if (savedColor) {
@@ -27,19 +25,16 @@ class Store extends BaseStore {
     }
   }
 
-  // Update current color
   setColor(color: string) {
     this.currentColor = color
     storage.set(STORAGE_KEY, color)
   }
 
-  // Handle color change from picker
   handleColorChange(color: ColorResult) {
     this.currentColor = color.hex
     storage.set(STORAGE_KEY, color.hex)
   }
 
-  // Copy to clipboard with toast notification
   async copyToClipboardWithToast(text: string) {
     try {
       await navigator.clipboard.writeText(text)
@@ -49,7 +44,6 @@ class Store extends BaseStore {
     }
   }
 
-  // Adjust saturation
   adjustSaturation(saturation: number) {
     const rgb = hexToRgb(this.currentColor)
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
@@ -58,7 +52,6 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY, this.currentColor)
   }
 
-  // Adjust lightness
   adjustLightness(lightness: number) {
     const rgb = hexToRgb(this.currentColor)
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
@@ -67,7 +60,6 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY, this.currentColor)
   }
 
-  // Get current HSL values
   getCurrentHsl() {
     const rgb = hexToRgb(this.currentColor)
     return rgbToHsl(rgb.r, rgb.g, rgb.b)

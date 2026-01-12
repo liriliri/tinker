@@ -359,6 +359,13 @@ Global `tinker` object provides system features.
 6. **Theme Consistency** - Always use `tw` utilities from `share/theme`
 7. **Prioritize Licia** - Check [licia.liriliri.io](https://licia.liriliri.io/) first
 8. **English Comments Only** - All code comments must be written in English, never use Chinese or other languages
+9. **Avoid Redundant Comments** - Don't write comments that just restate what the code does. Comments should explain "why" not "what"
+   - Bad: `// Set loading state` before `this.isLoading = true`
+   - Bad: `// Update current color` before `setColor(color: string)`
+   - Bad: `// Image list` before `images: ImageItem[] = []`
+   - Good: `// Note: Uint8Array from contextBridge needs to be converted to work with File API`
+   - Good: `// Prevent infinite loop` before `if (!regex.global) break`
+   - Good: Comments explaining non-obvious business logic, technical constraints, or workarounds
 
 ## New Plugin Checklist
 

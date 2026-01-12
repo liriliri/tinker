@@ -134,10 +134,8 @@ class Store extends BaseStore {
   }
 
   deleteConfig(id: string) {
-    // Check if this config was active
     const wasActive = contain(this.activeIds, id)
 
-    // If the deleted config is currently selected, switch to system view
     if (this.selectedId === id) {
       this.setViewMode('system')
     }

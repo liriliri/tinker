@@ -6,7 +6,6 @@ import type { Match } from './types'
 const storage = new LocalStore('tinker-regexp')
 
 class Store extends BaseStore {
-  // Regular expression state
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'
   testText: string = `Tinker RegExp is a regular expression testing tool, inspired by RegExr.

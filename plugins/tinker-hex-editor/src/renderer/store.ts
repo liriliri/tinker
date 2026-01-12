@@ -3,7 +3,6 @@ import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 
 class Store extends BaseStore {
-  // Hex editor data
   data: number[] = []
   nonce: number = 0
   currentFilePath: string | null = null
@@ -72,12 +71,10 @@ class Store extends BaseStore {
   async saveFile() {
     try {
       if (this.currentFilePath) {
-        // Save to existing file
         const data = new Uint8Array(this.data)
         await hexEditor.writeFile(this.currentFilePath, data)
         this.savedData = [...this.data]
       } else {
-        // Show save dialog
         await this.saveFileAs()
       }
     } catch (error) {

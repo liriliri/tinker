@@ -21,25 +21,20 @@ interface HistoryState {
 }
 
 class Store extends BaseStore {
-  // Image state
   image: ImageInfo | null = null
   isLoading: boolean = false
 
-  // Cropped result
   croppedBlob: Blob | null = null
   croppedDataUrl: string = ''
   croppedWidth: number = 0
   croppedHeight: number = 0
 
-  // History for undo/redo
   history: HistoryState[] = []
   historyIndex: number = -1
 
-  // Save settings
   overwriteOriginal: boolean = false
   isSaved: boolean = false
 
-  // Crop settings
   aspectRatio: number | null = null // null means free aspect ratio
   cropBoxWidth: number = 0
   cropBoxHeight: number = 0
@@ -95,7 +90,6 @@ class Store extends BaseStore {
       const buffer = await imageCropper.readFile(filePath)
       const fileName = splitPath(filePath).name
 
-      // Convert buffer to file
       const uint8Array = new Uint8Array(buffer)
       const file = new File([uint8Array], fileName, { type: 'image/*' })
 
@@ -110,7 +104,6 @@ class Store extends BaseStore {
     try {
       this.isLoading = true
 
-      // Load image
       const img = new Image()
       const url = URL.createObjectURL(file)
 
@@ -125,12 +118,10 @@ class Store extends BaseStore {
         img.src = url
       })
 
-      // Clean up old image URL if exists
       if (this.image?.originalUrl) {
         URL.revokeObjectURL(this.image.originalUrl)
       }
 
-      // Set image info
       this.image = {
         fileName: file.name,
         filePath,
@@ -140,13 +131,11 @@ class Store extends BaseStore {
         height: img.height,
       }
 
-      // Reset cropped result
       this.croppedBlob = null
       this.croppedDataUrl = ''
       this.croppedWidth = 0
       this.croppedHeight = 0
 
-      // Initialize history with the original image
       this.history = [
         {
           imageInfo: { ...this.image },
@@ -182,7 +171,6 @@ class Store extends BaseStore {
       URL.revokeObjectURL(oldUrl)
     }
 
-    // Update image with cropped result
     this.image = {
       ...this.image,
       originalUrl: this.croppedDataUrl,
@@ -202,7 +190,6 @@ class Store extends BaseStore {
     })
     this.historyIndex = this.history.length - 1
 
-    // Reset cropped result
     this.croppedBlob = null
     this.croppedDataUrl = ''
     this.croppedWidth = 0
@@ -219,10 +206,8 @@ class Store extends BaseStore {
       let savePath: string
 
       if (this.overwriteOriginal && this.image.filePath) {
-        // Overwrite mode: save to original file path
         savePath = this.image.filePath
       } else {
-        // Ask user to select save location
         const result = await tinker.showSaveDialog({
           defaultPath: this.image.fileName.replace(/\.[^.]+$/, '-cropped$&'),
           filters: [
@@ -240,16 +225,13 @@ class Store extends BaseStore {
         savePath = result.filePath
       }
 
-      // Convert current image to blob
       const response = await fetch(this.image.originalUrl)
       const blob = await response.blob()
       const arrayBuffer = await blob.arrayBuffer()
       const buffer = new Uint8Array(arrayBuffer)
 
-      // Save file
       await imageCropper.writeFile(savePath, buffer)
 
-      // Mark as saved
       this.isSaved = true
 
       return savePath
@@ -283,18 +265,15 @@ class Store extends BaseStore {
     const state = this.history[this.historyIndex]
     this.image = { ...state.imageInfo }
 
-    // Reset cropped result
     this.croppedBlob = null
     this.croppedDataUrl = ''
     this.croppedWidth = 0
     this.croppedHeight = 0
 
-    // Mark as unsaved since we changed state
     this.isSaved = false
   }
 
   clearImage() {
-    // Clean up all URLs in history
     for (const state of this.history) {
       if (state.imageInfo.originalUrl) {
         URL.revokeObjectURL(state.imageInfo.originalUrl)
