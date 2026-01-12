@@ -1,0 +1,21 @@
+{
+  "title": "Todo List",
+  "all": "All",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "yesterday": "Yesterday",
+  "important": "Important",
+  "completed": "Completed",
+  "addTask": "Add Task",
+  "taskPlaceholder": "Enter a new task...",
+  "searchPlaceholder": "Search todos...",
+  "noTasks": "No tasks yet",
+  "noSearchResults": "No matching tasks found",
+  "showCompleted": "Show completed",
+  "clearCompleted": "Clear completed",
+  "delete": "Delete",
+  "noPriority": "None",
+  "lowPriority": "Low",
+  "mediumPriority": "Medium",
+  "highPriority": "High"
+}

@@ -1,0 +1,21 @@
+{
+  "title": "待办清单",
+  "all": "全部",
+  "today": "今天",
+  "tomorrow": "明天",
+  "yesterday": "昨天",
+  "important": "重要",
+  "completed": "已完成",
+  "addTask": "添加任务",
+  "taskPlaceholder": "输入新任务...",
+  "searchPlaceholder": "搜索待办...",
+  "noTasks": "暂无任务",
+  "noSearchResults": "没有找到匹配的任务",
+  "showCompleted": "显示已完成",
+  "clearCompleted": "清除已完成",
+  "delete": "删除",
+  "noPriority": "无",
+  "lowPriority": "低",
+  "mediumPriority": "中",
+  "highPriority": "高"
+}
