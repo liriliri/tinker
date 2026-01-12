@@ -4,12 +4,7 @@ import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { tw, THEME_COLORS } from 'share/theme'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
 import store from './store'
 import WelcomeScreen from './components/WelcomeScreen'
 import Toolbar from './components/Toolbar'
@@ -89,8 +84,6 @@ export default observer(function App() {
                   </div>
                 </Panel>
 
-                <Separator />
-
                 {/* Center Panel - Entry List */}
                 <Panel id="center" minSize={300}>
                   <div
@@ -99,8 +92,6 @@ export default observer(function App() {
                     <EntryList />
                   </div>
                 </Panel>
-
-                <Separator />
 
                 {/* Right Panel - Entry Detail */}
                 <Panel id="right" minSize={300}>

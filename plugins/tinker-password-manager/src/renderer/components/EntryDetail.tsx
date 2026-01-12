@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff, Copy, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Copy, Check, Trash2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import store from '../store'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
@@ -9,7 +9,10 @@ import * as kdbxweb from 'kdbxweb'
 
 export default observer(function EntryDetail() {
   const { t } = useTranslation()
-  const { copyToClipboard } = useCopyToClipboard()
+  const { copied: copiedUsername, copyToClipboard: copyUsername } =
+    useCopyToClipboard()
+  const { copied: copiedPassword, copyToClipboard: copyPassword } =
+    useCopyToClipboard()
 
   const entry = store.selectedEntry
 
@@ -25,11 +28,11 @@ export default observer(function EntryDetail() {
 
   const handleCopyPassword = () => {
     const password = entry.password.getText()
-    copyToClipboard(password)
+    copyPassword(password)
   }
 
   const handleCopyUsername = () => {
-    copyToClipboard(entry.username)
+    copyUsername(entry.username)
   }
 
   const handleTogglePassword = () => {
@@ -51,7 +54,6 @@ export default observer(function EntryDetail() {
   const handleDelete = async () => {
     const confirmed = await confirm({
       title: t('confirmDeleteEntry'),
-      message: t('confirmDelete'),
     })
 
     if (confirmed) {
@@ -108,14 +110,18 @@ export default observer(function EntryDetail() {
                   onChange={(e) =>
                     handleUpdateField('UserName', e.target.value)
                   }
-                  className={`flex-1 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                  className={`flex-1 min-w-0 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
                 />
                 <button
                   onClick={handleCopyUsername}
-                  className={`px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
+                  className={`flex-shrink-0 px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
                   title={t('copyUsername')}
                 >
-                  <Copy size={16} />
+                  {copiedUsername ? (
+                    <Check size={16} className={tw.primary.text} />
+                  ) : (
+                    <Copy size={16} />
+                  )}
                 </button>
               </div>
             </div>
@@ -127,7 +133,7 @@ export default observer(function EntryDetail() {
                 {t('password')}
               </label>
               <div className="flex gap-2">
-                <div className="flex-1 relative">
+                <div className="flex-1 min-w-0 relative">
                   <input
                     type={store.showPassword ? 'text' : 'password'}
                     value={passwordText}
@@ -152,10 +158,14 @@ export default observer(function EntryDetail() {
                 </div>
                 <button
                   onClick={handleCopyPassword}
-                  className={`px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
+                  className={`flex-shrink-0 px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
                   title={t('copyPassword')}
                 >
-                  <Copy size={16} />
+                  {copiedPassword ? (
+                    <Check size={16} className={tw.primary.text} />
+                  ) : (
+                    <Copy size={16} />
+                  )}
                 </button>
               </div>
             </div>

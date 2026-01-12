@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import * as kdbxweb from 'kdbxweb'
@@ -60,6 +60,17 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadRecentFiles()
+    this.bindEvent()
+  }
+
+  private bindEvent() {
+    // Automatically update title when dbName changes
+    reaction(
+      () => this.dbName,
+      (dbName) => {
+        tinker.setTitle(dbName || '')
+      }
+    )
   }
 
   private loadRecentFiles() {
@@ -221,7 +232,7 @@ class Store extends BaseStore {
   private readDatabase() {
     if (!this.db) return
 
-    // 保存当前选中的分组和条目
+    // Save current selection
     const currentGroupId = this.selectedGroupId
     const currentEntryId = this.selectedEntryId
 
@@ -229,7 +240,7 @@ class Store extends BaseStore {
     this.rootGroup = this.convertGroup(defaultGroup)
     this.groups = this.flattenGroups(this.rootGroup)
 
-    // 恢复选中状态
+    // Restore selection
     if (currentGroupId) {
       this.selectGroup(currentGroupId)
       if (currentEntryId) {
@@ -313,6 +324,7 @@ class Store extends BaseStore {
   selectGroup(groupId: string) {
     this.selectedGroupId = groupId
     this.selectedEntryId = null
+    this.searchQuery = '' // Clear search when switching groups
     this.updateFilteredEntries()
   }
 
@@ -322,10 +334,37 @@ class Store extends BaseStore {
 
   setSearchQuery(query: string) {
     this.searchQuery = query
+    if (query && this.groups.length > 0) {
+      // Select root group when searching
+      this.selectedGroupId = this.groups[0].uuid
+      this.selectedEntryId = null
+    }
     this.updateFilteredEntries()
   }
 
   private updateFilteredEntries() {
+    // Global search when query exists
+    if (this.searchQuery) {
+      const query = this.searchQuery.toLowerCase()
+      const allEntries: KdbxEntry[] = []
+
+      // Collect entries from all groups
+      this.groups.forEach((group) => {
+        allEntries.push(...group.entries)
+      })
+
+      // Filter entries
+      this.filteredEntries = allEntries.filter(
+        (entry) =>
+          entry.title.toLowerCase().includes(query) ||
+          entry.username.toLowerCase().includes(query) ||
+          entry.url.toLowerCase().includes(query) ||
+          entry.notes.toLowerCase().includes(query)
+      )
+      return
+    }
+
+    // Show current group entries when no search query
     if (!this.selectedGroupId) {
       this.filteredEntries = []
       return
@@ -337,20 +376,7 @@ class Store extends BaseStore {
       return
     }
 
-    let entries = group.entries
-
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase()
-      entries = entries.filter(
-        (entry) =>
-          entry.title.toLowerCase().includes(query) ||
-          entry.username.toLowerCase().includes(query) ||
-          entry.url.toLowerCase().includes(query) ||
-          entry.notes.toLowerCase().includes(query)
-      )
-    }
-
-    this.filteredEntries = entries
+    this.filteredEntries = group.entries
   }
 
   togglePasswordVisibility() {

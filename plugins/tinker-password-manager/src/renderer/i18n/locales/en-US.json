@@ -26,7 +26,6 @@
   "confirmPassword": "Confirm Password",
   "recentFiles": "Recent Files",
   "passwordMismatch": "Passwords do not match",
-  "confirmDelete": "Are you sure you want to delete this?",
   "confirmDeleteEntry": "Are you sure you want to delete this entry?",
   "confirmDeleteGroup": "Are you sure you want to delete this group and all its contents?",
   "newEntry": "New Entry",

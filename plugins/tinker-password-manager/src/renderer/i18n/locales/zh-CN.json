@@ -26,7 +26,6 @@
   "confirmPassword": "确认密码",
   "recentFiles": "最近文件",
   "passwordMismatch": "密码不匹配",
-  "confirmDelete": "确定要删除吗？",
   "confirmDeleteEntry": "确定要删除此条目吗？",
   "confirmDeleteGroup": "确定要删除此分组及其所有内容吗？",
   "newEntry": "新建条目",

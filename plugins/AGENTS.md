@@ -358,6 +358,7 @@ Global `tinker` object provides system features.
 5. **Type Safety** - Avoid `any`, use union types, define props interfaces
 6. **Theme Consistency** - Always use `tw` utilities from `share/theme`
 7. **Prioritize Licia** - Check [licia.liriliri.io](https://licia.liriliri.io/) first
+8. **English Comments Only** - All code comments must be written in English, never use Chinese or other languages
 
 ## New Plugin Checklist
 

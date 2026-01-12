@@ -10,8 +10,9 @@ import {
   themeAlpine,
   RowClickedEvent,
   GetRowIdParams,
+  RowClassParams,
 } from 'ag-grid-community'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useRef, useEffect } from 'react'
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule])
@@ -25,6 +26,7 @@ interface RowData {
 
 export default observer(function EntryList() {
   const { t } = useTranslation()
+  const gridRef = useRef<AgGridReact<RowData>>(null)
 
   const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
@@ -73,6 +75,20 @@ export default observer(function EntryList() {
     []
   )
 
+  const getRowClass = useCallback((params: RowClassParams<RowData>) => {
+    if (params.data && params.data.id === store.selectedEntryId) {
+      return 'ag-row-selected'
+    }
+    return ''
+  }, [])
+
+  // 当选中的 entry 变化时，刷新所有行的样式
+  useEffect(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.redrawRows()
+    }
+  }, [store.selectedEntryId])
+
   // 使用 AG Grid 的主题 API，直接使用 store.isDark
   const theme = useMemo(() => {
     return themeAlpine.withParams({
@@ -86,6 +102,7 @@ export default observer(function EntryList() {
       headerTextColor: store.isDark ? '#d4d4d4' : '#000000',
       oddRowBackgroundColor: store.isDark ? '#252526' : '#ffffff',
       rowHoverColor: store.isDark ? '#3a3a3c' : '#e5e5e5',
+      selectedRowBackgroundColor: store.isDark ? '#0fc25e33' : '#0fc25e22',
     })
   }, [store.isDark])
 
@@ -102,11 +119,13 @@ export default observer(function EntryList() {
   return (
     <div className="h-full">
       <AgGridReact<RowData>
+        ref={gridRef}
         theme={theme}
         columnDefs={columnDefs}
         rowData={rowData}
         onRowClicked={onRowClicked}
         getRowId={getRowId}
+        getRowClass={getRowClass}
         headerHeight={40}
         rowHeight={40}
         animateRows={true}
