@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react-lite'
+import { Toaster } from 'react-hot-toast'
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import {
   Panel,
   Group,
@@ -27,6 +28,21 @@ export default observer(function App() {
     return (
       <AlertProvider>
         <PromptProvider>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: 'var(--toast-bg, #fff)',
+                color: 'var(--toast-text, #333)',
+              },
+              success: {
+                iconTheme: {
+                  primary: THEME_COLORS.primary,
+                  secondary: THEME_COLORS.bg.light.primary,
+                },
+              },
+            }}
+          />
           <WelcomeScreen />
         </PromptProvider>
       </AlertProvider>
@@ -37,6 +53,21 @@ export default observer(function App() {
     <AlertProvider>
       <ConfirmProvider>
         <PromptProvider>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: 'var(--toast-bg, #fff)',
+                color: 'var(--toast-text, #333)',
+              },
+              success: {
+                iconTheme: {
+                  primary: THEME_COLORS.primary,
+                  secondary: THEME_COLORS.bg.light.primary,
+                },
+              },
+            }}
+          />
           <div
             className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
           >

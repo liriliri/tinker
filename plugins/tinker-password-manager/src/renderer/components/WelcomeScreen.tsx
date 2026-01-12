@@ -12,7 +12,6 @@ export default observer(function WelcomeScreen() {
   const handleNewDatabase = async () => {
     const name = await prompt({
       title: t('newDatabase'),
-      message: t('enterTitle'),
       defaultValue: 'My Database',
     })
 
@@ -20,7 +19,6 @@ export default observer(function WelcomeScreen() {
 
     const password = await prompt({
       title: t('masterPassword'),
-      message: t('enterPassword'),
       inputType: 'password',
     })
 
@@ -28,7 +26,6 @@ export default observer(function WelcomeScreen() {
 
     const confirmPwd = await prompt({
       title: t('confirmPassword'),
-      message: t('enterPassword'),
       inputType: 'password',
     })
 
@@ -54,7 +51,6 @@ export default observer(function WelcomeScreen() {
 
     const password = await prompt({
       title: t('masterPassword'),
-      message: t('enterPassword'),
       inputType: 'password',
     })
 
@@ -66,7 +62,6 @@ export default observer(function WelcomeScreen() {
   const handleOpenRecent = async (path: string) => {
     const password = await prompt({
       title: t('masterPassword'),
-      message: t('enterPassword'),
       inputType: 'password',
     })
 

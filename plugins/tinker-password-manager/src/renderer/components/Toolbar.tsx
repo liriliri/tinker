@@ -27,7 +27,6 @@ export default observer(function Toolbar() {
 
     const title = await prompt({
       title: t('newEntry'),
-      message: t('enterTitle'),
       defaultValue: 'New Entry',
     })
 
@@ -41,7 +40,6 @@ export default observer(function Toolbar() {
 
     const name = await prompt({
       title: t('newGroup'),
-      message: t('enterGroupName'),
       defaultValue: 'New Group',
     })
 

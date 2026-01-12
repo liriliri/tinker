@@ -1,8 +1,9 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import { alert } from 'share/components/Alert'
 import * as kdbxweb from 'kdbxweb'
+import i18n from './i18n'
+import toast from 'react-hot-toast'
 
 const storage = new LocalStore('tinker-password-manager')
 
@@ -92,7 +93,8 @@ class Store extends BaseStore {
       this.isModified = true
       this.readDatabase()
     } catch (error) {
-      alert({ title: 'Failed to create database', message: String(error) })
+      toast.error(i18n.t('failedToCreateDatabase'))
+      console.error('Failed to create database:', error)
     }
   }
 
@@ -117,9 +119,10 @@ class Store extends BaseStore {
       this.readDatabase()
     } catch (error: any) {
       if (error.code === kdbxweb.Consts.ErrorCodes.InvalidKey) {
-        alert({ title: 'Invalid password or key file' })
+        toast.error(i18n.t('invalidPassword'))
       } else {
-        alert({ title: 'Failed to open database', message: String(error) })
+        toast.error(i18n.t('failedToOpenDatabase'))
+        console.error('Failed to open database:', error)
       }
     }
   }
@@ -155,7 +158,8 @@ class Store extends BaseStore {
         }
       }
     } catch (error) {
-      alert({ title: 'Failed to save database', message: String(error) })
+      toast.error(i18n.t('failedToSaveDatabase'))
+      console.error('Failed to save database:', error)
     }
   }
 
@@ -183,7 +187,8 @@ class Store extends BaseStore {
         this.addRecentFile(result.filePath)
       }
     } catch (error) {
-      alert({ title: 'Failed to save database', message: String(error) })
+      toast.error(i18n.t('failedToSaveDatabase'))
+      console.error('Failed to save database:', error)
     }
   }
 
@@ -405,6 +410,19 @@ class Store extends BaseStore {
     if (!parentGroup) return
 
     const group = this.db.createGroup(parentGroup, name)
+    group.times.update()
+
+    this.isModified = true
+    this.readDatabase()
+  }
+
+  renameGroup(groupId: string, name: string) {
+    if (!this.db) return
+
+    const group = this.findKdbxGroup(groupId)
+    if (!group) return
+
+    group.name = name
     group.times.update()
 
     this.isModified = true

@@ -99,16 +99,6 @@ export default observer(function EntryList() {
     )
   }
 
-  if (store.filteredEntries.length === 0) {
-    return (
-      <div
-        className={`h-full flex items-center justify-center text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-      >
-        {t('noEntriesInGroup')}
-      </div>
-    )
-  }
-
   return (
     <div className="h-full">
       <AgGridReact<RowData>
@@ -120,7 +110,8 @@ export default observer(function EntryList() {
         headerHeight={40}
         rowHeight={40}
         animateRows={true}
-        enableCellTextSelection={true}
+        enableCellTextSelection={false}
+        suppressCellFocus={true}
       />
     </div>
   )
