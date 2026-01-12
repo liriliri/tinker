@@ -1,8 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import { tw } from 'share/theme'
 import store from '../store'
 import {
@@ -44,13 +43,8 @@ function FormatRow({
   format,
   cssValue,
 }: FormatRowProps) {
-  const { copied, copyToClipboard } = useCopyToClipboard()
   const [localValue, setLocalValue] = useState(value)
   const [isEditing, setIsEditing] = useState(false)
-
-  const handleCopy = async () => {
-    await copyToClipboard(cssValue)
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
@@ -96,17 +90,7 @@ function FormatRow({
         onKeyDown={handleKeyDown}
         className={`flex-1 px-4 py-2.5 border ${tw.border.both} rounded-lg ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} font-mono text-sm focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
       />
-      <button
-        onClick={handleCopy}
-        className={`w-10 h-10 flex items-center justify-center ${
-          copied
-            ? tw.primary.text
-            : `${tw.text.light.tertiary} ${tw.text.dark.tertiary}`
-        } rounded-lg transition-colors`}
-        title={copyTitle}
-      >
-        {copied ? <Check size={20} /> : <Copy size={20} />}
-      </button>
+      <CopyButton text={cssValue} title={copyTitle} />
     </div>
   )
 }

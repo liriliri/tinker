@@ -12,6 +12,7 @@ share/
 │   ├── Alert.tsx
 │   ├── Checkbox.tsx
 │   ├── Confirm.tsx
+│   ├── CopyButton.tsx
 │   ├── Dialog.tsx
 │   ├── ImageOpen.tsx
 │   ├── Prompt.tsx
@@ -491,6 +492,60 @@ import Checkbox from 'share/components/Checkbox'
   label="Enable feature"
 />
 ```
+
+### CopyButton
+
+Button with copy-to-clipboard functionality and visual feedback:
+
+```typescript
+import CopyButton from 'share/components/CopyButton'
+
+// Default variant - standalone button with background
+<CopyButton text="text to copy" title="Copy to clipboard" />
+
+// Toolbar variant - for use in Toolbar components
+<CopyButton
+  variant="toolbar"
+  text={store.jsonInput}
+  disabled={store.isEmpty}
+  title={t('copy')}
+/>
+
+// Icon variant - flexible styling for embedded use
+<CopyButton
+  variant="icon"
+  text={entry.password}
+  size={20}
+  title="Copy password"
+  className="absolute bottom-2 right-2 w-10 h-10"
+/>
+
+// Custom size and styling
+<CopyButton
+  text={data}
+  size={18}
+  className="px-4 py-3"
+/>
+```
+
+**Props**:
+- `text`: String to copy to clipboard (required)
+- `variant`: Button style variant - `'default'`, `'icon'`, or `'toolbar'` (default: `'default'`)
+  - `'default'`: Standalone button with padding and background
+  - `'toolbar'`: Toolbar button style with hover effects (auto-uses TOOLBAR_ICON_SIZE)
+  - `'icon'`: Icon-only button without default styling (for flexible embedding)
+- `size`: Icon size in pixels (default: 16 for default/icon, 14 for toolbar)
+- `title`: Tooltip text
+- `className`: Additional CSS classes for button
+- `iconClassName`: Additional CSS classes for icon (not applied when copied)
+- Supports all standard button HTML attributes
+
+**Features**:
+- Automatic icon switching (Copy → Check)
+- Visual feedback with primary color when copied
+- Auto-resets after 2 seconds
+- Built-in hover and theme support (default and toolbar variants)
+- Flexible styling for various use cases (icon variant)
 
 ### ImageOpen
 

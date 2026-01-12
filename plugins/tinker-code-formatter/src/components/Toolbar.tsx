@@ -7,18 +7,17 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import { alert } from 'share/components/Alert'
-import { Copy, Clipboard, Eraser, Check } from 'lucide-react'
+import { Clipboard, Eraser } from 'lucide-react'
 import Select from 'share/components/Select'
+import { tw } from 'share/theme'
 import store from '../store'
 import formatter from '../lib/formatter'
 import { LANGUAGES } from '../lib/languages'
-import { tw } from 'share/theme'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const languageOptions = Object.values(LANGUAGES).map((lang) => ({
     value: lang.id,
@@ -56,10 +55,6 @@ export default observer(function ToolbarComponent() {
     }
   }
 
-  const handleCopy = async () => {
-    await copyToClipboard(store.input)
-  }
-
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText()
@@ -90,18 +85,12 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <ToolbarButton
-        onClick={handleCopy}
+      <CopyButton
+        variant="toolbar"
+        text={store.input}
         disabled={isEmpty}
-        className={copied ? tw.primary.text : ''}
         title={t('copy')}
-      >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+      />
 
       <ToolbarButton onClick={handlePaste} title={t('paste')}>
         <Clipboard size={TOOLBAR_ICON_SIZE} />

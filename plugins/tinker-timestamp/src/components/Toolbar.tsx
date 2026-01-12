@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Clock, Copy, RotateCcw, Check } from 'lucide-react'
+import { Clock, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
 import { tw } from 'share/theme'
@@ -10,16 +10,11 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
-
-  const copyCurrentTimestamp = async () => {
-    await copyToClipboard(store.currentTimestampDisplay)
-  }
 
   const resetData = () => {
     const now = new Date(store.currentTimestamp)
@@ -75,17 +70,11 @@ export default observer(function ToolbarComponent() {
       </div>
 
       {/* Copy */}
-      <ToolbarButton
-        onClick={copyCurrentTimestamp}
-        className={copied ? tw.primary.text : ''}
+      <CopyButton
+        variant="toolbar"
+        text={store.currentTimestampDisplay}
         title={t('copy')}
-      >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+      />
 
       <ToolbarSpacer />
 

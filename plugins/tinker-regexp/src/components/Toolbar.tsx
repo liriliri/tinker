@@ -1,26 +1,20 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Clipboard, Eraser, Check, Flag } from 'lucide-react'
+import { Clipboard, Eraser, Flag } from 'lucide-react'
 import {
   Toolbar,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-import { tw } from 'share/theme'
+import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import FlagsPanel from './FlagsPanel'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
   const [showFlags, setShowFlags] = useState(false)
-
-  const handleCopy = async () => {
-    await copyToClipboard(store.pattern)
-  }
 
   const matchCount = store.matches.length
   const matchText = store.error
@@ -31,18 +25,12 @@ export default observer(function ToolbarComponent() {
 
   return (
     <Toolbar>
-      <ToolbarButton
-        onClick={handleCopy}
+      <CopyButton
+        variant="toolbar"
+        text={store.pattern}
         disabled={store.isEmpty}
-        className={copied ? tw.primary.text : ''}
         title={t('copy')}
-      >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+      />
 
       <ToolbarButton
         onClick={() => store.pasteFromClipboard()}

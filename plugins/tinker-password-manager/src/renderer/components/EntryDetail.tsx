@@ -1,18 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff, Copy, Check, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Trash2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import store from '../store'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import { confirm } from 'share/components/Confirm'
 import * as kdbxweb from 'kdbxweb'
 
 export default observer(function EntryDetail() {
   const { t } = useTranslation()
-  const { copied: copiedUsername, copyToClipboard: copyUsername } =
-    useCopyToClipboard()
-  const { copied: copiedPassword, copyToClipboard: copyPassword } =
-    useCopyToClipboard()
 
   const entry = store.selectedEntry
 
@@ -24,15 +20,6 @@ export default observer(function EntryDetail() {
         {t('noEntries')}
       </div>
     )
-  }
-
-  const handleCopyPassword = () => {
-    const password = entry.password.getText()
-    copyPassword(password)
-  }
-
-  const handleCopyUsername = () => {
-    copyUsername(entry.username)
   }
 
   const handleTogglePassword = () => {
@@ -112,17 +99,7 @@ export default observer(function EntryDetail() {
                   }
                   className={`flex-1 min-w-0 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
                 />
-                <button
-                  onClick={handleCopyUsername}
-                  className={`flex-shrink-0 px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
-                  title={t('copyUsername')}
-                >
-                  {copiedUsername ? (
-                    <Check size={16} className={tw.primary.text} />
-                  ) : (
-                    <Copy size={16} />
-                  )}
-                </button>
+                <CopyButton text={entry.username} title={t('copyUsername')} />
               </div>
             </div>
 
@@ -156,17 +133,10 @@ export default observer(function EntryDetail() {
                     )}
                   </button>
                 </div>
-                <button
-                  onClick={handleCopyPassword}
-                  className={`flex-shrink-0 px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`}
+                <CopyButton
+                  text={entry.password.getText()}
                   title={t('copyPassword')}
-                >
-                  {copiedPassword ? (
-                    <Check size={16} className={tw.primary.text} />
-                  ) : (
-                    <Copy size={16} />
-                  )}
-                </button>
+                />
               </div>
             </div>
 

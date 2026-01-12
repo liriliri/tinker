@@ -1,14 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import {
   AlignJustify,
-  Copy,
   Clipboard,
   Eraser,
   FileText,
   Network,
   Undo,
   Redo,
-  Check,
   FolderOpen,
   AlertCircle,
   FilePlus,
@@ -22,8 +20,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-import { tw } from 'share/theme'
+import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import ExpandIcon from '../assets/expand.svg?react'
 import CollapseIcon from '../assets/collapse.svg?react'
@@ -31,11 +28,6 @@ import MinifyIcon from '../assets/minify.svg?react'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
-
-  const handleCopy = async () => {
-    await copyToClipboard(store.jsonInput)
-  }
 
   return (
     <Toolbar>
@@ -147,18 +139,12 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <ToolbarButton
-        onClick={handleCopy}
+      <CopyButton
+        variant="toolbar"
+        text={store.jsonInput}
         disabled={store.isEmpty}
-        className={copied ? tw.primary.text : ''}
         title={t('copy')}
-      >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+      />
 
       <ToolbarButton
         onClick={() => store.pasteFromClipboard()}

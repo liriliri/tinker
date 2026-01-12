@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Copy, Check } from 'lucide-react'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import { tw } from 'share/theme'
 
 interface HashResultProps {
@@ -9,12 +8,6 @@ interface HashResultProps {
 }
 
 export default observer(function HashResult({ label, value }: HashResultProps) {
-  const { copied, copyToClipboard } = useCopyToClipboard()
-
-  const handleCopy = async () => {
-    await copyToClipboard(value)
-  }
-
   return (
     <div className="relative">
       <textarea
@@ -28,18 +21,14 @@ export default observer(function HashResult({ label, value }: HashResultProps) {
       >
         {label.toUpperCase()}
       </div>
-      <button
-        onClick={handleCopy}
+      <CopyButton
+        variant="icon"
+        text={value}
+        size={20}
         disabled={!value}
-        className={`absolute bottom-2 right-2 w-10 h-10 flex items-center justify-center ${
-          copied
-            ? tw.primary.text
-            : `${tw.text.light.tertiary} ${tw.text.dark.tertiary}`
-        } rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed`}
+        className="absolute bottom-2 right-2 w-10 h-10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title="Copy to clipboard"
-      >
-        {copied ? <Check size={20} /> : <Copy size={20} />}
-      </button>
+      />
     </div>
   )
 })

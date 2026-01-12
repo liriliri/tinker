@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { ListX, Eraser, Copy, Check } from 'lucide-react'
+import { ListX, Eraser } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
@@ -9,13 +9,11 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-import { tw } from 'share/theme'
+import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const getCurrentLine = () => {
     return find(store.lines, (line) => line.id === store.activeLineId)
@@ -30,16 +28,14 @@ export default observer(function ToolbarComponent() {
     return !currentLine || isStrBlank(currentLine.expression)
   }
 
-  const handleCopyResult = async () => {
-    const currentLine = getCurrentLine()
-    if (currentLine && currentLine.result) {
-      await copyToClipboard(currentLine.result)
-    }
-  }
-
   const hasResult = () => {
     const currentLine = getCurrentLine()
     return currentLine && !isStrBlank(currentLine.result)
+  }
+
+  const getCurrentResult = () => {
+    const currentLine = getCurrentLine()
+    return currentLine?.result || ''
   }
 
   return (
@@ -52,18 +48,12 @@ export default observer(function ToolbarComponent() {
         <Eraser size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarButton
-        onClick={handleCopyResult}
+      <CopyButton
+        variant="toolbar"
+        text={getCurrentResult()}
         disabled={!hasResult()}
-        className={copied ? tw.primary.text : ''}
         title={t('copyResult')}
-      >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
-      </ToolbarButton>
+      />
 
       <ToolbarSpacer />
 
