@@ -4,3 +4,25 @@
 html.dark {
   color-scheme: dark;
 }
+
+/* Resizable panel styles */
+[data-separator] {
+  width: 4px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  background-color: #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+html.dark [data-separator] {
+  background-color: #374151;
+}
+
+[data-separator]:hover {
+  background-color: #0fc25e !important;
+}
+
+[data-separator]:active {
+  background-color: #0da84f !important;
+}

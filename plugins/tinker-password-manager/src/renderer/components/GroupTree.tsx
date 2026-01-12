@@ -80,11 +80,6 @@ export default observer(function GroupTree() {
     <div
       className={`h-full overflow-y-auto p-2 ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
     >
-      <div
-        className={`text-xs font-medium mb-2 px-2 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-      >
-        {t('groups')}
-      </div>
       <GroupItem group={store.rootGroup} level={0} />
     </div>
   )

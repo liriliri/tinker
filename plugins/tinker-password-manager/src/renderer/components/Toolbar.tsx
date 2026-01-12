@@ -52,6 +52,32 @@ export default observer(function Toolbar() {
 
   return (
     <ToolbarComponent>
+      <ToolbarButton
+        onClick={handleNewEntry}
+        disabled={!store.selectedGroupId}
+        title={t('createEntry')}
+      >
+        <Plus size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={handleNewGroup}
+        disabled={!store.selectedGroupId}
+        title={t('createGroup')}
+      >
+        <FolderPlus size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={handleSave}
+        disabled={!store.isModified}
+        title={t('saveDatabase')}
+      >
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
       <div className="relative w-48">
         <Search
           size={14}
@@ -67,32 +93,6 @@ export default observer(function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
-        <ToolbarButton
-          onClick={handleNewEntry}
-          disabled={!store.selectedGroupId}
-          title={t('createEntry')}
-        >
-          <Plus size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarButton
-          onClick={handleNewGroup}
-          disabled={!store.selectedGroupId}
-          title={t('createGroup')}
-        >
-          <FolderPlus size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarSeparator />
-
-        <ToolbarButton
-          onClick={handleSave}
-          disabled={!store.isModified}
-          title={t('saveDatabase')}
-        >
-          <Save size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
         <ToolbarButton onClick={handleLock} title={t('lockDatabase')}>
           <Lock size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

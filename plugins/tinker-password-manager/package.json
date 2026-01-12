@@ -25,6 +25,7 @@
   "devDependencies": {
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",
-    "kdbxweb": "^2.1.1"
+    "kdbxweb": "^2.1.1",
+    "react-resizable-panels": "^4.3.3"
   }
 }

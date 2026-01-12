@@ -3,6 +3,12 @@ import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { tw } from 'share/theme'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import store from './store'
 import WelcomeScreen from './components/WelcomeScreen'
 import Toolbar from './components/Toolbar'
@@ -11,6 +17,12 @@ import EntryList from './components/EntryList'
 import EntryDetail from './components/EntryDetail'
 
 export default observer(function App() {
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    panelIds: ['left', 'center', 'right'],
+    id: 'tinker-password-manager-layout',
+    storage: localStorage,
+  })
+
   if (store.isLocked) {
     return (
       <AlertProvider>
@@ -30,25 +42,42 @@ export default observer(function App() {
           >
             <Toolbar />
 
-            <div className="flex-1 flex overflow-hidden">
-              {/* Left Panel - Groups */}
-              <div
-                className={`w-48 border-r ${tw.border.both} overflow-hidden`}
+            <div className="flex-1 overflow-hidden">
+              <Group
+                orientation="horizontal"
+                className="h-full"
+                defaultLayout={defaultLayout}
+                onLayoutChange={onLayoutChange}
               >
-                <GroupTree />
-              </div>
+                {/* Left Panel - Groups */}
+                <Panel id="left" minSize={200}>
+                  <div
+                    className={`h-full border-r ${tw.border.both} overflow-hidden`}
+                  >
+                    <GroupTree />
+                  </div>
+                </Panel>
 
-              {/* Center Panel - Entry List */}
-              <div
-                className={`flex-1 border-r ${tw.border.both} overflow-hidden`}
-              >
-                <EntryList />
-              </div>
+                <Separator />
 
-              {/* Right Panel - Entry Detail */}
-              <div className="w-80 overflow-hidden">
-                <EntryDetail />
-              </div>
+                {/* Center Panel - Entry List */}
+                <Panel id="center" minSize={300}>
+                  <div
+                    className={`h-full border-r ${tw.border.both} overflow-hidden`}
+                  >
+                    <EntryList />
+                  </div>
+                </Panel>
+
+                <Separator />
+
+                {/* Right Panel - Entry Detail */}
+                <Panel id="right" minSize={300}>
+                  <div className="h-full overflow-hidden">
+                    <EntryDetail />
+                  </div>
+                </Panel>
+              </Group>
             </div>
           </div>
         </PromptProvider>

@@ -8,16 +8,25 @@ import {
   ModuleRegistry,
   AllCommunityModule,
   themeAlpine,
+  RowClickedEvent,
+  GetRowIdParams,
 } from 'ag-grid-community'
 import { useMemo, useCallback } from 'react'
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule])
 
+interface RowData {
+  id: string
+  title: string
+  username: string
+  url: string
+}
+
 export default observer(function EntryList() {
   const { t } = useTranslation()
 
-  const columnDefs: ColDef[] = useMemo(
+  const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
       {
         field: 'title',
@@ -53,13 +62,16 @@ export default observer(function EntryList() {
     }))
   }, [store.filteredEntries])
 
-  const onRowClicked = useCallback((event: any) => {
+  const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
     if (event.data) {
       store.selectEntry(event.data.id)
     }
   }, [])
 
-  const getRowId = useCallback((params: any) => params.data.id, [])
+  const getRowId = useCallback(
+    (params: GetRowIdParams<RowData>) => params.data.id,
+    []
+  )
 
   // 使用 AG Grid 的主题 API，直接使用 store.isDark
   const theme = useMemo(() => {
@@ -99,7 +111,7 @@ export default observer(function EntryList() {
 
   return (
     <div className="h-full">
-      <AgGridReact
+      <AgGridReact<RowData>
         theme={theme}
         columnDefs={columnDefs}
         rowData={rowData}
