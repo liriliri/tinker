@@ -15,7 +15,7 @@ export default observer(function EntryDetail() {
   if (!entry) {
     return (
       <div
-        className={`h-full flex items-center justify-center text-sm ${tw.bg.both.secondary} ${tw.text.both.secondary}`}
+        className={`h-full flex items-center justify-center text-sm ${tw.bg.both.tertiary} ${tw.text.both.secondary}`}
       >
         {t('noEntries')}
       </div>
@@ -53,7 +53,7 @@ export default observer(function EntryDetail() {
     : '••••••••'
 
   return (
-    <div className={`h-full overflow-y-auto ${tw.bg.both.secondary}`}>
+    <div className={`h-full overflow-y-auto ${tw.bg.both.tertiary}`}>
       <div className="p-4">
         <div className="max-w-2xl">
           <div className="flex items-center justify-between mb-6">

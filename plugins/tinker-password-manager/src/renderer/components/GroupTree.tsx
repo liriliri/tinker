@@ -142,14 +142,14 @@ export default observer(function GroupTree() {
 
   if (!store.rootGroup) {
     return (
-      <div className={`p-4 text-center text-sm ${tw.text.both.secondary}`}>
+      <div className={`p-4 text-center text-sm ${tw.text.both.tertiary}`}>
         {t('noEntries')}
       </div>
     )
   }
 
   return (
-    <div className={`h-full overflow-y-auto p-2 ${tw.bg.both.secondary}`}>
+    <div className={`h-full overflow-y-auto p-2 ${tw.bg.both.tertiary}`}>
       <GroupItem group={store.rootGroup} level={0} />
     </div>
   )

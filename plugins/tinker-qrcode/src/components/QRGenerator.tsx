@@ -64,7 +64,7 @@ export default observer(function QRGenerator() {
 
       {/* Right Panel - QR Code Display */}
       <div
-        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.both.secondary} p-4`}
+        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.both.tertiary} p-4`}
       >
         {store.text ? (
           <div

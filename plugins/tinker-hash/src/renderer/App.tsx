@@ -43,7 +43,7 @@ export default observer(function App() {
 
           {/* Right Panel - Results */}
           <div
-            className={`flex-1 p-4 ${tw.bg.both.secondary} flex flex-col justify-evenly`}
+            className={`flex-1 p-4 ${tw.bg.both.tertiary} flex flex-col justify-evenly`}
           >
             <HashResult label="md5" value={store.hashResults.md5} />
             <HashResult label="sha1" value={store.hashResults.sha1} />
