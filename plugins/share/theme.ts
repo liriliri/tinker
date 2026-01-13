@@ -129,7 +129,10 @@ export const tw = {
     light: {
       primary: 'bg-white',
       secondary: 'bg-[#f0f1f2]',
+      tertiary: 'bg-[#f6f7f8]',
       input: 'bg-white',
+      select: 'bg-white',
+      code: 'bg-[#252526]',
     },
     dark: {
       primary: 'dark:bg-[#1e1e1e]',
@@ -137,6 +140,15 @@ export const tw = {
       tertiary: 'dark:bg-[#252526]',
       input: 'dark:bg-[#2d2d2d]',
       select: 'dark:bg-[#3e3e42]',
+      code: 'dark:bg-[#252526]',
+    },
+    both: {
+      primary: 'bg-white dark:bg-[#1e1e1e]',
+      secondary: 'bg-[#f0f1f2] dark:bg-[#303133]',
+      tertiary: 'bg-[#f6f7f8] dark:bg-[#252526]',
+      input: 'bg-white dark:bg-[#2d2d2d]',
+      select: 'bg-white dark:bg-[#3e3e42]',
+      code: 'bg-[#252526] dark:bg-[#252526]',
     },
   },
 
@@ -174,6 +186,11 @@ export const tw = {
       secondary: 'dark:text-gray-300',
       tertiary: 'dark:text-gray-400',
     },
+    both: {
+      primary: 'text-gray-800 dark:text-gray-200',
+      secondary: 'text-gray-600 dark:text-gray-300',
+      tertiary: 'text-gray-500 dark:text-gray-400',
+    },
   },
 
   // Extended gray utilities
@@ -191,6 +208,16 @@ export const tw = {
       text400: 'dark:text-[#d4d4d4]',
       border100: 'dark:border-[#3a3a3c]',
       border200: 'dark:border-[#4a4a4a]',
+    },
+    both: {
+      text300: 'text-[#cccccc] dark:text-[#858585]',
+      text400: 'text-[#8a8a8a] dark:text-[#d4d4d4]',
+      text500: 'text-[#6e6e6e]',
+      text600: 'text-[#666666]',
+      border400: 'border-[#8a8a8a]',
+      border500: 'border-[#6e6e6e]',
+      border100: 'dark:border-[#3a3a3c]',
+      border200: 'border-[#4a4a4a] dark:border-[#4a4a4a]',
     },
   },
 } as const

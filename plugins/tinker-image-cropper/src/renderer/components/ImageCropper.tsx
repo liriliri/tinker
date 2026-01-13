@@ -27,7 +27,7 @@ export default observer(function ImageCropper({
           ref={cropperRef}
           src={store.image.originalUrl}
           className="h-full"
-          backgroundClassName={`${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+          backgroundClassName={`${tw.bg.both.secondary}`}
           stencilProps={{
             aspectRatio: store.aspectRatio ?? undefined,
           }}

@@ -112,7 +112,7 @@ export default observer(function CalculationList() {
               tw.border.both
             } transition-colors cursor-text ${
               isActive
-                ? `border-l-4 ${tw.bg.light.primary} ${tw.bg.dark.primary}`
+                ? `border-l-4 ${tw.bg.both.primary}`
                 : `border-l-4 border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]`
             }`}
           >

@@ -48,15 +48,11 @@ export default observer(function App() {
   }, [])
 
   return (
-    <div
-      className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-    >
+    <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
       <Toolbar />
 
       {/* Main Content */}
-      <div
-        className={`flex-1 overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-      >
+      <div className={`flex-1 overflow-hidden ${tw.bg.both.primary}`}>
         {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
       </div>
     </div>

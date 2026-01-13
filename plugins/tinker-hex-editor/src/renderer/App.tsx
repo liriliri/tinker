@@ -38,7 +38,7 @@ export default observer(function App() {
   return (
     <AlertProvider>
       <div
-        className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+        className={`h-screen flex flex-col ${tw.bg.both.primary}`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >

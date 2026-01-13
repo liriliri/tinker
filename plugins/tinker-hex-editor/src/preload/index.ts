@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron'
 import { readFile, writeFile } from 'fs/promises'
 
-const hexEditorAPI = {
+const hexEditorObj = {
   // Read file as buffer
   async readFile(filePath: string): Promise<Buffer> {
     try {
@@ -23,8 +23,8 @@ const hexEditorAPI = {
   },
 }
 
-contextBridge.exposeInMainWorld('hexEditor', hexEditorAPI)
+contextBridge.exposeInMainWorld('hexEditor', hexEditorObj)
 
 declare global {
-  const hexEditor: typeof hexEditorAPI
+  const hexEditor: typeof hexEditorObj
 }

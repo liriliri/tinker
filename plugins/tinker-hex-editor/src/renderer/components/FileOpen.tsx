@@ -53,9 +53,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
           strokeWidth={1.5}
         />
 
-        <p
-          className={`text-lg font-medium ${tw.text.light.primary} ${tw.gray.dark.text400} mb-2`}
-        >
+        <p className={`text-lg font-medium ${tw.text.both.primary} mb-2`}>
           {openTitle}
         </p>
         <p

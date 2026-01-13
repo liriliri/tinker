@@ -79,14 +79,14 @@ export default observer(function Toolbar() {
       <div className="relative w-48">
         <Search
           size={14}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.light.tertiary} ${tw.text.dark.tertiary}`}
+          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary}`}
         />
         <input
           type="text"
           placeholder={t('searchPlaceholder')}
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
-          className={`w-full pl-7 pr-2 py-1 text-xs border rounded ${tw.border.both} ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-2 py-1 text-xs border rounded ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
         />
       </div>
 

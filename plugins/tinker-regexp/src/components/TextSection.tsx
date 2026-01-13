@@ -87,7 +87,7 @@ export default observer(function TextSection() {
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">
       <div
-        className={`flex-1 overflow-hidden px-6 py-3 ${tw.bg.light.primary} ${tw.bg.dark.primary} relative`}
+        className={`flex-1 overflow-hidden px-6 py-3 ${tw.bg.both.primary} relative`}
       >
         <CodeMirrorEditor
           value={store.testText}
@@ -112,23 +112,19 @@ export default observer(function TextSection() {
                 <div className="mb-2">
                   <strong>{t('matchLabel')}:</strong> "{hoverMatch.text}"
                 </div>
-                <div
-                  className={`${tw.text.light.secondary} ${tw.text.dark.secondary} text-xs`}
-                >
+                <div className={`${tw.text.both.secondary} text-xs`}>
                   {t('positionLabel')}: {hoverMatch.index} -{' '}
                   {hoverMatch.index + hoverMatch.length}
                 </div>
                 {hoverMatch.groups.length > 0 && (
                   <div className={`mt-2 pt-2 border-t ${tw.border.both}`}>
-                    <div
-                      className={`${tw.text.light.secondary} ${tw.text.dark.secondary} text-xs mb-1`}
-                    >
+                    <div className={`${tw.text.both.secondary} text-xs mb-1`}>
                       {t('groupsLabel')}:
                     </div>
                     {hoverMatch.groups.map((group, i) => (
                       <div
                         key={i}
-                        className={`${tw.text.light.secondary} ${tw.text.dark.secondary} text-xs`}
+                        className={`${tw.text.both.secondary} text-xs`}
                       >
                         {i + 1}: {group || t('emptyGroup')}
                       </div>

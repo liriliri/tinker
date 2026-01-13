@@ -442,9 +442,7 @@ export default observer(function PdfViewer() {
   if (store.isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div
-          className={`text-center ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-        >
+        <div className={`text-center ${tw.text.both.secondary}`}>
           <p>Loading...</p>
         </div>
       </div>
@@ -456,7 +454,7 @@ export default observer(function PdfViewer() {
   return (
     <div
       ref={containerRef}
-      className={`flex-1 overflow-auto ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+      className={`flex-1 overflow-auto ${tw.bg.both.secondary}`}
     >
       <div className="py-4 px-4 flex flex-col items-center gap-4">
         {pages.map((pageNum) => {

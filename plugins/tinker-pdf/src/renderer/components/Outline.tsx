@@ -58,7 +58,7 @@ function OutlineNode({ item, level, onItemClick }: OutlineNodeProps) {
         <span
           className={`
             text-sm truncate
-            ${tw.text.light.primary} ${tw.text.dark.primary}
+            ${tw.text.both.primary}
             ${item.bold ? 'font-bold' : ''}
             ${item.italic ? 'italic' : ''}
           `}
@@ -152,7 +152,7 @@ export default observer(function Outline() {
         ref={containerRef}
         className={`
           flex-1 flex items-center justify-center p-4
-          ${tw.text.light.secondary} ${tw.text.dark.secondary}
+          ${tw.text.both.secondary}
         `}
       >
         <p className="text-sm text-center">{t('noOutline')}</p>

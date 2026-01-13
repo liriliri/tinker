@@ -73,7 +73,7 @@ export default function CropSizeDialog({
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.both.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
             value={width}
             onChange={(e) => setWidth(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -89,7 +89,7 @@ export default function CropSizeDialog({
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.both.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none`}
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             onKeyDown={handleKeyDown}

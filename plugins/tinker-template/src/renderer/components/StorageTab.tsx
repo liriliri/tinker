@@ -9,7 +9,7 @@ export default observer(function StorageTab() {
   return (
     <div className="space-y-6">
       <div
-        className={`${tw.bg.light.primary} ${tw.bg.dark.primary} rounded-lg p-6 border ${tw.border.both}`}
+        className={`${tw.bg.both.primary} rounded-lg p-6 border ${tw.border.both}`}
       >
         <h2
           className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
@@ -44,9 +44,7 @@ export default observer(function StorageTab() {
             </button>
           </div>
           <div className="bg-[#0fc25e]/10 dark:bg-[#0fc25e]/20 rounded p-4 border border-[#0fc25e]/30">
-            <p
-              className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-            >
+            <p className={`text-sm ${tw.text.both.secondary}`}>
               {t('dataPersistedNote')}
             </p>
           </div>

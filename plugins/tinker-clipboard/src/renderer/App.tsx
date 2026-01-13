@@ -22,9 +22,7 @@ export default observer(function App() {
 
   return (
     <ConfirmProvider>
-      <div
-        className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-      >
+      <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
         <Toaster
           position="top-center"
           toastOptions={{

@@ -2,10 +2,9 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
-import { homedir } from 'licia'
 
 const storage = new LocalStore('tinker-todo')
-const DEFAULT_FILE_PATH = `${homedir()}/todo.txt`
+const DEFAULT_FILE_PATH = `${todo.getHomedir()}/todo.txt`
 
 export type Priority = 'A' | 'B' | 'C' | null
 export type FilterType = 'all' | 'today' | 'important' | 'completed'
@@ -33,6 +32,7 @@ class Store extends BaseStore {
   filePath: string = ''
   isLoading: boolean = false
   error: string | null = null
+  needsFileSelection: boolean = false
 
   constructor() {
     super()
@@ -44,17 +44,56 @@ class Store extends BaseStore {
     const savedPath = storage.get('filePath')
     if (savedPath) {
       this.filePath = savedPath as string
+      await this.loadTodos()
     } else {
-      this.filePath = DEFAULT_FILE_PATH
-      storage.set('filePath', this.filePath)
+      this.needsFileSelection = true
     }
-    await this.loadTodos()
   }
 
   async setFilePath(path: string) {
     this.filePath = path
     storage.set('filePath', path)
+    this.needsFileSelection = false
     await this.loadTodos()
+  }
+
+  async openExistingFile() {
+    try {
+      const result = await tinker.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+          { name: 'Todo.txt Files', extensions: ['txt'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      })
+
+      if (!result.canceled && result.filePaths.length > 0) {
+        await this.setFilePath(result.filePaths[0])
+      }
+    } catch (error) {
+      this.error =
+        error instanceof Error ? error.message : 'Failed to open file'
+    }
+  }
+
+  async createNewFile() {
+    try {
+      const result = await tinker.showSaveDialog({
+        defaultPath: DEFAULT_FILE_PATH,
+        filters: [
+          { name: 'Todo.txt Files', extensions: ['txt'] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      })
+
+      if (!result.canceled && result.filePath) {
+        todo.writeFile(result.filePath, '')
+        await this.setFilePath(result.filePath)
+      }
+    } catch (error) {
+      this.error =
+        error instanceof Error ? error.message : 'Failed to create file'
+    }
   }
 
   private async loadTodos() {
@@ -64,7 +103,7 @@ class Store extends BaseStore {
     this.error = null
 
     try {
-      const content = todoAPI.readFile(this.filePath)
+      const content = todo.readFile(this.filePath)
       const lines = content.split('\n').filter((line) => line.trim())
 
       runInAction(() => {
@@ -87,7 +126,7 @@ class Store extends BaseStore {
 
     try {
       const content = this.todos.map((todo) => todo.raw).join('\n')
-      todoAPI.writeFile(this.filePath, content)
+      todo.writeFile(this.filePath, content)
     } catch (error) {
       this.error =
         error instanceof Error ? error.message : 'Failed to save todos'

@@ -109,7 +109,7 @@ export default observer(function ThumbnailSidebar() {
       className={`
         w-56 h-full flex flex-col
         border-r ${tw.border.both}
-        ${tw.bg.light.primary} ${tw.bg.dark.primary}
+        ${tw.bg.both.primary}
         transition-transform duration-200
         ${isVisible ? 'translate-x-0' : '-translate-x-full'}
       `}
@@ -167,7 +167,7 @@ export default observer(function ThumbnailSidebar() {
       <div
         className={`
           flex border-t ${tw.border.both}
-          ${tw.bg.light.primary} ${tw.bg.dark.primary}
+          ${tw.bg.both.primary}
         `}
       >
         <button
@@ -177,8 +177,8 @@ export default observer(function ThumbnailSidebar() {
             transition-colors
             ${
               store.sidebarView === 'thumbnails'
-                ? `${tw.hover.both} ${tw.text.light.primary} ${tw.text.dark.primary}`
-                : `${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.text.light.secondary} ${tw.text.dark.secondary}`
+                ? `${tw.hover.both} ${tw.text.both.primary}`
+                : `${tw.bg.both.secondary} ${tw.text.both.secondary}`
             }
           `}
           title="Thumbnails"
@@ -192,8 +192,8 @@ export default observer(function ThumbnailSidebar() {
             transition-colors
             ${
               store.sidebarView === 'outline'
-                ? `${tw.hover.both} ${tw.text.light.primary} ${tw.text.dark.primary}`
-                : `${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.text.light.secondary} ${tw.text.dark.secondary}`
+                ? `${tw.hover.both} ${tw.text.both.primary}`
+                : `${tw.bg.both.secondary} ${tw.text.both.secondary}`
             }
           `}
           title="Outline"

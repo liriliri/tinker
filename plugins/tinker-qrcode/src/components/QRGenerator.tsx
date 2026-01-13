@@ -52,7 +52,7 @@ export default observer(function QRGenerator() {
       <div
         className={`flex-1 min-w-0 flex flex-col border-r ${tw.border.both}`}
       >
-        <div className={`flex-1 ${tw.bg.light.primary} ${tw.bg.dark.primary}`}>
+        <div className={`flex-1 ${tw.bg.both.primary}`}>
           <textarea
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
@@ -64,7 +64,7 @@ export default observer(function QRGenerator() {
 
       {/* Right Panel - QR Code Display */}
       <div
-        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.light.secondary} ${tw.bg.dark.secondary} p-4`}
+        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.both.secondary} p-4`}
       >
         {store.text ? (
           <div

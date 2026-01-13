@@ -16,12 +16,10 @@ export default observer(function PasswordSettings({
     <div className="grid grid-cols-2 gap-4">
       <div>
         <label
-          className={`block text-sm mb-2 font-medium ${tw.text.light.primary} ${tw.text.dark.primary}`}
+          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
         >
           {t('passwordLength')}{' '}
-          <span
-            className={`text-xs font-normal ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-          >
+          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
             {t('lengthExample')}
           </span>
         </label>
@@ -34,17 +32,15 @@ export default observer(function PasswordSettings({
             store.setLength(Number(e.target.value))
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
         />
       </div>
       <div>
         <label
-          className={`block text-sm mb-2 font-medium ${tw.text.light.primary} ${tw.text.dark.primary}`}
+          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
         >
           {t('maxRepetition')}{' '}
-          <span
-            className={`text-xs font-normal ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-          >
+          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
             {t('repetitionExample')}
           </span>
         </label>
@@ -57,7 +53,7 @@ export default observer(function PasswordSettings({
             store.setRepeat(Number(e.target.value))
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
         />
       </div>
     </div>

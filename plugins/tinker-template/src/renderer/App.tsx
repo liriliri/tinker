@@ -20,7 +20,7 @@ export default observer(function App() {
   return (
     <AlertProvider>
       <div
-        className={`h-screen flex flex-col transition-colors ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+        className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
       >
         <TabNav tabs={tabs} />
 

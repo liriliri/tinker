@@ -112,7 +112,7 @@ export default observer(function ToolbarComponent() {
             {/* Statistics Tooltip */}
             {showStats && (
               <div
-                className={`absolute right-0 top-full mt-2 ${tw.bg.light.primary} ${tw.bg.dark.tertiary} border ${tw.border.both} dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap`}
+                className={`absolute right-0 top-full mt-2 ${tw.bg.both.tertiary} border ${tw.border.both} dark:border-[#3e3e42] rounded shadow-lg p-3 text-xs z-50 whitespace-nowrap`}
               >
                 <div className="font-medium mb-2 text-gray-800 dark:text-gray-200">
                   {t('statistics')}

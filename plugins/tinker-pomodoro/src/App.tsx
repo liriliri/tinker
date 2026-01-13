@@ -9,7 +9,7 @@ export default observer(function App() {
   return (
     <AlertProvider>
       <div
-        className={`h-screen flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary} transition-colors overflow-hidden`}
+        className={`h-screen flex flex-col ${tw.bg.both.secondary} transition-colors overflow-hidden`}
       >
         <div className="flex-1 flex flex-col items-center justify-center">
           <TimerDisplay />

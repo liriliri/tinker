@@ -20,5 +20,11 @@
   "highPriority": "High",
   "file": "File",
   "selectFile": "Select",
-  "reload": "Reload"
+  "reload": "Reload",
+  "filePrompt": {
+    "title": "Welcome to Todo",
+    "description": "Get started by opening an existing todo.txt file or creating a new one.",
+    "openFile": "Open File",
+    "createFile": "Create File"
+  }
 }

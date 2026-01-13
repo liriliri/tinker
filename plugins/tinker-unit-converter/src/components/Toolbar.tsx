@@ -44,7 +44,7 @@ export default observer(function Toolbar() {
         type="text"
         value={store.input}
         onChange={(e) => store.setInput(e.target.value)}
-        className={`w-32 px-2 py-1 text-xs rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.primary} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`}
+        className={`w-32 px-2 py-1 text-xs rounded border ${tw.border.both} ${tw.bg.both.primary} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`}
         placeholder={t('inputPlaceholder')}
       />
 

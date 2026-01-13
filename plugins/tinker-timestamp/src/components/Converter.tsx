@@ -52,9 +52,7 @@ export default observer(function Converter() {
   const cityName = currentTimezoneLabel.split(' | ')[1] || currentTimezoneLabel
 
   return (
-    <div
-      className={`h-full flex flex-col ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
-    >
+    <div className={`h-full flex flex-col ${tw.bg.both.secondary}`}>
       {/* Date to Timestamp */}
       <div className={`flex-1 border-b ${tw.border.both}`}>
         <div className="h-full flex flex-col p-6">
@@ -67,10 +65,10 @@ export default observer(function Converter() {
               step="1"
               value={dateFormat(store.selectedDate, 'yyyy-mm-dd"T"HH:MM:ss')}
               onChange={(e) => handleDateTimeChange(e.target.value)}
-              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder}`}
+              className={`px-3 py-2 text-sm rounded ${tw.bg.both.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder}`}
             />
             <div
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.dark.tertiary}`}
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}
             >
               <div className="flex-1 text-gray-800 dark:text-gray-100 font-mono">
                 {dateToTimestampResult}
@@ -103,10 +101,10 @@ export default observer(function Converter() {
               value={store.timestampInput}
               onChange={(e) => handleTimestampInput(e.target.value)}
               placeholder={t('enterTimestamp')}
-              className={`px-3 py-2 text-sm rounded ${tw.bg.light.input} ${tw.bg.dark.input} text-gray-700 dark:text-gray-300 font-mono border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
+              className={`px-3 py-2 text-sm rounded ${tw.bg.both.input} text-gray-700 dark:text-gray-300 font-mono border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
             />
             <div
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.dark.tertiary}`}
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}
             >
               <div className="flex-1 text-gray-800 dark:text-gray-100">
                 {timestampToDateResult

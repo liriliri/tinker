@@ -27,16 +27,14 @@ export default observer(function ResultDisplay() {
             className={`p-4 rounded-lg cursor-pointer transition-colors ${
               isSourceUnit
                 ? `${tw.primary.bg} text-white`
-                : `${tw.bg.light.secondary} ${tw.bg.dark.secondary} hover:opacity-80`
+                : `${tw.bg.both.secondary} hover:opacity-80`
             } ${tw.border.both} border`}
             onClick={() => handleCopy(item.value)}
           >
             <div className="flex justify-between items-center">
               <span
                 className={`font-medium text-lg ${
-                  isSourceUnit
-                    ? 'text-white'
-                    : `${tw.text.light.primary} ${tw.text.dark.primary}`
+                  isSourceUnit ? 'text-white' : `${tw.text.both.primary}`
                 }`}
               >
                 {item.value}
@@ -46,7 +44,7 @@ export default observer(function ResultDisplay() {
                   className={`text-sm ${
                     isSourceUnit
                       ? 'text-white opacity-90'
-                      : `${tw.text.light.secondary} ${tw.text.dark.secondary}`
+                      : `${tw.text.both.secondary}`
                   }`}
                 >
                   {item.unit}
@@ -55,7 +53,7 @@ export default observer(function ResultDisplay() {
                   className={`text-xs ${
                     isSourceUnit
                       ? 'text-white opacity-80'
-                      : `${tw.text.light.secondary} ${tw.text.dark.secondary}`
+                      : `${tw.text.both.secondary}`
                   }`}
                 >
                   {t(item.unitKey)}

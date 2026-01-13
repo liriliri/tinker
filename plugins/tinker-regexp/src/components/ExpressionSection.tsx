@@ -45,16 +45,10 @@ export default observer(function ExpressionSection() {
   })
 
   return (
-    <div
-      className={`border-b ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-    >
+    <div className={`border-b ${tw.border.both} ${tw.bg.both.primary}`}>
       <div className="relative px-6 py-3">
         <div className="flex items-center gap-2">
-          <span
-            className={`${tw.text.light.tertiary} ${tw.text.dark.tertiary} text-xl`}
-          >
-            /
-          </span>
+          <span className={`${tw.text.both.tertiary} text-xl`}>/</span>
           <div className="flex-1">
             <CodeMirrorEditor
               value={store.pattern}
@@ -65,9 +59,7 @@ export default observer(function ExpressionSection() {
               onEditorReady={setEditor}
             />
           </div>
-          <span
-            className={`${tw.text.light.tertiary} ${tw.text.dark.tertiary} text-xl`}
-          >
+          <span className={`${tw.text.both.tertiary} text-xl`}>
             /{store.flags}
           </span>
         </div>

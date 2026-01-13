@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron'
 import { readFile, writeFile } from 'fs/promises'
 
-const passwordManagerAPI = {
+const passwordManagerObj = {
   // Read .kdbx file as ArrayBuffer
   async readFile(filePath: string): Promise<ArrayBuffer> {
     try {
@@ -27,8 +27,8 @@ const passwordManagerAPI = {
   },
 }
 
-contextBridge.exposeInMainWorld('passwordManager', passwordManagerAPI)
+contextBridge.exposeInMainWorld('passwordManager', passwordManagerObj)
 
 declare global {
-  const passwordManager: typeof passwordManagerAPI
+  const passwordManager: typeof passwordManagerObj
 }

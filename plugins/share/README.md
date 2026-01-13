@@ -46,6 +46,12 @@ import { tw, THEME_COLORS } from 'share/theme'
 
 // Border and background utilities
 <div className={`border ${tw.border.both}`}>Content</div>
+
+// Use .both for combined light/dark mode (recommended)
+<div className={tw.bg.both.secondary}>Background</div>
+<input className={tw.bg.both.input} />
+
+// Or use separate light/dark classes if needed
 <div className={`${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}>
   Background
 </div>
@@ -74,17 +80,29 @@ tw.primary.checkedBorder   // group-data-[checked]:border-[#0fc25e] - Checked bo
 
 #### Background Colors
 ```typescript
-// Light mode
+// Light mode only
 tw.bg.light.primary     // bg-white
 tw.bg.light.secondary   // bg-[#f0f1f2]
+tw.bg.light.tertiary    // bg-[#f6f7f8]
 tw.bg.light.input       // bg-white
+tw.bg.light.select      // bg-white
+tw.bg.light.code        // bg-[#252526]
 
-// Dark mode
+// Dark mode only
 tw.bg.dark.primary      // dark:bg-[#1e1e1e]
 tw.bg.dark.secondary    // dark:bg-[#303133]
 tw.bg.dark.tertiary     // dark:bg-[#252526]
 tw.bg.dark.input        // dark:bg-[#2d2d2d]
 tw.bg.dark.select       // dark:bg-[#3e3e42]
+tw.bg.dark.code         // dark:bg-[#252526]
+
+// Combined light + dark (recommended)
+tw.bg.both.primary      // bg-white dark:bg-[#1e1e1e]
+tw.bg.both.secondary    // bg-[#f0f1f2] dark:bg-[#303133]
+tw.bg.both.tertiary     // bg-[#f6f7f8] dark:bg-[#252526]
+tw.bg.both.input        // bg-white dark:bg-[#2d2d2d]
+tw.bg.both.select       // bg-white dark:bg-[#3e3e42]
+tw.bg.both.code         // bg-[#252526] dark:bg-[#252526]
 ```
 
 #### Border Utilities
@@ -111,12 +129,20 @@ tw.active.both          // bg-gray-300 dark:bg-[#4a4a4a]
 
 #### Text Colors
 ```typescript
+// Light mode only
 tw.text.light.primary   // text-gray-800
 tw.text.light.secondary // text-gray-600
 tw.text.light.tertiary  // text-gray-500
+
+// Dark mode only
 tw.text.dark.primary    // dark:text-gray-200
 tw.text.dark.secondary  // dark:text-gray-300
 tw.text.dark.tertiary   // dark:text-gray-400
+
+// Combined light + dark (recommended)
+tw.text.both.primary    // text-gray-800 dark:text-gray-200
+tw.text.both.secondary  // text-gray-600 dark:text-gray-300
+tw.text.both.tertiary   // text-gray-500 dark:text-gray-400
 ```
 
 ### Color Constants
@@ -212,12 +238,12 @@ import { Copy, Check } from 'lucide-react'
 When updating existing code, always use theme utilities instead of hardcoded colors:
 
 ```typescript
-// ❌ Bad - hardcoded colors
+// Bad - hardcoded colors
 <button className="bg-[#0fc25e] hover:bg-[#0da84f]">
 <div className="border-[#e0e0e0] dark:border-[#4a4a4a]">
 <span className={copied ? 'text-[#0fc25e]' : ''}>
 
-// ✅ Good - theme utilities
+// Good - theme utilities
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
 <div className={`border ${tw.border.both}`}>
 <span className={copied ? tw.primary.text : ''}>
@@ -315,12 +341,12 @@ Use `observer` only for components that access store state:
 ```typescript
 import { observer } from 'mobx-react-lite'
 
-// ✅ Needs observer - reads from store
+// Needs observer - reads from store
 const Counter = observer(() => {
   return <div>Count: {store.count}</div>
 })
 
-// ✅ No observer needed - pure component
+// No observer needed - pure component
 const Button = ({ onClick, children }) => {
   return <button onClick={onClick}>{children}</button>
 }
@@ -541,7 +567,7 @@ import CopyButton from 'share/components/CopyButton'
 - Supports all standard button HTML attributes
 
 **Features**:
-- Automatic icon switching (Copy → Check)
+- Automatic icon switching (Copy to Check)
 - Visual feedback with primary color when copied
 - Auto-resets after 2 seconds
 - Built-in hover and theme support (default and toolbar variants)
@@ -654,10 +680,10 @@ class Store extends BaseStore {
   }
 }
 
-// ✅ Good - uses computed property
+// Good - uses computed property
 <Component items={store.activeItems} />
 
-// ❌ Bad - creates new array every render
+// Bad - creates new array every render
 <Component items={store.items.filter(x => x.active)} />
 ```
 

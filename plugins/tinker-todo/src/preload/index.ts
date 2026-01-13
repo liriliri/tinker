@@ -1,7 +1,12 @@
 import { contextBridge } from 'electron'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { homedir } from 'os'
 
-const todoAPI = {
+const todoObj = {
+  getHomedir(): string {
+    return homedir()
+  },
+
   readFile(filePath: string): string {
     try {
       if (!existsSync(filePath)) {
@@ -28,8 +33,8 @@ const todoAPI = {
   },
 }
 
-contextBridge.exposeInMainWorld('todoAPI', todoAPI)
+contextBridge.exposeInMainWorld('todo', todoObj)
 
 declare global {
-  const todoAPI: typeof todoAPI
+  const todo: typeof todoObj
 }

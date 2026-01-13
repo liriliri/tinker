@@ -18,12 +18,10 @@ export default observer(function InputFields({
       {/* Service Name */}
       <div>
         <label
-          className={`block text-sm mb-2 font-medium ${tw.text.light.primary} ${tw.text.dark.primary}`}
+          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
         >
           {t('serviceName')}{' '}
-          <span
-            className={`text-xs font-normal ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-          >
+          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
             {t('serviceExample')}
           </span>
         </label>
@@ -34,19 +32,17 @@ export default observer(function InputFields({
             store.setService(e.target.value)
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
         />
       </div>
 
       {/* Passphrase */}
       <div>
         <label
-          className={`block text-sm mb-2 font-medium ${tw.text.light.primary} ${tw.text.dark.primary}`}
+          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
         >
           {t('passphrase')}{' '}
-          <span
-            className={`text-xs font-normal ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-          >
+          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
             {t('passphraseExample')}
           </span>
         </label>
@@ -58,12 +54,12 @@ export default observer(function InputFields({
               store.setPhrase(e.target.value)
               onInputChange()
             }}
-            className={`w-full px-3 py-2 pr-11 rounded border ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+            className={`w-full px-3 py-2 pr-11 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
           />
           <button
             type="button"
             onClick={() => store.toggleShowPhrase()}
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${tw.text.light.secondary} ${tw.text.dark.secondary} hover:opacity-70 transition-opacity`}
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${tw.text.both.secondary} hover:opacity-70 transition-opacity`}
             title={store.showPhrase ? 'Hide passphrase' : 'Show passphrase'}
           >
             {store.showPhrase ? <Eye size={18} /> : <EyeOff size={18} />}

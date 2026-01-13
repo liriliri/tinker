@@ -124,9 +124,7 @@ const GroupItem = observer(function GroupItem({
         {!hasChildren && <div className="w-5" />}
         <Folder size={16} />
         <span className="text-sm flex-1 truncate">{group.name}</span>
-        <span
-          className={`text-xs ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-        >
+        <span className={`text-xs ${tw.text.both.secondary}`}>
           {group.entries.length}
         </span>
       </div>
@@ -144,18 +142,14 @@ export default observer(function GroupTree() {
 
   if (!store.rootGroup) {
     return (
-      <div
-        className={`p-4 text-center text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
-      >
+      <div className={`p-4 text-center text-sm ${tw.text.both.secondary}`}>
         {t('noEntries')}
       </div>
     )
   }
 
   return (
-    <div
-      className={`h-full overflow-y-auto p-2 ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
-    >
+    <div className={`h-full overflow-y-auto p-2 ${tw.bg.both.secondary}`}>
       <GroupItem group={store.rootGroup} level={0} />
     </div>
   )

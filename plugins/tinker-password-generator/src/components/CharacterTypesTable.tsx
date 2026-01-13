@@ -62,13 +62,13 @@ export default observer(function CharacterTypesTable({
     <div className={`overflow-x-auto rounded border ${tw.border.both}`}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className={`${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}>
+          <tr className={`${tw.bg.both.secondary}`}>
             <td className="w-32"></td>
             {charTypes.map((char) => (
               <th
                 key={char.key}
                 scope="col"
-                className={`px-4 py-2.5 text-xs font-semibold text-center ${tw.text.light.primary} ${tw.text.dark.primary}`}
+                className={`px-4 py-2.5 text-xs font-semibold text-center ${tw.text.both.primary}`}
               >
                 {char.label}
               </th>
@@ -82,7 +82,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
             >
               <label className="flex items-center gap-2">
                 <span className="whitespace-nowrap">{t('required')}</span>
@@ -95,7 +95,7 @@ export default observer(function CharacterTypesTable({
                     store.setRequired(Number(e.target.value))
                     onInputChange()
                   }}
-                  className={`w-10 px-1.5 py-1 text-xs text-center rounded border ${tw.bg.light.input} ${tw.bg.dark.input} ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder}`}
+                  className={`w-10 px-1.5 py-1 text-xs text-center rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder}`}
                 />
               </label>
             </th>
@@ -121,7 +121,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
             >
               {t('allowed')}
             </th>
@@ -147,7 +147,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.light.primary} ${tw.text.dark.primary} ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
             >
               {t('forbidden')}
             </th>

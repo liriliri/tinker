@@ -26,11 +26,11 @@ export default observer(function ClipboardItem({
             <div className="flex items-start gap-2">
               <FileText
                 size={16}
-                className={`mt-0.5 flex-shrink-0 ${tw.text.light.tertiary} ${tw.text.dark.tertiary}`}
+                className={`mt-0.5 flex-shrink-0 ${tw.text.both.tertiary}`}
               />
               <div className="flex-1 min-w-0">
                 <pre
-                  className={`text-sm font-mono whitespace-pre-wrap break-all ${tw.text.light.primary} ${tw.text.dark.primary}`}
+                  className={`text-sm font-mono whitespace-pre-wrap break-all ${tw.text.both.primary}`}
                 >
                   {item.preview || item.data}
                 </pre>
@@ -41,10 +41,7 @@ export default observer(function ClipboardItem({
       case 'image':
         return (
           <div className="flex items-center gap-3">
-            <ImageIcon
-              size={16}
-              className={`${tw.text.light.tertiary} ${tw.text.dark.tertiary}`}
-            />
+            <ImageIcon size={16} className={`${tw.text.both.tertiary}`} />
             <img
               src={item.data}
               alt="clipboard"
@@ -55,13 +52,8 @@ export default observer(function ClipboardItem({
       case 'file':
         return (
           <div className="flex items-start gap-2">
-            <FileText
-              size={16}
-              className={`mt-0.5 ${tw.text.light.tertiary} ${tw.text.dark.tertiary}`}
-            />
-            <span
-              className={`text-sm ${tw.text.light.primary} ${tw.text.dark.primary}`}
-            >
+            <FileText size={16} className={`mt-0.5 ${tw.text.both.tertiary}`} />
+            <span className={`text-sm ${tw.text.both.primary}`}>
               {item.preview || item.data}
             </span>
           </div>
@@ -91,16 +83,14 @@ export default observer(function ClipboardItem({
           >
             <X
               size={16}
-              className={`${tw.text.light.tertiary} ${tw.text.dark.tertiary} group-hover/delete:text-red-500 transition-colors`}
+              className={`${tw.text.both.tertiary} group-hover/delete:text-red-500 transition-colors`}
             />
           </button>
         </div>
       </div>
 
       {/* Timestamp */}
-      <div
-        className={`mt-2 text-xs ${tw.text.light.tertiary} ${tw.text.dark.tertiary}`}
-      >
+      <div className={`mt-2 text-xs ${tw.text.both.tertiary}`}>
         {formatRelativeTime(item.timestamp, t)}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { PromptProvider } from 'share/components/Prompt'
 import { tw, THEME_COLORS } from 'share/theme'
 import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
 import store from './store'
-import WelcomeScreen from './components/WelcomeScreen'
+import Welcome from './components/Welcome'
 import Toolbar from './components/Toolbar'
 import GroupTree from './components/GroupTree'
 import EntryList from './components/EntryList'
@@ -38,7 +38,7 @@ export default observer(function App() {
               },
             }}
           />
-          <WelcomeScreen />
+          <Welcome />
         </PromptProvider>
       </AlertProvider>
     )
@@ -63,9 +63,7 @@ export default observer(function App() {
               },
             }}
           />
-          <div
-            className={`h-screen flex flex-col ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
-          >
+          <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
             <Toolbar />
 
             <div className="flex-1 overflow-hidden">

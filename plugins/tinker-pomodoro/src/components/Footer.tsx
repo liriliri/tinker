@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { tw } from 'share/theme'
 import store from '../store'
 
-const BUTTON_CLASSES = `${tw.text.light.secondary} ${tw.text.dark.tertiary} hover:text-gray-800 dark:hover:text-gray-200 transition-colors`
+const BUTTON_CLASSES = `${tw.text.both.secondary} hover:text-gray-800 dark:hover:text-gray-200 transition-colors`
 
 export default observer(function Footer() {
   const { t } = useTranslation()

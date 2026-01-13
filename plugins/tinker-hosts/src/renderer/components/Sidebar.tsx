@@ -121,7 +121,7 @@ export default observer(function Sidebar() {
 
   return (
     <div
-      className={`w-64 flex-shrink-0 ${tw.bg.light.secondary} ${tw.bg.dark.tertiary} border-r ${tw.border.both} flex flex-col relative`}
+      className={`w-64 flex-shrink-0 ${tw.bg.both.tertiary} border-r ${tw.border.both} flex flex-col relative`}
     >
       {/* System Hosts - Fixed at top */}
       <div

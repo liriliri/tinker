@@ -187,8 +187,8 @@ export default function Thumbnail({
           flex items-center justify-center
           rounded-lg text-xs font-normal
           pointer-events-none
-          ${tw.bg.light.primary} ${tw.bg.dark.primary}
-          ${tw.text.light.primary} ${tw.text.dark.primary}
+          ${tw.bg.both.primary}
+          ${tw.text.both.primary}
         `}
       >
         {pageNum}

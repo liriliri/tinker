@@ -140,7 +140,7 @@ export default observer(function DualPanel() {
               store.setInputText(e.target.value)
               store.clearOutput()
             }}
-            className={`w-full h-full p-4 resize-none outline-none ${tw.bg.light.primary} ${tw.bg.dark.primary} text-gray-800 dark:text-gray-200`}
+            className={`w-full h-full p-4 resize-none outline-none ${tw.bg.both.primary} text-gray-800 dark:text-gray-200`}
             placeholder={t('inputPlaceholder')}
           />
         </div>
@@ -148,7 +148,7 @@ export default observer(function DualPanel() {
         {/* Right Panel - Output */}
         <div className="flex-1 min-w-0">
           <div
-            className={`w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${tw.bg.light.primary} ${tw.bg.dark.primary} text-gray-800 dark:text-gray-200`}
+            className={`w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${tw.bg.both.primary} text-gray-800 dark:text-gray-200`}
           >
             {store.outputText || (
               <span className="text-gray-400 dark:text-gray-500">

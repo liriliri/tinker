@@ -20,5 +20,11 @@
   "highPriority": "高",
   "file": "文件",
   "selectFile": "选择",
-  "reload": "刷新"
+  "reload": "刷新",
+  "filePrompt": {
+    "title": "欢迎使用待办清单",
+    "description": "打开现有的 todo.txt 文件或创建一个新文件开始使用。",
+    "openFile": "打开文件",
+    "createFile": "创建文件"
+  }
 }

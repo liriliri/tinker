@@ -6,7 +6,7 @@ import store from '../store'
 import { prompt } from 'share/components/Prompt'
 import { alert } from 'share/components/Alert'
 
-export default observer(function WelcomeScreen() {
+export default observer(function Welcome() {
   const { t } = useTranslation()
 
   const handleNewDatabase = async () => {
@@ -72,13 +72,13 @@ export default observer(function WelcomeScreen() {
 
   return (
     <div
-      className={`h-screen flex items-center justify-center ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
+      className={`h-screen flex items-center justify-center ${tw.bg.both.secondary}`}
     >
       <div className="max-w-md w-full px-8">
         <div className="space-y-3 mb-8">
           <button
             onClick={handleNewDatabase}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.light.primary} ${tw.bg.dark.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.both.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
           >
             <Plus size={20} />
             <span className="font-medium">{t('newDatabase')}</span>
@@ -86,7 +86,7 @@ export default observer(function WelcomeScreen() {
 
           <button
             onClick={handleOpenDatabase}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.light.primary} ${tw.bg.dark.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.both.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
           >
             <FolderOpen size={20} />
             <span className="font-medium">{t('openDatabase')}</span>
@@ -96,7 +96,7 @@ export default observer(function WelcomeScreen() {
         {store.recentFiles.length > 0 && (
           <div>
             <h2
-              className={`text-sm font-medium mb-2 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+              className={`text-sm font-medium mb-2 ${tw.text.both.secondary}`}
             >
               {t('recentFiles')}
             </h2>
@@ -105,7 +105,7 @@ export default observer(function WelcomeScreen() {
                 <button
                   key={path}
                   onClick={() => handleOpenRecent(path)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm ${tw.bg.light.primary} ${tw.bg.dark.primary} ${tw.hover.both} transition-colors truncate border ${tw.border.both}`}
+                  className={`w-full text-left px-3 py-2 rounded text-sm ${tw.bg.both.primary} ${tw.hover.both} transition-colors truncate border ${tw.border.both}`}
                 >
                   {path.split('/').pop()}
                 </button>

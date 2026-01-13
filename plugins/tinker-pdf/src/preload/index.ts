@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron'
 import { readFile } from 'fs/promises'
 
-const pdfAPI = {
+const pdfObj = {
   // Read file as Buffer for PDF loading
   async readFile(filePath: string): Promise<Uint8Array> {
     try {
@@ -14,8 +14,8 @@ const pdfAPI = {
   },
 }
 
-contextBridge.exposeInMainWorld('pdf', pdfAPI)
+contextBridge.exposeInMainWorld('pdf', pdfObj)
 
 declare global {
-  const pdf: typeof pdfAPI
+  const pdf: typeof pdfObj
 }

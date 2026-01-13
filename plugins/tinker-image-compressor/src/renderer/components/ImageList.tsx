@@ -61,7 +61,7 @@ export default observer(function ImageList() {
         {store.images.map((image) => (
           <div
             key={image.id}
-            className={`${tw.bg.light.primary} ${tw.bg.dark.tertiary} rounded-lg border ${tw.border.both} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
+            className={`${tw.bg.both.tertiary} rounded-lg border ${tw.border.both} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
             style={{ aspectRatio: '1 / 1' }}
             onContextMenu={(e) => handleContextMenu(e, image.id)}
           >
@@ -93,11 +93,9 @@ export default observer(function ImageList() {
             </div>
 
             {/* Info - fixed height */}
-            <div
-              className={`p-2 ${tw.bg.light.secondary} ${tw.bg.dark.input} flex-shrink-0`}
-            >
+            <div className={`p-2 ${tw.bg.both.secondary} flex-shrink-0`}>
               <p
-                className={`text-xs font-medium ${tw.text.light.primary} ${tw.gray.dark.text400} truncate mb-1`}
+                className={`text-xs font-medium ${tw.text.both.primary} truncate mb-1`}
                 title={image.fileName}
               >
                 {image.fileName}
@@ -114,9 +112,7 @@ export default observer(function ImageList() {
                       <span className="text-gray-400 dark:text-gray-600">
                         →
                       </span>
-                      <span
-                        className={`font-medium ${tw.text.light.primary} ${tw.gray.dark.text400}`}
-                      >
+                      <span className={`font-medium ${tw.text.both.primary}`}>
                         {fileSize(image.compressedSize)}
                       </span>
                     </div>

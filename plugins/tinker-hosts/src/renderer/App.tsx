@@ -17,7 +17,7 @@ export default observer(function App() {
       <ConfirmProvider>
         <PromptProvider>
           <div
-            className={`h-screen flex overflow-hidden ${tw.bg.light.primary} ${tw.bg.dark.primary}`}
+            className={`h-screen flex overflow-hidden ${tw.bg.both.primary}`}
           >
             <Sidebar />
             <Editor />

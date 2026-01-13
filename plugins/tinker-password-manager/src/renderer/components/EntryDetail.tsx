@@ -15,7 +15,7 @@ export default observer(function EntryDetail() {
   if (!entry) {
     return (
       <div
-        className={`h-full flex items-center justify-center text-sm ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+        className={`h-full flex items-center justify-center text-sm ${tw.bg.both.secondary} ${tw.text.both.secondary}`}
       >
         {t('noEntries')}
       </div>
@@ -53,9 +53,7 @@ export default observer(function EntryDetail() {
     : '••••••••'
 
   return (
-    <div
-      className={`h-full overflow-y-auto ${tw.bg.light.secondary} ${tw.bg.dark.secondary}`}
-    >
+    <div className={`h-full overflow-y-auto ${tw.bg.both.secondary}`}>
       <div className="p-4">
         <div className="max-w-2xl">
           <div className="flex items-center justify-between mb-6">
@@ -72,7 +70,7 @@ export default observer(function EntryDetail() {
           <div className="space-y-4">
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
               >
                 {t('title')}
               </label>
@@ -80,13 +78,13 @@ export default observer(function EntryDetail() {
                 type="text"
                 value={entry.title}
                 onChange={(e) => handleUpdateField('Title', e.target.value)}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
               >
                 {t('username')}
               </label>
@@ -97,7 +95,7 @@ export default observer(function EntryDetail() {
                   onChange={(e) =>
                     handleUpdateField('UserName', e.target.value)
                   }
-                  className={`flex-1 min-w-0 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                  className={`flex-1 min-w-0 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
                 />
                 <CopyButton text={entry.username} title={t('copyUsername')} />
               </div>
@@ -105,7 +103,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
               >
                 {t('password')}
               </label>
@@ -117,7 +115,7 @@ export default observer(function EntryDetail() {
                     onChange={(e) =>
                       handleUpdateField('Password', e.target.value)
                     }
-                    className={`w-full px-3 py-2 pr-10 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                    className={`w-full px-3 py-2 pr-10 rounded border ${tw.border.both} ${tw.bg.both.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
                   />
                   <button
                     onClick={handleTogglePassword}
@@ -142,7 +140,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
               >
                 {t('url')}
               </label>
@@ -150,13 +148,13 @@ export default observer(function EntryDetail() {
                 type="text"
                 value={entry.url}
                 onChange={(e) => handleUpdateField('URL', e.target.value)}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.light.secondary} ${tw.text.dark.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
               >
                 {t('notes')}
               </label>
@@ -164,14 +162,12 @@ export default observer(function EntryDetail() {
                 value={entry.notes}
                 onChange={(e) => handleUpdateField('Notes', e.target.value)}
                 rows={6}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.light.primary} ${tw.bg.dark.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 
             <div className={`pt-4 border-t ${tw.border.both}`}>
-              <div
-                className={`text-xs ${tw.text.light.secondary} ${tw.text.dark.secondary} space-y-1`}
-              >
+              <div className={`text-xs ${tw.text.both.secondary} space-y-1`}>
                 <div>
                   {t('created')}:{' '}
                   {new Date(entry.times.creationTime).toLocaleString()}
