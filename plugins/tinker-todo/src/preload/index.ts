@@ -1,62 +1,35 @@
 import { contextBridge } from 'electron'
-import { readFile, writeFile, access } from 'fs/promises'
-import { homedir, platform, arch } from 'os'
-import { join } from 'path'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 
-const templateObj = {
-  // Get greeting message
-  getGreeting(name: string): string {
-    return `Hello, ${name}!`
-  },
-
-  // Get current timestamp
-  getCurrentTime(): string {
-    return new Date().toLocaleString()
-  },
-
-  // Get system information
-  getSystemInfo(): {
-    platform: string
-    arch: string
-    homeDir: string
-    nodeVersion: string
-  } {
-    return {
-      platform: platform(),
-      arch: arch(),
-      homeDir: homedir(),
-      nodeVersion: process.version,
+const todoAPI = {
+  readFile(filePath: string): string {
+    try {
+      if (!existsSync(filePath)) {
+        return ''
+      }
+      return readFileSync(filePath, 'utf-8')
+    } catch (error) {
+      console.error('Failed to read file:', error)
+      throw new Error(`Failed to read file: ${filePath}`)
     }
   },
 
-  // Read file from specific path
-  async readFile(filePath: string): Promise<string> {
+  writeFile(filePath: string, content: string): void {
     try {
-      await access(filePath)
-      return await readFile(filePath, 'utf-8')
-    } catch {
-      return ''
-    }
-  },
-
-  // Write file to specific path
-  async writeFile(filePath: string, content: string): Promise<void> {
-    try {
-      await writeFile(filePath, content, 'utf-8')
+      writeFileSync(filePath, content, 'utf-8')
     } catch (error) {
       console.error('Failed to write file:', error)
-      throw new Error('Failed to write file')
+      throw new Error(`Failed to write file: ${filePath}`)
     }
   },
 
-  // Get app data path
-  getAppDataPath(): string {
-    return join(homedir(), '.tinker-template')
+  fileExists(filePath: string): boolean {
+    return existsSync(filePath)
   },
 }
 
-contextBridge.exposeInMainWorld('template', templateObj)
+contextBridge.exposeInMainWorld('todoAPI', todoAPI)
 
 declare global {
-  const template: typeof templateObj
+  const todoAPI: typeof todoAPI
 }

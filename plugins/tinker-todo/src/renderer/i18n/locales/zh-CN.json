@@ -17,5 +17,8 @@
   "noPriority": "无",
   "lowPriority": "低",
   "mediumPriority": "中",
-  "highPriority": "高"
+  "highPriority": "高",
+  "file": "文件",
+  "selectFile": "选择",
+  "reload": "刷新"
 }

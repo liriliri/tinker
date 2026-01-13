@@ -20,11 +20,36 @@ export default observer(function AddTodo() {
     }
   }
 
-  const priorities: { value: Priority; label: string; color: string }[] = [
-    { value: null, label: t('noPriority'), color: 'bg-gray-500' },
-    { value: 'C', label: t('lowPriority'), color: 'bg-blue-500' },
-    { value: 'B', label: t('mediumPriority'), color: 'bg-yellow-500' },
-    { value: 'A', label: t('highPriority'), color: 'bg-red-500' },
+  const priorities: {
+    value: Priority
+    label: string
+    colorLight: string
+    colorDark: string
+  }[] = [
+    {
+      value: null,
+      label: t('noPriority'),
+      colorLight: 'bg-gray-500',
+      colorDark: 'dark:bg-gray-500',
+    },
+    {
+      value: 'C',
+      label: t('lowPriority'),
+      colorLight: 'bg-blue-500',
+      colorDark: 'dark:bg-blue-500',
+    },
+    {
+      value: 'B',
+      label: t('mediumPriority'),
+      colorLight: 'bg-yellow-500',
+      colorDark: 'dark:bg-yellow-500',
+    },
+    {
+      value: 'A',
+      label: t('highPriority'),
+      colorLight: 'bg-red-500',
+      colorDark: 'dark:bg-red-500',
+    },
   ]
 
   return (
@@ -68,7 +93,7 @@ export default observer(function AddTodo() {
                 onClick={() => store.setNewTodoPriority(priority.value)}
                 className={`px-2 py-1 rounded text-xs transition-colors ${
                   store.newTodoPriority === priority.value
-                    ? `${priority.color} text-white`
+                    ? `${priority.colorLight} ${priority.colorDark} text-white`
                     : `${tw.text.secondary} hover:${tw.text.primary}`
                 }`}
                 title={priority.label}

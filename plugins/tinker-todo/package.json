@@ -23,6 +23,6 @@
     }
   },
   "devDependencies": {
-    "jstodotxt": "^0.10.0"
+    "jstodotxt": "1.0.0-alpha.3"
   }
 }

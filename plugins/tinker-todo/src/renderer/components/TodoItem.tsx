@@ -10,26 +10,40 @@ interface TodoItemProps {
 
 const priorityColors: Record<
   Priority | 'null',
-  { bg: string; text: string; label: string }
+  {
+    bgLight: string
+    bgDark: string
+    textLight: string
+    textDark: string
+    label: string
+  }
 > = {
   A: {
-    bg: 'bg-red-50 dark:bg-red-950/30',
-    text: 'text-red-500',
+    bgLight: 'bg-red-50',
+    bgDark: 'dark:bg-red-950/30',
+    textLight: 'text-red-500',
+    textDark: 'dark:text-red-500',
     label: 'High',
   },
   B: {
-    bg: 'bg-yellow-50 dark:bg-yellow-950/30',
-    text: 'text-yellow-500',
+    bgLight: 'bg-yellow-50',
+    bgDark: 'dark:bg-yellow-950/30',
+    textLight: 'text-yellow-500',
+    textDark: 'dark:text-yellow-500',
     label: 'Med',
   },
   C: {
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
-    text: 'text-blue-500',
+    bgLight: 'bg-blue-50',
+    bgDark: 'dark:bg-blue-950/30',
+    textLight: 'text-blue-500',
+    textDark: 'dark:text-blue-500',
     label: 'Low',
   },
   null: {
-    bg: 'bg-gray-50 dark:bg-gray-950/30',
-    text: 'text-gray-500',
+    bgLight: 'bg-gray-50',
+    bgDark: 'dark:bg-gray-950/30',
+    textLight: 'text-gray-500',
+    textDark: 'dark:text-gray-500',
     label: 'None',
   },
 }
@@ -96,7 +110,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
 
             {todo.priority && (
               <div
-                className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-medium ${priorityStyle.bg} ${priorityStyle.text}`}
+                className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-medium ${priorityStyle.bgLight} ${priorityStyle.bgDark} ${priorityStyle.textLight} ${priorityStyle.textDark}`}
               >
                 {priorityStyle.label}
               </div>

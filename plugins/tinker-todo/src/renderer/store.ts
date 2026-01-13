@@ -1,9 +1,11 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
+import { homedir } from 'licia'
 
 const storage = new LocalStore('tinker-todo')
+const DEFAULT_FILE_PATH = `${homedir()}/todo.txt`
 
 export type Priority = 'A' | 'B' | 'C' | null
 export type FilterType = 'all' | 'today' | 'important' | 'completed'
@@ -28,22 +30,72 @@ class Store extends BaseStore {
   newTodoText: string = ''
   newTodoPriority: Priority = null
   showCompleted: boolean = true
+  filePath: string = ''
+  isLoading: boolean = false
+  error: string | null = null
 
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadTodos()
+    this.initializeFile()
   }
 
-  private loadTodos() {
-    const saved = storage.get('todos')
-    if (saved) {
-      this.todos = JSON.parse(saved)
+  private async initializeFile() {
+    const savedPath = storage.get('filePath')
+    if (savedPath) {
+      this.filePath = savedPath as string
+    } else {
+      this.filePath = DEFAULT_FILE_PATH
+      storage.set('filePath', this.filePath)
+    }
+    await this.loadTodos()
+  }
+
+  async setFilePath(path: string) {
+    this.filePath = path
+    storage.set('filePath', path)
+    await this.loadTodos()
+  }
+
+  private async loadTodos() {
+    if (!this.filePath) return
+
+    this.isLoading = true
+    this.error = null
+
+    try {
+      const content = todoAPI.readFile(this.filePath)
+      const lines = content.split('\n').filter((line) => line.trim())
+
+      runInAction(() => {
+        this.todos = lines.map((line, index) =>
+          this.parseTodoItem(line, `${Date.now()}-${index}`)
+        )
+        this.isLoading = false
+      })
+    } catch (error) {
+      runInAction(() => {
+        this.error =
+          error instanceof Error ? error.message : 'Failed to load todos'
+        this.isLoading = false
+      })
     }
   }
 
-  private saveTodos() {
-    storage.set('todos', JSON.stringify(this.todos))
+  private async saveTodos() {
+    if (!this.filePath) return
+
+    try {
+      const content = this.todos.map((todo) => todo.raw).join('\n')
+      todoAPI.writeFile(this.filePath, content)
+    } catch (error) {
+      this.error =
+        error instanceof Error ? error.message : 'Failed to save todos'
+    }
+  }
+
+  async reloadTodos() {
+    await this.loadTodos()
   }
 
   private parseTodoItem(raw: string, id?: string): TodoItem {
@@ -51,11 +103,11 @@ class Store extends BaseStore {
 
     return {
       id: id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      text: item.body(),
-      completed: item.complete(),
+      text: item.body() || '',
+      completed: item.complete() || false,
       priority: item.priority() as Priority,
-      projects: item.projects(),
-      contexts: item.contexts(),
+      projects: item.projects() || [],
+      contexts: item.contexts() || [],
       dueDate: this.extractDueDate(item),
       createdDate: item.created() || null,
       completedDate: item.completed() || null,
@@ -63,9 +115,14 @@ class Store extends BaseStore {
     }
   }
 
+  private formatDate(date: string): string {
+    return date
+  }
+
   private extractDueDate(item: Item): string | null {
     const extensions = item.extensions()
-    const dueExt = extensions.find((ext) => ext.key === 'due')
+    if (!extensions) return null
+    const dueExt = extensions.find((ext: any) => ext.key === 'due')
     return dueExt ? dueExt.value : null
   }
 
@@ -76,11 +133,13 @@ class Store extends BaseStore {
   ): string {
     let raw = ''
 
+    const today = new Date().toISOString().split('T')[0]
+
     if (priority) {
       raw += `(${priority}) `
     }
 
-    raw += text
+    raw += `${today} ${text}`
 
     if (dueDate) {
       raw += ` due:${dueDate}`
@@ -133,9 +192,12 @@ class Store extends BaseStore {
     const item = new Item(todo.raw)
 
     if (item.complete()) {
-      item.uncomplete()
+      item.setComplete(false)
+      item.setCompleted(null)
     } else {
-      item.complete()
+      item.setComplete(true)
+      const today = new Date().toISOString().split('T')[0]
+      item.setCompleted(today)
     }
 
     const updated = this.parseTodoItem(item.toString(), id)

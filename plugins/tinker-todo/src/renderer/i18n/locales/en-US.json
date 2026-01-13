@@ -17,5 +17,8 @@
   "noPriority": "None",
   "lowPriority": "Low",
   "mediumPriority": "Medium",
-  "highPriority": "High"
+  "highPriority": "High",
+  "file": "File",
+  "selectFile": "Select",
+  "reload": "Reload"
 }
