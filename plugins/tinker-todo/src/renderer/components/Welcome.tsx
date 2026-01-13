@@ -25,7 +25,7 @@ export default observer(function Welcome({
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.both.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
           >
             <FilePlus size={20} />
-            <span className="font-medium">{t('filePrompt.createFile')}</span>
+            <span className="font-medium">{t('createFile')}</span>
           </button>
 
           <button
@@ -33,7 +33,7 @@ export default observer(function Welcome({
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.both.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
           >
             <FileText size={20} />
-            <span className="font-medium">{t('filePrompt.openFile')}</span>
+            <span className="font-medium">{t('openFile')}</span>
           </button>
         </div>
       </div>
