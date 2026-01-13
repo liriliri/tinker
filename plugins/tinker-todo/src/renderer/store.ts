@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction, reaction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
@@ -14,8 +14,6 @@ export interface TodoItem {
   text: string
   completed: boolean
   priority: Priority
-  projects: string[]
-  contexts: string[]
   dueDate: string | null
   createdDate: string | null
   completedDate: string | null
@@ -37,14 +35,62 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadSettings()
     this.initializeFile()
+    this.bindEvent()
+  }
+
+  private loadSettings() {
+    const savedFilter = storage.get('currentFilter')
+    if (
+      savedFilter &&
+      ['all', 'today', 'important', 'completed'].includes(savedFilter as string)
+    ) {
+      this.currentFilter = savedFilter as FilterType
+    }
+
+    const savedShowCompleted = storage.get('showCompleted')
+    if (savedShowCompleted !== undefined) {
+      this.showCompleted = savedShowCompleted as boolean
+    }
+  }
+
+  private bindEvent() {
+    reaction(
+      () => this.filePath,
+      (filePath) => {
+        if (filePath) {
+          const parts = filePath.split('/')
+          const fileName = parts[parts.length - 1]
+          tinker.setTitle(fileName)
+        } else {
+          tinker.setTitle('')
+        }
+      }
+    )
   }
 
   private async initializeFile() {
     const savedPath = storage.get('filePath')
     if (savedPath) {
-      this.filePath = savedPath as string
-      await this.loadTodos()
+      try {
+        const content = await todo.readFile(savedPath as string)
+        const lines = content.split('\n').filter((line) => line.trim())
+
+        runInAction(() => {
+          this.filePath = savedPath as string
+          this.todos = lines.map((line, index) =>
+            this.parseTodoItem(line, `${Date.now()}-${index}`)
+          )
+        })
+      } catch (error) {
+        storage.remove('filePath')
+        runInAction(() => {
+          this.needsFileSelection = true
+          this.error =
+            error instanceof Error ? error.message : 'Failed to load todos'
+        })
+      }
     } else {
       this.needsFileSelection = true
     }
@@ -87,7 +133,7 @@ class Store extends BaseStore {
       })
 
       if (!result.canceled && result.filePath) {
-        todo.writeFile(result.filePath, '')
+        await todo.writeFile(result.filePath, '')
         await this.setFilePath(result.filePath)
       }
     } catch (error) {
@@ -103,7 +149,7 @@ class Store extends BaseStore {
     this.error = null
 
     try {
-      const content = todo.readFile(this.filePath)
+      const content = await todo.readFile(this.filePath)
       const lines = content.split('\n').filter((line) => line.trim())
 
       runInAction(() => {
@@ -126,7 +172,7 @@ class Store extends BaseStore {
 
     try {
       const content = this.todos.map((todo) => todo.raw).join('\n')
-      todo.writeFile(this.filePath, content)
+      await todo.writeFile(this.filePath, content)
     } catch (error) {
       this.error =
         error instanceof Error ? error.message : 'Failed to save todos'
@@ -140,22 +186,24 @@ class Store extends BaseStore {
   private parseTodoItem(raw: string, id?: string): TodoItem {
     const item = new Item(raw)
 
+    let text = item.body() || ''
+    text = text.replace(/\s+due:\S+/g, '').trim()
+
+    const createdDate = item.created()
+    const completedDate = item.completed()
+
     return {
-      id: id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      text: item.body() || '',
+      id: id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+      text,
       completed: item.complete() || false,
       priority: item.priority() as Priority,
-      projects: item.projects() || [],
-      contexts: item.contexts() || [],
       dueDate: this.extractDueDate(item),
-      createdDate: item.created() || null,
-      completedDate: item.completed() || null,
+      createdDate: createdDate ? createdDate.toISOString().split('T')[0] : null,
+      completedDate: completedDate
+        ? completedDate.toISOString().split('T')[0]
+        : null,
       raw: item.toString(),
     }
-  }
-
-  private formatDate(date: string): string {
-    return date
   }
 
   private extractDueDate(item: Item): string | null {
@@ -189,6 +237,7 @@ class Store extends BaseStore {
 
   setCurrentFilter(filter: FilterType) {
     this.currentFilter = filter
+    storage.set('currentFilter', filter)
   }
 
   setSearchQuery(query: string) {
@@ -205,6 +254,7 @@ class Store extends BaseStore {
 
   setShowCompleted(show: boolean) {
     this.showCompleted = show
+    storage.set('showCompleted', show)
   }
 
   addTodo(dueDate?: string) {
@@ -284,12 +334,7 @@ class Store extends BaseStore {
 
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (t) =>
-          t.text.toLowerCase().includes(query) ||
-          t.projects.some((p) => p.toLowerCase().includes(query)) ||
-          t.contexts.some((c) => c.toLowerCase().includes(query))
-      )
+      filtered = filtered.filter((t) => t.text.toLowerCase().includes(query))
     }
 
     if (!this.showCompleted && this.currentFilter !== 'completed') {

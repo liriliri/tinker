@@ -1,55 +1,55 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Check, Trash2, Calendar, Hash, AtSign } from 'lucide-react'
-import store, { TodoItem as TodoItemType, Priority } from '../store'
+import { Check, Trash2, Calendar } from 'lucide-react'
+import { confirm } from 'share/components/Confirm'
+import store, { TodoItem as TodoItemType } from '../store'
 import { tw } from 'share/theme'
 
 interface TodoItemProps {
   todo: TodoItemType
 }
 
-const priorityColors: Record<
-  Priority | 'null',
+const PRIORITY_STYLES: Record<
+  string,
   {
-    bgLight: string
-    bgDark: string
-    textLight: string
-    textDark: string
-    label: string
+    bg: string
+    text: string
+    labelKey: string
   }
 > = {
   A: {
-    bgLight: 'bg-red-50',
-    bgDark: 'dark:bg-red-950/30',
-    textLight: 'text-red-500',
-    textDark: 'dark:text-red-500',
-    label: 'High',
+    bg: 'bg-red-50 dark:bg-red-950/30',
+    text: 'text-red-500',
+    labelKey: 'highPriority',
   },
   B: {
-    bgLight: 'bg-yellow-50',
-    bgDark: 'dark:bg-yellow-950/30',
-    textLight: 'text-yellow-500',
-    textDark: 'dark:text-yellow-500',
-    label: 'Med',
+    bg: 'bg-yellow-50 dark:bg-yellow-950/30',
+    text: 'text-yellow-500',
+    labelKey: 'mediumPriority',
   },
   C: {
-    bgLight: 'bg-blue-50',
-    bgDark: 'dark:bg-blue-950/30',
-    textLight: 'text-blue-500',
-    textDark: 'dark:text-blue-500',
-    label: 'Low',
+    bg: 'bg-blue-50 dark:bg-blue-950/30',
+    text: 'text-blue-500',
+    labelKey: 'lowPriority',
   },
   null: {
-    bgLight: 'bg-gray-50',
-    bgDark: 'dark:bg-gray-950/30',
-    textLight: 'text-gray-500',
-    textDark: 'dark:text-gray-500',
-    label: 'None',
+    bg: 'bg-gray-50 dark:bg-gray-950/30',
+    text: 'text-gray-500',
+    labelKey: 'noPriority',
   },
 }
 
 export default observer(function TodoItem({ todo }: TodoItemProps) {
   const { t } = useTranslation()
+
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: t('deleteConfirm'),
+    })
+    if (confirmed) {
+      store.deleteTodo(todo.id)
+    }
+  }
 
   const formatDate = (dateStr: string | null): string => {
     if (!dateStr) return ''
@@ -72,85 +72,63 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
   }
 
-  const priorityStyle = priorityColors[todo.priority || 'null']
+  const priorityStyle = PRIORITY_STYLES[todo.priority || 'null']
 
   return (
     <div
-      className={`group ${tw.bg.secondary} ${
+      className={`group ${tw.bg.both.tertiary} ${
         tw.border.both
-      } rounded-lg p-3 transition-all duration-200 hover:shadow-sm ${
+      } border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${
         todo.completed ? 'opacity-60' : ''
       }`}
     >
-      <div className="flex items-start gap-2.5">
+      <div className="flex items-center gap-2.5">
         <button
           onClick={() => store.toggleTodo(todo.id)}
-          className={`flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center mt-0.5 ${
+          className={`flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
             todo.completed
               ? `${tw.primary.bg} ${tw.primary.border}`
-              : `${tw.border.both} hover:${tw.primary.border}`
+              : `${tw.border.both} ${tw.primary.hoverBorder}`
           }`}
         >
-          {todo.completed && (
-            <Check size={12} className={tw.primary.textOnBg} />
-          )}
+          {todo.completed && <Check size={12} className="text-white" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2">
+          <div className="flex items-center gap-2">
             <h3
               className={`flex-1 text-sm font-medium ${
                 todo.completed
-                  ? `line-through ${tw.text.secondary}`
-                  : tw.text.primary
+                  ? `line-through ${tw.text.both.secondary}`
+                  : tw.text.both.primary
               }`}
             >
               {todo.text}
             </h3>
 
-            {todo.priority && (
-              <div
-                className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-medium ${priorityStyle.bgLight} ${priorityStyle.bgDark} ${priorityStyle.textLight} ${priorityStyle.textDark}`}
-              >
-                {priorityStyle.label}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3 mt-1">
             {todo.dueDate && (
               <div
-                className={`flex items-center gap-1 text-xs ${tw.text.secondary}`}
+                className={`flex items-center gap-1 text-xs ${tw.text.both.secondary}`}
               >
                 <Calendar size={12} />
                 <span>{formatDate(todo.dueDate)}</span>
               </div>
             )}
 
-            {todo.projects.length > 0 && (
+            {todo.priority && (
               <div
-                className={`flex items-center gap-1 text-xs ${tw.text.secondary}`}
+                className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-medium ${priorityStyle.bg} ${priorityStyle.text}`}
               >
-                <Hash size={12} />
-                <span>{todo.projects.join(', ')}</span>
-              </div>
-            )}
-
-            {todo.contexts.length > 0 && (
-              <div
-                className={`flex items-center gap-1 text-xs ${tw.text.secondary}`}
-              >
-                <AtSign size={12} />
-                <span>{todo.contexts.join(', ')}</span>
+                {t(priorityStyle.labelKey)}
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex-shrink-0 flex items-center gap-0.5">
           <button
-            onClick={() => store.deleteTodo(todo.id)}
-            className={`p-1.5 ${tw.text.secondary} hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors`}
+            onClick={handleDelete}
+            className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
             title={t('delete')}
           >
             <Trash2 size={14} />

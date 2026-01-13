@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2 } from 'lucide-react'
+import { Toaster } from 'react-hot-toast'
 import { AlertProvider } from 'share/components/Alert'
+import { ConfirmProvider } from 'share/components/Confirm'
 import { tw } from 'share/theme'
 import store from './store'
 import Sidebar from './components/Sidebar'
@@ -16,45 +18,66 @@ export default observer(function App() {
   if (store.needsFileSelection) {
     return (
       <AlertProvider>
-        <Welcome
-          onOpenFile={() => store.openExistingFile()}
-          onCreateFile={() => store.createNewFile()}
-        />
+        <ConfirmProvider>
+          <Welcome
+            onOpenFile={() => store.openExistingFile()}
+            onCreateFile={() => store.createNewFile()}
+          />
+        </ConfirmProvider>
       </AlertProvider>
     )
   }
 
   return (
     <AlertProvider>
-      <div className={`h-screen flex ${tw.bg.primary}`}>
-        <Sidebar />
-
-        <div className="flex-1 flex flex-col min-w-0">
+      <ConfirmProvider>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: 'var(--toast-bg)',
+              color: 'var(--toast-text)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#0fc25e',
+                secondary: '#ffffff',
+              },
+            },
+          }}
+        />
+        <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
           <Toolbar />
 
-          <AddTodo />
+          <div className="flex-1 flex overflow-hidden">
+            <Sidebar />
 
-          <div className="flex-1 overflow-y-auto p-4">
-            {store.filteredTodos.length === 0 ? (
-              <div className="text-center py-12">
-                <CheckCircle2
-                  size={48}
-                  className={`mx-auto ${tw.text.secondary} opacity-30 mb-3`}
-                />
-                <p className={`text-sm ${tw.text.secondary}`}>
-                  {store.searchQuery ? t('noSearchResults') : t('noTasks')}
-                </p>
+            <div className="flex-1 flex flex-col min-w-0">
+              <AddTodo />
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {store.filteredTodos.length === 0 ? (
+                  <div className="text-center py-12">
+                    <CheckCircle2
+                      size={48}
+                      className={`mx-auto ${tw.text.both.secondary} opacity-30 mb-3`}
+                    />
+                    <p className={`text-sm ${tw.text.both.secondary}`}>
+                      {store.searchQuery ? t('noSearchResults') : t('noTasks')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {store.filteredTodos.map((todo) => (
+                      <TodoItem key={todo.id} todo={todo} />
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="space-y-1.5">
-                {store.filteredTodos.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
-                ))}
-              </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      </ConfirmProvider>
     </AlertProvider>
   )
 })
