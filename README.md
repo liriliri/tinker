@@ -131,6 +131,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/pdf.png"/></th>
       <th><img src="https://tinker.liriliri.io/text_encoder.png"/></th>
     </tr>
+    <tr>
+      <th>Password Manager</th>
+      <th>Todo</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/password_manager.png"/></th>
+      <th><img src="https://tinker.liriliri.io/todo.png"/></th>
+    </tr>
   </tbody>
 </table>
 
