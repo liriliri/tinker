@@ -1,3 +1,8 @@
+## v0.8.0 (14 Jan 2026)
+
+* feat: add password manager
+* feat: add todo
+
 ## v0.7.0 (10 Jan 2026)
 
 * feat: add pdf
