@@ -13,12 +13,12 @@ import Welcome from './components/Welcome'
 import Toolbar from './components/Toolbar'
 
 export default observer(function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   if (store.needsFileSelection) {
     return (
-      <AlertProvider>
-        <ConfirmProvider>
+      <AlertProvider locale={i18n.language}>
+        <ConfirmProvider locale={i18n.language}>
           <Welcome
             onOpenFile={() => store.openExistingFile()}
             onCreateFile={() => store.createNewFile()}
@@ -29,8 +29,8 @@ export default observer(function App() {
   }
 
   return (
-    <AlertProvider>
-      <ConfirmProvider>
+    <AlertProvider locale={i18n.language}>
+      <ConfirmProvider locale={i18n.language}>
         <Toaster
           position="top-center"
           toastOptions={{

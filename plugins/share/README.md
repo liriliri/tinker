@@ -218,15 +218,18 @@ if (value !== null) { /* user entered value */ }
 **Setup**: Wrap app with providers in `App.tsx`:
 
 ```typescript
+import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 
 export default observer(function App() {
+  const { i18n } = useTranslation()
+
   return (
-    <AlertProvider>
-      <ConfirmProvider>
-        <PromptProvider>
+    <AlertProvider locale={i18n.language}>
+      <ConfirmProvider locale={i18n.language}>
+        <PromptProvider locale={i18n.language}>
           {/* Your content */}
         </PromptProvider>
       </ConfirmProvider>
@@ -234,6 +237,8 @@ export default observer(function App() {
   )
 })
 ```
+
+**Internationalization**: All dialog providers (`AlertProvider`, `ConfirmProvider`, `PromptProvider`) support a `locale` prop for internationalization. Pass `i18n.language` from `useTranslation()` to display buttons in the correct language. The providers include built-in translations for English (`en-US`) and Chinese (`zh-CN`). Default locale is `en-US`.
 
 ### Select & Checkbox
 

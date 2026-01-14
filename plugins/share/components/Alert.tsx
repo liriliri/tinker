@@ -8,6 +8,15 @@ export interface AlertOptions {
   confirmText?: string
 }
 
+const BUILT_IN_TRANSLATIONS = {
+  'en-US': {
+    confirm: 'Confirm',
+  },
+  'zh-CN': {
+    confirm: '确定',
+  },
+}
+
 let showAlertFn: ((options: AlertOptions) => Promise<void>) | null = null
 
 export function alert(options: AlertOptions): Promise<void> {
@@ -17,7 +26,12 @@ export function alert(options: AlertOptions): Promise<void> {
   return Promise.reject(new Error('Alert provider not mounted'))
 }
 
-export function AlertProvider({ children }: { children: React.ReactNode }) {
+interface AlertProviderProps {
+  children: React.ReactNode
+  locale?: string
+}
+
+export function AlertProvider({ children, locale = 'en-US' }: AlertProviderProps) {
   const [alertState, setAlertState] = useState<AlertOptions | null>(null)
   const [resolver, setResolver] = useState<(() => void) | null>(null)
 
@@ -55,7 +69,7 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
               className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}
               onClick={handleClose}
             >
-              {alertState.confirmText || '确定'}
+              {alertState.confirmText || BUILT_IN_TRANSLATIONS[locale].confirm}
             </button>
           </div>
         </Dialog>

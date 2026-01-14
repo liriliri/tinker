@@ -8,7 +8,7 @@ import FileOpen from './components/FileOpen'
 import { tw } from 'share/theme'
 
 export default observer(function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -36,7 +36,7 @@ export default observer(function App() {
   }
 
   return (
-    <AlertProvider>
+    <AlertProvider locale={i18n.language}>
       <div
         className={`h-screen flex flex-col ${tw.bg.both.primary}`}
         onDragOver={handleDragOver}

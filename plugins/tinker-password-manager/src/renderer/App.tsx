@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import { Toaster } from 'react-hot-toast'
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
@@ -13,6 +14,7 @@ import EntryList from './components/EntryList'
 import EntryDetail from './components/EntryDetail'
 
 export default observer(function App() {
+  const { i18n } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['left', 'center', 'right'],
     id: 'tinker-password-manager-layout',
@@ -21,8 +23,8 @@ export default observer(function App() {
 
   if (store.isLocked) {
     return (
-      <AlertProvider>
-        <PromptProvider>
+      <AlertProvider locale={i18n.language}>
+        <PromptProvider locale={i18n.language}>
           <Toaster
             position="top-center"
             toastOptions={{
@@ -45,9 +47,9 @@ export default observer(function App() {
   }
 
   return (
-    <AlertProvider>
-      <ConfirmProvider>
-        <PromptProvider>
+    <AlertProvider locale={i18n.language}>
+      <ConfirmProvider locale={i18n.language}>
+        <PromptProvider locale={i18n.language}>
           <Toaster
             position="top-center"
             toastOptions={{

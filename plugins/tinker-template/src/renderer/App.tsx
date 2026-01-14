@@ -9,7 +9,7 @@ import ThemeTab from './components/ThemeTab'
 import StorageTab from './components/StorageTab'
 
 export default observer(function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const tabs = [
     { id: 'preload', label: t('preload') },
@@ -18,7 +18,7 @@ export default observer(function App() {
   ]
 
   return (
-    <AlertProvider>
+    <AlertProvider locale={i18n.language}>
       <div
         className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
       >

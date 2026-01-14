@@ -12,6 +12,17 @@ export interface PromptOptions {
   inputType?: 'text' | 'password'
 }
 
+const BUILT_IN_TRANSLATIONS = {
+  'en-US': {
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+  },
+  'zh-CN': {
+    confirm: '确定',
+    cancel: '取消',
+  },
+}
+
 let showPromptFn: ((options: PromptOptions) => Promise<string | null>) | null =
   null
 
@@ -22,7 +33,12 @@ export function prompt(options: PromptOptions): Promise<string | null> {
   return Promise.reject(new Error('Prompt provider not mounted'))
 }
 
-export function PromptProvider({ children }: { children: React.ReactNode }) {
+interface PromptProviderProps {
+  children: React.ReactNode
+  locale?: string
+}
+
+export function PromptProvider({ children, locale = 'en-US' }: PromptProviderProps) {
   const [promptState, setPromptState] = useState<PromptOptions | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [resolver, setResolver] = useState<
@@ -90,14 +106,14 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
               className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               onClick={handleCancel}
             >
-              {promptState.cancelText || '取消'}
+              {promptState.cancelText || BUILT_IN_TRANSLATIONS[locale].cancel}
             </button>
             <button
               className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
               onClick={handleConfirm}
               disabled={!inputValue.trim()}
             >
-              {promptState.confirmText || '确定'}
+              {promptState.confirmText || BUILT_IN_TRANSLATIONS[locale].confirm}
             </button>
           </div>
         </Dialog>

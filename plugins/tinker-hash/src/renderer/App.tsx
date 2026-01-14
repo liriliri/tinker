@@ -8,10 +8,10 @@ import HashToolbar from './components/Toolbar'
 import FileOpen from './components/FileOpen'
 
 export default observer(function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return (
-    <AlertProvider>
+    <AlertProvider locale={i18n.language}>
       <div
         className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
       >
