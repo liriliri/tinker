@@ -3,6 +3,7 @@
   "openDatabase": "打开数据库",
   "saveDatabase": "保存数据库",
   "lockDatabase": "锁定数据库",
+  "showInFolder": "在文件夹中显示",
   "createEntry": "创建条目",
   "createGroup": "创建分组",
   "deleteEntry": "删除条目",
@@ -33,5 +34,6 @@
   "invalidPassword": "密码或密钥文件无效",
   "failedToCreateDatabase": "创建数据库失败",
   "failedToOpenDatabase": "打开数据库失败",
-  "failedToSaveDatabase": "保存数据库失败"
+  "failedToSaveDatabase": "保存数据库失败",
+  "noRowsToShow": "无数据"
 }

@@ -3,6 +3,7 @@
   "openDatabase": "Open Database",
   "saveDatabase": "Save Database",
   "lockDatabase": "Lock Database",
+  "showInFolder": "Show in Folder",
   "createEntry": "Create Entry",
   "createGroup": "Create Group",
   "deleteEntry": "Delete Entry",
@@ -33,5 +34,6 @@
   "invalidPassword": "Invalid password or key file",
   "failedToCreateDatabase": "Failed to create database",
   "failedToOpenDatabase": "Failed to open database",
-  "failedToSaveDatabase": "Failed to save database"
+  "failedToSaveDatabase": "Failed to save database",
+  "noRowsToShow": "No data"
 }

@@ -57,14 +57,18 @@ export default observer(function App() {
 
               <div className="flex-1 overflow-y-auto p-4">
                 {store.filteredTodos.length === 0 ? (
-                  <div className="text-center py-12">
-                    <CheckCircle2
-                      size={48}
-                      className={`mx-auto ${tw.text.both.secondary} opacity-30 mb-3`}
-                    />
-                    <p className={`text-sm ${tw.text.both.secondary}`}>
-                      {store.searchQuery ? t('noSearchResults') : t('noTasks')}
-                    </p>
+                  <div className="h-full flex items-center justify-center">
+                    <div className="text-center">
+                      <CheckCircle2
+                        size={48}
+                        className={`mx-auto ${tw.text.both.secondary} opacity-30 mb-3`}
+                      />
+                      <p className={`text-sm ${tw.text.both.secondary}`}>
+                        {store.searchQuery
+                          ? t('noSearchResults')
+                          : t('noTasks')}
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">

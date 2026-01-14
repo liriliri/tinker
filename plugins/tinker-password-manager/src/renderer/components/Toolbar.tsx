@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Save, Lock, Plus, FolderPlus, Search } from 'lucide-react'
+import { Save, Lock, Plus, FolderPlus, Search, Folder } from 'lucide-react'
 import {
   Toolbar as ToolbarComponent,
   ToolbarSeparator,
@@ -48,8 +48,32 @@ export default observer(function Toolbar() {
     store.createGroup(store.selectedGroupId, name)
   }
 
+  const handleShowInFolder = () => {
+    if (store.dbPath) {
+      tinker.showItemInPath(store.dbPath)
+    }
+  }
+
   return (
     <ToolbarComponent>
+      <ToolbarButton
+        onClick={handleShowInFolder}
+        disabled={!store.dbPath}
+        title={t('showInFolder')}
+      >
+        <Folder size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={handleSave}
+        disabled={!store.isModified}
+        title={t('saveDatabase')}
+      >
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
       <ToolbarButton
         onClick={handleNewEntry}
         disabled={!store.selectedGroupId}
@@ -64,14 +88,6 @@ export default observer(function Toolbar() {
         title={t('createGroup')}
       >
         <FolderPlus size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={handleSave}
-        disabled={!store.isModified}
-        title={t('saveDatabase')}
-      >
-        <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSeparator />

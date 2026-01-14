@@ -1,8 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Search, X, FolderOpen, RefreshCw } from 'lucide-react'
+import { Search, X, Folder, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Toolbar, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import {
+  Toolbar,
+  ToolbarSeparator,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'
@@ -11,34 +15,36 @@ import store from '../store'
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const handleSelectFile = async () => {
-    const result = await tinker.showOpenDialog({
-      properties: ['openFile'],
-      filters: [
-        { name: 'Text Files', extensions: ['txt'] },
-        { name: 'All Files', extensions: ['*'] },
-      ],
-    })
-
-    if (result && result.filePaths && result.filePaths.length > 0) {
-      await store.setFilePath(result.filePaths[0])
-    }
-  }
-
   const handleReload = async () => {
     await store.reloadTodos()
     toast.success(t('reloadSuccess'))
   }
 
+  const handleShowInFolder = () => {
+    if (store.filePath) {
+      tinker.showItemInPath(store.filePath)
+    }
+  }
+
+  const handleClose = () => {
+    store.closeFile()
+  }
+
   return (
     <Toolbar>
-      <ToolbarButton onClick={handleSelectFile} title={t('selectFile')}>
-        <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      <ToolbarButton
+        onClick={handleShowInFolder}
+        title={t('showInFolder')}
+        disabled={!store.filePath}
+      >
+        <Folder size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarButton onClick={handleReload} title={t('reload')}>
         <RefreshCw size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+
+      <ToolbarSeparator />
 
       <div className="relative w-48 ml-2">
         <Search
@@ -62,13 +68,17 @@ export default observer(function ToolbarComponent() {
         )}
       </div>
 
-      <div className="flex items-center gap-2 ml-auto">
-        <Checkbox
-          checked={store.showCompleted}
-          onChange={(checked) => store.setShowCompleted(checked)}
-        >
-          <span className={tw.text.both.secondary}>{t('showCompleted')}</span>
-        </Checkbox>
+      <Checkbox
+        checked={store.showCompleted}
+        onChange={(checked) => store.setShowCompleted(checked)}
+      >
+        <span className={tw.text.both.secondary}>{t('showCompleted')}</span>
+      </Checkbox>
+
+      <div className="ml-auto">
+        <ToolbarButton onClick={handleClose} title={t('close')}>
+          <X size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
       </div>
     </Toolbar>
   )

@@ -106,6 +106,13 @@ export default observer(function EntryList() {
     })
   }, [store.isDark])
 
+  const localeText = useMemo(
+    () => ({
+      noRowsToShow: t('noRowsToShow'),
+    }),
+    [t]
+  )
+
   if (!store.selectedGroupId) {
     return (
       <div
@@ -131,6 +138,7 @@ export default observer(function EntryList() {
         animateRows={true}
         enableCellTextSelection={false}
         suppressCellFocus={true}
+        localeText={localeText}
       />
     </div>
   )

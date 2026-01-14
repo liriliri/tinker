@@ -103,6 +103,14 @@ class Store extends BaseStore {
     await this.loadTodos()
   }
 
+  closeFile() {
+    this.filePath = ''
+    this.todos = []
+    this.needsFileSelection = true
+    storage.remove('filePath')
+    tinker.setTitle('')
+  }
+
   async openExistingFile() {
     try {
       const result = await tinker.showOpenDialog({
