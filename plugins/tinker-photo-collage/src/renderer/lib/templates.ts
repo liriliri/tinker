@@ -1,0 +1,817 @@
+import { LayoutTemplate } from '../store'
+
+export const templates: LayoutTemplate[] = [
+  {
+    id: '1-full',
+    photoCount: 1,
+    gridTemplate: 'repeat(1, 1fr) / repeat(1, 1fr)',
+    gridAreas: '"a"',
+    areas: ['a']
+  },
+  {
+    id: '2-t1b1',
+    photoCount: 2,
+    gridTemplate: 'repeat(2, 1fr) / repeat(1, 1fr)',
+    gridAreas: '"a" "b"',
+    areas: ['a', 'b']
+  },
+  {
+    id: '2-l1r1',
+    photoCount: 2,
+    gridTemplate: 'repeat(1, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b"',
+    areas: ['a', 'b']
+  },
+  {
+    id: '3-31',
+    photoCount: 3,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "a b c" "a b c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-t1b2',
+    photoCount: 3,
+    gridTemplate: 'repeat(2, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a a" "b c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-t2b1',
+    photoCount: 3,
+    gridTemplate: 'repeat(2, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-l1r2',
+    photoCount: 3,
+    gridTemplate: 'repeat(2, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "a c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-l2r1',
+    photoCount: 3,
+    gridTemplate: 'repeat(2, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c b"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-l1rr',
+    photoCount: 3,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a b" "a a c" "a a c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '3-t1bb',
+    photoCount: 3,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a a" "a a a" "b c c"',
+    areas: ['a', 'b', 'c']
+  },
+  {
+    id: '4-grid',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-41',
+    photoCount: 4,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "a b c d" "a b c d" "a b c d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-14',
+    photoCount: 4,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a a a" "b b b b" "c c c c" "d d d d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-t1b3',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a a" "b c d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-b1t3',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d d d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-l1r3',
+    photoCount: 4,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "a c" "a d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-l-feat',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b b" "a c d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-r-feat',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"b b c" "a d c"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-121',
+    photoCount: 4,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a a" "b c" "d d"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-212',
+    photoCount: 4,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "a d c"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '4-g3x2-alt',
+    photoCount: 4,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"d b" "d c" "a c"',
+    areas: ['a', 'b', 'c', 'd']
+  },
+  {
+    id: '5-center',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a b" "c d b" "c e e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-l3r2',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b b" "c d d" "e d d"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-131',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "a d c" "a e c"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-l2r3',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "a c" "d e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-t2b3',
+    photoCount: 5,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a b" "c d e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-center-h-bar',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"e a" "b b" "c d"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-t2b3-split',
+    photoCount: 5,
+    gridTemplate: 'repeat(2, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "c c d d e e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-l1r4-col',
+    photoCount: 5,
+    gridTemplate: 'repeat(4, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "a c" "a d" "a e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-t-feat-r',
+    photoCount: 5,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b b" "c d e"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-t1b4-grid',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"e e" "a b" "c d"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-r1l4-col',
+    photoCount: 5,
+    gridTemplate: 'repeat(4, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"b a" "c a" "d a" "e a"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '5-l-tall-r-split',
+    photoCount: 5,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"d e e" "d a b" "d c c"',
+    areas: ['a', 'b', 'c', 'd', 'e']
+  },
+  {
+    id: '6-g3x2',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d" "e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-g2x3',
+    photoCount: 6,
+    gridTemplate: 'repeat(2, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-center',
+    photoCount: 6,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a a b" "c d d b" "c d d e" "c f f e"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-123',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a a a a" "b b b c c c" "d d e e f f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-321',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a b b c c" "d d d e e e" "f f f f f f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-231',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "c c d d e e" "f f f f f f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-222',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a b" "c d d" "e e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-1133',
+    photoCount: 6,
+    gridTemplate: 'repeat(4, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a a" "a a a" "b c d" "e f d"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-223r',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a b" "a a c" "d e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-223l',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b b" "c b b" "d e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-114',
+    photoCount: 6,
+    gridTemplate: 'repeat(3, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a a a a a" "a a a a a" "b c d e f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '6-3333',
+    photoCount: 6,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a b c" "d e f f" "d e f f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f']
+  },
+  {
+    id: '7-main',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b b" "a a b b" "c c d e" "c c f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-h-center-band',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d d d" "e f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-w-center-band',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d b e" "f b g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-feat-l',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "a c" "d e" "f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-feat-t',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d" "e f" "g f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-311',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a a" "b c d" "e f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-113',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d e f" "g g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-232',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "c c d d e e" "f f f g g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-124',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a a b" "a a a c" "d e f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-323',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b b b" "c b b b" "d e f g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-313',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d d e" "d d f" "d d g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-331',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e e e f" "e e e g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-233',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "a a a b b b" "c c d d e e" "f f d d g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-333',
+    photoCount: 7,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b b" "c d e" "f g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '7-346',
+    photoCount: 7,
+    gridTemplate: 'repeat(4, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a b b c c" "d d b b c c" "e e e f f f" "e e e g g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  },
+  {
+    id: '8-g4x2',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d" "e f" "g h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-g2x4',
+    photoCount: 8,
+    gridTemplate: 'repeat(2, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-222',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "d d b c" "e f g g" "e f h h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-l2-tall-r6-grid',
+    photoCount: 8,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "a e f d" "a g h d"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-sandwich-6',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"h h h" "a b c" "d e f" "g g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-313',
+    photoCount: 8,
+    gridTemplate: 'repeat(5, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b b" "a a b b" "c d e f" "g g h h" "g g h h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-131',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a a b c c" "a a d c c" "e e f g g" "e e h g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-134',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a a b" "a a a c" "a a a d" "e f g h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-431',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f f f" "g f f f" "h f f f"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-323',
+    photoCount: 8,
+    gridTemplate: 'repeat(3, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a b b c c" "d d d e e e" "f f g g h h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-363',
+    photoCount: 8,
+    gridTemplate: 'repeat(6, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "a b c" "d b e" "d f e" "g f h" "g f h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '8-344',
+    photoCount: 8,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c c" "d b c c" "e e f g" "e e f h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  },
+  {
+    id: '9-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d e f" "g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-144-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a a a" "b c d e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-414-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e e e e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-441-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i i i i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-211-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a d e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-112-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g g" "h i g g"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-334-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b b c" "d b b e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-434-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b b c" "d b b e" "f b b g" "h b b i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-344-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e e e e" "e e e e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-424-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a b c" "d d e f" "g g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-116-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(6, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "a a a b b b" "a a a b b b" "c c c d d e" "c c c d d f" "c c c g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-611-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(6, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a b c c c" "a a d c c c" "e f g c c c" "h h h i i i" "h h h i i i" "h h h i i i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-cen-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b b" "c d d e" "c d d e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-quad-fill-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a b c" "d d e e" "f g h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '9-mid-strip-grid',
+    photoCount: 9,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b b" "a a c c" "d e f g" "d e h i"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+  },
+  {
+    id: '10-g5x2',
+    photoCount: 10,
+    gridTemplate: 'repeat(5, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d" "e f" "g h" "i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-t2b8-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b b" "c d e f" "g h i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-424-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e e f f" "g h i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-4x3-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(4, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a a a" "b c d" "e f g" "h i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-5x5-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(5, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a a a a b" "a a a a c" "a a a a d" "a a a a e" "f g h i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-4x4-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a d e" "f g h h" "i j h h"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-8x8-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(8, 1fr) / repeat(8, 1fr)',
+    gridAreas: '"a a a a b b b b" "a a a a b b b b" "a a a a b b b b" "a a a a b b b b" "c c c c d d e e" "c c c c d d e e" "c c c c f f g h" "c c c c f f i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-442-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e e f f" "e e f f" "g h i j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '10-6x6-grid',
+    photoCount: 10,
+    gridTemplate: 'repeat(6, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a b b c c" "a a b b c c" "d d e e f f" "d d g g f f" "h h i i j j" "h h i i j j"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+  },
+  {
+    id: '11-4c4-t',
+    photoCount: 11,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f f g" "e f f g" "h i j k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '11-4x4-t',
+    photoCount: 11,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b b c" "d e e f" "g e e h" "i j j k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '11-4x6-t',
+    photoCount: 11,
+    gridTemplate: 'repeat(4, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a b b b" "c c d d e e" "f f g g h h" "i i j j k k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '11-feat-t',
+    photoCount: 11,
+    gridTemplate: 'repeat(3, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a a a a a" "b c d e f" "g h i j k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '11-feat-c',
+    photoCount: 11,
+    gridTemplate: 'repeat(3, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a b c d e" "f f f f f" "g h i j k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '11-feat-f',
+    photoCount: 11,
+    gridTemplate: 'repeat(3, 1fr) / repeat(5, 1fr)',
+    gridAreas: '"a b c d e" "f g h i j" "k k k k k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+  },
+  {
+    id: '12-g4x3',
+    photoCount: 12,
+    gridTemplate: 'repeat(4, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d e f" "g h i" "j k l"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+  },
+  {
+    id: '12-g3x4',
+    photoCount: 12,
+    gridTemplate: 'repeat(3, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i j k l"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+  },
+  {
+    id: '12-g6x6',
+    photoCount: 12,
+    gridTemplate: 'repeat(6, 1fr) / repeat(6, 1fr)',
+    gridAreas: '"a a a a a b" "a a a a a c" "a a a a a d" "a a a a a e" "a a a a a f" "g h i j k l"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+  },
+  {
+    id: '13-feat-c',
+    photoCount: 13,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f f g" "h f f i" "j k l m"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
+  },
+  {
+    id: '13-211',
+    photoCount: 13,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a a b c" "a a d e" "f g h i" "j k l m"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
+  },
+  {
+    id: '13-112',
+    photoCount: 13,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i j k k" "l m k k"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
+  },
+  {
+    id: '14-g7x2',
+    photoCount: 14,
+    gridTemplate: 'repeat(7, 1fr) / repeat(2, 1fr)',
+    gridAreas: '"a b" "c d" "e f" "g h" "i j" "k l" "m n"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
+  },
+  {
+    id: '14-g4x4r',
+    photoCount: 14,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f f g" "h i i j" "k l m n"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
+  },
+  {
+    id: '14-g4x4c',
+    photoCount: 14,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i f g j" "k l m n"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
+  },
+  {
+    id: '15-g5x3',
+    photoCount: 15,
+    gridTemplate: 'repeat(5, 1fr) / repeat(3, 1fr)',
+    gridAreas: '"a b c" "d e f" "g h i" "j k l" "m n o"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
+  },
+  {
+    id: '15-g4x4c',
+    photoCount: 15,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f f g" "h i j k" "l m n o"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
+  },
+  {
+    id: '15-g4x4f',
+    photoCount: 15,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i j k l" "m n o o"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
+  },
+  {
+    id: '16-g4x4',
+    photoCount: 16,
+    gridTemplate: 'repeat(4, 1fr) / repeat(4, 1fr)',
+    gridAreas: '"a b c d" "e f g h" "i j k l" "m n o p"',
+    areas: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p']
+  },
+]
+
+export const getTemplatesByPhotoCount = (count: number): LayoutTemplate[] => {
+  return templates.filter(t => t.photoCount === count)
+}
+
+export const getTemplateById = (id: string): LayoutTemplate | undefined => {
+  return templates.find(t => t.id === id)
+}
