@@ -1,5 +1,10 @@
 import { makeAutoObservable } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+
+const STORAGE_KEY_CANVAS_BG_COLOR = 'canvasBgColor'
+const STORAGE_KEY_IMAGE_BG_COLOR = 'imageBgColor'
+const storage = new LocalStore('tinker-photo-collage')
 
 export type Photo = {
   id: string
@@ -30,9 +35,28 @@ class Store extends BaseStore {
   radius: number = 50
   radiusEnabled: boolean = true
 
+  canvasWidth: number = 1000
+  canvasHeight: number = 1000
+
+  canvasBgColor: string = '#ffffff'
+  imageBgColor: string = '#000000'
+
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadSettings()
+  }
+
+  loadSettings() {
+    const savedCanvasBgColor = storage.get(STORAGE_KEY_CANVAS_BG_COLOR)
+    if (savedCanvasBgColor) {
+      this.canvasBgColor = savedCanvasBgColor
+    }
+
+    const savedImageBgColor = storage.get(STORAGE_KEY_IMAGE_BG_COLOR)
+    if (savedImageBgColor) {
+      this.imageBgColor = savedImageBgColor
+    }
   }
 
   addPhotos(files: File[]) {
@@ -87,6 +111,21 @@ class Store extends BaseStore {
 
   toggleRadius() {
     this.radiusEnabled = !this.radiusEnabled
+  }
+
+  setCanvasSize(width: number, height: number) {
+    this.canvasWidth = width
+    this.canvasHeight = height
+  }
+
+  setCanvasBgColor(color: string) {
+    this.canvasBgColor = color
+    storage.set(STORAGE_KEY_CANVAS_BG_COLOR, color)
+  }
+
+  setImageBgColor(color: string) {
+    this.imageBgColor = color
+    storage.set(STORAGE_KEY_IMAGE_BG_COLOR, color)
   }
 
   clearAll() {

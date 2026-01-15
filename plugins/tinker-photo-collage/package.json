@@ -16,5 +16,8 @@
         "name": "照片拼接"
       }
     }
+  },
+  "devDependencies": {
+    "html-to-image": "^1.11.13"
   }
 }

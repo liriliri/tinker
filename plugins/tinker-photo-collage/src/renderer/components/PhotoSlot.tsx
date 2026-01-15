@@ -33,17 +33,18 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
 
   return (
     <div
-      className={`relative w-full h-full overflow-hidden ${tw.bg.both.primary} flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity`}
+      className="relative w-full h-full overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
       style={{
         gridArea: areaName,
         borderRadius: borderRadiusStyle,
+        backgroundColor: store.imageBgColor,
       }}
       onClick={handleClick}
     >
       {photo ? (
         <img src={photo.url} alt="" className="w-full h-full object-cover" />
       ) : (
-        <Plus size={48} className={tw.text.both.secondary} />
+        <Plus size={48} className={`${tw.text.both.tertiary} opacity-50`} />
       )}
     </div>
   )
