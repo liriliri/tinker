@@ -36,22 +36,22 @@ class Store extends BaseStore {
   }
 
   addPhotos(files: File[]) {
-    const newPhotos = files.map(file => ({
+    const newPhotos = files.map((file) => ({
       id: `photo-${Date.now()}-${Math.random()}`,
       url: URL.createObjectURL(file),
-      file
+      file,
     }))
     this.photos.push(...newPhotos)
   }
 
   removePhoto(id: string) {
-    const photo = this.photos.find(p => p.id === id)
+    const photo = this.photos.find((p) => p.id === id)
     if (photo) {
       URL.revokeObjectURL(photo.url)
     }
-    this.photos = this.photos.filter(p => p.id !== id)
+    this.photos = this.photos.filter((p) => p.id !== id)
 
-    this.photoSlots.forEach(slot => {
+    this.photoSlots.forEach((slot) => {
       if (slot.photoId === id) {
         slot.photoId = null
       }
@@ -59,7 +59,7 @@ class Store extends BaseStore {
   }
 
   setPhotoToSlot(areaName: string, photoId: string | null) {
-    const slot = this.photoSlots.find(s => s.areaName === areaName)
+    const slot = this.photoSlots.find((s) => s.areaName === areaName)
     if (slot) {
       slot.photoId = photoId
     }
@@ -67,9 +67,9 @@ class Store extends BaseStore {
 
   setTemplate(templateId: string, areas: string[]) {
     this.selectedTemplateId = templateId
-    this.photoSlots = areas.map(area => ({
+    this.photoSlots = areas.map((area) => ({
       areaName: area,
-      photoId: null
+      photoId: null,
     }))
   }
 
@@ -90,9 +90,9 @@ class Store extends BaseStore {
   }
 
   clearAll() {
-    this.photos.forEach(photo => URL.revokeObjectURL(photo.url))
+    this.photos.forEach((photo) => URL.revokeObjectURL(photo.url))
     this.photos = []
-    this.photoSlots.forEach(slot => {
+    this.photoSlots.forEach((slot) => {
       slot.photoId = null
     })
   }

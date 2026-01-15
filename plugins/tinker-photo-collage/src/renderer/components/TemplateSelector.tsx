@@ -14,24 +14,34 @@ const TemplateSelector = observer(() => {
   }
 
   return (
-    <div className={`w-60 ${tw.bg.both.primary} ${tw.border.both.right} overflow-y-auto flex flex-col`}>
-      {PHOTO_COUNTS.map(count => {
+    <div
+      className={`w-60 ${tw.bg.both.primary} ${tw.border.both.right} overflow-y-auto flex flex-col`}
+    >
+      {PHOTO_COUNTS.map((count) => {
         const templates = getTemplatesByPhotoCount(count)
         if (templates.length === 0) return null
 
         return (
           <div key={count} className={`p-4 ${tw.border.both.bottom}`}>
-            <h3 className={`text-xs font-semibold ${tw.text.both.secondary} mb-3`}>
+            <h3
+              className={`text-xs font-semibold ${tw.text.both.secondary} mb-3`}
+            >
               {count} {t('photos')}
             </h3>
             <div className="grid grid-cols-2 gap-3">
-              {templates.map(template => (
+              {templates.map((template) => (
                 <button
                   key={template.id}
-                  className={`aspect-square rounded ${tw.bg.both.secondary} hover:opacity-80 transition-opacity overflow-hidden ${
-                    store.selectedTemplateId === template.id ? `ring-2 ${tw.primary.ring}` : ''
+                  className={`aspect-square rounded ${
+                    tw.bg.both.secondary
+                  } hover:opacity-80 transition-opacity overflow-hidden ${
+                    store.selectedTemplateId === template.id
+                      ? `ring-2 ${tw.primary.ring}`
+                      : ''
                   }`}
-                  onClick={() => handleSelectTemplate(template.id, template.areas)}
+                  onClick={() =>
+                    handleSelectTemplate(template.id, template.areas)
+                  }
                 >
                   <div
                     className="w-full h-full"
@@ -40,10 +50,10 @@ const TemplateSelector = observer(() => {
                       gridTemplate: template.gridTemplate,
                       gridTemplateAreas: template.gridAreas,
                       gap: '2px',
-                      padding: '4px'
+                      padding: '4px',
                     }}
                   >
-                    {template.areas.map(area => (
+                    {template.areas.map((area) => (
                       <div
                         key={area}
                         className={`${tw.bg.both.primary} ${tw.border.both.full}`}

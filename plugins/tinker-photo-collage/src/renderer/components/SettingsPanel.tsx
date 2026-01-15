@@ -8,7 +8,9 @@ const SettingsPanel = observer(() => {
   const { t } = useTranslation()
 
   return (
-    <div className={`w-60 ${tw.bg.both.primary} ${tw.border.both.left} flex flex-col`}>
+    <div
+      className={`w-60 ${tw.bg.both.primary} ${tw.border.both.left} flex flex-col`}
+    >
       <div className="p-6 space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">

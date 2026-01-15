@@ -16,7 +16,7 @@ const CollageCanvas = observer(() => {
     gridTemplate: template.gridTemplate,
     gridTemplateAreas: template.gridAreas,
     gap: `${store.spacing}px`,
-    padding: `${store.padding}px`
+    padding: `${store.padding}px`,
   }
 
   return (
@@ -25,7 +25,7 @@ const CollageCanvas = observer(() => {
         className={`${tw.bg.both.secondary} shadow-2xl w-full h-full`}
         style={canvasStyle}
       >
-        {template.areas.map(area => (
+        {template.areas.map((area) => (
           <PhotoSlot key={area} areaName={area} />
         ))}
       </div>

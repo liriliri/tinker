@@ -8,8 +8,10 @@ interface PhotoSlotProps {
 }
 
 const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
-  const slot = store.photoSlots.find(s => s.areaName === areaName)
-  const photo = slot?.photoId ? store.photos.find(p => p.id === slot.photoId) : null
+  const slot = store.photoSlots.find((s) => s.areaName === areaName)
+  const photo = slot?.photoId
+    ? store.photos.find((p) => p.id === slot.photoId)
+    : null
 
   const handleClick = () => {
     const input = document.createElement('input')
@@ -34,16 +36,12 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
       className={`relative w-full h-full overflow-hidden ${tw.bg.both.primary} flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity`}
       style={{
         gridArea: areaName,
-        borderRadius: borderRadiusStyle
+        borderRadius: borderRadiusStyle,
       }}
       onClick={handleClick}
     >
       {photo ? (
-        <img
-          src={photo.url}
-          alt=""
-          className="w-full h-full object-cover"
-        />
+        <img src={photo.url} alt="" className="w-full h-full object-cover" />
       ) : (
         <Plus size={48} className={tw.text.both.secondary} />
       )}
