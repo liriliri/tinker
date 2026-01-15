@@ -150,7 +150,7 @@ const pluginViews: types.PlainObj<{
   win: BrowserWindow
 }> = {}
 
-let preloadPluginView: WebContentsView
+let preloadPluginView: WebContentsView | null = null
 function createPluginView() {
   const view = new WebContentsView({
     webPreferences: {
@@ -164,9 +164,13 @@ function createPluginView() {
 }
 
 function getPluginView() {
-  const view = preloadPluginView
-  preloadPluginView = createPluginView()
-  return view
+  if (preloadPluginView) {
+    const view = preloadPluginView
+    preloadPluginView = null
+    return view
+  }
+
+  return createPluginView()
 }
 
 function getWebPluginView() {
@@ -356,6 +360,12 @@ const importPluginData: IpcImportPluginData = function (id) {
   view.webContents.send('importData')
 }
 
+function preparePluginView() {
+  if (!preloadPluginView) {
+    preloadPluginView = createPluginView()
+  }
+}
+
 function nodeStreamToWeb(
   stream: NodeJS.ReadableStream
 ): ReadableStream<Uint8Array> {
@@ -384,6 +394,7 @@ export function init() {
   handleEvent('getClipboardFilePaths', getClipboardFilePaths)
   handleEvent('exportPluginData', exportPluginData)
   handleEvent('importPluginData', importPluginData)
+  handleEvent('preparePluginView', preparePluginView)
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {
@@ -391,8 +402,6 @@ export function init() {
       }
     }
   })
-
-  preloadPluginView = createPluginView()
 
   session
     .fromPartition(PLUGIN_PARTITION)

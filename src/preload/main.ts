@@ -26,4 +26,5 @@ export default Object.assign(mainObj, {
   openApp: invoke<IpcOpenApp>('openApp'),
   exportPluginData: invoke<IpcExportPluginData>('exportPluginData'),
   importPluginData: invoke<IpcImportPluginData>('importPluginData'),
+  preparePluginView: invoke('preparePluginView'),
 })

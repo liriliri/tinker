@@ -6,6 +6,7 @@ import lowerCase from 'licia/lowerCase'
 import trim from 'licia/trim'
 import PinyinMatch from 'pinyin-match'
 import toBool from 'licia/toBool'
+import pkg from '../../../package.json'
 
 class Store extends BaseStore {
   plugins: IPlugin[] = []
@@ -25,6 +26,7 @@ class Store extends BaseStore {
       setFilter: action,
     })
 
+    main.preparePluginView()
     this.refresh()
     this.bindEvent()
   }
@@ -65,6 +67,8 @@ class Store extends BaseStore {
       return
     }
     main.closePlugin(this.plugin.id)
+    preload.setTitle(pkg.productName)
+    main.preparePluginView()
     this.plugin = null
     this.setFilter('')
   }
