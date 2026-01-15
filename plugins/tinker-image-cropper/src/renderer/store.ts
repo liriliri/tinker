@@ -241,6 +241,22 @@ class Store extends BaseStore {
     }
   }
 
+  async copyImage() {
+    if (!this.image) return
+
+    try {
+      const response = await fetch(this.image.originalUrl)
+      const blob = await response.blob()
+      const arrayBuffer = await blob.arrayBuffer()
+      const buffer = new Uint8Array(arrayBuffer)
+
+      await imageCropper.copyImageToClipboard(buffer)
+    } catch (err) {
+      console.error('Failed to copy image:', err)
+      throw err
+    }
+  }
+
   undo() {
     if (!this.canUndo) return
 

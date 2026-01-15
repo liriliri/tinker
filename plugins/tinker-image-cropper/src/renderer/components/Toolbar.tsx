@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   FolderOpen,
   Save,
+  Copy,
+  Check,
   X,
   Crop,
   Undo,
@@ -38,6 +40,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
   const { t } = useTranslation()
   const [showSizeDialog, setShowSizeDialog] = useState(false)
   const [showResizeDialog, setShowResizeDialog] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleOpenImage = async () => {
     try {
@@ -52,6 +55,16 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
       await store.saveImage()
     } catch (err) {
       console.error('Failed to save image:', err)
+    }
+  }
+
+  const handleCopyImage = async () => {
+    try {
+      await store.copyImage()
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy image:', err)
     }
   }
 
@@ -191,6 +204,19 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
       </ToolbarButton>
 
       <ToolbarSeparator />
+
+      <ToolbarButton
+        onClick={handleCopyImage}
+        disabled={store.historyIndex <= 0}
+        className={copied ? tw.primary.text : ''}
+        title={t('copyImage')}
+      >
+        {copied ? (
+          <Check size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <Copy size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
 
       <ToolbarButton
         onClick={handleSaveImage}

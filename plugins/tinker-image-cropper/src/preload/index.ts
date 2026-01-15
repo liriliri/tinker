@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, clipboard, nativeImage } from 'electron'
 import * as fs from 'fs'
 
 const imageCropperObj = {
@@ -9,6 +9,11 @@ const imageCropperObj = {
   async writeFile(filePath: string, buffer: Uint8Array): Promise<void> {
     await fs.promises.writeFile(filePath, Buffer.from(buffer))
   },
+
+  async copyImageToClipboard(buffer: Uint8Array): Promise<void> {
+    const image = nativeImage.createFromBuffer(Buffer.from(buffer))
+    clipboard.writeImage(image)
+  },
 }
 
 contextBridge.exposeInMainWorld('imageCropper', imageCropperObj)
@@ -18,5 +23,6 @@ declare global {
   const imageCropper: {
     readFile(filePath: string): Promise<Uint8Array>
     writeFile(filePath: string, buffer: Uint8Array): Promise<void>
+    copyImageToClipboard(buffer: Uint8Array): Promise<void>
   }
 }
