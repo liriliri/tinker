@@ -17,6 +17,7 @@ share/
 │   ├── ImageOpen.tsx
 │   ├── Prompt.tsx
 │   ├── Select.tsx
+│   ├── Slider.tsx
 │   ├── Toolbar.tsx
 │   ├── ToolbarButton.tsx
 │   └── Tooltip.tsx
@@ -263,6 +264,32 @@ const options: SelectOption[] = [
   label="Enable feature"
 />
 ```
+
+### Slider
+
+```typescript
+import Slider from 'share/components/Slider'
+
+<Slider
+  min={0}
+  max={100}
+  value={store.padding}
+  onChange={(value) => store.setPadding(value)}
+/>
+
+// With disabled state
+<Slider
+  min={0}
+  max={100}
+  value={store.radius}
+  onChange={(value) => store.setRadius(value)}
+  disabled={!store.radiusEnabled}
+/>
+```
+
+**Props**: `value` (required), `min` (required), `max` (required), `onChange` (required), `disabled` (optional)
+
+**Features**: Click track to jump, drag thumb to adjust, visual feedback on hover/drag, theme-aware styling
 
 ### CopyButton
 

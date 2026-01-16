@@ -3,11 +3,75 @@ import { useRef, useEffect, useState } from 'react'
 import store from '../store'
 import { getTemplateById } from '../lib/templates'
 import PhotoSlot from './PhotoSlot'
+import GridResizer from './GridResizer'
 
 const CollageCanvas = observer(() => {
   const template = getTemplateById(store.selectedTemplateId)
   const containerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.5)
+  const initialRowSizesRef = useRef<number[]>([])
+  const initialColSizesRef = useRef<number[]>([])
+
+  const handleRowResize = (index: number, totalDelta: number) => {
+    if (!canvasRef.current) return
+
+    if (totalDelta === 0 || initialRowSizesRef.current.length === 0) {
+      initialRowSizesRef.current = [...store.customRowSizes]
+      return
+    }
+
+    const totalHeight =
+      store.canvasHeight -
+      store.padding * 2 -
+      store.spacing * (store.customRowSizes.length - 1)
+    const currentTotal = initialRowSizesRef.current.reduce(
+      (sum, size) => sum + size,
+      0
+    )
+    const pixelPerFr = totalHeight / currentTotal
+    const deltaFr = totalDelta / (pixelPerFr * scale)
+
+    if (index < initialRowSizesRef.current.length - 1) {
+      const newSize1 = initialRowSizesRef.current[index] + deltaFr
+      const newSize2 = initialRowSizesRef.current[index + 1] - deltaFr
+
+      if (newSize1 >= 0.5 && newSize2 >= 0.5) {
+        store.setRowSize(index, newSize1)
+        store.setRowSize(index + 1, newSize2)
+      }
+    }
+  }
+
+  const handleColResize = (index: number, totalDelta: number) => {
+    if (!canvasRef.current) return
+
+    if (totalDelta === 0 || initialColSizesRef.current.length === 0) {
+      initialColSizesRef.current = [...store.customColSizes]
+      return
+    }
+
+    const totalWidth =
+      store.canvasWidth -
+      store.padding * 2 -
+      store.spacing * (store.customColSizes.length - 1)
+    const currentTotal = initialColSizesRef.current.reduce(
+      (sum, size) => sum + size,
+      0
+    )
+    const pixelPerFr = totalWidth / currentTotal
+    const deltaFr = totalDelta / (pixelPerFr * scale)
+
+    if (index < initialColSizesRef.current.length - 1) {
+      const newSize1 = initialColSizesRef.current[index] + deltaFr
+      const newSize2 = initialColSizesRef.current[index + 1] - deltaFr
+
+      if (newSize1 >= 0.5 && newSize2 >= 0.5) {
+        store.setColSize(index, newSize1)
+        store.setColSize(index + 1, newSize2)
+      }
+    }
+  }
 
   useEffect(() => {
     const updateScale = () => {
@@ -45,9 +109,21 @@ const CollageCanvas = observer(() => {
     return null
   }
 
+  const getGridTemplateRowsAndCols = () => {
+    if (store.customGridTemplate) {
+      const [rows, cols] = store.customGridTemplate.split(' / ')
+      return { rows, cols }
+    }
+    const [rows, cols] = template.gridTemplate.split(' / ')
+    return { rows, cols }
+  }
+
+  const { rows, cols } = getGridTemplateRowsAndCols()
+
   const canvasStyle = {
     display: 'grid',
-    gridTemplate: template.gridTemplate,
+    gridTemplateRows: rows,
+    gridTemplateColumns: cols,
     gridTemplateAreas: template.gridAreas,
     gap: `${store.spacing}px`,
     padding: `${store.padding}px`,
@@ -56,6 +132,11 @@ const CollageCanvas = observer(() => {
     flexShrink: 0,
     flexGrow: 0,
     backgroundColor: store.canvasBgColor,
+    backgroundImage: store.backgroundImage
+      ? `url(${store.backgroundImage})`
+      : undefined,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
   }
 
@@ -66,15 +147,102 @@ const CollageCanvas = observer(() => {
     flexGrow: 0,
   }
 
+  const calculateResizerPositions = () => {
+    const rowPositions: number[] = []
+    const colPositions: number[] = []
+
+    if (store.customRowSizes.length > 1) {
+      const totalHeight = store.canvasHeight - store.padding * 2
+      const currentTotal = store.customRowSizes.reduce(
+        (sum, size) => sum + size,
+        0
+      )
+      let accumulated = store.padding
+
+      for (let i = 0; i < store.customRowSizes.length - 1; i++) {
+        accumulated +=
+          (store.customRowSizes[i] / currentTotal) *
+          (totalHeight - store.spacing * (store.customRowSizes.length - 1))
+        rowPositions.push(accumulated + store.spacing / 2)
+        accumulated += store.spacing
+      }
+    }
+
+    if (store.customColSizes.length > 1) {
+      const totalWidth = store.canvasWidth - store.padding * 2
+      const currentTotal = store.customColSizes.reduce(
+        (sum, size) => sum + size,
+        0
+      )
+      let accumulated = store.padding
+
+      for (let i = 0; i < store.customColSizes.length - 1; i++) {
+        accumulated +=
+          (store.customColSizes[i] / currentTotal) *
+          (totalWidth - store.spacing * (store.customColSizes.length - 1))
+        colPositions.push(accumulated + store.spacing / 2)
+        accumulated += store.spacing
+      }
+    }
+
+    return { rowPositions, colPositions }
+  }
+
+  const { rowPositions, colPositions } = calculateResizerPositions()
+
   return (
     <div
       ref={containerRef}
       className="flex-1 flex items-center justify-center overflow-hidden p-8"
     >
       <div style={wrapperStyle}>
-        <div id="collage-canvas" style={canvasStyle}>
-          {template.areas.map((area) => (
-            <PhotoSlot key={area} areaName={area} />
+        <div style={{ position: 'relative' }}>
+          <div id="collage-canvas" ref={canvasRef} style={canvasStyle}>
+            {template.areas.map((area) => (
+              <PhotoSlot key={area} areaName={area} />
+            ))}
+          </div>
+
+          {rowPositions.map((pos, index) => (
+            <div
+              key={`row-${index}`}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: `${pos}px`,
+                height: `${store.spacing}px`,
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+              }}
+            >
+              <GridResizer
+                direction="row"
+                index={index}
+                onResize={handleRowResize}
+              />
+            </div>
+          ))}
+
+          {colPositions.map((pos, index) => (
+            <div
+              key={`col-${index}`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: `${pos}px`,
+                width: `${store.spacing}px`,
+                transform: 'translateX(-50%)',
+                zIndex: 10,
+              }}
+            >
+              <GridResizer
+                direction="col"
+                index={index}
+                onResize={handleColResize}
+              />
+            </div>
           ))}
         </div>
       </div>

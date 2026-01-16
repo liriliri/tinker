@@ -3,6 +3,8 @@
   "save": "Save",
   "copyImage": "Copy Image",
   "setCanvasSize": "Set Canvas Size",
+  "setBackgroundImage": "Set Background Image",
+  "clearBackgroundImage": "Clear Background Image",
   "width": "Width",
   "height": "Height",
   "cancel": "Cancel",

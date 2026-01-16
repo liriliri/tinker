@@ -3,6 +3,8 @@
   "save": "保存",
   "copyImage": "复制图片",
   "setCanvasSize": "设置画布大小",
+  "setBackgroundImage": "设置背景图",
+  "clearBackgroundImage": "清除背景图",
   "width": "宽度",
   "height": "高度",
   "cancel": "取消",

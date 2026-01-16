@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
+import Slider from 'share/components/Slider'
 import store from '../store'
 import { getTemplatesByPhotoCount } from '../lib/templates'
 
@@ -25,23 +25,15 @@ const Sidebar = observer(() => {
             <label className={`text-sm ${tw.text.both.primary}`}>
               {t('padding')}
             </label>
-            <input
-              type="number"
-              value={store.padding}
-              onChange={(e) => store.setPadding(Number(e.target.value))}
-              className={`w-16 px-2 py-1 text-sm text-right ${tw.bg.both.secondary} ${tw.text.both.primary} border ${tw.border.both} rounded`}
-              min={0}
-              max={100}
-            />
-            <span className={`text-sm ${tw.text.both.secondary} ml-2`}>px</span>
+            <span className={`text-sm ${tw.text.both.secondary}`}>
+              {store.padding}px
+            </span>
           </div>
-          <input
-            type="range"
+          <Slider
             min={0}
             max={100}
             value={store.padding}
-            onChange={(e) => store.setPadding(Number(e.target.value))}
-            className="w-full"
+            onChange={(value) => store.setPadding(value)}
           />
         </div>
 
@@ -50,23 +42,15 @@ const Sidebar = observer(() => {
             <label className={`text-sm ${tw.text.both.primary}`}>
               {t('spacing')}
             </label>
-            <input
-              type="number"
-              value={store.spacing}
-              onChange={(e) => store.setSpacing(Number(e.target.value))}
-              className={`w-16 px-2 py-1 text-sm text-right ${tw.bg.both.secondary} ${tw.text.both.primary} border ${tw.border.both} rounded`}
-              min={0}
-              max={100}
-            />
-            <span className={`text-sm ${tw.text.both.secondary} ml-2`}>px</span>
+            <span className={`text-sm ${tw.text.both.secondary}`}>
+              {store.spacing}px
+            </span>
           </div>
-          <input
-            type="range"
+          <Slider
             min={0}
             max={100}
             value={store.spacing}
-            onChange={(e) => store.setSpacing(Number(e.target.value))}
-            className="w-full"
+            onChange={(value) => store.setSpacing(value)}
           />
         </div>
 
@@ -75,29 +59,15 @@ const Sidebar = observer(() => {
             <label className={`text-sm ${tw.text.both.primary}`}>
               {t('radius')}
             </label>
-            <Checkbox
-              checked={store.radiusEnabled}
-              onChange={() => store.toggleRadius()}
-            />
-            <input
-              type="number"
-              value={store.radius}
-              onChange={(e) => store.setRadius(Number(e.target.value))}
-              className={`w-16 px-2 py-1 text-sm text-right ${tw.bg.both.secondary} ${tw.text.both.primary} border ${tw.border.both} rounded`}
-              min={0}
-              max={100}
-              disabled={!store.radiusEnabled}
-            />
-            <span className={`text-sm ${tw.text.both.secondary} ml-2`}>px</span>
+            <span className={`text-sm ${tw.text.both.secondary}`}>
+              {store.radius}px
+            </span>
           </div>
-          <input
-            type="range"
+          <Slider
             min={0}
             max={100}
             value={store.radius}
-            onChange={(e) => store.setRadius(Number(e.target.value))}
-            className="w-full"
-            disabled={!store.radiusEnabled}
+            onChange={(value) => store.setRadius(value)}
           />
         </div>
       </div>
@@ -123,11 +93,11 @@ const Sidebar = observer(() => {
                   key={template.id}
                   className={`aspect-square rounded ${
                     tw.bg.both.secondary
-                  } hover:opacity-80 transition-opacity overflow-hidden ${
+                  } border-2 ${
                     store.selectedTemplateId === template.id
-                      ? `ring-2 ${tw.primary.ring}`
-                      : ''
-                  }`}
+                      ? tw.primary.border
+                      : 'border-transparent'
+                  } hover:opacity-80 transition-all overflow-hidden`}
                   onClick={() =>
                     handleSelectTemplate(template.id, template.areas)
                   }
@@ -138,7 +108,7 @@ const Sidebar = observer(() => {
                       display: 'grid',
                       gridTemplate: template.gridTemplate,
                       gridTemplateAreas: template.gridAreas,
-                      gap: '2px',
+                      gap: '4px',
                       padding: '4px',
                     }}
                   >

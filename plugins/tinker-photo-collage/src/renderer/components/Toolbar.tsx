@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { Shuffle, Save, X, Copy, Check } from 'lucide-react'
+import { Shuffle, Save, X, Copy, Check, Image, ImageOff } from 'lucide-react'
+import openFile from 'licia/openFile'
+import download from 'licia/download'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -28,7 +30,7 @@ export default observer(() => {
 
     try {
       const blob = await htmlToImage.toBlob(canvasElement, {
-        pixelRatio: 2,
+        pixelRatio: 1,
       })
 
       if (blob) {
@@ -54,14 +56,13 @@ export default observer(() => {
     }
 
     try {
-      const dataUrl = await htmlToImage.toPng(canvasElement, {
-        pixelRatio: 2,
+      const blob = await htmlToImage.toBlob(canvasElement, {
+        pixelRatio: 1,
       })
 
-      const link = document.createElement('a')
-      link.download = 'photo-collage.png'
-      link.href = dataUrl
-      link.click()
+      if (blob) {
+        download(blob, 'photo-collage.png')
+      }
     } catch (error) {
       console.error('Failed to save image:', error)
     }
@@ -69,6 +70,22 @@ export default observer(() => {
 
   const handleSetCanvasSize = (width: number, height: number) => {
     store.setCanvasSize(width, height)
+  }
+
+  const handleSetBackgroundImage = async () => {
+    try {
+      const files = await openFile({ accept: 'image/*' })
+      if (files && files.length > 0) {
+        const url = URL.createObjectURL(files[0])
+        store.setBackgroundImage(url)
+      }
+    } catch (err) {
+      console.error('Failed to open background image:', err)
+    }
+  }
+
+  const handleClearBackgroundImage = () => {
+    store.clearBackgroundImage()
   }
 
   return (
@@ -82,6 +99,31 @@ export default observer(() => {
         </ToolbarButton>
 
         <ToolbarSeparator />
+
+        <button
+          className="text-xs px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors cursor-pointer"
+          onClick={() => setShowSizeDialog(true)}
+          title={t('setCanvasSize')}
+        >
+          <div>
+            {store.canvasWidth} × {store.canvasHeight}
+          </div>
+        </button>
+
+        <ToolbarButton
+          onClick={handleSetBackgroundImage}
+          title={t('setBackgroundImage')}
+        >
+          <Image size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={handleClearBackgroundImage}
+          disabled={!store.backgroundImage}
+          title={t('clearBackgroundImage')}
+        >
+          <ImageOff size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
         <div className="flex items-center gap-1.5 px-1">
           <label
@@ -112,16 +154,6 @@ export default observer(() => {
         </div>
 
         <ToolbarSpacer />
-
-        <button
-          className={`text-xs px-2 py-1 ${tw.bg.light.hoverSecondary} ${tw.bg.dark.hoverTertiary} rounded transition-colors cursor-pointer`}
-          onClick={() => setShowSizeDialog(true)}
-          title={t('setCanvasSize')}
-        >
-          <div>
-            {store.canvasWidth} × {store.canvasHeight}
-          </div>
-        </button>
 
         <ToolbarButton
           onClick={handleCopy}
