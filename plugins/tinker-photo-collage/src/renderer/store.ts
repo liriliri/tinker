@@ -1,6 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import shuffle from 'licia/shuffle'
 import BaseStore from 'share/BaseStore'
+import { getTemplatesByPhotoCount } from './lib/templates'
 
 const STORAGE_KEY_CANVAS_BG_COLOR = 'canvasBgColor'
 const STORAGE_KEY_IMAGE_BG_COLOR = 'imageBgColor'
@@ -27,8 +29,9 @@ export type PhotoSlot = {
 
 class Store extends BaseStore {
   photos: Photo[] = []
-  selectedTemplateId: string = '2-t1b1'
+  selectedTemplateId: string = '4-grid'
   photoSlots: PhotoSlot[] = []
+  selectedPhotoCount: number = 4
 
   padding: number = 42
   spacing: number = 25
@@ -39,7 +42,7 @@ class Store extends BaseStore {
   canvasHeight: number = 1000
 
   canvasBgColor: string = '#ffffff'
-  imageBgColor: string = '#000000'
+  imageBgColor: string = '#808080'
 
   constructor() {
     super()
@@ -97,6 +100,15 @@ class Store extends BaseStore {
     }))
   }
 
+  setSelectedPhotoCount(count: number) {
+    this.selectedPhotoCount = count
+    const templates = getTemplatesByPhotoCount(count)
+    if (templates.length > 0) {
+      const firstTemplate = templates[0]
+      this.setTemplate(firstTemplate.id, firstTemplate.areas)
+    }
+  }
+
   setPadding(value: number) {
     this.padding = value
   }
@@ -133,6 +145,26 @@ class Store extends BaseStore {
     this.photos = []
     this.photoSlots.forEach((slot) => {
       slot.photoId = null
+    })
+  }
+
+  randomize() {
+    const assignedPhotoIds = this.photoSlots
+      .map((slot) => slot.photoId)
+      .filter((id): id is string => id !== null)
+
+    if (assignedPhotoIds.length <= 1) {
+      return
+    }
+
+    const shuffled = shuffle(assignedPhotoIds)
+
+    let shuffledIndex = 0
+    this.photoSlots.forEach((slot) => {
+      if (slot.photoId !== null) {
+        slot.photoId = shuffled[shuffledIndex]
+        shuffledIndex++
+      }
     })
   }
 }
