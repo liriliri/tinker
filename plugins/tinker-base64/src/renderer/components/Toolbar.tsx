@@ -13,7 +13,7 @@ import isStrBlank from 'licia/isStrBlank'
 import { tw } from 'share/theme'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import {
-  Toolbar as ToolbarRoot,
+  Toolbar,
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
@@ -21,7 +21,7 @@ import { ToolbarButton } from 'share/components/ToolbarButton'
 import Checkbox from 'share/components/Checkbox'
 import store from '../store'
 
-export default observer(function Toolbar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const { copied, copyToClipboard } = useCopyToClipboard()
 
@@ -53,7 +53,7 @@ export default observer(function Toolbar() {
   }
 
   return (
-    <ToolbarRoot className="justify-between">
+    <Toolbar className="justify-between">
       <div className="flex items-center gap-2">
         <ToolbarButton
           variant="toggle"
@@ -151,6 +151,6 @@ export default observer(function Toolbar() {
           </Checkbox>
         )}
       </div>
-    </ToolbarRoot>
+    </Toolbar>
   )
 })
