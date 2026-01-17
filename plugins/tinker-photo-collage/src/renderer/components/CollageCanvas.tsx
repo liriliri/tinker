@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useRef, useEffect, useState } from 'react'
+import { THEME_COLORS } from 'share/theme'
 import store from '../store'
 import { getTemplateById } from '../lib/templates'
 import PhotoSlot from './PhotoSlot'
@@ -10,6 +11,7 @@ const CollageCanvas = observer(() => {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.5)
+  const [isDragging, setIsDragging] = useState(false)
   const initialRowSizesRef = useRef<number[]>([])
   const initialColSizesRef = useRef<number[]>([])
 
@@ -71,6 +73,39 @@ const CollageCanvas = observer(() => {
         store.setColSize(index + 1, newSize2)
       }
     }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget === e.target) {
+      setIsDragging(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const files = Array.from(e.dataTransfer.files).filter((file) =>
+      file.type.startsWith('image/')
+    )
+
+    if (files.length === 0) return
+
+    store.addPhotos(files)
+
+    setTimeout(() => {
+      const actualNewPhotos = store.photos.slice(-files.length)
+      store.autoFillSlots(actualNewPhotos.map((p) => p.id))
+    }, 0)
   }
 
   useEffect(() => {
@@ -137,7 +172,10 @@ const CollageCanvas = observer(() => {
       : undefined,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    boxShadow: isDragging
+      ? `0 0 0 4px ${THEME_COLORS.primary}80, 0 25px 50px -12px rgba(0, 0, 0, 0.25)`
+      : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    transition: 'box-shadow 0.2s ease',
   }
 
   const wrapperStyle = {
@@ -194,6 +232,9 @@ const CollageCanvas = observer(() => {
     <div
       ref={containerRef}
       className="flex-1 flex items-center justify-center overflow-hidden p-8"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div style={wrapperStyle}>
         <div style={{ position: 'relative' }}>

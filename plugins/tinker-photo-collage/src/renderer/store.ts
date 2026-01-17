@@ -305,6 +305,15 @@ class Store extends BaseStore {
       }
     })
   }
+
+  autoFillSlots(photoIds: string[]) {
+    const emptySlots = this.photoSlots.filter((slot) => slot.photoId === null)
+    photoIds.forEach((photoId, index) => {
+      if (index < emptySlots.length) {
+        emptySlots[index].photoId = photoId
+      }
+    })
+  }
 }
 
 const store = new Store()
