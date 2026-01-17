@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { File } from 'lucide-react'
+import openFile from 'licia/openFile'
 import { tw } from 'share/theme'
 
 interface FileOpenProps {
@@ -17,21 +18,23 @@ const FileOpen: React.FC<FileOpenProps> = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false)
 
-  const handleClick = async () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.onchange = async (e: Event) => {
-      const target = e.target as HTMLInputElement
-      const file = target.files?.[0]
-      if (file) {
-        try {
-          await onOpenFile(file)
-        } catch (err) {
-          console.error('Failed to open file:', err)
-        }
-      }
+  const handleFileOpen = async (file: File) => {
+    try {
+      await onOpenFile(file)
+    } catch (err) {
+      console.error('Failed to open file:', err)
     }
-    input.click()
+  }
+
+  const handleClick = async () => {
+    try {
+      const files = await openFile()
+      if (files && files.length > 0) {
+        await handleFileOpen(files[0])
+      }
+    } catch (err) {
+      console.error('Failed to open file:', err)
+    }
   }
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -59,12 +62,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    const file = files[0]
-    try {
-      await onOpenFile(file)
-    } catch (err) {
-      console.error('Failed to open file:', err)
-    }
+    await handleFileOpen(files[0])
   }
 
   return (

@@ -18,7 +18,6 @@ export default observer(function DualEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleEditorWillMount = (monaco: Monaco) => {
-    // 禁用 TypeScript 和 JavaScript 的语法错误提示
     monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: true,
       noSyntaxValidation: true,
