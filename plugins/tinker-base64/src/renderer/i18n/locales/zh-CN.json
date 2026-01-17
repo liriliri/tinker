@@ -1,0 +1,19 @@
+{
+  "text": "文本",
+  "file": "文件",
+  "paste": "粘贴",
+  "clear": "清空",
+  "copy": "复制",
+  "encode": "编码",
+  "decode": "解码",
+  "decodeToFile": "解码为文件",
+  "inputPlaceholder": "输入要编码的文本或要解码的 Base64",
+  "outputPlaceholder": "结果显示在这里",
+  "fileDropTitle": "点击选择文件",
+  "fileSubtitle": "支持任意类型文件",
+  "fileOutputPlaceholder": "选择文件后会在此生成 Base64",
+  "encodeFailed": "文本编码失败",
+  "decodeFailed": "Base64 内容无效",
+  "clipboardFailed": "读取剪贴板失败",
+  "fileEncodeFailed": "文件编码失败"
+}

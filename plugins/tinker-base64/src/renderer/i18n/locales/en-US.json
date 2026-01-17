@@ -1,0 +1,19 @@
+{
+  "text": "Text",
+  "file": "File",
+  "paste": "Paste",
+  "clear": "Clear",
+  "copy": "Copy",
+  "encode": "Encode",
+  "decode": "Decode",
+  "decodeToFile": "Decode to file",
+  "inputPlaceholder": "Enter text to encode or Base64 to decode",
+  "outputPlaceholder": "Result will appear here",
+  "fileDropTitle": "Click to select a file",
+  "fileSubtitle": "Any file type supported",
+  "fileOutputPlaceholder": "Base64 output will appear here after selecting a file",
+  "encodeFailed": "Failed to encode text",
+  "decodeFailed": "Invalid Base64 input",
+  "clipboardFailed": "Failed to read clipboard",
+  "fileEncodeFailed": "Failed to encode file"
+}
