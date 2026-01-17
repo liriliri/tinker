@@ -35,7 +35,9 @@ export default observer(function DualPanel() {
 
   const renderFileMode = () => (
     <div className="flex-1 flex overflow-hidden">
-      <div className={`w-1/2 min-w-[260px] flex flex-col border-r ${tw.border.both}`}>
+      <div
+        className={`w-1/2 min-w-[260px] flex flex-col border-r ${tw.border.both}`}
+      >
         <FileOpen
           onOpenFile={(file) => store.handleFile(file)}
           openTitle={t('fileDropTitle')}

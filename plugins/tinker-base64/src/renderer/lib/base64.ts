@@ -2,9 +2,7 @@ import base64 from 'licia/base64'
 import isDataUrl from 'licia/isDataUrl'
 import dataUrl from 'licia/dataUrl'
 
-export function arrayBufferToBase64(
-  buffer: ArrayBuffer | Uint8Array
-): string {
+export function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
   const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)
   const byteArray = Array.from(bytes)
   return base64.encode(byteArray)
