@@ -1,3 +1,9 @@
+## v0.9.0 (19 Jan 2026)
+
+* feat: search linux apps
+* feat: add photo collage
+* feat: add base64
+
 ## v0.8.0 (14 Jan 2026)
 
 * feat: add password manager
