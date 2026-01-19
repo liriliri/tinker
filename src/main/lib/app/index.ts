@@ -1,7 +1,9 @@
 import { IpcGetApps, IpcOpenApp } from 'common/types'
 import singleton from 'licia/singleton'
 import isMac from 'licia/isMac'
+import isWindows from 'licia/isWindows'
 import { getApps as getMacApps } from './mac'
+import { getApps as getLinuxApps } from './linux'
 import { handleEvent } from 'share/main/lib/util'
 import fs from 'fs-extra'
 import { getUserDataPath } from 'share/main/lib/util'
@@ -16,14 +18,18 @@ fs.exists(getUserDataPath('data/cache/icons'), function (exists) {
 const getApps: IpcGetApps = singleton(async (force = false) => {
   if (isMac) {
     return getMacApps(force)
+  } else if (isWindows) {
+    return []
   }
 
-  return []
+  return getLinuxApps(force)
 })
 
 const openApp: IpcOpenApp = async (path) => {
   if (isMac) {
     exec(`open "${path}"`)
+  } else if (!isWindows) {
+    exec(path)
   }
 }
 
