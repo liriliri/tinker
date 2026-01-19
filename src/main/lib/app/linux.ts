@@ -28,17 +28,17 @@ const APP_PATHS = [
 const ICON_THEMES: string[] = []
 
 const ICON_SIZES = [
-  '24x24',
-  '48x48',
   'scalable',
   '128x128',
   '256x256',
   '512x512',
-  '24',
-  '48',
+  '48x48',
+  '24x24',
   '128',
   '256',
   '512',
+  '48',
+  '24',
 ]
 const ICON_TYPES = [
   'apps',
@@ -124,12 +124,17 @@ export const getApps: IpcGetApps = async (force = false) => {
   }
 
   const appList: IApp[] = []
+  const appPromises: Promise<void>[] = []
   for (let i = 0, len = desktopFileList.length; i < len; i++) {
-    const app = await parseDesktopFile(desktopFileList[i])
-    if (app) {
-      appList.push(app)
-    }
+    appPromises.push(
+      parseDesktopFile(desktopFileList[i]).then((app) => {
+        if (app) {
+          appList.push(app)
+        }
+      })
+    )
   }
+  await Promise.all(appPromises)
 
   apps = unique(appList, (a, b) => a.path === b.path)
   return apps
