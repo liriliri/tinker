@@ -35,8 +35,12 @@ import { exec } from 'child_process'
 import log from 'share/common/log'
 import mime from 'mime'
 import { getClipboardFilePaths } from './clipboard'
+import { getSettingsStore } from './store'
 
 const logger = log('plugin')
+
+const settingsStore = getSettingsStore()
+const customTitlebar = !settingsStore.get('useNativeTitlebar')
 
 const plugins: types.PlainObj<IPlugin> = {}
 
@@ -279,7 +283,10 @@ export const detachPlugin: IpcDetachPlugin = async function (id) {
   }
   win.contentView.removeChildView(view)
   const newWin = pluginWin.showWin(plugin)
-  newWin.setTitle(view.webContents.getTitle())
+  newWin.on('ready-to-show', () => {
+    const title = view.webContents.getTitle()
+    newWin.webContents.send('updatePluginTitle', title)
+  })
   newWin.contentView.addChildView(view)
   pluginViews[id].win = newWin
   layoutPlugin(id)
@@ -297,13 +304,16 @@ export function layoutPlugin(id: string) {
   const { view, win } = pluginViews[id]
 
   let titleBarHeight = 50
-  const bounds = win.contentView.getBounds()
   if (win !== window.getWin('main')) {
-    titleBarHeight = 31
-    if (isMac) {
-      titleBarHeight = 28
+    titleBarHeight = 0
+    if (customTitlebar) {
+      titleBarHeight = 31
+      if (isMac) {
+        titleBarHeight = 28
+      }
     }
   }
+  const bounds = win.contentView.getBounds()
   view.setBounds({
     x: bounds.x,
     y: bounds.y + titleBarHeight,
