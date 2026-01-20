@@ -61,7 +61,7 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
     </tr>
     <tr>
       <th>Image Cropper</th>
-      <th>JSON Eidtor</th>
+      <th>JSON Editor</th>
     </tr>
     <tr>
       <th><img src="https://tinker.liriliri.io/image_cropper.png"/></th>
