@@ -14,6 +14,7 @@ export const shareDeps = [
   'use-sync-external-store/shim',
   'mobx',
   'mobx-react-lite',
+  'mathjs',
 ]
 
 const globals = {
@@ -24,6 +25,7 @@ const globals = {
   'use-sync-external-store/shim': 'UseSyncExternalStoreShim',
   mobx: 'mobx',
   'mobx-react-lite': 'mobxReactLite',
+  mathjs: 'mathjs',
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -108,6 +110,10 @@ export default defineConfig(({ mode }) => {
         'use-sync-external-store/shim': 'UseSyncExternalStoreShim',
       }
     )
+  }
+
+  if (target === 'mathjs') {
+    return createConfig('mathjs', 'mathjs.ts', 'PluginVendorMathjs')
   }
 
   return createConfig('react', 'react.ts', 'PluginVendorReact')
