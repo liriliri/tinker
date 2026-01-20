@@ -6,7 +6,8 @@ import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { tw } from 'share/theme'
 import store from './store'
-import { Sidebar, Editor } from './components'
+import Sidebar from './components/Sidebar'
+import Editor from './components/Editor'
 
 export default observer(function App() {
   const { i18n } = useTranslation()

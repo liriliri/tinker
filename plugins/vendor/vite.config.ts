@@ -15,6 +15,7 @@ export const shareDeps = [
   'mobx',
   'mobx-react-lite',
   'mathjs',
+  '@monaco-editor/react',
 ]
 
 const globals = {
@@ -26,6 +27,7 @@ const globals = {
   mobx: 'mobx',
   'mobx-react-lite': 'mobxReactLite',
   mathjs: 'mathjs',
+  '@monaco-editor/react': 'MonacoEditorReact',
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -65,15 +67,32 @@ function createConfig(
   entry: string,
   globalsName: string,
   external: string[] = [],
-  globals: Record<string, string> = {}
+  outDir = 'dist'
 ): UserConfig {
+  const _globals: Record<string, string> = {}
+  for (const ext of external) {
+    if (globals[ext]) {
+      _globals[ext] = globals[ext]
+    }
+  }
+
   return {
     root: __dirname,
     define: {
       'process.env.NODE_ENV': JSON.stringify('production'),
     },
+    worker: {
+      format: 'es',
+      rollupOptions: {
+        output: {
+          entryFileNames: '[name].js',
+          chunkFileNames: '[name].js',
+          assetFileNames: '[name][extname]',
+        },
+      },
+    },
     build: {
-      outDir: 'dist',
+      outDir,
       emptyOutDir: false,
       lib: {
         entry: path.resolve(__dirname, entry),
@@ -85,7 +104,9 @@ function createConfig(
         external,
         output: {
           chunkFileNames: '[name].js',
-          globals,
+          entryFileNames: '[name].js',
+          assetFileNames: '[name][extname]',
+          globals: _globals,
         },
       },
     },
@@ -99,21 +120,25 @@ export default defineConfig(({ mode }) => {
   const target = process.env.VENDOR_TARGET || mode || 'react'
 
   if (target === 'mobx') {
-    return createConfig(
-      'mobx',
-      'mobx.ts',
-      'PluginVendorMobx',
-      ['react', 'react-dom', 'use-sync-external-store/shim'],
-      {
-        react: 'React',
-        'react-dom': 'ReactDOM',
-        'use-sync-external-store/shim': 'UseSyncExternalStoreShim',
-      }
-    )
+    return createConfig('mobx', 'mobx.ts', 'PluginVendorMobx', [
+      'react',
+      'react-dom',
+      'use-sync-external-store/shim',
+    ])
   }
 
   if (target === 'mathjs') {
     return createConfig('mathjs', 'mathjs.ts', 'PluginVendorMathjs')
+  }
+
+  if (target === 'monaco') {
+    return createConfig(
+      'monaco',
+      'monaco.ts',
+      'PluginVendorMonaco',
+      ['react'],
+      'dist/monaco'
+    )
   }
 
   return createConfig('react', 'react.ts', 'PluginVendorReact')

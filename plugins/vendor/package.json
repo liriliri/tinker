@@ -1,9 +1,10 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:monaco",
     "build:react": "VENDOR_TARGET=react vite build --config vite.config.ts",
     "build:mobx": "VENDOR_TARGET=mobx vite build --config vite.config.ts",
-    "build:mathjs": "VENDOR_TARGET=mathjs vite build --config vite.config.ts"
+    "build:mathjs": "VENDOR_TARGET=mathjs vite build --config vite.config.ts",
+    "build:monaco": "VENDOR_TARGET=monaco vite build --config vite.config.ts"
   }
 }

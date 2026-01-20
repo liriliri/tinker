@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import MonacoEditor, { Monaco } from '@monaco-editor/react'
+import { Monaco, Editor as MonacoEditor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import debounce from 'licia/debounce'
