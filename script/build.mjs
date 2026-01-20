@@ -3,6 +3,7 @@ import path from 'path'
 import contain from 'licia/contain.js'
 import isMac from 'licia/isMac.js'
 import each from 'licia/each.js'
+import { endWith } from 'licia'
 
 const pkg = await fs.readJson('package.json')
 const electron = pkg.devDependencies.electron
@@ -35,27 +36,51 @@ await fs.remove('dist/plugins')
 const files = await fs.readdir('plugins', { withFileTypes: true })
 for (let i = 0, len = files.length; i < len; i++) {
   const file = files[i]
-  if (file.isDirectory() && startWith(file.name, 'tinker-')) {
-    const pkg = await fs.readJson('plugins/' + file.name + '/package.json')
-    if (pkg.embedded === false) {
-      continue
+  if (file.isDirectory()) {
+    if (startWith(file.name, 'tinker-')) {
+      const pkg = await fs.readJson('plugins/' + file.name + '/package.json')
+      if (pkg.embedded === false) {
+        continue
+      }
+      await fs.copy('plugins/' + file.name, 'dist/plugins/' + file.name, {
+        filter(src) {
+          const basename = path.basename(src)
+
+          if (
+            contain(
+              [
+                'node_modules',
+                'src',
+                'references',
+                'tailwind.config.js',
+                '.claude',
+                '.DS_Store',
+              ],
+              basename
+            )
+          ) {
+            return false
+          }
+
+          return true
+        },
+      })
+    } else if (file.name === 'vendor') {
+      await fs.copy('plugins/vendor', 'dist/plugins/vendor', {
+        filter(src) {
+          const basename = path.basename(src)
+
+          if (contain(['vite.config.ts', '.DS_Store'], basename)) {
+            return false
+          }
+          if (endWith(basename, '.ts')) {
+            return false
+          }
+
+          return true
+        },
+      })
     }
-    await fs.copy('plugins/' + file.name, 'dist/plugins/' + file.name, {
-      filter(src) {
-        const basename = path.basename(src)
-
-        if (
-          contain(
-            ['node_modules', 'src', 'references', 'tailwind.config.js'],
-            basename
-          )
-        ) {
-          return false
-        }
-
-        return true
-      },
-    })
   }
 }
 

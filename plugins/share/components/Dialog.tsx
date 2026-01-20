@@ -53,7 +53,11 @@ export default function Dialog({
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel
-                className={`max-h-[90vh] flex flex-col transform rounded-lg ${tw.bg.light.primary} ${tw.bg.dark.secondary} shadow-xl transition-all ${className || 'w-full max-w-md'}`}
+                className={`max-h-[90vh] flex flex-col transform rounded-lg ${
+                  tw.bg.light.primary
+                } ${tw.bg.dark.secondary} shadow-xl transition-all ${
+                  className || 'w-full max-w-md'
+                }`}
               >
                 <div className="p-6 pb-0 flex-shrink-0">
                   {title && !showCloseIcon && (

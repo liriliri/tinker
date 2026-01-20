@@ -31,10 +31,13 @@ export function confirm(options: ConfirmOptions): Promise<boolean> {
 
 interface ConfirmProviderProps {
   children: React.ReactNode
-  locale?: string 
+  locale?: string
 }
 
-export function ConfirmProvider({ children, locale = 'en-US' }: ConfirmProviderProps) {
+export function ConfirmProvider({
+  children,
+  locale = 'en-US',
+}: ConfirmProviderProps) {
   const [confirmState, setConfirmState] = useState<ConfirmOptions | null>(null)
   const [resolver, setResolver] = useState<((value: boolean) => void) | null>(
     null
@@ -67,13 +70,11 @@ export function ConfirmProvider({ children, locale = 'en-US' }: ConfirmProviderP
     <>
       {children}
       {confirmState && (
-        <Dialog
-          open={true}
-          onClose={handleCancel}
-          title={confirmState.title}
-        >
+        <Dialog open={true} onClose={handleCancel} title={confirmState.title}>
           {confirmState.message && (
-            <p className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-6`}>
+            <p
+              className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-6`}
+            >
               {confirmState.message}
             </p>
           )}
@@ -88,7 +89,8 @@ export function ConfirmProvider({ children, locale = 'en-US' }: ConfirmProviderP
               className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}
               onClick={handleConfirm}
             >
-              {confirmState.confirmText || BUILT_IN_TRANSLATIONS[locale].confirm}
+              {confirmState.confirmText ||
+                BUILT_IN_TRANSLATIONS[locale].confirm}
             </button>
           </div>
         </Dialog>

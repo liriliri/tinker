@@ -413,40 +413,64 @@ export function init() {
     }
   })
 
-  session
-    .fromPartition(PLUGIN_PARTITION)
-    .protocol.handle('plugin', async (request) => {
-      const urlObj = new URL(request.url)
-      const pluginId = urlObj.host
-      let pathname = urlObj.pathname
+  const pluginSession = session.fromPartition(PLUGIN_PARTITION)
+  pluginSession.protocol.handle('plugin', async (request) => {
+    const urlObj = new URL(request.url)
+    const pluginId = urlObj.host
+    let pathname = urlObj.pathname
 
-      const prefix = `/plugin://${pluginId}/`
-      if (pathname.startsWith(prefix)) {
-        pathname = pathname.slice(prefix.length - 1)
+    const prefix = `/plugin://${pluginId}/`
+    if (pathname.startsWith(prefix)) {
+      pathname = pathname.slice(prefix.length - 1)
+    }
+
+    const plugin = plugins[pluginId]
+
+    let filePath = path.join(plugin.root, pathname)
+    if (await fs.pathExists(filePath)) {
+      const stat = await fs.stat(filePath)
+      if (stat.isDirectory()) {
+        filePath = path.join(filePath, 'index.html')
       }
+    } else if (plugin.historyApiFallback) {
+      filePath = path.join(plugin.root, 'index.html')
+    }
 
-      const plugin = plugins[pluginId]
+    if (!(await fs.pathExists(filePath))) {
+      return new Response('Not Found', { status: 404 })
+    }
 
-      let filePath = path.join(plugin.root, pathname)
-      if (await fs.pathExists(filePath)) {
-        const stat = await fs.stat(filePath)
-        if (stat.isDirectory()) {
-          filePath = path.join(filePath, 'index.html')
-        }
-      } else if (plugin.historyApiFallback) {
-        filePath = path.join(plugin.root, 'index.html')
-      }
+    const type = mime.getType(filePath) || 'application/octet-stream'
+    const nodeStream = fs.createReadStream(filePath)
+    const webStream = nodeStreamToWeb(nodeStream)
 
-      if (!(await fs.pathExists(filePath))) {
-        return new Response('Not Found', { status: 404 })
-      }
-
-      const type = mime.getType(filePath) || 'application/octet-stream'
-      const nodeStream = fs.createReadStream(filePath)
-      const webStream = nodeStreamToWeb(nodeStream)
-
-      return new Response(webStream, {
-        headers: { 'Content-Type': type },
-      })
+    return new Response(webStream, {
+      headers: { 'Content-Type': type },
     })
+  })
+
+  pluginSession.protocol.handle('tinker', async (request) => {
+    const urlObj = new URL(request.url)
+    if (urlObj.host !== 'vendor') {
+      return new Response('Not Found', { status: 404 })
+    }
+
+    const filePath = path.join(
+      getBuiltinPluginDir(),
+      urlObj.host,
+      'dist',
+      path.basename(urlObj.pathname)
+    )
+    if (!(await fs.pathExists(filePath))) {
+      return new Response('Not Found', { status: 404 })
+    }
+
+    const type = mime.getType(filePath) || 'application/octet-stream'
+    const nodeStream = fs.createReadStream(filePath)
+    const webStream = nodeStreamToWeb(nodeStream)
+
+    return new Response(webStream, {
+      headers: { 'Content-Type': type },
+    })
+  })
 }

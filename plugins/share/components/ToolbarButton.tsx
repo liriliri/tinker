@@ -1,8 +1,7 @@
 import { ReactNode, ButtonHTMLAttributes } from 'react'
 import { tw } from '../theme'
 
-interface ToolbarButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
   variant?: 'action' | 'toggle'
   active?: boolean

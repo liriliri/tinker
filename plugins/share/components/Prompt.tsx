@@ -38,7 +38,10 @@ interface PromptProviderProps {
   locale?: string
 }
 
-export function PromptProvider({ children, locale = 'en-US' }: PromptProviderProps) {
+export function PromptProvider({
+  children,
+  locale = 'en-US',
+}: PromptProviderProps) {
   const [promptState, setPromptState] = useState<PromptOptions | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [resolver, setResolver] = useState<
@@ -82,13 +85,11 @@ export function PromptProvider({ children, locale = 'en-US' }: PromptProviderPro
     <>
       {children}
       {promptState && (
-        <Dialog
-          open={true}
-          onClose={handleCancel}
-          title={promptState.title}
-        >
+        <Dialog open={true} onClose={handleCancel} title={promptState.title}>
           {promptState.message && (
-            <p className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-3`}>
+            <p
+              className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-3`}
+            >
               {promptState.message}
             </p>
           )}

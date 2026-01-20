@@ -53,7 +53,9 @@ const ImageOpen: React.FC<ImageOpenProps> = ({
           strokeWidth={1.5}
         />
 
-        <p className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}>
+        <p
+          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}
+        >
           {openTitle}
         </p>
         <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">

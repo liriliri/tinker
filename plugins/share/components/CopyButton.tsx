@@ -43,7 +43,8 @@ export default function CopyButton({
   }
 
   // Apply primary color to button when copied (for toolbar variant)
-  const buttonColorClass = variant === 'toolbar' && copied ? tw.primary.text : ''
+  const buttonColorClass =
+    variant === 'toolbar' && copied ? tw.primary.text : ''
 
   return (
     <button

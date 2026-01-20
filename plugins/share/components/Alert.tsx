@@ -31,7 +31,10 @@ interface AlertProviderProps {
   locale?: string
 }
 
-export function AlertProvider({ children, locale = 'en-US' }: AlertProviderProps) {
+export function AlertProvider({
+  children,
+  locale = 'en-US',
+}: AlertProviderProps) {
   const [alertState, setAlertState] = useState<AlertOptions | null>(null)
   const [resolver, setResolver] = useState<(() => void) | null>(null)
 
@@ -54,13 +57,11 @@ export function AlertProvider({ children, locale = 'en-US' }: AlertProviderProps
     <>
       {children}
       {alertState && (
-        <Dialog
-          open={true}
-          onClose={handleClose}
-          title={alertState.title}
-        >
+        <Dialog open={true} onClose={handleClose} title={alertState.title}>
           {alertState.message && (
-            <p className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-6`}>
+            <p
+              className={`text-sm ${tw.text.light.secondary} ${tw.text.dark.secondary} mb-6`}
+            >
               {alertState.message}
             </p>
           )}

@@ -1,0 +1,8 @@
+{
+  "name": "plugin-vendor",
+  "scripts": {
+    "build": "npm run build:react && npm run build:mobx",
+    "build:react": "VENDOR_TARGET=react vite build --config vite.config.ts",
+    "build:mobx": "VENDOR_TARGET=mobx vite build --config vite.config.ts"
+  }
+}

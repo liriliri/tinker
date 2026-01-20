@@ -2,6 +2,7 @@ import { defineConfig, UserConfig } from 'vite'
 import path from 'path'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
+import { shareDeps, globalsExternalPlugin } from './vendor/vite.config'
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const cwd = process.cwd()
@@ -11,7 +12,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
   return {
     root: cwd,
     base: '',
-    plugins: [react(), svgr()],
+    plugins: [react(), svgr(), globalsExternalPlugin()],
     build: {
       outDir: path.dirname(pkg.tinker.main),
       rollupOptions: {
@@ -42,6 +43,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     optimizeDeps: {
       include: ['shiki'],
+      exclude: shareDeps,
     },
   }
 })

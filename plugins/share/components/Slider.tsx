@@ -9,7 +9,13 @@ interface SliderProps {
   disabled?: boolean
 }
 
-const Slider = ({ value, min, max, onChange, disabled = false }: SliderProps) => {
+const Slider = ({
+  value,
+  min,
+  max,
+  onChange,
+  disabled = false,
+}: SliderProps) => {
   const [isDragging, setIsDragging] = useState(false)
   const trackRef = useRef<HTMLDivElement>(null)
 
@@ -67,9 +73,13 @@ const Slider = ({ value, min, max, onChange, disabled = false }: SliderProps) =>
         style={{ width: `${percentage}%` }}
       />
       <div
-        className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full ${tw.primary.bg} border-2 ${tw.bg.both.primary} shadow-md transition-transform ${
+        className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full ${
+          tw.primary.bg
+        } border-2 ${tw.bg.both.primary} shadow-md transition-transform ${
           isDragging ? 'scale-110' : 'hover:scale-110'
-        } ${disabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'}`}
+        } ${
+          disabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
+        }`}
         style={{ left: `calc(${percentage}% - 8px)` }}
       />
     </div>
