@@ -6,5 +6,10 @@
     "build:mobx": "VENDOR_TARGET=mobx vite build --config vite.config.ts",
     "build:mathjs": "VENDOR_TARGET=mathjs vite build --config vite.config.ts",
     "build:monaco": "VENDOR_TARGET=monaco vite build --config vite.config.ts"
+  },
+  "devDependencies": {
+    "mathjs": "^15.1.0",
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "^0.55.1"
   }
 }

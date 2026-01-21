@@ -15,8 +15,5 @@
         "name": "计算稿纸"
       }
     }
-  },
-  "devDependencies": {
-    "mathjs": "^15.1.0"
   }
 }

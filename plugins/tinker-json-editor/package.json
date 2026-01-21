@@ -22,9 +22,7 @@
     }
   },
   "devDependencies": {
-    "@monaco-editor/react": "^4.7.0",
     "@types/jsoneditor": "^9.9.6",
-    "jsoneditor": "^10.4.2",
-    "monaco-editor": "^0.55.1"
+    "jsoneditor": "^10.4.2"
   }
 }

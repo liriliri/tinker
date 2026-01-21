@@ -22,8 +22,6 @@
     }
   },
   "devDependencies": {
-    "@monaco-editor/react": "^4.7.0",
-    "monaco-editor": "^0.55.1",
     "vditor": "^3.11.2"
   }
 }

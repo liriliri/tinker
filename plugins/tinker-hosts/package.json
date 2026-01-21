@@ -20,8 +20,5 @@
         "name": "Hosts 切换"
       }
     }
-  },
-  "devDependencies": {
-    "@monaco-editor/react": "^4.7.0"
   }
 }

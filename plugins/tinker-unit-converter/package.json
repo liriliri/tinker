@@ -15,8 +15,5 @@
         "name": "单位换算"
       }
     }
-  },
-  "devDependencies": {
-    "mathjs": "^15.1.0"
   }
 }
