@@ -15,6 +15,8 @@ export type KeyAction =
   | 'memoryRecall'
   | 'toggleSecond'
   | 'toggleDegree'
+  | 'random'
+  | 'backspace'
 
 export type KeyKind = 'number' | 'operator' | 'function' | 'control' | 'memory'
 
@@ -107,21 +109,21 @@ export const KEY_ROWS: KeyConfig[][] = [
     },
     {
       id: 'sqrt',
-      label: 'sqrt',
+      label: '2√x',
       action: 'wrap',
       value: 'sqrt',
       kind: 'function',
     },
     {
       id: 'cbrt',
-      label: 'cbrt',
+      label: '3√x',
       action: 'wrap',
       value: 'cbrt',
       kind: 'function',
     },
     {
       id: 'nthRoot',
-      label: 'yroot',
+      label: 'y√x',
       action: 'append',
       value: 'nthRoot(',
       kind: 'function',
@@ -241,7 +243,7 @@ export const KEY_ROWS: KeyConfig[][] = [
     },
     {
       id: 'pi',
-      label: 'pi',
+      label: 'π',
       action: 'constant',
       value: 'pi',
       kind: 'function',
@@ -249,8 +251,7 @@ export const KEY_ROWS: KeyConfig[][] = [
     {
       id: 'rand',
       label: 'Rand',
-      action: 'append',
-      value: 'random()',
+      action: 'random',
       kind: 'function',
     },
     {

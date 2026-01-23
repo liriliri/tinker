@@ -15,7 +15,8 @@ export default observer(function Display() {
         {store.preview}
       </div>
       <div
-        className={`mt-2 text-right text-4xl md:text-5xl font-semibold tabular-nums break-all ${tw.text.both.primary}`}
+        className={`mt-2 text-right text-3xl md:text-4xl font-semibold tabular-nums truncate ${tw.text.both.primary}`}
+        title={displayText}
       >
         {displayText}
       </div>

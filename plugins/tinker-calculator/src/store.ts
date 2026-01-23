@@ -24,6 +24,11 @@ class Store extends BaseStore {
   isDegree = false
   hasError = false
   justEvaluated = false
+  lastRandomValue: string | null = null
+
+  get isBackspaceActive() {
+    return !this.justEvaluated && !this.hasError && this.expression.length > 0
+  }
 
   constructor() {
     super()
@@ -54,11 +59,15 @@ class Store extends BaseStore {
     this.preview = ''
     this.hasError = false
     this.justEvaluated = false
+    this.lastRandomValue = null
   }
 
-  private updateExpression(value: string) {
+  private updateExpression(value: string, keepRandom = false) {
     this.expression = value
     this.displayValue = value || '0'
+    if (!keepRandom) {
+      this.lastRandomValue = null
+    }
   }
 
   private startNewEntry() {
@@ -67,6 +76,7 @@ class Store extends BaseStore {
     this.expression = ''
     this.displayValue = '0'
     this.justEvaluated = false
+    this.lastRandomValue = null
   }
 
   private getLastValueRange() {
@@ -175,6 +185,46 @@ class Store extends BaseStore {
     this.appendToken(constant)
   }
 
+  insertRandom() {
+    if (this.hasError) this.resetInput()
+    this.startNewEntry()
+    const randomValue = formatResult(Number(Math.random().toFixed(8)))
+    const range = this.getLastValueRange()
+    const lastValue =
+      range && range.start >= 0 && range.end >= 0
+        ? this.expression.slice(range.start, range.end)
+        : null
+
+    const needsMultiply = (before: string) => /[0-9a-zA-Z)!]$/.test(before)
+
+    if (range && lastValue === this.lastRandomValue) {
+      const before = this.expression.slice(0, range.start)
+      const after = this.expression.slice(range.end)
+      const multiplier = needsMultiply(before) ? '*' : ''
+      this.updateExpression(
+        `${before}${multiplier}${randomValue}${after}`,
+        true
+      )
+    } else {
+      const multiplier = needsMultiply(this.expression) ? '*' : ''
+      this.updateExpression(
+        `${this.expression}${multiplier}${randomValue}`,
+        true
+      )
+    }
+
+    this.lastRandomValue = randomValue
+  }
+
+  backspace() {
+    if (this.hasError || this.justEvaluated || this.expression.length === 0) {
+      this.clearAll()
+      return
+    }
+    const next = this.expression.slice(0, -1)
+    this.updateExpression(next)
+  }
+
   toggleSign() {
     if (this.hasError) this.resetInput()
     const updated = this.replaceLastValue((value) => {
@@ -268,6 +318,7 @@ class Store extends BaseStore {
       this.expression = result
       this.justEvaluated = true
       this.hasError = false
+      this.lastRandomValue = null
       this.persistState()
     } catch {
       this.hasError = true

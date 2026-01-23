@@ -5,20 +5,23 @@ import { tw } from 'share/theme'
 import store from '../store'
 import { KEY_ROWS, KeyConfig, KeyKind } from '../lib/keys'
 
+const DEFAULT_TEXT_SIZE = 'text-xs md:text-sm'
+
 const KIND_CLASSES: Record<KeyKind, string> = {
-  number: tw.text.both.primary,
-  operator: tw.text.both.primary,
-  function: tw.text.both.primary,
-  control: tw.text.both.primary,
-  memory: tw.text.both.primary,
+  number: `text-lg md:text-xl ${tw.text.both.primary}`,
+  operator: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
+  function: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
+  control: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
+  memory: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
 }
 
 const BASE_BUTTON =
-  'h-11 md:h-12 rounded-full text-xs md:text-sm font-semibold transition-colors flex items-center justify-center'
+  'h-11 md:h-12 rounded-full font-semibold transition-colors flex items-center justify-center'
 const OPERATOR_ICON_SIZE = 18
-const LEFT_KEY_STYLE = `${tw.bg.both.primary} ${tw.hover.both}`
-const NUMBER_KEY_STYLE = `${tw.bg.both.tertiary} ${tw.hover.both}`
-const OPERATOR_KEY_STYLE = `${tw.primary.bg} ${tw.primary.bgHover}`
+const ACTIVE_FEEDBACK_STYLE = 'active:bg-gray-200 dark:active:bg-[#3a3a3c]'
+const LEFT_KEY_STYLE = `${tw.bg.both.primary} ${ACTIVE_FEEDBACK_STYLE}`
+const NUMBER_KEY_STYLE = `${tw.bg.both.tertiary} ${ACTIVE_FEEDBACK_STYLE}`
+const OPERATOR_KEY_STYLE = `${tw.primary.bg} active:bg-[#0da84f]`
 
 const EqualIcon = (
   <span className="flex flex-col items-center justify-center gap-[3px]">
@@ -35,7 +38,10 @@ const OPERATOR_ICONS: Record<string, ReactNode> = {
   equal: EqualIcon,
 }
 
-const getKeyLabel = (key: KeyConfig) => {
+const getKeyLabelText = (key: KeyConfig) => {
+  if (key.id === 'ac') {
+    return store.isBackspaceActive ? '⌫' : 'AC'
+  }
   if (key.id === 'toggleDegree') {
     return store.isDegree ? 'Deg' : 'Rad'
   }
@@ -45,7 +51,41 @@ const getKeyLabel = (key: KeyConfig) => {
   return key.label
 }
 
+const renderFormattedLabel = (label: string) => {
+  if (label === 'log10') {
+    return (
+      <span className="inline-flex items-end leading-none">
+        <span>log</span>
+        <sub className="text-[10px] md:text-[11px] leading-none ml-[1px]">
+          10
+        </sub>
+      </span>
+    )
+  }
+
+  if (!label.includes('^')) {
+    return label
+  }
+
+  const [base, exponent] = label.split('^')
+
+  return (
+    <span className="inline-flex items-start gap-[2px] leading-none">
+      <span>{base}</span>
+      <i className="text-[9px] md:text-[10px] leading-none align-super not-italic relative -top-[2px]">
+        {exponent}
+      </i>
+    </span>
+  )
+}
+
 const getKeyAction = (key: KeyConfig) => {
+  if (key.id === 'ac') {
+    return {
+      action: store.isBackspaceActive ? 'backspace' : 'clear',
+      value: undefined,
+    }
+  }
   if (store.isSecond && key.altAction) {
     return { action: key.altAction, value: key.altValue }
   }
@@ -72,6 +112,9 @@ export default observer(function Keypad() {
       case 'clear':
         store.clearAll()
         break
+      case 'backspace':
+        store.backspace()
+        break
       case 'toggleSign':
         store.toggleSign()
         break
@@ -86,6 +129,9 @@ export default observer(function Keypad() {
         break
       case 'constant':
         store.insertConstant(value as string)
+        break
+      case 'random':
+        store.insertRandom()
         break
       case 'memoryClear':
         store.memoryClear()
@@ -115,7 +161,8 @@ export default observer(function Keypad() {
       {KEY_ROWS.map((row) =>
         row.map((key, index) => {
           const kind = key.kind || 'number'
-          const label = getKeyLabel(key)
+          const labelText = getKeyLabelText(key)
+          const label = renderFormattedLabel(labelText)
           const isActive =
             (key.id === 'second' && store.isSecond) ||
             (key.id === 'toggleDegree' && store.isDegree)
@@ -135,7 +182,7 @@ export default observer(function Keypad() {
               } ${columnStyle} ${isActive ? tw.primary.border : ''}`}
               type="button"
               onClick={() => handleKeyPress(key)}
-              aria-label={label}
+              aria-label={labelText}
             >
               {icon || label}
             </button>
