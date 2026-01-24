@@ -128,7 +128,7 @@ export default observer(function Keypad() {
         store.appendToken(value as string)
         break
       case 'constant':
-        store.insertConstant(value as string)
+        store.appendToken(value as string)
         break
       case 'random':
         store.insertRandom()

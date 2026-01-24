@@ -181,10 +181,6 @@ class Store extends BaseStore {
     this.updateExpression(`${this.expression}${token}`)
   }
 
-  insertConstant(constant: string) {
-    this.appendToken(constant)
-  }
-
   insertRandom() {
     if (this.hasError) this.resetInput()
     this.startNewEntry()
