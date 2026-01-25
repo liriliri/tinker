@@ -147,6 +147,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/base64.png"/></th>
       <th><img src="https://tinker.liriliri.io/photo_collage.png"/></th>
     </tr>
+    <tr>
+      <th>Calculator</th>
+      <th>Voice Recorder</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/calculator.png"/></th>
+      <th><img src="https://tinker.liriliri.io/voice_recorder.png"/></th>
+    </tr>
   </tbody>
 </table>
 
