@@ -1,3 +1,9 @@
+## v0.10.0 (25 Jan 2026)
+
+* feat: search windows apps
+* feat: add calculator
+* feat: add voice recorder
+
 ## v0.9.0 (19 Jan 2026)
 
 * feat: search linux apps
