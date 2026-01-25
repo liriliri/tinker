@@ -10,6 +10,8 @@ builtins.push(
   'electron',
   'uiohook-napi',
   'node-mac-permissions',
+  'registry-js',
+  'file-icon',
   ...builtins.map((m) => `node:${m}`)
 )
 

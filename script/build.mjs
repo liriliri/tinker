@@ -2,6 +2,7 @@ import startWith from 'licia/startWith.js'
 import path from 'path'
 import contain from 'licia/contain.js'
 import isMac from 'licia/isMac.js'
+import isWindows from 'licia/isWindows.js'
 import each from 'licia/each.js'
 import { endWith } from 'licia'
 
@@ -11,14 +12,18 @@ delete pkg.devDependencies
 pkg.devDependencies = {
   electron,
 }
+const optionalDependencies = []
 if (isMac) {
-  each(['node-mac-permissions', 'file-icon'], (name) => {
-    if (!pkg.optionalDependencies[name]) {
-      return
-    }
-    pkg.dependencies[name] = pkg.optionalDependencies[name]
-  })
+  optionalDependencies.push('node-mac-permissions', 'file-icon')
+} else if (isWindows) {
+  optionalDependencies.push('registry-js', 'extract-file-icon')
 }
+each(optionalDependencies, (name) => {
+  if (!pkg.optionalDependencies[name]) {
+    return
+  }
+  pkg.dependencies[name] = pkg.optionalDependencies[name]
+})
 delete pkg.optionalDependencies
 delete pkg.scripts
 delete pkg.workspaces
