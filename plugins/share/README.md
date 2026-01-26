@@ -6,6 +6,7 @@ This directory contains shared components, utility classes, and hooks for the Ti
 
 ```
 share/
+├── base.scss            # Base styles (Tailwind + dark mode + toast)
 ├── BaseStore.ts         # MobX Store base class
 ├── theme.ts             # Unified theme configuration
 ├── components/          # Shared UI components
@@ -24,6 +25,22 @@ share/
 └── hooks/               # Shared React Hooks
     └── useCopyToClipboard.ts
 ```
+
+## Base Styles
+
+All plugins must import `share/base.scss` in their `index.scss`:
+
+```scss
+// Basic plugin: src/index.scss
+@use '../../share/base.scss';
+@config "../tailwind.config.js";
+
+// Advanced plugin: src/renderer/index.scss
+@use '../../../share/base.scss';
+@config "../../tailwind.config.js";
+```
+
+Includes: Tailwind CSS, dark mode support, toast CSS variables.
 
 ## Theme Configuration
 

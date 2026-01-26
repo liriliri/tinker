@@ -1,9 +1,5 @@
-@use 'tailwindcss';
+@use '../../../share/base.scss';
 @config "../../tailwind.config.js";
-
-html.dark {
-  color-scheme: dark;
-}
 
 /* react-hex-editor theme overrides for styled-components */
 .hex-editor {

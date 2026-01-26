@@ -1,9 +1,5 @@
-@use 'tailwindcss';
+@use '../../share/base.scss';
 @config "../tailwind.config.js";
-
-html.dark {
-  color-scheme: dark;
-}
 
 .code-editor-container::after {
   content: attr(data-value) ' ';
