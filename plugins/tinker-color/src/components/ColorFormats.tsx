@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import className from 'licia/className'
 import CopyButton from 'share/components/CopyButton'
 import { tw } from 'share/theme'
 import store from '../store'
@@ -86,7 +87,13 @@ function FormatRow({
         onBlur={handleBlur}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
-        className={`flex-1 px-4 py-2.5 border ${tw.border.both} rounded-lg ${tw.bg.both.input} ${tw.text.both.primary} font-mono text-sm focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+        className={className(
+          'flex-1 px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2',
+          tw.border.both,
+          tw.bg.both.input,
+          tw.text.both.primary,
+          tw.primary.focusRing
+        )}
       />
       <CopyButton text={cssValue} title={copyTitle} />
     </div>

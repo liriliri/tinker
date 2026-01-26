@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Divide, Minus, Plus, X } from 'lucide-react'
+import className from 'licia/className'
 import { tw } from 'share/theme'
 import store from '../store'
 import { KEY_ROWS, KeyConfig, KeyKind } from '../lib/keys'
@@ -177,9 +178,15 @@ export default observer(function Keypad() {
           return (
             <button
               key={key.id}
-              className={`${BASE_BUTTON} ${KIND_CLASSES[kind]} ${
-                key.wide ? 'col-span-2' : ''
-              } ${columnStyle} ${isActive ? tw.primary.border : ''}`}
+              className={className(
+                BASE_BUTTON,
+                KIND_CLASSES[kind],
+                columnStyle,
+                {
+                  'col-span-2': key.wide,
+                  [tw.primary.border]: isActive,
+                }
+              )}
               type="button"
               onClick={() => handleKeyPress(key)}
               aria-label={labelText}

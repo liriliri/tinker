@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import endWith from 'licia/endWith'
+import className from 'licia/className'
 import { tw } from 'share/theme'
 import MarkdownEditor from './components/MarkdownEditor'
 import MarkdownPreview from './components/MarkdownPreview'
@@ -56,11 +57,10 @@ export default observer(function App() {
         {/* Editor Panel */}
         {(store.viewMode === 'split' || store.viewMode === 'editor') && (
           <div
-            className={`${
-              store.viewMode === 'split'
-                ? `flex-1 min-w-0 border-r ${tw.border.both}`
-                : 'flex-1 min-w-0'
-            }`}
+            className={className(
+              'flex-1 min-w-0',
+              store.viewMode === 'split' && ['border-r', tw.border.both]
+            )}
           >
             <MarkdownEditor />
           </div>

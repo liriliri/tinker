@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Save, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import className from 'licia/className'
 import store from '../store'
 import Select from 'share/components/Select'
 import {
@@ -101,7 +102,14 @@ export default observer(function ToolbarComponent() {
           disabled={!store.isCustomSize}
           min="100"
           max="2000"
-          className={`w-16 text-xs px-2 py-1 ${tw.bg.light.input} ${tw.bg.dark.select} border ${tw.border.both} rounded focus:outline-none ${tw.primary.focusBorder} dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={className(
+            'w-16 text-xs px-2 py-1 border rounded focus:outline-none dark:text-gray-200',
+            tw.bg.light.input,
+            tw.bg.dark.select,
+            tw.border.both,
+            tw.primary.focusBorder,
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
         />
       </div>
 
@@ -160,7 +168,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         onClick={handleCopy}
         disabled={!store.text}
-        className={copied ? tw.primary.text : ''}
+        className={className(copied && tw.primary.text)}
         title={t('copy')}
       >
         {copied ? (

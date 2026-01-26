@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Clipboard, Eraser, Flag } from 'lucide-react'
+import className from 'licia/className'
 import {
   Toolbar,
   ToolbarSpacer,
@@ -49,13 +50,14 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
       <div
-        className={`text-xs mr-1 whitespace-nowrap ${
+        className={className(
+          'text-xs mr-1 whitespace-nowrap',
           store.error
             ? 'text-red-600 dark:text-red-400'
             : matchCount > 0
             ? 'text-green-600 dark:text-green-400'
             : 'text-gray-600 dark:text-gray-400'
-        }`}
+        )}
       >
         {matchText}
       </div>

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { List, Calendar, Star, CheckCircle2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
+import className from 'licia/className'
 import store, { FilterType } from '../store'
 import { tw } from 'share/theme'
 
@@ -64,11 +65,12 @@ export default observer(function Sidebar() {
             return (
               <button
                 key={category.id}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-sm ${
+                className={className(
+                  'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-sm',
                   isActive
-                    ? `${tw.primary.bg} text-white shadow-sm`
-                    : `${tw.hover.both} ${tw.text.both.primary}`
-                }`}
+                    ? [tw.primary.bg, 'text-white shadow-sm']
+                    : [tw.hover.both, tw.text.both.primary]
+                )}
                 onClick={() => store.setCurrentFilter(category.id)}
               >
                 <Icon size={16} />
@@ -76,9 +78,10 @@ export default observer(function Sidebar() {
                   {t(category.labelKey)}
                 </span>
                 <span
-                  className={`text-xs font-semibold tabular-nums min-w-[20px] text-right ${
+                  className={className(
+                    'text-xs font-semibold tabular-nums min-w-[20px] text-right',
                     isActive ? 'opacity-70' : tw.text.both.secondary
-                  }`}
+                  )}
                 >
                   {category.getCount()}
                 </span>

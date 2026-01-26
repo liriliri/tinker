@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { tw, THEME_COLORS } from 'share/theme'
+import className from 'licia/className'
 import type { PDFPageProxy } from 'pdfjs-dist'
 import { THUMBNAIL_WIDTH } from '../lib/constants'
 
@@ -146,13 +147,11 @@ export default function Thumbnail({
       aria-current={isActive ? 'page' : undefined}
     >
       <div
-        className={`
-          relative bg-white overflow-hidden rounded-lg transition-shadow
-          ${
-            !isActive &&
+        className={className(
+          'relative bg-white overflow-hidden rounded-lg transition-shadow',
+          !isActive &&
             'shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_1px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)] hover:shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_2px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)]'
-          }
-        `}
+        )}
         style={{
           width: dimensions.width,
           height: dimensions.height,

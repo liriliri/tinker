@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+import className from 'licia/className'
 import store, { shikiTheme } from '../store'
 
 export default observer(function CodeEditor() {
@@ -63,9 +64,9 @@ export default observer(function CodeEditor() {
 
   return (
     <div
-      className={`code-editor-container ${
-        showLineNumbers ? 'show-line-numbers' : ''
-      }`}
+      className={className('code-editor-container', {
+        'show-line-numbers': showLineNumbers,
+      })}
       data-value={store.code}
       style={{
         display: 'grid',

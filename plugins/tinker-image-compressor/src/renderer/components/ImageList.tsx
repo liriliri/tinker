@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import fileSize from 'licia/fileSize'
+import className from 'licia/className'
 import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
 import { MenuItemConstructorOptions } from 'electron'
@@ -123,11 +124,10 @@ export default observer(function ImageList() {
                         image.compressedSize >= image.originalSize
                       return (
                         <span
-                          className={`font-medium ${
-                            isLarger
-                              ? 'text-red-600 dark:text-red-400'
-                              : 'text-green-600 dark:text-green-400'
-                          }`}
+                          className={className('font-medium', {
+                            'text-red-600 dark:text-red-400': isLarger,
+                            'text-green-600 dark:text-green-400': !isLarger,
+                          })}
                         >
                           {isLarger ? '+' : ''}
                           {Math.abs(ratio).toFixed(1)}%

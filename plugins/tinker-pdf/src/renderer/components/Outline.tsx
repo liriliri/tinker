@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import className from 'licia/className'
 import store from '../store'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 
@@ -56,12 +57,12 @@ function OutlineNode({ item, level, onItemClick }: OutlineNodeProps) {
         )}
         {!hasChildren && <span className="w-5 flex-shrink-0" />}
         <span
-          className={`
-            text-sm truncate
-            ${tw.text.both.primary}
-            ${item.bold ? 'font-bold' : ''}
-            ${item.italic ? 'italic' : ''}
-          `}
+          className={className(
+            'text-sm truncate',
+            tw.text.both.primary,
+            item.bold && 'font-bold',
+            item.italic && 'italic'
+          )}
           title={item.title}
         >
           {item.title}

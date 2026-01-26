@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Check, Trash2, Calendar } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
+import className from 'licia/className'
 import store, { TodoItem as TodoItemType } from '../store'
 import { tw } from 'share/theme'
 
@@ -76,20 +77,22 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
 
   return (
     <div
-      className={`group ${tw.bg.both.tertiary} ${
-        tw.border.both
-      } border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${
-        todo.completed ? 'opacity-60' : ''
-      }`}
+      className={className(
+        'group border rounded-lg p-2 transition-all duration-200 hover:shadow-sm',
+        tw.bg.both.tertiary,
+        tw.border.both,
+        todo.completed && 'opacity-60'
+      )}
     >
       <div className="flex items-center gap-2.5">
         <button
           onClick={() => store.toggleTodo(todo.id)}
-          className={`flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
+          className={className(
+            'flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center',
             todo.completed
-              ? `${tw.primary.bg} ${tw.primary.border}`
-              : `${tw.border.both} ${tw.primary.hoverBorder}`
-          }`}
+              ? [tw.primary.bg, tw.primary.border]
+              : [tw.border.both, tw.primary.hoverBorder]
+          )}
         >
           {todo.completed && <Check size={12} className="text-white" />}
         </button>
@@ -97,11 +100,12 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3
-              className={`flex-1 text-sm font-medium ${
+              className={className(
+                'flex-1 text-sm font-medium',
                 todo.completed
-                  ? `line-through ${tw.text.both.secondary}`
+                  ? ['line-through', tw.text.both.secondary]
                   : tw.text.both.primary
-              }`}
+              )}
             >
               {todo.text}
             </h3>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Shuffle, Save, X, Copy, Check, Image, ImageOff } from 'lucide-react'
 import openFile from 'licia/openFile'
 import download from 'licia/download'
+import className from 'licia/className'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -157,7 +158,7 @@ export default observer(() => {
 
         <ToolbarButton
           onClick={handleCopy}
-          className={copied ? tw.primary.text : ''}
+          className={className(copied && tw.primary.text)}
           title={t('copyImage')}
         >
           {copied ? (

@@ -6,6 +6,7 @@ import { prompt } from 'share/components/Prompt'
 import { tw } from 'share/theme'
 import { FileText, Monitor, Plus } from 'lucide-react'
 import contain from 'licia/contain'
+import className from 'licia/className'
 import store from '../store'
 import { HostsConfig } from '../types'
 
@@ -94,9 +95,11 @@ export default observer(function Sidebar() {
     return (
       <div
         key={cfg.id}
-        className={`flex items-center gap-2 px-3 py-2 cursor-pointer ${
-          tw.hover.both
-        } ${isSelected ? `${tw.active.both}` : ''}`}
+        className={className(
+          'flex items-center gap-2 px-3 py-2 cursor-pointer',
+          tw.hover.both,
+          isSelected && tw.active.both
+        )}
         onClick={() => handleSelect(cfg.id)}
         onContextMenu={(e) => handleConfigContextMenu(e, cfg)}
       >
@@ -105,11 +108,12 @@ export default observer(function Sidebar() {
           {cfg.name}
         </span>
         <div
-          className={`w-3 h-3 rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors ${
+          className={className(
+            'w-3 h-3 rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors',
             isActive
-              ? `${tw.primary.border} ${tw.primary.bg}`
+              ? [tw.primary.border, tw.primary.bg]
               : 'border-gray-400 dark:border-gray-500'
-          }`}
+          )}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
             store.toggleActive(cfg.id)
@@ -125,9 +129,12 @@ export default observer(function Sidebar() {
     >
       {/* System Hosts - Fixed at top */}
       <div
-        className={`px-3 py-2 cursor-pointer ${tw.hover.both} border-b ${
-          tw.border.both
-        } flex-shrink-0 ${viewMode === 'system' ? `${tw.active.both}` : ''}`}
+        className={className(
+          'px-3 py-2 cursor-pointer border-b flex-shrink-0',
+          tw.hover.both,
+          tw.border.both,
+          viewMode === 'system' && tw.active.both
+        )}
         onClick={handleSystemView}
       >
         <div className="flex items-center gap-2">

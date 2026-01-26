@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Folder, ChevronRight, ChevronDown } from 'lucide-react'
 import { tw } from 'share/theme'
+import className from 'licia/className'
 import store, { KdbxGroup } from '../store'
 import { useState } from 'react'
 import { prompt } from 'share/components/Prompt'
@@ -107,9 +108,10 @@ const GroupItem = observer(function GroupItem({
       <div
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded ${
-          isSelected ? tw.primary.bg + ' text-white' : tw.hover.both
-        }`}
+        className={className(
+          'flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded',
+          isSelected ? [tw.primary.bg, 'text-white'] : tw.hover.both
+        )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         {hasChildren && (

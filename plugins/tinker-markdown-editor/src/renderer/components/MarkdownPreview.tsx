@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 import { tw } from 'share/theme'
+import className from 'licia/className'
 import store from '../store'
 
 export default observer(function MarkdownPreview() {
@@ -84,7 +85,10 @@ export default observer(function MarkdownPreview() {
     >
       <div
         ref={contentRef}
-        className={`vditor-reset ${store.isDark ? 'vditor-reset--dark' : ''}`}
+        className={className(
+          'vditor-reset',
+          store.isDark && 'vditor-reset--dark'
+        )}
       />
     </div>
   )

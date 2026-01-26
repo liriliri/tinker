@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { FolderOpen, Save, ListX, Info } from 'lucide-react'
 import { useState } from 'react'
 import fileSize from 'licia/fileSize'
+import className from 'licia/className'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'
@@ -141,11 +142,14 @@ export default observer(function ToolbarComponent() {
                       <div className="flex justify-between gap-4">
                         <span>{t('totalReduction')}:</span>
                         <span
-                          className={`font-medium ${
-                            store.totalCompressedSize >= store.totalOriginalSize
-                              ? 'text-red-600 dark:text-red-400'
-                              : 'text-green-600 dark:text-green-400'
-                          }`}
+                          className={className('font-medium', {
+                            'text-red-600 dark:text-red-400':
+                              store.totalCompressedSize >=
+                              store.totalOriginalSize,
+                            'text-green-600 dark:text-green-400':
+                              store.totalCompressedSize <
+                              store.totalOriginalSize,
+                          })}
                         >
                           {store.totalCompressedSize >= store.totalOriginalSize
                             ? '+'

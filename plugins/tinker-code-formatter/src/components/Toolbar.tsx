@@ -10,6 +10,7 @@ import { ToolbarButton } from 'share/components/ToolbarButton'
 import CopyButton from 'share/components/CopyButton'
 import { alert } from 'share/components/Alert'
 import { Clipboard, Eraser } from 'lucide-react'
+import className from 'licia/className'
 import Select from 'share/components/Select'
 import { tw } from 'share/theme'
 import store from '../store'
@@ -109,7 +110,11 @@ export default observer(function ToolbarComponent() {
       <button
         onClick={handleFormat}
         disabled={isEmpty}
-        className={`px-3 py-1 rounded text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+        className={className(
+          'px-3 py-1 rounded text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed',
+          tw.primary.bg,
+          tw.primary.bgHover
+        )}
       >
         {t('format')}
       </button>

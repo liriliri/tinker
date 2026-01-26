@@ -8,6 +8,7 @@ import {
   File,
   ListX,
 } from 'lucide-react'
+import className from 'licia/className'
 import store, { FilterTab } from '../store'
 import { tw } from 'share/theme'
 import {
@@ -66,14 +67,25 @@ export default observer(function ToolbarComponent() {
       <div className="relative w-48">
         <Search
           size={14}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary}`}
+          className={className(
+            'absolute left-2 top-1/2 -translate-y-1/2',
+            tw.text.both.tertiary
+          )}
         />
         <input
           type="text"
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
           placeholder={t('search')}
-          className={`w-full pl-7 pr-2 py-1 text-xs border rounded ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={className(
+            'w-full pl-7 pr-2 py-1 text-xs border rounded focus:outline-none',
+            tw.border.both,
+            tw.bg.both.input,
+            tw.text.both.primary,
+            tw.primary.focusBorder,
+            `placeholder:${tw.text.light.tertiary}`,
+            `dark:placeholder:${tw.text.dark.tertiary}`
+          )}
         />
       </div>
 

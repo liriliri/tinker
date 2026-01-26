@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Save, Moon, Sun, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
+import className from 'licia/className'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -112,19 +113,22 @@ export default observer(function ToolbarComponent() {
       <button
         onClick={() => store.toggleDarkMode()}
         title={store.darkMode ? t('darkMode') : t('lightMode')}
-        className={`
-          ml-3 relative w-10 h-5 rounded-full transition-colors duration-300 ease-in-out
-          ${store.darkMode ? 'bg-gray-700 dark:bg-gray-600' : 'bg-gray-300'}
-        `}
+        className={className(
+          'ml-3 relative w-10 h-5 rounded-full transition-colors duration-300 ease-in-out',
+          {
+            'bg-gray-700 dark:bg-gray-600': store.darkMode,
+            'bg-gray-300': !store.darkMode,
+          }
+        )}
       >
         <div
-          className={`
-            absolute top-0.5 left-0.5 w-4 h-4 rounded-full
-            bg-white shadow-md
-            flex items-center justify-center
-            transition-transform duration-300 ease-in-out
-            ${store.darkMode ? 'translate-x-5' : 'translate-x-0'}
-          `}
+          className={className(
+            'absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300 ease-in-out',
+            {
+              'translate-x-5': store.darkMode,
+              'translate-x-0': !store.darkMode,
+            }
+          )}
         >
           {store.darkMode ? (
             <Moon size={10} className="text-gray-700" />
@@ -138,7 +142,7 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarButton
         onClick={handleCopy}
-        className={copied ? tw.primary.text : ''}
+        className={className({ [tw.primary.text]: copied })}
         title={t('copyImage')}
       >
         {copied ? (

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import className from 'licia/className'
 import Select from 'share/components/Select'
 import Slider from 'share/components/Slider'
 import store from '../store'
@@ -91,13 +92,13 @@ const Sidebar = observer(() => {
               (template) => (
                 <button
                   key={template.id}
-                  className={`aspect-square rounded ${
-                    tw.bg.both.secondary
-                  } border-2 ${
+                  className={className(
+                    'aspect-square rounded border-2 hover:opacity-80 transition-all overflow-hidden',
+                    tw.bg.both.secondary,
                     store.selectedTemplateId === template.id
                       ? tw.primary.border
                       : 'border-transparent'
-                  } hover:opacity-80 transition-all overflow-hidden`}
+                  )}
                   onClick={() =>
                     handleSelectTemplate(template.id, template.areas)
                   }

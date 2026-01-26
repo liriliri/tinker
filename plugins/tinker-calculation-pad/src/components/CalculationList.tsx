@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
+import className from 'licia/className'
 import toast from 'react-hot-toast'
 import { THEME_COLORS, tw } from 'share/theme'
 import store from '../store'
@@ -108,13 +109,15 @@ export default observer(function CalculationList() {
             style={
               isActive ? { borderLeftColor: THEME_COLORS.primary } : undefined
             }
-            className={`px-4 py-3 border-b ${
-              tw.border.both
-            } transition-colors cursor-text ${
-              isActive
-                ? `border-l-4 ${tw.bg.both.primary}`
-                : `border-l-4 border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]`
-            }`}
+            className={className(
+              'px-4 py-3 border-b transition-colors cursor-text border-l-4',
+              tw.border.both,
+              {
+                [tw.bg.both.primary]: isActive,
+                'border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]':
+                  !isActive,
+              }
+            )}
           >
             <textarea
               ref={(el) => store.setInputRef(line.id, el as any)}

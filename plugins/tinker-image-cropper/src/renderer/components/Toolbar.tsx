@@ -26,6 +26,7 @@ import { ToolbarButton } from 'share/components/ToolbarButton'
 import { tw } from 'share/theme'
 import { RefObject, useState } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
+import className from 'licia/className'
 import store from '../store'
 import CropSizeDialog from './CropSizeDialog'
 import ResizeImageDialog from './ResizeImageDialog'
@@ -208,7 +209,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
       <ToolbarButton
         onClick={handleCopyImage}
         disabled={store.historyIndex <= 0}
-        className={copied ? tw.primary.text : ''}
+        className={className(copied && tw.primary.text)}
         title={t('copyImage')}
       >
         {copied ? (
@@ -315,7 +316,11 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
           {/* Crop Button */}
           <button
             onClick={onCrop}
-            className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} text-white font-medium rounded transition-colors flex items-center gap-1.5`}
+            className={className(
+              'px-3 py-1 text-xs text-white font-medium rounded transition-colors flex items-center gap-1.5',
+              tw.primary.bg,
+              tw.primary.bgHover
+            )}
           >
             <Crop size={TOOLBAR_ICON_SIZE} />
             {t('crop')}
