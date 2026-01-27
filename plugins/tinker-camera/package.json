@@ -1,0 +1,20 @@
+{
+  "name": "tinker-camera",
+  "version": "0.1.0",
+  "description": "Camera Plugin for Tinker",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "Camera",
+    "icon": "icon.png",
+    "main": "dist/renderer/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "相机"
+      }
+    }
+  }
+}

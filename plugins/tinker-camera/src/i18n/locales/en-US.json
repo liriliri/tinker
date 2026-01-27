@@ -1,0 +1,7 @@
+{
+  "loading": "Loading camera...",
+  "error": "Error",
+  "cameraAccessError": "Failed to access camera. Please check permissions.",
+  "retry": "Retry",
+  "playbackError": "Failed to start video playback."
+}

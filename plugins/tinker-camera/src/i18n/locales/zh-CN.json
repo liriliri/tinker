@@ -1,0 +1,7 @@
+{
+  "loading": "正在加载摄像头...",
+  "error": "错误",
+  "cameraAccessError": "无法访问摄像头，请检查权限。",
+  "retry": "重试",
+  "playbackError": "无法播放视频。"
+}
