@@ -146,10 +146,10 @@ const DigitalClock = observer(() => {
     const adjustProps = (digit: keyof typeof timeObj, numberIndex: number) => {
       for (const prop in timeObj[digit]) {
         const key = prop as keyof (typeof timeObj)[typeof digit]
-        timeObj[digit][key] = shiftAtIndex(
-          [...timeObj[digit][key]],
-          numberIndex
-        ) as any
+        const value = timeObj[digit][key]
+        if (Array.isArray(value)) {
+          timeObj[digit][key] = shiftAtIndex([...value], numberIndex) as any
+        }
       }
     }
 
