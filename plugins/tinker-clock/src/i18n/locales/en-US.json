@@ -1,0 +1,15 @@
+{
+  "flipClock": "Flip Clock",
+  "analogClock": "Analog Clock",
+  "digitalClock": "Digital Clock",
+  "timezone": "Timezone",
+  "local": "Local Time",
+  "utc": "UTC",
+  "newYork": "New York (UTC-5)",
+  "london": "London (UTC+0)",
+  "paris": "Paris (UTC+1)",
+  "dubai": "Dubai (UTC+4)",
+  "beijing": "Beijing (UTC+8)",
+  "tokyo": "Tokyo (UTC+9)",
+  "sydney": "Sydney (UTC+10)"
+}

@@ -35,4 +35,5 @@ function transOptions(
       item.submenu = transOptions(view, item.submenu)
     }
   })
+  return template
 }

@@ -1,0 +1,15 @@
+{
+  "flipClock": "翻页时钟",
+  "analogClock": "模拟时钟",
+  "digitalClock": "数字时钟",
+  "timezone": "时区",
+  "local": "本地时间",
+  "utc": "UTC",
+  "newYork": "纽约 (UTC-5)",
+  "london": "伦敦 (UTC+0)",
+  "paris": "巴黎 (UTC+1)",
+  "dubai": "迪拜 (UTC+4)",
+  "beijing": "北京 (UTC+8)",
+  "tokyo": "东京 (UTC+9)",
+  "sydney": "悉尼 (UTC+10)"
+}
