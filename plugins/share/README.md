@@ -21,6 +21,7 @@ share/
 │   ├── Slider.tsx
 │   ├── Toolbar.tsx
 │   ├── ToolbarButton.tsx
+│   ├── Toaster.tsx
 │   └── Tooltip.tsx
 └── hooks/               # Shared React Hooks
     └── useCopyToClipboard.ts
@@ -257,6 +258,26 @@ export default observer(function App() {
 ```
 
 **Internationalization**: All dialog providers (`AlertProvider`, `ConfirmProvider`, `PromptProvider`) support a `locale` prop for internationalization. Pass `i18n.language` from `useTranslation()` to display buttons in the correct language. The providers include built-in translations for English (`en-US`) and Chinese (`zh-CN`). Default locale is `en-US`.
+
+### Toaster
+
+```typescript
+import { ToasterProvider } from 'share/components/Toaster'
+import toast from 'react-hot-toast'
+
+export default function App() {
+  return (
+    <ToasterProvider>
+      {/* Your content */}
+    </ToasterProvider>
+  )
+}
+
+toast.success('Saved')
+toast.error('Failed')
+```
+
+**Setup**: Wrap app content with `ToasterProvider` to enable toast rendering. Styling and theme colors are unified by default.
 
 ### Select & Checkbox
 
