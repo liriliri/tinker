@@ -1,4 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import LocalStore from 'licia/LocalStore'
+import toast from 'react-hot-toast'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
@@ -6,6 +8,13 @@ import i18n from './i18n'
 import type { App } from 'leafer-ui'
 
 export type ToolType = 'select' | 'rect' | 'ellipse' | 'line' | 'pen' | 'text'
+
+const STORAGE_FOREGROUND_KEY = 'foreground-color'
+const STORAGE_BACKGROUND_KEY = 'background-color'
+const STORAGE_TOOL_KEY = 'tool'
+const storage = new LocalStore('tinker-image-annotator')
+const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
+const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
 
 export interface ImageInfo {
   fileName: string
@@ -22,13 +31,15 @@ class Store extends BaseStore {
   scale: number = 100
   tool: ToolType = 'select'
   strokeWidth: number = 4
-  foregroundColor: string = THEME_COLORS.primary
-  backgroundColor: string = THEME_COLORS.bg.light.primary
+  foregroundColor: string = DEFAULT_FOREGROUND_COLOR
+  backgroundColor: string = DEFAULT_BACKGROUND_COLOR
   fontSize: number = 28
 
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadToolFromStorage()
+    this.loadColorsFromStorage()
   }
 
   get hasImage() {
@@ -46,14 +57,17 @@ class Store extends BaseStore {
   setTool(tool: ToolType) {
     this.tool = tool
     this.syncEditorMode()
+    storage.set(STORAGE_TOOL_KEY, tool)
   }
 
   setForegroundColor(color: string) {
     this.foregroundColor = color
+    storage.set(STORAGE_FOREGROUND_KEY, color)
   }
 
   setBackgroundColor(color: string) {
     this.backgroundColor = color
+    storage.set(STORAGE_BACKGROUND_KEY, color)
   }
 
   swapColors() {
@@ -61,6 +75,8 @@ class Store extends BaseStore {
     const nextBackground = this.foregroundColor
     this.foregroundColor = nextForeground
     this.backgroundColor = nextBackground
+    storage.set(STORAGE_FOREGROUND_KEY, nextForeground)
+    storage.set(STORAGE_BACKGROUND_KEY, nextBackground)
   }
 
   setStrokeWidth(value: number) {
@@ -136,53 +152,126 @@ class Store extends BaseStore {
     if (!this.app?.tree || !this.image) return
 
     try {
+      const fileName = this.image.fileName || 'annotated.png'
+      const extMatch = fileName.match(/\.([^.]+)$/)
+      const ext = extMatch ? extMatch[1].toLowerCase() : 'png'
+      const format =
+        ext === 'jpeg'
+          ? 'jpg'
+          : ext === 'jpg'
+          ? 'jpg'
+          : ext === 'webp'
+          ? 'webp'
+          : 'png'
+      const outputExt =
+        ext === 'jpeg' || ext === 'jpg' || ext === 'webp' || ext === 'png'
+          ? ext
+          : 'png'
+      const baseName = fileName.replace(/\.[^/.]+$/, '') || 'annotated'
+
       const result = await tinker.showSaveDialog({
-        defaultPath: this.image?.fileName || 'annotated.png',
-        filters: [{ name: 'PNG', extensions: ['png'] }],
+        defaultPath: `${baseName}-annotated.${outputExt}`,
+        filters: [
+          {
+            name: format.toUpperCase(),
+            extensions: [outputExt],
+          },
+        ],
       })
 
       if (result.canceled || !result.filePath) return
 
-      const exportResult = await this.app.tree.export('png', {
+      const exportOptions: {
+        pixelRatio: number
+        blob: boolean
+        quality?: number
+        fill?: string
+      } = {
         pixelRatio: 2,
         blob: true,
-      })
+      }
+      if (format === 'jpg' || format === 'webp') {
+        exportOptions.quality = 0.9
+        exportOptions.fill = '#ffffff'
+      }
+
+      const exportResult = await this.app.tree.export(format, exportOptions)
       const blob = exportResult.data as Blob
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
-      const baseName =
-        this.image.fileName.replace(/\.[^/.]+$/, '') || 'annotated'
 
       link.href = url
-      link.download = `${baseName}-annotated.png`
+      link.download = `${baseName}-annotated.${outputExt}`
       link.click()
       setTimeout(() => URL.revokeObjectURL(url), 1000)
 
-      alert({ title: i18n.t('saved') as string })
+      toast.success(i18n.t('saved') as string)
     } catch (error) {
       console.error('Failed to save image:', error)
-      alert({ title: i18n.t('saveImageError') as string })
+      toast.error(i18n.t('saveImageError') as string)
     }
   }
 
   zoomIn() {
     if (!this.app?.tree) return
-    this.app.tree.zoom(this.app.tree.scale * 1.1)
+    const scaleValue = this.app.tree.scale
+    const nextScale =
+      typeof scaleValue === 'number' ? scaleValue : scaleValue?.x ?? 1
+    this.app.tree.zoom(nextScale * 1.1)
+    this.syncScaleFromTree()
   }
 
   zoomOut() {
     if (!this.app?.tree) return
-    this.app.tree.zoom(this.app.tree.scale / 1.1)
+    const scaleValue = this.app.tree.scale
+    const nextScale =
+      typeof scaleValue === 'number' ? scaleValue : scaleValue?.x ?? 1
+    this.app.tree.zoom(nextScale / 1.1)
+    this.syncScaleFromTree()
   }
 
   zoomFit() {
     if (!this.app?.tree) return
     this.app.tree.zoom('fit', 100)
+    this.syncScaleFromTree()
+  }
+
+  zoomToPercent(percent: number) {
+    if (!this.app?.tree) return
+    this.app.tree.zoom(percent / 100)
+    this.syncScaleFromTree()
   }
 
   deleteSelected() {
     if (!this.app?.editor) return
     this.app.editor.list.forEach((item) => item.remove())
+  }
+
+  private syncScaleFromTree() {
+    if (!this.app?.tree) return
+    const scaleValue = this.app.tree.scale
+    const nextScale =
+      typeof scaleValue === 'number' ? scaleValue : scaleValue?.x ?? 1
+    this.setScale(nextScale)
+  }
+
+  private loadColorsFromStorage() {
+    const savedForeground = storage.get(STORAGE_FOREGROUND_KEY)
+    const savedBackground = storage.get(STORAGE_BACKGROUND_KEY)
+
+    if (savedForeground) {
+      this.foregroundColor = savedForeground
+    }
+    if (savedBackground) {
+      this.backgroundColor = savedBackground
+    }
+  }
+
+  private loadToolFromStorage() {
+    const savedTool = storage.get(STORAGE_TOOL_KEY)
+    if (savedTool) {
+      this.tool = savedTool as ToolType
+    }
   }
 }
 

@@ -69,12 +69,19 @@ const Canvas = observer(() => {
       store.setScale(nextScale)
     }
 
+    const handleResize = () => {
+      if (store.image) {
+        app.tree.zoom('fit', 100)
+      }
+      updateScale()
+    }
+
     app.tree.on(ZoomEvent.ZOOM, updateScale)
-    app.tree.on(ResizeEvent.RESIZE, updateScale)
+    app.tree.on(ResizeEvent.RESIZE, handleResize)
 
     return () => {
       app.tree.off(ZoomEvent.ZOOM, updateScale)
-      app.tree.off(ResizeEvent.RESIZE, updateScale)
+      app.tree.off(ResizeEvent.RESIZE, handleResize)
       app.destroy(true)
       store.setApp(null)
     }

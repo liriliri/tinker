@@ -1,6 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { MousePointer2, Square, Circle, Minus, Repeat2 } from 'lucide-react'
+import {
+  MousePointer2,
+  Square,
+  Circle,
+  Minus,
+  Repeat2,
+  Pencil,
+  Type,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { THEME_COLORS, tw } from 'share/theme'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -13,6 +21,7 @@ const SIDE_TOOL_DEFS: Array<{
   labelKey: string
 }> = [
   { id: 'select', icon: MousePointer2, labelKey: 'select' },
+  { id: 'pen', icon: Pencil, labelKey: 'pen' },
   { id: 'line', icon: Minus, labelKey: 'line' },
   { id: 'rect', icon: Square, labelKey: 'rect' },
   { id: 'ellipse', icon: Circle, labelKey: 'ellipse' },
@@ -23,7 +32,7 @@ export default observer(function SideToolbar() {
 
   return (
     <div
-      className={`w-12 flex flex-col items-center py-3 border-r ${tw.border.both} ${tw.bg.both.primary}`}
+      className={`w-12 flex flex-col items-center py-3 border-r ${tw.border.both} ${tw.bg.both.tertiary}`}
     >
       {SIDE_TOOL_DEFS.map((tool) => {
         const Icon = tool.icon
@@ -41,13 +50,23 @@ export default observer(function SideToolbar() {
           </ToolbarButton>
         )
       })}
+      <ToolbarButton
+        variant="toggle"
+        active={store.tool === 'text'}
+        onClick={() => store.setTool('text')}
+        disabled={false}
+        title={t('text')}
+        className="mb-4"
+      >
+        <Type size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
       <div className="mt-4 flex w-full flex-col items-center gap-2">
         <div className="relative h-9 w-9 mx-auto">
           <button
             type="button"
             onClick={() => store.swapColors()}
             disabled={false}
-            className={`absolute -top-2 -right-1 ${tw.bg.both.primary} p-1 disabled:opacity-40`}
+            className="absolute -top-2 -right-1 p-1 disabled:opacity-40"
             title={t('swapColors')}
           >
             <Repeat2 size={12} />
