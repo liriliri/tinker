@@ -1,0 +1,27 @@
+{
+  "name": "tinker-image-annotator",
+  "version": "0.1.0",
+  "description": "Image Annotator Plugin for Tinker",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "Image Annotator",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "图片标注"
+      }
+    }
+  },
+  "devDependencies": {
+    "@leafer-in/editor": "^2.0.0",
+    "@leafer-in/resize": "^2.0.0",
+    "@leafer-in/scroll": "^2.0.0",
+    "@leafer-in/view": "^2.0.0",
+    "leafer-ui": "^2.0.0"
+  }
+}
