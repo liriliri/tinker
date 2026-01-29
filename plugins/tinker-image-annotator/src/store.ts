@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import download from 'licia/download'
 import toast from 'react-hot-toast'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
@@ -169,25 +170,11 @@ class Store extends BaseStore {
           : 'png'
       const baseName = fileName.replace(/\.[^/.]+$/, '') || 'annotated'
 
-      const result = await tinker.showSaveDialog({
-        defaultPath: `${baseName}-annotated.${outputExt}`,
-        filters: [
-          {
-            name: format.toUpperCase(),
-            extensions: [outputExt],
-          },
-        ],
-      })
-
-      if (result.canceled || !result.filePath) return
-
       const exportOptions: {
-        pixelRatio: number
         blob: boolean
         quality?: number
         fill?: string
       } = {
-        pixelRatio: 2,
         blob: true,
       }
       if (format === 'jpg' || format === 'webp') {
@@ -197,18 +184,28 @@ class Store extends BaseStore {
 
       const exportResult = await this.app.tree.export(format, exportOptions)
       const blob = exportResult.data as Blob
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-
-      link.href = url
-      link.download = `${baseName}-annotated.${outputExt}`
-      link.click()
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-
-      toast.success(i18n.t('saved') as string)
+      download(blob, `${baseName}.${outputExt}`)
     } catch (error) {
       console.error('Failed to save image:', error)
       toast.error(i18n.t('saveImageError') as string)
+    }
+  }
+
+  async copyToClipboard() {
+    if (!this.app?.tree) return false
+
+    try {
+      const exportResult = await this.app.tree.export('png', { blob: true })
+      const blob = exportResult.data as Blob
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blob,
+        }),
+      ])
+      return true
+    } catch (error) {
+      console.error('Failed to copy image:', error)
+      return false
     }
   }
 

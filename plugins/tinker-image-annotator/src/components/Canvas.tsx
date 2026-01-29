@@ -13,6 +13,7 @@ import {
 } from 'leafer-ui'
 import { ScrollBar } from '@leafer-in/scroll'
 import '@leafer-in/editor'
+import '@leafer-in/export'
 import '@leafer-in/scroll'
 import '@leafer-in/view'
 import store from '../store'

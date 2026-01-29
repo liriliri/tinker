@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@leafer-in/editor": "^2.0.0",
+    "@leafer-in/export": "^2.0.0",
     "@leafer-in/resize": "^2.0.0",
     "@leafer-in/scroll": "^2.0.0",
     "@leafer-in/view": "^2.0.0",
