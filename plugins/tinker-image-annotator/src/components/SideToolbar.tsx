@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import {
   MousePointer2,
+  Hand,
   Square,
   Circle,
   Minus,
@@ -21,6 +22,7 @@ const SIDE_TOOL_DEFS: Array<{
   labelKey: string
 }> = [
   { id: 'select', icon: MousePointer2, labelKey: 'select' },
+  { id: 'move', icon: Hand, labelKey: 'move' },
   { id: 'pen', icon: Pencil, labelKey: 'pen' },
   { id: 'line', icon: Minus, labelKey: 'line' },
   { id: 'rect', icon: Square, labelKey: 'rect' },

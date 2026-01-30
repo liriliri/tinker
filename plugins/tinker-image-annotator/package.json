@@ -23,6 +23,7 @@
     "@leafer-in/resize": "^2.0.0",
     "@leafer-in/scroll": "^2.0.0",
     "@leafer-in/view": "^2.0.0",
+    "@leafer-in/viewport": "^2.0.0",
     "leafer-ui": "^2.0.0"
   }
 }

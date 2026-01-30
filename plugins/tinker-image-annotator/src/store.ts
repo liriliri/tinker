@@ -8,7 +8,14 @@ import { THEME_COLORS } from 'share/theme'
 import i18n from './i18n'
 import type { App } from 'leafer-ui'
 
-export type ToolType = 'select' | 'rect' | 'ellipse' | 'line' | 'pen' | 'text'
+export type ToolType =
+  | 'select'
+  | 'move'
+  | 'rect'
+  | 'ellipse'
+  | 'line'
+  | 'pen'
+  | 'text'
 
 const STORAGE_FOREGROUND_KEY = 'foreground-color'
 const STORAGE_BACKGROUND_KEY = 'background-color'
@@ -91,6 +98,11 @@ class Store extends BaseStore {
   syncEditorMode() {
     if (!this.app?.editor) return
     this.app.editor.hittable = this.tool === 'select'
+    const config = this.app.config as { move?: { drag?: boolean } }
+    if (!config.move) {
+      config.move = {}
+    }
+    config.move.drag = this.tool === 'move'
   }
 
   async loadImage(file: File, filePath?: string) {

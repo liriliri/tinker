@@ -15,6 +15,7 @@ import { ScrollBar } from '@leafer-in/scroll'
 import '@leafer-in/editor'
 import '@leafer-in/export'
 import '@leafer-in/scroll'
+import '@leafer-in/viewport'
 import '@leafer-in/view'
 import store from '../store'
 import i18n from '../i18n'
@@ -41,7 +42,6 @@ const getPoint = (event: unknown) => {
 
 const Canvas = observer(() => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<Rect | null>(null)
 
   useEffect(() => {
     const target = containerRef.current
@@ -55,7 +55,10 @@ const Canvas = observer(() => {
         skewable: false,
         hover: false,
       },
-      tree: { usePartRender: true },
+      move: {
+        drag: false,
+      },
+      tree: { usePartRender: true, type: 'design' },
       sky: { type: 'draw', usePartRender: true },
     })
 
@@ -93,8 +96,6 @@ const Canvas = observer(() => {
     if (!app) return
 
     app.tree.children.forEach((child) => child.remove())
-    imageRef.current = null
-
     if (!store.image) {
       app.tree.zoom(1)
       const scaleValue = app.tree.scale
@@ -117,7 +118,6 @@ const Canvas = observer(() => {
     })
 
     app.tree.add(image)
-    imageRef.current = image
     app.tree.zoom('fit', 100)
     const scaleValue = app.tree.scale
     const nextScale =
@@ -164,7 +164,9 @@ const Canvas = observer(() => {
 
     const onDragStart = (event: unknown) => {
       if (!store.image) return
-      if (store.tool === 'select' || store.tool === 'text') return
+      if (store.tool === 'select') return
+      if (store.tool === 'move') return
+      if (store.tool === 'text') return
 
       startPoint = getPoint(event)
 

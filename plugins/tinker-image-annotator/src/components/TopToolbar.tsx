@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { FolderOpen, Save, Trash2, RotateCcw, Copy, Check } from 'lucide-react'
+import { FolderOpen, Save, Undo, Copy, Check } from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
@@ -35,18 +35,11 @@ export default observer(function TopToolbar({ onOpenImage }: TopToolbarProps) {
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
-        onClick={() => store.deleteSelected()}
-        disabled={!store.hasImage}
-        title={t('delete')}
-      >
-        <Trash2 size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-      <ToolbarButton
         onClick={() => store.clearAnnotations()}
         disabled={!store.hasImage}
         title={t('clear')}
       >
-        <RotateCcw size={TOOLBAR_ICON_SIZE} />
+        <Undo size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSpacer />
       <ToolbarButton
