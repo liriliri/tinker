@@ -1,0 +1,31 @@
+@use '../../share/base.scss';
+@config "../tailwind.config.js";
+
+:root {
+  --fc-border-color: #e0e0e0;
+  --fc-today-bg-color: rgba(15, 194, 94, 0.1);
+  --fc-event-bg-color: #0fc25e;
+  --fc-event-border-color: #0fc25e;
+  --fc-event-text-color: #ffffff;
+  --fc-now-indicator-color: #0fc25e;
+}
+
+.dark {
+  --fc-border-color: #404040;
+  --fc-page-bg-color: #1e1e1e;
+  --fc-today-bg-color: rgba(15, 194, 94, 0.15);
+
+  .fc {
+    color: #e0e0e0;
+  }
+
+  .fc-daygrid-day-number,
+  .fc-timegrid-slot-label,
+  .fc-col-header-cell-cushion {
+    color: #e0e0e0;
+  }
+
+  .fc-timegrid-now-indicator-line {
+    border-color: #0fc25e;
+  }
+}
