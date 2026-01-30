@@ -287,7 +287,7 @@ const Canvas = observer(() => {
       url: store.watermarkSvg,
       mode: 'repeat',
       format: 'svg',
-      size: Math.round(frame.width / 6),
+      size: Math.round((frame.width ?? 0) / 6),
     }
   }, [store.frame, store.watermarkSvg, store.image?.width, store.image?.height])
 
