@@ -6,7 +6,7 @@ import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
 import i18n from './i18n'
-import { Text, type App, type Frame } from 'leafer-ui'
+import { Rect, Text, type App, type Frame } from 'leafer-ui'
 
 export type ToolType =
   | 'select'
@@ -189,6 +189,52 @@ class Store extends BaseStore {
     })
   }
 
+  async addImageOverlay(file: File) {
+    if (!this.app?.tree || !this.image) return
+
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = () => reject(new Error('Failed to read image'))
+        reader.readAsDataURL(file)
+      })
+
+      const img = new Image()
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Failed to load image'))
+        img.src = dataUrl
+      })
+
+      const maxWidth = this.image.width * 0.8
+      const maxHeight = this.image.height * 0.8
+      const scale = Math.min(1, maxWidth / img.width, maxHeight / img.height)
+      const width = img.width * scale
+      const height = img.height * scale
+
+      const overlay = new Rect({
+        x: (this.image.width - width) / 2,
+        y: (this.image.height - height) / 2,
+        width,
+        height,
+        fill: {
+          type: 'image',
+          url: dataUrl,
+          mode: 'fit',
+        },
+        editable: true,
+      })
+
+      const parent = this.frame ?? this.app.tree
+      parent.add(overlay)
+      this.setTool('select')
+    } catch (error) {
+      console.error('Failed to add overlay image:', error)
+      alert({ title: i18n.t('loadImageError') as string })
+    }
+  }
+
   async saveToFile() {
     if (!this.app?.tree || !this.image) return
 
@@ -282,6 +328,24 @@ class Store extends BaseStore {
   deleteSelected() {
     if (!this.app?.editor) return
     this.app.editor.list.forEach((item) => item.remove())
+  }
+
+  undo() {
+    const editor = this.app?.editor as
+      | {
+          undo?: () => void
+        }
+      | undefined
+    editor?.undo?.()
+  }
+
+  redo() {
+    const editor = this.app?.editor as
+      | {
+          redo?: () => void
+        }
+      | undefined
+    editor?.redo?.()
   }
 
   private syncScaleFromTree() {

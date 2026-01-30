@@ -19,9 +19,11 @@ import '@leafer-in/scroll'
 import '@leafer-in/text-editor'
 import '@leafer-in/viewport'
 import '@leafer-in/view'
+import { Snap } from 'leafer-x-easy-snap'
 import store from '../store'
 import i18n from '../i18n'
 import { THEME_COLORS } from 'share/theme'
+const rotateIconUrl = new URL('../assets/rotate.svg', import.meta.url).href
 
 type LeaferPointEvent = {
   getPage?: () => { x: number; y: number }
@@ -92,6 +94,15 @@ const Canvas = observer(() => {
       editor: {
         lockRatio: 'corner',
         stroke: THEME_COLORS.primary,
+        rotateable: true,
+        rotatePoint: {
+          width: 16,
+          height: 16,
+          fill: {
+            type: 'image',
+            url: rotateIconUrl,
+          },
+        },
         skewable: false,
         hover: false,
       },
@@ -105,6 +116,17 @@ const Canvas = observer(() => {
     new ScrollBar(app)
     store.setApp(app)
     store.syncEditorMode()
+    const snap = new Snap(app, {
+      attachEvents: ['move', 'scale'],
+      lineColor: THEME_COLORS.primary,
+      snapSize: 5,
+      distanceLabelStyle: {
+        text: {
+          fill: THEME_COLORS.primary,
+        },
+      },
+    })
+    snap.enable(true)
 
     const updateTextSelection = () => {
       const editor = app.editor
@@ -151,6 +173,10 @@ const Canvas = observer(() => {
     updateTextSelection()
 
     return () => {
+      snap.enable(false)
+      if ('destroy' in snap && typeof snap.destroy === 'function') {
+        snap.destroy()
+      }
       app.tree.off(ZoomEvent.ZOOM, updateScale)
       app.tree.off(ResizeEvent.RESIZE, handleResize)
       app.editor?.off('editor.select', updateTextSelection)

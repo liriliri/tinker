@@ -1,8 +1,11 @@
 {
   "open": "Open Image",
+  "insertImage": "Insert Image",
   "copy": "Copy",
   "save": "Save",
   "clear": "Clear",
+  "undo": "Undo",
+  "redo": "Redo",
   "select": "Select",
   "move": "Move",
   "pen": "Pen",

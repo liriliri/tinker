@@ -14,6 +14,7 @@ import store from './store'
 export default observer(function App() {
   const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const overlayInputRef = useRef<HTMLInputElement>(null)
 
   const handleOpenImage = async () => {
     fileInputRef.current?.click()
@@ -23,6 +24,18 @@ export default observer(function App() {
     const file = event.target.files?.[0]
     if (file) {
       store.loadImage(file)
+    }
+    event.target.value = ''
+  }
+
+  const handleInsertImage = () => {
+    overlayInputRef.current?.click()
+  }
+
+  const handleOverlayChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      store.addImageOverlay(file)
     }
     event.target.value = ''
   }
@@ -44,6 +57,24 @@ export default observer(function App() {
         return
       }
 
+      if (event.metaKey || event.ctrlKey) {
+        const key = event.key.toLowerCase()
+        if (key === 'z' && !isEditingText) {
+          event.preventDefault()
+          if (event.shiftKey) {
+            store.redo()
+          } else {
+            store.undo()
+          }
+          return
+        }
+        if (key === 'y' && !isEditingText) {
+          event.preventDefault()
+          store.redo()
+          return
+        }
+      }
+
       if (event.key === 'Escape') {
         store.setTool('select')
         return
@@ -62,7 +93,10 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
-        <TopToolbar onOpenImage={handleOpenImage} />
+        <TopToolbar
+          onOpenImage={handleOpenImage}
+          onInsertImage={handleInsertImage}
+        />
 
         <div className="flex flex-1 min-h-0">
           <input
@@ -70,6 +104,13 @@ export default observer(function App() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
+            className="hidden"
+          />
+          <input
+            ref={overlayInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleOverlayChange}
             className="hidden"
           />
           <div className="flex flex-1 min-h-0">

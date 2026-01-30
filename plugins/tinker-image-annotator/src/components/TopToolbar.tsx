@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { FolderOpen, Save, Undo, Copy, Check } from 'lucide-react'
+import { FolderOpen, Image, Save, Undo, Redo, Copy, Check } from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
@@ -16,6 +16,7 @@ import store from '../store'
 
 interface TopToolbarProps {
   onOpenImage: () => void
+  onInsertImage: () => void
 }
 
 const STROKE_WIDTH_TOOLS = new Set(['pen', 'line', 'arrow', 'rect', 'ellipse'])
@@ -44,7 +45,10 @@ const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
   { label: '72', value: 72 },
 ]
 
-export default observer(function TopToolbar({ onOpenImage }: TopToolbarProps) {
+export default observer(function TopToolbar({
+  onOpenImage,
+  onInsertImage,
+}: TopToolbarProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const shouldShowStrokeWidth = STROKE_WIDTH_TOOLS.has(store.tool)
@@ -66,11 +70,25 @@ export default observer(function TopToolbar({ onOpenImage }: TopToolbarProps) {
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
-        onClick={() => store.clearAnnotations()}
+        onClick={onInsertImage}
         disabled={!store.hasImage}
-        title={t('clear')}
+        title={t('insertImage')}
+      >
+        <Image size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => store.undo()}
+        disabled={!store.hasImage}
+        title={t('undo')}
       >
         <Undo size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => store.redo()}
+        disabled={!store.hasImage}
+        title={t('redo')}
+      >
+        <Redo size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       {shouldShowStrokeWidth ? (
         <>

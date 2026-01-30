@@ -25,6 +25,7 @@
     "@leafer-in/text-editor": "^2.0.0",
     "@leafer-in/view": "^2.0.0",
     "@leafer-in/viewport": "^2.0.0",
-    "leafer-ui": "^2.0.0"
+    "leafer-ui": "^2.0.0",
+    "leafer-x-easy-snap": "^1.11.0"
   }
 }

@@ -1,8 +1,11 @@
 {
   "open": "打开图片",
+  "insertImage": "导入图片",
   "copy": "复制",
   "save": "保存",
   "clear": "清空",
+  "undo": "撤销",
+  "redo": "重做",
   "select": "选择",
   "move": "移动",
   "pen": "画笔",
