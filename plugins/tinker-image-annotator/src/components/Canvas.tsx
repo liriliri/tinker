@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import {
   App,
+  Frame,
   Rect,
   Ellipse,
   Line,
@@ -15,6 +16,7 @@ import { ScrollBar } from '@leafer-in/scroll'
 import '@leafer-in/editor'
 import '@leafer-in/export'
 import '@leafer-in/scroll'
+import '@leafer-in/text-editor'
 import '@leafer-in/viewport'
 import '@leafer-in/view'
 import store from '../store'
@@ -38,6 +40,44 @@ const getPoint = (event: unknown) => {
     }
   }
   return { x: 0, y: 0 }
+}
+
+const getArrowPoints = (
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+  strokeWidth: number
+) => {
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const distance = Math.hypot(dx, dy)
+  if (distance < 0.001) {
+    return [start.x, start.y, end.x, end.y]
+  }
+
+  const headLength = Math.max(8, strokeWidth * 3)
+  const angle = Math.atan2(dy, dx)
+  const headAngle = Math.PI / 6
+  const left = {
+    x: end.x - headLength * Math.cos(angle - headAngle),
+    y: end.y - headLength * Math.sin(angle - headAngle),
+  }
+  const right = {
+    x: end.x - headLength * Math.cos(angle + headAngle),
+    y: end.y - headLength * Math.sin(angle + headAngle),
+  }
+
+  return [
+    start.x,
+    start.y,
+    end.x,
+    end.y,
+    left.x,
+    left.y,
+    end.x,
+    end.y,
+    right.x,
+    right.y,
+  ]
 }
 
 const Canvas = observer(() => {
@@ -66,6 +106,29 @@ const Canvas = observer(() => {
     store.setApp(app)
     store.syncEditorMode()
 
+    const updateTextSelection = () => {
+      const editor = app.editor
+      if (!editor) return
+      const selectedText = editor.list.find((item) => item instanceof Text)
+      store.setTextSelected(!!selectedText)
+      if (selectedText && typeof selectedText.fontSize === 'number') {
+        store.setFontSize(selectedText.fontSize)
+      }
+    }
+
+    const handleInnerEditorOpen = () => {
+      const target = app.editor?.innerEditor?.editTarget
+      const isTextEditing = target instanceof Text
+      store.setTextEditing(isTextEditing)
+      if (isTextEditing && typeof target.fontSize === 'number') {
+        store.setFontSize(target.fontSize)
+      }
+    }
+
+    const handleInnerEditorClose = () => {
+      store.setTextEditing(false)
+    }
+
     const updateScale = () => {
       const scaleValue = app.tree.scale
       const nextScale =
@@ -82,10 +145,20 @@ const Canvas = observer(() => {
 
     app.tree.on(ZoomEvent.ZOOM, updateScale)
     app.tree.on(ResizeEvent.RESIZE, handleResize)
+    app.editor?.on('editor.select', updateTextSelection)
+    app.editor?.on('innerEditor.open', handleInnerEditorOpen)
+    app.editor?.on('innerEditor.close', handleInnerEditorClose)
+    updateTextSelection()
 
     return () => {
       app.tree.off(ZoomEvent.ZOOM, updateScale)
       app.tree.off(ResizeEvent.RESIZE, handleResize)
+      app.editor?.off('editor.select', updateTextSelection)
+      app.editor?.off('innerEditor.open', handleInnerEditorOpen)
+      app.editor?.off('innerEditor.close', handleInnerEditorClose)
+      store.setFrame(null)
+      store.setTextSelected(false)
+      store.setTextEditing(false)
       app.destroy(true)
       store.setApp(null)
     }
@@ -96,6 +169,7 @@ const Canvas = observer(() => {
     if (!app) return
 
     app.tree.children.forEach((child) => child.remove())
+    store.setFrame(null)
     if (!store.image) {
       app.tree.zoom(1)
       const scaleValue = app.tree.scale
@@ -104,6 +178,13 @@ const Canvas = observer(() => {
       store.setScale(nextScale)
       return
     }
+
+    const frame = new Frame({
+      id: 'image-frame',
+      width: store.image.width,
+      height: store.image.height,
+      overflow: 'hide',
+    })
 
     const image = new Rect({
       id: 'base-image',
@@ -117,7 +198,9 @@ const Canvas = observer(() => {
       editable: false,
     })
 
-    app.tree.add(image)
+    app.tree.add(frame)
+    frame.add(image)
+    store.setFrame(frame)
     app.tree.zoom('fit', 100)
     const scaleValue = app.tree.scale
     const nextScale =
@@ -144,9 +227,21 @@ const Canvas = observer(() => {
       })
     }
 
+    const createArrow = (point: { x: number; y: number }) => {
+      return new Line({
+        points: getArrowPoints(point, point, store.strokeWidth),
+        stroke: store.foregroundColor,
+        strokeWidth: store.strokeWidth,
+        strokeCap: 'round',
+        strokeJoin: 'round',
+        editable: true,
+      })
+    }
+
     const onPointerDown = (event: unknown) => {
       if (store.tool !== 'text') return
       if (!store.image) return
+      const parent = store.frame ?? app.tree
 
       const point = getPoint(event)
       const text = new Text({
@@ -158,8 +253,10 @@ const Canvas = observer(() => {
         editable: true,
       })
 
-      app.tree.add(text)
+      parent.add(text)
       app.editor?.select(text)
+      app.editor?.openInnerEditor(text, 'TextEditor', true)
+      store.setTool('select')
     }
 
     const onDragStart = (event: unknown) => {
@@ -193,12 +290,15 @@ const Canvas = observer(() => {
         })
       } else if (store.tool === 'line') {
         drawing = createLine(startPoint, false)
+      } else if (store.tool === 'arrow') {
+        drawing = createArrow(startPoint)
       } else if (store.tool === 'pen') {
         drawing = createLine(startPoint, true)
       }
 
       if (drawing) {
-        app.tree.add(drawing)
+        const parent = store.frame ?? app.tree
+        parent.add(drawing)
       }
     }
 
@@ -221,6 +321,8 @@ const Canvas = observer(() => {
         if (store.tool === 'pen') {
           const points = drawing.points as number[]
           drawing.points = [...points, point.x, point.y]
+        } else if (store.tool === 'arrow') {
+          drawing.points = getArrowPoints(startPoint, point, store.strokeWidth)
         } else {
           drawing.points = [startPoint.x, startPoint.y, point.x, point.y]
         }

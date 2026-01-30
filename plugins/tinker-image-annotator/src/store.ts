@@ -6,7 +6,7 @@ import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
 import i18n from './i18n'
-import type { App } from 'leafer-ui'
+import { Text, type App, type Frame } from 'leafer-ui'
 
 export type ToolType =
   | 'select'
@@ -14,12 +14,15 @@ export type ToolType =
   | 'rect'
   | 'ellipse'
   | 'line'
+  | 'arrow'
   | 'pen'
   | 'text'
 
 const STORAGE_FOREGROUND_KEY = 'foreground-color'
 const STORAGE_BACKGROUND_KEY = 'background-color'
 const STORAGE_TOOL_KEY = 'tool'
+const STORAGE_STROKE_WIDTH_KEY = 'stroke-width'
+const STORAGE_FONT_SIZE_KEY = 'font-size'
 const storage = new LocalStore('tinker-image-annotator')
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
@@ -34,6 +37,7 @@ export interface ImageInfo {
 
 class Store extends BaseStore {
   app: App | null = null
+  frame: Frame | null = null
   image: ImageInfo | null = null
   isLoading: boolean = false
   scale: number = 100
@@ -42,12 +46,16 @@ class Store extends BaseStore {
   foregroundColor: string = DEFAULT_FOREGROUND_COLOR
   backgroundColor: string = DEFAULT_BACKGROUND_COLOR
   fontSize: number = 28
+  isTextSelected: boolean = false
+  isTextEditing: boolean = false
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadToolFromStorage()
     this.loadColorsFromStorage()
+    this.loadStrokeWidthFromStorage()
+    this.loadFontSizeFromStorage()
   }
 
   get hasImage() {
@@ -56,6 +64,10 @@ class Store extends BaseStore {
 
   setApp(app: App | null) {
     this.app = app
+  }
+
+  setFrame(frame: Frame | null) {
+    this.frame = frame
   }
 
   setScale(scale: number) {
@@ -89,10 +101,26 @@ class Store extends BaseStore {
 
   setStrokeWidth(value: number) {
     this.strokeWidth = value
+    storage.set(STORAGE_STROKE_WIDTH_KEY, value)
   }
 
   setFontSize(value: number) {
     this.fontSize = value
+    storage.set(STORAGE_FONT_SIZE_KEY, value)
+    if (!this.app?.editor) return
+    this.app.editor.list.forEach((item) => {
+      if (item instanceof Text) {
+        item.fontSize = value
+      }
+    })
+  }
+
+  setTextSelected(value: boolean) {
+    this.isTextSelected = value
+  }
+
+  setTextEditing(value: boolean) {
+    this.isTextEditing = value
   }
 
   syncEditorMode() {
@@ -280,6 +308,20 @@ class Store extends BaseStore {
     const savedTool = storage.get(STORAGE_TOOL_KEY)
     if (savedTool) {
       this.tool = savedTool as ToolType
+    }
+  }
+
+  private loadStrokeWidthFromStorage() {
+    const savedStrokeWidth = storage.get(STORAGE_STROKE_WIDTH_KEY)
+    if (typeof savedStrokeWidth === 'number') {
+      this.strokeWidth = savedStrokeWidth
+    }
+  }
+
+  private loadFontSizeFromStorage() {
+    const savedFontSize = storage.get(STORAGE_FONT_SIZE_KEY)
+    if (typeof savedFontSize === 'number') {
+      this.fontSize = savedFontSize
     }
   }
 }

@@ -6,6 +6,7 @@ import {
   Square,
   Circle,
   Minus,
+  ArrowRight,
   Repeat2,
   Pencil,
   Type,
@@ -25,6 +26,7 @@ const SIDE_TOOL_DEFS: Array<{
   { id: 'move', icon: Hand, labelKey: 'move' },
   { id: 'pen', icon: Pencil, labelKey: 'pen' },
   { id: 'line', icon: Minus, labelKey: 'line' },
+  { id: 'arrow', icon: ArrowRight, labelKey: 'arrow' },
   { id: 'rect', icon: Square, labelKey: 'rect' },
   { id: 'ellipse', icon: Circle, labelKey: 'ellipse' },
 ]

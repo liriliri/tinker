@@ -29,6 +29,15 @@ export default observer(function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target
+      const isEditableTarget =
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA')
+      const isEditingText =
+        !!store.app?.editor?.innerEditor?.editTarget || isEditableTarget
+
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
         event.preventDefault()
         store.saveToFile()
@@ -41,6 +50,7 @@ export default observer(function App() {
       }
 
       if (event.key === 'Delete' || event.key === 'Backspace') {
+        if (isEditingText) return
         store.deleteSelected()
       }
     }
