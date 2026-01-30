@@ -11,18 +11,20 @@ import { Rect, Text, type App, type Frame } from 'leafer-ui'
 export type ToolType =
   | 'select'
   | 'move'
-  | 'rect'
-  | 'ellipse'
-  | 'line'
-  | 'arrow'
+  | 'shape'
   | 'pen'
   | 'text'
+  | 'magnifier'
+  | 'mosaic'
+
+export type ShapeType = 'rect' | 'ellipse' | 'line' | 'arrow'
 
 const STORAGE_FOREGROUND_KEY = 'foreground-color'
 const STORAGE_BACKGROUND_KEY = 'background-color'
 const STORAGE_TOOL_KEY = 'tool'
 const STORAGE_STROKE_WIDTH_KEY = 'stroke-width'
 const STORAGE_FONT_SIZE_KEY = 'font-size'
+const STORAGE_SHAPE_TYPE_KEY = 'shape-type'
 const storage = new LocalStore('tinker-image-annotator')
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
@@ -42,17 +44,20 @@ class Store extends BaseStore {
   isLoading: boolean = false
   scale: number = 100
   tool: ToolType = 'select'
+  shapeType: ShapeType = 'rect'
   strokeWidth: number = 4
   foregroundColor: string = DEFAULT_FOREGROUND_COLOR
   backgroundColor: string = DEFAULT_BACKGROUND_COLOR
   fontSize: number = 28
   isTextSelected: boolean = false
   isTextEditing: boolean = false
+  snapshot: { data: string; width: number; height: number } | null = null
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadToolFromStorage()
+    this.loadShapeTypeFromStorage()
     this.loadColorsFromStorage()
     this.loadStrokeWidthFromStorage()
     this.loadFontSizeFromStorage()
@@ -78,6 +83,11 @@ class Store extends BaseStore {
     this.tool = tool
     this.syncEditorMode()
     storage.set(STORAGE_TOOL_KEY, tool)
+  }
+
+  setShapeType(shapeType: ShapeType) {
+    this.shapeType = shapeType
+    storage.set(STORAGE_SHAPE_TYPE_KEY, shapeType)
   }
 
   setForegroundColor(color: string) {
@@ -121,6 +131,54 @@ class Store extends BaseStore {
 
   setTextEditing(value: boolean) {
     this.isTextEditing = value
+  }
+
+  setSnapshot(
+    snapshot: { data: string; width: number; height: number } | null
+  ) {
+    this.snapshot = snapshot
+  }
+
+  async createSnapshot() {
+    if (!this.frame || !this.image) return
+
+    try {
+      const baseImage = this.frame.children.find(
+        (child) => child.id === 'base-image'
+      )
+      if (!baseImage) return
+
+      const oldVisible = new Map()
+      this.frame.children.forEach((child) => {
+        if (child.id !== 'base-image') {
+          oldVisible.set(child, child.visible)
+          child.visible = false
+        }
+      })
+
+      const exportResult = await this.frame.export('png', { pixelRatio: 2 })
+      const data = exportResult.data as string
+
+      this.frame.children.forEach((child) => {
+        if (oldVisible.has(child)) {
+          child.visible = oldVisible.get(child)
+        }
+      })
+
+      runInAction(() => {
+        this.snapshot = {
+          data,
+          width: this.image!.width * 2,
+          height: this.image!.height * 2,
+        }
+      })
+    } catch (error) {
+      console.error('Failed to create snapshot:', error)
+    }
+  }
+
+  clearSnapshot() {
+    this.snapshot = null
   }
 
   syncEditorMode() {
@@ -187,6 +245,7 @@ class Store extends BaseStore {
         child.remove()
       }
     })
+    this.clearSnapshot()
   }
 
   async addImageOverlay(file: File) {
@@ -372,6 +431,13 @@ class Store extends BaseStore {
     const savedTool = storage.get(STORAGE_TOOL_KEY)
     if (savedTool) {
       this.tool = savedTool as ToolType
+    }
+  }
+
+  private loadShapeTypeFromStorage() {
+    const savedShapeType = storage.get(STORAGE_SHAPE_TYPE_KEY)
+    if (savedShapeType) {
+      this.shapeType = savedShapeType as ShapeType
     }
   }
 

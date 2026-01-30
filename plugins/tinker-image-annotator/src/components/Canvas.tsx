@@ -11,6 +11,7 @@ import {
   PointerEvent,
   ZoomEvent,
   ResizeEvent,
+  PropertyEvent,
 } from 'leafer-ui'
 import { ScrollBar } from '@leafer-in/scroll'
 import '@leafer-in/editor'
@@ -20,6 +21,8 @@ import '@leafer-in/text-editor'
 import '@leafer-in/viewport'
 import '@leafer-in/view'
 import { Snap } from 'leafer-x-easy-snap'
+import Magnifier from '../lib/Magnifier'
+import Mosaic from '../lib/Mosaic'
 import store from '../store'
 import i18n from '../i18n'
 import { THEME_COLORS } from 'share/theme'
@@ -136,6 +139,15 @@ const Canvas = observer(() => {
       if (selectedText && typeof selectedText.fontSize === 'number') {
         store.setFontSize(selectedText.fontSize)
       }
+
+      const hasMagnifier = editor.list.some((item) => item instanceof Magnifier)
+      if (hasMagnifier && editor.list.length > 1) {
+        app.editor.config.rotateable = false
+        app.editor.config.lockRatio = true
+      } else {
+        app.editor.config.rotateable = true
+        app.editor.config.lockRatio = 'corner'
+      }
     }
 
     const handleInnerEditorOpen = () => {
@@ -232,13 +244,14 @@ const Canvas = observer(() => {
     const nextScale =
       typeof scaleValue === 'number' ? scaleValue : scaleValue?.x ?? 1
     store.setScale(nextScale)
+    store.createSnapshot()
   }, [store.app, store.image])
 
   useEffect(() => {
     const app = store.app
     if (!app) return
 
-    let drawing: Rect | Ellipse | Line | Text | null = null
+    let drawing: Rect | Ellipse | Line | Text | Magnifier | Mosaic | null = null
     let startPoint: { x: number; y: number } | null = null
 
     const createLine = (point: { x: number; y: number }, curve: boolean) => {
@@ -293,31 +306,75 @@ const Canvas = observer(() => {
 
       startPoint = getPoint(event)
 
-      if (store.tool === 'rect') {
-        drawing = new Rect({
+      if (store.tool === 'shape') {
+        if (store.shapeType === 'rect') {
+          drawing = new Rect({
+            x: startPoint.x,
+            y: startPoint.y,
+            width: 1,
+            height: 1,
+            stroke: store.foregroundColor,
+            strokeWidth: store.strokeWidth,
+            cornerRadius: 6,
+            editable: true,
+          })
+        } else if (store.shapeType === 'ellipse') {
+          drawing = new Ellipse({
+            x: startPoint.x,
+            y: startPoint.y,
+            width: 1,
+            height: 1,
+            stroke: store.foregroundColor,
+            strokeWidth: store.strokeWidth,
+            editable: true,
+          })
+        } else if (store.shapeType === 'line') {
+          drawing = createLine(startPoint, false)
+        } else if (store.shapeType === 'arrow') {
+          drawing = createArrow(startPoint)
+        }
+      } else if (store.tool === 'magnifier') {
+        if (!store.snapshot) {
+          store.createSnapshot()
+        }
+        drawing = new Magnifier({
           x: startPoint.x,
           y: startPoint.y,
           width: 1,
           height: 1,
-          stroke: store.foregroundColor,
-          strokeWidth: store.strokeWidth,
-          cornerRadius: 6,
+          stroke: store.isDark ? '#ffffff90' : '#ffffff90',
+          strokeWidth: 4,
+          strokeAlign: 'outside',
+          shadow: {
+            x: 4,
+            y: 4,
+            blur: 6,
+            color: store.isDark ? '#ffffff10' : '#00000010',
+            box: true,
+          },
           editable: true,
         })
-      } else if (store.tool === 'ellipse') {
-        drawing = new Ellipse({
+      } else if (store.tool === 'mosaic') {
+        if (!store.snapshot) {
+          store.createSnapshot()
+        }
+        drawing = new Mosaic({
           x: startPoint.x,
           y: startPoint.y,
           width: 1,
           height: 1,
-          stroke: store.foregroundColor,
-          strokeWidth: store.strokeWidth,
+          stroke: store.isDark ? '#ffffff90' : '#ffffff90',
+          strokeWidth: 2,
+          strokeAlign: 'outside',
+          shadow: {
+            x: 2,
+            y: 2,
+            blur: 4,
+            color: store.isDark ? '#ffffff10' : '#00000010',
+            box: true,
+          },
           editable: true,
         })
-      } else if (store.tool === 'line') {
-        drawing = createLine(startPoint, false)
-      } else if (store.tool === 'arrow') {
-        drawing = createArrow(startPoint)
       } else if (store.tool === 'pen') {
         drawing = createLine(startPoint, true)
       }
@@ -341,13 +398,23 @@ const Canvas = observer(() => {
 
         drawing.x = x
         drawing.y = y
-        drawing.width = width
-        drawing.height = height
+
+        if (drawing instanceof Magnifier) {
+          const max = Math.max(width, height)
+          drawing.width = max
+          drawing.height = max
+        } else if (drawing instanceof Mosaic) {
+          drawing.width = width
+          drawing.height = height
+        } else {
+          drawing.width = width
+          drawing.height = height
+        }
       } else if (drawing instanceof Line) {
         if (store.tool === 'pen') {
           const points = drawing.points as number[]
           drawing.points = [...points, point.x, point.y]
-        } else if (store.tool === 'arrow') {
+        } else if (store.tool === 'shape' && store.shapeType === 'arrow') {
           drawing.points = getArrowPoints(startPoint, point, store.strokeWidth)
         } else {
           drawing.points = [startPoint.x, startPoint.y, point.x, point.y]
@@ -355,9 +422,209 @@ const Canvas = observer(() => {
       }
     }
 
-    const onDragEnd = () => {
+    const onDragEnd = async () => {
+      if (drawing instanceof Magnifier && store.snapshot) {
+        applyMagnifierFill(drawing)
+        setupMagnifierListener(drawing)
+        app.editor?.select(drawing)
+        store.setTool('select')
+      } else if (drawing instanceof Mosaic && store.snapshot) {
+        drawing.stroke = undefined
+        drawing.strokeWidth = undefined
+        drawing.shadow = undefined
+        await applyMosaicFill(drawing)
+        setupMosaicListener(drawing)
+        app.editor?.select(drawing)
+        store.setTool('select')
+      } else if (drawing && store.tool === 'shape') {
+        app.editor?.select(drawing)
+        store.setTool('select')
+      }
       drawing = null
       startPoint = null
+    }
+
+    const applyMagnifierFill = (magnifier: Magnifier) => {
+      if (!store.snapshot) return
+      if (
+        typeof magnifier.x !== 'number' ||
+        typeof magnifier.y !== 'number' ||
+        typeof magnifier.width !== 'number' ||
+        typeof magnifier.height !== 'number'
+      ) {
+        return
+      }
+
+      const offsetX = -magnifier.x * 2 - magnifier.width / 2
+      const offsetY = -magnifier.y * 2 - magnifier.height / 2
+
+      magnifier.fill = [
+        { type: 'solid', color: store.isDark ? '#000000' : '#ffffff' },
+        {
+          type: 'image',
+          url: store.snapshot.data,
+          mode: 'clip',
+          size: {
+            width: store.snapshot.width,
+            height: store.snapshot.height,
+          },
+          offset: { x: offsetX, y: offsetY },
+        },
+        {
+          type: 'linear',
+          from: 'top',
+          to: 'bottom',
+          stops: [
+            { offset: 0, color: store.isDark ? '#000000aa' : '#ffffffaa' },
+            { offset: 0.48, color: store.isDark ? '#00000000' : '#ffffff00' },
+          ],
+        },
+      ]
+    }
+
+    const setupMagnifierListener = (magnifier: Magnifier) => {
+      let lastOffset = { x: 0, y: 0 }
+
+      const updateFill = () => {
+        if (!store.snapshot) return
+        if (
+          typeof magnifier.x !== 'number' ||
+          typeof magnifier.y !== 'number' ||
+          typeof magnifier.width !== 'number' ||
+          typeof magnifier.height !== 'number'
+        ) {
+          return
+        }
+
+        const offsetX = -magnifier.x * 2 - magnifier.width / 2
+        const offsetY = -magnifier.y * 2 - magnifier.height / 2
+
+        if (lastOffset.x === offsetX && lastOffset.y === offsetY) return
+
+        lastOffset = { x: offsetX, y: offsetY }
+        applyMagnifierFill(magnifier)
+      }
+
+      magnifier.on(PropertyEvent.CHANGE, (event: any) => {
+        if (!store.snapshot) return
+        if (!['x', 'y', 'width', 'height'].includes(event.attrName)) return
+        updateFill()
+      })
+    }
+
+    const applyMosaicFill = async (mosaic: Mosaic) => {
+      if (!store.snapshot) return
+      if (
+        typeof mosaic.x !== 'number' ||
+        typeof mosaic.y !== 'number' ||
+        typeof mosaic.width !== 'number' ||
+        typeof mosaic.height !== 'number'
+      ) {
+        return
+      }
+
+      const pixelSize = 40
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      const img = new Image()
+      img.src = store.snapshot.data
+
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve()
+        img.onerror = () => resolve()
+      })
+
+      const sourceX = mosaic.x * 2
+      const sourceY = mosaic.y * 2
+      const sourceWidth = mosaic.width * 2
+      const sourceHeight = mosaic.height * 2
+
+      const smallWidth = Math.max(1, Math.ceil(sourceWidth / pixelSize))
+      const smallHeight = Math.max(1, Math.ceil(sourceHeight / pixelSize))
+
+      canvas.width = mosaic.width
+      canvas.height = mosaic.height
+
+      ctx.imageSmoothingEnabled = false
+
+      const tempCanvas = document.createElement('canvas')
+      const tempCtx = tempCanvas.getContext('2d')
+      if (!tempCtx) return
+
+      tempCanvas.width = smallWidth
+      tempCanvas.height = smallHeight
+      tempCtx.drawImage(
+        img,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        smallWidth,
+        smallHeight
+      )
+
+      ctx.drawImage(
+        tempCanvas,
+        0,
+        0,
+        smallWidth,
+        smallHeight,
+        0,
+        0,
+        mosaic.width,
+        mosaic.height
+      )
+
+      const mosaicData = canvas.toDataURL()
+
+      mosaic.fill = {
+        type: 'image',
+        url: mosaicData,
+        mode: 'clip',
+      }
+    }
+
+    const setupMosaicListener = (mosaic: Mosaic) => {
+      let lastPos = { x: 0, y: 0, width: 0, height: 0 }
+
+      const updateFill = async () => {
+        if (!store.snapshot) return
+        if (
+          typeof mosaic.x !== 'number' ||
+          typeof mosaic.y !== 'number' ||
+          typeof mosaic.width !== 'number' ||
+          typeof mosaic.height !== 'number'
+        ) {
+          return
+        }
+
+        if (
+          lastPos.x === mosaic.x &&
+          lastPos.y === mosaic.y &&
+          lastPos.width === mosaic.width &&
+          lastPos.height === mosaic.height
+        ) {
+          return
+        }
+
+        lastPos = {
+          x: mosaic.x,
+          y: mosaic.y,
+          width: mosaic.width,
+          height: mosaic.height,
+        }
+        await applyMosaicFill(mosaic)
+      }
+
+      mosaic.on(PropertyEvent.CHANGE, (event: any) => {
+        if (!store.snapshot) return
+        if (!['x', 'y', 'width', 'height'].includes(event.attrName)) return
+        updateFill()
+      })
     }
 
     app.tree.on(PointerEvent.DOWN, onPointerDown)
@@ -374,6 +641,7 @@ const Canvas = observer(() => {
   }, [
     store.app,
     store.tool,
+    store.shapeType,
     store.foregroundColor,
     store.strokeWidth,
     store.fontSize,

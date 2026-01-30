@@ -1,7 +1,19 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { FolderOpen, Image, Save, Undo, Redo, Copy, Check } from 'lucide-react'
+import {
+  FolderOpen,
+  Image,
+  Save,
+  Undo,
+  Redo,
+  Copy,
+  Check,
+  Square,
+  Circle,
+  Minus,
+  ArrowRight,
+} from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
@@ -12,14 +24,14 @@ import {
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Select, { type SelectOption } from 'share/components/Select'
 import { tw } from 'share/theme'
-import store from '../store'
+import store, { type ShapeType } from '../store'
 
 interface TopToolbarProps {
   onOpenImage: () => void
   onInsertImage: () => void
 }
 
-const STROKE_WIDTH_TOOLS = new Set(['pen', 'line', 'arrow', 'rect', 'ellipse'])
+const STROKE_WIDTH_TOOLS = new Set(['pen', 'shape'])
 
 const STROKE_WIDTH_OPTIONS: SelectOption<number>[] = [
   { label: '2', value: 2 },
@@ -27,6 +39,11 @@ const STROKE_WIDTH_OPTIONS: SelectOption<number>[] = [
   { label: '6', value: 6 },
   { label: '8', value: 8 },
   { label: '10', value: 10 },
+  { label: '12', value: 12 },
+  { label: '14', value: 14 },
+  { label: '16', value: 16 },
+  { label: '18', value: 18 },
+  { label: '20', value: 20 },
 ]
 
 const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
@@ -45,6 +62,16 @@ const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
   { label: '72', value: 72 },
 ]
 
+const SHAPE_TYPE_CONFIGS: Record<
+  ShapeType,
+  { icon: typeof Square; labelKey: string }
+> = {
+  rect: { icon: Square, labelKey: 'rect' },
+  ellipse: { icon: Circle, labelKey: 'ellipse' },
+  line: { icon: Minus, labelKey: 'line' },
+  arrow: { icon: ArrowRight, labelKey: 'arrow' },
+}
+
 export default observer(function TopToolbar({
   onOpenImage,
   onInsertImage,
@@ -52,6 +79,7 @@ export default observer(function TopToolbar({
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const shouldShowStrokeWidth = STROKE_WIDTH_TOOLS.has(store.tool)
+  const shouldShowShapeSelector = store.tool === 'shape'
   const shouldShowFontSize =
     store.tool === 'text' || store.isTextSelected || store.isTextEditing
 
@@ -106,6 +134,28 @@ export default observer(function TopToolbar({
               disabled={false}
               title={t('strokeWidth')}
             />
+          </div>
+        </>
+      ) : null}
+      {shouldShowShapeSelector ? (
+        <>
+          <ToolbarSeparator />
+          <div className="flex items-center gap-1.5 px-1">
+            {(Object.keys(SHAPE_TYPE_CONFIGS) as ShapeType[]).map((shape) => {
+              const config = SHAPE_TYPE_CONFIGS[shape]
+              const Icon = config.icon
+              return (
+                <ToolbarButton
+                  key={shape}
+                  variant="toggle"
+                  active={store.shapeType === shape}
+                  onClick={() => store.setShapeType(shape)}
+                  title={t(config.labelKey)}
+                >
+                  <Icon size={TOOLBAR_ICON_SIZE} />
+                </ToolbarButton>
+              )
+            })}
           </div>
         </>
       ) : null}

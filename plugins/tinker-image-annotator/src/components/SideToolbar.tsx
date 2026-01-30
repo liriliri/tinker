@@ -4,18 +4,17 @@ import {
   MousePointer2,
   Hand,
   Square,
-  Circle,
-  Minus,
-  ArrowRight,
-  Repeat2,
   Pencil,
   Type,
+  Search,
+  Repeat2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { THEME_COLORS, tw } from 'share/theme'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import { TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
 import store, { ToolType } from '../store'
+import MosaicIcon from '../assets/mosaic.svg?react'
 
 const SIDE_TOOL_DEFS: Array<{
   id: ToolType
@@ -25,10 +24,8 @@ const SIDE_TOOL_DEFS: Array<{
   { id: 'select', icon: MousePointer2, labelKey: 'select' },
   { id: 'move', icon: Hand, labelKey: 'move' },
   { id: 'pen', icon: Pencil, labelKey: 'pen' },
-  { id: 'line', icon: Minus, labelKey: 'line' },
-  { id: 'arrow', icon: ArrowRight, labelKey: 'arrow' },
-  { id: 'rect', icon: Square, labelKey: 'rect' },
-  { id: 'ellipse', icon: Circle, labelKey: 'ellipse' },
+  { id: 'shape', icon: Square, labelKey: 'shape' },
+  { id: 'magnifier', icon: Search, labelKey: 'magnifier' },
 ]
 
 export default observer(function SideToolbar() {
@@ -54,6 +51,20 @@ export default observer(function SideToolbar() {
           </ToolbarButton>
         )
       })}
+      <ToolbarButton
+        variant="toggle"
+        active={store.tool === 'mosaic'}
+        onClick={() => store.setTool('mosaic')}
+        disabled={false}
+        title={t('mosaic')}
+        className="mb-2"
+      >
+        <MosaicIcon
+          width={TOOLBAR_ICON_SIZE}
+          height={TOOLBAR_ICON_SIZE}
+          className="fill-current"
+        />
+      </ToolbarButton>
       <ToolbarButton
         variant="toggle"
         active={store.tool === 'text'}
