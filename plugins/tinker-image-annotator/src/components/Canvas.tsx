@@ -87,6 +87,7 @@ const getArrowPoints = (
 
 const Canvas = observer(() => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const watermarkRectRef = useRef<Rect | null>(null)
 
   useEffect(() => {
     const target = containerRef.current
@@ -246,6 +247,49 @@ const Canvas = observer(() => {
     store.setScale(nextScale)
     store.createSnapshot()
   }, [store.app, store.image])
+
+  useEffect(() => {
+    const frame = store.frame
+    if (!frame) {
+      if (watermarkRectRef.current) {
+        watermarkRectRef.current.remove()
+        watermarkRectRef.current = null
+      }
+      return
+    }
+
+    if (!store.watermarkSvg) {
+      if (watermarkRectRef.current) {
+        watermarkRectRef.current.remove()
+        watermarkRectRef.current = null
+      }
+      return
+    }
+
+    if (!watermarkRectRef.current) {
+      watermarkRectRef.current = new Rect({
+        id: 'watermark-layer',
+        x: 0,
+        y: 0,
+        editable: false,
+      })
+      frame.add(watermarkRectRef.current)
+    } else if (watermarkRectRef.current.parent !== frame) {
+      frame.add(watermarkRectRef.current)
+    }
+
+    const watermarkRect = watermarkRectRef.current
+    watermarkRect.width = frame.width
+    watermarkRect.height = frame.height
+    watermarkRect.zIndex = 1
+    watermarkRect.fill = {
+      type: 'image',
+      url: store.watermarkSvg,
+      mode: 'repeat',
+      format: 'svg',
+      size: Math.round(frame.width / 6),
+    }
+  }, [store.frame, store.watermarkSvg, store.image?.width, store.image?.height])
 
   useEffect(() => {
     const app = store.app

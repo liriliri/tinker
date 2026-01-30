@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import {
   FolderOpen,
   Image,
@@ -23,6 +23,7 @@ import {
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
 import Select, { type SelectOption } from 'share/components/Select'
+import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'
 import store, { type ShapeType } from '../store'
 
@@ -62,6 +63,9 @@ const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
   { label: '72', value: 72 },
 ]
 
+const WATERMARK_TEXT_INPUT_CLASS = `h-7 w-24 rounded border px-2 text-xs ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing} ${tw.primary.focusBorder} disabled:opacity-50`
+const WATERMARK_COLOR_INPUT_CLASS = `h-5 w-8 cursor-pointer rounded border-0 disabled:opacity-50 disabled:cursor-not-allowed`
+
 const SHAPE_TYPE_CONFIGS: Record<
   ShapeType,
   { icon: typeof Square; labelKey: string }
@@ -92,6 +96,18 @@ export default observer(function TopToolbar({
     }
   }
 
+  const handleWatermarkTextChange = (event: ChangeEvent<HTMLInputElement>) => {
+    store.setWatermarkText(event.target.value)
+  }
+
+  const handleWatermarkColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    store.setWatermarkColor(event.target.value)
+  }
+
+  const handleWatermarkToggle = (checked: boolean) => {
+    store.setWatermarkEnabled(checked)
+  }
+
   return (
     <Toolbar>
       <ToolbarButton onClick={onOpenImage} title={t('open')}>
@@ -104,6 +120,7 @@ export default observer(function TopToolbar({
       >
         <Image size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+      <ToolbarSeparator />
       <ToolbarButton
         onClick={() => store.undo()}
         disabled={!store.hasImage}
@@ -179,6 +196,33 @@ export default observer(function TopToolbar({
         </>
       ) : null}
       <ToolbarSpacer />
+      <div className="flex items-center gap-2 px-2">
+        <Checkbox
+          checked={store.watermarkEnabled}
+          onChange={handleWatermarkToggle}
+        >
+          {t('watermark')}
+        </Checkbox>
+        <input
+          type="color"
+          value={store.watermarkColor}
+          onChange={handleWatermarkColorChange}
+          disabled={!store.watermarkEnabled}
+          className={WATERMARK_COLOR_INPUT_CLASS}
+          title={t('watermarkColor')}
+          aria-label={t('watermarkColor')}
+        />
+        <input
+          type="text"
+          value={store.watermarkText}
+          onChange={handleWatermarkTextChange}
+          disabled={!store.watermarkEnabled}
+          placeholder={t('watermarkTextPlaceholder')}
+          className={WATERMARK_TEXT_INPUT_CLASS}
+          title={t('watermarkTextPlaceholder')}
+        />
+      </div>
+      <ToolbarSeparator />
       <ToolbarButton
         onClick={handleCopy}
         disabled={!store.hasImage}

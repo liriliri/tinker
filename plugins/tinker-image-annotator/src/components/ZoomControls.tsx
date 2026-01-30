@@ -27,9 +27,6 @@ export default observer(function ZoomControls() {
       <div
         ref={menuRef}
         className="relative pb-0.5"
-        onMouseEnter={() => {
-          if (!isDisabled) setIsMenuOpen(true)
-        }}
         onMouseLeave={() => setIsMenuOpen(false)}
       >
         <div
@@ -47,6 +44,9 @@ export default observer(function ZoomControls() {
           <button
             type="button"
             disabled={isDisabled}
+            onMouseEnter={() => {
+              if (!isDisabled) setIsMenuOpen(true)
+            }}
             className={`h-9 px-3 flex items-center justify-center text-[15px] font-medium text-center tabular-nums min-w-[56px] ${tw.text.both.primary} ${buttonState}`}
           >
             {store.scale}%

@@ -7,6 +7,7 @@ import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
 import i18n from './i18n'
 import { Rect, Text, type App, type Frame } from 'leafer-ui'
+import { textToSvg } from './lib/watermark'
 
 export type ToolType =
   | 'select'
@@ -25,9 +26,16 @@ const STORAGE_TOOL_KEY = 'tool'
 const STORAGE_STROKE_WIDTH_KEY = 'stroke-width'
 const STORAGE_FONT_SIZE_KEY = 'font-size'
 const STORAGE_SHAPE_TYPE_KEY = 'shape-type'
+const STORAGE_WATERMARK_ENABLED_KEY = 'watermark-enabled'
+const STORAGE_WATERMARK_TEXT_KEY = 'watermark-text'
+const STORAGE_WATERMARK_COLOR_KEY = 'watermark-color'
 const storage = new LocalStore('tinker-image-annotator')
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
+const DEFAULT_WATERMARK_TEXT = 'Tinker'
+const DEFAULT_WATERMARK_COLOR = '#00000030'
+const WATERMARK_ANGLE_DEGREES = 45
+const WATERMARK_FONT_SIZE = 36
 
 export interface ImageInfo {
   fileName: string
@@ -52,6 +60,10 @@ class Store extends BaseStore {
   isTextSelected: boolean = false
   isTextEditing: boolean = false
   snapshot: { data: string; width: number; height: number } | null = null
+  watermarkEnabled: boolean = false
+  watermarkText: string = DEFAULT_WATERMARK_TEXT
+  watermarkColor: string = DEFAULT_WATERMARK_COLOR
+  watermarkSvg: string | null = null
 
   constructor() {
     super()
@@ -61,6 +73,7 @@ class Store extends BaseStore {
     this.loadColorsFromStorage()
     this.loadStrokeWidthFromStorage()
     this.loadFontSizeFromStorage()
+    this.loadWatermarkFromStorage()
   }
 
   get hasImage() {
@@ -137,6 +150,24 @@ class Store extends BaseStore {
     snapshot: { data: string; width: number; height: number } | null
   ) {
     this.snapshot = snapshot
+  }
+
+  setWatermarkEnabled(enabled: boolean) {
+    this.watermarkEnabled = enabled
+    storage.set(STORAGE_WATERMARK_ENABLED_KEY, enabled)
+    this.updateWatermarkSvg()
+  }
+
+  setWatermarkText(text: string) {
+    this.watermarkText = text
+    storage.set(STORAGE_WATERMARK_TEXT_KEY, text)
+    this.updateWatermarkSvg()
+  }
+
+  setWatermarkColor(color: string) {
+    this.watermarkColor = color
+    storage.set(STORAGE_WATERMARK_COLOR_KEY, color)
+    this.updateWatermarkSvg()
   }
 
   async createSnapshot() {
@@ -241,7 +272,7 @@ class Store extends BaseStore {
   clearAnnotations() {
     if (!this.app?.tree) return
     this.app.tree.children.forEach((child) => {
-      if (child.id !== 'base-image') {
+      if (child.id !== 'base-image' && child.id !== 'watermark-layer') {
         child.remove()
       }
     })
@@ -453,6 +484,37 @@ class Store extends BaseStore {
     if (typeof savedFontSize === 'number') {
       this.fontSize = savedFontSize
     }
+  }
+
+  private loadWatermarkFromStorage() {
+    const savedEnabled = storage.get(STORAGE_WATERMARK_ENABLED_KEY)
+    const savedText = storage.get(STORAGE_WATERMARK_TEXT_KEY)
+    const savedColor = storage.get(STORAGE_WATERMARK_COLOR_KEY)
+
+    if (typeof savedEnabled === 'boolean') {
+      this.watermarkEnabled = savedEnabled
+    }
+    if (typeof savedText === 'string') {
+      this.watermarkText = savedText
+    }
+    if (typeof savedColor === 'string') {
+      this.watermarkColor = savedColor
+    }
+
+    this.updateWatermarkSvg()
+  }
+
+  private updateWatermarkSvg() {
+    if (!this.watermarkEnabled || !this.watermarkText.trim()) {
+      this.watermarkSvg = null
+      return
+    }
+    this.watermarkSvg = textToSvg({
+      text: this.watermarkText.trim(),
+      color: this.watermarkColor,
+      angleDegrees: WATERMARK_ANGLE_DEGREES,
+      fontSize: WATERMARK_FONT_SIZE,
+    })
   }
 }
 
