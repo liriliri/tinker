@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, Trash2 } from 'lucide-react'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
 import CopyButton from 'share/components/CopyButton'
@@ -74,11 +75,11 @@ export default observer(function EntryDetail() {
               >
                 {t('title')}
               </label>
-              <input
+              <TextInput
                 type="text"
                 value={entry.title}
                 onChange={(e) => handleUpdateField('Title', e.target.value)}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 
@@ -89,13 +90,13 @@ export default observer(function EntryDetail() {
                 {t('username')}
               </label>
               <div className="flex gap-2">
-                <input
+                <TextInput
                   type="text"
                   value={entry.username}
                   onChange={(e) =>
                     handleUpdateField('UserName', e.target.value)
                   }
-                  className={`flex-1 min-w-0 px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                  className={`flex-1 min-w-0 font-mono focus:ring-2 ${tw.primary.focusRing}`}
                 />
                 <CopyButton text={entry.username} title={t('copyUsername')} />
               </div>
@@ -109,13 +110,13 @@ export default observer(function EntryDetail() {
               </label>
               <div className="flex gap-2">
                 <div className="flex-1 min-w-0 relative">
-                  <input
+                  <TextInput
                     type={store.showPassword ? 'text' : 'password'}
                     value={passwordText}
                     onChange={(e) =>
                       handleUpdateField('Password', e.target.value)
                     }
-                    className={`w-full px-3 py-2 pr-10 rounded border ${tw.border.both} ${tw.bg.both.input} font-mono focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                    className={`pr-10 font-mono focus:ring-2 ${tw.primary.focusRing}`}
                   />
                   <button
                     onClick={handleTogglePassword}
@@ -144,11 +145,11 @@ export default observer(function EntryDetail() {
               >
                 {t('url')}
               </label>
-              <input
+              <TextInput
                 type="text"
                 value={entry.url}
                 onChange={(e) => handleUpdateField('URL', e.target.value)}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 

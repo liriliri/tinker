@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Copy, Check } from 'lucide-react'
 import dateFormat from 'licia/dateFormat'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
 
@@ -60,12 +61,12 @@ export default observer(function Converter() {
             {t('dateToTimestamp')} ({cityName}) {t('timestamp')}
           </h2>
           <div className="flex-1 flex flex-col gap-3 overflow-auto">
-            <input
+            <TextInput
               type="datetime-local"
               step="1"
               value={dateFormat(store.selectedDate, 'yyyy-mm-dd"T"HH:MM:ss')}
               onChange={(e) => handleDateTimeChange(e.target.value)}
-              className={`px-3 py-2 text-sm rounded ${tw.bg.both.input} text-gray-700 dark:text-gray-300 border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder}`}
+              className="text-sm"
             />
             <div
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}
@@ -96,12 +97,12 @@ export default observer(function Converter() {
             {t('timestampToDate')} ({cityName}) {t('date')}
           </h2>
           <div className="flex-1 flex flex-col gap-3">
-            <input
+            <TextInput
               type="text"
               value={store.timestampInput}
               onChange={(e) => handleTimestampInput(e.target.value)}
               placeholder={t('enterTimestamp')}
-              className={`px-3 py-2 text-sm rounded ${tw.bg.both.input} text-gray-700 dark:text-gray-300 font-mono border border-gray-300 ${tw.border.dark} focus:outline-none ${tw.primary.focusBorder} dark:focus:border-[#0fc25e]`}
+              className="text-sm font-mono"
             />
             <div
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}

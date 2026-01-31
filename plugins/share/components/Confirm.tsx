@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Dialog from './Dialog'
+import Dialog, { DialogButton } from './Dialog'
 import { tw } from '../theme'
 
 export interface ConfirmOptions {
@@ -79,19 +79,13 @@ export function ConfirmProvider({
             </p>
           )}
           <div className="flex gap-2 justify-end">
-            <button
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              onClick={handleCancel}
-            >
+            <DialogButton variant="text" onClick={handleCancel}>
               {confirmState.cancelText || BUILT_IN_TRANSLATIONS[locale].cancel}
-            </button>
-            <button
-              className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}
-              onClick={handleConfirm}
-            >
+            </DialogButton>
+            <DialogButton onClick={handleConfirm}>
               {confirmState.confirmText ||
                 BUILT_IN_TRANSLATIONS[locale].confirm}
-            </button>
+            </DialogButton>
           </div>
         </Dialog>
       )}

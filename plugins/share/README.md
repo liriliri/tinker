@@ -19,6 +19,7 @@ share/
 │   ├── Prompt.tsx
 │   ├── Select.tsx
 │   ├── Slider.tsx
+│   ├── TextInput.tsx
 │   ├── Toolbar.tsx
 │   ├── ToolbarButton.tsx
 │   ├── Toaster.tsx

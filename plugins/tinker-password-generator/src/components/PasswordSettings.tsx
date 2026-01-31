@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
 
@@ -23,7 +24,7 @@ export default observer(function PasswordSettings({
             {t('lengthExample')}
           </span>
         </label>
-        <input
+        <TextInput
           type="number"
           min="1"
           max="99"
@@ -32,7 +33,7 @@ export default observer(function PasswordSettings({
             store.setLength(Number(e.target.value))
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className="transition-colors"
         />
       </div>
       <div>
@@ -44,7 +45,7 @@ export default observer(function PasswordSettings({
             {t('repetitionExample')}
           </span>
         </label>
-        <input
+        <TextInput
           type="number"
           min="0"
           max="9"
@@ -53,7 +54,7 @@ export default observer(function PasswordSettings({
             store.setRepeat(Number(e.target.value))
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className="transition-colors"
         />
       </div>
     </div>

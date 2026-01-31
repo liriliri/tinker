@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import { Eye, EyeOff } from 'lucide-react'
 import store from '../store'
@@ -25,14 +26,14 @@ export default observer(function InputFields({
             {t('serviceExample')}
           </span>
         </label>
-        <input
+        <TextInput
           type="text"
           value={store.service}
           onChange={(e) => {
             store.setService(e.target.value)
             onInputChange()
           }}
-          className={`w-full px-3 py-2 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+          className="transition-colors"
         />
       </div>
 
@@ -47,14 +48,14 @@ export default observer(function InputFields({
           </span>
         </label>
         <div className="relative">
-          <input
+          <TextInput
             type={store.showPhrase ? 'text' : 'password'}
             value={store.phrase}
             onChange={(e) => {
               store.setPhrase(e.target.value)
               onInputChange()
             }}
-            className={`w-full px-3 py-2 pr-11 rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder} transition-colors`}
+            className="pr-11 transition-colors"
           />
           <button
             type="button"

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store, { CharsetState } from '../store'
 
@@ -86,7 +87,7 @@ export default observer(function CharacterTypesTable({
             >
               <label className="flex items-center gap-2">
                 <span className="whitespace-nowrap">{t('required')}</span>
-                <input
+                <TextInput
                   type="number"
                   min="1"
                   max="9"
@@ -95,7 +96,7 @@ export default observer(function CharacterTypesTable({
                     store.setRequired(Number(e.target.value))
                     onInputChange()
                   }}
-                  className={`w-10 px-1.5 py-1 text-xs text-center rounded border ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} focus:outline-none ${tw.primary.focusBorder}`}
+                  className="w-10 px-1.5 py-1 text-xs text-center"
                 />
               </label>
             </th>

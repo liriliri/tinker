@@ -2,8 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
-import store, { Priority } from '../store'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
+import store, { Priority } from '../store'
 
 const PRIORITY_COLORS = {
   A: { bg: 'bg-red-500', hover: 'hover:bg-red-600' },
@@ -48,13 +49,13 @@ export default observer(function AddTodo() {
       className={`${tw.bg.both.tertiary} ${tw.border.both} border-b p-4 flex-shrink-0`}
     >
       <div className="flex gap-2 mb-2">
-        <input
+        <TextInput
           type="text"
           value={store.newTodoText}
           onChange={(e) => store.setNewTodoText(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={t('taskPlaceholder')}
-          className={`flex-1 h-9 px-3 ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} border rounded text-sm focus:outline-none ${tw.primary.focusRing} focus:ring-2`}
+          className={`flex-1 h-9 text-sm ${tw.primary.focusRing} focus:ring-2`}
         />
 
         <button
@@ -68,11 +69,11 @@ export default observer(function AddTodo() {
 
       <div className="flex gap-2 items-center">
         <div className="relative">
-          <input
+          <TextInput
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className={`h-7 px-2 pr-7 ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} border rounded text-xs focus:outline-none ${tw.primary.focusRing} focus:ring-2`}
+            className={`w-auto h-7 px-2 pr-7 text-xs ${tw.primary.focusRing} focus:ring-2`}
           />
           <button
             onClick={handleClearDate}

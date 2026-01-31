@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import Dialog from './Dialog'
+import Dialog, { DialogButton } from './Dialog'
+import TextInput from './TextInput'
 import { tw } from '../theme'
 
 export interface PromptOptions {
@@ -93,9 +94,9 @@ export function PromptProvider({
               {promptState.message}
             </p>
           )}
-          <input
+          <TextInput
             type={promptState.inputType || 'text'}
-            className={`w-full px-3 py-2 mb-6 border ${tw.border.both} rounded ${tw.bg.light.primary} ${tw.bg.dark.tertiary} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none`}
+            className="mb-6"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -103,19 +104,12 @@ export function PromptProvider({
             autoFocus
           />
           <div className="flex gap-2 justify-end">
-            <button
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              onClick={handleCancel}
-            >
+            <DialogButton variant="text" onClick={handleCancel}>
               {promptState.cancelText || BUILT_IN_TRANSLATIONS[locale].cancel}
-            </button>
-            <button
-              className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
-              onClick={handleConfirm}
-              disabled={!inputValue.trim()}
-            >
+            </DialogButton>
+            <DialogButton onClick={handleConfirm} disabled={!inputValue.trim()}>
               {promptState.confirmText || BUILT_IN_TRANSLATIONS[locale].confirm}
-            </button>
+            </DialogButton>
           </div>
         </Dialog>
       )}

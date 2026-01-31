@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Dialog from './Dialog'
+import Dialog, { DialogButton } from './Dialog'
 import { tw } from '../theme'
 
 export interface AlertOptions {
@@ -66,12 +66,9 @@ export function AlertProvider({
             </p>
           )}
           <div className="flex justify-end">
-            <button
-              className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}
-              onClick={handleClose}
-            >
+            <DialogButton onClick={handleClose}>
               {alertState.confirmText || BUILT_IN_TRANSLATIONS[locale].confirm}
-            </button>
+            </DialogButton>
           </div>
         </Dialog>
       )}

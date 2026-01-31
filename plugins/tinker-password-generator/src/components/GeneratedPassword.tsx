@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
 import CopyButton from 'share/components/CopyButton'
+import TextInput from 'share/components/TextInput'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function GeneratedPassword() {
@@ -9,12 +10,12 @@ export default observer(function GeneratedPassword() {
 
   return (
     <div className="relative">
-      <input
+      <TextInput
         type="text"
         value={store.generatedPassword}
         readOnly
         placeholder={t('generatedPassword')}
-        className={`w-full px-3 py-2 pr-11 rounded border font-mono text-sm ${tw.bg.both.input} ${tw.text.both.primary} ${tw.border.both} select-all focus:outline-none ${tw.primary.focusBorder}`}
+        className="pr-11 font-mono text-sm select-all"
       />
       {store.generatedPassword && (
         <CopyButton
