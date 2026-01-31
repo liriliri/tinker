@@ -21,5 +21,10 @@
   "monthView": "月视图",
   "weekView": "周视图",
   "dayView": "日视图",
-  "toggleSidebar": "切换侧边栏"
+  "toggleSidebar": "切换侧边栏",
+  "allDay": "全天",
+  "startTime": "开始",
+  "endTime": "结束",
+  "cancel": "取消",
+  "save": "保存"
 }

@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { ChevronLeft, ChevronRight, Plus, PanelRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { prompt } from 'share/components/Prompt'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -19,24 +18,13 @@ interface ToolbarComponentProps {
   setCurrentView: (view: string) => void
 }
 
-function getDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
-  return formatter.format(new Date(`${dateKey}T00:00:00`))
-}
-
 export default observer(function ToolbarComponent({
   calendarRef,
   currentView,
   setCurrentView,
 }: ToolbarComponentProps) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const titleRef = useRef<HTMLDivElement>(null)
-
-  const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
 
   const getCalendarApi = () => calendarRef.current?.getApi()
 
@@ -77,16 +65,8 @@ export default observer(function ToolbarComponent({
     titleRef.current.textContent = api.view.title
   }
 
-  const handleAddEvent = async () => {
-    const selectedDateLabel = getDateLabel(store.selectedDate, dateFormatter)
-    const title = await prompt({
-      title: t('newEventTitle'),
-      message: t('newEventMessage', { date: selectedDateLabel }),
-      placeholder: t('eventTitlePlaceholder'),
-    })
-
-    if (!title) return
-    store.addEvent(store.selectedDate, title)
+  const handleAddEvent = () => {
+    store.openEventDialog(store.selectedDate)
   }
 
   return (

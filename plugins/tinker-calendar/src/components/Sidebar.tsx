@@ -3,12 +3,36 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Pencil, Trash2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
-import { prompt } from 'share/components/Prompt'
 import { tw } from 'share/theme'
 import store, { type CalendarEvent } from '../store'
 
 function formatDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
   return formatter.format(new Date(`${dateKey}T00:00:00`))
+}
+
+function formatEventTime(event: CalendarEvent, selectedDate: string): string {
+  if (event.allDay || !event.startTime) return ''
+
+  const startDate = event.start.slice(0, 10)
+  const endDate = event.end?.slice(0, 10)
+  const endTime = event.endTime
+
+  // If event spans multiple days
+  if (endDate && endDate !== startDate) {
+    // If showing on start date
+    if (startDate === selectedDate) {
+      return `${event.startTime} - 24:00`
+    }
+    // If showing on end date
+    if (endDate === selectedDate) {
+      return `00:00 - ${endTime || '24:00'}`
+    }
+    // If showing on middle day
+    return '00:00 - 24:00'
+  }
+
+  // Same day event
+  return endTime ? `${event.startTime} - ${endTime}` : event.startTime
 }
 
 const Sidebar = observer(() => {
@@ -27,15 +51,8 @@ const Sidebar = observer(() => {
   const selectedDateLabel = formatDateLabel(store.selectedDate, dateFormatter)
   const eventsForSelectedDate = store.eventsForSelectedDate
 
-  const handleEditEvent = async (event: CalendarEvent) => {
-    const nextTitle = await prompt({
-      title: t('editEventTitle'),
-      defaultValue: event.title,
-      placeholder: t('eventTitlePlaceholder'),
-    })
-
-    if (!nextTitle) return
-    store.updateEventTitle(event.id, nextTitle)
+  const handleEditEvent = (event: CalendarEvent) => {
+    store.openEventDialog(event.start.slice(0, 10), event.id)
   }
 
   const handleDeleteEvent = async (event: CalendarEvent) => {
@@ -86,6 +103,11 @@ const Sidebar = observer(() => {
                     >
                       {event.title}
                     </h3>
+                    {!event.allDay && event.startTime && (
+                      <p className={`text-xs mt-0.5 ${tw.text.both.secondary}`}>
+                        {formatEventTime(event, store.selectedDate)}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex-shrink-0 flex items-center gap-0.5">

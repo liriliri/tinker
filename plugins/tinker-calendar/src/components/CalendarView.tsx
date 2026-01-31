@@ -14,7 +14,7 @@ import type {
   DatesSetArg,
 } from '@fullcalendar/core'
 import { useTranslation } from 'react-i18next'
-import { prompt } from 'share/components/Prompt'
+import EventDialog, { type EventFormData } from './EventDialog'
 import store from '../store'
 
 interface CalendarViewProps {
@@ -22,13 +22,9 @@ interface CalendarViewProps {
   setCurrentView: (view: string) => void
 }
 
-function getDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
-  return formatter.format(new Date(`${dateKey}T00:00:00`))
-}
-
 const CalendarView = observer(
   ({ calendarRef, setCurrentView }: CalendarViewProps) => {
-    const { t, i18n } = useTranslation()
+    const { i18n } = useTranslation()
     const clickTimerRef = useRef<NodeJS.Timeout | null>(null)
     const lastClickInfoRef = useRef<DateClickArg | null>(null)
 
@@ -44,12 +40,12 @@ const CalendarView = observer(
       const calendarEl = calendarRef.current?.getApi().el
       if (!calendarEl) return
 
-      const handleDoubleClick = async (e: MouseEvent) => {
+      const handleDoubleClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement
         const dayCell = target.closest('.fc-daygrid-day')
 
         if (dayCell && lastClickInfoRef.current) {
-          await handleDateDoubleClick(lastClickInfoRef.current)
+          handleDateDoubleClick(lastClickInfoRef.current)
         }
       }
 
@@ -57,18 +53,9 @@ const CalendarView = observer(
       return () => {
         calendarEl.removeEventListener('dblclick', handleDoubleClick)
       }
-    }, [i18n.language])
+    }, [])
     const calendarLocale = useMemo(
       () => (i18n.language === 'zh-CN' ? zhLocale : undefined),
-      [i18n.language]
-    )
-    const dateFormatter = useMemo(
-      () =>
-        new Intl.DateTimeFormat(i18n.language, {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-        }),
       [i18n.language]
     )
     const calendarPlugins = useMemo(
@@ -93,37 +80,43 @@ const CalendarView = observer(
       }, 250)
     }
 
-    const handleDateDoubleClick = async (info: DateClickArg) => {
-      // Clear single click timer
+    const handleDateDoubleClick = (info: DateClickArg) => {
       if (clickTimerRef.current) {
         clearTimeout(clickTimerRef.current)
         clickTimerRef.current = null
       }
 
       store.setSelectedDate(info.dateStr)
-      const title = await prompt({
-        title: t('newEventTitle'),
-        message: t('newEventMessage', {
-          date: getDateLabel(info.dateStr, dateFormatter),
-        }),
-        placeholder: t('eventTitlePlaceholder'),
-      })
-
-      if (!title) return
-      store.addEvent(info.dateStr, title)
+      store.openEventDialog(info.dateStr)
     }
 
-    const handleEventClick = async (info: EventClickArg) => {
+    const handleEventClick = (info: EventClickArg) => {
       const eventDate = info.event.start ?? new Date()
       store.setSelectedDate(eventDate)
-      const nextTitle = await prompt({
-        title: t('editEventTitle'),
-        defaultValue: info.event.title,
-        placeholder: t('eventTitlePlaceholder'),
-      })
+      store.openEventDialog(info.event.startStr.slice(0, 10), info.event.id)
+    }
 
-      if (!nextTitle) return
-      store.updateEventTitle(info.event.id, nextTitle)
+    const handleDialogSave = (data: EventFormData) => {
+      if (store.editingEventId) {
+        store.updateEvent(
+          store.editingEventId,
+          data.title,
+          data.startDate,
+          data.isAllDay,
+          data.startTime,
+          data.endTime,
+          data.endDate
+        )
+      } else {
+        store.addEvent(
+          data.startDate,
+          data.title,
+          data.isAllDay,
+          data.startTime,
+          data.endTime,
+          data.endDate
+        )
+      }
     }
 
     const handleEventDrop = (info: EventDropArg) => {
@@ -140,28 +133,49 @@ const CalendarView = observer(
       setCurrentView(arg.view.type)
     }
 
+    const editingEvent = store.editingEventId
+      ? store.getEventById(store.editingEventId)
+      : null
+
+    const getEndDate = (event: typeof editingEvent) => {
+      if (!event?.end) return undefined
+      return event.end.slice(0, 10)
+    }
+
     return (
-      <FullCalendar
-        ref={calendarRef}
-        plugins={calendarPlugins}
-        initialView="dayGridMonth"
-        headerToolbar={false}
-        height="100%"
-        expandRows={true}
-        fixedWeekCount={false}
-        firstDay={0}
-        dayMaxEvents={3}
-        events={store.events}
-        locale={calendarLocale}
-        editable={true}
-        navLinks={true}
-        navLinkDayClick="timeGridDay"
-        dateClick={handleDateClick}
-        eventClick={handleEventClick}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventResize}
-        datesSet={handleDatesSet}
-      />
+      <>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={calendarPlugins}
+          initialView="dayGridMonth"
+          headerToolbar={false}
+          height="100%"
+          expandRows={true}
+          fixedWeekCount={false}
+          firstDay={0}
+          dayMaxEvents={3}
+          events={store.calendarEvents}
+          locale={calendarLocale}
+          editable={true}
+          navLinks={true}
+          navLinkDayClick="timeGridDay"
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
+          eventDrop={handleEventDrop}
+          eventResize={handleEventResize}
+          datesSet={handleDatesSet}
+        />
+        <EventDialog
+          isOpen={store.eventDialogOpen}
+          onClose={() => store.closeEventDialog()}
+          onSave={handleDialogSave}
+          initialDate={store.eventDialogDate}
+          initialTitle={editingEvent?.title}
+          initialStartTime={editingEvent?.startTime}
+          initialEndTime={editingEvent?.endTime}
+          initialEndDate={getEndDate(editingEvent)}
+        />
+      </>
     )
   }
 )
