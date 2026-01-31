@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import Toolbar from './Toolbar'
-import FileOpen from './FileOpen'
+import FileOpen from 'share/components/FileOpen'
 import store from '../store'
 
 export default observer(function DualPanel() {

@@ -5,7 +5,7 @@ import { tw } from 'share/theme'
 import store from './store'
 import HashResult from './components/HashResult'
 import HashToolbar from './components/Toolbar'
-import FileOpen from './components/FileOpen'
+import FileOpen from 'share/components/FileOpen'
 
 export default observer(function App() {
   const { t, i18n } = useTranslation()

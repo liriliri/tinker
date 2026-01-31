@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { File } from 'lucide-react'
 import openFile from 'licia/openFile'
-import className from 'licia/className'
 import { tw } from 'share/theme'
 
 interface FileOpenProps {
@@ -66,6 +65,10 @@ const FileOpen: React.FC<FileOpenProps> = ({
     await handleFileOpen(files[0])
   }
 
+  const borderClass = isDragging
+    ? tw.primary.border
+    : `${tw.gray.light.border400} ${tw.gray.dark.border200} ${tw.primary.hoverBorder}`
+
   return (
     <div
       onClick={handleClick}
@@ -73,15 +76,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      className={className(
-        'flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4',
-        {
-          [tw.primary.border]: isDragging,
-          [tw.gray.light.border400]: !isDragging,
-          [tw.gray.dark.border200]: !isDragging,
-          [tw.primary.hoverBorder]: !isDragging,
-        }
-      )}
+      className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${borderClass}`}
     >
       <div className="text-center p-8 pointer-events-none">
         <File

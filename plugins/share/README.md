@@ -15,6 +15,7 @@ share/
 │   ├── Confirm.tsx
 │   ├── CopyButton.tsx
 │   ├── Dialog.tsx
+│   ├── FileOpen.tsx
 │   ├── ImageOpen.tsx
 │   ├── Prompt.tsx
 │   ├── Select.tsx
@@ -186,6 +187,19 @@ export default observer(function MyComponent({
 ```
 
 ## Shared Components
+
+### FileOpen
+
+```typescript
+import FileOpen from 'share/components/FileOpen'
+
+<FileOpen
+  onOpenFile={(file) => store.handleFileOpen(file)}
+  openTitle={t('openFile')}
+  supportedFormats="PNG, JPG"
+  fileName={store.fileName}
+/>
+```
 
 ### Toolbar
 
