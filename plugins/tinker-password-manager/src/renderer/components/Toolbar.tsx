@@ -4,6 +4,7 @@ import { Save, Lock, Plus, FolderPlus, Search, Folder } from 'lucide-react'
 import {
   Toolbar as ToolbarComponent,
   ToolbarSeparator,
+  ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -97,12 +98,11 @@ export default observer(function Toolbar() {
           size={14}
           className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary}`}
         />
-        <input
-          type="text"
+        <ToolbarTextInput
           placeholder={t('searchPlaceholder')}
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
-          className={`w-full pl-7 pr-2 py-1 text-xs border rounded ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-2 py-1 ${tw.bg.both.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
         />
       </div>
 

@@ -19,6 +19,7 @@ import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
+  ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -63,7 +64,6 @@ const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
   { label: '72', value: 72 },
 ]
 
-const WATERMARK_TEXT_INPUT_CLASS = `h-7 w-24 rounded border px-2 text-xs ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing} ${tw.primary.focusBorder} disabled:opacity-50`
 const WATERMARK_COLOR_INPUT_CLASS = `h-5 w-8 cursor-pointer rounded border-0 disabled:opacity-50 disabled:cursor-not-allowed`
 
 const SHAPE_TYPE_CONFIGS: Record<
@@ -212,13 +212,12 @@ export default observer(function TopToolbar({
           title={t('watermarkColor')}
           aria-label={t('watermarkColor')}
         />
-        <input
-          type="text"
+        <ToolbarTextInput
           value={store.watermarkText}
           onChange={handleWatermarkTextChange}
           disabled={!store.watermarkEnabled}
           placeholder={t('watermarkTextPlaceholder')}
-          className={WATERMARK_TEXT_INPUT_CLASS}
+          className={`h-7 w-24 px-2 text-xs ${tw.bg.both.input} ${tw.primary.focusBorder} disabled:opacity-50`}
           title={t('watermarkTextPlaceholder')}
         />
       </div>

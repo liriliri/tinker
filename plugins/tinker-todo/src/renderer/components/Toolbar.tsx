@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import {
   Toolbar,
   ToolbarSeparator,
+  ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -51,12 +52,11 @@ export default observer(function ToolbarComponent() {
           size={14}
           className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary}`}
         />
-        <input
-          type="text"
+        <ToolbarTextInput
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
-          className={`w-full pl-7 pr-7 py-1 text-xs border rounded ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-7 py-1 ${tw.bg.both.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
         />
         {store.searchQuery && (
           <button

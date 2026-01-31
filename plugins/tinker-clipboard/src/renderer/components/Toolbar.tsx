@@ -15,6 +15,7 @@ import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
+  ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { ToolbarButton } from 'share/components/ToolbarButton'
@@ -72,17 +73,13 @@ export default observer(function ToolbarComponent() {
             tw.text.both.tertiary
           )}
         />
-        <input
-          type="text"
+        <ToolbarTextInput
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
           placeholder={t('search')}
           className={className(
-            'w-full pl-7 pr-2 py-1 text-xs border rounded focus:outline-none',
-            tw.border.both,
+            'w-full pl-7 pr-2 py-1',
             tw.bg.both.input,
-            tw.text.both.primary,
-            tw.primary.focusBorder,
             `placeholder:${tw.text.light.tertiary}`,
             `dark:placeholder:${tw.text.dark.tertiary}`
           )}
