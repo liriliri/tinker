@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import React, { ButtonHTMLAttributes, ReactNode } from 'react'
 import { tw } from '../theme'
 
 interface ToolbarProps {
@@ -10,6 +10,33 @@ export function Toolbar({ children, className = '' }: ToolbarProps) {
   const baseClass = `${tw.bg.light.secondary} ${tw.bg.dark.secondary} border-b ${tw.border.both} ${tw.text.dark.primary} px-1.5 py-1.5 flex gap-1 items-center`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
+}
+
+interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode
+  variant?: 'action' | 'toggle'
+  active?: boolean
+}
+
+export function ToolbarButton({
+  children,
+  variant = 'action',
+  active = false,
+  className = '',
+  ...props
+}: ToolbarButtonProps) {
+  const baseClass = 'p-1.5 rounded transition-colors'
+
+  const variantClass =
+    variant === 'toggle' && active
+      ? `${tw.primary.bg} text-white ${tw.primary.bgHover}`
+      : `${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
+
+  return (
+    <button className={`${baseClass} ${variantClass} ${className}`} {...props}>
+      {children}
+    </button>
+  )
 }
 
 export function ToolbarSeparator() {

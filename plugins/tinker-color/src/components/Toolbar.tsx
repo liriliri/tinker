@@ -7,8 +7,8 @@ import {
   Toolbar,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 import i18n from '../i18n'
 

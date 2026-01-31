@@ -21,7 +21,6 @@ share/
 │   ├── Slider.tsx
 │   ├── TextInput.tsx
 │   ├── Toolbar.tsx
-│   ├── ToolbarButton.tsx
 │   ├── Toaster.tsx
 │   └── Tooltip.tsx
 └── hooks/               # Shared React Hooks
@@ -191,8 +190,13 @@ export default observer(function MyComponent({
 ### Toolbar
 
 ```typescript
-import { Toolbar, ToolbarSeparator, ToolbarSpacer, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import { Copy, Trash } from 'lucide-react'
 
 <Toolbar>

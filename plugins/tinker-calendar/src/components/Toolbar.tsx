@@ -7,8 +7,8 @@ import {
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import type { CalendarApi } from '@fullcalendar/core'
 import store from '../store'
 

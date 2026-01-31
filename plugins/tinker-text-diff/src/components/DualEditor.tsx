@@ -8,8 +8,11 @@ import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
 import openFile from 'licia/openFile'
 import { tw } from 'share/theme'
-import { Toolbar, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
+import {
+  Toolbar,
+  TOOLBAR_ICON_SIZE,
+  ToolbarButton,
+} from 'share/components/Toolbar'
 import store from '../store'
 import { detectLanguageFromFileName } from '../lib/languageDetector'
 

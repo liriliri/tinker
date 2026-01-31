@@ -6,8 +6,8 @@ import {
   Toolbar as ToolbarContainer,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 
 export default observer(function Toolbar() {
   const { t } = useTranslation()

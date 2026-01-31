@@ -21,8 +21,8 @@ import {
   ToolbarSpacer,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import Select, { type SelectOption } from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'

@@ -7,8 +7,8 @@ import {
   ToolbarSeparator,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'
 import store from '../store'

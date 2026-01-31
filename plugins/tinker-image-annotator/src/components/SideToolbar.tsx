@@ -11,8 +11,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { THEME_COLORS, tw } from 'share/theme'
-import { ToolbarButton } from 'share/components/ToolbarButton'
-import { TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import { ToolbarButton, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
 import store, { ToolType } from '../store'
 import MosaicIcon from '../assets/mosaic.svg?react'
 

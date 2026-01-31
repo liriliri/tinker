@@ -6,8 +6,8 @@ import {
   Toolbar,
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import store from '../store'
 import { SUPPORTED_LANGUAGES } from '../lib/languageDetector'
 

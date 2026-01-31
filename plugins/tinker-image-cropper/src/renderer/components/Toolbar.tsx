@@ -21,8 +21,8 @@ import {
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
+  ToolbarButton,
 } from 'share/components/Toolbar'
-import { ToolbarButton } from 'share/components/ToolbarButton'
 import { tw } from 'share/theme'
 import { RefObject, useState } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
