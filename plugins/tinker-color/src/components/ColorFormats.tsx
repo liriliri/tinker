@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import className from 'licia/className'
 import CopyButton from 'share/components/CopyButton'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
 import {
@@ -80,22 +80,24 @@ function FormatRow({
       <span className={`${tw.text.both.primary} font-medium w-24 text-sm`}>
         {label}
       </span>
-      <input
-        type="text"
-        value={isEditing ? localValue : value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        onKeyDown={handleKeyDown}
-        className={className(
-          'flex-1 px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2',
-          tw.border.both,
-          tw.bg.both.input,
-          tw.text.both.primary,
-          tw.primary.focusRing
-        )}
-      />
-      <CopyButton text={cssValue} title={copyTitle} />
+      <div className="relative flex-1">
+        <TextInput
+          type="text"
+          value={isEditing ? localValue : value}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
+          className={`w-full px-4 py-2.5 pr-10 rounded-lg font-mono text-sm focus:ring-2 ${tw.bg.both.input} ${tw.text.both.primary} ${tw.primary.focusRing}`}
+        />
+        <CopyButton
+          text={cssValue}
+          title={copyTitle}
+          variant="icon"
+          iconClassName={tw.text.both.primary}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover.both}`}
+        />
+      </div>
     </div>
   )
 }
