@@ -8,10 +8,10 @@
   "deleteEvent": "Delete",
   "deleteEventTitle": "Delete event?",
   "deleteEventMessage": "Remove \"{{title}}\" from your calendar.",
-  "emptyEvents": "No events for this day yet.",
-  "clearAll": "Clear all events",
-  "clearAllTitle": "Clear every event?",
-  "clearAllMessage": "This will permanently remove all calendar events.",
+  "empty": "Empty",
+  "clearDay": "Clear day",
+  "clearDayTitle": "Clear this day?",
+  "clearDayMessage": "Remove all events from {{date}}.",
   "previous": "Previous",
   "next": "Next",
   "today": "Today",
@@ -20,5 +20,6 @@
   "day": "Day",
   "monthView": "Month view",
   "weekView": "Week view",
-  "dayView": "Day view"
+  "dayView": "Day view",
+  "toggleSidebar": "Toggle sidebar"
 }

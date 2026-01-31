@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, PanelRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { prompt } from 'share/components/Prompt'
 import {
@@ -15,6 +15,8 @@ import store from '../store'
 
 interface ToolbarComponentProps {
   calendarRef: React.RefObject<{ getApi: () => CalendarApi }>
+  currentView: string
+  setCurrentView: (view: string) => void
 }
 
 function getDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
@@ -23,10 +25,11 @@ function getDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
 
 export default observer(function ToolbarComponent({
   calendarRef,
+  currentView,
+  setCurrentView,
 }: ToolbarComponentProps) {
   const { t, i18n } = useTranslation()
   const titleRef = useRef<HTMLDivElement>(null)
-  const [currentView, setCurrentView] = useState<string>('dayGridMonth')
 
   const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
     weekday: 'long',
@@ -143,6 +146,17 @@ export default observer(function ToolbarComponent({
         className="text-xs leading-none"
       >
         {t('month')}
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <ToolbarButton
+        variant="toggle"
+        active={store.sidebarOpen}
+        onClick={() => store.toggleSidebar()}
+        title={t('toggleSidebar')}
+      >
+        <PanelRight size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
     </Toolbar>
   )

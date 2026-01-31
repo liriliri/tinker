@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { Pencil, Trash2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import { prompt } from 'share/components/Prompt'
 import { tw } from 'share/theme'
@@ -10,7 +11,7 @@ function formatDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
   return formatter.format(new Date(`${dateKey}T00:00:00`))
 }
 
-const EventSidebar = observer(() => {
+const Sidebar = observer(() => {
   const { t, i18n } = useTranslation()
   const dateFormatter = useMemo(
     () =>
@@ -48,50 +49,59 @@ const EventSidebar = observer(() => {
   }
 
   const handleClearAll = async () => {
-    if (!store.hasEvents) return
+    if (eventsForSelectedDate.length === 0) return
     const shouldClear = await confirm({
-      title: t('clearAllTitle'),
-      message: t('clearAllMessage'),
+      title: t('clearDayTitle'),
+      message: t('clearDayMessage', { date: selectedDateLabel }),
     })
 
     if (!shouldClear) return
-    store.clearEvents()
+    store.clearEventsForDate(store.selectedDate)
   }
 
   return (
     <aside
-      className={`w-64 h-full p-6 flex flex-col border-t ${tw.border.both}`}
+      className={`w-64 h-full flex flex-col border-t ${tw.border.both} ${tw.bg.both.tertiary}`}
     >
-      <div>
+      <div className={`p-3 border-b ${tw.border.both}`}>
         <h2 className="text-lg font-semibold">{selectedDateLabel}</h2>
       </div>
 
-      <div className="mt-4 flex-1 overflow-y-auto">
+      <div className="px-3 pt-3 flex-1 overflow-y-auto">
         {eventsForSelectedDate.length === 0 ? (
-          <p className={`text-sm ${tw.text.both.secondary}`}>
-            {t('emptyEvents')}
-          </p>
+          <div className="flex items-center justify-center h-full">
+            <p className={`text-sm ${tw.text.both.secondary}`}>{t('empty')}</p>
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 pb-6">
             {eventsForSelectedDate.map((event) => (
               <div
                 key={event.id}
-                className={`rounded-md border ${tw.border.both} ${tw.bg.both.tertiary} p-3`}
+                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.both.tertiary} ${tw.border.both}`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium">{event.title}</p>
-                  <div className="flex gap-2">
-                    <button
-                      className={`text-xs px-2 py-1 rounded border ${tw.border.both} ${tw.hover.both}`}
-                      onClick={() => handleEditEvent(event)}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className={`text-sm font-medium ${tw.text.both.primary}`}
                     >
-                      {t('editEvent')}
+                      {event.title}
+                    </h3>
+                  </div>
+
+                  <div className="flex-shrink-0 flex items-center gap-0.5">
+                    <button
+                      onClick={() => handleEditEvent(event)}
+                      className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+                      title={t('editEvent')}
+                    >
+                      <Pencil size={14} />
                     </button>
                     <button
-                      className={`text-xs px-2 py-1 rounded border ${tw.border.both} ${tw.hover.both}`}
                       onClick={() => handleDeleteEvent(event)}
+                      className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+                      title={t('deleteEvent')}
                     >
-                      {t('deleteEvent')}
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
@@ -101,15 +111,17 @@ const EventSidebar = observer(() => {
         )}
       </div>
 
-      <button
-        className={`mt-4 w-full px-3 py-2 text-sm rounded border ${tw.border.both} ${tw.bg.both.tertiary} ${tw.hover.both} disabled:opacity-50 disabled:cursor-not-allowed`}
-        onClick={handleClearAll}
-        disabled={!store.hasEvents}
-      >
-        {t('clearAll')}
-      </button>
+      <div className={`p-3 border-t ${tw.border.both}`}>
+        <button
+          className={`w-full px-3 py-1.5 text-xs ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          onClick={handleClearAll}
+          disabled={eventsForSelectedDate.length === 0}
+        >
+          {t('clearDay')}
+        </button>
+      </div>
     </aside>
   )
 })
 
-export default EventSidebar
+export default Sidebar

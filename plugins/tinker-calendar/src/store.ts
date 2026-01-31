@@ -4,6 +4,7 @@ import BaseStore from 'share/BaseStore'
 
 const storage = new LocalStore('tinker-calendar')
 const EVENTS_KEY = 'calendar-events'
+const SIDEBAR_KEY = 'sidebar-open'
 
 export type CalendarEvent = {
   id: string
@@ -16,11 +17,13 @@ export type CalendarEvent = {
 class Store extends BaseStore {
   selectedDate: string = this.getTodayKey()
   events: CalendarEvent[] = []
+  sidebarOpen: boolean = true
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadEvents()
+    this.loadSidebarState()
   }
 
   private getTodayKey() {
@@ -45,12 +48,28 @@ class Store extends BaseStore {
     storage.set(EVENTS_KEY, this.events)
   }
 
+  private loadSidebarState() {
+    const saved = storage.get(SIDEBAR_KEY)
+    if (saved !== null && saved !== undefined) {
+      this.sidebarOpen = saved as boolean
+    }
+  }
+
+  private saveSidebarState() {
+    storage.set(SIDEBAR_KEY, this.sidebarOpen)
+  }
+
   setSelectedDate(value: string | Date) {
     this.selectedDate = this.normalizeDateKey(value)
   }
 
   setToday() {
     this.selectedDate = this.getTodayKey()
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen
+    this.saveSidebarState()
   }
 
   addEvent(date: string | Date, title: string) {
@@ -90,6 +109,14 @@ class Store extends BaseStore {
 
   clearEvents() {
     this.events = []
+    this.saveEvents()
+  }
+
+  clearEventsForDate(date: string | Date) {
+    const dateKey = this.normalizeDateKey(date)
+    this.events = this.events.filter(
+      (event) => event.start.slice(0, 10) !== dateKey
+    )
     this.saveEvents()
   }
 
