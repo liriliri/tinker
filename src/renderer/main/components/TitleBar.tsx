@@ -73,23 +73,28 @@ export default observer(function Titlebar() {
         },
         {
           type: 'separator',
-        },
-        {
-          label: t('exportData'),
-          click() {
-            main.exportPluginData(store.plugin!.id)
-          },
-        },
-        {
-          label: t('importData'),
-          click() {
-            main.importPluginData(store.plugin!.id)
-          },
-        },
-        {
-          type: 'separator',
         }
       )
+
+      if (!store.plugin.online) {
+        template.push(
+          {
+            label: t('exportData'),
+            click() {
+              main.exportPluginData(store.plugin!.id)
+            },
+          },
+          {
+            label: t('importData'),
+            click() {
+              main.importPluginData(store.plugin!.id)
+            },
+          },
+          {
+            type: 'separator',
+          }
+        )
+      }
     } else {
       template.push(
         {

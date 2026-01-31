@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import mainObj from './main'
+import nodeObj from 'share/preload/node'
 import {
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
@@ -131,6 +132,8 @@ const tinkerObj = {
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
   saveData,
   loadData,
+  readFile: nodeObj.readFile,
+  writeFile: nodeObj.writeFile,
   on: mainObj.on,
 }
 

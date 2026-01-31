@@ -12,6 +12,8 @@ export function injectApi() {
     showItemInPath: _tinker.showItemInPath,
     getClipboardFilePaths: _tinker.getClipboardFilePaths,
     setTitle: _tinker.setTitle,
+    readFile: _tinker.readFile,
+    writeFile: _tinker.writeFile,
     on: _tinker.on,
     showContextMenu,
   }

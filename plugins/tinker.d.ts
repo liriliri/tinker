@@ -3,7 +3,11 @@ import type {
   OpenDialogReturnValue,
   SaveDialogOptions,
   SaveDialogReturnValue,
+  MenuItemConstructorOptions,
 } from 'electron'
+
+type ReadFile = typeof import('node:fs/promises').readFile
+type WriteFile = typeof import('node:fs/promises').writeFile
 
 declare global {
   /**
@@ -89,6 +93,26 @@ declare global {
      * console.log(filePaths) // ['/path/to/file1.png', '/path/to/file2.jpg']
      */
     getClipboardFilePaths(): Promise<string[]>
+
+    /**
+     * Read a file from the filesystem using Node's fs.promises.readFile.
+     * @param path - File path or URL
+     * @param options - Encoding or read options
+     * @returns Buffer or string depending on options
+     * @example
+     * const content = await tinker.readFile('/path/to/file.txt', 'utf-8')
+     */
+    readFile: ReadFile
+
+    /**
+     * Write data to a file using Node's fs.promises.writeFile.
+     * @param path - File path or URL
+     * @param data - Data to write
+     * @param options - Write options
+     * @example
+     * await tinker.writeFile('/path/to/file.txt', 'Hello World')
+     */
+    writeFile: WriteFile
 
     /**
      * Register an event listener.
