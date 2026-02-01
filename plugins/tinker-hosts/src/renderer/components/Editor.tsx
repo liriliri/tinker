@@ -4,6 +4,7 @@ import { Monaco, Editor as MonacoEditor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import debounce from 'licia/debounce'
+import { tw } from 'share/theme'
 
 // Register custom hosts language
 const registerHostsLanguage = (monaco: Monaco) => {
@@ -162,23 +163,23 @@ export default observer(function Editor() {
 
       {/* Bottom bar - only show in system view */}
       {isReadonly && (
-        <div className="h-[36px] px-4 border-t border-[#e0e0e0] dark:border-[#4a4a4a] flex items-center justify-between flex-shrink-0">
+        <div
+          className={`h-[36px] px-4 border-t ${tw.border.both} flex items-center justify-between flex-shrink-0`}
+        >
           {/* Left side - Open Hosts File button */}
-          <div>
-            <button
-              onClick={handleOpenHostsFile}
-              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-[#3a3a3c] transition-colors cursor-pointer"
-            >
-              {t('openHostsFile')}
-            </button>
-          </div>
+          <button
+            onClick={handleOpenHostsFile}
+            className={`inline-flex items-center h-6 text-xs ${tw.text.both.secondary} px-2 rounded ${tw.hover.both} transition-colors cursor-pointer`}
+          >
+            {t('openHostsFile')}
+          </button>
 
           {/* Right side - Readonly badge */}
-          <div>
-            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#3a3a3c] px-2 py-1 rounded">
-              {t('readonly')}
-            </span>
-          </div>
+          <span
+            className={`inline-flex items-center h-6 text-xs ${tw.text.both.tertiary} ${tw.bg.both.secondary} px-2 rounded`}
+          >
+            {t('readonly')}
+          </span>
         </div>
       )}
     </div>

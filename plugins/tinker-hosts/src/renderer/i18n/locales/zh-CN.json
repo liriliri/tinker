@@ -15,6 +15,7 @@
   "saveFailed": "✗ 应用失败: {{message}}",
   "applying": "应用中...",
   "applyConfig": "应用配置 ({{count}} 个激活)",
+  "rename": "重命名",
   "edit": "编辑",
   "delete": "删除",
   "apply": "应用",

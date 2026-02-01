@@ -74,7 +74,7 @@ export default observer(function Sidebar() {
         },
       },
       {
-        label: t('edit'),
+        label: t('rename'),
         click: () => {
           handleEditConfig(cfg.id, cfg.name)
         },
@@ -153,11 +153,11 @@ export default observer(function Sidebar() {
       {/* Action buttons - Fixed at bottom */}
       <div className="p-3 flex justify-center flex-shrink-0">
         <button
-          className={`${tw.primary.bg} ${tw.primary.bgHover} text-white px-4 py-2 rounded flex items-center gap-2 transition-colors`}
+          className={`w-full ${tw.primary.bg} ${tw.primary.bgHover} text-white px-3 py-1.5 text-xs rounded-md flex items-center justify-center gap-2 transition-colors`}
           onClick={handleAddConfig}
           title={t('newConfig')}
         >
-          <Plus className="w-5 h-5" />
+          <Plus size={14} />
           <span className="text-sm font-medium">{t('newConfig')}</span>
         </button>
       </div>

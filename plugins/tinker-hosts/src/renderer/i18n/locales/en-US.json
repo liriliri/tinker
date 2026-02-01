@@ -15,6 +15,7 @@
   "saveFailed": "✗ Failed to apply: {{message}}",
   "applying": "Applying...",
   "applyConfig": "Apply Config ({{count}} active)",
+  "rename": "Rename",
   "edit": "Edit",
   "delete": "Delete",
   "apply": "Apply",

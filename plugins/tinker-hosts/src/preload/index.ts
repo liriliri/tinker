@@ -99,26 +99,6 @@ const hostsObj = {
       throw error
     }
   },
-
-  // Read file from specified path
-  async readFile(filePath: string): Promise<string> {
-    try {
-      return await fs.promises.readFile(filePath, 'utf-8')
-    } catch (error) {
-      console.error('Failed to read file:', error)
-      throw new Error('Failed to read file.')
-    }
-  },
-
-  // Write file to specified path
-  async writeFile(filePath: string, content: string): Promise<void> {
-    try {
-      await fs.promises.writeFile(filePath, content, 'utf-8')
-    } catch (error) {
-      console.error('Failed to write file:', error)
-      throw new Error('Failed to write file.')
-    }
-  },
 }
 
 contextBridge.exposeInMainWorld('hosts', hostsObj)
