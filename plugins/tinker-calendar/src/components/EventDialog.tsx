@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
 import TextInput from 'share/components/TextInput'
-import { tw } from 'share/theme'
 import TimeSelect from './TimeSelect'
 import DateSelect from './DateSelect'
 

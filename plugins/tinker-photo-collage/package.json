@@ -9,7 +9,7 @@
   "tinker": {
     "name": "Photo Collage",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "照片拼接"

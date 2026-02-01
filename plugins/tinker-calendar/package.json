@@ -10,7 +10,7 @@
   "tinker": {
     "name": "Calendar",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "日历"

@@ -9,7 +9,7 @@
   "tinker": {
     "name": "Camera",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "相机"

@@ -11,7 +11,7 @@
   "tinker": {
     "name": "Base64",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "Base64"
