@@ -165,10 +165,10 @@ class Store extends BaseStore {
 
       const files: Array<{ file: File; filePath: string }> = []
       for (const filePath of result.filePaths) {
-        const buffer = await imageCompressor.readFile(filePath)
+        const buffer = await tinker.readFile(filePath)
         const fileName = splitPath(filePath).name
 
-        // Note: Uint8Array from contextBridge needs to be converted to work with File API
+        // Note: Buffer is Uint8Array-compatible but File expects a Uint8Array payload
         const uint8Array = new Uint8Array(buffer)
         const file = new File([uint8Array], fileName, { type: 'image/*' })
         files.push({ file, filePath })
@@ -325,7 +325,7 @@ class Store extends BaseStore {
           const arrayBuffer = await image.compressedBlob.arrayBuffer()
           const buffer = new Uint8Array(arrayBuffer)
 
-          await imageCompressor.writeFile(image.filePath, buffer)
+          await tinker.writeFile(image.filePath, buffer)
 
           image.isSaved = true
         }
@@ -356,16 +356,14 @@ class Store extends BaseStore {
             console.log(
               `Compressed size (${image.compressedSize}) >= original size (${image.originalSize}) for ${image.fileName}, saving original file`
             )
-            const originalBuffer = await imageCompressor.readFile(
-              image.filePath
-            )
+            const originalBuffer = await tinker.readFile(image.filePath)
             buffer = new Uint8Array(originalBuffer)
           } else {
             const arrayBuffer = await image.compressedBlob.arrayBuffer()
             buffer = new Uint8Array(arrayBuffer)
           }
 
-          await imageCompressor.writeFile(filePath, buffer)
+          await tinker.writeFile(filePath, buffer)
 
           image.isSaved = true
         }
