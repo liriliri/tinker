@@ -101,11 +101,11 @@ class Store extends BaseStore {
 
   async handleFilePath(filePath: string) {
     try {
-      const buffer = await hash.readFile(filePath)
+      const buffer = await tinker.readFile(filePath)
       const fileName = filePath.split(/[\\/]/).pop() || filePath
       this.fileName = fileName
 
-      const file = new File([buffer as any], fileName)
+      const file = new File([buffer as Uint8Array], fileName)
       const results = await calculateFileHashes(file)
       this.fileHashResults = this.applyCase(results)
     } catch (error) {
