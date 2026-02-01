@@ -24,9 +24,9 @@ export default observer(function HashResult({ label, value }: HashResultProps) {
       <CopyButton
         variant="icon"
         text={value}
-        size={20}
+        size={16}
         disabled={!value}
-        className="absolute bottom-2 right-2 w-10 h-10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className="absolute bottom-2 right-2 w-8 h-8 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         title="Copy to clipboard"
       />
     </div>

@@ -6,13 +6,12 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarTextButton,
 } from 'share/components/Toolbar'
 import CopyButton from 'share/components/CopyButton'
 import { alert } from 'share/components/Alert'
 import { Clipboard, Eraser } from 'lucide-react'
-import className from 'licia/className'
 import Select from 'share/components/Select'
-import { tw } from 'share/theme'
 import store from '../store'
 import formatter from '../lib/formatter'
 import { LANGUAGES } from '../lib/languages'
@@ -107,17 +106,9 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
 
-      <button
-        onClick={handleFormat}
-        disabled={isEmpty}
-        className={className(
-          'px-3 py-1 rounded text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed',
-          tw.primary.bg,
-          tw.primary.bgHover
-        )}
-      >
+      <ToolbarTextButton onClick={handleFormat} disabled={isEmpty}>
         {t('format')}
-      </button>
+      </ToolbarTextButton>
     </Toolbar>
   )
 })

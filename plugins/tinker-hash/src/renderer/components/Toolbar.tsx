@@ -7,12 +7,14 @@ import {
   Clipboard,
   Eraser,
 } from 'lucide-react'
+import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSpacer,
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
 } from 'share/components/Toolbar'
 import store from '../store'
 
@@ -43,23 +45,27 @@ export default observer(function ToolbarCompoent() {
 
   return (
     <Toolbar>
-      <ToolbarButton
-        variant="toggle"
-        active={store.inputType === 'text'}
-        onClick={() => store.setInputType('text')}
-        title={t('text')}
-      >
-        <FileText size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={store.inputType === 'text'}
+          onClick={() => store.setInputType('text')}
+          title={t('text')}
+          className={`rounded-none rounded-l border-r ${tw.border.both}`}
+        >
+          <FileText size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        variant="toggle"
-        active={store.inputType === 'file'}
-        onClick={() => store.setInputType('file')}
-        title={t('file')}
-      >
-        <FileIcon size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+        <ToolbarButton
+          variant="toggle"
+          active={store.inputType === 'file'}
+          onClick={() => store.setInputType('file')}
+          title={t('file')}
+          className="rounded-none rounded-r"
+        >
+          <FileIcon size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </ToolbarButtonGroup>
 
       <ToolbarSeparator />
 
