@@ -16,6 +16,7 @@ export const shareDeps = [
   'mobx-react-lite',
   'mathjs',
   '@monaco-editor/react',
+  'idb',
 ]
 
 const globals = {
@@ -28,6 +29,7 @@ const globals = {
   'mobx-react-lite': 'mobxReactLite',
   mathjs: 'mathjs',
   '@monaco-editor/react': 'MonacoEditorReact',
+  idb: 'idb',
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -129,6 +131,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'mathjs') {
     return createConfig('mathjs', 'mathjs.ts', 'PluginVendorMathjs')
+  }
+
+  if (target === 'idb') {
+    return createConfig('idb', 'idb.ts', 'PluginVendorIdb')
   }
 
   if (target === 'monaco') {
