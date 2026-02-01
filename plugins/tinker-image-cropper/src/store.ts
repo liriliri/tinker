@@ -87,7 +87,7 @@ class Store extends BaseStore {
       }
 
       const filePath = result.filePaths[0]
-      const buffer = await imageCropper.readFile(filePath)
+      const buffer = await tinker.readFile(filePath)
       const fileName = splitPath(filePath).name
 
       const uint8Array = new Uint8Array(buffer)
@@ -230,7 +230,7 @@ class Store extends BaseStore {
       const arrayBuffer = await blob.arrayBuffer()
       const buffer = new Uint8Array(arrayBuffer)
 
-      await imageCropper.writeFile(savePath, buffer)
+      await tinker.writeFile(savePath, buffer)
 
       this.isSaved = true
 
@@ -247,10 +247,12 @@ class Store extends BaseStore {
     try {
       const response = await fetch(this.image.originalUrl)
       const blob = await response.blob()
-      const arrayBuffer = await blob.arrayBuffer()
-      const buffer = new Uint8Array(arrayBuffer)
 
-      await imageCropper.copyImageToClipboard(buffer)
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blob,
+        }),
+      ])
     } catch (err) {
       console.error('Failed to copy image:', err)
       throw err
@@ -286,26 +288,6 @@ class Store extends BaseStore {
     this.croppedWidth = 0
     this.croppedHeight = 0
 
-    this.isSaved = false
-  }
-
-  clearImage() {
-    for (const state of this.history) {
-      if (state.imageInfo.originalUrl) {
-        URL.revokeObjectURL(state.imageInfo.originalUrl)
-      }
-    }
-
-    if (this.image?.originalUrl) {
-      URL.revokeObjectURL(this.image.originalUrl)
-    }
-    this.image = null
-    this.croppedBlob = null
-    this.croppedDataUrl = ''
-    this.croppedWidth = 0
-    this.croppedHeight = 0
-    this.history = []
-    this.historyIndex = -1
     this.isSaved = false
   }
 

@@ -5,7 +5,6 @@ import {
   Save,
   Copy,
   Check,
-  X,
   Crop,
   Undo,
   Redo,
@@ -22,6 +21,7 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarTextButton,
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
 import { RefObject, useState } from 'react'
@@ -67,10 +67,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
     } catch (err) {
       console.error('Failed to copy image:', err)
     }
-  }
-
-  const handleClear = () => {
-    store.clearImage()
   }
 
   const handleOverwriteChange = (checked: boolean) => {
@@ -178,14 +174,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarButton
-        onClick={handleClear}
-        disabled={!store.hasImage}
-        title={t('clear')}
-      >
-        <X size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
       <ToolbarSeparator />
 
       <ToolbarButton
@@ -241,7 +229,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
         <>
           {/* Crop box dimensions */}
           <button
-            className="text-xs px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors cursor-pointer"
+            className={`text-xs px-2 py-1 ${tw.hover.both} rounded transition-colors cursor-pointer`}
             onClick={() => setShowSizeDialog(true)}
             disabled={store.cropBoxWidth <= 0 || store.cropBoxHeight <= 0}
             title={t('setCropSize')}
@@ -251,7 +239,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
                 {store.cropBoxWidth} × {store.cropBoxHeight}
               </div>
             ) : (
-              <div className="text-gray-400">-</div>
+              <div className={tw.text.both.tertiary}>-</div>
             )}
           </button>
 
@@ -314,17 +302,12 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
           <ToolbarSeparator />
 
           {/* Crop Button */}
-          <button
-            onClick={onCrop}
-            className={className(
-              'px-3 py-1 text-xs text-white font-medium rounded transition-colors flex items-center gap-1.5',
-              tw.primary.bg,
-              tw.primary.bgHover
-            )}
-          >
-            <Crop size={TOOLBAR_ICON_SIZE} />
-            {t('crop')}
-          </button>
+          <ToolbarTextButton onClick={onCrop}>
+            <div className="flex items-center gap-1.5">
+              <Crop size={TOOLBAR_ICON_SIZE} />
+              {t('crop')}
+            </div>
+          </ToolbarTextButton>
         </>
       )}
 
