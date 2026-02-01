@@ -139,6 +139,15 @@ const CalendarView = observer(
 
     const handleDatesSet = (arg: DatesSetArg) => {
       setCurrentView(arg.view.type)
+
+      if (arg.view.type === 'timeGridDay') {
+        const viewDate = arg.view.currentStart
+        const year = viewDate.getFullYear()
+        const month = String(viewDate.getMonth() + 1).padStart(2, '0')
+        const day = String(viewDate.getDate()).padStart(2, '0')
+        const dateStr = `${year}-${month}-${day}`
+        store.setSelectedDate(dateStr)
+      }
     }
 
     const editingEvent = store.editingEventId
@@ -156,13 +165,13 @@ const CalendarView = observer(
       return []
     }
 
-    const handleEventDidMount = (info: any) => {
-      if (info.event.classNames.includes('holiday-event')) {
-        const titleEl = info.el.querySelector('.fc-event-title')
-        if (titleEl) {
-          titleEl.textContent = t(info.event.title)
+    const handleEventContent = (arg: any) => {
+      if (arg.event.classNames.includes('holiday-event')) {
+        return {
+          html: `<div class="fc-event-title">${t(arg.event.title)}</div>`,
         }
       }
+      return true
     }
 
     return (
@@ -177,19 +186,20 @@ const CalendarView = observer(
           fixedWeekCount={false}
           firstDay={0}
           dayMaxEvents={3}
+          eventOrder="order,start,title"
           events={store.calendarEvents}
           locale={calendarLocale}
           editable={true}
           navLinks={true}
           navLinkDayClick="timeGridDay"
-          moreLinkClick="timeGridDay"
+          moreLinkClick="popover"
           dateClick={handleDateClick}
           eventClick={handleEventClick}
           eventDrop={handleEventDrop}
           eventResize={handleEventResize}
           datesSet={handleDatesSet}
           dayCellClassNames={dayCellClassNames}
-          eventDidMount={handleEventDidMount}
+          eventContent={handleEventContent}
         />
         <EventDialog
           isOpen={store.eventDialogOpen}

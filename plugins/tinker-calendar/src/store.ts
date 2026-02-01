@@ -1,10 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import { getHolidaysForYearRange } from './lib/holidays'
+import * as db from './lib/db'
 
 const storage = new LocalStore('tinker-calendar')
-const EVENTS_KEY = 'calendar-events'
 const SIDEBAR_KEY = 'sidebar-open'
 
 export type CalendarEvent = {
@@ -26,8 +27,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadEvents()
-    this.loadSidebarState()
+    this.loadFromStorage()
   }
 
   private getTodayKey() {
@@ -48,21 +48,17 @@ class Store extends BaseStore {
     return dateTimeStr.slice(11, 16)
   }
 
-  private loadEvents() {
-    const saved = storage.get(EVENTS_KEY)
-    if (saved) {
-      this.events = saved as CalendarEvent[]
-    }
-  }
+  private async loadFromStorage() {
+    try {
+      const saved = storage.get(SIDEBAR_KEY)
+      if (saved !== null && saved !== undefined) {
+        this.sidebarOpen = saved as boolean
+      }
 
-  private saveEvents() {
-    storage.set(EVENTS_KEY, this.events)
-  }
-
-  private loadSidebarState() {
-    const saved = storage.get(SIDEBAR_KEY)
-    if (saved !== null && saved !== undefined) {
-      this.sidebarOpen = saved as boolean
+      const events = await db.getAllEvents()
+      this.events = events
+    } catch (error) {
+      console.error('Failed to load from storage:', error)
     }
   }
 
@@ -105,7 +101,7 @@ class Store extends BaseStore {
     const startDateKey = this.normalizeDateKey(startDate)
     const endDateKey = endDate ? this.normalizeDateKey(endDate) : startDateKey
     const newEvent: CalendarEvent = {
-      id: this.createId(),
+      id: uuid(),
       title: title.trim(),
       start: isAllDay
         ? `${startDateKey}T00:00`
@@ -121,7 +117,7 @@ class Store extends BaseStore {
     }
 
     this.events = [...this.events, newEvent]
-    this.saveEvents()
+    db.addEvent(newEvent)
   }
 
   updateEvent(
@@ -158,7 +154,10 @@ class Store extends BaseStore {
         allDay: isAllDay,
       }
     })
-    this.saveEvents()
+    const updatedEvent = this.events.find((e) => e.id === id)
+    if (updatedEvent) {
+      db.updateEvent(updatedEvent)
+    }
   }
 
   updateEventDate(id: string, newDate: Date) {
@@ -176,25 +175,31 @@ class Store extends BaseStore {
         end: endTime ? `${dateKey}T${endTime}` : undefined,
       }
     })
-    this.saveEvents()
+    const updatedEvent = this.events.find((e) => e.id === id)
+    if (updatedEvent) {
+      db.updateEvent(updatedEvent)
+    }
   }
 
   removeEvent(id: string) {
     this.events = this.events.filter((event) => event.id !== id)
-    this.saveEvents()
+    db.removeEvent(id)
   }
 
   clearEvents() {
     this.events = []
-    this.saveEvents()
+    db.clearAllEvents()
   }
 
   clearEventsForDate(date: string | Date) {
     const dateKey = this.normalizeDateKey(date)
+    const toRemove = this.events.filter(
+      (event) => event.start.slice(0, 10) === dateKey
+    )
     this.events = this.events.filter(
       (event) => event.start.slice(0, 10) !== dateKey
     )
-    this.saveEvents()
+    toRemove.forEach((event) => db.removeEvent(event.id))
   }
 
   get holidayEvents() {
@@ -257,12 +262,6 @@ class Store extends BaseStore {
 
   get hasEvents() {
     return this.events.length > 0
-  }
-
-  private createId() {
-    return `event_${Date.now().toString(36)}_${Math.random()
-      .toString(36)
-      .slice(2, 8)}`
   }
 }
 

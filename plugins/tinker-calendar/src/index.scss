@@ -37,3 +37,22 @@
 .fc-day-selected {
   background-color: var(--fc-selected-bg-color) !important;
 }
+
+.fc-timeGridDay-view .fc-day-selected {
+  background-color: transparent !important;
+}
+
+.fc-popover {
+  background-color: #ffffff !important;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  .fc-day-selected {
+    background-color: transparent !important;
+  }
+}
+
+.dark .fc-popover {
+  background-color: #1e1e1e !important;
+  border-color: #404040;
+}
