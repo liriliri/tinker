@@ -49,7 +49,7 @@ export function ToolbarTextButton({
   className = '',
   ...props
 }: ToolbarTextButtonProps) {
-  const baseClass = `px-3 py-1 text-xs rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:opacity-30 disabled:cursor-not-allowed`
+  const baseClass = `px-3 py-1 text-xs rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:bg-[#8a8a8a] disabled:cursor-not-allowed`
 
   return (
     <button className={`${baseClass} ${className}`} {...props}>

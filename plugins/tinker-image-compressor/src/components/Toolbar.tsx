@@ -13,6 +13,7 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarTextButton,
 } from 'share/components/Toolbar'
 import store from '../store'
 
@@ -182,13 +183,12 @@ export default observer(function ToolbarComponent() {
           <ToolbarSeparator />
 
           {/* Compress Button */}
-          <button
+          <ToolbarTextButton
             onClick={handleCompress}
             disabled={store.isCompressing || !store.hasUncompressed}
-            className={`px-3 py-1 text-xs ${tw.primary.bg} ${tw.primary.bgHover} disabled:bg-[#8a8a8a] disabled:cursor-not-allowed text-white font-medium rounded transition-colors`}
           >
             {store.isCompressing ? t('compressing') : t('compress')}
-          </button>
+          </ToolbarTextButton>
         </>
       )}
     </Toolbar>

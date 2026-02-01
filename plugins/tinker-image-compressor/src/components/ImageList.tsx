@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import fileSize from 'licia/fileSize'
 import className from 'licia/className'
 import { tw, THEME_COLORS } from 'share/theme'
+import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
 import { MenuItemConstructorOptions } from 'electron'
 
@@ -88,7 +89,7 @@ export default observer(function ImageList() {
               />
               {image.isCompressing && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent"></div>
+                  <LoadingCircle className="w-8 h-8" />
                 </div>
               )}
             </div>
