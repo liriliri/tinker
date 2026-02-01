@@ -39,6 +39,39 @@ export function ToolbarButton({
   )
 }
 
+interface ToolbarTextButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode
+}
+
+export function ToolbarTextButton({
+  children,
+  className = '',
+  ...props
+}: ToolbarTextButtonProps) {
+  const baseClass = `px-3 py-1 text-xs rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:opacity-30 disabled:cursor-not-allowed`
+
+  return (
+    <button className={`${baseClass} ${className}`} {...props}>
+      {children}
+    </button>
+  )
+}
+
+interface ToolbarButtonGroupProps {
+  children: ReactNode
+  className?: string
+}
+
+export function ToolbarButtonGroup({
+  children,
+  className = '',
+}: ToolbarButtonGroupProps) {
+  const baseClass = `flex items-center overflow-hidden rounded border -my-px ${tw.border.both} ${tw.bg.both.secondary}`
+
+  return <div className={`${baseClass} ${className}`}>{children}</div>
+}
+
 export function ToolbarSeparator() {
   return <div className={`w-px h-5 ${tw.border.bg} mx-1`} />
 }

@@ -6,14 +6,13 @@ import isDataUrl from 'licia/isDataUrl'
 import dataUrl from 'licia/dataUrl'
 import mime from 'licia/mime'
 import { arrayBufferToBase64, base64ToUint8Array } from './lib/base64'
+import { encodeBytesBase64, encodeFileBase64 } from './lib/base64Worker'
 import i18n from './i18n'
 
 type InputType = 'text' | 'file'
 
 const storage = new LocalStore('tinker-base64')
 const STORAGE_KEY_INPUT_TYPE = 'inputType'
-const STORAGE_KEY_INPUT_TEXT = 'inputText'
-const STORAGE_KEY_OUTPUT_TEXT = 'outputText'
 const STORAGE_KEY_OUTPUT_AS_DATA_URL = 'outputAsDataUrl'
 
 class Store extends BaseStore {
@@ -24,6 +23,7 @@ class Store extends BaseStore {
   private _fileBase64Raw: string = ''
   private _fileMimeType: string = ''
   outputAsDataUrl: boolean = false
+  isEncodingFile: boolean = false
 
   get fileBase64(): string {
     if (!this._fileBase64Raw) return ''
@@ -46,16 +46,6 @@ class Store extends BaseStore {
       this.inputType = savedInputType
     }
 
-    const savedInputText = storage.get(STORAGE_KEY_INPUT_TEXT)
-    if (typeof savedInputText === 'string') {
-      this.inputText = savedInputText
-    }
-
-    const savedOutputText = storage.get(STORAGE_KEY_OUTPUT_TEXT)
-    if (typeof savedOutputText === 'string') {
-      this.outputText = savedOutputText
-    }
-
     const savedOutputAsDataUrl = storage.get(STORAGE_KEY_OUTPUT_AS_DATA_URL)
     if (typeof savedOutputAsDataUrl === 'boolean') {
       this.outputAsDataUrl = savedOutputAsDataUrl
@@ -69,12 +59,13 @@ class Store extends BaseStore {
 
   setInputText(value: string) {
     this.inputText = value
-    storage.set(STORAGE_KEY_INPUT_TEXT, value)
+    if (this.outputText) {
+      this.setOutputText('')
+    }
   }
 
   setOutputText(value: string) {
     this.outputText = value
-    storage.set(STORAGE_KEY_OUTPUT_TEXT, value)
   }
 
   setOutputAsDataUrl(value: boolean) {
@@ -82,11 +73,18 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_OUTPUT_AS_DATA_URL, value)
   }
 
+  async copyToClipboardWithToast(text: string) {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(i18n.t('copiedSuccess'))
+    } catch {
+      toast.error(i18n.t('copiedFailed'))
+    }
+  }
+
   clearText() {
     this.inputText = ''
     this.outputText = ''
-    storage.remove(STORAGE_KEY_INPUT_TEXT)
-    storage.remove(STORAGE_KEY_OUTPUT_TEXT)
   }
 
   clearFile() {
@@ -97,6 +95,7 @@ class Store extends BaseStore {
 
   encodeText() {
     try {
+      this.setOutputText('')
       const encoder = new TextEncoder()
       const bytes = encoder.encode(this.inputText)
       const base64 = arrayBufferToBase64(bytes.buffer)
@@ -141,7 +140,7 @@ class Store extends BaseStore {
       })
 
       if (result && result.filePath) {
-        await base64.writeFile(result.filePath, bytes)
+        await tinker.writeFile(result.filePath, bytes)
       }
     } catch (error) {
       console.error('Failed to decode to file:', error)
@@ -150,25 +149,29 @@ class Store extends BaseStore {
   }
 
   async handleFile(file: File) {
+    this.isEncodingFile = true
+    this._fileBase64Raw = ''
     try {
-      const buffer = await file.arrayBuffer()
-      const base64Str = arrayBufferToBase64(buffer)
       this.fileName = file.name
-      this._fileBase64Raw = base64Str
+      this._fileBase64Raw = await encodeFileBase64(file)
       this._fileMimeType = file.type || 'application/octet-stream'
     } catch (error) {
       console.error('Failed to encode file:', error)
       toast.error(i18n.t('fileEncodeFailed'))
+    } finally {
+      this.isEncodingFile = false
     }
   }
 
   async handleFilePath(filePath: string) {
+    this.isEncodingFile = true
+    this._fileBase64Raw = ''
     try {
-      const buffer = await base64.readFile(filePath)
+      const buffer = await tinker.readFile(filePath)
       const fileName = filePath.split(/[\\/]/).pop() || filePath
       this.fileName = fileName
 
-      const base64Str = arrayBufferToBase64(buffer)
+      const base64Str = await encodeBytesBase64(buffer)
       const ext = fileName.split('.').pop() || ''
       const mimeType = mime(ext) || 'application/octet-stream'
 
@@ -177,6 +180,8 @@ class Store extends BaseStore {
     } catch (error) {
       console.error('Failed to encode file from path:', error)
       toast.error(i18n.t('fileEncodeFailed'))
+    } finally {
+      this.isEncodingFile = false
     }
   }
 }

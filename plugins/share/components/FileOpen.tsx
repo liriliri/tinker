@@ -90,9 +90,11 @@ const FileOpen: React.FC<FileOpenProps> = ({
         >
           {fileName || openTitle}
         </p>
-        <p className={`text-sm ${tw.text.both.secondary}`}>
-          {fileName ? '' : supportedFormats}
-        </p>
+        {!fileName && supportedFormats && (
+          <p className={`text-sm ${tw.text.both.secondary}`}>
+            {supportedFormats}
+          </p>
+        )}
       </div>
     </div>
   )
