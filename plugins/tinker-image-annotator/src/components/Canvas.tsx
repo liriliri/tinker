@@ -272,6 +272,7 @@ const Canvas = observer(() => {
         x: 0,
         y: 0,
         editable: false,
+        hittable: false,
       })
       frame.add(watermarkRectRef.current)
     } else if (watermarkRectRef.current.parent !== frame) {
