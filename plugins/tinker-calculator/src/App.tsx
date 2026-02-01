@@ -8,7 +8,7 @@ export default observer(function App() {
     <div
       className={`h-screen w-full flex items-center justify-center p-4 ${tw.bg.both.secondary}`}
     >
-      <div className={`w-full max-w-[1024px] ${tw.bg.both.secondary}`}>
+      <div className="w-full max-w-[1024px]">
         <Display />
         <Keypad />
       </div>

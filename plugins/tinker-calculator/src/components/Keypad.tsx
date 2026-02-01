@@ -8,12 +8,13 @@ import { KEY_ROWS, KeyConfig, KeyKind } from '../lib/keys'
 
 const DEFAULT_TEXT_SIZE = 'text-xs md:text-sm'
 
+const DEFAULT_KIND_CLASS = `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`
 const KIND_CLASSES: Record<KeyKind, string> = {
   number: `text-lg md:text-xl ${tw.text.both.primary}`,
-  operator: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
-  function: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
-  control: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
-  memory: `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`,
+  operator: DEFAULT_KIND_CLASS,
+  function: DEFAULT_KIND_CLASS,
+  control: DEFAULT_KIND_CLASS,
+  memory: DEFAULT_KIND_CLASS,
 }
 
 const BASE_BUTTON =
@@ -126,8 +127,6 @@ export default observer(function Keypad() {
         store.applyWrap(value as string)
         break
       case 'append':
-        store.appendToken(value as string)
-        break
       case 'constant':
         store.appendToken(value as string)
         break
