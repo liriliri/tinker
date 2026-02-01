@@ -56,7 +56,7 @@ class Store extends BaseStore {
 
       if (result && result.filePaths && result.filePaths.length > 0) {
         const filePath = result.filePaths[0]
-        const buffer = await hexEditor.readFile(filePath)
+        const buffer = await tinker.readFile(filePath)
         const data = Array.from(buffer)
         this.currentFilePath = filePath
         this.data = data
@@ -72,7 +72,7 @@ class Store extends BaseStore {
     try {
       const filePath = (file as File & { path?: string }).path
       if (filePath) {
-        const buffer = await hexEditor.readFile(filePath)
+        const buffer = await tinker.readFile(filePath)
         this.importData(buffer, filePath)
         return
       }
@@ -88,7 +88,7 @@ class Store extends BaseStore {
     try {
       if (this.currentFilePath) {
         const data = new Uint8Array(this.data)
-        await hexEditor.writeFile(this.currentFilePath, data)
+        await tinker.writeFile(this.currentFilePath, data)
         this.savedData = [...this.data]
       } else {
         await this.saveFileAs()
@@ -106,7 +106,7 @@ class Store extends BaseStore {
 
       if (result && result.filePath) {
         const data = new Uint8Array(this.data)
-        await hexEditor.writeFile(result.filePath, data)
+        await tinker.writeFile(result.filePath, data)
         this.currentFilePath = result.filePath
         this.savedData = [...this.data]
       }
