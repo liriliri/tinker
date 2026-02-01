@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
 import className from 'licia/className'
 import toast from 'react-hot-toast'
@@ -9,35 +9,35 @@ import store from '../store'
 
 export default observer(function CalculationList() {
   const { t } = useTranslation()
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
+  const primaryBg = store.isDark
+    ? THEME_COLORS.bg.dark.primary
+    : THEME_COLORS.bg.light.primary
 
   const handleKeyDown = (
-    id: number,
+    lineId: number,
+    lineIndex: number,
+    line: { id: number; expression: string; result: string },
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      const currentLine = find(store.lines, (line) => line.id === id)
 
       // If current line is empty, do nothing
-      if (currentLine && isStrBlank(currentLine.expression)) {
+      if (isStrBlank(line.expression)) {
         return
       }
 
-      const currentIndex = store.lines.findIndex((line) => line.id === id)
-      const nextIndex = currentIndex + 1
+      const nextIndex = lineIndex + 1
 
       if (nextIndex < store.lines.length) {
         // If there's a next line, check if it's empty and fill with result if so
         const nextLine = store.lines[nextIndex]
         const nextLineId = nextLine.id
 
-        if (
-          currentLine &&
-          currentLine.result &&
-          isStrBlank(nextLine.expression)
-        ) {
+        if (line.result && isStrBlank(nextLine.expression)) {
           // Fill next line with current result
-          store.updateExpression(nextLineId, currentLine.result)
+          store.updateExpression(nextLineId, line.result)
         }
 
         store.setActiveLineId(nextLineId)
@@ -46,17 +46,12 @@ export default observer(function CalculationList() {
         }, 0)
       } else {
         // If it's the last line, create a new one
-        store.addNewLine(id)
+        store.addNewLine(lineId)
       }
     } else if (e.key === 'Backspace') {
-      const currentLine = find(store.lines, (line) => line.id === id)
-      if (
-        currentLine &&
-        isStrBlank(currentLine.expression) &&
-        store.lines.length > 1
-      ) {
+      if (isStrBlank(line.expression) && store.lines.length > 1) {
         e.preventDefault()
-        store.deleteLine(id)
+        store.deleteLine(lineId)
       }
     }
   }
@@ -100,22 +95,30 @@ export default observer(function CalculationList() {
 
   return (
     <div className="w-full">
-      {store.lines.map((line) => {
+      {store.lines.map((line, lineIndex) => {
         const isActive = line.id === store.activeLineId
+        const isHovered = hoveredId === line.id
         return (
           <div
             key={line.id}
             onClick={() => handleLineClick(line.id)}
+            onMouseEnter={() => setHoveredId(line.id)}
+            onMouseLeave={() => setHoveredId(null)}
             style={
-              isActive ? { borderLeftColor: THEME_COLORS.primary } : undefined
+              isActive || isHovered
+                ? {
+                    borderLeftColor: isActive
+                      ? THEME_COLORS.primary
+                      : undefined,
+                    backgroundColor: primaryBg,
+                  }
+                : undefined
             }
             className={className(
-              'px-4 py-3 border-b transition-colors cursor-text border-l-4',
+              `px-4 py-3 border-b transition-colors cursor-text border-l-4 ${tw.bg.both.tertiary}`,
               tw.border.both,
               {
-                [tw.bg.both.primary]: isActive,
-                'border-l-transparent hover:bg-white dark:hover:bg-[#1e1e1e]':
-                  !isActive,
+                'border-l-transparent': !isActive,
               }
             )}
           >
@@ -124,7 +127,9 @@ export default observer(function CalculationList() {
               value={line.expression}
               onChange={(e) => store.updateExpression(line.id, e.target.value)}
               onInput={handleInput}
-              onKeyDown={(e) => handleKeyDown(line.id, e as any)}
+              onKeyDown={(e) =>
+                handleKeyDown(line.id, lineIndex, line, e as any)
+              }
               placeholder={t('placeholder')}
               rows={1}
               className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-200 text-xl font-mono resize-none overflow-hidden pointer-events-auto"
@@ -137,13 +142,6 @@ export default observer(function CalculationList() {
                 <span
                   onClick={(e) => handleResultClick(e, line.result)}
                   className={`text-gray-800 dark:text-gray-200 text-2xl font-mono font-medium cursor-pointer ${tw.primary.text} transition-colors`}
-                  style={{
-                    ['--tw-text-opacity' as any]: undefined,
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = THEME_COLORS.primary)
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                   title={t('clickToCopy')}
                 >
                   {formatNumber(line.result)}

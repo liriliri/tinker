@@ -15,34 +15,23 @@ import store from '../store'
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const getCurrentLine = () => {
-    return find(store.lines, (line) => line.id === store.activeLineId)
-  }
+  const currentLine = find(
+    store.lines,
+    (line) => line.id === store.activeLineId
+  )
+  const isCurrentLineEmpty = !currentLine || isStrBlank(currentLine.expression)
+  const hasResult = !!currentLine && !isStrBlank(currentLine.result)
+  const currentResult = currentLine?.result || ''
 
   const handleClearCurrentLine = () => {
     store.updateExpression(store.activeLineId, '')
-  }
-
-  const isCurrentLineEmpty = () => {
-    const currentLine = getCurrentLine()
-    return !currentLine || isStrBlank(currentLine.expression)
-  }
-
-  const hasResult = () => {
-    const currentLine = getCurrentLine()
-    return currentLine && !isStrBlank(currentLine.result)
-  }
-
-  const getCurrentResult = () => {
-    const currentLine = getCurrentLine()
-    return currentLine?.result || ''
   }
 
   return (
     <Toolbar>
       <ToolbarButton
         onClick={handleClearCurrentLine}
-        disabled={isCurrentLineEmpty()}
+        disabled={isCurrentLineEmpty}
         title={t('clearCurrent')}
       >
         <Eraser size={TOOLBAR_ICON_SIZE} />
@@ -50,8 +39,8 @@ export default observer(function ToolbarComponent() {
 
       <CopyButton
         variant="toolbar"
-        text={getCurrentResult()}
-        disabled={!hasResult()}
+        text={currentResult}
+        disabled={!hasResult}
         title={t('copyResult')}
       />
 

@@ -18,10 +18,6 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    // Ensure activeLineId always points to the first line
-    if (this.lines.length > 0) {
-      this.activeLineId = this.lines[0].id
-    }
   }
 
   get isEmpty() {
