@@ -11,17 +11,18 @@ function formatDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
 }
 
 function formatEventTime(event: CalendarEvent, selectedDate: string): string {
-  if (event.allDay || !event.startTime) return ''
+  if (event.allDay) return ''
 
+  const startTime = event.start.slice(11, 16)
   const startDate = event.start.slice(0, 10)
   const endDate = event.end?.slice(0, 10)
-  const endTime = event.endTime
+  const endTime = event.end?.slice(11, 16)
 
   // If event spans multiple days
   if (endDate && endDate !== startDate) {
     // If showing on start date
     if (startDate === selectedDate) {
-      return `${event.startTime} - 24:00`
+      return `${startTime} - 24:00`
     }
     // If showing on end date
     if (endDate === selectedDate) {
@@ -32,7 +33,7 @@ function formatEventTime(event: CalendarEvent, selectedDate: string): string {
   }
 
   // Same day event
-  return endTime ? `${event.startTime} - ${endTime}` : event.startTime
+  return endTime ? `${startTime} - ${endTime}` : startTime
 }
 
 const Sidebar = observer(() => {
@@ -103,7 +104,7 @@ const Sidebar = observer(() => {
                     >
                       {event.title}
                     </h3>
-                    {!event.allDay && event.startTime && (
+                    {!event.allDay && (
                       <p className={`text-xs mt-0.5 ${tw.text.both.secondary}`}>
                         {formatEventTime(event, store.selectedDate)}
                       </p>

@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import { getHolidaysForYearRange } from './lib/holidays'
 
 const storage = new LocalStore('tinker-calendar')
 const EVENTS_KEY = 'calendar-events'
@@ -12,8 +13,6 @@ export type CalendarEvent = {
   start: string
   end?: string
   allDay?: boolean
-  startTime?: string
-  endTime?: string
 }
 
 class Store extends BaseStore {
@@ -32,14 +31,21 @@ class Store extends BaseStore {
   }
 
   private getTodayKey() {
-    return new Date().toISOString().slice(0, 10)
+    return this.normalizeDateKey(new Date())
   }
 
   private normalizeDateKey(value: string | Date) {
     if (value instanceof Date) {
-      return value.toISOString().slice(0, 10)
+      const year = value.getFullYear()
+      const month = String(value.getMonth() + 1).padStart(2, '0')
+      const day = String(value.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
     }
     return value.slice(0, 10)
+  }
+
+  private extractTime(dateTimeStr: string): string {
+    return dateTimeStr.slice(11, 16)
   }
 
   private loadEvents() {
@@ -92,8 +98,8 @@ class Store extends BaseStore {
     startDate: string | Date,
     title: string,
     isAllDay = true,
-    startTime?: string,
-    endTime?: string,
+    startTime = '09:00',
+    endTime = '10:00',
     endDate?: string
   ) {
     const startDateKey = this.normalizeDateKey(startDate)
@@ -101,17 +107,17 @@ class Store extends BaseStore {
     const newEvent: CalendarEvent = {
       id: this.createId(),
       title: title.trim(),
-      start: isAllDay ? startDateKey : `${startDateKey}T${startTime}`,
+      start: isAllDay
+        ? `${startDateKey}T00:00`
+        : `${startDateKey}T${startTime}`,
       end: isAllDay
         ? endDateKey !== startDateKey
-          ? endDateKey
+          ? `${endDateKey}T00:00`
           : undefined
         : endTime
         ? `${endDateKey}T${endTime}`
         : undefined,
       allDay: isAllDay,
-      startTime,
-      endTime,
     }
 
     this.events = [...this.events, newEvent]
@@ -123,8 +129,8 @@ class Store extends BaseStore {
     title: string,
     startDate: string,
     isAllDay: boolean,
-    startTime?: string,
-    endTime?: string,
+    startTime = '09:00',
+    endTime = '10:00',
     endDate?: string
   ) {
     const trimmed = title.trim()
@@ -139,29 +145,19 @@ class Store extends BaseStore {
       return {
         ...event,
         title: trimmed,
-        start: isAllDay ? startDateKey : `${startDateKey}T${startTime}`,
+        start: isAllDay
+          ? `${startDateKey}T00:00`
+          : `${startDateKey}T${startTime}`,
         end: isAllDay
           ? endDateKey !== startDateKey
-            ? endDateKey
+            ? `${endDateKey}T00:00`
             : undefined
           : endTime
           ? `${endDateKey}T${endTime}`
           : undefined,
         allDay: isAllDay,
-        startTime,
-        endTime,
       }
     })
-    this.saveEvents()
-  }
-
-  updateEventTitle(id: string, title: string) {
-    const trimmed = title.trim()
-    if (!trimmed) return
-
-    this.events = this.events.map((event) =>
-      event.id === id ? { ...event, title: trimmed } : event
-    )
     this.saveEvents()
   }
 
@@ -170,13 +166,14 @@ class Store extends BaseStore {
     this.events = this.events.map((event) => {
       if (event.id !== id) return event
 
+      const startTime = event.allDay ? '00:00' : this.extractTime(event.start)
+      const endTime =
+        event.end && !event.allDay ? this.extractTime(event.end) : undefined
+
       return {
         ...event,
-        start: event.allDay ? dateKey : `${dateKey}T${event.startTime}`,
-        end:
-          event.allDay || !event.endTime
-            ? undefined
-            : `${dateKey}T${event.endTime}`,
+        start: `${dateKey}T${startTime}`,
+        end: endTime ? `${dateKey}T${endTime}` : undefined,
       }
     })
     this.saveEvents()
@@ -200,24 +197,55 @@ class Store extends BaseStore {
     this.saveEvents()
   }
 
+  get holidayEvents() {
+    const currentYear = new Date().getFullYear()
+    const holidays = getHolidaysForYearRange(currentYear - 1, currentYear + 1)
+
+    return holidays.map((holiday) => ({
+      id: holiday.id,
+      title: holiday.nameKey,
+      start: `${holiday.date}T00:00`,
+      allDay: true,
+      classNames: ['holiday-event'],
+      backgroundColor: '#fb923c',
+      borderColor: '#fb923c',
+      editable: false,
+      order: 0,
+    }))
+  }
+
   get calendarEvents() {
-    return this.events.map((event) => ({
+    const userEvents = this.events.map((event) => ({
       id: event.id,
       title: event.title,
       start: event.start,
       end: event.end,
       allDay: event.allDay ?? true,
+      order: 1,
     }))
+
+    return [...this.holidayEvents, ...userEvents]
   }
 
   get eventsForSelectedDate() {
     return this.events
-      .filter((event) => event.start.slice(0, 10) === this.selectedDate)
+      .filter((event) => {
+        const startDate = event.start.slice(0, 10)
+        const endDate = event.end?.slice(0, 10)
+
+        if (!endDate || endDate === startDate) {
+          return startDate === this.selectedDate
+        }
+
+        return this.selectedDate >= startDate && this.selectedDate <= endDate
+      })
       .sort((a, b) => {
         if (a.allDay && !b.allDay) return 1
         if (!a.allDay && b.allDay) return -1
-        if (!a.allDay && !b.allDay && a.startTime && b.startTime) {
-          return a.startTime.localeCompare(b.startTime)
+        if (!a.allDay && !b.allDay) {
+          const aTime = this.extractTime(a.start)
+          const bTime = this.extractTime(b.start)
+          return aTime.localeCompare(bTime)
         }
         return a.title.localeCompare(b.title)
       })

@@ -24,7 +24,7 @@ interface CalendarViewProps {
 
 const CalendarView = observer(
   ({ calendarRef, setCurrentView }: CalendarViewProps) => {
-    const { i18n } = useTranslation()
+    const { i18n, t } = useTranslation()
     const clickTimerRef = useRef<NodeJS.Timeout | null>(null)
     const lastClickInfoRef = useRef<DateClickArg | null>(null)
 
@@ -35,6 +35,11 @@ const CalendarView = observer(
       }, 100)
       return () => clearTimeout(timer)
     }, [store.sidebarOpen, calendarRef])
+
+    // Watch for selected date changes and trigger re-render
+    useEffect(() => {
+      calendarRef.current?.getApi()?.render()
+    }, [store.selectedDate, calendarRef])
 
     useEffect(() => {
       const calendarEl = calendarRef.current?.getApi().el
@@ -91,6 +96,9 @@ const CalendarView = observer(
     }
 
     const handleEventClick = (info: EventClickArg) => {
+      if (info.event.classNames.includes('holiday-event')) {
+        return
+      }
       const eventDate = info.event.start ?? new Date()
       store.setSelectedDate(eventDate)
       store.openEventDialog(info.event.startStr.slice(0, 10), info.event.id)
@@ -137,9 +145,24 @@ const CalendarView = observer(
       ? store.getEventById(store.editingEventId)
       : null
 
-    const getEndDate = (event: typeof editingEvent) => {
-      if (!event?.end) return undefined
-      return event.end.slice(0, 10)
+    const dayCellClassNames = (arg: { date: Date }) => {
+      const year = arg.date.getFullYear()
+      const month = String(arg.date.getMonth() + 1).padStart(2, '0')
+      const day = String(arg.date.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}`
+      if (dateStr === store.selectedDate) {
+        return ['fc-day-selected']
+      }
+      return []
+    }
+
+    const handleEventDidMount = (info: any) => {
+      if (info.event.classNames.includes('holiday-event')) {
+        const titleEl = info.el.querySelector('.fc-event-title')
+        if (titleEl) {
+          titleEl.textContent = t(info.event.title)
+        }
+      }
     }
 
     return (
@@ -159,11 +182,14 @@ const CalendarView = observer(
           editable={true}
           navLinks={true}
           navLinkDayClick="timeGridDay"
+          moreLinkClick="timeGridDay"
           dateClick={handleDateClick}
           eventClick={handleEventClick}
           eventDrop={handleEventDrop}
           eventResize={handleEventResize}
           datesSet={handleDatesSet}
+          dayCellClassNames={dayCellClassNames}
+          eventDidMount={handleEventDidMount}
         />
         <EventDialog
           isOpen={store.eventDialogOpen}
@@ -171,9 +197,9 @@ const CalendarView = observer(
           onSave={handleDialogSave}
           initialDate={store.eventDialogDate}
           initialTitle={editingEvent?.title}
-          initialStartTime={editingEvent?.startTime}
-          initialEndTime={editingEvent?.endTime}
-          initialEndDate={getEndDate(editingEvent)}
+          initialStartTime={editingEvent?.start.slice(11, 16)}
+          initialEndTime={editingEvent?.end?.slice(11, 16)}
+          initialEndDate={editingEvent?.end?.slice(0, 10)}
         />
       </>
     )

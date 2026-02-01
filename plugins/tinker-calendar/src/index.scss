@@ -4,9 +4,12 @@
 :root {
   --fc-border-color: #e0e0e0;
   --fc-today-bg-color: rgba(15, 194, 94, 0.1);
+  --fc-selected-bg-color: rgba(59, 130, 246, 0.15);
   --fc-event-bg-color: #0fc25e;
   --fc-event-border-color: #0fc25e;
   --fc-event-text-color: #ffffff;
+  --fc-holiday-bg-color: #fb923c;
+  --fc-holiday-border-color: #fb923c;
   --fc-now-indicator-color: #0fc25e;
 }
 
@@ -14,6 +17,7 @@
   --fc-border-color: #404040;
   --fc-page-bg-color: #1e1e1e;
   --fc-today-bg-color: rgba(15, 194, 94, 0.15);
+  --fc-selected-bg-color: rgba(59, 130, 246, 0.2);
 
   .fc {
     color: #e0e0e0;
@@ -28,4 +32,8 @@
   .fc-timegrid-now-indicator-line {
     border-color: #0fc25e;
   }
+}
+
+.fc-day-selected {
+  background-color: var(--fc-selected-bg-color) !important;
 }

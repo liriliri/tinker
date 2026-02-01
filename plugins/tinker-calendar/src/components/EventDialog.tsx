@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import Dialog from 'share/components/Dialog'
+import Dialog, { DialogButton } from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
+import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import TimeSelect from './TimeSelect'
 import DateSelect from './DateSelect'
@@ -95,14 +96,12 @@ const EventDialog = observer(
         <div className="space-y-4">
           {/* Title Input */}
           <div>
-            <input
-              type="text"
+            <TextInput
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t('eventTitlePlaceholder')}
               autoFocus
-              className={`w-full px-3 py-2 border ${tw.border.both} rounded ${tw.bg.both.tertiary} text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fc25e]`}
             />
           </div>
 
@@ -150,19 +149,12 @@ const EventDialog = observer(
 
         {/* Footer Buttons */}
         <div className="flex justify-end gap-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-          >
+          <DialogButton variant="text" onClick={onClose}>
             {t('cancel')}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!title.trim()}
-            className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
+          </DialogButton>
+          <DialogButton onClick={handleSave} disabled={!title.trim()}>
             {t('save')}
-          </button>
+          </DialogButton>
         </div>
       </Dialog>
     )

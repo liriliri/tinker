@@ -26,5 +26,13 @@
   "startTime": "开始",
   "endTime": "结束",
   "cancel": "取消",
-  "save": "保存"
+  "save": "保存",
+  "newYear": "元旦",
+  "valentines": "情人节",
+  "laborDay": "劳动节",
+  "mothersDay": "母亲节",
+  "fathersDay": "父亲节",
+  "thanksgiving": "感恩节",
+  "christmasEve": "平安夜",
+  "christmas": "圣诞节"
 }

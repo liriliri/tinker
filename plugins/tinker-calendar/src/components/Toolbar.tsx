@@ -2,12 +2,14 @@ import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { ChevronLeft, ChevronRight, Plus, PanelRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
 } from 'share/components/Toolbar'
 import type { CalendarApi } from '@fullcalendar/core'
 import store from '../store'
@@ -51,6 +53,7 @@ export default observer(function ToolbarComponent({
     const api = getCalendarApi()
     api?.today()
     updateTitle(api)
+    store.setToday()
   }
 
   const handleViewChange = (view: string) => {
@@ -96,37 +99,37 @@ export default observer(function ToolbarComponent({
         {t('today')}
       </ToolbarButton>
 
-      <ToolbarSeparator />
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={currentView === 'timeGridDay'}
+          onClick={() => handleViewChange('timeGridDay')}
+          title={t('dayView')}
+          className={`rounded-none rounded-l border-r ${tw.border.both} text-xs leading-none`}
+        >
+          {t('day')}
+        </ToolbarButton>
 
-      <ToolbarButton
-        variant="toggle"
-        active={currentView === 'timeGridDay'}
-        onClick={() => handleViewChange('timeGridDay')}
-        title={t('dayView')}
-        className="text-xs leading-none"
-      >
-        {t('day')}
-      </ToolbarButton>
+        <ToolbarButton
+          variant="toggle"
+          active={currentView === 'timeGridWeek'}
+          onClick={() => handleViewChange('timeGridWeek')}
+          title={t('weekView')}
+          className={`rounded-none border-r ${tw.border.both} text-xs leading-none`}
+        >
+          {t('week')}
+        </ToolbarButton>
 
-      <ToolbarButton
-        variant="toggle"
-        active={currentView === 'timeGridWeek'}
-        onClick={() => handleViewChange('timeGridWeek')}
-        title={t('weekView')}
-        className="text-xs leading-none"
-      >
-        {t('week')}
-      </ToolbarButton>
-
-      <ToolbarButton
-        variant="toggle"
-        active={currentView === 'dayGridMonth'}
-        onClick={() => handleViewChange('dayGridMonth')}
-        title={t('monthView')}
-        className="text-xs leading-none"
-      >
-        {t('month')}
-      </ToolbarButton>
+        <ToolbarButton
+          variant="toggle"
+          active={currentView === 'dayGridMonth'}
+          onClick={() => handleViewChange('dayGridMonth')}
+          title={t('monthView')}
+          className="rounded-none rounded-r text-xs leading-none"
+        >
+          {t('month')}
+        </ToolbarButton>
+      </ToolbarButtonGroup>
 
       <ToolbarSeparator />
 
