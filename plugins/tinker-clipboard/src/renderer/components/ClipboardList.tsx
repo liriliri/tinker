@@ -21,6 +21,8 @@ export default observer(function ClipboardList() {
         clipboard.writeText(item.data)
       } else if (item.type === 'image') {
         clipboard.writeImage(item.data)
+      } else if (item.type === 'file') {
+        clipboard.writeFiles(item.data)
       }
       toast.success(t('copied'))
     } catch (error) {

@@ -1,7 +1,6 @@
 import { contextBridge, clipboard, nativeImage } from 'electron'
-import uuid from 'licia/uuid'
+import md5 from 'licia/md5'
 
-// Clipboard item type matching renderer types
 type ClipboardType = 'text' | 'image' | 'file'
 
 interface ClipboardItem {
@@ -12,101 +11,89 @@ interface ClipboardItem {
   timestamp: number
 }
 
-// Clipboard monitoring
 let monitoringInterval: NodeJS.Timeout | null = null
-let lastClipboardText = ''
-let lastClipboardImage = ''
+let lastItemId = ''
 let onClipboardChangeCallback: ((item: ClipboardItem) => void) | null = null
-
-function generateId(): string {
-  return uuid()
-}
 
 function createPreview(text: string, maxLength = 200): string {
   if (text.length <= maxLength) return text
   return text.substring(0, maxLength) + '...'
 }
 
-function checkClipboard() {
+async function getClipboardItem(): Promise<ClipboardItem | null> {
   try {
-    // Check for text first (cheaper operation)
+    // Check for files first (highest priority)
+    const filePaths = await tinker.getClipboardFilePaths()
+    if (filePaths && filePaths.length > 0) {
+      const data = JSON.stringify(filePaths)
+      const fileNames = filePaths.map((path) => {
+        const parts = path.split(/[/\\]/)
+        return parts[parts.length - 1]
+      })
+
+      return {
+        id: md5(data),
+        type: 'file',
+        data,
+        preview: fileNames.join(', '),
+        timestamp: Date.now(),
+      }
+    }
+
+    // Check for image (before text to avoid false positives)
+    const image = clipboard.readImage()
+    if (!image.isEmpty()) {
+      const data = image.toDataURL()
+      return {
+        id: md5(data),
+        type: 'image',
+        data,
+        timestamp: Date.now(),
+      }
+    }
+
+    // Check for text last
     const text = clipboard.readText()
-    if (text && text !== lastClipboardText) {
-      lastClipboardText = text
-      lastClipboardImage = ''
-      const item: ClipboardItem = {
-        id: generateId(),
+    if (text && text.trim()) {
+      return {
+        id: md5(text),
         type: 'text',
         data: text,
         preview: createPreview(text),
         timestamp: Date.now(),
       }
-      onClipboardChangeCallback?.(item)
-      return
     }
 
-    // Check for image
-    const image = clipboard.readImage()
-    if (!image.isEmpty()) {
-      // If no previous image, definitely need to check
-      if (!lastClipboardImage || !lastClipboardImage.startsWith('data:image')) {
-        const imageData = image.toDataURL()
-        if (imageData !== lastClipboardImage) {
-          lastClipboardImage = imageData
-          lastClipboardText = ''
-          const item: ClipboardItem = {
-            id: generateId(),
-            type: 'image',
-            data: imageData,
-            timestamp: Date.now(),
-          }
-          onClipboardChangeCallback?.(item)
-          return
-        }
-      } else {
-        // We have a previous image - need to compare actual content
-        // Convert to data URL to check if it changed
-        const imageData = image.toDataURL()
-        if (imageData !== lastClipboardImage) {
-          lastClipboardImage = imageData
-          lastClipboardText = ''
-          const item: ClipboardItem = {
-            id: generateId(),
-            type: 'image',
-            data: imageData,
-            timestamp: Date.now(),
-          }
-          onClipboardChangeCallback?.(item)
-          return
-        }
-      }
-    } else if (lastClipboardImage) {
-      // Clipboard was cleared
-      lastClipboardImage = ''
-    }
+    return null
   } catch (error) {
-    console.error('Error checking clipboard:', error)
+    console.error('Error getting clipboard:', error)
+    return null
+  }
+}
+
+async function checkClipboard() {
+  const item = await getClipboardItem()
+
+  if (!item) return
+
+  // Only trigger callback if content changed
+  if (item.id !== lastItemId) {
+    lastItemId = item.id
+    onClipboardChangeCallback?.(item)
   }
 }
 
 const clipboardObj = {
-  // Start monitoring clipboard changes
   startMonitoring(callback: (item: ClipboardItem) => void) {
     onClipboardChangeCallback = callback
+    lastItemId = ''
 
-    // Initialize with current clipboard content
-    lastClipboardText = clipboard.readText() || ''
-    const image = clipboard.readImage()
-    lastClipboardImage = image.isEmpty() ? '' : image.toDataURL()
-
-    // Check every 500ms
     if (monitoringInterval) {
       clearInterval(monitoringInterval)
     }
     monitoringInterval = setInterval(checkClipboard, 500)
   },
 
-  // Stop monitoring
   stopMonitoring() {
     if (monitoringInterval) {
       clearInterval(monitoringInterval)
@@ -115,28 +102,36 @@ const clipboardObj = {
     onClipboardChangeCallback = null
   },
 
-  // Write to clipboard
   writeText(text: string) {
     clipboard.writeText(text)
-    lastClipboardText = text
+    lastItemId = md5(text)
   },
 
   writeImage(dataUrl: string) {
     try {
       const image = nativeImage.createFromDataURL(dataUrl)
       clipboard.writeImage(image)
-      lastClipboardImage = dataUrl
+      lastItemId = md5(dataUrl)
     } catch (error) {
       console.error('Error writing image to clipboard:', error)
       throw error
     }
   },
 
-  // Clear clipboard
+  writeFiles(filesJson: string) {
+    try {
+      const filePaths = JSON.parse(filesJson) as string[]
+      clipboard.writeText(filePaths.join('\n'))
+      lastItemId = md5(filesJson)
+    } catch (error) {
+      console.error('Error writing files to clipboard:', error)
+      throw error
+    }
+  },
+
   clear() {
     clipboard.clear()
-    lastClipboardText = ''
-    lastClipboardImage = ''
+    lastItemId = ''
   },
 }
 
