@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
+import FileOpen from 'share/components/FileOpen'
 import store from './store'
 import Toolbar from './components/Toolbar'
 import HexEditorView from './components/HexEditorView'
-import FileOpen from './components/FileOpen'
 import { tw } from 'share/theme'
 
 export default observer(function App() {
@@ -22,14 +22,8 @@ export default observer(function App() {
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    const file = files[0]
-
     try {
-      const filePath = (file as any).path
-      if (filePath) {
-        const buffer = await hexEditor.readFile(filePath)
-        store.importData(Array.from(buffer), filePath)
-      }
+      await store.openFileFromFile(files[0])
     } catch (err) {
       console.error('Failed to load file:', err)
     }
@@ -47,9 +41,9 @@ export default observer(function App() {
           {!store.hasData ? (
             <div className={'flex-1 flex flex-col'}>
               <FileOpen
-                onOpenFile={() => store.openFile()}
+                onOpenFile={(file) => store.openFileFromFile(file)}
                 openTitle={t('openTitle')}
-                supportedFormats={t('supportedFormats')}
+                supportedFormats=""
               />
             </div>
           ) : (

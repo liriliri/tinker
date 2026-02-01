@@ -68,6 +68,22 @@ class Store extends BaseStore {
     }
   }
 
+  async openFileFromFile(file: File) {
+    try {
+      const filePath = (file as File & { path?: string }).path
+      if (filePath) {
+        const buffer = await hexEditor.readFile(filePath)
+        this.importData(buffer, filePath)
+        return
+      }
+
+      const arrayBuffer = await file.arrayBuffer()
+      this.importData(new Uint8Array(arrayBuffer))
+    } catch (error) {
+      console.error('Open file failed:', error)
+    }
+  }
+
   async saveFile() {
     try {
       if (this.currentFilePath) {
@@ -103,9 +119,7 @@ class Store extends BaseStore {
     this.data = Array.from(newData)
     this.savedData = [...this.data]
     this.nonce += 1
-    if (filePath) {
-      this.currentFilePath = filePath
-    }
+    this.currentFilePath = filePath || null
   }
 }
 

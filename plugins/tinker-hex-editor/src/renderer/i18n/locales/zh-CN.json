@@ -1,6 +1,5 @@
 {
   "open": "打开",
   "save": "保存",
-  "openTitle": "拖拽文件到此处或点击打开",
-  "supportedFormats": "支持所有二进制文件"
+  "openTitle": "拖拽文件到此处或点击打开"
 }
