@@ -115,13 +115,20 @@ class Store extends BaseStore {
     keyFileData?: ArrayBuffer
   ) {
     try {
-      const fileData = await passwordManager.readFile(path)
+      const fileData = await tinker.readFile(path)
+      const buffer =
+        fileData instanceof ArrayBuffer
+          ? fileData
+          : fileData.buffer.slice(
+              fileData.byteOffset,
+              fileData.byteOffset + fileData.byteLength
+            )
       const credentials = new kdbxweb.Credentials(
         kdbxweb.ProtectedValue.fromString(password),
         keyFileData
       )
 
-      this.db = await kdbxweb.Kdbx.load(fileData, credentials)
+      this.db = await kdbxweb.Kdbx.load(buffer, credentials)
       this.dbPath = path
       this.dbName = path.split('/').pop() || 'Database'
       this.isLocked = false
@@ -151,7 +158,7 @@ class Store extends BaseStore {
       const data = await this.db.save()
 
       if (this.dbPath) {
-        await passwordManager.writeFile(this.dbPath, new Uint8Array(data))
+        await tinker.writeFile(this.dbPath, new Uint8Array(data))
         this.isModified = false
       } else {
         // Save as new file
@@ -161,7 +168,7 @@ class Store extends BaseStore {
         })
 
         if (result && !result.canceled && result.filePath) {
-          await passwordManager.writeFile(result.filePath, new Uint8Array(data))
+          await tinker.writeFile(result.filePath, new Uint8Array(data))
           this.dbPath = result.filePath
           this.dbName = result.filePath.split('/').pop() || 'Database'
           this.isModified = false
@@ -191,7 +198,7 @@ class Store extends BaseStore {
         })
 
         const data = await this.db.save()
-        await passwordManager.writeFile(result.filePath, new Uint8Array(data))
+        await tinker.writeFile(result.filePath, new Uint8Array(data))
         this.dbPath = result.filePath
         this.dbName = result.filePath.split('/').pop() || 'Database'
         this.isModified = false
