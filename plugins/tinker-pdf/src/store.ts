@@ -166,10 +166,8 @@ class Store extends BaseStore {
     this.setFileName(filePath.split('/').pop() || '')
 
     try {
-      // Read file using pdf API
-      const fileData = await pdf.readFile(filePath)
+      const fileData = await tinker.readFile(filePath)
 
-      // Load PDF document
       const loadingTask = pdfjsLib.getDocument({ data: fileData })
       const pdfDoc = await loadingTask.promise
 
@@ -180,6 +178,17 @@ class Store extends BaseStore {
     } finally {
       this.setLoading(false)
     }
+  }
+
+  // Open file from File object (for FileOpen component)
+  async openFileFromFile(file: File) {
+    const filePath = (file as any).path
+    if (!filePath) {
+      this.showError('Cannot get file path from file object')
+      return
+    }
+
+    await this.loadPdfFile(filePath)
   }
 
   // Open file dialog

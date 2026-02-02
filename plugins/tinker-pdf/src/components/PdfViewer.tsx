@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import store from '../store'
 import { tw } from 'share/theme'
-import FileOpen from './FileOpen'
+import FileOpen from 'share/components/FileOpen'
 
 interface PageRenderState {
   rendered: boolean
@@ -22,31 +22,6 @@ export default observer(function PdfViewer() {
     new Map()
   )
   const observerRef = useRef<IntersectionObserver | null>(null)
-
-  // Handle drag and drop
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const files = e.dataTransfer.files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-
-    try {
-      const filePath = (file as any).path
-      if (filePath) {
-        await store.loadPdfFile(filePath)
-      }
-    } catch (err) {
-      console.error('Failed to load file:', err)
-    }
-  }
 
   // Initialize page states when document loads
   useEffect(() => {
@@ -426,16 +401,11 @@ export default observer(function PdfViewer() {
 
   if (!store.pdfDoc) {
     return (
-      <div
-        className="flex-1 flex flex-col"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
-        <FileOpen
-          onOpenFile={() => store.openFile()}
-          openTitle={t('openTitle')}
-        />
-      </div>
+      <FileOpen
+        onOpenFile={(file) => store.openFileFromFile(file)}
+        openTitle={t('openTitle')}
+        fileName={store.fileName}
+      />
     )
   }
 
