@@ -99,6 +99,10 @@ class Store extends BaseStore {
         kdbxweb.ProtectedValue.fromString(password)
       )
       this.db = kdbxweb.Kdbx.create(credentials, name)
+
+      // Use AES-KDF instead of Argon2 to avoid "argon2 not implemented" error
+      this.db.header.setKdf(kdbxweb.Consts.KdfId.Aes)
+
       this.dbName = name
       this.isLocked = false
       this.isModified = true

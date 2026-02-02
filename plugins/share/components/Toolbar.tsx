@@ -80,7 +80,7 @@ export function ToolbarSpacer() {
   return <div className="flex-1" />
 }
 
-const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border.both} ${tw.bg.both.primary} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
+const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border.both} ${tw.bg.both.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
 
 export type ToolbarTextInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
