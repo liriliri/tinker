@@ -12,12 +12,14 @@ import {
   Eye,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
 } from 'share/components/Toolbar'
 import CopyButton from 'share/components/CopyButton'
 import store from '../store'
@@ -45,6 +47,40 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'split'}
+          onClick={() => store.setViewMode('split')}
+          title={t('splitView')}
+          className={`rounded-none rounded-l border-r ${tw.border.both}`}
+        >
+          <Columns2 size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'editor'}
+          onClick={() => store.setViewMode('editor')}
+          title={t('editorOnly')}
+          className={`rounded-none border-r ${tw.border.both}`}
+        >
+          <FileEdit size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'preview'}
+          onClick={() => store.setViewMode('preview')}
+          title={t('previewOnly')}
+          className="rounded-none rounded-r"
+        >
+          <Eye size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </ToolbarButtonGroup>
+
+      <ToolbarSeparator />
+
       <ToolbarButton
         onClick={() => store.undo()}
         disabled={!store.canUndo}
@@ -59,35 +95,6 @@ export default observer(function ToolbarComponent() {
         title={t('redo')}
       >
         <Redo size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarSeparator />
-
-      <ToolbarButton
-        variant="toggle"
-        active={store.viewMode === 'split'}
-        onClick={() => store.setViewMode('split')}
-        title={t('splitView')}
-      >
-        <Columns2 size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton
-        variant="toggle"
-        active={store.viewMode === 'editor'}
-        onClick={() => store.setViewMode('editor')}
-        title={t('editorOnly')}
-      >
-        <FileEdit size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton
-        variant="toggle"
-        active={store.viewMode === 'preview'}
-        onClick={() => store.setViewMode('preview')}
-        title={t('previewOnly')}
-      >
-        <Eye size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSeparator />

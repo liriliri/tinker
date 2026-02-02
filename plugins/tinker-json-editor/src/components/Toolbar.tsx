@@ -19,7 +19,9 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
 } from 'share/components/Toolbar'
+import { tw } from 'share/theme'
 import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import ExpandIcon from '../assets/expand.svg?react'
@@ -49,23 +51,27 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <ToolbarButton
-        variant="toggle"
-        active={store.mode === 'text'}
-        onClick={() => store.setMode('text')}
-        title={t('textMode')}
-      >
-        <FileText size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={store.mode === 'text'}
+          onClick={() => store.setMode('text')}
+          title={t('textMode')}
+          className={`rounded-none rounded-l border-r ${tw.border.both}`}
+        >
+          <FileText size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
 
-      <ToolbarButton
-        variant="toggle"
-        active={store.mode === 'tree'}
-        onClick={() => store.setMode('tree')}
-        title={t('treeMode')}
-      >
-        <Network size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+        <ToolbarButton
+          variant="toggle"
+          active={store.mode === 'tree'}
+          onClick={() => store.setMode('tree')}
+          title={t('treeMode')}
+          className="rounded-none rounded-r"
+        >
+          <Network size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </ToolbarButtonGroup>
 
       <ToolbarSeparator />
 

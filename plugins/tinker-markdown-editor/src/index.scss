@@ -1,5 +1,5 @@
-@use '../../../share/base.scss';
-@config "../../tailwind.config.js";
+@use '../../share/base.scss';
+@config "../tailwind.config.js";
 
 /* Override vditor styles for dark mode */
 .vditor-reset--dark {

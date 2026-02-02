@@ -63,7 +63,7 @@ class Store extends BaseStore {
 
     if (savedFilePath) {
       try {
-        const content = await markdownEditor.readFile(savedFilePath)
+        const content = await tinker.readFile(savedFilePath, 'utf-8')
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.markdownInput = content
@@ -180,7 +180,7 @@ class Store extends BaseStore {
       }
 
       const filePath = result.filePaths[0]
-      const content = await markdownEditor.readFile(filePath)
+      const content = await tinker.readFile(filePath, 'utf-8')
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
@@ -196,7 +196,11 @@ class Store extends BaseStore {
     try {
       if (this.currentFilePath) {
         // Save to existing file
-        await markdownEditor.writeFile(this.currentFilePath, this.markdownInput)
+        await tinker.writeFile(
+          this.currentFilePath,
+          this.markdownInput,
+          'utf-8'
+        )
         this.savedContent = this.markdownInput
       } else {
         // Show save dialog
@@ -221,7 +225,7 @@ class Store extends BaseStore {
         return
       }
 
-      await markdownEditor.writeFile(result.filePath, this.markdownInput)
+      await tinker.writeFile(result.filePath, this.markdownInput, 'utf-8')
       this.currentFilePath = result.filePath
       this.savedContent = this.markdownInput
       storage.set(FILE_PATH_KEY, result.filePath)

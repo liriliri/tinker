@@ -52,7 +52,7 @@ class Store extends BaseStore {
 
     if (savedFilePath) {
       try {
-        const content = await jsonEditor.readFile(savedFilePath)
+        const content = await tinker.readFile(savedFilePath, 'utf-8')
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.jsonInput = content
@@ -202,7 +202,7 @@ class Store extends BaseStore {
       }
 
       const filePath = result.filePaths[0]
-      const content = await jsonEditor.readFile(filePath)
+      const content = await tinker.readFile(filePath, 'utf-8')
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
@@ -218,7 +218,7 @@ class Store extends BaseStore {
     try {
       if (this.currentFilePath) {
         // Save to existing file
-        await jsonEditor.writeFile(this.currentFilePath, this.jsonInput)
+        await tinker.writeFile(this.currentFilePath, this.jsonInput, 'utf-8')
         this.savedContent = this.jsonInput
       } else {
         // Show save dialog
@@ -243,7 +243,7 @@ class Store extends BaseStore {
         return
       }
 
-      await jsonEditor.writeFile(result.filePath, this.jsonInput)
+      await tinker.writeFile(result.filePath, this.jsonInput, 'utf-8')
       this.currentFilePath = result.filePath
       this.savedContent = this.jsonInput
       storage.set(FILE_PATH_KEY, result.filePath)
