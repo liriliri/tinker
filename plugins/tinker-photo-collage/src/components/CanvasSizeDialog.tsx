@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import Dialog from 'share/components/Dialog'
+import Dialog, { DialogButton } from 'share/components/Dialog'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 
@@ -90,19 +90,12 @@ export default function CanvasSizeDialog({
       </div>
 
       <div className="flex gap-2 justify-end mt-6">
-        <button
-          className={`px-4 py-2 text-sm ${tw.text.both.secondary} ${tw.text.light.hoverPrimary} ${tw.text.dark.hoverPrimary}`}
-          onClick={onClose}
-        >
+        <DialogButton variant="text" onClick={onClose}>
           {t('cancel')}
-        </button>
-        <button
-          className={`px-4 py-2 text-sm ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`}
-          onClick={handleConfirm}
-          disabled={!isValid}
-        >
+        </DialogButton>
+        <DialogButton onClick={handleConfirm} disabled={!isValid}>
           {t('confirm')}
-        </button>
+        </DialogButton>
       </div>
     </Dialog>
   )
