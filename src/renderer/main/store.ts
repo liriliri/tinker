@@ -6,7 +6,13 @@ import lowerCase from 'licia/lowerCase'
 import trim from 'licia/trim'
 import PinyinMatch from 'pinyin-match'
 import toBool from 'licia/toBool'
+import isArr from 'licia/isArr'
+import LocalStore from 'licia/LocalStore'
 import pkg from '../../../package.json'
+
+const storage = new LocalStore('main')
+const STORAGE_KEY_PLUGINS = 'plugins'
+const STORAGE_KEY_APPS = 'apps'
 
 class Store extends BaseStore {
   plugins: IPlugin[] = []
@@ -26,6 +32,7 @@ class Store extends BaseStore {
       setFilter: action,
     })
 
+    this.loadCache()
     main.preparePluginView()
     this.refresh()
     this.bindEvent()
@@ -98,6 +105,7 @@ class Store extends BaseStore {
       this.apps = apps
       this.applyFilter()
     })
+    this.saveCache()
   }
   private getPlugin(id: string) {
     return find(this.plugins, (plugin) => plugin.id === id)
@@ -124,6 +132,24 @@ class Store extends BaseStore {
       if (this.plugin) {
         runInAction(() => (this.filter = title))
       }
+    })
+  }
+  private loadCache() {
+    const plugins = storage.get(STORAGE_KEY_PLUGINS)
+    const apps = storage.get(STORAGE_KEY_APPS)
+    if (!isArr(plugins) || !isArr(apps)) {
+      return
+    }
+    runInAction(() => {
+      this.plugins = plugins
+      this.apps = apps
+      this.applyFilter()
+    })
+  }
+  private saveCache() {
+    storage.set({
+      [STORAGE_KEY_PLUGINS]: this.plugins,
+      [STORAGE_KEY_APPS]: this.apps,
     })
   }
 }
