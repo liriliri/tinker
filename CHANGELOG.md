@@ -1,3 +1,10 @@
+## v0.11.0 (3 Feb 2026)
+
+* add: clock
+* add: calendar
+* add: image annotator
+* add: camera
+
 ## v0.10.0 (25 Jan 2026)
 
 * feat: search windows apps

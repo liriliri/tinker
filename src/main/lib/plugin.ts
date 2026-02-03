@@ -30,6 +30,7 @@ import { colorBgContainer, colorBgContainerDark } from 'common/theme'
 import each from 'licia/each'
 import * as pluginWin from '../window/plugin'
 import isMac from 'licia/isMac'
+import replaceAll from 'licia/replaceAll'
 import contextMenu from './contextMenu'
 import { exec } from 'child_process'
 import log from 'share/common/log'
@@ -52,12 +53,22 @@ const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
     return map(plugins, identity)
   }
 
-  const pluginDirs: string[] = []
+  const pluginDirs: Array<{ dir: string; prefix?: string }> = []
   if (isEmpty(plugins)) {
-    pluginDirs.push(getBuiltinPluginDir())
+    pluginDirs.push({ dir: getBuiltinPluginDir() })
   }
   try {
-    pluginDirs.push(await getNpmGlobalDir())
+    const npmGlobalDir = await getNpmGlobalDir()
+    pluginDirs.push({ dir: npmGlobalDir })
+    const files = await fs.readdir(npmGlobalDir, { withFileTypes: true })
+    for (const file of files) {
+      if (startWith(file.name, '@') && file.isDirectory()) {
+        pluginDirs.push({
+          dir: path.join(npmGlobalDir, file.name),
+          prefix: file.name + '/',
+        })
+      }
+    }
   } catch (e) {
     logger.warn('failed to get npm global directory:', e)
   }
@@ -69,7 +80,7 @@ const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
   })
 
   logger.info('loading plugins from directories:', pluginDirs)
-  for (const dir of pluginDirs) {
+  for (const { dir, prefix = '' } of pluginDirs) {
     const files = await fs.readdir(dir, { withFileTypes: true })
     for (const file of files) {
       if (startWith(file.name, 'tinker-')) {
@@ -86,10 +97,11 @@ const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
         }
         if (isDir) {
           try {
-            if (!plugins[file.name]) {
-              plugins[file.name] = await loadPlugin(path.join(dir, file.name))
+            const pluginId = normalizePluginId(prefix + file.name)
+            if (!plugins[pluginId]) {
+              plugins[pluginId] = await loadPlugin(path.join(dir, file.name))
             } else {
-              logger.warn(`plugin conflict: ${file.name}`)
+              logger.warn(`plugin conflict: ${pluginId}`)
             }
           } catch (e) {
             logger.error(`failed to load plugin ${file.name}:`, e)
@@ -101,6 +113,14 @@ const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
 
   return map(plugins, identity)
 })
+
+function normalizePluginId(id: string) {
+  if (startWith(id, '@')) {
+    return replaceAll(id.slice(1), '/', '-')
+  }
+
+  return id
+}
 
 function getBuiltinPluginDir() {
   return path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
@@ -124,7 +144,7 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
   const pkg = await fs.readJson(pkgPath)
   const rawPlugin = pkg.tinker as IRawPlugin
   const plugin: IPlugin = {
-    id: pkg.name,
+    id: normalizePluginId(pkg.name),
     dir,
     root: path.join(dir, path.dirname(rawPlugin.main)),
     name: rawPlugin.name,
