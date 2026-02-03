@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
 import { tw } from 'share/theme'
 import store from './store'
-import TabNav from './components/TabNav'
+import Toolbar from './components/Toolbar'
 import PreloadAPITab from './components/PreloadAPITab'
 import ThemeTab from './components/ThemeTab'
 import StorageTab from './components/StorageTab'
@@ -22,7 +22,7 @@ export default observer(function App() {
       <div
         className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
       >
-        <TabNav tabs={tabs} />
+        <Toolbar tabs={tabs} />
 
         <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6">
           {store.activeTab === 'preload' && <PreloadAPITab />}

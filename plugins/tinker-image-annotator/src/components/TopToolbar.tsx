@@ -22,6 +22,7 @@ import {
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarColor,
 } from 'share/components/Toolbar'
 import Select, { type SelectOption } from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
@@ -63,8 +64,6 @@ const FONT_SIZE_OPTIONS: SelectOption<number>[] = [
   { label: '64', value: 64 },
   { label: '72', value: 72 },
 ]
-
-const WATERMARK_COLOR_INPUT_CLASS = `h-5 w-8 cursor-pointer rounded border-0 disabled:opacity-50 disabled:cursor-not-allowed`
 
 const SHAPE_TYPE_CONFIGS: Record<
   ShapeType,
@@ -203,12 +202,10 @@ export default observer(function TopToolbar({
         >
           {t('watermark')}
         </Checkbox>
-        <input
-          type="color"
+        <ToolbarColor
           value={store.watermarkColor}
           onChange={handleWatermarkColorChange}
           disabled={!store.watermarkEnabled}
-          className={WATERMARK_COLOR_INPUT_CLASS}
           title={t('watermarkColor')}
           aria-label={t('watermarkColor')}
         />

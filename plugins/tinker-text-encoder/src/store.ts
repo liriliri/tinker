@@ -1,6 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import toast from 'react-hot-toast'
+import i18n from './i18n'
 
 export type EncodingType = 'url' | 'morse' | 'unicode'
 
@@ -72,6 +74,15 @@ class Store extends BaseStore {
   clearOutput() {
     this.outputText = ''
     this.saveToStorage()
+  }
+
+  async copyToClipboardWithToast(text: string) {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(i18n.t('copiedSuccess'))
+    } catch {
+      toast.error(i18n.t('copiedFailed'))
+    }
   }
 
   async pasteToInput() {

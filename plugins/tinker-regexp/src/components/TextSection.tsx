@@ -87,7 +87,7 @@ export default observer(function TextSection() {
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">
       <div
-        className={`flex-1 overflow-hidden px-6 py-3 ${tw.bg.both.primary} relative`}
+        className={`flex-1 overflow-hidden px-6 py-3 ${tw.bg.both.tertiary} relative`}
       >
         <CodeMirrorEditor
           value={store.testText}

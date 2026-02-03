@@ -8,5 +8,7 @@
   "placeholder": "Enter text or URL to generate QR code...",
   "emptyTitle": "Enter text or URL on the left",
   "emptySubtitle": "to generate QR code",
-  "custom": "Custom"
+  "custom": "Custom",
+  "copiedSuccess": "Copied to clipboard",
+  "copiedFailed": "Copy failed"
 }

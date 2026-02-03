@@ -14,6 +14,7 @@ import {
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
   ToolbarTextButton,
+  ToolbarLabel,
 } from 'share/components/Toolbar'
 import store from '../store'
 
@@ -169,9 +170,7 @@ export default observer(function ToolbarComponent() {
 
           {/* Quality Select */}
           <div className="flex gap-2 items-center">
-            <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-              {t('quality')}:
-            </label>
+            <ToolbarLabel>{`${t('quality')}:`}</ToolbarLabel>
             <Select
               value={store.quality}
               onChange={handleQualityChange}

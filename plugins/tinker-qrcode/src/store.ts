@@ -2,6 +2,8 @@ import { makeAutoObservable } from 'mobx'
 import type { RefObject } from 'react'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import toast from 'react-hot-toast'
+import i18n from './i18n'
 
 const STORAGE_KEY_SIZE = 'size'
 const STORAGE_KEY_FG_COLOR = 'fgColor'
@@ -102,6 +104,30 @@ class Store extends BaseStore {
 
   setQRCodeDataURL(dataURL: string) {
     this.qrCodeDataURL = dataURL
+  }
+
+  async copyQRCodeToClipboardWithToast() {
+    try {
+      if (!this.canvasRef?.current) {
+        throw new Error('Canvas not ready')
+      }
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        this.canvasRef?.current?.toBlob(resolve, 'image/png')
+      })
+
+      if (!blob) {
+        throw new Error('Failed to create image blob')
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ])
+      toast.success(i18n.t('copiedSuccess'))
+    } catch (error) {
+      console.error('Failed to copy QR code:', error)
+      toast.error(i18n.t('copiedFailed'))
+    }
   }
 }
 

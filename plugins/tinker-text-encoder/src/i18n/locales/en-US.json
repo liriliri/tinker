@@ -10,6 +10,8 @@
   "morseCode": "Morse Code",
   "unicode": "Unicode",
   "encodingType": "Encoding Type",
-  "inputPlaceholder": "Enter text here...",
-  "outputPlaceholder": "Result will appear here..."
+  "inputPlaceholder": "Enter text here",
+  "outputPlaceholder": "Result will appear here",
+  "copiedSuccess": "Copied to clipboard",
+  "copiedFailed": "Copy failed"
 }

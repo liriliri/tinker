@@ -11,7 +11,7 @@ import {
   IPlugin,
   IRawPlugin,
 } from 'common/types'
-import { handleEvent } from 'share/main/lib/util'
+import { handleEvent, resolveResources } from 'share/main/lib/util'
 import singleton from 'licia/singleton'
 import { isDev } from 'share/common/util'
 import path from 'path'
@@ -45,6 +45,7 @@ const customTitlebar = !settingsStore.get('useNativeTitlebar')
 const plugins: types.PlainObj<IPlugin> = {}
 
 const PLUGIN_PARTITION = 'persist:plugin'
+const DEFAULT_ICON = resolveResources('default-plugin.png')
 
 const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
   if (!force && !isEmpty(plugins)) {
@@ -127,14 +128,18 @@ async function loadPlugin(dir: string): Promise<IPlugin> {
     dir,
     root: path.join(dir, path.dirname(rawPlugin.main)),
     name: rawPlugin.name,
-    icon: rawPlugin.icon,
+    icon: rawPlugin.icon || '',
     main: rawPlugin.main,
     historyApiFallback: rawPlugin.historyApiFallback || false,
     preload: rawPlugin.preload,
     online: startWith(rawPlugin.main, 'https://'),
     builtin: startWith(dir, builtinDir),
   }
-  plugin.icon = path.join(dir, plugin.icon)
+  if (plugin.icon) {
+    plugin.icon = path.join(dir, plugin.icon)
+  } else {
+    plugin.icon = DEFAULT_ICON
+  }
   if (plugin.preload) {
     plugin.preload = path.join(dir, plugin.preload)
   }

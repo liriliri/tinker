@@ -52,12 +52,12 @@ export default observer(function QRGenerator() {
       <div
         className={`flex-1 min-w-0 flex flex-col border-r ${tw.border.both}`}
       >
-        <div className={`flex-1 ${tw.bg.both.primary}`}>
+        <div className="flex-1">
           <textarea
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
             placeholder={t('placeholder')}
-            className="w-full h-full px-3 py-2 border-0 focus:outline-none focus:ring-0 bg-transparent text-gray-900 dark:text-gray-100 font-mono text-sm resize-none"
+            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.both.primary} ${tw.text.both.primary}`}
           />
         </div>
       </div>
@@ -68,6 +68,8 @@ export default observer(function QRGenerator() {
       >
         {store.text ? (
           <div
+            onClick={() => store.copyQRCodeToClipboardWithToast()}
+            title={t('copy')}
             className="rounded-lg"
             style={{
               padding: '12px',
@@ -78,6 +80,7 @@ export default observer(function QRGenerator() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              cursor: 'pointer',
             }}
           >
             <canvas
@@ -93,7 +96,7 @@ export default observer(function QRGenerator() {
             />
           </div>
         ) : (
-          <div className="text-center text-gray-500 dark:text-gray-400 px-4">
+          <div className={`text-center px-4 ${tw.text.both.secondary}`}>
             <div className="text-base mb-1">{t('emptyTitle')}</div>
             <div className="text-sm opacity-75">{t('emptySubtitle')}</div>
           </div>

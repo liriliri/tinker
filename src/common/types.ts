@@ -3,8 +3,8 @@ import types from 'licia/types'
 
 export interface IRawPlugin {
   name: string
-  icon: string
   main: string
+  icon?: string
   preload?: string
   server?: boolean
   historyApiFallback?: boolean

@@ -13,7 +13,6 @@
   "embedded": false,
   "tinker": {
     "name": "Template",
-    "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {

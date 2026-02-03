@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
 import {
   Toolbar,
-  ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
+  ToolbarSeparator,
 } from 'share/components/Toolbar'
 import store from '../store'
 import { SUPPORTED_LANGUAGES } from '../lib/languageDetector'
@@ -23,23 +24,25 @@ export default observer(function ToolbarComponent() {
   return (
     <Toolbar className="justify-between">
       <div className="flex gap-1 items-center">
-        <ToolbarButton
-          variant="toggle"
-          active={store.mode === 'edit'}
-          onClick={() => store.setMode('edit')}
-          title={t('editMode')}
-        >
-          <PenLine size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+        <ToolbarButtonGroup>
+          <ToolbarButton
+            variant="toggle"
+            active={store.mode === 'edit'}
+            onClick={() => store.setMode('edit')}
+            title={t('editMode')}
+          >
+            <PenLine size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
 
-        <ToolbarButton
-          variant="toggle"
-          active={store.mode === 'diff'}
-          onClick={() => store.setMode('diff')}
-          title={t('diffMode')}
-        >
-          <GitCompare size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+          <ToolbarButton
+            variant="toggle"
+            active={store.mode === 'diff'}
+            onClick={() => store.setMode('diff')}
+            title={t('diffMode')}
+          >
+            <GitCompare size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+        </ToolbarButtonGroup>
 
         <ToolbarSeparator />
 

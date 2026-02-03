@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import CodeMirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
+import { tw } from 'share/theme'
 
 interface CodeMirrorEditorProps {
   value: string
@@ -71,5 +72,5 @@ export default function CodeMirrorEditor({
     }
   }, [value])
 
-  return <div ref={editorRef} className={className} />
+  return <div ref={editorRef} className={`${tw.bg.both.input} ${className}`} />
 }

@@ -1,14 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, Eraser, Copy, Check } from 'lucide-react'
+import { Clipboard, Eraser } from 'lucide-react'
 import isStrBlank from 'licia/isStrBlank'
-import { tw } from 'share/theme'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import {
   Toolbar,
-  ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarTextButton,
 } from 'share/components/Toolbar'
 import Select from 'share/components/Select'
 import store from '../store'
@@ -23,7 +21,6 @@ import {
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const handleEncode = () => {
     try {
@@ -62,10 +59,6 @@ export default observer(function ToolbarComponent() {
     store.clearOutput()
   }
 
-  const handleCopyOutput = () => {
-    copyToClipboard(store.outputText)
-  }
-
   const encodingOptions = [
     { value: 'url', label: t('urlEncoding') },
     { value: 'morse', label: t('morseCode') },
@@ -85,18 +78,6 @@ export default observer(function ToolbarComponent() {
         >
           <Eraser size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
-        <ToolbarSeparator />
-        <ToolbarButton
-          onClick={handleCopyOutput}
-          disabled={isStrBlank(store.outputText)}
-          title={t('copy')}
-        >
-          {copied ? (
-            <Check size={TOOLBAR_ICON_SIZE} className={tw.primary.text} />
-          ) : (
-            <Copy size={TOOLBAR_ICON_SIZE} />
-          )}
-        </ToolbarButton>
       </div>
       <div className="flex items-center gap-2">
         <Select
@@ -108,20 +89,18 @@ export default observer(function ToolbarComponent() {
           options={encodingOptions}
           title={t('encodingType')}
         />
-        <button
+        <ToolbarTextButton
           onClick={handleEncode}
           disabled={isStrBlank(store.inputText)}
-          className={`px-3 py-1 text-xs rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:opacity-30 disabled:cursor-not-allowed`}
         >
           {t('encode')}
-        </button>
-        <button
+        </ToolbarTextButton>
+        <ToolbarTextButton
           onClick={handleDecode}
           disabled={isStrBlank(store.inputText)}
-          className={`px-3 py-1 text-xs rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white disabled:opacity-30 disabled:cursor-not-allowed`}
         >
           {t('decode')}
-        </button>
+        </ToolbarTextButton>
       </div>
     </Toolbar>
   )

@@ -10,6 +10,8 @@
   "morseCode": "摩斯电码",
   "unicode": "Unicode",
   "encodingType": "编码类型",
-  "inputPlaceholder": "在此输入文本...",
-  "outputPlaceholder": "结果将显示在这里..."
+  "inputPlaceholder": "在此输入文本",
+  "outputPlaceholder": "结果将显示在这里",
+  "copiedSuccess": "已复制到剪贴板",
+  "copiedFailed": "复制失败"
 }

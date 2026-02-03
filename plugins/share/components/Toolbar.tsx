@@ -95,3 +95,51 @@ export function ToolbarTextInput({
 }
 
 export const TOOLBAR_ICON_SIZE = 14
+
+const toolbarLabelClassName = `text-xs ${tw.text.both.secondary} whitespace-nowrap`
+
+export type ToolbarLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
+
+export function ToolbarLabel({ className = '', ...rest }: ToolbarLabelProps) {
+  const combinedClassName = `${toolbarLabelClassName} ${className}`.trim()
+
+  return <label className={combinedClassName} {...rest} />
+}
+
+const toolbarColorWrapClassName = `relative h-4 w-4 rounded overflow-hidden ${tw.border.both} border`
+const toolbarColorSwatchClassName = `h-full w-full ${tw.bg.both.primary}`
+const toolbarColorInputClassName = 'absolute inset-0 opacity-0 cursor-pointer'
+
+export type ToolbarColorProps = React.InputHTMLAttributes<HTMLInputElement>
+
+export function ToolbarColor({
+  className = '',
+  type = 'color',
+  value,
+  disabled,
+  ...rest
+}: ToolbarColorProps) {
+  const disabledClassName = disabled ? 'opacity-50 cursor-not-allowed' : ''
+  const wrapClassName =
+    `${toolbarColorWrapClassName} ${disabledClassName} ${className}`.trim()
+  const inputClassName =
+    `${toolbarColorInputClassName} ${disabledClassName}`.trim()
+
+  return (
+    <div className={wrapClassName}>
+      <div
+        className={toolbarColorSwatchClassName}
+        style={
+          typeof value === 'string' ? { backgroundColor: value } : undefined
+        }
+      />
+      <input
+        type={type}
+        value={value}
+        disabled={disabled}
+        className={inputClassName}
+        {...rest}
+      />
+    </div>
+  )
+}

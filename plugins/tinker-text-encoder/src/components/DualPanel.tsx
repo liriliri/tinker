@@ -21,7 +21,7 @@ export default observer(function DualPanel() {
               store.setInputText(e.target.value)
               store.clearOutput()
             }}
-            className={`w-full h-full p-4 resize-none outline-none ${tw.bg.both.primary} text-gray-800 dark:text-gray-200`}
+            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.both.primary} ${tw.text.both.primary}`}
             placeholder={t('inputPlaceholder')}
           />
         </div>
@@ -29,12 +29,25 @@ export default observer(function DualPanel() {
         {/* Right Panel - Output */}
         <div className="flex-1 min-w-0">
           <div
-            className={`w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${tw.bg.both.primary} text-gray-800 dark:text-gray-200`}
+            onClick={() =>
+              store.outputText &&
+              store.copyToClipboardWithToast(store.outputText)
+            }
+            title={store.outputText ? t('copy') : undefined}
+            className={`w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${
+              tw.bg.both.tertiary
+            } ${tw.text.both.primary} ${
+              store.outputText ? 'cursor-pointer' : ''
+            }`}
           >
-            {store.outputText || (
-              <span className="text-gray-400 dark:text-gray-500">
-                {t('outputPlaceholder')}
-              </span>
+            {store.outputText ? (
+              store.outputText
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-center">
+                <span className={tw.text.both.secondary}>
+                  {t('outputPlaceholder')}
+                </span>
+              </div>
             )}
           </div>
         </div>

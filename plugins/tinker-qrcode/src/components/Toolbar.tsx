@@ -10,6 +10,8 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarColor,
+  ToolbarLabel,
 } from 'share/components/Toolbar'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import { tw } from 'share/theme'
@@ -87,9 +89,7 @@ export default observer(function ToolbarComponent() {
     <Toolbar>
       {/* Size Control */}
       <div className="flex items-center gap-1.5 px-1">
-        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-          {t('size')}:
-        </label>
+        <ToolbarLabel>{`${t('size')}:`}</ToolbarLabel>
         <Select
           value={getCurrentSizeValue()}
           onChange={handleSizeChange}
@@ -117,9 +117,7 @@ export default observer(function ToolbarComponent() {
 
       {/* Error Correction Level */}
       <div className="flex items-center gap-1.5 px-1">
-        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-          {t('correctLevel')}:
-        </label>
+        <ToolbarLabel>{`${t('correctLevel')}:`}</ToolbarLabel>
         <Select
           value={store.correctLevel}
           onChange={(value) =>
@@ -138,27 +136,19 @@ export default observer(function ToolbarComponent() {
 
       {/* Foreground Color */}
       <div className="flex items-center gap-1.5 px-1">
-        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-          {t('color')}:
-        </label>
-        <input
-          type="color"
+        <ToolbarLabel>{`${t('color')}:`}</ToolbarLabel>
+        <ToolbarColor
           value={store.fgColor}
           onChange={(e) => store.setFgColor(e.target.value)}
-          className="h-5 w-10 cursor-pointer rounded border-0"
         />
       </div>
 
       {/* Background Color */}
       <div className="flex items-center gap-1.5 px-1">
-        <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
-          {t('background')}:
-        </label>
-        <input
-          type="color"
+        <ToolbarLabel>{`${t('background')}:`}</ToolbarLabel>
+        <ToolbarColor
           value={store.bgColor}
           onChange={(e) => store.setBgColor(e.target.value)}
-          className="h-5 w-10 cursor-pointer rounded border-0"
         />
       </div>
 

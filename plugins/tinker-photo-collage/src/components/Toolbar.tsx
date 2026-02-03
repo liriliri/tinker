@@ -11,6 +11,8 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarColor,
+  ToolbarLabel,
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
 import * as htmlToImage from 'html-to-image'
@@ -127,30 +129,18 @@ export default observer(() => {
         </ToolbarButton>
 
         <div className="flex items-center gap-1.5 px-1">
-          <label
-            className={`text-xs ${tw.text.both.secondary} whitespace-nowrap`}
-          >
-            {t('canvasBackground')}:
-          </label>
-          <input
-            type="color"
+          <ToolbarLabel>{`${t('canvasBackground')}:`}</ToolbarLabel>
+          <ToolbarColor
             value={store.canvasBgColor}
             onChange={(e) => store.setCanvasBgColor(e.target.value)}
-            className="h-5 w-10 cursor-pointer rounded border-0"
           />
         </div>
 
         <div className="flex items-center gap-1.5 px-1">
-          <label
-            className={`text-xs ${tw.text.both.secondary} whitespace-nowrap`}
-          >
-            {t('imageBackground')}:
-          </label>
-          <input
-            type="color"
+          <ToolbarLabel>{`${t('imageBackground')}:`}</ToolbarLabel>
+          <ToolbarColor
             value={store.imageBgColor}
             onChange={(e) => store.setImageBgColor(e.target.value)}
-            className="h-5 w-10 cursor-pointer rounded border-0"
           />
         </div>
 
