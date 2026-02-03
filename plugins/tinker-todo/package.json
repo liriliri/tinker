@@ -3,18 +3,13 @@
   "version": "0.1.0",
   "description": "Todo List Plugin for Tinker",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
-    "dev:renderer": "vite --config ../vite.config.ts",
-    "dev:preload": "vite --config ../vite.preload.ts",
-    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
-    "build:renderer": "vite build --config ../vite.config.ts",
-    "build:preload": "vite build --config ../vite.preload.ts"
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Todo",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
-    "preload": "dist/preload/index.js",
+    "main": "dist/index.html",
     "locales": {
       "zh-CN": {
         "name": "待办清单"

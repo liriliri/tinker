@@ -4,7 +4,6 @@ import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
 
 const storage = new LocalStore('tinker-todo')
-const DEFAULT_FILE_PATH = `${todo.getHomedir()}/todo.txt`
 
 export type Priority = 'A' | 'B' | 'C' | null
 export type FilterType = 'all' | 'today' | 'important' | 'completed'
@@ -74,7 +73,7 @@ class Store extends BaseStore {
     const savedPath = storage.get('filePath')
     if (savedPath) {
       try {
-        const content = await todo.readFile(savedPath as string)
+        const content = await tinker.readFile(savedPath as string, 'utf-8')
         const lines = content.split('\n').filter((line) => line.trim())
 
         runInAction(() => {
@@ -133,7 +132,6 @@ class Store extends BaseStore {
   async createNewFile() {
     try {
       const result = await tinker.showSaveDialog({
-        defaultPath: DEFAULT_FILE_PATH,
         filters: [
           { name: 'Todo.txt Files', extensions: ['txt'] },
           { name: 'All Files', extensions: ['*'] },
@@ -141,7 +139,7 @@ class Store extends BaseStore {
       })
 
       if (!result.canceled && result.filePath) {
-        await todo.writeFile(result.filePath, '')
+        await tinker.writeFile(result.filePath, '', 'utf-8')
         await this.setFilePath(result.filePath)
       }
     } catch (error) {
@@ -157,7 +155,7 @@ class Store extends BaseStore {
     this.error = null
 
     try {
-      const content = await todo.readFile(this.filePath)
+      const content = await tinker.readFile(this.filePath, 'utf-8')
       const lines = content.split('\n').filter((line) => line.trim())
 
       runInAction(() => {
@@ -180,7 +178,7 @@ class Store extends BaseStore {
 
     try {
       const content = this.todos.map((todo) => todo.raw).join('\n')
-      await todo.writeFile(this.filePath, content)
+      await tinker.writeFile(this.filePath, content, 'utf-8')
     } catch (error) {
       this.error =
         error instanceof Error ? error.message : 'Failed to save todos'
