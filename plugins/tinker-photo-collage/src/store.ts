@@ -11,7 +11,6 @@ const STORAGE_KEY_PHOTO_COUNT = 'photoCount'
 const STORAGE_KEY_PADDING = 'padding'
 const STORAGE_KEY_SPACING = 'spacing'
 const STORAGE_KEY_RADIUS = 'radius'
-const STORAGE_KEY_RADIUS_ENABLED = 'radiusEnabled'
 const STORAGE_KEY_CANVAS_WIDTH = 'canvasWidth'
 const STORAGE_KEY_CANVAS_HEIGHT = 'canvasHeight'
 const storage = new LocalStore('tinker-photo-collage')
@@ -47,7 +46,6 @@ class Store extends BaseStore {
   padding: number = 42
   spacing: number = 25
   radius: number = 50
-  radiusEnabled: boolean = true
 
   canvasWidth: number = 1000
   canvasHeight: number = 1000
@@ -63,7 +61,10 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadSettings()
-    this.setSelectedPhotoCount(this.selectedPhotoCount)
+
+    if (this.photoSlots.length === 0) {
+      this.setSelectedPhotoCount(this.selectedPhotoCount)
+    }
   }
 
   loadSettings() {
@@ -97,11 +98,6 @@ class Store extends BaseStore {
       this.radius = parseInt(savedRadius)
     }
 
-    const savedRadiusEnabled = storage.get(STORAGE_KEY_RADIUS_ENABLED)
-    if (savedRadiusEnabled !== null) {
-      this.radiusEnabled = savedRadiusEnabled === 'true'
-    }
-
     const savedCanvasWidth = storage.get(STORAGE_KEY_CANVAS_WIDTH)
     if (savedCanvasWidth) {
       this.canvasWidth = parseInt(savedCanvasWidth)
@@ -117,6 +113,14 @@ class Store extends BaseStore {
       const template = getTemplateById(savedTemplateId)
       if (template) {
         this.selectedTemplateId = savedTemplateId
+        this.photoSlots = template.areas.map((area) => ({
+          areaName: area,
+          photoId: null,
+          scale: 1,
+          offsetX: 0,
+          offsetY: 0,
+        }))
+        this.initializeGridSizes(savedTemplateId)
       } else {
         const templates = getTemplatesByPhotoCount(this.selectedPhotoCount)
         if (templates.length > 0) {
@@ -228,11 +232,6 @@ class Store extends BaseStore {
   setRadius(value: number) {
     this.radius = value
     storage.set(STORAGE_KEY_RADIUS, value.toString())
-  }
-
-  toggleRadius() {
-    this.radiusEnabled = !this.radiusEnabled
-    storage.set(STORAGE_KEY_RADIUS_ENABLED, this.radiusEnabled.toString())
   }
 
   setCanvasSize(width: number, height: number) {

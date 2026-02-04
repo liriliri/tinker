@@ -88,7 +88,7 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
     }
   }, [isDragging, dragStart, areaName, slot])
 
-  const borderRadiusStyle = store.radiusEnabled ? `${store.radius}px` : '0px'
+  const borderRadiusStyle = `${store.radius}px`
 
   const imageStyle = slot
     ? {
