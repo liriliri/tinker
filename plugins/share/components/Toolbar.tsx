@@ -119,11 +119,13 @@ export function ToolbarColor({
   disabled,
   ...rest
 }: ToolbarColorProps) {
-  const disabledClassName = disabled ? 'opacity-50 cursor-not-allowed' : ''
+  const wrapDisabledClass = disabled ? 'opacity-50 cursor-not-allowed' : ''
+  const inputDisabledClass = disabled ? 'cursor-not-allowed' : ''
+
   const wrapClassName =
-    `${toolbarColorWrapClassName} ${disabledClassName} ${className}`.trim()
+    `${toolbarColorWrapClassName} ${wrapDisabledClass} ${className}`.trim()
   const inputClassName =
-    `${toolbarColorInputClassName} ${disabledClassName}`.trim()
+    `${toolbarColorInputClassName} ${inputDisabledClass}`.trim()
 
   return (
     <div className={wrapClassName}>
