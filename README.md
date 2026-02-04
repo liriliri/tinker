@@ -155,6 +155,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/calculator.png"/></th>
       <th><img src="https://tinker.liriliri.io/voice_recorder.png"/></th>
     </tr>
+    <tr>
+      <th>Clock</th>
+      <th>Image Annotator</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/clock.png"/></th>
+      <th><img src="https://tinker.liriliri.io/image_annotator.png"/></th>
+    </tr>
+    <tr>
+      <th>Calendar</th>
+      <th>Camera</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/calendar.png"/></th>
+      <th><img src="https://tinker.liriliri.io/camera.png"/></th>
+    </tr>
   </tbody>
 </table>
 
