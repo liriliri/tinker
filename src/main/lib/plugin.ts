@@ -99,7 +99,10 @@ const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
           try {
             const pluginId = normalizePluginId(prefix + file.name)
             if (!plugins[pluginId]) {
-              plugins[pluginId] = await loadPlugin(path.join(dir, file.name))
+              plugins[pluginId] = await loadPlugin(
+                pluginId,
+                path.join(dir, file.name)
+              )
             } else {
               logger.warn(`plugin conflict: ${pluginId}`)
             }
@@ -138,13 +141,13 @@ async function getNpmGlobalDir(): Promise<string> {
   })
 }
 
-async function loadPlugin(dir: string): Promise<IPlugin> {
+async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
   const builtinDir = getBuiltinPluginDir()
   const pkgPath = path.join(dir, 'package.json')
   const pkg = await fs.readJson(pkgPath)
   const rawPlugin = pkg.tinker as IRawPlugin
   const plugin: IPlugin = {
-    id: normalizePluginId(pkg.name),
+    id,
     dir,
     root: path.join(dir, path.dirname(rawPlugin.main)),
     name: rawPlugin.name,
