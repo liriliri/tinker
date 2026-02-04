@@ -1,7 +1,7 @@
 {
   "name": "tinker-clipboard",
   "version": "0.1.0",
-  "description": "Clipboard Manager Plugin for Tinker",
+  "description": "Clipboard Manager Plugin for TINKER",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",

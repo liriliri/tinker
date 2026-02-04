@@ -1,7 +1,7 @@
 {
   "name": "tinker-image-cropper",
   "version": "0.1.0",
-  "description": "Image Cropper Plugin for Tinker",
+  "description": "Image Cropper Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

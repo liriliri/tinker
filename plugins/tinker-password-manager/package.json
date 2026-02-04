@@ -1,7 +1,7 @@
 {
   "name": "tinker-password-manager",
   "version": "0.1.0",
-  "description": "Password Manager Plugin for Tinker",
+  "description": "Password Manager Plugin for TINKER",
   "scripts": {
     "dev": "npm run dev:renderer",
     "dev:renderer": "vite --config ../vite.config.ts",

@@ -1,7 +1,7 @@
 {
   "name": "tinker-hex-editor",
   "version": "0.1.0",
-  "description": "Hex Editor Plugin for Tinker",
+  "description": "Hex Editor Plugin for TINKER",
   "scripts": {
     "dev": "npm run dev:renderer",
     "dev:renderer": "vite --config ../vite.config.ts",

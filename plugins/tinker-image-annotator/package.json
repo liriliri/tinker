@@ -1,7 +1,7 @@
 {
   "name": "tinker-image-annotator",
   "version": "0.1.0",
-  "description": "Image Annotator Plugin for Tinker",
+  "description": "Image Annotator Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

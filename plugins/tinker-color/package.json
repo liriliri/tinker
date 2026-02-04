@@ -1,7 +1,7 @@
 {
   "name": "tinker-color",
   "version": "0.1.0",
-  "description": "Color Utilities Plugin for Tinker",
+  "description": "Color Utilities Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

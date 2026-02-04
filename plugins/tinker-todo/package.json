@@ -1,7 +1,7 @@
 {
   "name": "tinker-todo",
   "version": "0.1.0",
-  "description": "Todo List Plugin for Tinker",
+  "description": "Todo List Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

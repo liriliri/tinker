@@ -1,7 +1,7 @@
 {
   "name": "tinker-pdf",
   "version": "0.1.0",
-  "description": "PDF Viewer and Editor Plugin for Tinker",
+  "description": "PDF Viewer and Editor Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

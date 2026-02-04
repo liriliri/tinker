@@ -1,7 +1,7 @@
 {
   "name": "tinker-camera",
   "version": "0.1.0",
-  "description": "Camera Plugin for Tinker",
+  "description": "Camera Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

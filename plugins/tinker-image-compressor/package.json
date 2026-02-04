@@ -1,7 +1,7 @@
 {
   "name": "tinker-image-compressor",
   "version": "0.1.0",
-  "description": "Image Compressor Plugin for Tinker",
+  "description": "Image Compressor Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

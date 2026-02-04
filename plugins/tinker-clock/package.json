@@ -1,7 +1,7 @@
 {
   "name": "tinker-clock",
   "version": "0.1.0",
-  "description": "Clock Plugin for Tinker",
+  "description": "Clock Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

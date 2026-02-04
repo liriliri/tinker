@@ -1,7 +1,7 @@
 {
   "name": "tinker-whiteboard",
   "version": "0.1.0",
-  "description": "Whiteboard Plugin for Tinker",
+  "description": "Whiteboard Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

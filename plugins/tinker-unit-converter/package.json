@@ -1,7 +1,7 @@
 {
   "name": "tinker-unit-converter",
   "version": "0.1.0",
-  "description": "Unit Converter Plugin for Tinker",
+  "description": "Unit Converter Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

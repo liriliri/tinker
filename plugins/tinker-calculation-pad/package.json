@@ -1,7 +1,7 @@
 {
   "name": "tinker-calculation-pad",
   "version": "0.1.0",
-  "description": "Calculation Pad Plugin for Tinker",
+  "description": "Calculation Pad Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"

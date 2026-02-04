@@ -1,7 +1,7 @@
 {
   "name": "tinker-hosts",
   "version": "0.1.0",
-  "description": "Hosts Manager Plugin for Tinker",
+  "description": "Hosts Manager Plugin for TINKER",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",
