@@ -122,14 +122,14 @@ export default observer(function TopToolbar({
       <ToolbarSeparator />
       <ToolbarButton
         onClick={() => store.undo()}
-        disabled={!store.hasImage}
+        disabled={!store.canUndo}
         title={t('undo')}
       >
         <Undo size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => store.redo()}
-        disabled={!store.hasImage}
+        disabled={!store.canRedo}
         title={t('redo')}
       >
         <Redo size={TOOLBAR_ICON_SIZE} />

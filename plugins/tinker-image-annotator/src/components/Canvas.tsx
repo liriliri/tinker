@@ -12,6 +12,7 @@ import {
   ZoomEvent,
   ResizeEvent,
   PropertyEvent,
+  ChildEvent,
 } from 'leafer-ui'
 import { ScrollBar } from '@leafer-in/scroll'
 import '@leafer-in/editor'
@@ -162,6 +163,9 @@ const Canvas = observer(() => {
 
     const handleInnerEditorClose = () => {
       store.setTextEditing(false)
+      if (store.getPropertyChangeEnabled()) {
+        store.saveState()
+      }
     }
 
     const updateScale = () => {
@@ -246,6 +250,29 @@ const Canvas = observer(() => {
       typeof scaleValue === 'number' ? scaleValue : scaleValue?.x ?? 1
     store.setScale(nextScale)
     store.createSnapshot()
+    store.resetUndoRedo()
+
+    const handleChildEvent = () => {
+      if (store.getPropertyChangeEnabled()) {
+        store.saveState()
+      }
+    }
+
+    const handleDragEnd = () => {
+      if (store.getPropertyChangeEnabled()) {
+        store.saveState()
+      }
+    }
+
+    frame.on(ChildEvent.ADD, handleChildEvent)
+    frame.on(ChildEvent.REMOVE, handleChildEvent)
+    app.editor?.on(DragEvent.END, handleDragEnd)
+
+    return () => {
+      frame.off(ChildEvent.ADD, handleChildEvent)
+      frame.off(ChildEvent.REMOVE, handleChildEvent)
+      app.editor?.off(DragEvent.END, handleDragEnd)
+    }
   }, [store.app, store.image])
 
   useEffect(() => {
@@ -349,6 +376,7 @@ const Canvas = observer(() => {
       if (store.tool === 'move') return
       if (store.tool === 'text') return
 
+      store.disablePropertyChangeWatch()
       startPoint = getPoint(event)
 
       if (store.tool === 'shape') {
@@ -468,6 +496,8 @@ const Canvas = observer(() => {
     }
 
     const onDragEnd = async () => {
+      store.enablePropertyChangeWatch()
+
       if (drawing instanceof Magnifier && store.snapshot) {
         applyMagnifierFill(drawing)
         setupMagnifierListener(drawing)
@@ -485,6 +515,11 @@ const Canvas = observer(() => {
         app.editor?.select(drawing)
         store.setTool('select')
       }
+
+      if (drawing) {
+        store.saveState()
+      }
+
       drawing = null
       startPoint = null
     }

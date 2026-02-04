@@ -2,12 +2,14 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import download from 'licia/download'
 import toast from 'react-hot-toast'
+import debounce from 'licia/debounce'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
 import i18n from './i18n'
 import { Rect, Text, type App, type Frame } from 'leafer-ui'
 import { textToSvg } from './lib/watermark'
+import { UndoRedoBase } from './lib/undoRedo'
 
 export type ToolType =
   | 'select'
@@ -64,6 +66,11 @@ class Store extends BaseStore {
   watermarkText: string = DEFAULT_WATERMARK_TEXT
   watermarkColor: string = DEFAULT_WATERMARK_COLOR
   watermarkSvg: string | null = null
+  private undoRedoInstance: UndoRedoBase = new UndoRedoBase()
+  private lastState: string | undefined = undefined
+  private enablePropertyChange: boolean = true
+  private _canUndo: boolean = false
+  private _canRedo: boolean = false
 
   constructor() {
     super()
@@ -78,6 +85,31 @@ class Store extends BaseStore {
 
   get hasImage() {
     return !!this.image
+  }
+
+  get canUndo() {
+    return this._canUndo
+  }
+
+  get canRedo() {
+    return this._canRedo
+  }
+
+  private updateUndoRedoState() {
+    this._canUndo = this.undoRedoInstance.canUndo
+    this._canRedo = this.undoRedoInstance.canRedo
+  }
+
+  disablePropertyChangeWatch() {
+    this.enablePropertyChange = false
+  }
+
+  enablePropertyChangeWatch() {
+    this.enablePropertyChange = true
+  }
+
+  getPropertyChangeEnabled() {
+    return this.enablePropertyChange
   }
 
   setApp(app: App | null) {
@@ -277,6 +309,7 @@ class Store extends BaseStore {
       }
     })
     this.clearSnapshot()
+    this.resetUndoRedo()
   }
 
   async addImageOverlay(file: File) {
@@ -421,21 +454,66 @@ class Store extends BaseStore {
   }
 
   undo() {
-    const editor = this.app?.editor as
-      | {
-          undo?: () => void
-        }
-      | undefined
-    editor?.undo?.()
+    if (!this.canUndo) return
+    this.disablePropertyChangeWatch()
+    try {
+      this.lastState = this.undoRedoInstance.undo(this.lastState)
+      if (this.lastState) {
+        this.loadJson(this.lastState)
+      }
+    } finally {
+      this.updateUndoRedoState()
+      this.enablePropertyChangeWatch()
+    }
   }
 
   redo() {
-    const editor = this.app?.editor as
-      | {
-          redo?: () => void
-        }
-      | undefined
-    editor?.redo?.()
+    if (!this.canRedo) return
+    this.disablePropertyChangeWatch()
+    try {
+      this.lastState = this.undoRedoInstance.redo(this.lastState)
+      if (this.lastState) {
+        this.loadJson(this.lastState)
+      }
+    } finally {
+      this.updateUndoRedoState()
+      this.enablePropertyChangeWatch()
+    }
+  }
+
+  saveState = debounce(() => {
+    if (!this.undoRedoInstance.isTracking) return
+    if (!this.frame) return
+    this.undoRedoInstance.push(this.lastState)
+    this.lastState = this.getJson()
+    this.updateUndoRedoState()
+  }, 300)
+
+  resetUndoRedo() {
+    this.undoRedoInstance.reset()
+    this.lastState = this.frame ? this.getJson() : undefined
+    this.updateUndoRedoState()
+  }
+
+  private getJson(): string {
+    if (!this.frame) return '{}'
+    return JSON.stringify(this.frame.toJSON())
+  }
+
+  private loadJson(json: string) {
+    if (!this.frame) return
+    this.undoRedoInstance.pause()
+    try {
+      const data = JSON.parse(json)
+      this.frame.set(data)
+      if (this.app?.editor) {
+        this.app.editor.target = undefined
+      }
+    } catch (error) {
+      console.error('Failed to load JSON:', error)
+    } finally {
+      this.undoRedoInstance.resume()
+    }
   }
 
   private syncScaleFromTree() {
