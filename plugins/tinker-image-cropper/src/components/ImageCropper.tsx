@@ -21,7 +21,7 @@ export default observer(function ImageCropper({
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+    <div className="flex-1 flex items-center justify-center overflow-hidden">
       <div className="w-full h-full max-w-4xl max-h-full">
         <Cropper
           ref={cropperRef}
