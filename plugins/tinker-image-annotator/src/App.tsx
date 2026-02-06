@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react'
-import type { ChangeEvent } from 'react'
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import ImageOpen from 'share/components/ImageOpen'
 import { ToasterProvider } from 'share/components/Toaster'
+import { openImageFile } from 'share/lib/util'
 import { tw } from 'share/theme'
 import Canvas from './components/Canvas'
 import SideToolbar from './components/SideToolbar'
@@ -13,32 +13,6 @@ import store from './store'
 
 export default observer(function App() {
   const { t } = useTranslation()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const overlayInputRef = useRef<HTMLInputElement>(null)
-
-  const handleOpenImage = async () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      store.loadImage(file)
-    }
-    event.target.value = ''
-  }
-
-  const handleInsertImage = () => {
-    overlayInputRef.current?.click()
-  }
-
-  const handleOverlayChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      store.addImageOverlay(file)
-    }
-    event.target.value = ''
-  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -93,26 +67,9 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
-        <TopToolbar
-          onOpenImage={handleOpenImage}
-          onInsertImage={handleInsertImage}
-        />
+        <TopToolbar />
 
         <div className="flex flex-1 min-h-0">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <input
-            ref={overlayInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleOverlayChange}
-            className="hidden"
-          />
           <div className="flex flex-1 min-h-0">
             <SideToolbar />
             <div className={'flex-1 relative'}>
@@ -122,7 +79,12 @@ export default observer(function App() {
                 <div className="absolute inset-0 p-4 flex">
                   <div className="flex-1 [&>div]:m-0 [&>div]:h-full">
                     <ImageOpen
-                      onOpenImage={handleOpenImage}
+                      onOpenImage={async () => {
+                        const result = await openImageFile({ title: t('open') })
+                        if (result) {
+                          store.loadImage(result.file)
+                        }
+                      }}
                       openTitle={t('title')}
                       supportedFormats={t('subtitle')}
                     />

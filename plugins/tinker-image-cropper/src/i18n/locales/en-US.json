@@ -1,5 +1,7 @@
 {
   "openImage": "Open Image",
+  "captureScreen": "Capture Screen",
+  "pasteImage": "Paste",
   "saveImage": "Save Image",
   "copyImage": "Copy Image",
   "crop": "Crop",

@@ -1,125 +1,45 @@
 # Shared Components and Utilities
 
-This directory contains shared components, utility classes, and hooks for the Tinker plugin system.
-
-## Directory Structure
-
-```
-share/
-├── base.scss            # Base styles (Tailwind + dark mode + toast)
-├── BaseStore.ts         # MobX Store base class
-├── theme.ts             # Unified theme configuration
-├── components/          # Shared UI components
-│   ├── Alert.tsx
-│   ├── Checkbox.tsx
-│   ├── Confirm.tsx
-│   ├── CopyButton.tsx
-│   ├── Dialog.tsx
-│   ├── FileOpen.tsx
-│   ├── ImageOpen.tsx
-│   ├── Prompt.tsx
-│   ├── Select.tsx
-│   ├── Slider.tsx
-│   ├── TextInput.tsx
-│   ├── Toolbar.tsx
-│   ├── Toaster.tsx
-│   └── Tooltip.tsx
-└── hooks/               # Shared React Hooks
-    └── useCopyToClipboard.ts
-```
+Shared components, utility classes, and hooks for the Tinker plugin system.
 
 ## Base Styles
 
-All plugins must import `share/base.scss` in their `index.scss`:
+Import `share/base.scss` in `index.scss`:
 
 ```scss
-// Basic plugin: src/index.scss
+// Basic: src/index.scss
 @use '../../share/base.scss';
 @config "../tailwind.config.js";
 
-// Advanced plugin: src/renderer/index.scss
+// Advanced: src/renderer/index.scss
 @use '../../../share/base.scss';
 @config "../../tailwind.config.js";
 ```
 
-Includes: Tailwind CSS, dark mode support, toast CSS variables.
-
 ## Theme Configuration
 
-**All plugins must use the unified theme configuration from `share/theme.ts`**.
-
-### Basic Usage
+Use unified theme from `share/theme.ts`:
 
 ```typescript
 import { tw, THEME_COLORS } from 'share/theme'
 
 // Primary colors
-<button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>Button</button>
+<button className={`${tw.primary.bg} ${tw.primary.bgHover}`} />
 <Copy className={copied ? tw.primary.text : ''} />
 
-// Backgrounds (use .both for light/dark mode)
+// Backgrounds & Borders (use .both for light/dark)
 <div className={tw.bg.both.secondary}>Content</div>
-<input className={tw.bg.both.input} />
+<input className={`${tw.bg.both.input} border ${tw.border.both}`} />
 
-// Borders
-<div className={`border ${tw.border.both}`}>Content</div>
-
-// Text colors
-<span className={tw.text.both.primary}>Text</span>
-
-// Hover and active states
-<div className={`${tw.hover.both} ${isActive ? tw.active.both : ''}`}>Item</div>
-
-// Inline styles (when needed)
-<div style={{ borderColor: THEME_COLORS.primary }}>Content</div>
+// States
+<div className={`${tw.hover.both} ${isActive ? tw.active.both : ''}`} />
 ```
 
-### Theme API
-
-Use IDE autocomplete to discover all available utilities. Key patterns:
-
-- **Primary**: `tw.primary.{bg, bgHover, text, border, focusBorder, checkedBg}`
-- **Backgrounds**: `tw.bg.{light|dark|both}.{primary, secondary, tertiary, input, select, code}`
-- **Borders**: `tw.border.{light, dark, both, bg}`
-- **Text**: `tw.text.{light|dark|both}.{primary, secondary, tertiary}`
-- **States**: `tw.{hover|active}.{light, dark, both}`
-
-**Tip**: Always prefer `.both` variants for automatic light/dark mode support.
-
-### Common Patterns
-
-```typescript
-// Success/copy state
-<ToolbarButton className={copied ? tw.primary.text : ''}>
-  {copied ? <Check /> : <Copy />}
-</ToolbarButton>
-
-// Primary action button
-<button className={`px-3 py-1 ${tw.primary.bg} ${tw.primary.bgHover} text-white rounded`}>
-  Action
-</button>
-
-// Interactive list item
-<div className={`px-3 py-2 cursor-pointer ${tw.hover.both} ${isSelected ? tw.active.both : ''}`}>
-  Item
-</div>
-
-// Input field
-<input className={`px-3 py-2 ${tw.bg.both.input} border ${tw.border.both} ${tw.primary.focusBorder}`} />
-```
-
-**Migration**: Replace hardcoded colors with theme utilities:
-```typescript
-// Bad
-<button className="bg-[#0fc25e] hover:bg-[#0da84f]">
-
-// Good
-<button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
-```
+**Key patterns**: `tw.primary.*`, `tw.bg.{light|dark|both}.*`, `tw.border.*`, `tw.text.*`, `tw.{hover|active}.*`. Always prefer `.both` variants.
 
 ## BaseStore
 
-All plugin Stores must extend `BaseStore` for automatic theme management.
+All plugin stores must extend `BaseStore`:
 
 ```typescript
 import { makeAutoObservable } from 'mobx'
@@ -129,7 +49,7 @@ class Store extends BaseStore {
   input: string = ''
 
   constructor() {
-    super() // Must call first
+    super()
     makeAutoObservable(this)
   }
 
@@ -145,94 +65,51 @@ class Store extends BaseStore {
 export default new Store()
 ```
 
-**Key points**:
-- Call `super()` first in constructor
-- Call `makeAutoObservable(this)` to enable MobX reactivity
-- Export singleton instance
-- Use getters for computed properties
-- Access theme via `store.isDark` (auto-updates on theme change)
+**Key**: Call `super()` first, then `makeAutoObservable(this)`. Access theme via `store.isDark`.
 
 ## Component Patterns
 
-Use `observer` only for components that access store state:
+Use `observer` for components accessing store:
 
 ```typescript
 import { observer } from 'mobx-react-lite'
 
-// Needs observer
-const Counter = observer(() => <div>Count: {store.count}</div>)
+const Counter = observer(() => <div>{store.count}</div>)
 
-// No observer needed
-const Button = ({ onClick, children }) => (
-  <button onClick={onClick}>{children}</button>
-)
-```
-
-Always define component props with TypeScript interfaces:
-
-```typescript
-interface MyComponentProps {
-  value: string
-  onChange: (value: string) => void
+interface ButtonProps {
+  onClick: () => void
   disabled?: boolean
 }
 
-export default observer(function MyComponent({
-  value,
-  onChange,
-  disabled = false
-}: MyComponentProps) {
-  // ...
-})
+const Button = ({ onClick, disabled = false }: ButtonProps) => (
+  <button onClick={onClick} disabled={disabled}>Click</button>
+)
 ```
 
 ## Shared Components
 
-### FileOpen
-
-```typescript
-import FileOpen from 'share/components/FileOpen'
-
-<FileOpen
-  onOpenFile={(file) => store.handleFileOpen(file)}
-  openTitle={t('openFile')}
-  supportedFormats="PNG, JPG"
-  fileName={store.fileName}
-/>
-```
-
 ### Toolbar
 
 ```typescript
-import {
-  Toolbar,
-  ToolbarButton,
-  ToolbarSeparator,
-  ToolbarSpacer,
-  TOOLBAR_ICON_SIZE,
-} from 'share/components/Toolbar'
-import { Copy, Trash } from 'lucide-react'
+import { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import { Copy } from 'lucide-react'
 
 <Toolbar>
   <ToolbarButton onClick={handleCopy}>
     <Copy size={TOOLBAR_ICON_SIZE} />
   </ToolbarButton>
-
   <ToolbarSeparator />
-
-  <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggleActive()}>
+  <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggle()}>
     Toggle
   </ToolbarButton>
-
   <ToolbarSpacer />
-
-  <ToolbarButton onClick={handleClear} disabled={store.isEmpty}>
-    <Trash size={TOOLBAR_ICON_SIZE} />
+  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>
+    Menu
   </ToolbarButton>
 </Toolbar>
 ```
 
-**Components**: `Toolbar`, `ToolbarButton`, `ToolbarSeparator`, `ToolbarSpacer`, `TOOLBAR_ICON_SIZE` (14)
+**ToolbarButton Props**: `variant` ('action' | 'toggle'), `active`, `menu`, `longPressDuration`
 
 ### Dialog Components
 
@@ -241,42 +118,31 @@ import { alert } from 'share/components/Alert'
 import { confirm } from 'share/components/Confirm'
 import { prompt } from 'share/components/Prompt'
 
-// Alert
-await alert({ title: 'Error', message: 'Something went wrong!' })
-
-// Confirm
-const result = await confirm({ title: 'Delete', message: 'Are you sure?' })
-if (result) { /* confirmed */ }
-
-// Prompt
-const value = await prompt({ title: 'Enter name', defaultValue: 'Untitled' })
-if (value !== null) { /* user entered value */ }
+await alert({ title: 'Error', message: 'Failed!' })
+const ok = await confirm({ title: 'Delete', message: 'Sure?' })
+const value = await prompt({ title: 'Name', defaultValue: 'Untitled' })
 ```
 
-**Setup**: Wrap app with providers in `App.tsx`:
+Setup in `App.tsx`:
 
 ```typescript
-import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 
 export default observer(function App() {
   const { i18n } = useTranslation()
-
   return (
     <AlertProvider locale={i18n.language}>
       <ConfirmProvider locale={i18n.language}>
         <PromptProvider locale={i18n.language}>
-          {/* Your content */}
+          {/* content */}
         </PromptProvider>
       </ConfirmProvider>
     </AlertProvider>
   )
 })
 ```
-
-**Internationalization**: All dialog providers (`AlertProvider`, `ConfirmProvider`, `PromptProvider`) support a `locale` prop for internationalization. Pass `i18n.language` from `useTranslation()` to display buttons in the correct language. The providers include built-in translations for English (`en-US`) and Chinese (`zh-CN`). Default locale is `en-US`.
 
 ### Toaster
 
@@ -285,116 +151,55 @@ import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
 
 export default function App() {
-  return (
-    <ToasterProvider>
-      {/* Your content */}
-    </ToasterProvider>
-  )
+  return <ToasterProvider>{/* content */}</ToasterProvider>
 }
 
 toast.success('Saved')
 toast.error('Failed')
 ```
 
-**Setup**: Wrap app content with `ToasterProvider` to enable toast rendering. Styling and theme colors are unified by default.
-
-### Select & Checkbox
+### Form Components
 
 ```typescript
 import Select, { SelectOption } from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
-
-const options: SelectOption[] = [
-  { label: 'Option 1', value: '1' },
-  { label: 'Option 2', value: '2' },
-]
-
-<Select
-  value={store.selectedValue}
-  onChange={(value) => store.setSelectedValue(value)}
-  options={options}
-/>
-
-<Checkbox
-  checked={store.isEnabled}
-  onChange={(checked) => store.setEnabled(checked)}
-  label="Enable feature"
-/>
-```
-
-### Slider
-
-```typescript
 import Slider from 'share/components/Slider'
 
-<Slider
-  min={0}
-  max={100}
-  value={store.padding}
-  onChange={(value) => store.setPadding(value)}
-/>
-
-// With disabled state
-<Slider
-  min={0}
-  max={100}
-  value={store.radius}
-  onChange={(value) => store.setRadius(value)}
-  disabled={!store.radiusEnabled}
-/>
+<Select value={store.value} onChange={store.setValue} options={options} />
+<Checkbox checked={store.enabled} onChange={store.setEnabled} label="Enable" />
+<Slider min={0} max={100} value={store.size} onChange={store.setSize} disabled={!store.enabled} />
 ```
 
-**Props**: `value` (required), `min` (required), `max` (required), `onChange` (required), `disabled` (optional)
-
-**Features**: Click track to jump, drag thumb to adjust, visual feedback on hover/drag, theme-aware styling
-
-### CopyButton
+### Other Components
 
 ```typescript
 import CopyButton from 'share/components/CopyButton'
-
-// Default variant
-<CopyButton text="text to copy" title="Copy to clipboard" />
-
-// Toolbar variant
-<CopyButton variant="toolbar" text={store.jsonInput} disabled={store.isEmpty} />
-
-// Icon variant (flexible styling)
-<CopyButton
-  variant="icon"
-  text={entry.password}
-  size={20}
-  className="absolute bottom-2 right-2 w-10 h-10"
-/>
-```
-
-**Props**: `text` (required), `variant` ('default' | 'icon' | 'toolbar'), `size`, `title`, `className`, `disabled`
-
-**Features**: Auto icon switching (Copy → Check), visual feedback, auto-resets after 2s
-
-### ImageOpen & Tooltip
-
-```typescript
+import FileOpen from 'share/components/FileOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import Tooltip from 'share/components/Tooltip'
 
-// Image drop zone
-<ImageOpen
-  onOpenImage={() => store.openImageDialog()}
-  openTitle="Drop image here or click to open"
-  supportedFormats="Supports PNG, JPG, WebP"
+// Copy button variants
+<CopyButton text="copy me" title="Copy" />
+<CopyButton variant="toolbar" text={store.text} disabled={store.isEmpty} />
+<CopyButton variant="icon" text={data} size={20} className="custom-style" />
+
+// File open
+<FileOpen
+  onOpenFile={(file) => store.handleFile(file)}
+  openTitle={t('openFile')}
+  supportedFormats="PNG, JPG"
+  fileName={store.fileName}
 />
 
-// Tooltip with auto-positioning
-const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 })
+// Image drop zone
+<ImageOpen
+  onOpenImage={() => store.openImage()}
+  openTitle="Drop image or click"
+  supportedFormats="PNG, JPG, WebP"
+/>
 
-<div
-  onMouseEnter={(e) => setTooltip({ visible: true, x: e.clientX, y: e.clientY + 20 })}
-  onMouseLeave={() => setTooltip({ visible: false, x: 0, y: 0 })}
->
-  Hover me
-</div>
-<Tooltip visible={tooltip.visible} x={tooltip.x} y={tooltip.y} content="Helpful tooltip" />
+// Tooltip
+<Tooltip visible={show} x={x} y={y} content="Hint" />
 ```
 
 ## Shared Hooks
@@ -403,64 +208,55 @@ const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 })
 
 ```typescript
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-import { Copy, Check } from 'lucide-react'
-import { tw } from 'share/theme'
 
 const { copied, copyToClipboard } = useCopyToClipboard()
 
-<button
-  onClick={() => copyToClipboard('text to copy')}
-  className={copied ? tw.primary.text : ''}
->
+<button onClick={() => copyToClipboard('text')} className={copied ? tw.primary.text : ''}>
   {copied ? <Check /> : <Copy />}
 </button>
 ```
 
-Auto-resets `copied` state after 2 seconds.
+Auto-resets `copied` after 2 seconds.
+
+## Shared Utilities
+
+### openImageFile
+
+```typescript
+import { openImageFile } from 'share/lib/util'
+
+const result = await openImageFile({ title: 'Open Image' })
+if (result) {
+  store.loadImage(result.file, result.filePath)
+}
+```
+
+Opens native file dialog for images. Returns `{ file: File, filePath: string } | null`.
 
 ## Best Practices
 
-### Performance
-
-Use computed properties for cached calculations:
+**Performance**: Use computed properties for cached calculations.
 
 ```typescript
 class Store extends BaseStore {
   items: Item[] = []
-
   get activeItems() {
-    return this.items.filter(x => x.active) // Cached until dependencies change
+    return this.items.filter(x => x.active) // Cached
   }
 }
-
-// Good
-<Component items={store.activeItems} />
-
-// Bad - creates new array every render
-<Component items={store.items.filter(x => x.active)} />
 ```
 
-### Error Handling
+**Error Handling**: Use try-catch with dialogs.
 
 ```typescript
-import { alert } from 'share/components/Alert'
-
-async function handleSave() {
-  try {
-    await store.saveToFile()
-  } catch (error) {
-    console.error('Save failed:', error)
-    await alert({ title: 'Save Failed', message: 'Could not save file. Please try again.' })
-  }
+try {
+  await store.save()
+} catch (error) {
+  await alert({ title: 'Failed', message: 'Could not save.' })
 }
 ```
 
-### Type Safety
-
-- Avoid `any` - use proper types
-- Use union types: `type Mode = 'text' | 'tree'`
-- Define interfaces for component props
-- Leverage TypeScript inference
+**Type Safety**: Avoid `any`, use union types, define prop interfaces.
 
 ## Quick Reference
 
@@ -468,4 +264,4 @@ async function handleSave() {
 - **Theme**: Always use `tw` or `THEME_COLORS` - never hardcode colors
 - **BaseStore**: All stores must extend `BaseStore` and call `super()` first
 - **Observer**: Only wrap components that access store state
-- **Examples**: See `tinker-hash`, `tinker-hex-editor` for reference implementations
+- **Examples**: See `tinker-hash`, `tinker-hex-editor` for reference

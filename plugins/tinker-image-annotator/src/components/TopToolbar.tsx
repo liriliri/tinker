@@ -26,13 +26,9 @@ import {
 } from 'share/components/Toolbar'
 import Select, { type SelectOption } from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
+import { openImageFile } from 'share/lib/util'
 import { tw } from 'share/theme'
 import store, { type ShapeType } from '../store'
-
-interface TopToolbarProps {
-  onOpenImage: () => void
-  onInsertImage: () => void
-}
 
 const STROKE_WIDTH_TOOLS = new Set(['pen', 'shape'])
 
@@ -75,16 +71,87 @@ const SHAPE_TYPE_CONFIGS: Record<
   arrow: { icon: ArrowRight, labelKey: 'arrow' },
 }
 
-export default observer(function TopToolbar({
-  onOpenImage,
-  onInsertImage,
-}: TopToolbarProps) {
+export default observer(function TopToolbar() {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const shouldShowStrokeWidth = STROKE_WIDTH_TOOLS.has(store.tool)
   const shouldShowShapeSelector = store.tool === 'shape'
   const shouldShowFontSize =
     store.tool === 'text' || store.isTextSelected || store.isTextEditing
+
+  const captureScreenToFile = async (): Promise<File | null> => {
+    const dataUrl = await tinker.captureScreen()
+    if (!dataUrl) return null
+
+    try {
+      const response = await fetch(dataUrl)
+      const blob = await response.blob()
+      return new File([blob], 'screenshot.png', { type: 'image/png' })
+    } catch (error) {
+      console.error('Failed to capture screenshot:', error)
+      return null
+    }
+  }
+
+  const pasteImageFromClipboard = async (): Promise<File | null> => {
+    try {
+      const items = await navigator.clipboard.read()
+      for (const item of items) {
+        for (const type of item.types) {
+          if (type.startsWith('image/')) {
+            const blob = await item.getType(type)
+            return new File([blob], 'clipboard.png', { type })
+          }
+        }
+      }
+      return null
+    } catch (error) {
+      console.error('Failed to paste image from clipboard:', error)
+      return null
+    }
+  }
+
+  const handleOpenImage = async () => {
+    const result = await openImageFile({ title: t('open') })
+    if (result) {
+      store.loadImage(result.file)
+    }
+  }
+
+  const handleCaptureScreen = async () => {
+    const file = await captureScreenToFile()
+    if (file) {
+      store.loadImage(file)
+    }
+  }
+
+  const handlePasteImage = async () => {
+    const file = await pasteImageFromClipboard()
+    if (file) {
+      store.loadImage(file)
+    }
+  }
+
+  const handleInsertImage = async () => {
+    const result = await openImageFile({ title: t('insertImage') })
+    if (result) {
+      store.addImageOverlay(result.file)
+    }
+  }
+
+  const handleInsertScreen = async () => {
+    const file = await captureScreenToFile()
+    if (file) {
+      store.addImageOverlay(file)
+    }
+  }
+
+  const handlePasteInsertImage = async () => {
+    const file = await pasteImageFromClipboard()
+    if (file) {
+      store.addImageOverlay(file)
+    }
+  }
 
   const handleCopy = async () => {
     if (!store.hasImage) return
@@ -109,11 +176,34 @@ export default observer(function TopToolbar({
 
   return (
     <Toolbar>
-      <ToolbarButton onClick={onOpenImage} title={t('open')}>
+      <ToolbarButton
+        onClick={handleOpenImage}
+        menu={[
+          {
+            label: t('captureScreen'),
+            click: () => handleCaptureScreen(),
+          },
+          {
+            label: t('pasteImage'),
+            click: () => handlePasteImage(),
+          },
+        ]}
+        title={t('open')}
+      >
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
-        onClick={onInsertImage}
+        onClick={handleInsertImage}
+        menu={[
+          {
+            label: t('captureScreen'),
+            click: () => handleInsertScreen(),
+          },
+          {
+            label: t('pasteImage'),
+            click: () => handlePasteInsertImage(),
+          },
+        ]}
         disabled={!store.hasImage}
         title={t('insertImage')}
       >

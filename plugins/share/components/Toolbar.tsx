@@ -1,4 +1,10 @@
-import React, { ButtonHTMLAttributes, ReactNode } from 'react'
+import React, {
+  ButtonHTMLAttributes,
+  ReactNode,
+  useRef,
+  MouseEvent,
+} from 'react'
+import type { MenuItemConstructorOptions } from 'electron'
 import { tw } from '../theme'
 
 interface ToolbarProps {
@@ -16,6 +22,8 @@ interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
   variant?: 'action' | 'toggle'
   active?: boolean
+  menu?: MenuItemConstructorOptions[]
+  longPressDuration?: number
 }
 
 export function ToolbarButton({
@@ -23,18 +31,102 @@ export function ToolbarButton({
   variant = 'action',
   active = false,
   className = '',
+  menu,
+  longPressDuration = 500,
+  onClick,
+  onMouseDown,
+  onMouseUp,
+  onMouseLeave,
+  onContextMenu,
   ...props
 }: ToolbarButtonProps) {
   const baseClass = 'p-1.5 rounded transition-colors'
+  const longPressTimerRef = useRef<number | null>(null)
+  const isLongPressRef = useRef(false)
 
   const variantClass =
     variant === 'toggle' && active
       ? `${tw.primary.bg} text-white ${tw.primary.bgHover}`
       : `${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
 
+  const showContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    if (!menu || menu.length === 0) return
+    tinker.showContextMenu(event.clientX, event.clientY, menu)
+  }
+
+  const handleMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
+    if (menu && event.button === 0) {
+      isLongPressRef.current = false
+      longPressTimerRef.current = window.setTimeout(() => {
+        isLongPressRef.current = true
+        showContextMenu(event)
+      }, longPressDuration)
+    }
+    onMouseDown?.(event)
+  }
+
+  const handleMouseUp = (event: MouseEvent<HTMLButtonElement>) => {
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+    onMouseUp?.(event)
+  }
+
+  const handleMouseLeave = (event: MouseEvent<HTMLButtonElement>) => {
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+    onMouseLeave?.(event)
+  }
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (menu && isLongPressRef.current) {
+      isLongPressRef.current = false
+      return
+    }
+    isLongPressRef.current = false
+    onClick?.(event)
+  }
+
+  const handleContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    if (menu) {
+      event.preventDefault()
+      showContextMenu(event)
+    }
+    onContextMenu?.(event)
+  }
+
   return (
-    <button className={`${baseClass} ${variantClass} ${className}`} {...props}>
+    <button
+      className={`${baseClass} ${variantClass} ${className} ${
+        menu ? 'relative' : ''
+      }`}
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      onContextMenu={handleContextMenu}
+      {...props}
+    >
       {children}
+      {menu && (
+        <svg
+          className="absolute bottom-0.5 right-0.5 pointer-events-none"
+          width="5"
+          height="5"
+          viewBox="0 0 5 5"
+        >
+          <path
+            d="M 1 5 L 5 5 L 5 1"
+            stroke="currentColor"
+            strokeWidth="1"
+            fill="none"
+            opacity="0.4"
+          />
+        </svg>
+      )}
     </button>
   )
 }

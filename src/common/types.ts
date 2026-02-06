@@ -56,3 +56,4 @@ export type IpcOpenApp = (path: string) => void
 export type IpcGetClipboardFilePaths = () => string[]
 export type IpcExportPluginData = (id: string) => void
 export type IpcImportPluginData = (id: string) => void
+export type IpcCaptureScreen = () => Promise<string>

@@ -37,6 +37,7 @@ import log from 'share/common/log'
 import mime from 'mime'
 import { getClipboardFilePaths } from './clipboard'
 import { getSettingsStore } from './store'
+import { captureScreen } from './screen'
 
 const logger = log('plugin')
 
@@ -433,6 +434,7 @@ export function init() {
   handleEvent('exportPluginData', exportPluginData)
   handleEvent('importPluginData', importPluginData)
   handleEvent('preparePluginView', preparePluginView)
+  handleEvent('captureScreen', captureScreen)
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

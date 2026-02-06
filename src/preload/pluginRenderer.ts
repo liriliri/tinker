@@ -11,6 +11,7 @@ export function injectApi() {
     showSaveDialog: _tinker.showSaveDialog,
     showItemInPath: _tinker.showItemInPath,
     getClipboardFilePaths: _tinker.getClipboardFilePaths,
+    captureScreen: _tinker.captureScreen,
     setTitle: _tinker.setTitle,
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,

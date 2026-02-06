@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
+import { openImageFile } from 'share/lib/util'
 
 const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
 const storage = new LocalStore('tinker-image-cropper')
@@ -67,36 +67,9 @@ class Store extends BaseStore {
   }
 
   async openImageDialog() {
-    try {
-      const result = await tinker.showOpenDialog({
-        filters: [
-          {
-            name: 'Images',
-            extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'],
-          },
-        ],
-        properties: ['openFile'],
-      })
-
-      if (
-        result.canceled ||
-        !result.filePaths ||
-        result.filePaths.length === 0
-      ) {
-        return
-      }
-
-      const filePath = result.filePaths[0]
-      const buffer = await tinker.readFile(filePath)
-      const fileName = splitPath(filePath).name
-
-      const uint8Array = new Uint8Array(buffer)
-      const file = new File([uint8Array], fileName, { type: 'image/*' })
-
-      await this.loadImage(file, filePath)
-    } catch (err) {
-      console.error('Failed to open image:', err)
-      throw err
+    const result = await openImageFile({ title: 'Open Image' })
+    if (result) {
+      await this.loadImage(result.file, result.filePath)
     }
   }
 

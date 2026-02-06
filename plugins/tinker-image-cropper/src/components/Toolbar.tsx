@@ -43,11 +43,57 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
   const [showResizeDialog, setShowResizeDialog] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  const captureScreenToFile = async (): Promise<File | null> => {
+    const dataUrl = await tinker.captureScreen()
+    if (!dataUrl) return null
+
+    try {
+      const response = await fetch(dataUrl)
+      const blob = await response.blob()
+      return new File([blob], 'screenshot.png', { type: 'image/png' })
+    } catch (error) {
+      console.error('Failed to capture screenshot:', error)
+      return null
+    }
+  }
+
+  const pasteImageFromClipboard = async (): Promise<File | null> => {
+    try {
+      const items = await navigator.clipboard.read()
+      for (const item of items) {
+        for (const type of item.types) {
+          if (type.startsWith('image/')) {
+            const blob = await item.getType(type)
+            return new File([blob], 'clipboard.png', { type })
+          }
+        }
+      }
+      return null
+    } catch (error) {
+      console.error('Failed to paste image from clipboard:', error)
+      return null
+    }
+  }
+
   const handleOpenImage = async () => {
     try {
       await store.openImageDialog()
     } catch (err) {
       console.error('Failed to open image:', err)
+    }
+  }
+
+  const handleCaptureScreen = async () => {
+    const file = await captureScreenToFile()
+    if (file) {
+      await store.loadImage(file)
+    }
+  }
+
+  const handlePasteImage = async () => {
+    const file = await pasteImageFromClipboard()
+    if (file) {
+      await store.loadImage(file)
     }
   }
 
@@ -170,7 +216,20 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
 
   return (
     <Toolbar>
-      <ToolbarButton onClick={handleOpenImage} title={t('openImage')}>
+      <ToolbarButton
+        onClick={handleOpenImage}
+        menu={[
+          {
+            label: t('captureScreen'),
+            click: () => handleCaptureScreen(),
+          },
+          {
+            label: t('pasteImage'),
+            click: () => handlePasteImage(),
+          },
+        ]}
+        title={t('openImage')}
+      >
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 

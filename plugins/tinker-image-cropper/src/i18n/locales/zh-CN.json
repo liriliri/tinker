@@ -1,5 +1,7 @@
 {
   "openImage": "打开图片",
+  "captureScreen": "截图",
+  "pasteImage": "粘贴",
   "saveImage": "保存图片",
   "copyImage": "复制图片",
   "crop": "裁剪",

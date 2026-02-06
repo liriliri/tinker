@@ -95,6 +95,19 @@ declare global {
     getClipboardFilePaths(): Promise<string[]>
 
     /**
+     * Capture a screenshot of the screen.
+     * @returns Data URL of the captured screenshot, or empty string if canceled or failed
+     * @example
+     * const dataUrl = await tinker.captureScreen()
+     * if (dataUrl) {
+     *   const img = document.createElement('img')
+     *   img.src = dataUrl
+     *   document.body.appendChild(img)
+     * }
+     */
+    captureScreen(): Promise<string>
+
+    /**
      * Read a file from the filesystem using Node's fs.promises.readFile.
      * @param path - File path or URL
      * @param options - Encoding or read options

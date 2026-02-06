@@ -2,6 +2,7 @@ import { contextBridge } from 'electron'
 import mainObj from './main'
 import nodeObj from 'share/preload/node'
 import {
+  IpcCaptureScreen,
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
   IpcShowPluginContextMenu,
@@ -127,6 +128,7 @@ const tinkerObj = {
   getClipboardFilePaths: invoke<IpcGetClipboardFilePaths>(
     'getClipboardFilePaths'
   ),
+  captureScreen: invoke<IpcCaptureScreen>('captureScreen'),
   setTitle,
   showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
