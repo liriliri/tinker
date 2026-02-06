@@ -1,3 +1,8 @@
+## v0.11.1 (6 Feb 2026)
+
+* fix(photo-collage): border radius
+* fix(image-annotator): undo and redo
+
 ## v0.11.0 (3 Feb 2026)
 
 * add: clock
