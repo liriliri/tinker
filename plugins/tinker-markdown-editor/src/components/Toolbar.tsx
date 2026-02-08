@@ -47,40 +47,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <ToolbarButtonGroup>
-        <ToolbarButton
-          variant="toggle"
-          active={store.viewMode === 'split'}
-          onClick={() => store.setViewMode('split')}
-          title={t('splitView')}
-          className={`rounded-none rounded-l border-r ${tw.border.both}`}
-        >
-          <Columns2 size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarButton
-          variant="toggle"
-          active={store.viewMode === 'editor'}
-          onClick={() => store.setViewMode('editor')}
-          title={t('editorOnly')}
-          className={`rounded-none border-r ${tw.border.both}`}
-        >
-          <FileEdit size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarButton
-          variant="toggle"
-          active={store.viewMode === 'preview'}
-          onClick={() => store.setViewMode('preview')}
-          title={t('previewOnly')}
-          className="rounded-none rounded-r"
-        >
-          <Eye size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      </ToolbarButtonGroup>
-
-      <ToolbarSeparator />
-
       <ToolbarButton
         onClick={() => store.undo()}
         disabled={!store.canUndo}
@@ -123,11 +89,37 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
 
-      {store.lineCount > 0 && (
-        <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
-          {t('lines', { count: store.lineCount })}
-        </div>
-      )}
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'split'}
+          onClick={() => store.setViewMode('split')}
+          title={t('splitView')}
+          className={`rounded-none rounded-l border-r ${tw.border.both}`}
+        >
+          <Columns2 size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'editor'}
+          onClick={() => store.setViewMode('editor')}
+          title={t('editorOnly')}
+          className={`rounded-none border-r ${tw.border.both}`}
+        >
+          <FileEdit size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'preview'}
+          onClick={() => store.setViewMode('preview')}
+          title={t('previewOnly')}
+          className="rounded-none rounded-r"
+        >
+          <Eye size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </ToolbarButtonGroup>
     </Toolbar>
   )
 })
