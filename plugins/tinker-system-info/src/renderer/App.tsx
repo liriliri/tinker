@@ -6,6 +6,7 @@ import { ToasterProvider } from 'share/components/Toaster'
 import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import fileSize from 'licia/fileSize'
+import lowerCase from 'licia/lowerCase'
 import store from './store'
 import InfoSection from './components/InfoSection'
 import InfoRow from './components/InfoRow'
@@ -56,9 +57,10 @@ export default observer(function App() {
               {system?.model && (
                 <InfoRow label={t('model_name')} value={system.model} />
               )}
-              {system?.serial && (
-                <InfoRow label={t('serialNumber')} value={system.serial} />
-              )}
+              {system?.serial &&
+                lowerCase(system.serial) !== 'default string' && (
+                  <InfoRow label={t('serialNumber')} value={system.serial} />
+                )}
 
               {osInfo && (
                 <InfoRow
@@ -123,9 +125,6 @@ export default observer(function App() {
                           value={`${display.resolutionX} × ${display.resolutionY}`}
                         />
                       )}
-                    {display.vendor && (
-                      <InfoRow label={t('vendor')} value={display.vendor} />
-                    )}
                   </div>
                 ))}
               </InfoSection>
