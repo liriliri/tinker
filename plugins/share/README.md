@@ -26,6 +26,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 // Primary colors
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`} />
 <Copy className={copied ? tw.primary.text : ''} />
+<span className={`${tw.text.both.primary} ${tw.primary.textHover}`}>Hover me</span>
 
 // Backgrounds & Borders (use .both for light/dark)
 <div className={tw.bg.both.secondary}>Content</div>
