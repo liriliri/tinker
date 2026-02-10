@@ -65,15 +65,20 @@ function isDoubleShortcut(accelerator: string): boolean {
 const DOUBLE_PRESS_INTERVAL = 300
 
 const startUIOhook = once(() => {
+  const keyMap: Record<number, string> = {
+    [UiohookKey.Ctrl]: 'Ctrl',
+    [UiohookKey.CtrlRight]: 'Ctrl',
+  }
+
   const lastPressTime: Record<string, number> = {}
+  const keyPressed: Record<string, boolean> = {}
+
   uIOhook.on('keydown', (event) => {
-    const keyMap: Record<number, string> = {
-      [UiohookKey.Ctrl]: 'Ctrl',
-      [UiohookKey.CtrlRight]: 'Ctrl',
-    }
     const keyName = keyMap[event.keycode]
     if (!keyName) return
+    if (keyPressed[keyName]) return
 
+    keyPressed[keyName] = true
     const now = Date.now()
     const last = lastPressTime[keyName] || 0
     lastPressTime[keyName] = now
@@ -85,6 +90,13 @@ const startUIOhook = once(() => {
       }
       lastPressTime[keyName] = 0
     }
+  })
+
+  uIOhook.on('keyup', (event) => {
+    const keyName = keyMap[event.keycode]
+    if (!keyName) return
+
+    keyPressed[keyName] = false
   })
 
   if (isMac && !mainStore.get('uIOhookCalled')) {
