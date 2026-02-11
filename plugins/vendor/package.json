@@ -1,15 +1,18 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
     "build:idb": "vite build --config vite.config.ts --mode idb",
-    "build:monaco": "vite build --config vite.config.ts --mode monaco"
+    "build:monaco": "vite build --config vite.config.ts --mode monaco",
+    "build:aggrid": "vite build --config vite.config.ts --mode aggrid"
   },
   "devDependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "ag-grid-community": "^35.0.0",
+    "ag-grid-react": "^35.0.0",
     "idb": "^8.0.3",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1"

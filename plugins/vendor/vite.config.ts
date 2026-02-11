@@ -17,6 +17,8 @@ export const shareDeps = [
   'mathjs',
   '@monaco-editor/react',
   'idb',
+  'ag-grid-community',
+  'ag-grid-react',
 ]
 
 const globals = {
@@ -30,6 +32,8 @@ const globals = {
   mathjs: 'mathjs',
   '@monaco-editor/react': 'MonacoEditorReact',
   idb: 'idb',
+  'ag-grid-community': 'AgGridCommunity',
+  'ag-grid-react': 'AgGridReact',
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -145,6 +149,13 @@ export default defineConfig(({ mode }) => {
       ['react'],
       'dist/monaco'
     )
+  }
+
+  if (target === 'aggrid') {
+    return createConfig('aggrid', 'aggrid.ts', 'PluginVendorAgGrid', [
+      'react',
+      'react-dom',
+    ])
   }
 
   return createConfig('react', 'react.ts', 'PluginVendorReact')
