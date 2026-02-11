@@ -15,7 +15,7 @@ export interface DialogProps {
   title?: string
   children: ReactNode
   className?: string
-  showCloseIcon?: boolean
+  showClose?: boolean
 }
 
 export interface DialogButtonProps
@@ -29,7 +29,7 @@ export default function Dialog({
   title,
   children,
   className = '',
-  showCloseIcon = false,
+  showClose = false,
 }: DialogProps) {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -63,7 +63,7 @@ export default function Dialog({
                 } shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
                 <div className="p-6 pb-0 flex-shrink-0">
-                  {title && !showCloseIcon && (
+                  {title && !showClose && (
                     <DialogTitle
                       as="h3"
                       className="text-lg font-semibold text-gray-800 dark:text-gray-200"
@@ -71,8 +71,8 @@ export default function Dialog({
                       {title}
                     </DialogTitle>
                   )}
-                  {title && showCloseIcon && (
-                    <div className="flex items-center justify-between mb-4">
+                  {title && showClose && (
+                    <div className="flex items-center justify-between">
                       <DialogTitle
                         as="h3"
                         className="text-lg font-semibold text-gray-800 dark:text-gray-200"
@@ -87,7 +87,7 @@ export default function Dialog({
                       </button>
                     </div>
                   )}
-                  {!title && showCloseIcon && (
+                  {!title && showClose && (
                     <div className="flex justify-end mb-2">
                       <button
                         onClick={onClose}
