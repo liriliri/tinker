@@ -108,6 +108,21 @@ declare global {
     captureScreen(): Promise<string>
 
     /**
+     * Get the icon for a file or file extension.
+     * @param filePath - File path or extension (e.g., '/path/to/file.pdf' or '.pdf')
+     * @returns PNG Data URL of the file icon
+     * @example
+     * // Get icon by file extension
+     * const pdfIcon = await tinker.getFileIcon('.pdf')
+     * const img = document.createElement('img')
+     * img.src = pdfIcon
+     *
+     * // Get icon by file path
+     * const fileIcon = await tinker.getFileIcon('/path/to/document.docx')
+     */
+    getFileIcon(filePath: string): Promise<string>
+
+    /**
      * Read a file from the filesystem using Node's fs.promises.readFile.
      * @param path - File path or URL
      * @param options - Encoding or read options

@@ -15,6 +15,7 @@ export function injectApi() {
     setTitle: _tinker.setTitle,
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,
+    getFileIcon: _tinker.getFileIcon,
     on: _tinker.on,
     showContextMenu,
   }

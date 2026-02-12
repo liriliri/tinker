@@ -8,12 +8,12 @@ import unique from 'licia/unique'
 import lowerCase from 'licia/lowerCase'
 import { getUserDataPath, sha1 } from 'share/main/lib/util'
 import { loadMod } from '../util'
+import { getFileIcon } from '../fileIcon'
 
 type RegistryModule = typeof import('registry-js')
 type RegistryValueEntry = import('registry-js').RegistryValue
 type RegistryHiveValue = import('registry-js').HKEY
 type RegistryHive = 'HKEY_LOCAL_MACHINE' | 'HKEY_CURRENT_USER'
-type ExtractFileIconModule = (path: string, size?: 16 | 32 | 64 | 256) => Buffer
 
 type RegistrySource = {
   hive: RegistryHive
@@ -57,18 +57,11 @@ Object.keys(process.env).forEach((key) => {
 
 const apps: IApp[] = []
 let registryModule: RegistryModule | null = null
-let extractFileIconModule: ExtractFileIconModule | null = null
 
 if (isWindows) {
   loadMod('registry-js').then((mod) => {
     if (mod) {
       registryModule = mod as RegistryModule
-    }
-  })
-
-  loadMod('extract-file-icon').then((mod) => {
-    if (typeof mod === 'function') {
-      extractFileIconModule = mod as ExtractFileIconModule
     }
   })
 }
@@ -234,27 +227,18 @@ async function extractAppIcon(executablePath: string) {
     return ''
   }
 
-  const extractor = extractFileIconModule
-  if (!extractor) {
-    return ''
-  }
-
   const iconPath = getIconPath(executablePath)
   if (await fs.pathExists(iconPath)) {
     return iconPath
   }
 
-  return generateAppIcon(executablePath, iconPath, extractor)
+  return generateAppIcon(executablePath, iconPath)
 }
 
-async function generateAppIcon(
-  executablePath: string,
-  iconPath: string,
-  extractor: ExtractFileIconModule
-) {
+async function generateAppIcon(executablePath: string, iconPath: string) {
   try {
-    const buffer = extractor(executablePath, ICON_SIZE)
-    if (!buffer || buffer.length === 0) {
+    const buffer = await getFileIcon(executablePath, ICON_SIZE)
+    if (!buffer) {
       return ''
     }
     await fs.ensureDir(path.dirname(iconPath))

@@ -16,24 +16,12 @@ import store from '../store'
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const handleCpuClick = () => {
-    store.setViewMode('cpu')
-  }
-
-  const handleMemoryClick = () => {
-    store.setViewMode('memory')
-  }
-
-  const handlePortClick = () => {
-    store.setViewMode('port')
-  }
-
   return (
     <Toolbar className="!border-b-0">
       <ToolbarButton
         variant="toggle"
         active={store.viewMode === 'cpu'}
-        onClick={handleCpuClick}
+        onClick={() => store.setViewMode('cpu')}
       >
         <div className="flex items-center gap-1.5">
           <Cpu size={TOOLBAR_ICON_SIZE} />
@@ -44,7 +32,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         variant="toggle"
         active={store.viewMode === 'memory'}
-        onClick={handleMemoryClick}
+        onClick={() => store.setViewMode('memory')}
       >
         <div className="flex items-center gap-1.5">
           <HardDrive size={TOOLBAR_ICON_SIZE} />
@@ -55,7 +43,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         variant="toggle"
         active={store.viewMode === 'port'}
-        onClick={handlePortClick}
+        onClick={() => store.setViewMode('port')}
       >
         <div className="flex items-center gap-1.5">
           <Network size={TOOLBAR_ICON_SIZE} />

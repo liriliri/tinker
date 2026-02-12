@@ -10,6 +10,7 @@
   "user": "用户",
   "state": "状态",
   "command": "命令",
+  "path": "路径",
   "port": "端口",
   "search": "搜索...",
   "searchPlaceholder": "搜索进程名称、PID 或端口",

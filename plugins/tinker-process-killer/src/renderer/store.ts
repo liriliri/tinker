@@ -1,15 +1,17 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import { alert } from 'share/components/Alert'
 import { confirm } from 'share/components/Confirm'
 import LocalStore from 'licia/LocalStore'
 import i18n from './i18n'
+import isMac from 'licia/isMac'
+import defaultIcon from './assets/default-icon.png'
+import toast from 'react-hot-toast'
 
 const STORAGE_KEY_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-process-killer')
 
-interface ProcessInfo {
+export interface ProcessInfo {
   pid: number
   name: string
   cpu: number
@@ -20,11 +22,12 @@ interface ProcessInfo {
   path?: string
   state?: string
   ports?: string
+  icon?: string
 }
 
-type SortField = 'pid' | 'name' | 'cpu' | 'memRss'
-type SortOrder = 'asc' | 'desc'
-type ViewMode = 'cpu' | 'memory' | 'port'
+export type SortField = 'pid' | 'name' | 'cpu' | 'memRss' | 'ports'
+export type SortOrder = 'asc' | 'desc'
+export type ViewMode = 'cpu' | 'memory' | 'port'
 
 class Store extends BaseStore {
   processes: ProcessInfo[] = []
@@ -37,6 +40,8 @@ class Store extends BaseStore {
   refreshInterval: number = 5000
 
   private refreshTimer: NodeJS.Timeout | null = null
+  private iconCache: Map<string, string> = new Map()
+  private loadingIcons: Set<string> = new Set()
 
   constructor() {
     super()
@@ -77,7 +82,7 @@ class Store extends BaseStore {
       }))
     } catch (error) {
       console.error('Failed to refresh process list:', error)
-      alert({ title: i18n.t('refreshFailed') })
+      toast.error(i18n.t('refreshFailed'))
     } finally {
       this.isLoading = false
     }
@@ -93,8 +98,8 @@ class Store extends BaseStore {
       this.sortField = 'cpu'
     } else if (mode === 'memory') {
       this.sortField = 'memRss'
-    } else {
-      this.sortField = 'name'
+    } else if (mode === 'port') {
+      this.sortField = 'ports'
     }
     this.sortOrder = 'desc'
     this.saveViewMode()
@@ -119,11 +124,11 @@ class Store extends BaseStore {
 
     try {
       await processKiller.killProcess(pid)
-      alert({ title: i18n.t('killSuccess') })
+      toast.success(i18n.t('killSuccess'))
       await this.refreshProcessList()
     } catch (error) {
       console.error('Failed to kill process:', error)
-      alert({ title: i18n.t('killFailed') })
+      toast.error(i18n.t('killFailed'))
     }
   }
 
@@ -208,8 +213,62 @@ class Store extends BaseStore {
     }
   }
 
+  async loadProcessIcon(pid: number) {
+    const process = this.processes.find((p) => p.pid === pid)
+    if (!process) {
+      return
+    }
+
+    if (!process.icon) {
+      process.icon = defaultIcon
+    }
+
+    let filePath: string = process.path || ''
+
+    if (!filePath) {
+      return
+    }
+
+    if (isMac) {
+      const appIndex = filePath.indexOf('.app/Contents/')
+      if (appIndex !== -1) {
+        filePath = filePath.substring(0, appIndex + 4)
+      }
+    }
+
+    const cacheKey = filePath
+    if (this.iconCache.has(cacheKey)) {
+      process.icon = this.iconCache.get(cacheKey)
+      return
+    }
+
+    if (this.loadingIcons.has(cacheKey)) {
+      return
+    }
+
+    this.loadingIcons.add(cacheKey)
+    try {
+      let icon = await tinker.getFileIcon(filePath)
+      if (!icon) {
+        icon = defaultIcon
+      }
+      this.iconCache.set(cacheKey, icon)
+
+      const currentProcess = this.processes.find((p) => p.pid === pid)
+      if (currentProcess) {
+        currentProcess.icon = icon
+      }
+    } catch {
+      this.iconCache.set(cacheKey, defaultIcon)
+    } finally {
+      this.loadingIcons.delete(cacheKey)
+    }
+  }
+
   destroy() {
     this.stopAutoRefresh()
+    this.iconCache.clear()
+    this.loadingIcons.clear()
   }
 }
 

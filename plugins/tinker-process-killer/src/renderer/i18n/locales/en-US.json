@@ -10,6 +10,7 @@
   "user": "User",
   "state": "State",
   "command": "Command",
+  "path": "Path",
   "port": "Port",
   "search": "Search...",
   "searchPlaceholder": "Search by process name, PID or port",

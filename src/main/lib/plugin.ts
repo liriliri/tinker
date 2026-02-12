@@ -2,6 +2,7 @@ import {
   IpcClosePlugin,
   IpcDetachPlugin,
   IpcExportPluginData,
+  IpcGetFileIcon,
   IpcGetPlugins,
   IpcImportPluginData,
   IpcOpenPlugin,
@@ -38,6 +39,8 @@ import mime from 'mime'
 import { getClipboardFilePaths } from './clipboard'
 import { getSettingsStore } from './store'
 import { captureScreen } from './screen'
+import { getFileIcon as getFileIconBuffer } from './fileIcon'
+import PQueue from 'p-queue'
 
 const logger = log('plugin')
 
@@ -399,6 +402,18 @@ const importPluginData: IpcImportPluginData = function (id) {
   view.webContents.send('importData')
 }
 
+const fileIconQueue = new PQueue({ concurrency: 1 })
+
+const getFileIcon: IpcGetFileIcon = async function (filePath) {
+  return fileIconQueue.add(async () => {
+    const buffer = await getFileIconBuffer(filePath, 64)
+    if (!buffer) {
+      return ''
+    }
+    return `data:image/png;base64,${buffer.toString('base64')}`
+  })
+}
+
 function preparePluginView() {
   if (!preloadPluginView) {
     preloadPluginView = createPluginView()
@@ -435,6 +450,7 @@ export function init() {
   handleEvent('importPluginData', importPluginData)
   handleEvent('preparePluginView', preparePluginView)
   handleEvent('captureScreen', captureScreen)
+  handleEvent('pluginGetFileIcon', getFileIcon)
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import store from '../store'
+import store, { ProcessInfo } from '../store'
 import { AgGridReact } from 'ag-grid-react'
 import {
   ColDef,
@@ -10,24 +10,40 @@ import {
   themeAlpine,
   GetRowIdParams,
   RowClickedEvent,
+  ICellRendererParams,
 } from 'ag-grid-community'
 import { useMemo, useCallback, useRef, useEffect } from 'react'
 import fileSize from 'licia/fileSize'
 
 ModuleRegistry.registerModules([AllCommunityModule])
 
-interface ProcessInfo {
-  pid: number
-  name: string
-  cpu: number
-  mem: number
-  memRss: number
-  user: string
-  command?: string
-  path?: string
-  state?: string
-  ports?: string
-}
+const ProcessNameCell = observer(
+  ({ data }: ICellRendererParams<ProcessInfo>) => {
+    useEffect(() => {
+      if (data && (data.path || data.command) && !data.icon) {
+        store.loadProcessIcon(data.pid)
+      }
+    }, [data])
+
+    if (!data) return null
+
+    return (
+      <div className="flex items-center gap-2">
+        {data.icon ? (
+          <img
+            src={data.icon}
+            alt=""
+            className="w-4 h-4 flex-shrink-0"
+            style={{ imageRendering: 'auto' }}
+          />
+        ) : (
+          <div className="w-4 h-4 flex-shrink-0" />
+        )}
+        <span className="truncate">{data.name}</span>
+      </div>
+    )
+  }
+)
 
 export default observer(function ProcessList() {
   const { t } = useTranslation()
@@ -42,6 +58,7 @@ export default observer(function ProcessList() {
         minWidth: 150,
         sortable: true,
         cellClass: 'font-medium',
+        cellRenderer: ProcessNameCell,
       },
       {
         field: 'pid',
@@ -76,8 +93,15 @@ export default observer(function ProcessList() {
         headerName: t('port'),
         flex: 2,
         minWidth: 150,
-        sortable: false,
-        valueFormatter: (params) => params.value || '-',
+        sortable: true,
+        valueFormatter: (params) => {
+          if (!params.value) return '-'
+          return params.value
+            .split(', ')
+            .map((port: string) => port.split(':')[1] || port)
+            .join(' ')
+        },
+        tooltipValueGetter: (params) => params.value || undefined,
         cellClass: 'text-sm font-mono',
         hide: store.viewMode !== 'port',
       },
@@ -91,14 +115,14 @@ export default observer(function ProcessList() {
         cellClass: 'text-sm',
       },
       {
-        field: 'command',
-        headerName: t('command'),
+        field: 'path',
+        headerName: t('path'),
         flex: 3,
         minWidth: 200,
         sortable: false,
         valueFormatter: (params) => params.value || '-',
         cellClass: 'text-sm',
-        tooltipField: 'command',
+        tooltipField: 'path',
       },
     ],
     [t, store.viewMode]
@@ -144,8 +168,13 @@ export default observer(function ProcessList() {
     const sortedColumn = columnState?.find((col) => col.sort !== null)
 
     if (sortedColumn) {
-      const field = sortedColumn.colId as 'pid' | 'name' | 'cpu' | 'memRss'
-      if (['pid', 'name', 'cpu', 'memRss'].includes(field)) {
+      const field = sortedColumn.colId as
+        | 'pid'
+        | 'name'
+        | 'cpu'
+        | 'memRss'
+        | 'ports'
+      if (['pid', 'name', 'cpu', 'memRss', 'ports'].includes(field)) {
         store.sortField = field
         store.sortOrder = sortedColumn.sort === 'asc' ? 'asc' : 'desc'
       }
