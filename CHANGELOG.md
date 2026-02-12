@@ -1,3 +1,8 @@
+## v0.12.0 (12 Feb 2026)
+
+* feat: add system info
+* feat: add process killer
+
 ## v0.11.1 (6 Feb 2026)
 
 * fix(photo-collage): border radius
@@ -5,10 +10,10 @@
 
 ## v0.11.0 (3 Feb 2026)
 
-* add: clock
-* add: calendar
-* add: image annotator
-* add: camera
+* feat: add clock
+* feat: add calendar
+* feat: add image annotator
+* feat: add camera
 
 ## v0.10.0 (25 Jan 2026)
 
