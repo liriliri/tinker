@@ -4,12 +4,15 @@ import { confirm } from 'share/components/Confirm'
 import LocalStore from 'licia/LocalStore'
 import i18n from './i18n'
 import isMac from 'licia/isMac'
+import isWindows from 'licia/isWindows'
 import defaultIcon from './assets/default-icon.png'
+import defaultWinIcon from './assets/default-win-icon.png'
 import toast from 'react-hot-toast'
 
 const STORAGE_KEY_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-process-killer')
+const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
 
 export interface ProcessInfo {
   pid: number
@@ -51,12 +54,12 @@ class Store extends BaseStore {
   }
 
   private async init() {
-    await this.refreshProcessList()
+    await this.refreshProcessList(false)
     this.startAutoRefresh()
   }
 
-  async refreshProcessList() {
-    this.isLoading = true
+  async refreshProcessList(showLoading: boolean = true) {
+    this.isLoading = showLoading
     try {
       const [processes, networkConnections] = await Promise.all([
         processKiller.getProcessList(),
@@ -220,7 +223,7 @@ class Store extends BaseStore {
     }
 
     if (!process.icon) {
-      process.icon = defaultIcon
+      process.icon = defaultAppIcon
     }
 
     let filePath: string = process.path || ''
@@ -250,7 +253,7 @@ class Store extends BaseStore {
     try {
       let icon = await tinker.getFileIcon(filePath)
       if (!icon) {
-        icon = defaultIcon
+        icon = defaultAppIcon
       }
       this.iconCache.set(cacheKey, icon)
 
@@ -259,7 +262,7 @@ class Store extends BaseStore {
         currentProcess.icon = icon
       }
     } catch {
-      this.iconCache.set(cacheKey, defaultIcon)
+      this.iconCache.set(cacheKey, defaultAppIcon)
     } finally {
       this.loadingIcons.delete(cacheKey)
     }

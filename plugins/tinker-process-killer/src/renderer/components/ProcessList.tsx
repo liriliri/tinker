@@ -158,9 +158,9 @@ export default observer(function ProcessList() {
 
   const localeText = useMemo(
     () => ({
-      noRowsToShow: t('noProcesses'),
+      noRowsToShow: store.searchKeyword ? t('noProcesses') : '',
     }),
-    [t]
+    [t, store.searchKeyword]
   )
 
   const onSortChanged = useCallback(() => {
