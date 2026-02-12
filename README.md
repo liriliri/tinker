@@ -171,6 +171,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/calendar.png"/></th>
       <th><img src="https://tinker.liriliri.io/camera.png"/></th>
     </tr>
+    <tr>
+      <th>System Info</th>
+      <th>Process Killer</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/system_info.png"/></th>
+      <th><img src="https://tinker.liriliri.io/process_killer.png"/></th>
+    </tr>
   </tbody>
 </table>
 
