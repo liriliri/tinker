@@ -463,6 +463,7 @@ export function init() {
   pluginSession.protocol.handle('plugin', async (request) => {
     const urlObj = new URL(request.url)
     const pluginId = urlObj.host
+    const plugin = plugins[pluginId]
     let pathname = urlObj.pathname
 
     const prefix = `/plugin://${pluginId}/`
@@ -471,7 +472,7 @@ export function init() {
     }
 
     let filePath = ''
-    if (startWith(pathname, '/vendor/')) {
+    if (startWith(pathname, '/vendor/') && plugin.builtin) {
       filePath = path.join(
         getBuiltinPluginDir(),
         'vendor/dist',
@@ -481,8 +482,6 @@ export function init() {
         return new Response('Not Found', { status: 404 })
       }
     } else {
-      const plugin = plugins[pluginId]
-
       filePath = path.join(plugin.root, pathname)
       if (await fs.pathExists(filePath)) {
         const stat = await fs.stat(filePath)
