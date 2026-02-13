@@ -3,4 +3,5 @@ node_modules/
 dist/
 release/
 references/
+resources/ScreenCapture.exe
 package-lock.json

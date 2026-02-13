@@ -24,6 +24,7 @@ jobs:
         node-version: '20.x'
     - run: |
         npm i
+        npm run init
         npm run build
         npm run pack
       env:
