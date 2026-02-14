@@ -1,0 +1,29 @@
+{
+  "openFile": "Open File",
+  "saveFile": "Save File",
+  "undo": "Undo",
+  "redo": "Redo",
+  "addNode": "Add Node",
+  "deleteNode": "Delete Node",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "fit": "Fit",
+  "exportImage": "Export Image",
+  "layout": {
+    "logicalStructure": "Logical Structure",
+    "mindMap": "Mind Map",
+    "organizationStructure": "Organization Structure",
+    "catalogOrganization": "Catalog Organization"
+  },
+  "theme": {
+    "default": "Default",
+    "classic": "Classic",
+    "minions": "Minions",
+    "pinkGrape": "Pink Grape",
+    "mint": "Mint",
+    "gold": "Gold",
+    "vitalityOrange": "Vitality Orange",
+    "greenLeaf": "Green Leaf",
+    "dark2": "Dark"
+  }
+}

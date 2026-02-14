@@ -1,0 +1,29 @@
+{
+  "openFile": "打开文件",
+  "saveFile": "保存文件",
+  "undo": "撤销",
+  "redo": "重做",
+  "addNode": "添加节点",
+  "deleteNode": "删除节点",
+  "zoomIn": "放大",
+  "zoomOut": "缩小",
+  "fit": "适应画布",
+  "exportImage": "导出图片",
+  "layout": {
+    "logicalStructure": "逻辑结构图",
+    "mindMap": "思维导图",
+    "organizationStructure": "组织结构图",
+    "catalogOrganization": "目录组织图"
+  },
+  "theme": {
+    "default": "默认",
+    "classic": "经典",
+    "minions": "小黄人",
+    "pinkGrape": "粉红葡萄",
+    "mint": "薄荷",
+    "gold": "金色",
+    "vitalityOrange": "活力橙",
+    "greenLeaf": "绿叶",
+    "dark2": "暗黑"
+  }
+}

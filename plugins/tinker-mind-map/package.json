@@ -1,0 +1,22 @@
+{
+  "name": "tinker-mind-map",
+  "version": "0.1.0",
+  "description": "Mind Map Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Mind Map",
+    "main": "dist/index.html",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "思维导图"
+      }
+    }
+  },
+  "devDependencies": {
+    "simple-mind-map": "^0.14.0-fix.1"
+  }
+}
