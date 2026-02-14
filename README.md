@@ -182,9 +182,13 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
   </tbody>
 </table>
 
+## Official Plugins
+
+Official non-built-in plugins are maintained at [tinker-plugins](https://github.com/liriliri/tinker-plugins). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-whois`.
+
 ## Third-party Plugins
 
-In addition to the built-in plugins, you can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
+You can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
 
 ## Web Plugins
 
