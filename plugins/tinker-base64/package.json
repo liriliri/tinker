@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "description": "Base64 encoder/decoder for Tinker",
   "scripts": {
-    "dev": "npm run dev:renderer",
-    "dev:renderer": "vite --config ../vite.config.ts",
-    "build": "npm run build:renderer",
-    "build:renderer": "vite build --config ../vite.config.ts"
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Base64",
