@@ -15,6 +15,7 @@ const config = {
   directories: {
     output: `../release/${pkg.version}`,
   },
+  externals: ['ffmpeg-static'],
   files: ['main', 'preload', 'renderer', 'plugins'],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: {

@@ -19,6 +19,7 @@
   "newRecording": "新录音",
   "confirmDelete": "确定要删除这条录音吗？",
   "failedToStopRecording": "停止录音失败",
-  "failedToConvertToMp3": "转换为 MP3 格式失败",
-  "clickToStartRecording": "点击按钮开始录音吧"
+  "failedToSaveRecording": "保存录音失败",
+  "clickToStartRecording": "点击按钮开始录音吧",
+  "savedSuccessfully": "录音保存成功"
 }

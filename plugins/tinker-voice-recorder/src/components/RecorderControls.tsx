@@ -8,7 +8,6 @@ import toast from 'react-hot-toast'
 import { tw } from 'share/theme'
 import store from '../store'
 import { AudioRecorder } from '../lib/AudioRecorder'
-import { convertToMp3 } from '../lib/audioConverter'
 import WaveformVisualizer from './WaveformVisualizer'
 import AudioWaveform from './AudioWaveform'
 import WaveformLoading from './WaveformLoading'
@@ -77,17 +76,32 @@ const RecorderControls = observer(() => {
     if (!store.recordedBlob) return
 
     try {
-      const mp3Blob = await convertToMp3(store.recordedBlob)
-      const url = URL.createObjectURL(mp3Blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `recording-${dateFormat('yyyymmddHH')}.mp3`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch {
-      toast.error(t('failedToConvertToMp3'))
+      const result = await tinker.showSaveDialog({
+        defaultPath: `recording-${dateFormat('yyyymmddHH')}.mp3`,
+        filters: [{ name: 'MP3', extensions: ['mp3'] }],
+      })
+
+      if (result.canceled) return
+
+      const tmpDir = tinker.tmpdir()
+      const tempInput = `${tmpDir}/tinker-voice-${Date.now()}.webm`
+      const buffer = await store.recordedBlob.arrayBuffer()
+      await tinker.writeFile(tempInput, new Uint8Array(buffer))
+
+      tinker.runFFmpeg([
+        '-i',
+        tempInput,
+        '-codec:a',
+        'libmp3lame',
+        '-b:a',
+        '128k',
+        result.filePath,
+      ])
+
+      toast.success(t('savedSuccessfully'))
+    } catch (error) {
+      console.error('Failed to save recording:', error)
+      toast.error(t('failedToSaveRecording'))
     }
   }
 

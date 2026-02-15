@@ -9,6 +9,38 @@ import type {
 type ReadFile = typeof import('node:fs/promises').readFile
 type WriteFile = typeof import('node:fs/promises').writeFile
 
+/**
+ * FFmpeg execution progress information.
+ */
+interface RunProgress {
+  /** Video bitrate (e.g., "1024kbits/s") */
+  bitrate: string
+  /** Frames per second */
+  fps: number
+  /** Current frame number */
+  frame: number
+  /** Conversion progress percentage (0-100), only available when duration is known */
+  percent?: number
+  /** Video quality factor */
+  q: number | string
+  /** Current output size (e.g., "1024kB") */
+  size: string
+  /** Processing speed (e.g., "1.5x") */
+  speed: string
+  /** Current processing time (e.g., "00:01:23.45") */
+  time: string
+}
+
+/**
+ * FFmpeg task control interface.
+ */
+interface FFmpegTask {
+  /** Force kill the FFmpeg process (SIGKILL) */
+  kill(): void
+  /** Gracefully quit the FFmpeg process (SIGTERM) */
+  quit(): void
+}
+
 declare global {
   /**
    * Global Tinker API for plugin development.
@@ -143,6 +175,19 @@ declare global {
     writeFile: WriteFile
 
     /**
+     * Get the operating system's default directory for temporary files.
+     * @returns Path to the temp directory
+     * @example
+     * const tempDir = tinker.tmpdir()
+     * console.log(tempDir) // e.g., '/tmp' on macOS/Linux or 'C:\Users\...\AppData\Local\Temp' on Windows
+     *
+     * // Use it to create temp files
+     * const tempFile = `${tempDir}/my-temp-file.txt`
+     * await tinker.writeFile(tempFile, 'temporary data')
+     */
+    tmpdir(): string
+
+    /**
      * Register an event listener.
      * @param event - Event name (e.g., 'changeTheme', 'changeLanguage')
      * @param callback - Event handler function
@@ -155,6 +200,30 @@ declare global {
      * // Later: unsubscribe()
      */
     on(event: string, callback: (...args: any[]) => void): () => void
+
+    /**
+     * Run FFmpeg with the specified arguments.
+     * @param args - FFmpeg command line arguments (without 'ffmpeg' itself). Must include output file path.
+     * @param onProgress - Optional progress callback function
+     * @returns Task control object with kill() and quit() methods
+     * @example
+     * // Convert video to different format
+     * const task = tinker.runFFmpeg(
+     *   ['-i', 'input.mp4', '-c:v', 'libx264', 'output.mp4'],
+     *   (progress) => {
+     *     console.log(`Progress: ${progress.percent}%`)
+     *     console.log(`Speed: ${progress.speed}`)
+     *   }
+     * )
+     *
+     * // Kill the task if needed
+     * task.kill()  // Force kill (SIGKILL)
+     * task.quit()  // Graceful quit (SIGTERM)
+     */
+    runFFmpeg(
+      args: string[],
+      onProgress?: (progress: RunProgress) => void
+    ): FFmpegTask
 
     /**
      * Show a context menu at the specified position.

@@ -17,7 +17,6 @@
     }
   },
   "devDependencies": {
-    "lamejs": "^1.2.1",
     "wavesurfer.js": "^7.12.1"
   }
 }

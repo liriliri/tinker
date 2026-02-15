@@ -4,6 +4,34 @@ import types from 'licia/types'
 declare const window: any
 
 export function injectApi() {
+  const ffmpegTasks: types.PlainObj<{
+    kill: () => void
+    quit: () => void
+  }> = {}
+
+  function runFFmpeg(args: string[], onProgress?: any) {
+    const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
+
+    ffmpegTasks[taskId] = {
+      kill: () => _tinker.killFFmpeg(taskId),
+      quit: () => _tinker.quitFFmpeg(taskId),
+    }
+
+    promise.finally(() => {
+      delete ffmpegTasks[taskId]
+    })
+
+    const extendedPromise = promise as any
+    extendedPromise.kill = function () {
+      ffmpegTasks[taskId]?.kill()
+    }
+    extendedPromise.quit = function () {
+      ffmpegTasks[taskId]?.quit()
+    }
+
+    return extendedPromise
+  }
+
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -15,8 +43,10 @@ export function injectApi() {
     setTitle: _tinker.setTitle,
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,
+    tmpdir: _tinker.tmpdir,
     getFileIcon: _tinker.getFileIcon,
     on: _tinker.on,
+    runFFmpeg,
     showContextMenu,
   }
 

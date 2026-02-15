@@ -19,6 +19,7 @@
   "newRecording": "New Recording",
   "confirmDelete": "Are you sure you want to delete this recording?",
   "failedToStopRecording": "Failed to stop recording",
-  "failedToConvertToMp3": "Failed to convert audio to MP3",
-  "clickToStartRecording": "Click the button to start recording"
+  "failedToSaveRecording": "Failed to save recording",
+  "clickToStartRecording": "Click the button to start recording",
+  "savedSuccessfully": "Recording saved successfully"
 }

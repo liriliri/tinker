@@ -13,16 +13,11 @@ import { pathToFileURL } from 'url'
 import * as pluginRenderer from './pluginRenderer'
 import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
-import {
-  injectRendererScript,
-  domReady,
-  zipFiles,
-  unzipFiles,
-} from './lib/util'
+import { injectRendererScript, domReady } from './lib/util'
+import { runFFmpeg, killFFmpeg, quitFFmpeg } from './lib/ffmpeg'
+import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import types from 'licia/types'
-import fs from 'fs-extra'
-import dateFormat from 'licia/dateFormat'
-import { t, i18n } from 'common/util'
+import { i18n } from 'common/util'
 
 window.addEventListener('DOMContentLoaded', () => {
   tinkerObj.setTitle('')
@@ -74,48 +69,11 @@ function setTitle(title: string) {
 }
 
 async function saveData(files: types.PlainObj<string>) {
-  const buf = zipFiles(files)
-  const { filePath } = await mainObj.showSaveDialog({
-    title: t('exportData'),
-    defaultPath: plugin
-      ? `${plugin.id}-${dateFormat('yyyymmdd')}.zip`
-      : 'tinker-data.zip',
-    filters: [{ name: 'Zip Files', extensions: ['zip'] }],
-  })
-  if (filePath) {
-    await fs.writeFile(filePath, buf)
-  }
+  return saveDataUtil(files, plugin)
 }
 
 async function loadData(): Promise<types.PlainObj<string> | undefined> {
-  const { filePaths } = await mainObj.showOpenDialog({
-    title: t('importData'),
-    properties: ['openFile'],
-    filters: [{ name: 'Zip Files', extensions: ['zip'] }],
-  })
-  if (filePaths && filePaths.length > 0) {
-    const result = confirm(t('importDataConfirm'))
-    if (!result) {
-      return
-    }
-    const filePath = filePaths[0]
-    const buf = await fs.readFile(filePath)
-    const files = unzipFiles(buf)
-    const pluginData = files['plugin.json']
-    if (pluginData) {
-      const meta = JSON.parse(pluginData)
-      if (plugin && meta.id !== plugin.id) {
-        alert(
-          t('importDataMismatchErr', {
-            expected: plugin.id,
-            got: meta.id,
-          })
-        )
-        return
-      }
-    }
-    return files
-  }
+  return loadDataUtil(plugin)
 }
 
 const tinkerObj = {
@@ -138,7 +96,11 @@ const tinkerObj = {
   loadData,
   readFile: nodeObj.readFile,
   writeFile: nodeObj.writeFile,
+  tmpdir: nodeObj.tmpdir,
   on: mainObj.on,
+  runFFmpeg,
+  killFFmpeg,
+  quitFFmpeg,
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)

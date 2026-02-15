@@ -4,7 +4,7 @@ import { builtinModules } from 'node:module'
 import { alias } from './vite.config'
 
 const builtins = builtinModules.filter((e) => !e.startsWith('_'))
-builtins.push('electron', ...builtins.map((m) => `node:${m}`))
+builtins.push('electron', 'ffmpeg-static', ...builtins.map((m) => `node:${m}`))
 
 export default defineConfig({
   build: {
