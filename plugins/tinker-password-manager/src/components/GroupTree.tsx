@@ -109,13 +109,16 @@ const GroupItem = observer(function GroupItem({
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         className={className(
-          'flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded',
-          isSelected ? [tw.primary.bg, 'text-white'] : tw.hover.both
+          'flex items-center py-1 px-2 cursor-pointer rounded transition-colors',
+          isSelected ? tw.primary.bg : tw.hover.both
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         {hasChildren && (
-          <button onClick={handleToggle} className="p-0.5">
+          <button
+            onClick={handleToggle}
+            className="flex-shrink-0 mr-1 p-0.5 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+          >
             {isExpanded ? (
               <ChevronDown size={14} />
             ) : (
@@ -123,10 +126,22 @@ const GroupItem = observer(function GroupItem({
             )}
           </button>
         )}
-        {!hasChildren && <div className="w-5" />}
-        <Folder size={16} />
-        <span className="text-sm flex-1 truncate">{group.name}</span>
-        <span className={`text-xs ${tw.text.both.secondary}`}>
+        {!hasChildren && <div className="w-5 flex-shrink-0" />}
+        <Folder size={16} className="flex-shrink-0 mr-1" />
+        <span
+          className={className(
+            'text-sm flex-1 truncate',
+            isSelected ? 'text-white font-medium' : tw.text.both.primary
+          )}
+        >
+          {group.name}
+        </span>
+        <span
+          className={className(
+            'text-xs ml-2',
+            isSelected ? 'text-white opacity-90' : tw.text.both.secondary
+          )}
+        >
           {group.entries.length}
         </span>
       </div>

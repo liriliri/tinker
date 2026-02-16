@@ -178,6 +178,7 @@ import CopyButton from 'share/components/CopyButton'
 import FileOpen from 'share/components/FileOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import Tooltip from 'share/components/Tooltip'
+import Tree, { TreeNodeData } from 'share/components/Tree'
 
 // Copy button variants
 <CopyButton text="copy me" title="Copy" />
@@ -201,6 +202,18 @@ import Tooltip from 'share/components/Tooltip'
 
 // Tooltip
 <Tooltip visible={show} x={x} y={y} content="Hint" />
+
+// Tree - Generic tree view with expand/collapse and highlighting
+interface MyNode extends TreeNodeData {
+  customField: string
+}
+
+<Tree<MyNode>
+  data={treeData}
+  onNodeClick={(node) => handleClick(node)}
+  activeNodeId={activeId}
+  emptyText="No data"
+/>
 ```
 
 ## Shared Hooks

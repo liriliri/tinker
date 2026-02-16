@@ -33,6 +33,12 @@ export default observer(function MindMapCanvas() {
 
     store.setMindMap(mindMap)
 
+    // Listen for node right-click events
+    mindMap.on('node_contextmenu', (e: any, node: any) => {
+      e.preventDefault()
+      store.showNodeContextMenu(e, node)
+    })
+
     const handleResize = () => {
       mindMap?.resize()
     }

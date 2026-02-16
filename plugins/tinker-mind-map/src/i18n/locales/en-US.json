@@ -1,29 +1,37 @@
 {
+  "newFile": "New File",
   "openFile": "Open File",
   "saveFile": "Save File",
   "undo": "Undo",
   "redo": "Redo",
-  "addNode": "Add Node",
-  "deleteNode": "Delete Node",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",
   "fit": "Fit",
   "exportImage": "Export Image",
+  "showSidebar": "Show Sidebar",
+  "hideSidebar": "Hide Sidebar",
+  "outline": {
+    "title": "Outline",
+    "noData": "No outline data available"
+  },
+  "contextmenu": {
+    "insertChildNode": "Insert Child Node",
+    "insertSiblingNode": "Insert Sibling Node",
+    "moveUpNode": "Move Up",
+    "moveDownNode": "Move Down",
+    "expandNodeChild": "Expand Children",
+    "unExpandNodeChild": "Collapse Children",
+    "copyNode": "Copy",
+    "cutNode": "Cut",
+    "pasteNode": "Paste",
+    "deleteNode": "Delete",
+    "removeHyperlink": "Remove Hyperlink",
+    "removeNote": "Remove Note"
+  },
   "layout": {
     "logicalStructure": "Logical Structure",
     "mindMap": "Mind Map",
     "organizationStructure": "Organization Structure",
     "catalogOrganization": "Catalog Organization"
-  },
-  "theme": {
-    "default": "Default",
-    "classic": "Classic",
-    "minions": "Minions",
-    "pinkGrape": "Pink Grape",
-    "mint": "Mint",
-    "gold": "Gold",
-    "vitalityOrange": "Vitality Orange",
-    "greenLeaf": "Green Leaf",
-    "dark2": "Dark"
   }
 }

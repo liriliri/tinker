@@ -1,16 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import {
+  FilePlus,
   FolderOpen,
   Save,
   Undo,
   Redo,
-  Plus,
-  Trash2,
   FileDown,
-  ZoomIn,
-  ZoomOut,
-  Maximize,
+  PanelLeftClose,
+  PanelLeft,
 } from 'lucide-react'
 import {
   Toolbar,
@@ -35,20 +33,25 @@ export default observer(function ToolbarComponent() {
     { label: t('layout.catalogOrganization'), value: 'catalogOrganization' },
   ]
 
-  const themeOptions = [
-    { label: t('theme.default'), value: 'default' },
-    { label: t('theme.classic'), value: 'classic' },
-    { label: t('theme.minions'), value: 'minions' },
-    { label: t('theme.pinkGrape'), value: 'pinkGrape' },
-    { label: t('theme.mint'), value: 'mint' },
-    { label: t('theme.gold'), value: 'gold' },
-    { label: t('theme.vitalityOrange'), value: 'vitalityOrange' },
-    { label: t('theme.greenLeaf'), value: 'greenLeaf' },
-    { label: t('theme.dark2'), value: 'dark2' },
-  ]
-
   return (
     <Toolbar>
+      <ToolbarButton
+        onClick={() => store.toggleSidebar()}
+        title={t(store.sidebarOpen ? 'hideSidebar' : 'showSidebar')}
+      >
+        {store.sidebarOpen ? (
+          <PanelLeftClose size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <PanelLeft size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <ToolbarButton onClick={() => store.newFile()} title={t('newFile')}>
+        <FilePlus size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
       <ToolbarButton onClick={() => store.openFile()} title={t('openFile')}>
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
@@ -60,6 +63,14 @@ export default observer(function ToolbarComponent() {
       >
         <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <Select
+        value={store.currentLayout}
+        onChange={(value) => store.setLayout(value)}
+        options={layoutOptions}
+      />
 
       <ToolbarSeparator />
 
@@ -79,55 +90,7 @@ export default observer(function ToolbarComponent() {
         <Redo size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarSeparator />
-
-      <ToolbarButton
-        onClick={() => store.addNode()}
-        disabled={!store.hasActiveNode}
-        title={t('addNode')}
-      >
-        <Plus size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => store.deleteNode()}
-        disabled={!store.hasActiveNode}
-        title={t('deleteNode')}
-      >
-        <Trash2 size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarSeparator />
-
-      <Select
-        value={store.currentLayout}
-        onChange={(value) => store.setLayout(value)}
-        options={layoutOptions}
-      />
-
-      <ToolbarSeparator />
-
-      <Select
-        value={store.currentTheme}
-        onChange={(value) => store.setTheme(value)}
-        options={themeOptions}
-      />
-
       <ToolbarSpacer />
-
-      <ToolbarButton onClick={() => store.zoomIn()} title={t('zoomIn')}>
-        <ZoomIn size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton onClick={() => store.zoomOut()} title={t('zoomOut')}>
-        <ZoomOut size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarButton onClick={() => store.fit()} title={t('fit')}>
-        <Maximize size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-
-      <ToolbarSeparator />
 
       <ToolbarButton
         onClick={() => store.exportImage()}
