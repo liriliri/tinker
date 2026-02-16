@@ -1,11 +1,14 @@
 {
   "openFile": "Open File",
-  "toggleSidebar": "Toggle Sidebar",
+  "hideSidebar": "Hide Sidebar",
+  "showSidebar": "Show Sidebar",
   "previousPage": "Previous Page",
   "nextPage": "Next Page",
   "zoomIn": "Zoom In",
   "zoomOut": "Zoom Out",
   "resetZoom": "Reset Zoom",
   "openTitle": "Drop PDF file here or click to open",
-  "noOutline": "No outline available"
+  "noOutline": "No outline available",
+  "errorLoadPdf": "Failed to load PDF file",
+  "errorGetFilePath": "Cannot get file path"
 }

@@ -1,11 +1,14 @@
 {
   "openFile": "打开文件",
-  "toggleSidebar": "切换侧边栏",
+  "hideSidebar": "隐藏侧边栏",
+  "showSidebar": "显示侧边栏",
   "previousPage": "上一页",
   "nextPage": "下一页",
   "zoomIn": "放大",
   "zoomOut": "缩小",
   "resetZoom": "重置缩放",
   "openTitle": "拖拽 PDF 文件到此处或点击打开",
-  "noOutline": "无大纲"
+  "noOutline": "无大纲",
+  "errorLoadPdf": "加载 PDF 文件失败",
+  "errorGetFilePath": "无法获取文件路径"
 }

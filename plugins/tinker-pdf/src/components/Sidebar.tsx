@@ -109,7 +109,7 @@ export default observer(function ThumbnailSidebar() {
       className={`
         w-56 h-full flex flex-col
         border-r ${tw.border.both}
-        ${tw.bg.both.primary}
+        ${tw.bg.both.tertiary}
         transition-transform duration-200
         ${isVisible ? 'translate-x-0' : '-translate-x-full'}
       `}
@@ -174,11 +174,11 @@ export default observer(function ThumbnailSidebar() {
           onClick={() => store.setSidebarView('thumbnails')}
           className={`
             flex-1 flex items-center justify-center py-2 px-3
-            transition-colors
+            transition-colors ${tw.hover.both}
             ${
               store.sidebarView === 'thumbnails'
-                ? `${tw.hover.both} ${tw.text.both.primary}`
-                : `${tw.bg.both.secondary} ${tw.text.both.secondary}`
+                ? tw.primary.text
+                : tw.text.both.secondary
             }
           `}
           title="Thumbnails"
@@ -189,11 +189,11 @@ export default observer(function ThumbnailSidebar() {
           onClick={() => store.setSidebarView('outline')}
           className={`
             flex-1 flex items-center justify-center py-2 px-3
-            transition-colors
+            transition-colors ${tw.hover.both}
             ${
               store.sidebarView === 'outline'
-                ? `${tw.hover.both} ${tw.text.both.primary}`
-                : `${tw.bg.both.secondary} ${tw.text.both.secondary}`
+                ? tw.primary.text
+                : tw.text.both.secondary
             }
           `}
           title="Outline"

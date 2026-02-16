@@ -1,25 +1,22 @@
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
-import { AlertProvider } from 'share/components/Alert'
+import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import PdfViewer from './components/PdfViewer'
-import ThumbnailSidebar from './components/ThumbnailSidebar'
+import Sidebar from './components/Sidebar'
 
 export default observer(function App() {
-  const { i18n } = useTranslation()
-
   return (
-    <AlertProvider locale={i18n.language}>
+    <ToasterProvider>
       <div
         className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
       >
         <Toolbar />
         <div className="flex-1 flex overflow-hidden">
-          <ThumbnailSidebar />
+          <Sidebar />
           <PdfViewer />
         </div>
       </div>
-    </AlertProvider>
+    </ToasterProvider>
   )
 })

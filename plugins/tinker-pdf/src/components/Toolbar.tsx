@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   PanelLeft,
+  PanelLeftClose,
 } from 'lucide-react'
 import store from '../store'
 import { tw } from 'share/theme'
@@ -26,13 +27,15 @@ export default observer(function ToolbarComponent() {
       {/* Left side */}
       <div className="flex items-center gap-0">
         <ToolbarButton
-          variant="toggle"
-          active={store.sidebarOpen && !!store.pdfDoc}
           onClick={() => store.toggleSidebar()}
-          title={t('toggleSidebar')}
+          title={t(store.sidebarOpen ? 'hideSidebar' : 'showSidebar')}
           disabled={!store.pdfDoc}
         >
-          <PanelLeft size={TOOLBAR_ICON_SIZE} />
+          {store.sidebarOpen ? (
+            <PanelLeftClose size={TOOLBAR_ICON_SIZE} />
+          ) : (
+            <PanelLeft size={TOOLBAR_ICON_SIZE} />
+          )}
         </ToolbarButton>
 
         <ToolbarSeparator />

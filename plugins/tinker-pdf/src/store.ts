@@ -1,9 +1,10 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import { alert } from 'share/components/Alert'
+import toast from 'react-hot-toast'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { pdfjsLib } from './lib/pdfjs'
 import LocalStore from 'licia/LocalStore'
+import i18n from './i18n'
 
 const storage = new LocalStore('tinker-pdf')
 const STORAGE_KEY_SIDEBAR_OPEN = 'sidebarOpen'
@@ -156,14 +157,13 @@ class Store extends BaseStore {
   }
 
   // Error handling
-  showError(message: string) {
-    alert({ title: 'Error', message })
+  showError(key: string) {
+    toast.error(i18n.t(key))
   }
 
   // Load PDF file
   async loadPdfFile(filePath: string) {
     this.setLoading(true)
-    this.setFileName(filePath.split('/').pop() || '')
 
     try {
       const fileData = await tinker.readFile(filePath)
@@ -172,9 +172,10 @@ class Store extends BaseStore {
       const pdfDoc = await loadingTask.promise
 
       this.setPdfDoc(pdfDoc)
+      this.setFileName(filePath.split('/').pop() || '')
     } catch (error) {
       console.error('Error loading PDF:', error)
-      this.showError('Failed to load PDF file')
+      this.showError('errorLoadPdf')
     } finally {
       this.setLoading(false)
     }
@@ -184,7 +185,7 @@ class Store extends BaseStore {
   async openFileFromFile(file: File) {
     const filePath = (file as any).path
     if (!filePath) {
-      this.showError('Cannot get file path from file object')
+      this.showError('errorGetFilePath')
       return
     }
 
