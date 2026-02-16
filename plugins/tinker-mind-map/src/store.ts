@@ -52,6 +52,38 @@ class Store extends BaseStore {
     return splitPath(this.currentFilePath).name
   }
 
+  private getDefaultTemplate() {
+    return {
+      data: {
+        text: i18n.t('rootNode'),
+      },
+      children: [
+        {
+          data: {
+            text: i18n.t('secondaryNode'),
+            generalization: {
+              text: i18n.t('summary'),
+            },
+          },
+          children: [
+            {
+              data: {
+                text: i18n.t('branchTopic'),
+              },
+              children: [],
+            },
+            {
+              data: {
+                text: i18n.t('branchTopic'),
+              },
+              children: [],
+            },
+          ],
+        },
+      ],
+    }
+  }
+
   private async loadSavedFile() {
     const savedFilePath = storage.get(FILE_PATH_KEY)
 
@@ -115,12 +147,7 @@ class Store extends BaseStore {
     return {
       layout: this.currentLayout,
       theme: this.currentTheme,
-      root: {
-        data: {
-          text: 'Root Node',
-        },
-        children: [],
-      },
+      root: this.getDefaultTemplate(),
     }
   }
 
@@ -135,14 +162,7 @@ class Store extends BaseStore {
     this.isLoadingFile = true
     this.currentFilePath = null
     storage.remove(FILE_PATH_KEY)
-    this.mindMap.setData({
-      root: {
-        data: {
-          text: 'Root Node',
-        },
-        children: [],
-      },
-    })
+    this.mindMap.setData(this.getDefaultTemplate())
     setTimeout(() => {
       this.hasChanges = false
       this.isLoadingFile = false
@@ -296,63 +316,63 @@ class Store extends BaseStore {
 
     const items: any[] = [
       {
-        label: i18n.t('contextmenu.insertChildNode'),
+        label: i18n.t('insertChildNode'),
         enabled: !isGeneralization,
         click: () => this.mindMap?.execCommand('INSERT_CHILD_NODE'),
       },
       {
-        label: i18n.t('contextmenu.insertSiblingNode'),
+        label: i18n.t('insertSiblingNode'),
         enabled: canInsertSibling,
         click: () => this.mindMap?.execCommand('INSERT_NODE'),
       },
       { type: 'separator' as const },
       {
-        label: i18n.t('contextmenu.moveUpNode'),
+        label: i18n.t('moveUpNode'),
         enabled: canMoveUp,
         click: () => this.mindMap?.execCommand('UP_NODE'),
       },
       {
-        label: i18n.t('contextmenu.moveDownNode'),
+        label: i18n.t('moveDownNode'),
         enabled: canMoveDown,
         click: () => this.mindMap?.execCommand('DOWN_NODE'),
       },
       { type: 'separator' as const },
       {
-        label: i18n.t('contextmenu.expandNodeChild'),
+        label: i18n.t('expandNodeChild'),
         click: () => this.mindMap?.execCommand('EXPAND_ALL', node.uid),
       },
       {
-        label: i18n.t('contextmenu.unExpandNodeChild'),
+        label: i18n.t('unExpandNodeChild'),
         click: () => this.mindMap?.execCommand('UNEXPAND_ALL', false, node.uid),
       },
       { type: 'separator' as const },
       {
-        label: i18n.t('contextmenu.copyNode'),
+        label: i18n.t('copyNode'),
         enabled: !isGeneralization,
         click: () => this.mindMap?.renderer.copy(),
       },
       {
-        label: i18n.t('contextmenu.cutNode'),
+        label: i18n.t('cutNode'),
         enabled: !isGeneralization,
         click: () => this.mindMap?.renderer.cut(),
       },
       {
-        label: i18n.t('contextmenu.pasteNode'),
+        label: i18n.t('pasteNode'),
         click: () => this.mindMap?.renderer.paste(),
       },
       { type: 'separator' as const },
       {
-        label: i18n.t('contextmenu.deleteNode'),
+        label: i18n.t('deleteNode'),
         click: () => this.mindMap?.execCommand('REMOVE_NODE'),
       },
       { type: 'separator' as const },
       {
-        label: i18n.t('contextmenu.removeHyperlink'),
+        label: i18n.t('removeHyperlink'),
         enabled: hasHyperlink,
         click: () => node.setHyperlink('', ''),
       },
       {
-        label: i18n.t('contextmenu.removeNote'),
+        label: i18n.t('removeNote'),
         enabled: hasNote,
         click: () => node.setNote(''),
       },

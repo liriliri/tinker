@@ -10,28 +10,26 @@
   "exportImage": "导出图片",
   "showSidebar": "显示侧边栏",
   "hideSidebar": "隐藏侧边栏",
-  "outline": {
-    "title": "大纲",
-    "noData": "暂无大纲数据"
-  },
-  "contextmenu": {
-    "insertChildNode": "插入子节点",
-    "insertSiblingNode": "插入同级节点",
-    "moveUpNode": "上移节点",
-    "moveDownNode": "下移节点",
-    "expandNodeChild": "展开子节点",
-    "unExpandNodeChild": "收起子节点",
-    "copyNode": "复制",
-    "cutNode": "剪切",
-    "pasteNode": "粘贴",
-    "deleteNode": "删除节点",
-    "removeHyperlink": "移除超链接",
-    "removeNote": "移除备注"
-  },
-  "layout": {
-    "logicalStructure": "逻辑结构图",
-    "mindMap": "思维导图",
-    "organizationStructure": "组织结构图",
-    "catalogOrganization": "目录组织图"
-  }
+  "outlineTitle": "大纲",
+  "outlineNoData": "暂无大纲数据",
+  "insertChildNode": "插入子节点",
+  "insertSiblingNode": "插入同级节点",
+  "moveUpNode": "上移节点",
+  "moveDownNode": "下移节点",
+  "expandNodeChild": "展开子节点",
+  "unExpandNodeChild": "收起子节点",
+  "copyNode": "复制",
+  "cutNode": "剪切",
+  "pasteNode": "粘贴",
+  "deleteNode": "删除节点",
+  "removeHyperlink": "移除超链接",
+  "removeNote": "移除备注",
+  "logicalStructure": "逻辑结构图",
+  "mindMap": "思维导图",
+  "organizationStructure": "组织结构图",
+  "catalogOrganization": "目录组织图",
+  "rootNode": "根节点",
+  "secondaryNode": "二级节点",
+  "branchTopic": "分支主题",
+  "summary": "概要"
 }

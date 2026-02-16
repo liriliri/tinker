@@ -10,28 +10,26 @@
   "exportImage": "Export Image",
   "showSidebar": "Show Sidebar",
   "hideSidebar": "Hide Sidebar",
-  "outline": {
-    "title": "Outline",
-    "noData": "No outline data available"
-  },
-  "contextmenu": {
-    "insertChildNode": "Insert Child Node",
-    "insertSiblingNode": "Insert Sibling Node",
-    "moveUpNode": "Move Up",
-    "moveDownNode": "Move Down",
-    "expandNodeChild": "Expand Children",
-    "unExpandNodeChild": "Collapse Children",
-    "copyNode": "Copy",
-    "cutNode": "Cut",
-    "pasteNode": "Paste",
-    "deleteNode": "Delete",
-    "removeHyperlink": "Remove Hyperlink",
-    "removeNote": "Remove Note"
-  },
-  "layout": {
-    "logicalStructure": "Logical Structure",
-    "mindMap": "Mind Map",
-    "organizationStructure": "Organization Structure",
-    "catalogOrganization": "Catalog Organization"
-  }
+  "outlineTitle": "Outline",
+  "outlineNoData": "No outline data available",
+  "insertChildNode": "Insert Child Node",
+  "insertSiblingNode": "Insert Sibling Node",
+  "moveUpNode": "Move Up",
+  "moveDownNode": "Move Down",
+  "expandNodeChild": "Expand Children",
+  "unExpandNodeChild": "Collapse Children",
+  "copyNode": "Copy",
+  "cutNode": "Cut",
+  "pasteNode": "Paste",
+  "deleteNode": "Delete",
+  "removeHyperlink": "Remove Hyperlink",
+  "removeNote": "Remove Note",
+  "logicalStructure": "Logical Structure",
+  "mindMap": "Mind Map",
+  "organizationStructure": "Organization Structure",
+  "catalogOrganization": "Catalog Organization",
+  "rootNode": "Root Node",
+  "secondaryNode": "Secondary Node",
+  "branchTopic": "Branch Topic",
+  "summary": "Summary"
 }

@@ -71,7 +71,7 @@ export default observer(function Outline() {
       data={outlineData}
       onNodeClick={handleNodeClick}
       activeNodeId={activeNodeUid}
-      emptyText={t('outline.noData')}
+      emptyText={t('outlineNoData')}
     />
   )
 })

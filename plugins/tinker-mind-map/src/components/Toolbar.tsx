@@ -24,13 +24,13 @@ export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
   const layoutOptions = [
-    { label: t('layout.logicalStructure'), value: 'logicalStructure' },
-    { label: t('layout.mindMap'), value: 'mindMap' },
+    { label: t('logicalStructure'), value: 'logicalStructure' },
+    { label: t('mindMap'), value: 'mindMap' },
     {
-      label: t('layout.organizationStructure'),
+      label: t('organizationStructure'),
       value: 'organizationStructure',
     },
-    { label: t('layout.catalogOrganization'), value: 'catalogOrganization' },
+    { label: t('catalogOrganization'), value: 'catalogOrganization' },
   ]
 
   return (
