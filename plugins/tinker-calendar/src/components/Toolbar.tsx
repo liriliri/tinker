@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { ChevronLeft, ChevronRight, Plus, PanelRight } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  PanelRight,
+  PanelRightClose,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import {
@@ -134,12 +140,14 @@ export default observer(function ToolbarComponent({
       <ToolbarSeparator />
 
       <ToolbarButton
-        variant="toggle"
-        active={store.sidebarOpen}
         onClick={() => store.toggleSidebar()}
-        title={t('toggleSidebar')}
+        title={t(store.sidebarOpen ? 'hideSidebar' : 'showSidebar')}
       >
-        <PanelRight size={TOOLBAR_ICON_SIZE} />
+        {store.sidebarOpen ? (
+          <PanelRightClose size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <PanelRight size={TOOLBAR_ICON_SIZE} />
+        )}
       </ToolbarButton>
     </Toolbar>
   )
