@@ -21,6 +21,7 @@
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
-    "@fullcalendar/timegrid": "^6.1.20"
+    "@fullcalendar/timegrid": "^6.1.20",
+    "js-calendar-converter": "^0.0.7"
   }
 }

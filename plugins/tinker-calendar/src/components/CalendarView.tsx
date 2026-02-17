@@ -16,6 +16,7 @@ import type {
 import { useTranslation } from 'react-i18next'
 import EventDialog, { type EventFormData } from './EventDialog'
 import store from '../store'
+import { getLunarDate } from '../lib/lunar'
 
 interface CalendarViewProps {
   calendarRef: React.RefObject<any>
@@ -174,6 +175,34 @@ const CalendarView = observer(
       return true
     }
 
+    const handleDayCellContent = (arg: {
+      date: Date
+      dayNumberText: string
+      view: any
+    }) => {
+      const isZhCN = i18n.language === 'zh-CN'
+      const isMonthView = arg.view.type === 'dayGridMonth'
+
+      if (!isZhCN || !isMonthView) {
+        return { html: arg.dayNumberText }
+      }
+
+      const lunarText = getLunarDate(arg.date)
+
+      return {
+        html: `
+          <div class="tinker-day-content">
+            ${
+              lunarText
+                ? `<div class="tinker-lunar-date">${lunarText}</div>`
+                : ''
+            }
+            <div class="tinker-day-number">${arg.dayNumberText}</div>
+          </div>
+        `,
+      }
+    }
+
     return (
       <>
         <FullCalendar
@@ -199,6 +228,7 @@ const CalendarView = observer(
           eventResize={handleEventResize}
           datesSet={handleDatesSet}
           dayCellClassNames={dayCellClassNames}
+          dayCellContent={handleDayCellContent}
           eventContent={handleEventContent}
         />
         <EventDialog

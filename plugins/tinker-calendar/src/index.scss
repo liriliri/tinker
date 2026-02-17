@@ -32,6 +32,15 @@
   .fc-timegrid-now-indicator-line {
     border-color: #0fc25e;
   }
+
+  .fc-lunar-date {
+    color: #666;
+  }
+
+  .fc-popover {
+    background-color: #1e1e1e !important;
+    border-color: #404040;
+  }
 }
 
 .fc-day-selected {
@@ -52,7 +61,29 @@
   }
 }
 
-.dark .fc-popover {
-  background-color: #1e1e1e !important;
-  border-color: #404040;
+.fc-daygrid-day-number {
+  width: 100%;
+  text-align: right;
+}
+
+.tinker-day-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  padding: 2px 4px;
+}
+
+.tinker-day-number {
+  line-height: 1;
+  flex: 1;
+  text-align: right;
+}
+
+.tinker-lunar-date {
+  font-size: 10px;
+  color: #999;
+  line-height: 1;
+  text-align: left;
 }
