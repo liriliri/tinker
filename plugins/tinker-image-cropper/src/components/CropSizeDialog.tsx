@@ -69,9 +69,7 @@ export default function CropSizeDialog({
     <Dialog open={open} onClose={onClose} title={t('setCropSize')}>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <label
-            className={`text-sm font-medium ${tw.text.both.secondary} w-12`}
-          >
+          <label className={`text-sm font-medium ${tw.text.secondary} w-12`}>
             {t('width')}
           </label>
           <TextInput
@@ -87,9 +85,7 @@ export default function CropSizeDialog({
         </div>
 
         <div className="flex items-center gap-3">
-          <label
-            className={`text-sm font-medium ${tw.text.both.secondary} w-12`}
-          >
+          <label className={`text-sm font-medium ${tw.text.secondary} w-12`}>
             {t('height')}
           </label>
           <TextInput

@@ -23,7 +23,7 @@ export default observer(function DualPanel() {
         <textarea
           value={store.inputText}
           onChange={(e) => store.setInputText(e.target.value)}
-          className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
+          className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.primary}`}
           placeholder={t('inputPlaceholder')}
         />
       </div>
@@ -36,15 +36,13 @@ export default observer(function DualPanel() {
           title={store.outputText ? t('copy') : undefined}
           className={`relative w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${
             tw.bg.tertiary
-          } ${tw.text.both.primary} ${
-            store.outputText ? 'cursor-pointer' : ''
-          }`}
+          } ${tw.text.primary} ${store.outputText ? 'cursor-pointer' : ''}`}
         >
           {truncatedOutputText ? (
             truncatedOutputText
           ) : (
             <div className="h-full w-full flex items-center justify-center text-center">
-              <span className={tw.text.both.secondary}>
+              <span className={tw.text.secondary}>
                 {t('outputPlaceholder')}
               </span>
             </div>
@@ -77,9 +75,7 @@ export default observer(function DualPanel() {
           title={store.fileBase64 ? t('copy') : undefined}
           className={`flex-1 w-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${
             tw.bg.tertiary
-          } ${tw.text.both.primary} ${
-            store.fileBase64 ? 'cursor-pointer' : ''
-          }`}
+          } ${tw.text.primary} ${store.fileBase64 ? 'cursor-pointer' : ''}`}
         />
         {store.isEncodingFile && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -88,7 +84,7 @@ export default observer(function DualPanel() {
         )}
         {!truncatedFileBase64 && !store.isEncodingFile && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-center">
-            <span className={tw.text.both.secondary}>
+            <span className={tw.text.secondary}>
               {t('fileOutputPlaceholder')}
             </span>
           </div>

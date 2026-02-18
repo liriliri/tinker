@@ -46,7 +46,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
         className={`
           flex items-center py-1 px-2 cursor-pointer rounded
           transition-colors
-          ${isActive ? tw.primary.bg : tw.hover.both}
+          ${isActive ? tw.primary.bg : tw.hover}
         `}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={handleClick}
@@ -66,7 +66,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
           <span
             className={className(
               'text-sm truncate',
-              isActive ? 'text-white font-medium' : tw.text.both.primary
+              isActive ? 'text-white font-medium' : tw.text.primary
             )}
             title={node.label}
           >
@@ -114,7 +114,7 @@ export default function Tree<T extends TreeNodeData = TreeNodeData>({
       <div
         className={className(
           'flex-1 flex items-center justify-center p-4',
-          tw.text.both.secondary,
+          tw.text.secondary,
           customClassName
         )}
       >

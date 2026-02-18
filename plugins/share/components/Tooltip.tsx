@@ -55,7 +55,7 @@ export default function Tooltip({ content, x, y, visible }: TooltipProps) {
       ref={tooltipRef}
       className={`fixed z-50 max-w-md px-3 py-2 text-sm rounded-lg shadow-lg pointer-events-none
                  ${tw.bg.primary} dark:bg-[#2c2d30] border border-[#dcdfe6] dark:border-[#4c4d50]
-                 ${tw.text.light.primary} dark:text-[#f0f1f2] transition-opacity duration-150`}
+                 ${tw.text.primary} dark:text-[#f0f1f2] transition-opacity duration-150`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,

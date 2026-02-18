@@ -169,14 +169,14 @@ export default observer(function Editor() {
           {/* Left side - Open Hosts File button */}
           <button
             onClick={handleOpenHostsFile}
-            className={`inline-flex items-center h-6 text-xs ${tw.text.both.secondary} px-2 rounded ${tw.hover.both} transition-colors cursor-pointer`}
+            className={`inline-flex items-center h-6 text-xs ${tw.text.secondary} px-2 rounded ${tw.hover} transition-colors cursor-pointer`}
           >
             {t('openHostsFile')}
           </button>
 
           {/* Right side - Readonly badge */}
           <span
-            className={`inline-flex items-center h-6 text-xs ${tw.text.both.tertiary} ${tw.bg.secondary} px-2 rounded`}
+            className={`inline-flex items-center h-6 text-xs ${tw.text.tertiary} ${tw.bg.secondary} px-2 rounded`}
           >
             {t('readonly')}
           </span>

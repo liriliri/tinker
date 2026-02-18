@@ -10,7 +10,7 @@ export default observer(function ThemeTab() {
     <div className="space-y-6">
       <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
         <h2
-          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
+          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.primary}`}
         >
           {t('currentTheme')}
         </h2>
@@ -28,7 +28,7 @@ export default observer(function ThemeTab() {
 
       <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
         <h2
-          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
+          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.primary}`}
         >
           {t('colorPalette')}
         </h2>

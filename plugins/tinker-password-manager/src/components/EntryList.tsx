@@ -116,7 +116,7 @@ export default observer(function EntryList() {
   if (!store.selectedGroupId) {
     return (
       <div
-        className={`h-full flex items-center justify-center text-sm ${tw.text.both.secondary}`}
+        className={`h-full flex items-center justify-center text-sm ${tw.text.secondary}`}
       >
         {t('noEntries')}
       </div>

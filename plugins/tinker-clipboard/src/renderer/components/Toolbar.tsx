@@ -70,7 +70,7 @@ export default observer(function ToolbarComponent() {
           size={14}
           className={className(
             'absolute left-2 top-1/2 -translate-y-1/2',
-            tw.text.both.tertiary
+            tw.text.tertiary
           )}
         />
         <ToolbarTextInput
@@ -80,8 +80,8 @@ export default observer(function ToolbarComponent() {
           className={className(
             'w-full pl-7 pr-2 py-1',
             tw.bg.input,
-            `placeholder:${tw.text.light.tertiary}`,
-            `dark:placeholder:${tw.text.dark.tertiary}`
+            `placeholder:${tw.text.tertiary}`,
+            `dark:placeholder:${tw.text.tertiary}`
           )}
         />
       </div>
@@ -90,7 +90,7 @@ export default observer(function ToolbarComponent() {
 
       {/* Item Count */}
       {store.items.length > 0 && (
-        <span className={`text-xs ${tw.text.both.tertiary} mr-2`}>
+        <span className={`text-xs ${tw.text.tertiary} mr-2`}>
           {t('itemCount', { count: store.filteredItems.length })}
         </span>
       )}

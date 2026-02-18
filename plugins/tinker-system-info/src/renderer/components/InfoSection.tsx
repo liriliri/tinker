@@ -13,7 +13,7 @@ export default observer(function InfoSection({
   return (
     <div className="mb-6">
       {title && (
-        <h2 className={`text-base font-semibold mb-3 ${tw.text.both.primary}`}>
+        <h2 className={`text-base font-semibold mb-3 ${tw.text.primary}`}>
           {title}
         </h2>
       )}

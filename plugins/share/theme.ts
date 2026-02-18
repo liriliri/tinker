@@ -140,64 +140,28 @@ export const tw = {
   border: 'border-[#e0e0e0] dark:border-[#4a4a4a]',
 
   // Hover state utilities
-  hover: {
-    light: 'hover:bg-gray-200',
-    dark: 'dark:hover:bg-[#3a3a3c]',
-    both: 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]',
-  },
+  hover: 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]',
 
   // Active state utilities
-  active: {
-    light: 'bg-gray-300',
-    dark: 'dark:bg-[#4a4a4a]',
-    both: 'bg-gray-300 dark:bg-[#4a4a4a]',
-  },
+  active: 'bg-gray-300 dark:bg-[#4a4a4a]',
 
   // Text color utilities
   text: {
-    light: {
-      primary: 'text-gray-800',
-      secondary: 'text-gray-600',
-      tertiary: 'text-gray-500',
-    },
-    dark: {
-      primary: 'dark:text-gray-200',
-      secondary: 'dark:text-gray-300',
-      tertiary: 'dark:text-gray-400',
-    },
-    both: {
-      primary: 'text-gray-800 dark:text-gray-200',
-      secondary: 'text-gray-600 dark:text-gray-300',
-      tertiary: 'text-gray-500 dark:text-gray-400',
-    },
+    primary: 'text-gray-800 dark:text-gray-200',
+    secondary: 'text-gray-600 dark:text-gray-300',
+    tertiary: 'text-gray-500 dark:text-gray-400',
   },
 
   // Extended gray utilities
   gray: {
-    light: {
-      text300: 'text-[#cccccc]',
-      text400: 'text-[#8a8a8a]',
-      text500: 'text-[#6e6e6e]',
-      text600: 'text-[#666666]',
-      border400: 'border-[#8a8a8a]',
-      border500: 'border-[#6e6e6e]',
-    },
-    dark: {
-      text300: 'dark:text-[#858585]',
-      text400: 'dark:text-[#d4d4d4]',
-      border100: 'dark:border-[#3a3a3c]',
-      border200: 'dark:border-[#4a4a4a]',
-    },
-    both: {
-      text300: 'text-[#cccccc] dark:text-[#858585]',
-      text400: 'text-[#8a8a8a] dark:text-[#d4d4d4]',
-      text500: 'text-[#6e6e6e]',
-      text600: 'text-[#666666]',
-      border400: 'border-[#8a8a8a]',
-      border500: 'border-[#6e6e6e]',
-      border100: 'dark:border-[#3a3a3c]',
-      border200: 'border-[#4a4a4a] dark:border-[#4a4a4a]',
-    },
+    text300: 'text-[#cccccc] dark:text-[#858585]',
+    text400: 'text-[#8a8a8a] dark:text-[#d4d4d4]',
+    text500: 'text-[#6e6e6e]',
+    text600: 'text-[#666666]',
+    border400: 'border-[#8a8a8a] dark:border-[#4a4a4a]',
+    border500: 'border-[#6e6e6e]',
+    border100: 'dark:border-[#3a3a3c]',
+    border200: 'border-[#4a4a4a] dark:border-[#4a4a4a]',
   },
 } as const
 

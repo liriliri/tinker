@@ -67,7 +67,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
 
   const borderClass = isDragging
     ? tw.primary.border
-    : `${tw.gray.light.border400} ${tw.gray.dark.border200} ${tw.primary.hoverBorder}`
+    : `${tw.gray.border400} ${tw.primary.hoverBorder}`
 
   return (
     <div
@@ -80,20 +80,18 @@ const FileOpen: React.FC<FileOpenProps> = ({
     >
       <div className="text-center p-8 pointer-events-none">
         <File
-          className={`w-16 h-16 mx-auto mb-4 ${tw.gray.light.text400} ${tw.gray.dark.text300}`}
+          className={`w-16 h-16 mx-auto mb-4 ${tw.gray.text400}`}
           strokeWidth={1.5}
         />
 
         <p
-          className={`text-lg font-medium ${tw.text.both.primary} mb-2 max-w-full break-all px-4`}
+          className={`text-lg font-medium ${tw.text.primary} mb-2 max-w-full break-all px-4`}
           title={fileName}
         >
           {fileName || openTitle}
         </p>
         {!fileName && supportedFormats && (
-          <p className={`text-sm ${tw.text.both.secondary}`}>
-            {supportedFormats}
-          </p>
+          <p className={`text-sm ${tw.text.secondary}`}>{supportedFormats}</p>
         )}
       </div>
     </div>

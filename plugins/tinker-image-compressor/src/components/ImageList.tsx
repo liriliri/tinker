@@ -97,14 +97,12 @@ export default observer(function ImageList() {
             {/* Info - fixed height */}
             <div className={`p-2 ${tw.bg.secondary} flex-shrink-0`}>
               <p
-                className={`text-xs font-medium ${tw.text.both.primary} truncate mb-1`}
+                className={`text-xs font-medium ${tw.text.primary} truncate mb-1`}
                 title={image.fileName}
               >
                 {image.fileName}
               </p>
-              <div
-                className={`text-[10px] ${tw.gray.light.text500} ${tw.gray.light.text400}`}
-              >
+              <div className={`text-[10px] ${tw.gray.text400}`}>
                 {image.compressedBlob ? (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
@@ -114,7 +112,7 @@ export default observer(function ImageList() {
                       <span className="text-gray-400 dark:text-gray-600">
                         →
                       </span>
-                      <span className={`font-medium ${tw.text.both.primary}`}>
+                      <span className={`font-medium ${tw.text.primary}`}>
                         {fileSize(image.compressedSize)}
                       </span>
                     </div>

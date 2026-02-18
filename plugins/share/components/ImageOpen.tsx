@@ -54,7 +54,7 @@ const ImageOpen: React.FC<ImageOpenProps> = ({
         />
 
         <p
-          className={`text-lg font-medium ${tw.text.light.primary} dark:text-[#cccccc] mb-2`}
+          className={`text-lg font-medium ${tw.text.primary} dark:text-[#cccccc] mb-2`}
         >
           {openTitle}
         </p>

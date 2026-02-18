@@ -97,8 +97,8 @@ export default observer(function Sidebar() {
         key={cfg.id}
         className={className(
           'flex items-center gap-2 px-3 py-2 cursor-pointer',
-          tw.hover.both,
-          isSelected && tw.active.both
+          tw.hover,
+          isSelected && tw.active
         )}
         onClick={() => handleSelect(cfg.id)}
         onContextMenu={(e) => handleConfigContextMenu(e, cfg)}
@@ -131,9 +131,9 @@ export default observer(function Sidebar() {
       <div
         className={className(
           'px-3 py-2 cursor-pointer border-b flex-shrink-0',
-          tw.hover.both,
+          tw.hover,
           tw.border,
-          viewMode === 'system' && tw.active.both
+          viewMode === 'system' && tw.active
         )}
         onClick={handleSystemView}
       >

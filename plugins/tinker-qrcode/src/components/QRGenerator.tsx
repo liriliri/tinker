@@ -55,7 +55,7 @@ export default observer(function QRGenerator() {
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
             placeholder={t('placeholder')}
-            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
+            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.primary}`}
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ export default observer(function QRGenerator() {
             />
           </div>
         ) : (
-          <div className={`text-center px-4 ${tw.text.both.secondary}`}>
+          <div className={`text-center px-4 ${tw.text.secondary}`}>
             <div className="text-base mb-1">{t('emptyTitle')}</div>
             <div className="text-sm opacity-75">{t('emptySubtitle')}</div>
           </div>

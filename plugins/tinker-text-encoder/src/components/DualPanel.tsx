@@ -21,7 +21,7 @@ export default observer(function DualPanel() {
               store.setInputText(e.target.value)
               store.clearOutput()
             }}
-            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
+            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.primary}`}
             placeholder={t('inputPlaceholder')}
           />
         </div>
@@ -36,15 +36,13 @@ export default observer(function DualPanel() {
             title={store.outputText ? t('copy') : undefined}
             className={`w-full h-full p-4 overflow-auto whitespace-pre-wrap break-words ${
               tw.bg.tertiary
-            } ${tw.text.both.primary} ${
-              store.outputText ? 'cursor-pointer' : ''
-            }`}
+            } ${tw.text.primary} ${store.outputText ? 'cursor-pointer' : ''}`}
           >
             {store.outputText ? (
               store.outputText
             ) : (
               <div className="h-full w-full flex items-center justify-center text-center">
-                <span className={tw.text.both.secondary}>
+                <span className={tw.text.secondary}>
                   {t('outputPlaceholder')}
                 </span>
               </div>

@@ -13,7 +13,7 @@ export default observer(function HashResult({ label, value }: HashResultProps) {
       <textarea
         value={value}
         readOnly
-        className={`w-full px-3 py-2 pb-10 text-sm font-mono border ${tw.border} rounded-lg ${tw.bg.input} ${tw.text.both.primary} resize-none focus:outline-none`}
+        className={`w-full px-3 py-2 pb-10 text-sm font-mono border ${tw.border} rounded-lg ${tw.bg.input} ${tw.text.primary} resize-none focus:outline-none`}
         rows={3}
       />
       <div

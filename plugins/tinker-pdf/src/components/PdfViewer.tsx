@@ -412,7 +412,7 @@ export default observer(function PdfViewer() {
   if (store.isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className={`text-center ${tw.text.both.secondary}`}>
+        <div className={`text-center ${tw.text.secondary}`}>
           <p>Loading...</p>
         </div>
       </div>

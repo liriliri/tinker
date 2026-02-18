@@ -150,11 +150,6 @@ import { tw, THEME_COLORS } from 'share/theme'
 <div className="border-[#e0e0e0]">
 ```
 
-**Common patterns**:
-- Full-screen layout: `<div className="h-screen flex flex-col">`
-- Use `.both` variants for combined light/dark: `tw.bg.both.primary`, `tw.border`
-- Copy success state: `className={copied ? tw.primary.text : ''}`
-
 **Complete theme API**: See `share/README.md`
 
 **Style files**: Only use SCSS for third-party library overrides. Use Tailwind for everything else.

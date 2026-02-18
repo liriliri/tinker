@@ -50,18 +50,18 @@ export default observer(function ToolbarComponent() {
       <div className="relative w-48 ml-2">
         <Search
           size={14}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary}`}
+          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
         />
         <ToolbarTextInput
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
-          className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`}
         />
         {store.searchQuery && (
           <button
             onClick={() => store.setSearchQuery('')}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary} hover:${tw.text.both.primary}`}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary} hover:${tw.text.primary}`}
           >
             <X size={14} />
           </button>
@@ -72,7 +72,7 @@ export default observer(function ToolbarComponent() {
         checked={store.showCompleted}
         onChange={(checked) => store.setShowCompleted(checked)}
       >
-        <span className={tw.text.both.secondary}>{t('showCompleted')}</span>
+        <span className={tw.text.secondary}>{t('showCompleted')}</span>
       </Checkbox>
 
       <div className="ml-auto">

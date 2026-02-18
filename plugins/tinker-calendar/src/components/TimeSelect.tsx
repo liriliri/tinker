@@ -40,7 +40,7 @@ const TimeSelect = observer(
         </select>
         <ChevronDown
           size={16}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${tw.text.both.secondary}`}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${tw.text.secondary}`}
         />
       </div>
     )

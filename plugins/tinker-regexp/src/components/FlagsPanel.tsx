@@ -21,7 +21,7 @@ export default observer(function FlagsPanel() {
             onChange={() => store.toggleFlag(flag)}
             className="p-1 rounded"
           >
-            <span className={`${tw.text.both.secondary}`}>
+            <span className={`${tw.text.secondary}`}>
               <strong>{flag}</strong> - {t(`flagLabels.${flag}`)}
             </span>
           </Checkbox>

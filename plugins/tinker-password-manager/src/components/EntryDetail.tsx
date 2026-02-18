@@ -16,7 +16,7 @@ export default observer(function EntryDetail() {
   if (!entry) {
     return (
       <div
-        className={`h-full flex items-center justify-center text-sm ${tw.bg.tertiary} ${tw.text.both.secondary}`}
+        className={`h-full flex items-center justify-center text-sm ${tw.bg.tertiary} ${tw.text.secondary}`}
       >
         {t('noEntries')}
       </div>
@@ -61,7 +61,7 @@ export default observer(function EntryDetail() {
             <h2 className="text-xl font-bold">{entry.title}</h2>
             <button
               onClick={handleDelete}
-              className={`p-2 rounded ${tw.hover.both} text-red-600 dark:text-red-400`}
+              className={`p-2 rounded ${tw.hover} text-red-600 dark:text-red-400`}
               title={t('deleteEntry')}
             >
               <Trash2 size={18} />
@@ -71,7 +71,7 @@ export default observer(function EntryDetail() {
           <div className="space-y-4">
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
               >
                 {t('title')}
               </label>
@@ -85,7 +85,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
               >
                 {t('username')}
               </label>
@@ -104,7 +104,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
               >
                 {t('password')}
               </label>
@@ -120,7 +120,7 @@ export default observer(function EntryDetail() {
                   />
                   <button
                     onClick={handleTogglePassword}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover.both}`}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover}`}
                     title={
                       store.showPassword ? t('hidePassword') : t('showPassword')
                     }
@@ -141,7 +141,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
               >
                 {t('url')}
               </label>
@@ -155,7 +155,7 @@ export default observer(function EntryDetail() {
 
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${tw.text.both.secondary}`}
+                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
               >
                 {t('notes')}
               </label>
@@ -168,7 +168,7 @@ export default observer(function EntryDetail() {
             </div>
 
             <div className={`pt-4 border-t ${tw.border}`}>
-              <div className={`text-xs ${tw.text.both.secondary} space-y-1`}>
+              <div className={`text-xs ${tw.text.secondary} space-y-1`}>
                 <div>
                   {t('created')}:{' '}
                   {new Date(entry.times.creationTime).toLocaleString()}

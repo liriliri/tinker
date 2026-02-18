@@ -69,7 +69,7 @@ export default observer(function Sidebar() {
                   'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-sm',
                   isActive
                     ? [tw.primary.bg, 'text-white shadow-sm']
-                    : [tw.hover.both, tw.text.both.primary]
+                    : [tw.hover, tw.text.primary]
                 )}
                 onClick={() => store.setCurrentFilter(category.id)}
               >
@@ -80,7 +80,7 @@ export default observer(function Sidebar() {
                 <span
                   className={className(
                     'text-xs font-semibold tabular-nums min-w-[20px] text-right',
-                    isActive ? 'opacity-70' : tw.text.both.secondary
+                    isActive ? 'opacity-70' : tw.text.secondary
                   )}
                 >
                   {category.getCount()}
@@ -93,7 +93,7 @@ export default observer(function Sidebar() {
 
       <div className={`p-3 border-t ${tw.border}`}>
         <button
-          className={`w-full px-3 py-1.5 text-xs ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+          className={`w-full px-3 py-1.5 text-xs ${tw.text.secondary} ${tw.hover} rounded-md transition-colors`}
           onClick={handleClearCompleted}
         >
           {t('clearCompleted')}

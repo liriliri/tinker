@@ -48,7 +48,7 @@ export default observer(function ExpressionSection() {
     <div className={`border-b ${tw.border} ${tw.bg.input}`}>
       <div className="relative px-6 py-3">
         <div className="flex items-center gap-2">
-          <span className={`${tw.text.both.tertiary} text-xl`}>/</span>
+          <span className={`${tw.text.tertiary} text-xl`}>/</span>
           <div className="flex-1">
             <CodeMirrorEditor
               value={store.pattern}
@@ -59,9 +59,7 @@ export default observer(function ExpressionSection() {
               onEditorReady={setEditor}
             />
           </div>
-          <span className={`${tw.text.both.tertiary} text-xl`}>
-            /{store.flags}
-          </span>
+          <span className={`${tw.text.tertiary} text-xl`}>/{store.flags}</span>
         </div>
       </div>
       <Tooltip

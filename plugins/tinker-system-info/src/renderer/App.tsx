@@ -147,7 +147,7 @@ export default observer(function App() {
                               <span>
                                 {disk.name}
                                 {details && (
-                                  <span className={tw.text.both.tertiary}>
+                                  <span className={tw.text.tertiary}>
                                     {' '}
                                     ({details})
                                   </span>

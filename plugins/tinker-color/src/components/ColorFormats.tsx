@@ -77,7 +77,7 @@ function FormatRow({
 
   return (
     <div className="flex items-center gap-4">
-      <span className={`${tw.text.both.primary} font-medium w-24 text-sm`}>
+      <span className={`${tw.text.primary} font-medium w-24 text-sm`}>
         {label}
       </span>
       <div className="relative flex-1">
@@ -88,14 +88,14 @@ function FormatRow({
           onBlur={handleBlur}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          className={`w-full px-4 py-2.5 pr-10 rounded-lg font-mono text-sm focus:ring-2 ${tw.bg.input} ${tw.text.both.primary} ${tw.primary.focusRing}`}
+          className={`w-full px-4 py-2.5 pr-10 rounded-lg font-mono text-sm focus:ring-2 ${tw.bg.input} ${tw.text.primary} ${tw.primary.focusRing}`}
         />
         <CopyButton
           text={cssValue}
           title={copyTitle}
           variant="icon"
-          iconClassName={tw.text.both.primary}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover.both}`}
+          iconClassName={tw.text.primary}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
         />
       </div>
     </div>

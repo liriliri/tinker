@@ -78,8 +78,8 @@ export default observer(function Converter() {
                 onClick={() => copyToClipboard(dateToTimestampResult, 'date')}
                 className={
                   copiedDate
-                    ? `p-1 rounded ${tw.primary.text} ${tw.hover.both} transition-colors`
-                    : `p-1 rounded ${tw.hover.both} transition-colors dark:text-gray-200`
+                    ? `p-1 rounded ${tw.primary.text} ${tw.hover} transition-colors`
+                    : `p-1 rounded ${tw.hover} transition-colors dark:text-gray-200`
                 }
                 title={t('copy')}
               >
@@ -139,8 +139,8 @@ export default observer(function Converter() {
                 disabled={!timestampToDateResult}
                 className={
                   copiedTimestamp
-                    ? `p-1 rounded ${tw.primary.text} ${tw.hover.both} transition-colors disabled:opacity-30 disabled:cursor-not-allowed`
-                    : `p-1 rounded ${tw.hover.both} transition-colors disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-200`
+                    ? `p-1 rounded ${tw.primary.text} ${tw.hover} transition-colors disabled:opacity-30 disabled:cursor-not-allowed`
+                    : `p-1 rounded ${tw.hover} transition-colors disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-200`
                 }
                 title={t('copy')}
               >

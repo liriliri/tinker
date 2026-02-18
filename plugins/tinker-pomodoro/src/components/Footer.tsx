@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { tw } from 'share/theme'
 import store from '../store'
 
-const BUTTON_CLASSES = `${tw.text.both.secondary} hover:text-gray-800 dark:hover:text-gray-200 transition-colors`
+const BUTTON_CLASSES = `${tw.text.secondary} hover:text-gray-800 dark:hover:text-gray-200 transition-colors`
 
 export default observer(function Footer() {
   const { t } = useTranslation()
@@ -70,9 +70,7 @@ export default observer(function Footer() {
 
       {/* Center: Round counter */}
       <div className="absolute left-1/2 -translate-x-1/2">
-        <span
-          className={`text-base ${tw.text.light.secondary} ${tw.text.dark.tertiary}`}
-        >
+        <span className={`text-base ${tw.text.secondary} ${tw.text.tertiary}`}>
           {store.currentRound}/{store.totalRounds}
           {store.totalFocusCompleted > 0 && (
             <span

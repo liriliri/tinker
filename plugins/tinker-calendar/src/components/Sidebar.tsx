@@ -88,7 +88,7 @@ const Sidebar = observer(() => {
       <div className="px-3 pt-3 flex-1 overflow-y-auto">
         {eventsForSelectedDate.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className={`text-sm ${tw.text.both.secondary}`}>{t('empty')}</p>
+            <p className={`text-sm ${tw.text.secondary}`}>{t('empty')}</p>
           </div>
         ) : (
           <div className="space-y-3 pb-6">
@@ -99,13 +99,11 @@ const Sidebar = observer(() => {
               >
                 <div className="flex items-center gap-2.5">
                   <div className="flex-1 min-w-0">
-                    <h3
-                      className={`text-sm font-medium ${tw.text.both.primary}`}
-                    >
+                    <h3 className={`text-sm font-medium ${tw.text.primary}`}>
                       {event.title}
                     </h3>
                     {!event.allDay && (
-                      <p className={`text-xs mt-0.5 ${tw.text.both.secondary}`}>
+                      <p className={`text-xs mt-0.5 ${tw.text.secondary}`}>
                         {formatEventTime(event, store.selectedDate)}
                       </p>
                     )}
@@ -114,14 +112,14 @@ const Sidebar = observer(() => {
                   <div className="flex-shrink-0 flex items-center gap-0.5">
                     <button
                       onClick={() => handleEditEvent(event)}
-                      className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+                      className={`p-1.5 ${tw.text.secondary} ${tw.hover} rounded-md transition-colors`}
                       title={t('editEvent')}
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       onClick={() => handleDeleteEvent(event)}
-                      className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+                      className={`p-1.5 ${tw.text.secondary} ${tw.hover} rounded-md transition-colors`}
                       title={t('deleteEvent')}
                     >
                       <Trash2 size={14} />
@@ -136,7 +134,7 @@ const Sidebar = observer(() => {
 
       <div className={`p-3 border-t ${tw.border}`}>
         <button
-          className={`w-full px-3 py-1.5 text-xs ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full px-3 py-1.5 text-xs ${tw.text.secondary} ${tw.hover} rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={handleClearAll}
           disabled={eventsForSelectedDate.length === 0}
         >

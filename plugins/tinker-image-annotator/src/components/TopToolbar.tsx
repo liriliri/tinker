@@ -228,9 +228,7 @@ export default observer(function TopToolbar() {
         <>
           <ToolbarSeparator />
           <div className="flex items-center gap-1.5 px-1">
-            <label
-              className={`text-xs whitespace-nowrap ${tw.text.both.secondary}`}
-            >
+            <label className={`text-xs whitespace-nowrap ${tw.text.secondary}`}>
               {t('strokeWidth')}:
             </label>
             <Select
@@ -269,9 +267,7 @@ export default observer(function TopToolbar() {
         <>
           <ToolbarSeparator />
           <div className="flex items-center gap-1.5 px-1">
-            <label
-              className={`text-xs whitespace-nowrap ${tw.text.both.secondary}`}
-            >
+            <label className={`text-xs whitespace-nowrap ${tw.text.secondary}`}>
               {t('fontSize')}:
             </label>
             <Select

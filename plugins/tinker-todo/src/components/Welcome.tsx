@@ -22,7 +22,7 @@ export default observer(function Welcome({
         <div className="space-y-3">
           <button
             onClick={onCreateFile}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover} transition-colors border ${tw.border}`}
           >
             <FilePlus size={20} />
             <span className="font-medium">{t('createFile')}</span>
@@ -30,7 +30,7 @@ export default observer(function Welcome({
 
           <button
             onClick={onOpenFile}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover} transition-colors border ${tw.border}`}
           >
             <FileText size={20} />
             <span className="font-medium">{t('openFile')}</span>

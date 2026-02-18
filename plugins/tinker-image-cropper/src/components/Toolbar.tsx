@@ -288,7 +288,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
         <>
           {/* Crop box dimensions */}
           <button
-            className={`text-xs px-2 py-1 ${tw.hover.both} rounded transition-colors cursor-pointer`}
+            className={`text-xs px-2 py-1 ${tw.hover} rounded transition-colors cursor-pointer`}
             onClick={() => setShowSizeDialog(true)}
             disabled={store.cropBoxWidth <= 0 || store.cropBoxHeight <= 0}
             title={t('setCropSize')}
@@ -298,7 +298,7 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
                 {store.cropBoxWidth} × {store.cropBoxHeight}
               </div>
             ) : (
-              <div className={tw.text.both.tertiary}>-</div>
+              <div className={tw.text.tertiary}>-</div>
             )}
           </button>
 

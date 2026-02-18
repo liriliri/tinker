@@ -13,7 +13,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ children, className = '' }: ToolbarProps) {
-  const baseClass = `${tw.bg.secondary} border-b ${tw.border} ${tw.text.dark.primary} px-1.5 py-1.5 flex gap-1 items-center`
+  const baseClass = `${tw.bg.secondary} border-b ${tw.border} ${tw.text.primary} px-1.5 py-1.5 flex gap-1 items-center`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
 }
@@ -47,7 +47,7 @@ export function ToolbarButton({
   const variantClass =
     variant === 'toggle' && active
       ? `${tw.primary.bg} text-white ${tw.primary.bgHover}`
-      : `${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
+      : `${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed`
 
   const showContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
     if (!menu || menu.length === 0) return
@@ -172,7 +172,7 @@ export function ToolbarSpacer() {
   return <div className="flex-1" />
 }
 
-const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
+const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
 
 export type ToolbarTextInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
@@ -188,7 +188,7 @@ export function ToolbarTextInput({
 
 export const TOOLBAR_ICON_SIZE = 14
 
-const toolbarLabelClassName = `text-xs ${tw.text.both.secondary} whitespace-nowrap`
+const toolbarLabelClassName = `text-xs ${tw.text.secondary} whitespace-nowrap`
 
 export type ToolbarLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
 

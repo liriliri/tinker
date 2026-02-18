@@ -110,7 +110,7 @@ const GroupItem = observer(function GroupItem({
         onContextMenu={handleContextMenu}
         className={className(
           'flex items-center py-1 px-2 cursor-pointer rounded transition-colors',
-          isSelected ? tw.primary.bg : tw.hover.both
+          isSelected ? tw.primary.bg : tw.hover
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
@@ -131,7 +131,7 @@ const GroupItem = observer(function GroupItem({
         <span
           className={className(
             'text-sm flex-1 truncate',
-            isSelected ? 'text-white font-medium' : tw.text.both.primary
+            isSelected ? 'text-white font-medium' : tw.text.primary
           )}
         >
           {group.name}
@@ -139,7 +139,7 @@ const GroupItem = observer(function GroupItem({
         <span
           className={className(
             'text-xs ml-2',
-            isSelected ? 'text-white opacity-90' : tw.text.both.secondary
+            isSelected ? 'text-white opacity-90' : tw.text.secondary
           )}
         >
           {group.entries.length}
@@ -159,7 +159,7 @@ export default observer(function GroupTree() {
 
   if (!store.rootGroup) {
     return (
-      <div className={`p-4 text-center text-sm ${tw.text.both.tertiary}`}>
+      <div className={`p-4 text-center text-sm ${tw.text.tertiary}`}>
         {t('noEntries')}
       </div>
     )

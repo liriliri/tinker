@@ -63,7 +63,7 @@ export default observer(function ToolbarComponent() {
               </ToolbarButton>
 
               <span
-                className={`text-xs ${tw.text.both.primary} min-w-[80px] text-center px-2`}
+                className={`text-xs ${tw.text.primary} min-w-[80px] text-center px-2`}
               >
                 {`${store.currentPage} / ${store.numPages}`}
               </span>
@@ -90,7 +90,7 @@ export default observer(function ToolbarComponent() {
               </ToolbarButton>
 
               <span
-                className={`text-xs ${tw.text.both.primary} min-w-[40px] text-center px-1`}
+                className={`text-xs ${tw.text.primary} min-w-[40px] text-center px-1`}
               >
                 {`${Math.round(store.scale * 100)}%`}
               </span>

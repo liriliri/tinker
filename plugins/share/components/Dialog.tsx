@@ -120,7 +120,7 @@ export const DialogButton = ({
   const variantClassName =
     variant === 'primary'
       ? `${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`
-      : `${tw.bg.tertiary} ${tw.hover.both} ${tw.text.both.secondary} rounded`
+      : `${tw.bg.tertiary} ${tw.hover} ${tw.text.secondary} rounded`
   const combinedClassName =
     `${baseClassName} ${variantClassName} ${className}`.trim()
 

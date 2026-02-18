@@ -197,7 +197,7 @@ export default observer(function ProcessList() {
   if (store.isLoading && store.processes.length === 0) {
     return (
       <div
-        className={`flex items-center justify-center h-full ${tw.text.both.secondary}`}
+        className={`flex items-center justify-center h-full ${tw.text.secondary}`}
       >
         {t('loading')}
       </div>

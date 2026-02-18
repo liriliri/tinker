@@ -23,7 +23,7 @@ export default observer(function GeneratedPassword() {
           text={store.generatedPassword}
           size={18}
           className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded transition-colors`}
-          iconClassName={`${tw.text.both.tertiary}`}
+          iconClassName={`${tw.text.tertiary}`}
           title={t('copyToClipboard')}
         />
       )}

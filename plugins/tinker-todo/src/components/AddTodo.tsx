@@ -77,7 +77,7 @@ export default observer(function AddTodo() {
           />
           <button
             onClick={handleClearDate}
-            className={`absolute right-1 top-1/2 -translate-y-1/2 ${tw.text.both.tertiary} ${tw.hover.both} rounded p-0.5`}
+            className={`absolute right-1 top-1/2 -translate-y-1/2 ${tw.text.tertiary} ${tw.hover} rounded p-0.5`}
             title={t('clearDate')}
           >
             <X size={12} />
@@ -97,7 +97,7 @@ export default observer(function AddTodo() {
                   className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                     isSelected
                       ? `${colors.bg} text-white`
-                      : `${tw.text.both.secondary} ${tw.hover.both}`
+                      : `${tw.text.secondary} ${tw.hover}`
                   }`}
                   title={t(priority.labelKey)}
                 >

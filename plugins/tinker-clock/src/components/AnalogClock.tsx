@@ -126,7 +126,7 @@ export default observer(function AnalogClock() {
             return (
               <div
                 key={num}
-                className={`absolute font-medium ${tw.text.both}`}
+                className={`absolute font-medium ${tw.text.primary}`}
                 style={{
                   left: `calc(50% + ${xPercent}%)`,
                   top: `calc(50% + ${yPercent}%)`,
@@ -144,7 +144,7 @@ export default observer(function AnalogClock() {
 
           {/* Date display */}
           <div
-            className={`absolute left-1/2 -translate-x-1/2 text-sm font-medium ${tw.text.both} opacity-70`}
+            className={`absolute left-1/2 -translate-x-1/2 text-sm font-medium ${tw.text.primary} opacity-70`}
             style={{
               top: '65%',
               textShadow: isDark

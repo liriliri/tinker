@@ -60,12 +60,12 @@ export default function CanvasSizeDialog({
     <Dialog open={open} onClose={onClose} title={t('setCanvasSize')}>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <label className={`text-sm font-medium ${tw.text.both.primary} w-12`}>
+          <label className={`text-sm font-medium ${tw.text.primary} w-12`}>
             {t('width')}
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border} rounded ${tw.bg.tertiary} ${tw.text.both.primary} focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border} rounded ${tw.bg.tertiary} ${tw.text.primary} focus:outline-none`}
             value={width}
             onChange={(e) => setWidth(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -75,12 +75,12 @@ export default function CanvasSizeDialog({
         </div>
 
         <div className="flex items-center gap-3">
-          <label className={`text-sm font-medium ${tw.text.both.primary} w-12`}>
+          <label className={`text-sm font-medium ${tw.text.primary} w-12`}>
             {t('height')}
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border} rounded ${tw.bg.tertiary} ${tw.text.both.primary} focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border} rounded ${tw.bg.tertiary} ${tw.text.primary} focus:outline-none`}
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             onKeyDown={handleKeyDown}

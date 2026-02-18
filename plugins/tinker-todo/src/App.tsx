@@ -47,9 +47,9 @@ export default observer(function App() {
                       <div className="text-center">
                         <CheckCircle2
                           size={48}
-                          className={`mx-auto ${tw.text.both.secondary} opacity-30 mb-3`}
+                          className={`mx-auto ${tw.text.secondary} opacity-30 mb-3`}
                         />
-                        <p className={`text-sm ${tw.text.both.secondary}`}>
+                        <p className={`text-sm ${tw.text.secondary}`}>
                           {store.searchQuery
                             ? t('noSearchResults')
                             : t('noTasks')}

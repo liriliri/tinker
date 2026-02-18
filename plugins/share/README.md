@@ -26,17 +26,17 @@ import { tw, THEME_COLORS } from 'share/theme'
 // Primary colors
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`} />
 <Copy className={copied ? tw.primary.text : ''} />
-<span className={`${tw.text.both.primary} ${tw.primary.textHover}`}>Hover me</span>
+<span className={`${tw.text.primary} ${tw.primary.textHover}`}>Hover me</span>
 
-// Backgrounds & Borders (use .both for light/dark)
-<div className={tw.bg.both.secondary}>Content</div>
-<input className={`${tw.bg.both.input} border ${tw.border}`} />
+// Backgrounds & Borders
+<div className={tw.bg.secondary}>Content</div>
+<input className={`${tw.bg.input} border ${tw.border}`} />
 
 // States
-<div className={`${tw.hover.both} ${isActive ? tw.active.both : ''}`} />
+<div className={`${tw.hover} ${isActive ? tw.active : ''}`} />
 ```
 
-**Key patterns**: `tw.primary.*`, `tw.bg.{light|dark|both}.*`, `tw.border.*`, `tw.text.*`, `tw.{hover|active}.*`. Always prefer `.both` variants.
+**Key patterns**: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
 
 ## BaseStore
 

@@ -8,7 +8,7 @@ export default function TextInput({
   type = 'text',
   ...rest
 }: TextInputProps) {
-  const baseClassName = `w-full px-3 py-2 border ${tw.border} ${tw.primary.focusBorder} rounded ${tw.bg.input} ${tw.text.light.primary} ${tw.text.dark.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
+  const baseClassName = `w-full px-3 py-2 border ${tw.border} ${tw.primary.focusBorder} rounded ${tw.bg.input} ${tw.text.primary} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
   const combinedClassName = `${baseClassName} ${className}`.trim()
 
   return <input type={type} className={combinedClassName} {...rest} />

@@ -89,7 +89,7 @@ export default observer(function Outline() {
     <span
       className={className(
         'text-sm truncate',
-        tw.text.both.primary,
+        tw.text.primary,
         item.bold && 'font-bold',
         item.italic && 'italic'
       )}

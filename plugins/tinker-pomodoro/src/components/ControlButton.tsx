@@ -21,9 +21,9 @@ export default observer(function ControlButton() {
                    hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         {store.isRunning ? (
-          <Pause size={18} className={tw.text.both.primary} />
+          <Pause size={18} className={tw.text.primary} />
         ) : (
-          <Play size={18} className={`${tw.text.both.primary} ml-0.5`} />
+          <Play size={18} className={`${tw.text.primary} ml-0.5`} />
         )}
       </button>
     </div>

@@ -28,7 +28,7 @@ export default observer(function App() {
                   value={store.input}
                   onChange={(e) => store.setInput(e.target.value)}
                   placeholder={t('placeholder')}
-                  className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
+                  className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.primary}`}
                 />
               </div>
             ) : (

@@ -23,10 +23,10 @@ const Sidebar = observer(() => {
       <div className={`p-4 border-b ${tw.border} space-y-4`}>
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className={`text-sm ${tw.text.both.primary}`}>
+            <label className={`text-sm ${tw.text.primary}`}>
               {t('padding')}
             </label>
-            <span className={`text-sm ${tw.text.both.secondary}`}>
+            <span className={`text-sm ${tw.text.secondary}`}>
               {store.padding}px
             </span>
           </div>
@@ -40,10 +40,10 @@ const Sidebar = observer(() => {
 
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className={`text-sm ${tw.text.both.primary}`}>
+            <label className={`text-sm ${tw.text.primary}`}>
               {t('spacing')}
             </label>
-            <span className={`text-sm ${tw.text.both.secondary}`}>
+            <span className={`text-sm ${tw.text.secondary}`}>
               {store.spacing}px
             </span>
           </div>
@@ -57,10 +57,10 @@ const Sidebar = observer(() => {
 
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className={`text-sm ${tw.text.both.primary}`}>
+            <label className={`text-sm ${tw.text.primary}`}>
               {t('radius')}
             </label>
-            <span className={`text-sm ${tw.text.both.secondary}`}>
+            <span className={`text-sm ${tw.text.secondary}`}>
               {store.radius}px
             </span>
           </div>

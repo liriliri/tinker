@@ -18,11 +18,9 @@ export default observer(function InputFields({
     <div className="grid grid-cols-2 gap-4">
       {/* Service Name */}
       <div>
-        <label
-          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
-        >
+        <label className={`block text-sm mb-2 font-medium ${tw.text.primary}`}>
           {t('serviceName')}{' '}
-          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
+          <span className={`text-xs font-normal ${tw.text.secondary}`}>
             {t('serviceExample')}
           </span>
         </label>
@@ -39,11 +37,9 @@ export default observer(function InputFields({
 
       {/* Passphrase */}
       <div>
-        <label
-          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
-        >
+        <label className={`block text-sm mb-2 font-medium ${tw.text.primary}`}>
           {t('passphrase')}{' '}
-          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
+          <span className={`text-xs font-normal ${tw.text.secondary}`}>
             {t('passphraseExample')}
           </span>
         </label>
@@ -60,7 +56,7 @@ export default observer(function InputFields({
           <button
             type="button"
             onClick={() => store.toggleShowPhrase()}
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${tw.text.both.secondary} hover:opacity-70 transition-opacity`}
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${tw.text.secondary} hover:opacity-70 transition-opacity`}
             title={store.showPhrase ? 'Hide passphrase' : 'Show passphrase'}
           >
             {store.showPhrase ? <Eye size={18} /> : <EyeOff size={18} />}

@@ -22,12 +22,12 @@ export default observer(function TimerDisplay() {
     <div className="flex flex-col items-center">
       <CircularProgress progress={store.progress} mode={store.mode}>
         <div
-          className={`text-5xl font-mono ${tw.text.light.primary} dark:text-gray-100`}
+          className={`text-5xl font-mono ${tw.text.primary} dark:text-gray-100`}
         >
           {store.formattedTime}
         </div>
         <div
-          className={`absolute top-[66%] text-sm tracking-widest ${tw.text.light.secondary} ${tw.text.dark.tertiary} uppercase`}
+          className={`absolute top-[66%] text-sm tracking-widest ${tw.text.secondary} ${tw.text.tertiary} uppercase`}
         >
           {getModeLabel()}
         </div>

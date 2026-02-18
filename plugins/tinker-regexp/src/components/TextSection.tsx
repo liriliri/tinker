@@ -112,20 +112,17 @@ export default observer(function TextSection() {
                 <div className="mb-2">
                   <strong>{t('matchLabel')}:</strong> "{hoverMatch.text}"
                 </div>
-                <div className={`${tw.text.both.secondary} text-xs`}>
+                <div className={`${tw.text.secondary} text-xs`}>
                   {t('positionLabel')}: {hoverMatch.index} -{' '}
                   {hoverMatch.index + hoverMatch.length}
                 </div>
                 {hoverMatch.groups.length > 0 && (
                   <div className={`mt-2 pt-2 border-t ${tw.border}`}>
-                    <div className={`${tw.text.both.secondary} text-xs mb-1`}>
+                    <div className={`${tw.text.secondary} text-xs mb-1`}>
                       {t('groupsLabel')}:
                     </div>
                     {hoverMatch.groups.map((group, i) => (
-                      <div
-                        key={i}
-                        className={`${tw.text.both.secondary} text-xs`}
-                      >
+                      <div key={i} className={`${tw.text.secondary} text-xs`}>
                         {i + 1}: {group || t('emptyGroup')}
                       </div>
                     ))}

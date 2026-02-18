@@ -36,10 +36,10 @@ export default function CopyButton({
   if (variant === 'icon') {
     baseClass = 'flex items-center justify-center'
   } else if (variant === 'toolbar') {
-    baseClass = `p-1.5 rounded transition-colors ${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
+    baseClass = `p-1.5 rounded transition-colors ${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed`
   } else {
     // default variant
-    baseClass = `flex-shrink-0 px-3 py-2 rounded ${tw.bg.secondary} ${tw.hover.both}`
+    baseClass = `flex-shrink-0 px-3 py-2 rounded ${tw.bg.secondary} ${tw.hover}`
   }
 
   // Apply primary color to button when copied (for toolbar variant)

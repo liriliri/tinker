@@ -26,10 +26,10 @@ export default observer(function InfoRow({ label, value }: InfoRowProps) {
       <div
         className={`flex items-center justify-between py-2 ${tw.border} border-b`}
       >
-        <span className={`text-sm ${tw.text.both.secondary}`}>{label}</span>
+        <span className={`text-sm ${tw.text.secondary}`}>{label}</span>
         <span
           onClick={handleValueClick}
-          className={`text-sm ${tw.text.both.primary} ${tw.primary.textHover} cursor-pointer transition-colors`}
+          className={`text-sm ${tw.text.primary} ${tw.primary.textHover} cursor-pointer transition-colors`}
           title={t('clickToCopy')}
         >
           {value}

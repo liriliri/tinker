@@ -174,11 +174,11 @@ export default observer(function ThumbnailSidebar() {
           onClick={() => store.setSidebarView('thumbnails')}
           className={`
             flex-1 flex items-center justify-center py-2 px-3
-            transition-colors ${tw.hover.both}
+            transition-colors ${tw.hover}
             ${
               store.sidebarView === 'thumbnails'
                 ? tw.primary.text
-                : tw.text.both.secondary
+                : tw.text.secondary
             }
           `}
           title="Thumbnails"
@@ -189,11 +189,11 @@ export default observer(function ThumbnailSidebar() {
           onClick={() => store.setSidebarView('outline')}
           className={`
             flex-1 flex items-center justify-center py-2 px-3
-            transition-colors ${tw.hover.both}
+            transition-colors ${tw.hover}
             ${
               store.sidebarView === 'outline'
                 ? tw.primary.text
-                : tw.text.both.secondary
+                : tw.text.secondary
             }
           `}
           title="Outline"

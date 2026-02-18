@@ -16,9 +16,7 @@ export default observer(function ZoomControls() {
   const isDisabled = !store.mindMap
   const buttonBase =
     'h-9 w-9 flex items-center justify-center transition-colors'
-  const buttonState = isDisabled
-    ? 'cursor-not-allowed opacity-40'
-    : tw.hover.both
+  const buttonState = isDisabled ? 'cursor-not-allowed opacity-40' : tw.hover
   const shellBase = `border shadow-md ${tw.bg.primary} ${tw.border}`
   const menuItemBase = 'w-full px-3 py-1 text-sm text-left transition-colors'
 
@@ -47,7 +45,7 @@ export default observer(function ZoomControls() {
             onMouseEnter={() => {
               if (!isDisabled) setIsMenuOpen(true)
             }}
-            className={`h-9 px-3 flex items-center justify-center text-[15px] font-medium text-center tabular-nums min-w-[56px] ${tw.text.both.primary} ${buttonState}`}
+            className={`h-9 px-3 flex items-center justify-center text-[15px] font-medium text-center tabular-nums min-w-[56px] ${tw.text.primary} ${buttonState}`}
           >
             {store.scale}%
           </button>
@@ -73,7 +71,7 @@ export default observer(function ZoomControls() {
                   store.setZoom(value)
                   setIsMenuOpen(false)
                 }}
-                className={`${menuItemBase} ${tw.hover.both}`}
+                className={`${menuItemBase} ${tw.hover}`}
               >
                 {value}%
               </button>

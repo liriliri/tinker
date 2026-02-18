@@ -67,12 +67,12 @@ export default observer(function Display() {
   return (
     <div className={`px-4 py-4 mb-8 rounded-xl ${tw.bg.tertiary}`}>
       <div
-        className={`h-8 flex items-center justify-end text-xl md:text-2xl tracking-wide overflow-hidden ${tw.text.both.tertiary}`}
+        className={`h-8 flex items-center justify-end text-xl md:text-2xl tracking-wide overflow-hidden ${tw.text.tertiary}`}
       >
         {renderExpression(store.preview, 18)}
       </div>
       <div
-        className={`mt-2 flex items-center justify-end text-3xl md:text-4xl font-semibold tabular-nums overflow-hidden ${tw.text.both.primary}`}
+        className={`mt-2 flex items-center justify-end text-3xl md:text-4xl font-semibold tabular-nums overflow-hidden ${tw.text.primary}`}
         title={displayText}
       >
         {renderExpression(displayText, 28)}

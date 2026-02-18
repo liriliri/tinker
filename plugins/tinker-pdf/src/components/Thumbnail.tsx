@@ -187,7 +187,7 @@ export default function Thumbnail({
           rounded-lg text-xs font-normal
           pointer-events-none
           ${tw.bg.primary}
-          ${tw.text.both.primary}
+          ${tw.text.primary}
         `}
       >
         {pageNum}

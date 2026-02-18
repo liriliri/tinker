@@ -16,11 +16,9 @@ export default observer(function PasswordSettings({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <label
-          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
-        >
+        <label className={`block text-sm mb-2 font-medium ${tw.text.primary}`}>
           {t('passwordLength')}{' '}
-          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
+          <span className={`text-xs font-normal ${tw.text.secondary}`}>
             {t('lengthExample')}
           </span>
         </label>
@@ -37,11 +35,9 @@ export default observer(function PasswordSettings({
         />
       </div>
       <div>
-        <label
-          className={`block text-sm mb-2 font-medium ${tw.text.both.primary}`}
-        >
+        <label className={`block text-sm mb-2 font-medium ${tw.text.primary}`}>
           {t('maxRepetition')}{' '}
-          <span className={`text-xs font-normal ${tw.text.both.secondary}`}>
+          <span className={`text-xs font-normal ${tw.text.secondary}`}>
             {t('repetitionExample')}
           </span>
         </label>

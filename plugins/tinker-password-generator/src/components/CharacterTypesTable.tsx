@@ -69,7 +69,7 @@ export default observer(function CharacterTypesTable({
               <th
                 key={char.key}
                 scope="col"
-                className={`px-4 py-2.5 text-xs font-semibold text-center ${tw.text.both.primary}`}
+                className={`px-4 py-2.5 text-xs font-semibold text-center ${tw.text.primary}`}
               >
                 {char.label}
               </th>
@@ -78,12 +78,10 @@ export default observer(function CharacterTypesTable({
         </thead>
         <tbody>
           {/* Required Row */}
-          <tr
-            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
-          >
+          <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.primary} ${tw.bg.secondary}`}
             >
               <label className="flex items-center gap-2">
                 <span className="whitespace-nowrap">{t('required')}</span>
@@ -117,12 +115,10 @@ export default observer(function CharacterTypesTable({
           </tr>
 
           {/* Allowed Row */}
-          <tr
-            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
-          >
+          <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.primary} ${tw.bg.secondary}`}
             >
               {t('allowed')}
             </th>
@@ -143,12 +139,10 @@ export default observer(function CharacterTypesTable({
           </tr>
 
           {/* Forbidden Row */}
-          <tr
-            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
-          >
+          <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.primary} ${tw.bg.secondary}`}
             >
               {t('forbidden')}
             </th>

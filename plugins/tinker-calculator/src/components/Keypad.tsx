@@ -8,9 +8,9 @@ import { KEY_ROWS, KeyConfig, KeyKind } from '../lib/keys'
 
 const DEFAULT_TEXT_SIZE = 'text-xs md:text-sm'
 
-const DEFAULT_KIND_CLASS = `${DEFAULT_TEXT_SIZE} ${tw.text.both.primary}`
+const DEFAULT_KIND_CLASS = `${DEFAULT_TEXT_SIZE} ${tw.text.primary}`
 const KIND_CLASSES: Record<KeyKind, string> = {
-  number: `text-lg md:text-xl ${tw.text.both.primary}`,
+  number: `text-lg md:text-xl ${tw.text.primary}`,
   operator: DEFAULT_KIND_CLASS,
   function: DEFAULT_KIND_CLASS,
   control: DEFAULT_KIND_CLASS,

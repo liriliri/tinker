@@ -115,14 +115,14 @@ const RecorderControls = observer(() => {
     >
       {/* Timer Display */}
       <div
-        className={`text-5xl font-mono tabular-nums text-center w-[240px] ${tw.text.light.primary} dark:text-gray-100 mb-14`}
+        className={`text-5xl font-mono tabular-nums text-center w-[240px] ${tw.text.primary} dark:text-gray-100 mb-14`}
       >
         {durationFormat(store.currentRecordingDuration * 1000, 'mm:ss')}
       </div>
 
       {/* Play Time Display - always occupy space */}
       <div
-        className={`text-2xl font-mono tabular-nums text-center w-[240px] ${tw.text.light.secondary} dark:text-gray-400 -mt-8 mb-10`}
+        className={`text-2xl font-mono tabular-nums text-center w-[240px] ${tw.text.secondary} dark:text-gray-400 -mt-8 mb-10`}
       >
         {store.isPreview
           ? durationFormat(store.currentPlayTime * 1000, 'mm:ss')
@@ -140,7 +140,7 @@ const RecorderControls = observer(() => {
             >
               <Mic size={40} />
             </button>
-            <p className={`text-sm ${tw.text.both.secondary}`}>
+            <p className={`text-sm ${tw.text.secondary}`}>
               {t('clickToStartRecording')}
             </p>
           </div>
@@ -175,7 +175,7 @@ const RecorderControls = observer(() => {
           <div className="flex items-center gap-6">
             <button
               onClick={handlePauseRecording}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <Pause size={20} />
             </button>
@@ -217,13 +217,13 @@ const RecorderControls = observer(() => {
             </button>
             <button
               onClick={handleDownload}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <Save size={20} />
             </button>
             <button
               onClick={handleReset}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <RotateCcw size={20} />
             </button>

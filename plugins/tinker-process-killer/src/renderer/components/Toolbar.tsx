@@ -58,7 +58,7 @@ export default observer(function ToolbarComponent() {
           size={14}
           className={className(
             'absolute left-2 top-1/2 -translate-y-1/2',
-            tw.text.both.tertiary
+            tw.text.tertiary
           )}
         />
         <ToolbarTextInput
@@ -68,15 +68,15 @@ export default observer(function ToolbarComponent() {
           className={className(
             'w-full pl-7 pr-2 py-1',
             tw.bg.input,
-            `placeholder:${tw.text.light.tertiary}`,
-            `dark:placeholder:${tw.text.dark.tertiary}`
+            `placeholder:${tw.text.tertiary}`,
+            `dark:placeholder:${tw.text.tertiary}`
           )}
         />
       </div>
 
       <ToolbarSpacer />
 
-      <div className={`text-xs ${tw.text.both.secondary} mr-1`}>
+      <div className={`text-xs ${tw.text.secondary} mr-1`}>
         {t('totalProcesses', { count: store.filteredProcesses.length })}
       </div>
     </Toolbar>

@@ -103,8 +103,8 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
               className={className(
                 'flex-1 text-sm font-medium',
                 todo.completed
-                  ? ['line-through', tw.text.both.secondary]
-                  : tw.text.both.primary
+                  ? ['line-through', tw.text.secondary]
+                  : tw.text.primary
               )}
             >
               {todo.text}
@@ -112,7 +112,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
 
             {todo.dueDate && (
               <div
-                className={`flex items-center gap-1 text-xs ${tw.text.both.secondary}`}
+                className={`flex items-center gap-1 text-xs ${tw.text.secondary}`}
               >
                 <Calendar size={12} />
                 <span>{formatDate(todo.dueDate)}</span>
@@ -132,7 +132,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
         <div className="flex-shrink-0 flex items-center gap-0.5">
           <button
             onClick={handleDelete}
-            className={`p-1.5 ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors`}
+            className={`p-1.5 ${tw.text.secondary} ${tw.hover} rounded-md transition-colors`}
             title={t('delete')}
           >
             <Trash2 size={14} />
