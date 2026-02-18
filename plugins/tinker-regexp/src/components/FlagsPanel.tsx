@@ -11,7 +11,7 @@ export default observer(function FlagsPanel() {
 
   return (
     <div
-      className={`absolute top-12 right-0 ${tw.bg.primary} border ${tw.border.both} rounded shadow-lg p-3 z-10 min-w-[200px]`}
+      className={`absolute top-12 right-0 ${tw.bg.primary} border ${tw.border} rounded shadow-lg p-3 z-10 min-w-[200px]`}
     >
       <div className="space-y-1">
         {FLAGS.map((flag) => (

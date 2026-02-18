@@ -79,9 +79,9 @@ const Sidebar = observer(() => {
 
   return (
     <aside
-      className={`w-64 h-full flex flex-col border-t ${tw.border.both} ${tw.bg.tertiary}`}
+      className={`w-64 h-full flex flex-col border-t ${tw.border} ${tw.bg.tertiary}`}
     >
-      <div className={`p-3 border-b ${tw.border.both}`}>
+      <div className={`p-3 border-b ${tw.border}`}>
         <h2 className="text-lg font-semibold">{selectedDateLabel}</h2>
       </div>
 
@@ -95,7 +95,7 @@ const Sidebar = observer(() => {
             {eventsForSelectedDate.map((event) => (
               <div
                 key={event.id}
-                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.tertiary} ${tw.border.both}`}
+                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.tertiary} ${tw.border}`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="flex-1 min-w-0">
@@ -134,7 +134,7 @@ const Sidebar = observer(() => {
         )}
       </div>
 
-      <div className={`p-3 border-t ${tw.border.both}`}>
+      <div className={`p-3 border-t ${tw.border}`}>
         <button
           className={`w-full px-3 py-1.5 text-xs ${tw.text.both.secondary} ${tw.hover.both} rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={handleClearAll}

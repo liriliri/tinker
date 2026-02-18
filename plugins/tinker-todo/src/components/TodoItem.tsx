@@ -80,7 +80,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
       className={className(
         'group border rounded-lg p-2 transition-all duration-200 hover:shadow-sm',
         tw.bg.tertiary,
-        tw.border.both,
+        tw.border,
         todo.completed && 'opacity-60'
       )}
     >
@@ -91,7 +91,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
             'flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center',
             todo.completed
               ? [tw.primary.bg, tw.primary.border]
-              : [tw.border.both, tw.primary.hoverBorder]
+              : [tw.border, tw.primary.hoverBorder]
           )}
         >
           {todo.completed && <Check size={12} className="text-white" />}

@@ -111,7 +111,7 @@ export default observer(function ToolbarComponent({
           active={currentView === 'timeGridDay'}
           onClick={() => handleViewChange('timeGridDay')}
           title={t('dayView')}
-          className={`rounded-none rounded-l border-r ${tw.border.both} text-xs leading-none`}
+          className={`rounded-none rounded-l border-r ${tw.border} text-xs leading-none`}
         >
           {t('day')}
         </ToolbarButton>
@@ -121,7 +121,7 @@ export default observer(function ToolbarComponent({
           active={currentView === 'timeGridWeek'}
           onClick={() => handleViewChange('timeGridWeek')}
           title={t('weekView')}
-          className={`rounded-none border-r ${tw.border.both} text-xs leading-none`}
+          className={`rounded-none border-r ${tw.border} text-xs leading-none`}
         >
           {t('week')}
         </ToolbarButton>

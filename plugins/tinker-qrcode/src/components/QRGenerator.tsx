@@ -49,9 +49,7 @@ export default observer(function QRGenerator() {
   return (
     <div className="h-full flex">
       {/* Left Panel - Text Input */}
-      <div
-        className={`flex-1 min-w-0 flex flex-col border-r ${tw.border.both}`}
-      >
+      <div className={`flex-1 min-w-0 flex flex-col border-r ${tw.border}`}>
         <div className="flex-1">
           <textarea
             value={store.text}

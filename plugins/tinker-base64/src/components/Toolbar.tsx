@@ -58,7 +58,7 @@ export default observer(function ToolbarComponent() {
             active={store.inputType === 'text'}
             onClick={() => store.setInputType('text')}
             title={t('text')}
-            className={`rounded-none rounded-l border-r ${tw.border.both}`}
+            className={`rounded-none rounded-l border-r ${tw.border}`}
           >
             <FileText size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>

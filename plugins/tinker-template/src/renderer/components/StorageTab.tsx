@@ -8,9 +8,7 @@ export default observer(function StorageTab() {
 
   return (
     <div className="space-y-6">
-      <div
-        className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border.both}`}
-      >
+      <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
         <h2
           className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
         >
@@ -26,7 +24,7 @@ export default observer(function StorageTab() {
               onChange={(e) => store.setSavedData(e.target.value)}
               rows={4}
               placeholder={t('typeToSave')}
-              className={`w-full px-3 py-2 border ${tw.border.both} rounded ${tw.bg.input} text-gray-900 ${tw.text.dark.primary} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+              className={`w-full px-3 py-2 border ${tw.border} rounded ${tw.bg.input} text-gray-900 ${tw.text.dark.primary} focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
             />
           </div>
           <div className="flex gap-3">

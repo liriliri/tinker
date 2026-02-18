@@ -14,7 +14,7 @@ export default observer(function DualPanel() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Input */}
-        <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
+        <div className={`flex-1 min-w-0 border-r ${tw.border}`}>
           <textarea
             value={store.inputText}
             onChange={(e) => {

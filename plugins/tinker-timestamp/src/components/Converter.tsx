@@ -55,7 +55,7 @@ export default observer(function Converter() {
   return (
     <div className={`h-full flex flex-col ${tw.bg.secondary}`}>
       {/* Date to Timestamp */}
-      <div className={`flex-1 border-b ${tw.border.both}`}>
+      <div className={`flex-1 border-b ${tw.border}`}>
         <div className="h-full flex flex-col p-6">
           <h2 className="text-sm font-medium mb-3 text-gray-600 dark:text-gray-400">
             {t('dateToTimestamp')} ({cityName}) {t('timestamp')}

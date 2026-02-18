@@ -78,7 +78,7 @@ export default observer(function Welcome() {
         <div className="space-y-3 mb-8">
           <button
             onClick={handleNewDatabase}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border}`}
           >
             <Plus size={20} />
             <span className="font-medium">{t('newDatabase')}</span>
@@ -86,7 +86,7 @@ export default observer(function Welcome() {
 
           <button
             onClick={handleOpenDatabase}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border.both}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.primary} ${tw.hover.both} transition-colors border ${tw.border}`}
           >
             <FolderOpen size={20} />
             <span className="font-medium">{t('openDatabase')}</span>
@@ -105,7 +105,7 @@ export default observer(function Welcome() {
                 <button
                   key={path}
                   onClick={() => handleOpenRecent(path)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm ${tw.bg.primary} ${tw.hover.both} transition-colors truncate border ${tw.border.both}`}
+                  className={`w-full text-left px-3 py-2 rounded text-sm ${tw.bg.primary} ${tw.hover.both} transition-colors truncate border ${tw.border}`}
                 >
                   {path.split('/').pop()}
                 </button>

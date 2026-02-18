@@ -24,7 +24,7 @@ export default observer(function InfoRow({ label, value }: InfoRowProps) {
   return (
     <div className="px-4 last:[&>div]:border-b-0">
       <div
-        className={`flex items-center justify-between py-2 ${tw.border.both} border-b`}
+        className={`flex items-center justify-between py-2 ${tw.border} border-b`}
       >
         <span className={`text-sm ${tw.text.both.secondary}`}>{label}</span>
         <span

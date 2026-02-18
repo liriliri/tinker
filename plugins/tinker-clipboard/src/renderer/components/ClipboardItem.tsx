@@ -45,7 +45,7 @@ export default observer(function ClipboardItem({
             <img
               src={item.data}
               alt="clipboard"
-              className={`h-16 w-auto max-w-[200px] rounded border ${tw.border.both} object-contain`}
+              className={`h-16 w-auto max-w-[200px] rounded border ${tw.border} object-contain`}
             />
           </div>
         )
@@ -63,7 +63,7 @@ export default observer(function ClipboardItem({
 
   return (
     <div
-      className={`group px-4 py-3 border-b ${tw.border.both} ${tw.hover.both} transition-colors cursor-pointer`}
+      className={`group px-4 py-3 border-b ${tw.border} ${tw.hover.both} transition-colors cursor-pointer`}
     >
       <div className="flex items-start gap-3">
         {/* Preview */}

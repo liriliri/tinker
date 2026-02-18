@@ -105,7 +105,7 @@ export default observer(function ToolbarComponent() {
           className={className(
             'w-16 text-xs px-2 py-1 border rounded focus:outline-none dark:text-gray-200',
             tw.bg.input,
-            tw.border.both,
+            tw.border,
             tw.primary.focusBorder,
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}

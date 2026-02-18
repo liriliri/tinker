@@ -45,7 +45,7 @@ export default observer(function ExpressionSection() {
   })
 
   return (
-    <div className={`border-b ${tw.border.both} ${tw.bg.input}`}>
+    <div className={`border-b ${tw.border} ${tw.bg.input}`}>
       <div className="relative px-6 py-3">
         <div className="flex items-center gap-2">
           <span className={`${tw.text.both.tertiary} text-xl`}>/</span>

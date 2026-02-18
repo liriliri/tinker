@@ -59,7 +59,7 @@ export default observer(function App() {
           <div
             className={className(
               'flex-1 min-w-0',
-              store.viewMode === 'split' && ['border-r', tw.border.both]
+              store.viewMode === 'split' && ['border-r', tw.border]
             )}
           >
             <MarkdownEditor />

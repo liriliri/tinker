@@ -19,7 +19,7 @@ export default observer(function DualPanel() {
 
   const renderTextMode = () => (
     <div className="flex-1 flex overflow-hidden">
-      <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
+      <div className={`flex-1 min-w-0 border-r ${tw.border}`}>
         <textarea
           value={store.inputText}
           onChange={(e) => store.setInputText(e.target.value)}
@@ -57,7 +57,7 @@ export default observer(function DualPanel() {
   const renderFileMode = () => (
     <div className="flex-1 flex overflow-hidden">
       <div
-        className={`w-1/2 min-w-[260px] flex flex-col border-r ${tw.border.both}`}
+        className={`w-1/2 min-w-[260px] flex flex-col border-r ${tw.border}`}
       >
         <FileOpen
           onOpenFile={(file) => store.handleFile(file)}

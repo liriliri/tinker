@@ -10,7 +10,7 @@ export default observer(function Sidebar() {
     <div
       className={`
         w-56 h-full flex flex-col
-        border-r ${tw.border.both}
+        border-r ${tw.border}
         ${tw.bg.tertiary}
         transition-all duration-200
       `}

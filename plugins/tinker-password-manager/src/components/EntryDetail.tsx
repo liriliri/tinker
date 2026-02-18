@@ -163,11 +163,11 @@ export default observer(function EntryDetail() {
                 value={entry.notes}
                 onChange={(e) => handleUpdateField('Notes', e.target.value)}
                 rows={6}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`w-full px-3 py-2 rounded border ${tw.border} ${tw.bg.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 
-            <div className={`pt-4 border-t ${tw.border.both}`}>
+            <div className={`pt-4 border-t ${tw.border}`}>
               <div className={`text-xs ${tw.text.both.secondary} space-y-1`}>
                 <div>
                   {t('created')}:{' '}

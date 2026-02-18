@@ -164,7 +164,7 @@ export default observer(function Editor() {
       {/* Bottom bar - only show in system view */}
       {isReadonly && (
         <div
-          className={`h-[36px] px-4 border-t ${tw.border.both} flex items-center justify-between flex-shrink-0`}
+          className={`h-[36px] px-4 border-t ${tw.border} flex items-center justify-between flex-shrink-0`}
         >
           {/* Left side - Open Hosts File button */}
           <button

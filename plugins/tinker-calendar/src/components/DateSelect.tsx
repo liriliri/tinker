@@ -16,7 +16,7 @@ const DateSelect = observer(
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className={`w-full px-3 py-2 border ${tw.border.both} rounded ${tw.bg.input} text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fc25e] cursor-pointer [color-scheme:light] dark:[color-scheme:dark] disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full px-3 py-2 border ${tw.border} rounded ${tw.bg.input} text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fc25e] cursor-pointer [color-scheme:light] dark:[color-scheme:dark] disabled:opacity-50 disabled:cursor-not-allowed`}
         />
       </div>
     )

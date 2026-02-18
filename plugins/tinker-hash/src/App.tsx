@@ -21,7 +21,7 @@ export default observer(function App() {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Input */}
-          <div className={`w-2/5 flex flex-col ${tw.border.both} border-r`}>
+          <div className={`w-2/5 flex flex-col ${tw.border} border-r`}>
             {store.inputType === 'text' ? (
               <div className="flex-1">
                 <textarea

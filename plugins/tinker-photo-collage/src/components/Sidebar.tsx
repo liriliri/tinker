@@ -18,9 +18,9 @@ const Sidebar = observer(() => {
 
   return (
     <div
-      className={`w-60 ${tw.bg.tertiary} border-r ${tw.border.both} flex flex-col`}
+      className={`w-60 ${tw.bg.tertiary} border-r ${tw.border} flex flex-col`}
     >
-      <div className={`p-4 border-b ${tw.border.both} space-y-4`}>
+      <div className={`p-4 border-b ${tw.border} space-y-4`}>
         <div>
           <div className="flex justify-between items-center mb-2">
             <label className={`text-sm ${tw.text.both.primary}`}>
@@ -73,7 +73,7 @@ const Sidebar = observer(() => {
         </div>
       </div>
 
-      <div className={`p-4 border-b ${tw.border.both}`}>
+      <div className={`p-4 border-b ${tw.border}`}>
         <Select
           value={store.selectedPhotoCount}
           onChange={(value) => store.setSelectedPhotoCount(value)}
@@ -116,7 +116,7 @@ const Sidebar = observer(() => {
                     {template.areas.map((area) => (
                       <div
                         key={area}
-                        className={`${tw.bg.primary} border ${tw.border.both}`}
+                        className={`${tw.bg.primary} border ${tw.border}`}
                         style={{ gridArea: area }}
                       />
                     ))}

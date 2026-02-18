@@ -133,15 +133,11 @@ export const tw = {
     input: 'bg-white dark:bg-[#2d2d2d]',
     select: 'bg-white dark:bg-[#3e3e42]',
     code: 'bg-[#252526] dark:bg-[#252526]',
+    border: 'bg-[#e0e0e0] dark:bg-[#4a4a4a]', // For separators using background color
   },
 
   // Border color utilities
-  border: {
-    light: 'border-[#e0e0e0]',
-    dark: 'dark:border-[#4a4a4a]',
-    both: 'border-[#e0e0e0] dark:border-[#4a4a4a]',
-    bg: 'bg-[#e0e0e0] dark:bg-[#4a4a4a]', // For separators using background color
-  },
+  border: 'border-[#e0e0e0] dark:border-[#4a4a4a]',
 
   // Hover state utilities
   hover: {

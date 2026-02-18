@@ -141,7 +141,7 @@ export default observer(function DualEditor() {
     <div className="h-full flex flex-col">
       <div ref={containerRef} className="flex-1 w-full flex overflow-hidden">
         {/* Left Editor - Original */}
-        <div className={`flex-1 min-w-0 border-r ${tw.border.both}`}>
+        <div className={`flex-1 min-w-0 border-r ${tw.border}`}>
           <Editor
             value={store.originalText}
             language={store.language}
@@ -186,7 +186,7 @@ export default observer(function DualEditor() {
       {/* Bottom Toolbars */}
       <div className="flex">
         {/* Left Toolbar - Original */}
-        <div className={`flex-1 border-r ${tw.border.both}`}>
+        <div className={`flex-1 border-r ${tw.border}`}>
           <Toolbar className="justify-between border-t">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <span>{t('original')}</span>

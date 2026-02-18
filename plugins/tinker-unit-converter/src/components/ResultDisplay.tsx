@@ -28,7 +28,7 @@ export default observer(function ResultDisplay() {
               isSourceUnit
                 ? `${tw.primary.bg} text-white`
                 : `${tw.bg.secondary} hover:opacity-80`
-            } ${tw.border.both} border`}
+            } ${tw.border} border`}
             onClick={() => handleCopy(item.value)}
           >
             <div className="flex justify-between items-center">

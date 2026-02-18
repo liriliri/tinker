@@ -125,14 +125,14 @@ export default observer(function Sidebar() {
 
   return (
     <div
-      className={`w-64 flex-shrink-0 ${tw.bg.tertiary} border-r ${tw.border.both} flex flex-col relative`}
+      className={`w-64 flex-shrink-0 ${tw.bg.tertiary} border-r ${tw.border} flex flex-col relative`}
     >
       {/* System Hosts - Fixed at top */}
       <div
         className={className(
           'px-3 py-2 cursor-pointer border-b flex-shrink-0',
           tw.hover.both,
-          tw.border.both,
+          tw.border,
           viewMode === 'system' && tw.active.both
         )}
         onClick={handleSystemView}

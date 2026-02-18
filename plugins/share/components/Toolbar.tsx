@@ -13,7 +13,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ children, className = '' }: ToolbarProps) {
-  const baseClass = `${tw.bg.secondary} border-b ${tw.border.both} ${tw.text.dark.primary} px-1.5 py-1.5 flex gap-1 items-center`
+  const baseClass = `${tw.bg.secondary} border-b ${tw.border} ${tw.text.dark.primary} px-1.5 py-1.5 flex gap-1 items-center`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
 }
@@ -159,20 +159,20 @@ export function ToolbarButtonGroup({
   children,
   className = '',
 }: ToolbarButtonGroupProps) {
-  const baseClass = `flex items-center overflow-hidden rounded border -my-px ${tw.border.both} ${tw.bg.secondary}`
+  const baseClass = `flex items-center overflow-hidden rounded border -my-px ${tw.border} ${tw.bg.secondary}`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
 }
 
 export function ToolbarSeparator() {
-  return <div className={`w-px h-5 ${tw.border.bg} mx-1`} />
+  return <div className={`w-px h-5 ${tw.bg.border} mx-1`} />
 }
 
 export function ToolbarSpacer() {
   return <div className="flex-1" />
 }
 
-const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border.both} ${tw.bg.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
+const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.both.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
 
 export type ToolbarTextInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
@@ -198,7 +198,7 @@ export function ToolbarLabel({ className = '', ...rest }: ToolbarLabelProps) {
   return <label className={combinedClassName} {...rest} />
 }
 
-const toolbarColorWrapClassName = `relative h-4 w-4 rounded overflow-hidden ${tw.border.both} border`
+const toolbarColorWrapClassName = `relative h-4 w-4 rounded overflow-hidden ${tw.border} border`
 const toolbarColorSwatchClassName = `h-full w-full ${tw.bg.primary}`
 const toolbarColorInputClassName = 'absolute inset-0 opacity-0 cursor-pointer'
 

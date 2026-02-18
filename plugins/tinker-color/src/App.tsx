@@ -23,10 +23,10 @@ export default observer(function App() {
 
           {/* Right sidebar - Color Info Blocks */}
           <div
-            className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.tertiary} p-6 shadow-lg overflow-y-auto border-l ${tw.border.both}`}
+            className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.tertiary} p-6 shadow-lg overflow-y-auto border-l ${tw.border}`}
           >
             <ColorFormats />
-            <div className={`border-t ${tw.border.both}`}></div>
+            <div className={`border-t ${tw.border}`}></div>
             <ColorSchemes />
           </div>
         </div>

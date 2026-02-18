@@ -143,7 +143,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 
 // Correct
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`}>
-<div className={tw.border.both}>
+<div className={tw.border}>
 
 // Wrong
 <button className="bg-[#0fc25e]">
@@ -152,7 +152,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 
 **Common patterns**:
 - Full-screen layout: `<div className="h-screen flex flex-col">`
-- Use `.both` variants for combined light/dark: `tw.bg.both.primary`, `tw.border.both`
+- Use `.both` variants for combined light/dark: `tw.bg.both.primary`, `tw.border`
 - Copy success state: `className={copied ? tw.primary.text : ''}`
 
 **Complete theme API**: See `share/README.md`

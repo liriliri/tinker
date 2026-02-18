@@ -30,7 +30,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 
 // Backgrounds & Borders (use .both for light/dark)
 <div className={tw.bg.both.secondary}>Content</div>
-<input className={`${tw.bg.both.input} border ${tw.border.both}`} />
+<input className={`${tw.bg.both.input} border ${tw.border}`} />
 
 // States
 <div className={`${tw.hover.both} ${isActive ? tw.active.both : ''}`} />

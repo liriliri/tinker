@@ -117,7 +117,7 @@ export default observer(function TextSection() {
                   {hoverMatch.index + hoverMatch.length}
                 </div>
                 {hoverMatch.groups.length > 0 && (
-                  <div className={`mt-2 pt-2 border-t ${tw.border.both}`}>
+                  <div className={`mt-2 pt-2 border-t ${tw.border}`}>
                     <div className={`${tw.text.both.secondary} text-xs mb-1`}>
                       {t('groupsLabel')}:
                     </div>

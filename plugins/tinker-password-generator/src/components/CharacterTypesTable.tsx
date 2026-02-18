@@ -60,7 +60,7 @@ export default observer(function CharacterTypesTable({
   ]
 
   return (
-    <div className={`overflow-x-auto rounded border ${tw.border.both}`}>
+    <div className={`overflow-x-auto rounded border ${tw.border}`}>
       <table className="w-full border-collapse">
         <thead>
           <tr className={`${tw.bg.secondary}`}>
@@ -79,7 +79,7 @@ export default observer(function CharacterTypesTable({
         <tbody>
           {/* Required Row */}
           <tr
-            className={`border-t ${tw.border.both} ${tw.hover.both} transition-colors`}
+            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
           >
             <th
               scope="row"
@@ -118,7 +118,7 @@ export default observer(function CharacterTypesTable({
 
           {/* Allowed Row */}
           <tr
-            className={`border-t ${tw.border.both} ${tw.hover.both} transition-colors`}
+            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
           >
             <th
               scope="row"
@@ -144,7 +144,7 @@ export default observer(function CharacterTypesTable({
 
           {/* Forbidden Row */}
           <tr
-            className={`border-t ${tw.border.both} ${tw.hover.both} transition-colors`}
+            className={`border-t ${tw.border} ${tw.hover.both} transition-colors`}
           >
             <th
               scope="row"
