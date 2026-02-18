@@ -35,5 +35,17 @@
   "fathersDay": "父亲节",
   "thanksgiving": "感恩节",
   "christmasEve": "平安夜",
-  "christmas": "圣诞节"
+  "christmas": "圣诞节",
+  "womensDay": "妇女节",
+  "arborDay": "植树节",
+  "childrensDay": "儿童节",
+  "partyFoundingDay": "建党节",
+  "armyDay": "建军节",
+  "nationalDay": "国庆节",
+  "springFestival": "春节",
+  "lanternFestival": "元宵节",
+  "dragonBoatFestival": "端午节",
+  "qixiFestival": "七夕节",
+  "midAutumnFestival": "中秋节",
+  "doubleNinthFestival": "重阳节"
 }

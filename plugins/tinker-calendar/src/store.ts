@@ -4,6 +4,7 @@ import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import { getHolidaysForYearRange } from './lib/holidays'
 import * as db from './lib/db'
+import i18n from './i18n'
 
 const storage = new LocalStore('tinker-calendar')
 const SIDEBAR_KEY = 'sidebar-open'
@@ -204,7 +205,11 @@ class Store extends BaseStore {
 
   get holidayEvents() {
     const currentYear = new Date().getFullYear()
-    const holidays = getHolidaysForYearRange(currentYear - 1, currentYear + 1)
+    const holidays = getHolidaysForYearRange(
+      currentYear - 1,
+      currentYear + 1,
+      i18n.language
+    )
 
     return holidays.map((holiday) => ({
       id: holiday.id,

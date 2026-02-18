@@ -1,3 +1,5 @@
+import calendar from 'js-calendar-converter'
+
 export type Holiday = {
   id: string
   nameKey: string // i18n translation key
@@ -5,6 +7,10 @@ export type Holiday = {
   day?: number // For fixed date holidays
   weekOfMonth?: number // For floating holidays (1-5)
   dayOfWeek?: number // 0=Sunday, 1=Monday, etc.
+  locale?: string // Specific locale (e.g., 'zh-CN')
+  isLunar?: boolean // Whether it's a lunar calendar date
+  lunarMonth?: number // Lunar month (1-12)
+  lunarDay?: number // Lunar day (1-30)
 }
 
 // Common international holidays
@@ -40,6 +46,118 @@ export const HOLIDAYS: Holiday[] = [
   }, // 4th Thursday of November
 ]
 
+// Chinese holidays (solar calendar dates)
+export const CHINESE_SOLAR_HOLIDAYS: Holiday[] = [
+  { id: 'womens-day', nameKey: 'womensDay', month: 3, day: 8, locale: 'zh-CN' },
+  {
+    id: 'arbor-day',
+    nameKey: 'arborDay',
+    month: 3,
+    day: 12,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'childrens-day',
+    nameKey: 'childrensDay',
+    month: 6,
+    day: 1,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'party-founding-day',
+    nameKey: 'partyFoundingDay',
+    month: 7,
+    day: 1,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'army-day',
+    nameKey: 'armyDay',
+    month: 8,
+    day: 1,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'national-day',
+    nameKey: 'nationalDay',
+    month: 10,
+    day: 1,
+    locale: 'zh-CN',
+  },
+]
+
+// Chinese holidays (lunar calendar dates)
+export const CHINESE_LUNAR_HOLIDAYS: Holiday[] = [
+  {
+    id: 'spring-festival',
+    nameKey: 'springFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 1,
+    lunarDay: 1,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'lantern-festival',
+    nameKey: 'lanternFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 1,
+    lunarDay: 15,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'dragon-boat-festival',
+    nameKey: 'dragonBoatFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 5,
+    lunarDay: 5,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'qixi-festival',
+    nameKey: 'qixiFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 7,
+    lunarDay: 7,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'mid-autumn-festival',
+    nameKey: 'midAutumnFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 8,
+    lunarDay: 15,
+    locale: 'zh-CN',
+  },
+  {
+    id: 'double-ninth-festival',
+    nameKey: 'doubleNinthFestival',
+    month: 0,
+    isLunar: true,
+    lunarMonth: 9,
+    lunarDay: 9,
+    locale: 'zh-CN',
+  },
+]
+
+/**
+ * Convert lunar date to solar date
+ */
+function lunarToSolar(year: number, lunarMonth: number, lunarDay: number) {
+  try {
+    const result = calendar.lunar2solar(year, lunarMonth, lunarDay)
+    if (!result) return null
+    return new Date(result.cYear, result.cMonth - 1, result.cDay)
+  } catch (error) {
+    console.error('Failed to convert lunar to solar date:', error)
+    return null
+  }
+}
+
 /**
  * Calculate the date for a floating holiday (e.g., 2nd Sunday of May)
  */
@@ -66,12 +184,20 @@ function getFloatingHolidayDate(
  */
 export function getHolidaysForYearRange(
   startYear: number,
-  endYear: number
+  endYear: number,
+  locale?: string
 ): Array<{ date: string; nameKey: string; id: string }> {
   const result: Array<{ date: string; nameKey: string; id: string }> = []
 
+  // Filter holidays based on locale
+  const allHolidays = [...HOLIDAYS, ...CHINESE_SOLAR_HOLIDAYS]
+  const holidaysToProcess = locale
+    ? allHolidays.filter((h) => !h.locale || h.locale === locale)
+    : allHolidays.filter((h) => !h.locale)
+
   for (let year = startYear; year <= endYear; year++) {
-    for (const holiday of HOLIDAYS) {
+    // Process solar calendar holidays
+    for (const holiday of holidaysToProcess) {
       let date: Date
 
       if (holiday.day !== undefined) {
@@ -101,6 +227,30 @@ export function getHolidaysForYearRange(
         date: dateStr,
         nameKey: holiday.nameKey,
       })
+    }
+
+    // Process lunar calendar holidays (Chinese only)
+    if (locale === 'zh-CN') {
+      for (const holiday of CHINESE_LUNAR_HOLIDAYS) {
+        if (!holiday.lunarMonth || !holiday.lunarDay) continue
+
+        const solarDate = lunarToSolar(
+          year,
+          holiday.lunarMonth,
+          holiday.lunarDay
+        )
+        if (!solarDate) continue
+
+        const dateStr = `${solarDate.getFullYear()}-${String(
+          solarDate.getMonth() + 1
+        ).padStart(2, '0')}-${String(solarDate.getDate()).padStart(2, '0')}`
+
+        result.push({
+          id: `${holiday.id}-${year}`,
+          date: dateStr,
+          nameKey: holiday.nameKey,
+        })
+      }
     }
   }
 
