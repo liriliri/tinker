@@ -1,7 +1,8 @@
 import { spawn, ChildProcess } from 'child_process'
-import ffmpegPath from 'ffmpeg-static'
+import ffmpegStatic from 'ffmpeg-static'
 import uuid from 'licia/uuid'
 import toNum from 'licia/toNum'
+import { isDev } from 'share/common/util'
 
 export interface RunProgress {
   bitrate: string
@@ -25,15 +26,19 @@ class FFmpegTask {
   private ffmpegProcess: ChildProcess | null = null
 
   constructor(args: string[], onProgress?: ProgressCallback) {
+    let ffmpegPath = ffmpegStatic || ''
     if (!ffmpegPath) {
       throw new Error('FFmpeg binary not found')
+    }
+    if (!isDev()) {
+      ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked')
     }
 
     let duration = 0
     let lastProgressTime = 0
 
     this.promise = new Promise<void>((resolve, reject) => {
-      this.ffmpegProcess = spawn(ffmpegPath as string, args)
+      this.ffmpegProcess = spawn(ffmpegPath, args)
 
       let stderrData = ''
 
