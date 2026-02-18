@@ -16,7 +16,7 @@ export default observer(function EntryDetail() {
   if (!entry) {
     return (
       <div
-        className={`h-full flex items-center justify-center text-sm ${tw.bg.both.tertiary} ${tw.text.both.secondary}`}
+        className={`h-full flex items-center justify-center text-sm ${tw.bg.tertiary} ${tw.text.both.secondary}`}
       >
         {t('noEntries')}
       </div>
@@ -54,7 +54,7 @@ export default observer(function EntryDetail() {
     : '••••••••'
 
   return (
-    <div className={`h-full overflow-y-auto ${tw.bg.both.tertiary}`}>
+    <div className={`h-full overflow-y-auto ${tw.bg.tertiary}`}>
       <div className="p-4">
         <div className="max-w-2xl">
           <div className="flex items-center justify-between mb-6">
@@ -163,7 +163,7 @@ export default observer(function EntryDetail() {
                 value={entry.notes}
                 onChange={(e) => handleUpdateField('Notes', e.target.value)}
                 rows={6}
-                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.both.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+                className={`w-full px-3 py-2 rounded border ${tw.border.both} ${tw.bg.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
               />
             </div>
 

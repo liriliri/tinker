@@ -88,7 +88,7 @@ function FormatRow({
           onBlur={handleBlur}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          className={`w-full px-4 py-2.5 pr-10 rounded-lg font-mono text-sm focus:ring-2 ${tw.bg.both.input} ${tw.text.both.primary} ${tw.primary.focusRing}`}
+          className={`w-full px-4 py-2.5 pr-10 rounded-lg font-mono text-sm focus:ring-2 ${tw.bg.input} ${tw.text.both.primary} ${tw.primary.focusRing}`}
         />
         <CopyButton
           text={cssValue}

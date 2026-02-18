@@ -72,5 +72,5 @@ export default function CodeMirrorEditor({
     }
   }, [value])
 
-  return <div ref={editorRef} className={`${tw.bg.both.input} ${className}`} />
+  return <div ref={editorRef} className={`${tw.bg.input} ${className}`} />
 }

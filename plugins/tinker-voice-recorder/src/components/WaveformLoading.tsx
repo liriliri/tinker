@@ -7,7 +7,7 @@ const WaveformLoading = () => {
 
   return (
     <div
-      className={`w-full h-[120px] rounded-lg overflow-hidden ${tw.bg.both.secondary} flex items-center justify-center`}
+      className={`w-full h-[120px] rounded-lg overflow-hidden ${tw.bg.secondary} flex items-center justify-center`}
     >
       <div className="flex items-center gap-1.5">
         {barHeights.map((height, i) => (

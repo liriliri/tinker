@@ -102,7 +102,7 @@ export default observer(function Toolbar() {
           placeholder={t('searchPlaceholder')}
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
-          className={`w-full pl-7 pr-2 py-1 ${tw.bg.both.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-2 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
         />
       </div>
 

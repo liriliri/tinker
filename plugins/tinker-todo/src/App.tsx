@@ -32,7 +32,7 @@ export default observer(function App() {
     <AlertProvider locale={i18n.language}>
       <ConfirmProvider locale={i18n.language}>
         <ToasterProvider>
-          <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+          <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
             <Toolbar />
 
             <div className="flex-1 flex overflow-hidden">

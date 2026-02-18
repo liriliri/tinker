@@ -81,7 +81,7 @@ export default observer(function MarkdownPreview() {
   return (
     <div
       ref={containerRef}
-      className={`markdown-preview-container h-full w-full overflow-auto p-6 ${tw.bg.both.primary}`}
+      className={`markdown-preview-container h-full w-full overflow-auto p-6 ${tw.bg.primary}`}
     >
       <div
         ref={contentRef}

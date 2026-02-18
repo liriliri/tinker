@@ -109,7 +109,7 @@ export default observer(function ThumbnailSidebar() {
       className={`
         w-56 h-full flex flex-col
         border-r ${tw.border.both}
-        ${tw.bg.both.tertiary}
+        ${tw.bg.tertiary}
         transition-transform duration-200
         ${isVisible ? 'translate-x-0' : '-translate-x-full'}
       `}
@@ -167,7 +167,7 @@ export default observer(function ThumbnailSidebar() {
       <div
         className={`
           flex border-t ${tw.border.both}
-          ${tw.bg.both.primary}
+          ${tw.bg.primary}
         `}
       >
         <button

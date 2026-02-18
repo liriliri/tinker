@@ -54,7 +54,7 @@ export default observer(function Sidebar() {
 
   return (
     <div
-      className={`w-52 ${tw.bg.both.tertiary} border-r ${tw.border.both} flex flex-col flex-shrink-0`}
+      className={`w-52 ${tw.bg.tertiary} border-r ${tw.border.both} flex flex-col flex-shrink-0`}
     >
       <div className="flex-1 overflow-y-auto p-3">
         <div className="space-y-0.5">

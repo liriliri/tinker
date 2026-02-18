@@ -65,7 +65,7 @@ export default function CanvasSizeDialog({
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.both.tertiary} ${tw.text.both.primary} focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.tertiary} ${tw.text.both.primary} focus:outline-none`}
             value={width}
             onChange={(e) => setWidth(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -80,7 +80,7 @@ export default function CanvasSizeDialog({
           </label>
           <input
             type="number"
-            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.both.tertiary} ${tw.text.both.primary} focus:outline-none`}
+            className={`flex-1 px-3 py-2 border ${tw.border.both} rounded ${tw.bg.tertiary} ${tw.text.both.primary} focus:outline-none`}
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             onKeyDown={handleKeyDown}

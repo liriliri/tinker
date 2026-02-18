@@ -424,7 +424,7 @@ export default observer(function PdfViewer() {
   return (
     <div
       ref={containerRef}
-      className={`flex-1 overflow-auto ${tw.bg.both.secondary}`}
+      className={`flex-1 overflow-auto ${tw.bg.secondary}`}
     >
       <div className="py-4 px-4 flex flex-col items-center gap-4">
         {pages.map((pageNum) => {

@@ -56,7 +56,7 @@ export default observer(function ToolbarComponent() {
           value={store.searchQuery}
           onChange={(e) => store.setSearchQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
-          className={`w-full pl-7 pr-7 py-1 ${tw.bg.both.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
+          className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.light.tertiary} dark:placeholder:${tw.text.dark.tertiary}`}
         />
         {store.searchQuery && (
           <button

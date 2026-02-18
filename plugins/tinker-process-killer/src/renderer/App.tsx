@@ -15,7 +15,7 @@ export default observer(function App() {
       <AlertProvider locale={i18n.language}>
         <ConfirmProvider locale={i18n.language}>
           <div
-            className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
+            className={`h-screen flex flex-col transition-colors ${tw.bg.primary}`}
           >
             <Toolbar />
             <div className="flex-1 overflow-hidden">

@@ -57,14 +57,14 @@ export default observer(function QRGenerator() {
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
             placeholder={t('placeholder')}
-            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.both.primary} ${tw.text.both.primary}`}
+            className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
           />
         </div>
       </div>
 
       {/* Right Panel - QR Code Display */}
       <div
-        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.both.tertiary} p-4`}
+        className={`flex-1 min-w-0 flex items-center justify-center ${tw.bg.tertiary} p-4`}
       >
         {store.text ? (
           <div

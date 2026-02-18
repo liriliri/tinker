@@ -19,7 +19,7 @@ export default observer(function ZoomControls() {
   const buttonState = isDisabled
     ? 'cursor-not-allowed opacity-40'
     : tw.hover.both
-  const shellBase = `border shadow-md ${tw.bg.both.primary} ${tw.border.both}`
+  const shellBase = `border shadow-md ${tw.bg.primary} ${tw.border.both}`
   const menuItemBase = 'w-full px-3 py-1 text-sm text-left transition-colors'
 
   return (
@@ -63,7 +63,7 @@ export default observer(function ZoomControls() {
         </div>
         {isMenuOpen && (
           <div
-            className={`absolute bottom-full left-1/2 mb-0.5 -translate-x-1/2 rounded-md border shadow-md py-0 overflow-hidden ${tw.bg.both.primary} ${tw.border.both}`}
+            className={`absolute bottom-full left-1/2 mb-0.5 -translate-x-1/2 rounded-md border shadow-md py-0 overflow-hidden ${tw.bg.primary} ${tw.border.both}`}
           >
             {ZOOM_PRESET_VALUES.map((value) => (
               <button

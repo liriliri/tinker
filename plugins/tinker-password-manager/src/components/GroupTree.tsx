@@ -166,7 +166,7 @@ export default observer(function GroupTree() {
   }
 
   return (
-    <div className={`h-full overflow-y-auto p-2 ${tw.bg.both.tertiary}`}>
+    <div className={`h-full overflow-y-auto p-2 ${tw.bg.tertiary}`}>
       <GroupItem group={store.rootGroup} level={0} />
     </div>
   )

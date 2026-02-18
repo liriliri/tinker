@@ -98,7 +98,7 @@ export default observer(function App() {
 
   return (
     <div
-      className={`h-screen flex items-center justify-center transition-colors ${tw.bg.both.secondary}`}
+      className={`h-screen flex items-center justify-center transition-colors ${tw.bg.secondary}`}
       onContextMenu={handleContextMenu}
     >
       {store.theme === 'flip' ? (

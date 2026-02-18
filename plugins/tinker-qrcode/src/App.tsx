@@ -7,7 +7,7 @@ import QRGenerator from './components/QRGenerator'
 export default observer(function App() {
   return (
     <ToasterProvider>
-      <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+      <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
         <Toolbar />
 
         <div className="flex-1 overflow-hidden">

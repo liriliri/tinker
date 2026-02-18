@@ -46,7 +46,7 @@ export default observer(function AddTodo() {
 
   return (
     <div
-      className={`${tw.bg.both.tertiary} ${tw.border.both} border-b p-4 flex-shrink-0`}
+      className={`${tw.bg.tertiary} ${tw.border.both} border-b p-4 flex-shrink-0`}
     >
       <div className="flex gap-2 mb-2">
         <TextInput
@@ -85,7 +85,7 @@ export default observer(function AddTodo() {
         </div>
         <div className="flex items-center gap-1.5">
           <div
-            className={`flex gap-0.5 ${tw.bg.both.input} ${tw.border.both} border rounded-md p-0.5`}
+            className={`flex gap-0.5 ${tw.bg.input} ${tw.border.both} border rounded-md p-0.5`}
           >
             {PRIORITIES.map((priority) => {
               const isSelected = store.newTodoPriority === priority.value

@@ -26,7 +26,7 @@ export default observer(function App() {
   return (
     <ConfirmProvider locale={i18n.language}>
       <ToasterProvider>
-        <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+        <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
           <Toolbar />
           <ClipboardList />
         </div>

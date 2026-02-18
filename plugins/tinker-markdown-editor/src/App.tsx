@@ -49,7 +49,7 @@ export default observer(function App() {
   }, [])
 
   return (
-    <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+    <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
       <Toolbar />
 
       {/* Main Content */}

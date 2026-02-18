@@ -7,7 +7,7 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <div
-        className={`h-screen flex flex-col transition-colors ${tw.bg.both.secondary}`}
+        className={`h-screen flex flex-col transition-colors ${tw.bg.secondary}`}
       >
         <RecorderControls />
       </div>

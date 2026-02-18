@@ -60,7 +60,7 @@ export default observer(function App() {
 
   return (
     <div
-      className={`h-screen flex flex-col ${tw.bg.both.primary}`}
+      className={`h-screen flex flex-col ${tw.bg.primary}`}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >

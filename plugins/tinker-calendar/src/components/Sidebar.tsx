@@ -79,7 +79,7 @@ const Sidebar = observer(() => {
 
   return (
     <aside
-      className={`w-64 h-full flex flex-col border-t ${tw.border.both} ${tw.bg.both.tertiary}`}
+      className={`w-64 h-full flex flex-col border-t ${tw.border.both} ${tw.bg.tertiary}`}
     >
       <div className={`p-3 border-b ${tw.border.both}`}>
         <h2 className="text-lg font-semibold">{selectedDateLabel}</h2>
@@ -95,7 +95,7 @@ const Sidebar = observer(() => {
             {eventsForSelectedDate.map((event) => (
               <div
                 key={event.id}
-                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.both.tertiary} ${tw.border.both}`}
+                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.tertiary} ${tw.border.both}`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="flex-1 min-w-0">

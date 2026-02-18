@@ -150,9 +150,7 @@ const WaveformVisualizer = ({
   }, [analyser, isRecording, isPaused])
 
   return (
-    <div
-      className={`w-full rounded-lg overflow-hidden ${tw.bg.both.secondary}`}
-    >
+    <div className={`w-full rounded-lg overflow-hidden ${tw.bg.secondary}`}>
       <canvas
         ref={canvasRef}
         className="w-full h-[120px]"

@@ -11,7 +11,7 @@ export default observer(function Sidebar() {
       className={`
         w-56 h-full flex flex-col
         border-r ${tw.border.both}
-        ${tw.bg.both.tertiary}
+        ${tw.bg.tertiary}
         transition-all duration-200
       `}
       style={{

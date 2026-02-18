@@ -20,7 +20,7 @@ export default observer(function App() {
   return (
     <AlertProvider locale={i18n.language}>
       <div
-        className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
+        className={`h-screen flex flex-col transition-colors ${tw.bg.primary}`}
       >
         <Toolbar tabs={tabs} />
 

@@ -32,7 +32,7 @@ export default observer(function SideToolbar() {
 
   return (
     <div
-      className={`w-12 flex flex-col items-center py-3 border-r ${tw.border.both} ${tw.bg.both.tertiary}`}
+      className={`w-12 flex flex-col items-center py-3 border-r ${tw.border.both} ${tw.bg.tertiary}`}
     >
       {SIDE_TOOL_DEFS.map((tool) => {
         const Icon = tool.icon

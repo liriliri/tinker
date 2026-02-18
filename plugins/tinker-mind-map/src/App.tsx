@@ -12,7 +12,7 @@ export default observer(function App() {
 
   return (
     <AlertProvider locale={i18n.language}>
-      <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+      <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
         <Toolbar />
         <div className="flex-1 flex overflow-hidden">
           <Sidebar />

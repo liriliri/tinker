@@ -18,7 +18,7 @@ export default observer(function App() {
     <ConfirmProvider locale={i18n.language}>
       <PromptProvider locale={i18n.language}>
         <div
-          className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary} ${tw.text.both.primary}`}
+          className={`h-screen flex flex-col transition-colors ${tw.bg.primary} ${tw.text.both.primary}`}
         >
           <Toolbar
             calendarRef={calendarRef}

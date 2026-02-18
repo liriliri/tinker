@@ -304,7 +304,7 @@ export default observer(function TopToolbar() {
           onChange={handleWatermarkTextChange}
           disabled={!store.watermarkEnabled}
           placeholder={t('watermarkTextPlaceholder')}
-          className={`h-7 w-24 px-2 text-xs ${tw.bg.both.input} ${tw.primary.focusBorder} disabled:opacity-50`}
+          className={`h-7 w-24 px-2 text-xs ${tw.bg.input} ${tw.primary.focusBorder} disabled:opacity-50`}
           title={t('watermarkTextPlaceholder')}
         />
       </div>

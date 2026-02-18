@@ -27,7 +27,7 @@ export default observer(function ResultDisplay() {
             className={`p-4 rounded-lg cursor-pointer transition-colors ${
               isSourceUnit
                 ? `${tw.primary.bg} text-white`
-                : `${tw.bg.both.secondary} hover:opacity-80`
+                : `${tw.bg.secondary} hover:opacity-80`
             } ${tw.border.both} border`}
             onClick={() => handleCopy(item.value)}
           >

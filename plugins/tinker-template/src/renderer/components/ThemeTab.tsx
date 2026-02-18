@@ -9,7 +9,7 @@ export default observer(function ThemeTab() {
   return (
     <div className="space-y-6">
       <div
-        className={`${tw.bg.both.primary} rounded-lg p-6 border ${tw.border.both}`}
+        className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border.both}`}
       >
         <h2
           className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}
@@ -29,7 +29,7 @@ export default observer(function ThemeTab() {
       </div>
 
       <div
-        className={`${tw.bg.both.primary} rounded-lg p-6 border ${tw.border.both}`}
+        className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border.both}`}
       >
         <h2
           className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.dark.primary}`}

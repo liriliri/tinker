@@ -20,7 +20,7 @@ export default observer(function App() {
       <ToasterProvider>
         <AlertProvider>
           <div
-            className={`h-screen flex items-center justify-center ${tw.bg.both.secondary}`}
+            className={`h-screen flex items-center justify-center ${tw.bg.secondary}`}
           >
             <LoadingCircle />
           </div>
@@ -43,9 +43,7 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <AlertProvider>
-        <div
-          className={`min-h-screen ${tw.bg.both.secondary} transition-colors`}
-        >
+        <div className={`min-h-screen ${tw.bg.secondary} transition-colors`}>
           <div className="max-w-4xl mx-auto px-4 py-6">
             <InfoSection>
               {system?.manufacturer && (

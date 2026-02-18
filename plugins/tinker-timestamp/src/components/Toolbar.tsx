@@ -63,7 +63,7 @@ export default observer(function ToolbarComponent() {
 
       {/* Current Timestamp Display */}
       <div
-        className={`flex items-center gap-1 px-2 py-1 ${tw.bg.both.primary} rounded text-xs font-mono`}
+        className={`flex items-center gap-1 px-2 py-1 ${tw.bg.primary} rounded text-xs font-mono`}
       >
         <Clock size={12} className="text-gray-500 dark:text-gray-400" />
         <span>{store.currentTimestampDisplay}</span>

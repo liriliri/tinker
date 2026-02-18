@@ -10,7 +10,7 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <div
-        className={`h-screen w-screen flex flex-col overflow-hidden ${tw.bg.both.primary}`}
+        className={`h-screen w-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
       >
         <Toolbar />
 
@@ -23,7 +23,7 @@ export default observer(function App() {
 
           {/* Right sidebar - Color Info Blocks */}
           <div
-            className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.both.tertiary} p-6 shadow-lg overflow-y-auto border-l ${tw.border.both}`}
+            className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.tertiary} p-6 shadow-lg overflow-y-auto border-l ${tw.border.both}`}
           >
             <ColorFormats />
             <div className={`border-t ${tw.border.both}`}></div>

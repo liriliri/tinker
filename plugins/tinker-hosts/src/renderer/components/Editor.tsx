@@ -176,7 +176,7 @@ export default observer(function Editor() {
 
           {/* Right side - Readonly badge */}
           <span
-            className={`inline-flex items-center h-6 text-xs ${tw.text.both.tertiary} ${tw.bg.both.secondary} px-2 rounded`}
+            className={`inline-flex items-center h-6 text-xs ${tw.text.both.tertiary} ${tw.bg.secondary} px-2 rounded`}
           >
             {t('readonly')}
           </span>

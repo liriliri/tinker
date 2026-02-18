@@ -115,7 +115,7 @@ export default observer(function CalculationList() {
                 : undefined
             }
             className={className(
-              `px-4 py-3 border-b transition-colors cursor-text border-l-4 ${tw.bg.both.tertiary}`,
+              `px-4 py-3 border-b transition-colors cursor-text border-l-4 ${tw.bg.tertiary}`,
               tw.border.both,
               {
                 'border-l-transparent': !isActive,

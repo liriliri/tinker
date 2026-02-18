@@ -63,7 +63,7 @@ export default observer(function ImageList() {
         {store.images.map((image) => (
           <div
             key={image.id}
-            className={`${tw.bg.both.tertiary} rounded-lg border ${tw.border.both} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
+            className={`${tw.bg.tertiary} rounded-lg border ${tw.border.both} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
             style={{ aspectRatio: '1 / 1' }}
             onContextMenu={(e) => handleContextMenu(e, image.id)}
           >
@@ -95,7 +95,7 @@ export default observer(function ImageList() {
             </div>
 
             {/* Info - fixed height */}
-            <div className={`p-2 ${tw.bg.both.secondary} flex-shrink-0`}>
+            <div className={`p-2 ${tw.bg.secondary} flex-shrink-0`}>
               <p
                 className={`text-xs font-medium ${tw.text.both.primary} truncate mb-1`}
                 title={image.fileName}

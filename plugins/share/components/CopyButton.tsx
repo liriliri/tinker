@@ -39,7 +39,7 @@ export default function CopyButton({
     baseClass = `p-1.5 rounded transition-colors ${tw.hover.both} disabled:opacity-30 disabled:cursor-not-allowed`
   } else {
     // default variant
-    baseClass = `flex-shrink-0 px-3 py-2 rounded ${tw.bg.light.secondary} ${tw.bg.dark.secondary} ${tw.hover.both}`
+    baseClass = `flex-shrink-0 px-3 py-2 rounded ${tw.bg.secondary} ${tw.hover.both}`
   }
 
   // Apply primary color to button when copied (for toolbar variant)

@@ -12,7 +12,7 @@ export default observer(function App() {
     <ToasterProvider>
       <AlertProvider locale={i18n.language}>
         <div
-          className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
+          className={`h-screen flex flex-col transition-colors ${tw.bg.primary}`}
         >
           <div className="flex-1 overflow-hidden">
             <DualPanel />

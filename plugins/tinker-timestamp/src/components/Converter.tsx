@@ -53,7 +53,7 @@ export default observer(function Converter() {
   const cityName = currentTimezoneLabel.split(' | ')[1] || currentTimezoneLabel
 
   return (
-    <div className={`h-full flex flex-col ${tw.bg.both.secondary}`}>
+    <div className={`h-full flex flex-col ${tw.bg.secondary}`}>
       {/* Date to Timestamp */}
       <div className={`flex-1 border-b ${tw.border.both}`}>
         <div className="h-full flex flex-col p-6">
@@ -69,7 +69,7 @@ export default observer(function Converter() {
               className="text-sm"
             />
             <div
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.tertiary}`}
             >
               <div className="flex-1 text-gray-800 dark:text-gray-100 font-mono">
                 {dateToTimestampResult}
@@ -105,7 +105,7 @@ export default observer(function Converter() {
               className="text-sm font-mono"
             />
             <div
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.both.tertiary}`}
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.tertiary}`}
             >
               <div className="flex-1 text-gray-800 dark:text-gray-100">
                 {timestampToDateResult

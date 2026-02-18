@@ -104,8 +104,7 @@ export default observer(function ToolbarComponent() {
           max="2000"
           className={className(
             'w-16 text-xs px-2 py-1 border rounded focus:outline-none dark:text-gray-200',
-            tw.bg.light.input,
-            tw.bg.dark.select,
+            tw.bg.input,
             tw.border.both,
             tw.primary.focusBorder,
             'disabled:opacity-50 disabled:cursor-not-allowed'

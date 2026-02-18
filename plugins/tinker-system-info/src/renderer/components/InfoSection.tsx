@@ -18,7 +18,7 @@ export default observer(function InfoSection({
         </h2>
       )}
       <div
-        className={`${tw.bg.both.tertiary} ${tw.border.both} border rounded-lg overflow-hidden`}
+        className={`${tw.bg.tertiary} ${tw.border.both} border rounded-lg overflow-hidden`}
       >
         {children}
       </div>

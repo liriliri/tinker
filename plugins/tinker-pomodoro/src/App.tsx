@@ -12,7 +12,7 @@ export default observer(function App() {
   return (
     <AlertProvider locale={i18n.language}>
       <div
-        className={`h-screen flex flex-col ${tw.bg.both.secondary} transition-colors overflow-hidden`}
+        className={`h-screen flex flex-col ${tw.bg.secondary} transition-colors overflow-hidden`}
       >
         <div className="flex-1 flex flex-col items-center justify-center">
           <TimerDisplay />

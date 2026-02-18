@@ -6,7 +6,7 @@ import Keypad from './components/Keypad'
 export default observer(function App() {
   return (
     <div
-      className={`h-screen w-full flex items-center justify-center p-4 ${tw.bg.both.secondary}`}
+      className={`h-screen w-full flex items-center justify-center p-4 ${tw.bg.secondary}`}
     >
       <div className="w-full max-w-[1024px]">
         <Display />

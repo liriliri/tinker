@@ -186,7 +186,7 @@ export default function Thumbnail({
           flex items-center justify-center
           rounded-lg text-xs font-normal
           pointer-events-none
-          ${tw.bg.both.primary}
+          ${tw.bg.primary}
           ${tw.text.both.primary}
         `}
       >

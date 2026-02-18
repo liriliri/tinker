@@ -63,7 +63,7 @@ export default observer(function CharacterTypesTable({
     <div className={`overflow-x-auto rounded border ${tw.border.both}`}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className={`${tw.bg.both.secondary}`}>
+          <tr className={`${tw.bg.secondary}`}>
             <td className="w-32"></td>
             {charTypes.map((char) => (
               <th
@@ -83,7 +83,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
             >
               <label className="flex items-center gap-2">
                 <span className="whitespace-nowrap">{t('required')}</span>
@@ -122,7 +122,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
             >
               {t('allowed')}
             </th>
@@ -148,7 +148,7 @@ export default observer(function CharacterTypesTable({
           >
             <th
               scope="row"
-              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.both.secondary}`}
+              className={`px-4 py-3 text-left text-xs font-semibold ${tw.text.both.primary} ${tw.bg.secondary}`}
             >
               {t('forbidden')}
             </th>

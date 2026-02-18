@@ -65,7 +65,7 @@ export default observer(function Display() {
   const displayText = store.hasError ? t('error') : store.displayValue
 
   return (
-    <div className={`px-4 py-4 mb-8 rounded-xl ${tw.bg.both.tertiary}`}>
+    <div className={`px-4 py-4 mb-8 rounded-xl ${tw.bg.tertiary}`}>
       <div
         className={`h-8 flex items-center justify-end text-xl md:text-2xl tracking-wide overflow-hidden ${tw.text.both.tertiary}`}
       >

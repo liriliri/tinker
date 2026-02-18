@@ -18,7 +18,7 @@ const Sidebar = observer(() => {
 
   return (
     <div
-      className={`w-60 ${tw.bg.both.tertiary} border-r ${tw.border.both} flex flex-col`}
+      className={`w-60 ${tw.bg.tertiary} border-r ${tw.border.both} flex flex-col`}
     >
       <div className={`p-4 border-b ${tw.border.both} space-y-4`}>
         <div>
@@ -94,7 +94,7 @@ const Sidebar = observer(() => {
                   key={template.id}
                   className={className(
                     'aspect-square rounded border-2 hover:opacity-80 transition-all overflow-hidden',
-                    tw.bg.both.secondary,
+                    tw.bg.secondary,
                     store.selectedTemplateId === template.id
                       ? tw.primary.border
                       : 'border-transparent'
@@ -116,7 +116,7 @@ const Sidebar = observer(() => {
                     {template.areas.map((area) => (
                       <div
                         key={area}
-                        className={`${tw.bg.both.primary} border ${tw.border.both}`}
+                        className={`${tw.bg.primary} border ${tw.border.both}`}
                         style={{ gridArea: area }}
                       />
                     ))}

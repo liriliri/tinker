@@ -79,9 +79,7 @@ const AudioWaveform = ({
   }, [isPlaying])
 
   return (
-    <div
-      className={`w-full rounded-lg overflow-hidden ${tw.bg.both.secondary} p-4`}
-    >
+    <div className={`w-full rounded-lg overflow-hidden ${tw.bg.secondary} p-4`}>
       <div ref={containerRef} />
     </div>
   )

@@ -59,7 +59,7 @@ export default function Dialog({
             >
               <DialogPanel
                 className={`max-h-[90vh] flex flex-col transform rounded-lg ${
-                  tw.bg.both.secondary
+                  tw.bg.secondary
                 } shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
                 <div className="p-6 pb-0 flex-shrink-0">
@@ -120,7 +120,7 @@ export const DialogButton = ({
   const variantClassName =
     variant === 'primary'
       ? `${tw.primary.bg} ${tw.primary.bgHover} text-white rounded disabled:opacity-50 disabled:cursor-not-allowed`
-      : `${tw.bg.both.tertiary} ${tw.hover.both} ${tw.text.both.secondary} rounded`
+      : `${tw.bg.tertiary} ${tw.hover.both} ${tw.text.both.secondary} rounded`
   const combinedClassName =
     `${baseClassName} ${variantClassName} ${className}`.trim()
 

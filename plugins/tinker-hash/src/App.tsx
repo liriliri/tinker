@@ -13,7 +13,7 @@ export default observer(function App() {
   return (
     <AlertProvider locale={i18n.language}>
       <div
-        className={`h-screen flex flex-col transition-colors ${tw.bg.both.primary}`}
+        className={`h-screen flex flex-col transition-colors ${tw.bg.primary}`}
       >
         {/* Toolbar */}
         <HashToolbar />
@@ -28,7 +28,7 @@ export default observer(function App() {
                   value={store.input}
                   onChange={(e) => store.setInput(e.target.value)}
                   placeholder={t('placeholder')}
-                  className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.both.primary} ${tw.text.both.primary}`}
+                  className={`w-full h-full p-4 resize-none outline-none overflow-x-hidden whitespace-pre-wrap break-words ${tw.bg.primary} ${tw.text.both.primary}`}
                 />
               </div>
             ) : (
@@ -43,7 +43,7 @@ export default observer(function App() {
 
           {/* Right Panel - Results */}
           <div
-            className={`flex-1 p-4 ${tw.bg.both.tertiary} flex flex-col justify-evenly`}
+            className={`flex-1 p-4 ${tw.bg.tertiary} flex flex-col justify-evenly`}
           >
             <HashResult label="md5" value={store.hashResults.md5} />
             <HashResult label="sha1" value={store.hashResults.sha1} />

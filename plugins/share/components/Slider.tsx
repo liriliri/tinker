@@ -63,7 +63,7 @@ const Slider = ({
   return (
     <div
       ref={trackRef}
-      className={`relative h-1.5 rounded-full ${tw.bg.both.secondary} ${
+      className={`relative h-1.5 rounded-full ${tw.bg.secondary} ${
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
       }`}
       onMouseDown={handleMouseDown}
@@ -75,7 +75,7 @@ const Slider = ({
       <div
         className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full ${
           tw.primary.bg
-        } border-2 ${tw.bg.both.primary} shadow-md transition-transform ${
+        } border-2 ${tw.bg.primary} shadow-md transition-transform ${
           isDragging ? 'scale-110' : 'hover:scale-110'
         } ${
           disabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'

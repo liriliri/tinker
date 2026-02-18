@@ -79,7 +79,7 @@ export default observer(function ToolbarComponent() {
           placeholder={t('search')}
           className={className(
             'w-full pl-7 pr-2 py-1',
-            tw.bg.both.input,
+            tw.bg.input,
             `placeholder:${tw.text.light.tertiary}`,
             `dark:placeholder:${tw.text.dark.tertiary}`
           )}

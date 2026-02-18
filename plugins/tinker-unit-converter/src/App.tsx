@@ -7,7 +7,7 @@ import ResultDisplay from './components/ResultDisplay'
 export default observer(function App() {
   return (
     <ToasterProvider>
-      <div className={`h-screen flex flex-col ${tw.bg.both.primary}`}>
+      <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
         <Toolbar />
 
         <div className="flex-1 overflow-y-auto p-6">

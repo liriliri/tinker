@@ -12,7 +12,7 @@ export default observer(function App() {
   return (
     <AlertProvider locale={i18n.language}>
       <div
-        className={`h-screen flex flex-col ${tw.bg.both.primary} transition-colors`}
+        className={`h-screen flex flex-col ${tw.bg.primary} transition-colors`}
       >
         <Toolbar />
         <ExpressionSection />

@@ -26,7 +26,7 @@ export default observer(function App() {
   if (!store.highlighter) {
     return (
       <div
-        className={`h-screen flex items-center justify-center ${tw.bg.both.primary}`}
+        className={`h-screen flex items-center justify-center ${tw.bg.primary}`}
       >
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
@@ -34,9 +34,7 @@ export default observer(function App() {
   }
 
   return (
-    <div
-      className={`h-screen flex flex-col overflow-hidden ${tw.bg.both.primary}`}
-    >
+    <div className={`h-screen flex flex-col overflow-hidden ${tw.bg.primary}`}>
       <Toolbar />
       <div className="flex-1 min-h-0">
         <Frame />

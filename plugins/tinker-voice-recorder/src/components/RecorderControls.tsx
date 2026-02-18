@@ -111,7 +111,7 @@ const RecorderControls = observer(() => {
 
   return (
     <div
-      className={`h-screen flex flex-col items-center justify-center px-6 ${tw.bg.both.secondary}`}
+      className={`h-screen flex flex-col items-center justify-center px-6 ${tw.bg.secondary}`}
     >
       {/* Timer Display */}
       <div
@@ -175,7 +175,7 @@ const RecorderControls = observer(() => {
           <div className="flex items-center gap-6">
             <button
               onClick={handlePauseRecording}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.both.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <Pause size={20} />
             </button>
@@ -217,13 +217,13 @@ const RecorderControls = observer(() => {
             </button>
             <button
               onClick={handleDownload}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.both.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <Save size={20} />
             </button>
             <button
               onClick={handleReset}
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.both.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
+              className={`flex items-center justify-center w-12 h-12 rounded-full ${tw.bg.tertiary} ${tw.text.both.primary} hover:opacity-80 transition-all shadow-md hover:shadow-lg hover:scale-105`}
             >
               <RotateCcw size={20} />
             </button>
