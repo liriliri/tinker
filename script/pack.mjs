@@ -35,6 +35,8 @@ const config = {
   },
   mac: {
     electronLanguages: ['zh_CN', 'en'],
+    entitlements: 'build/entitlements.mac.plist',
+    entitlementsInherit: 'build/entitlements.mac.plist',
     target: [
       {
         target: 'dmg',
