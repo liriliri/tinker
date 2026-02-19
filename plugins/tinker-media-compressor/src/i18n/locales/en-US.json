@@ -1,0 +1,22 @@
+{
+  "openFile": "Open File",
+  "clear": "Clear",
+  "openTitle": "Drop media files here or click to open",
+  "supportedFormats": "Supports MP4, MKV, AVI, MOV, WebM, MP3, M4A, AAC, OGG, FLAC, WAV",
+  "quality": "Quality",
+  "qualityVeryLow": "Very Low",
+  "qualityLow": "Low",
+  "qualityMedium": "Medium",
+  "qualityHigh": "High",
+  "qualityExcellent": "Excellent",
+  "compress": "Compress",
+  "compressing": "Compressing...",
+  "outputDir": "Output Dir",
+  "outputDirPlaceholder": "Same as source",
+  "browseOutputDir": "Browse output directory",
+  "clearOutputDir": "Clear output directory",
+  "originalSize": "Original",
+  "outputSize": "Output",
+  "remove": "Remove",
+  "showInFileManager": "Show in File Manager"
+}

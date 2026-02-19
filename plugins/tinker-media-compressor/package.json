@@ -1,0 +1,19 @@
+{
+  "name": "tinker-media-compressor",
+  "version": "0.1.0",
+  "description": "Media Compressor Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Media Compressor",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "音视频压缩"
+      }
+    }
+  }
+}
