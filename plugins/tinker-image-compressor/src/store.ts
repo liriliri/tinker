@@ -8,6 +8,9 @@ import sum from 'licia/sum'
 import map from 'licia/map'
 import splitPath from 'licia/splitPath'
 import last from 'licia/last'
+import base64 from 'licia/base64'
+import dataUrl from 'licia/dataUrl'
+import mime from 'licia/mime'
 import type { ImageFormat, ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
 
@@ -23,9 +26,6 @@ class Store extends BaseStore {
 
   compareImageId: string | null = null
 
-  private worker: Worker | null = null
-  private workerCallbacks: Map<string, (result: any) => void> = new Map()
-
   constructor() {
     super()
     makeAutoObservable(this)
@@ -35,16 +35,12 @@ class Store extends BaseStore {
   private async init() {
     this.loadQuality()
     this.loadOverwriteSetting()
-    this.initWorker()
   }
 
   private loadQuality() {
     const savedQuality = storage.get(STORAGE_KEY_QUALITY)
     if (savedQuality !== null) {
-      const quality = clamp(toNum(savedQuality), 1, 100)
-      if (quality > 0) {
-        this.quality = quality
-      }
+      this.quality = clamp(toNum(savedQuality), 1, 100)
     }
   }
 
@@ -52,32 +48,6 @@ class Store extends BaseStore {
     const savedOverwrite = storage.get(STORAGE_KEY_OVERWRITE)
     if (savedOverwrite !== null) {
       this.overwriteOriginal = savedOverwrite === 'true'
-    }
-  }
-
-  private initWorker() {
-    this.worker = new Worker(
-      new URL('./lib/compress.worker.ts', import.meta.url),
-      { type: 'module' }
-    )
-
-    this.worker.onmessage = (e) => {
-      const { type, id, result, error } = e.data
-
-      if (type === 'result') {
-        const callback = this.workerCallbacks.get(id)
-        if (callback) {
-          callback(result)
-          this.workerCallbacks.delete(id)
-        }
-      } else if (type === 'error') {
-        console.error('Compression error:', error)
-        const image = this.images.find((img) => img.id === id)
-        if (image) {
-          image.isCompressing = false
-        }
-        this.workerCallbacks.delete(id)
-      }
     }
   }
 
@@ -114,18 +84,7 @@ class Store extends BaseStore {
     const ext = last(fileName.toLowerCase().split('.')) || ''
     if (ext === 'png') return 'png'
     if (ext === 'webp') return 'webp'
-    return 'jpeg' // Default to jpeg for jpg, jpeg and unknown formats
-  }
-
-  private getFormatMimeType(format: ImageFormat): string {
-    switch (format) {
-      case 'jpeg':
-        return 'image/jpeg'
-      case 'png':
-        return 'image/png'
-      case 'webp':
-        return 'image/webp'
-    }
+    return 'jpeg'
   }
 
   private getFormatExtension(format: ImageFormat): string {
@@ -205,22 +164,12 @@ class Store extends BaseStore {
         img.src = url
       })
 
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      if (!ctx) throw new Error('Failed to get canvas context')
-
-      ctx.drawImage(img, 0, 0)
-      const imageData = ctx.getImageData(0, 0, img.width, img.height)
-
       const imageItem: ImageItem = {
         id,
         fileName: file.name,
         filePath,
         originalFormat,
         originalImage: img,
-        originalImageData: imageData,
         originalSize: file.size,
         originalUrl: url,
         compressedBlob: null,
@@ -247,57 +196,126 @@ class Store extends BaseStore {
 
   async compressImage(id: string) {
     const image = this.images.find((img) => img.id === id)
-    if (!image || !this.worker) return
+    if (!image || !image.filePath) return
 
     image.isCompressing = true
 
-    return new Promise<void>((resolve) => {
-      this.workerCallbacks.set(
-        id,
-        (result: { data: Uint8Array; size: number }) => {
-          this.handleCompressResult(id, result)
-          resolve()
+    try {
+      const tmpDir = tinker.tmpdir()
+      const timestamp = Date.now()
+      const extension = this.getFormatExtension(image.originalFormat)
+      const outputPath = `${tmpDir}/tinker-compressed-${timestamp}-${id}.${extension}`
+
+      const ffmpegArgs = ['-i', image.filePath]
+
+      switch (image.originalFormat) {
+        case 'jpeg':
+          // JPEG: Use libx264 quality-based encoding
+          // PicSharp uses: quality, progressive, chromaSubsampling, optimizeCoding, trellisQuantisation
+          ffmpegArgs.push(
+            '-q:v',
+            String(2 + Math.round((100 - this.quality) * 0.29)),
+            '-huffman',
+            'optimal', // optimizeCoding
+            '-sampling-factor',
+            this.quality >= 90 ? '1x1' : '2x2' // chromaSubsampling based on quality
+          )
+
+          // Progressive JPEG for better streaming
+          if (this.quality >= 80) {
+            ffmpegArgs.push('-progressive', '1')
+          }
+          break
+
+        case 'png':
+          // PNG: Use quantization for lossy compression (similar to pngquant/imagequant)
+          if (this.quality < 100) {
+            // Calculate color count based on quality (16 to 256 colors)
+            const maxColors = Math.max(
+              16,
+              Math.round((this.quality / 100) * 256)
+            )
+            // Use split filter to apply palette quantization
+            ffmpegArgs.push(
+              '-vf',
+              `split[a][b];[a]palettegen=max_colors=${maxColors}:stats_mode=single[p];[b][p]paletteuse=dither=sierra2_4a`
+            )
+          }
+          // Use best compression level
+          ffmpegArgs.push('-compression_level', '9')
+          break
+
+        case 'webp':
+          // WebP: Match PicSharp settings
+          // PicSharp uses: quality, lossless, preset, effort, smartSubsample
+          ffmpegArgs.push('-q:v', String(this.quality))
+
+          // Set preset based on quality (higher quality = photo preset)
+          ffmpegArgs.push('-preset', this.quality >= 80 ? 'photo' : 'default')
+
+          // Compression effort (0-6, higher is slower but better)
+          ffmpegArgs.push(
+            '-compression_level',
+            String(Math.min(6, Math.round((this.quality / 100) * 6)))
+          )
+
+          // Enable smart subsampling for better quality
+          if (this.quality >= 80) {
+            ffmpegArgs.push('-auto-alt-ref', '1')
+          }
+          break
+      }
+
+      ffmpegArgs.push('-y', outputPath)
+
+      tinker.runFFmpeg(ffmpegArgs)
+
+      await new Promise<void>((resolve, reject) => {
+        const maxAttempts = 100
+        let attempts = 0
+
+        const checkFile = async () => {
+          try {
+            const buffer = await tinker.readFile(outputPath)
+            if (buffer && buffer.length > 0) {
+              resolve()
+              return
+            }
+          } catch {
+            // File not ready yet
+          }
+
+          attempts++
+          if (attempts >= maxAttempts) {
+            reject(new Error('FFmpeg processing timeout'))
+            return
+          }
+
+          setTimeout(checkFile, 100)
         }
-      )
 
-      this.worker!.postMessage({
-        type: 'compress',
-        id,
-        imageData: {
-          data: image.originalImageData.data,
-          width: image.originalImageData.width,
-          height: image.originalImageData.height,
-        },
-        options: {
-          format: image.originalFormat,
-          quality: this.quality,
-        },
+        checkFile()
       })
-    })
-  }
 
-  private handleCompressResult(
-    id: string,
-    result: { data: Uint8Array; size: number }
-  ) {
-    const image = this.images.find((img) => img.id === id)
-    if (!image) return
+      const compressedBuffer = await tinker.readFile(outputPath)
+      const compressedSize = compressedBuffer.length
 
-    image.compressedSize = result.size
-    image.isSaved = false // Reset saved status when recompressing
+      const base64Str = base64.encode(Array.from(compressedBuffer))
+      const mimeType = mime(image.originalFormat) as string
+      const compressedDataUrl = dataUrl.stringify(base64Str, mimeType, {
+        base64: true,
+      })
 
-    const mimeType = this.getFormatMimeType(image.originalFormat)
-
-    image.compressedBlob = new Blob([new Uint8Array(result.data)], {
-      type: mimeType,
-    })
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      image.compressedDataUrl = reader.result as string
+      image.compressedSize = compressedSize
+      image.compressedDataUrl = compressedDataUrl
+      image.compressedBlob = new Blob([compressedBuffer], { type: mimeType })
+      image.isSaved = false
       image.isCompressing = false
+    } catch (err) {
+      console.error('Compression error:', err)
+      image.isCompressing = false
+      throw err
     }
-    reader.readAsDataURL(image.compressedBlob)
   }
 
   async saveAll() {

@@ -48,19 +48,11 @@ export default observer(function ToolbarComponent() {
   }
 
   const handleOpenImage = async () => {
-    try {
-      await store.openImageDialog()
-    } catch (err) {
-      console.error('Failed to open image:', err)
-    }
+    await store.openImageDialog()
   }
 
   const handleSaveImage = async () => {
-    try {
-      await store.saveAll()
-    } catch (err) {
-      console.error('Failed to save images:', err)
-    }
+    await store.saveAll()
   }
 
   const handleClear = () => {
