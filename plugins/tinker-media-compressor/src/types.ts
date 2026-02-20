@@ -1,5 +1,13 @@
 export type MediaType = 'video' | 'audio'
 
+export interface VideoInfo {
+  width: number
+  height: number
+  fps: number
+  duration: number
+  thumbnail: string
+}
+
 export interface MediaItem {
   id: string
   fileName: string
@@ -12,4 +20,5 @@ export interface MediaItem {
   isDone: boolean
   outputPath: string | null
   error: string | null
+  videoInfo?: VideoInfo
 }

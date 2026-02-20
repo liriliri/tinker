@@ -1,10 +1,27 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Film, Music, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
+import {
+  Film,
+  Music,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  X,
+} from 'lucide-react'
 import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
 import type { MediaItem } from '../types'
 import store from '../store'
+
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = Math.floor(seconds % 60)
+  if (h > 0) {
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  return `${m}:${String(s).padStart(2, '0')}`
+}
 
 function getReduction(item: MediaItem): string {
   if (!item.originalSize || !item.outputSize) return ''
@@ -38,14 +55,32 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
     tinker.showContextMenu(e.clientX, e.clientY, menuItems)
   }
 
+  const { videoInfo } = item
+
   return (
     <div
-      className={`flex items-center gap-3 px-3 py-2.5 rounded border ${tw.bg.secondary} ${tw.border} select-none`}
+      className={`flex items-center gap-3 px-3 py-3 rounded border ${tw.bg.secondary} ${tw.border} select-none`}
       onContextMenu={handleContextMenu}
     >
-      {/* Media type icon */}
-      <div className={`flex-shrink-0 ${tw.text.secondary}`}>
-        {item.mediaType === 'video' ? <Film size={16} /> : <Music size={16} />}
+      {/* Thumbnail or media type icon */}
+      <div className="flex-shrink-0">
+        {videoInfo?.thumbnail ? (
+          <img
+            src={videoInfo.thumbnail}
+            className="w-12 h-8 object-cover rounded"
+            draggable={false}
+          />
+        ) : (
+          <div
+            className={`w-12 h-8 flex items-center justify-center rounded ${tw.bg.tertiary} ${tw.text.secondary}`}
+          >
+            {item.mediaType === 'video' ? (
+              <Film size={16} />
+            ) : (
+              <Music size={16} />
+            )}
+          </div>
+        )}
       </div>
 
       {/* File info */}
@@ -53,8 +88,26 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         <div className={`text-xs font-medium truncate ${tw.text.primary}`}>
           {item.fileName}
         </div>
-        <div className={`text-xs ${tw.text.secondary} mt-0.5`}>
-          {item.originalSize > 0 ? fileSize(item.originalSize) : '--'}
+        <div
+          className={`text-xs ${tw.text.secondary} mt-0.5 flex items-center gap-2`}
+        >
+          <span>
+            {t('size')}:{' '}
+            {item.originalSize > 0 ? fileSize(item.originalSize) : '--'}
+          </span>
+          {videoInfo && (
+            <>
+              <span>
+                {t('resolution')}: {videoInfo.width}×{videoInfo.height}
+              </span>
+              <span>
+                {t('fps')}: {Math.round(videoInfo.fps)}
+              </span>
+              <span>
+                {t('duration')}: {formatDuration(videoInfo.duration)}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -120,6 +173,16 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         {!item.isCompressing && !item.isDone && !item.error && (
           <div className={`text-xs ${tw.text.secondary}`}>—</div>
         )}
+
+        {/* Remove button */}
+        <button
+          onClick={() => store.removeItem(item.id)}
+          title={t('remove')}
+          disabled={item.isCompressing}
+          className={`flex items-center justify-center p-1 rounded ${tw.text.secondary} hover:text-red-500 dark:hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed`}
+        >
+          <X size={14} />
+        </button>
       </div>
     </div>
   )
@@ -128,7 +191,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
 export default observer(function MediaList() {
   return (
     <div className="flex-1 overflow-y-auto p-3">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         {store.items.map((item) => (
           <MediaRow key={item.id} item={item} />
         ))}

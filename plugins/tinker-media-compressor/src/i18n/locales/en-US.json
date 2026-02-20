@@ -20,6 +20,10 @@
   "clearOutputDir": "Clear output directory",
   "originalSize": "Original",
   "outputSize": "Output",
+  "size": "Size",
+  "resolution": "Resolution",
+  "fps": "FPS",
+  "duration": "Duration",
   "remove": "Remove",
   "showInFileManager": "Show in File Manager"
 }

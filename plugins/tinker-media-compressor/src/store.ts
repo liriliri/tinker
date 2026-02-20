@@ -249,9 +249,31 @@ class Store extends BaseStore {
       isDone: false,
       outputPath: null,
       error: null,
+      videoInfo: undefined,
     }
 
     this.items.push(item)
+
+    if (mediaType === 'video') {
+      try {
+        const info = await tinker.getMediaInfo(filePath)
+        const storedItem = this.items.find((i) => i.id === item.id)
+        if (storedItem && info.videoStream) {
+          storedItem.videoInfo = {
+            width: info.videoStream.width,
+            height: info.videoStream.height,
+            fps: info.videoStream.fps,
+            duration: info.duration,
+            thumbnail: info.videoStream.thumbnail,
+          }
+          if (!fileSize && info.size) {
+            storedItem.originalSize = info.size
+          }
+        }
+      } catch (err) {
+        console.error('Failed to get media info:', err)
+      }
+    }
   }
 
   async compressAll() {
