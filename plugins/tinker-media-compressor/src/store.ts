@@ -40,10 +40,15 @@ const VIDEO_CRF_PRESETS = [35, 28, 23, 18, 15]
 const AUDIO_BITRATE_PRESETS = ['64k', '96k', '128k', '192k', '320k']
 
 class Store extends BaseStore {
-  items: MediaItem[] = []
+  videoItems: MediaItem[] = []
+  audioItems: MediaItem[] = []
   quality: number = 2
   outputDir: string = ''
   mode: MediaType = 'video'
+
+  get items(): MediaItem[] {
+    return this.mode === 'video' ? this.videoItems : this.audioItems
+  }
 
   constructor() {
     super()
@@ -83,7 +88,6 @@ class Store extends BaseStore {
 
   setMode(mode: MediaType) {
     this.mode = mode
-    this.items = []
     storage.set(STORAGE_KEY_MODE, mode)
   }
 
@@ -326,7 +330,11 @@ class Store extends BaseStore {
   }
 
   clear() {
-    this.items = []
+    if (this.mode === 'video') {
+      this.videoItems = []
+    } else {
+      this.audioItems = []
+    }
   }
 
   get hasItems() {

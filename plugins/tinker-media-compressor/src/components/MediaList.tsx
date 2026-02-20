@@ -157,10 +157,6 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
             </span>
           </div>
         )}
-
-        {!item.isCompressing && !item.isDone && !item.error && (
-          <div className={`text-xs ${tw.text.secondary}`}>—</div>
-        )}
       </div>
     </div>
   )
