@@ -8,10 +8,17 @@ import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_QUALITY = 'quality'
 const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
+const STORAGE_KEY_MODE = 'mode'
 const storage = new LocalStore('tinker-media-compressor')
 
-const VIDEO_EXTENSIONS = new Set(['.mp4', '.mkv', '.avi', '.mov', '.webm'])
-const AUDIO_EXTENSIONS = new Set([
+export const VIDEO_EXTENSIONS = new Set([
+  '.mp4',
+  '.mkv',
+  '.avi',
+  '.mov',
+  '.webm',
+])
+export const AUDIO_EXTENSIONS = new Set([
   '.mp3',
   '.m4a',
   '.aac',
@@ -36,6 +43,7 @@ class Store extends BaseStore {
   items: MediaItem[] = []
   quality: number = 2
   outputDir: string = ''
+  mode: MediaType = 'video'
 
   constructor() {
     super()
@@ -46,6 +54,7 @@ class Store extends BaseStore {
   private async init() {
     this.loadQuality()
     this.loadOutputDir()
+    this.loadMode()
   }
 
   private loadQuality() {
@@ -63,6 +72,19 @@ class Store extends BaseStore {
     if (saved !== null) {
       this.outputDir = saved
     }
+  }
+
+  private loadMode() {
+    const saved = storage.get(STORAGE_KEY_MODE)
+    if (saved === 'video' || saved === 'audio') {
+      this.mode = saved
+    }
+  }
+
+  setMode(mode: MediaType) {
+    this.mode = mode
+    this.items = []
+    storage.set(STORAGE_KEY_MODE, mode)
   }
 
   setQuality(quality: number) {
@@ -169,33 +191,23 @@ class Store extends BaseStore {
 
   async openMediaDialog() {
     try {
+      const filters =
+        this.mode === 'video'
+          ? [
+              {
+                name: 'Video',
+                extensions: ['mp4', 'mkv', 'avi', 'mov', 'webm'],
+              },
+            ]
+          : [
+              {
+                name: 'Audio',
+                extensions: ['mp3', 'm4a', 'aac', 'ogg', 'flac', 'wav'],
+              },
+            ]
+
       const result = await tinker.showOpenDialog({
-        filters: [
-          {
-            name: 'Video',
-            extensions: ['mp4', 'mkv', 'avi', 'mov', 'webm'],
-          },
-          {
-            name: 'Audio',
-            extensions: ['mp3', 'm4a', 'aac', 'ogg', 'flac', 'wav'],
-          },
-          {
-            name: 'All Media',
-            extensions: [
-              'mp4',
-              'mkv',
-              'avi',
-              'mov',
-              'webm',
-              'mp3',
-              'm4a',
-              'aac',
-              'ogg',
-              'flac',
-              'wav',
-            ],
-          },
-        ],
+        filters,
         properties: ['openFile', 'multiSelections'],
       })
 
@@ -220,8 +232,10 @@ class Store extends BaseStore {
     // Skip duplicates
     if (this.items.some((i) => i.filePath === filePath)) return
 
-    const { name } = splitPath(filePath)
     const mediaType = this.detectMediaType(filePath)
+    if (mediaType !== this.mode) return
+
+    const { name } = splitPath(filePath)
 
     const item: MediaItem = {
       id: `${Date.now()}-${Math.random()}`,

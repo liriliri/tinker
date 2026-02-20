@@ -1,7 +1,10 @@
 {
+  "video": "Video",
+  "audio": "Audio",
   "openFile": "Open File",
   "clear": "Clear",
-  "openTitle": "Drop media files here or click to open",
+  "openTitleVideo": "Drop video files here or click to open",
+  "openTitleAudio": "Drop audio files here or click to open",
   "supportedFormats": "Supports MP4, MKV, AVI, MOV, WebM, MP3, M4A, AAC, OGG, FLAC, WAV",
   "quality": "Quality",
   "qualityVeryLow": "Very Low",

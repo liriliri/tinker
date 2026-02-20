@@ -4,7 +4,7 @@ import { FilePlus2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MediaList from './components/MediaList'
-import store, { SUPPORTED_EXTENSIONS } from './store'
+import store, { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './store'
 
 export default observer(function App() {
   const { t } = useTranslation()
@@ -18,9 +18,11 @@ export default observer(function App() {
     e.preventDefault()
     e.stopPropagation()
 
+    const extensions =
+      store.mode === 'video' ? VIDEO_EXTENSIONS : AUDIO_EXTENSIONS
     const files = Array.from(e.dataTransfer.files).filter((file) => {
       const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0] || ''
-      return SUPPORTED_EXTENSIONS.has(ext)
+      return extensions.has(ext)
     })
 
     if (files.length === 0) return
@@ -52,11 +54,10 @@ export default observer(function App() {
                 className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
                 strokeWidth={1.5}
               />
-              <p className={`text-lg font-medium ${tw.text.primary} mb-2`}>
-                {t('openTitle')}
-              </p>
-              <p className="text-sm text-[#6e6e6e] dark:text-[#8a8a8a]">
-                {t('supportedFormats')}
+              <p className={`text-lg font-medium ${tw.text.primary}`}>
+                {store.mode === 'video'
+                  ? t('openTitleVideo')
+                  : t('openTitleAudio')}
               </p>
             </div>
           </div>

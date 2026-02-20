@@ -1,7 +1,10 @@
 {
+  "video": "视频",
+  "audio": "音频",
   "openFile": "打开文件",
   "clear": "清空",
-  "openTitle": "拖拽音视频到此处或点击打开",
+  "openTitleVideo": "拖拽视频到此处或点击打开",
+  "openTitleAudio": "拖拽音频到此处或点击打开",
   "supportedFormats": "支持 MP4、MKV、AVI、MOV、WebM、MP3、M4A、AAC、OGG、FLAC、WAV",
   "quality": "质量",
   "qualityVeryLow": "非常低",
