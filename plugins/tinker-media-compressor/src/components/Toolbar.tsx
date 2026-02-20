@@ -136,7 +136,7 @@ export default observer(function ToolbarComponent() {
             onClick={handleCompress}
             disabled={store.isCompressing || !store.hasUncompressed}
           >
-            {store.isCompressing ? t('compressing') : t('compress')}
+            {t('compress')}
           </ToolbarTextButton>
         </>
       )}
