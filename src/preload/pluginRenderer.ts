@@ -48,6 +48,7 @@ export function injectApi() {
     on: _tinker.on,
     runFFmpeg,
     showContextMenu,
+    getMediaInfo: _tinker.getMediaInfo,
   }
 
   function showContextMenu(x, y, options) {

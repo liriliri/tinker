@@ -4,6 +4,27 @@ import uuid from 'licia/uuid'
 import toNum from 'licia/toNum'
 import { isDev } from 'share/common/util'
 
+export interface VideoStream {
+  codec: string
+  width: number
+  height: number
+  fps: number
+  bitrate?: number
+  thumbnail: string
+}
+
+export interface AudioStream {
+  codec: string
+  sampleRate?: number
+  bitrate?: number
+}
+
+export interface MediaInfo {
+  duration: number
+  videoStream?: VideoStream
+  audioStream?: AudioStream
+}
+
 export interface RunProgress {
   bitrate: string
   fps: number
@@ -19,20 +40,30 @@ type ProgressCallback = (progress: RunProgress) => void
 
 const regDuration = /Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/
 const regProgress =
-  /frame=\s*(\d+)\s+fps=\s*([\d.]+)\s+q=([\d.-]+)\s+(?:L?size|Lsize)=\s*(\d+\w+)\s+time=(\d{2}):(\d{2}):(\d{2}\.\d{2})\s+bitrate=\s*([\d.]+\w+\/s)\s+speed=\s*([\d.]+x)/
+  /frame=\s*(\d+)\s+fps=\s*([\d.]+)\s+q=([\d.-]+)\s+L?size=\s*(\d+\w+)\s+time=(\d{2}):(\d{2}):(\d{2}\.\d{2})\s+bitrate=\s*([\d.]+\w+\/s)\s+speed=\s*([\d.]+x)/
+const regVideoStream =
+  /Stream[^\n]*?: Video: (\w+)[^\n]*?(\d{3,5})x(\d{3,5})[^\n]*?([\d.]+) fps/
+const regVideoBitrate = /Stream[^\n]*?: Video:[^\n]*?(\d+) kb\/s/
+const regAudioStream = /Stream[^\n]*?: Audio: (\w+)[^\n]*?(\d+) Hz/
+const regAudioBitrate = /Stream[^\n]*?: Audio:[^\n]*?(\d+) kb\/s/
+
+function getFFmpegPath(): string {
+  let ffmpegPath = ffmpegStatic || ''
+  if (!ffmpegPath) {
+    throw new Error('FFmpeg binary not found')
+  }
+  if (!isDev()) {
+    ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked')
+  }
+  return ffmpegPath
+}
 
 class FFmpegTask {
   private promise: Promise<void>
   private ffmpegProcess: ChildProcess | null = null
 
   constructor(args: string[], onProgress?: ProgressCallback) {
-    let ffmpegPath = ffmpegStatic || ''
-    if (!ffmpegPath) {
-      throw new Error('FFmpeg binary not found')
-    }
-    if (!isDev()) {
-      ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked')
-    }
+    const ffmpegPath = getFFmpegPath()
 
     let duration = 0
     let lastProgressTime = 0
@@ -176,4 +207,116 @@ export function killFFmpeg(taskId: string): void {
 
 export function quitFFmpeg(taskId: string): void {
   ffmpegManager.quit(taskId)
+}
+
+export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
+  const info = await new Promise<MediaInfo>((resolve, reject) => {
+    const ffmpegPath = getFFmpegPath()
+    const ffmpegProcess = spawn(ffmpegPath, ['-i', filePath])
+
+    let stderrData = ''
+
+    ffmpegProcess.stderr?.on('data', (data: Buffer) => {
+      stderrData += data.toString()
+    })
+
+    ffmpegProcess.on('close', () => {
+      const durationMatch = stderrData.match(regDuration)
+      if (!durationMatch) {
+        reject(new Error('Not a valid media file'))
+        return
+      }
+
+      const hours = toNum(durationMatch[1])
+      const minutes = toNum(durationMatch[2])
+      const seconds = toNum(durationMatch[3])
+      const duration = hours * 3600 + minutes * 60 + seconds
+
+      const info: MediaInfo = { duration }
+
+      const videoMatch = stderrData.match(regVideoStream)
+      if (videoMatch) {
+        info.videoStream = {
+          codec: videoMatch[1],
+          width: toNum(videoMatch[2]),
+          height: toNum(videoMatch[3]),
+          fps: toNum(videoMatch[4]),
+          thumbnail: '',
+        }
+
+        const videoBitrateMatch = stderrData.match(regVideoBitrate)
+        if (videoBitrateMatch) {
+          info.videoStream.bitrate = toNum(videoBitrateMatch[1])
+        }
+      }
+
+      const audioMatch = stderrData.match(regAudioStream)
+      if (audioMatch) {
+        info.audioStream = {
+          codec: audioMatch[1],
+          sampleRate: toNum(audioMatch[2]),
+        }
+
+        const audioBitrateMatch = stderrData.match(regAudioBitrate)
+        if (audioBitrateMatch) {
+          info.audioStream.bitrate = toNum(audioBitrateMatch[1])
+        }
+      }
+
+      resolve(info)
+    })
+
+    ffmpegProcess.on('error', (err) => {
+      reject(err)
+    })
+  })
+
+  if (info.videoStream) {
+    info.videoStream.thumbnail = await generateThumbnail(
+      filePath,
+      Math.min(1, info.duration / 2)
+    )
+  }
+
+  return info
+}
+
+function generateThumbnail(
+  filePath: string,
+  seekTime: number
+): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const ffmpegProcess = spawn(getFFmpegPath(), [
+      '-ss',
+      String(seekTime),
+      '-i',
+      filePath,
+      '-vframes',
+      '1',
+      '-f',
+      'image2pipe',
+      '-vcodec',
+      'mjpeg',
+      'pipe:1',
+    ])
+
+    const chunks: Buffer[] = []
+
+    ffmpegProcess.stdout?.on('data', (data: Buffer) => {
+      chunks.push(data)
+    })
+
+    ffmpegProcess.on('close', () => {
+      if (chunks.length === 0) {
+        reject(new Error('Failed to generate thumbnail'))
+        return
+      }
+      const buffer = Buffer.concat(chunks)
+      resolve(`data:image/jpeg;base64,${buffer.toString('base64')}`)
+    })
+
+    ffmpegProcess.on('error', (err) => {
+      reject(err)
+    })
+  })
 }

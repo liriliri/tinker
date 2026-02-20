@@ -41,6 +41,48 @@ interface FFmpegTask {
   quit(): void
 }
 
+/**
+ * Video stream information parsed from media file.
+ */
+interface VideoStream {
+  /** Video codec name (e.g., "h264", "vp9") */
+  codec: string
+  /** Video width in pixels */
+  width: number
+  /** Video height in pixels */
+  height: number
+  /** Frame rate (e.g., 29.97) */
+  fps: number
+  /** Video bitrate in kb/s */
+  bitrate?: number
+  /** Thumbnail of the video as a JPEG data URL */
+  thumbnail: string
+}
+
+/**
+ * Audio stream information parsed from media file.
+ */
+interface AudioStream {
+  /** Audio codec name (e.g., "aac", "mp3") */
+  codec: string
+  /** Sample rate in Hz (e.g., 44100) */
+  sampleRate?: number
+  /** Audio bitrate in kb/s */
+  bitrate?: number
+}
+
+/**
+ * Media file information returned by getMediaInfo.
+ */
+interface MediaInfo {
+  /** Duration in seconds */
+  duration: number
+  /** Video stream info, present only if the file contains a video stream */
+  videoStream?: VideoStream
+  /** Audio stream info, present only if the file contains an audio stream */
+  audioStream?: AudioStream
+}
+
 declare global {
   /**
    * Global Tinker API for plugin development.
@@ -224,6 +266,21 @@ declare global {
       args: string[],
       onProgress?: (progress: RunProgress) => void
     ): FFmpegTask
+
+    /**
+     * Get media information for a file using FFmpeg.
+     * Throws an error if the file is not a valid media file.
+     * @param filePath - Absolute path to the media file
+     * @returns Media info including duration, video stream, and audio stream
+     * @example
+     * const info = await tinker.getMediaInfo('/path/to/video.mp4')
+     * console.log(info.duration)               // e.g., 123.4
+     * console.log(info.videoStream?.codec)     // e.g., 'h264'
+     * console.log(info.videoStream?.thumbnail) // 'data:image/jpeg;base64,...'
+     * console.log(info.audioStream?.codec)     // e.g., 'aac'
+     * console.log(info.audioStream?.sampleRate) // e.g., 44100
+     */
+    getMediaInfo(filePath: string): Promise<MediaInfo>
 
     /**
      * Show a context menu at the specified position.

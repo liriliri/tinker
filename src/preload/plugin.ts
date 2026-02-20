@@ -14,7 +14,7 @@ import * as pluginRenderer from './pluginRenderer'
 import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
 import { injectRendererScript, domReady } from './lib/util'
-import { runFFmpeg, killFFmpeg, quitFFmpeg } from './lib/ffmpeg'
+import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import types from 'licia/types'
 import { i18n } from 'common/util'
@@ -101,6 +101,7 @@ const tinkerObj = {
   runFFmpeg,
   killFFmpeg,
   quitFFmpeg,
+  getMediaInfo,
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)
