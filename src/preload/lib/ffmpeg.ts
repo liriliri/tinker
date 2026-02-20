@@ -1,4 +1,5 @@
 import { spawn, ChildProcess } from 'child_process'
+import { stat } from 'fs/promises'
 import ffmpegStatic from 'ffmpeg-static'
 import uuid from 'licia/uuid'
 import toNum from 'licia/toNum'
@@ -20,6 +21,8 @@ export interface AudioStream {
 }
 
 export interface MediaInfo {
+  /** in bytes */
+  size: number
   duration: number
   videoStream?: VideoStream
   audioStream?: AudioStream
@@ -232,7 +235,7 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
       const seconds = toNum(durationMatch[3])
       const duration = hours * 3600 + minutes * 60 + seconds
 
-      const info: MediaInfo = { duration }
+      const info: MediaInfo = { size: 0, duration }
 
       const videoMatch = stderrData.match(regVideoStream)
       if (videoMatch) {
@@ -270,6 +273,8 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
       reject(err)
     })
   })
+
+  info.size = (await stat(filePath)).size
 
   if (info.videoStream) {
     info.videoStream.thumbnail = await generateThumbnail(

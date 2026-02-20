@@ -50,6 +50,8 @@ interface AudioStream {
 }
 
 interface MediaInfo {
+  /** in bytes */
+  size: number
   /** in seconds */
   duration: number
   /** present only if the file contains a video stream */
