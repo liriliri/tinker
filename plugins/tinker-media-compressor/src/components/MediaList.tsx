@@ -1,13 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import {
-  Film,
-  Music,
-  CheckCircle2,
-  Loader2,
-  AlertCircle,
-  X,
-} from 'lucide-react'
+import { Film, Music, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
 import type { MediaItem } from '../types'
@@ -59,9 +52,15 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
 
   return (
     <div
-      className={`flex items-center gap-3 px-3 py-3 rounded border ${tw.bg.secondary} ${tw.border} select-none`}
+      className={`relative flex items-center gap-3 px-3 py-3 rounded border overflow-hidden ${tw.bg.secondary} ${tw.border} select-none`}
       onContextMenu={handleContextMenu}
     >
+      {item.isCompressing && (
+        <div
+          className="absolute inset-0 bg-green-500/10 dark:bg-green-500/15 transition-[width] duration-300"
+          style={{ width: `${item.progress}%` }}
+        />
+      )}
       {/* Thumbnail or media type icon */}
       <div className="flex-shrink-0">
         {videoInfo?.thumbnail ? (
@@ -112,23 +111,12 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
       </div>
 
       {/* Status area */}
-      <div className="flex-shrink-0 flex items-center gap-2">
+      <div className="relative flex-shrink-0 flex items-center gap-2">
         {item.isCompressing && (
-          <div className="flex items-center gap-2">
-            {/* Progress bar */}
-            <div className="w-24">
-              <div className={`h-1.5 rounded-full ${tw.bg.tertiary}`}>
-                <div
-                  className={`h-full rounded-full ${tw.primary.bg} transition-all duration-300`}
-                  style={{ width: `${item.progress}%` }}
-                />
-              </div>
-              <div
-                className={`text-xs text-center mt-0.5 ${tw.text.secondary}`}
-              >
-                {item.progress}%
-              </div>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-xs ${tw.text.secondary}`}>
+              {item.progress}%
+            </span>
             <Loader2 size={14} className={`${tw.primary.text} animate-spin`} />
           </div>
         )}
@@ -173,16 +161,6 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         {!item.isCompressing && !item.isDone && !item.error && (
           <div className={`text-xs ${tw.text.secondary}`}>—</div>
         )}
-
-        {/* Remove button */}
-        <button
-          onClick={() => store.removeItem(item.id)}
-          title={t('remove')}
-          disabled={item.isCompressing}
-          className={`flex items-center justify-center p-1 rounded ${tw.text.secondary} hover:text-red-500 dark:hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed`}
-        >
-          <X size={14} />
-        </button>
       </div>
     </div>
   )

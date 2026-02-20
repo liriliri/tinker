@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
 import clamp from 'licia/clamp'
@@ -295,13 +295,13 @@ class Store extends BaseStore {
       const outputPath = this.getOutputPath(item)
       const ffmpegArgs = this.buildFFmpegArgs(item, outputPath)
 
-      console.log('FFmpeg command:', 'ffmpeg', ffmpegArgs.join(' '))
-
       // runFFmpeg returns a Promise at runtime (extended with kill/quit)
       await (tinker.runFFmpeg(ffmpegArgs, (progress) => {
-        if (progress.percent !== undefined) {
-          item.progress = Math.min(99, Math.round(progress.percent))
-        }
+        runInAction(() => {
+          if (progress.percent !== undefined) {
+            item.progress = Math.min(99, Math.round(progress.percent))
+          }
+        })
       }) as unknown as Promise<void>)
 
       const buf = await tinker.readFile(outputPath)
