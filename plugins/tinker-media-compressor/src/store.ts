@@ -3,7 +3,7 @@ import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
 import clamp from 'licia/clamp'
 import splitPath from 'licia/splitPath'
-import type { MediaItem, MediaType } from './types'
+import type { MediaItem, MediaType, AudioInfo } from './types'
 import BaseStore from 'share/BaseStore'
 
 const STORAGE_KEY_QUALITY = 'quality'
@@ -254,29 +254,39 @@ class Store extends BaseStore {
       outputPath: null,
       error: null,
       videoInfo: undefined,
+      audioInfo: undefined,
     }
 
     this.items.push(item)
 
-    if (mediaType === 'video') {
-      try {
-        const info = await tinker.getMediaInfo(filePath)
-        const storedItem = this.items.find((i) => i.id === item.id)
-        if (storedItem && info.videoStream) {
-          storedItem.videoInfo = {
-            width: info.videoStream.width,
-            height: info.videoStream.height,
-            fps: info.videoStream.fps,
-            duration: info.duration,
-            thumbnail: info.videoStream.thumbnail,
-          }
-          if (!fileSize && info.size) {
-            storedItem.originalSize = info.size
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get media info:', err)
+    try {
+      const info = await tinker.getMediaInfo(filePath)
+      const storedItem = this.items.find((i) => i.id === item.id)
+      if (!storedItem) return
+
+      if (!fileSize && info.size) {
+        storedItem.originalSize = info.size
       }
+
+      if (mediaType === 'video' && info.videoStream) {
+        storedItem.videoInfo = {
+          width: info.videoStream.width,
+          height: info.videoStream.height,
+          fps: info.videoStream.fps,
+          duration: info.duration,
+          thumbnail: info.videoStream.thumbnail,
+        }
+      } else if (mediaType === 'audio' && info.audioStream) {
+        const audioInfo: AudioInfo = {
+          duration: info.duration,
+          codec: info.audioStream.codec,
+          sampleRate: info.audioStream.sampleRate,
+          bitrate: info.audioStream.bitrate,
+        }
+        storedItem.audioInfo = audioInfo
+      }
+    } catch (err) {
+      console.error('Failed to get media info:', err)
     }
   }
 

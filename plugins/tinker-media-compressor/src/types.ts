@@ -8,6 +8,13 @@ export interface VideoInfo {
   thumbnail: string
 }
 
+export interface AudioInfo {
+  duration: number
+  codec: string
+  sampleRate?: number
+  bitrate?: number
+}
+
 export interface MediaItem {
   id: string
   fileName: string
@@ -21,4 +28,5 @@ export interface MediaItem {
   outputPath: string | null
   error: string | null
   videoInfo?: VideoInfo
+  audioInfo?: AudioInfo
 }

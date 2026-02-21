@@ -23,6 +23,8 @@
   "resolution": "Resolution",
   "fps": "FPS",
   "duration": "Duration",
+  "bitrate": "Bitrate",
+  "sampleRate": "Sample Rate",
   "remove": "Remove",
   "showInFileManager": "Show in File Manager"
 }

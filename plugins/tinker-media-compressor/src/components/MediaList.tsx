@@ -2,18 +2,15 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Film, Music, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import fileSize from 'licia/fileSize'
+import durationFormat from 'licia/durationFormat'
 import { tw } from 'share/theme'
 import type { MediaItem } from '../types'
 import store from '../store'
 
 function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = Math.floor(seconds % 60)
-  if (h > 0) {
-    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-  }
-  return `${m}:${String(s).padStart(2, '0')}`
+  return seconds >= 3600
+    ? durationFormat(seconds * 1000, 'H:mm:ss')
+    : durationFormat(seconds * 1000, 'm:ss')
 }
 
 function getReduction(item: MediaItem): string {
@@ -105,6 +102,25 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
               <span>
                 {t('duration')}: {formatDuration(videoInfo.duration)}
               </span>
+            </>
+          )}
+          {item.audioInfo && (
+            <>
+              <span>
+                {t('duration')}: {formatDuration(item.audioInfo.duration)}
+              </span>
+              {item.audioInfo.bitrate && (
+                <span>
+                  {t('bitrate')}: {Math.round(item.audioInfo.bitrate / 1000)}
+                  kbps
+                </span>
+              )}
+              {item.audioInfo.sampleRate && (
+                <span>
+                  {t('sampleRate')}:{' '}
+                  {(item.audioInfo.sampleRate / 1000).toFixed(1)}kHz
+                </span>
+              )}
             </>
           )}
         </div>

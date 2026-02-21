@@ -23,6 +23,8 @@
   "resolution": "分辨率",
   "fps": "帧率",
   "duration": "时长",
+  "bitrate": "比特率",
+  "sampleRate": "采样率",
   "remove": "移除",
   "showInFileManager": "在文件管理器中显示"
 }
