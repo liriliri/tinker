@@ -1,3 +1,8 @@
+## v0.13.0 (23 Feb 2026)
+
+* feat: add mind map
+* feat: add media compressor
+
 ## v0.12.0 (12 Feb 2026)
 
 * feat: add system info
