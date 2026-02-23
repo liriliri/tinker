@@ -111,8 +111,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
               </span>
               {item.audioInfo.bitrate && (
                 <span>
-                  {t('bitrate')}: {Math.round(item.audioInfo.bitrate / 1000)}
-                  kbps
+                  {t('bitrate')}: {Math.round(item.audioInfo.bitrate)}kbps
                 </span>
               )}
               {item.audioInfo.sampleRate && (
