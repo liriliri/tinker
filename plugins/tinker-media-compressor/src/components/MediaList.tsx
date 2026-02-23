@@ -46,7 +46,45 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
     tinker.showContextMenu(e.clientX, e.clientY, menuItems)
   }
 
-  const { videoInfo } = item
+  const { videoInfo, compressedVideoInfo, audioInfo, compressedAudioInfo } =
+    item
+  const hasCompressed =
+    item.isDone && (compressedVideoInfo || compressedAudioInfo)
+
+  const renderValue = (
+    original: string | number,
+    compressed?: string | number,
+    unit?: string
+  ) => {
+    if (!hasCompressed || compressed === undefined) {
+      return (
+        <span>
+          {original}
+          {unit}
+        </span>
+      )
+    }
+    if (String(original) === String(compressed)) {
+      return (
+        <span>
+          {original}
+          {unit}
+        </span>
+      )
+    }
+    return (
+      <>
+        <span className="line-through opacity-50">
+          {original}
+          {unit}
+        </span>
+        <span className="ml-1">
+          {compressed}
+          {unit}
+        </span>
+      </>
+    )
+  }
 
   return (
     <div
@@ -95,30 +133,67 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
           {videoInfo && (
             <>
               <span>
-                {t('resolution')}: {videoInfo.width}×{videoInfo.height}
+                {t('resolution')}:{' '}
+                {renderValue(
+                  `${videoInfo.width}×${videoInfo.height}`,
+                  compressedVideoInfo
+                    ? `${compressedVideoInfo.width}×${compressedVideoInfo.height}`
+                    : undefined
+                )}
               </span>
               <span>
-                {t('fps')}: {Math.round(videoInfo.fps)}
+                {t('fps')}:{' '}
+                {renderValue(
+                  Math.round(videoInfo.fps),
+                  compressedVideoInfo
+                    ? Math.round(compressedVideoInfo.fps)
+                    : undefined
+                )}
               </span>
               <span>
                 {t('duration')}: {formatDuration(videoInfo.duration)}
               </span>
-            </>
-          )}
-          {item.audioInfo && (
-            <>
-              <span>
-                {t('duration')}: {formatDuration(item.audioInfo.duration)}
-              </span>
-              {item.audioInfo.bitrate && (
+              {videoInfo.bitrate && (
                 <span>
-                  {t('bitrate')}: {Math.round(item.audioInfo.bitrate)}kbps
+                  {t('bitrate')}:{' '}
+                  {renderValue(
+                    Math.round(videoInfo.bitrate),
+                    compressedVideoInfo?.bitrate
+                      ? Math.round(compressedVideoInfo.bitrate)
+                      : undefined,
+                    'kbps'
+                  )}
                 </span>
               )}
-              {item.audioInfo.sampleRate && (
+            </>
+          )}
+          {audioInfo && (
+            <>
+              <span>
+                {t('duration')}: {formatDuration(audioInfo.duration)}
+              </span>
+              {audioInfo.bitrate && (
+                <span>
+                  {t('bitrate')}:{' '}
+                  {renderValue(
+                    Math.round(audioInfo.bitrate),
+                    compressedAudioInfo?.bitrate
+                      ? Math.round(compressedAudioInfo.bitrate)
+                      : undefined,
+                    'kbps'
+                  )}
+                </span>
+              )}
+              {audioInfo.sampleRate && (
                 <span>
                   {t('sampleRate')}:{' '}
-                  {(item.audioInfo.sampleRate / 1000).toFixed(1)}kHz
+                  {renderValue(
+                    (audioInfo.sampleRate / 1000).toFixed(1),
+                    compressedAudioInfo?.sampleRate
+                      ? (compressedAudioInfo.sampleRate / 1000).toFixed(1)
+                      : undefined,
+                    'kHz'
+                  )}
                 </span>
               )}
             </>

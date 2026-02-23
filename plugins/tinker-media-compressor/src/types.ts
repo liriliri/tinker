@@ -1,11 +1,16 @@
 export type MediaType = 'video' | 'audio'
 
+export type VideoCompressionMode = 'crf' | 'bitrate' | 'resolution'
+export type AudioCompressionMode = 'bitrate' | 'samplerate'
+
 export interface VideoInfo {
+  codec: string
   width: number
   height: number
   fps: number
   duration: number
   thumbnail: string
+  bitrate?: number
 }
 
 export interface AudioInfo {
@@ -29,4 +34,6 @@ export interface MediaItem {
   error: string | null
   videoInfo?: VideoInfo
   audioInfo?: AudioInfo
+  compressedVideoInfo?: VideoInfo
+  compressedAudioInfo?: AudioInfo
 }
