@@ -29,8 +29,8 @@
     "gen:icon": "lsla genIcon --input src/renderer/ --output src/renderer/icon.css --name tinker-icon --source src/renderer/icon/",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "init": "npm run screenCapture",
-    "screenCapture": "zx script/screenCapture.mjs"
+    "init": "npm run resources",
+    "resources": "zx script/resources.mjs"
   },
   "repository": {
     "type": "git",
@@ -42,9 +42,9 @@
   "author": "surunzi",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/liriliri/opheia/issues"
+    "url": "https://github.com/liriliri/tinker/issues"
   },
-  "homepage": "https://github.com/liriliri/opheia#readme",
+  "homepage": "https://github.com/liriliri/tinker#readme",
   "devDependencies": {
     "@headlessui/react": "^2.2.9",
     "@tailwindcss/postcss": "^4.1.17",
