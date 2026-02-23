@@ -6,6 +6,7 @@ import durationFormat from 'licia/durationFormat'
 import { tw } from 'share/theme'
 import type { MediaItem } from '../types'
 import store from '../store'
+import { MenuItemConstructorOptions } from 'electron'
 
 function formatDuration(seconds: number): string {
   return seconds >= 3600
@@ -27,7 +28,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
   const { t } = useTranslation()
 
   const handleContextMenu = (e: React.MouseEvent) => {
-    const menuItems = []
+    const menuItems: MenuItemConstructorOptions[] = []
 
     if (item.isDone && item.outputPath) {
       menuItems.push({
