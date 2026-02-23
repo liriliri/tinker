@@ -26,5 +26,5 @@
   "bitrate": "比特率",
   "sampleRate": "采样率",
   "remove": "移除",
-  "showInFileManager": "在文件管理器中显示"
+  "showInFileManager": "打开所在位置"
 }
