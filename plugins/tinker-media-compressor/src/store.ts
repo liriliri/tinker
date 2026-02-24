@@ -44,11 +44,8 @@ export const SUPPORTED_EXTENSIONS = new Set([
 // CRF presets for H.264/VP9: lower value = higher quality (0-51, typical 18-28)
 export const VIDEO_CRF_PRESETS = [35, 28, 23, 18, 15]
 
-// Bitrate percentage presets (percentage of original bitrate)
-export const VIDEO_BITRATE_PERCENTAGES = [30, 50, 70, 85, 95]
-
-// Resolution percentage presets (percentage of original dimensions)
-export const VIDEO_RESOLUTION_PERCENTAGES = [30, 50, 70, 85, 95]
+// Quality percentage presets used for both bitrate and resolution modes
+export const VIDEO_QUALITY_PERCENTAGES = [30, 50, 70, 85, 95]
 
 // Audio bitrate presets
 export const AUDIO_BITRATE_PRESETS = ['64k', '96k', '128k', '192k', '320k']
@@ -68,13 +65,19 @@ class Store extends BaseStore {
   videoCompressionMode: VideoCompressionMode = 'crf'
   audioCompressionMode: AudioCompressionMode = 'bitrate'
 
+  private gpuEncoder: string | null = null
+  private gpuEncoderChecked = false
+
   get items(): MediaItem[] {
     return this.mode === 'video' ? this.videoItems : this.audioItems
   }
 
   constructor() {
     super()
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      gpuEncoder: false,
+      gpuEncoderChecked: false,
+    } as any)
     this.init()
   }
 
@@ -179,7 +182,11 @@ class Store extends BaseStore {
     return `${dir}${baseName}_compressed${ext}`
   }
 
-  private buildCrfArgs(isVP9: boolean, crf: number): string[] {
+  private buildCrfArgs(
+    isVP9: boolean,
+    crf: number,
+    gpuEncoder?: string | null
+  ): string[] {
     if (isVP9) {
       // -deadline good -cpu-used 2 balances encoding speed and quality for VP9
       return [
@@ -201,6 +208,11 @@ class Store extends BaseStore {
         '128k',
       ]
     }
+
+    if (gpuEncoder) {
+      return this.buildGpuCrfArgs(gpuEncoder, crf)
+    }
+
     // -preset slow improves compression ~5-10% over default; yuv420p ensures broad device compatibility
     return [
       '-c:v',
@@ -218,23 +230,173 @@ class Store extends BaseStore {
     ]
   }
 
-  private buildFFmpegArgs(item: MediaItem, outputPath: string): string[] {
+  // Maps CRF (0-51, lower=better) to VideoToolbox q:v (0-100, higher=better)
+  private crfToQv(crf: number): number {
+    return Math.round(clamp(65 - (crf - 15) * 2.75, 1, 100))
+  }
+
+  private buildGpuCrfArgs(gpuEncoder: string, crf: number): string[] {
+    switch (gpuEncoder) {
+      case 'h264_videotoolbox':
+        return [
+          '-c:v',
+          'h264_videotoolbox',
+          '-q:v',
+          String(this.crfToQv(crf)),
+          '-c:a',
+          'aac',
+          '-b:a',
+          '128k',
+        ]
+      case 'h264_nvenc':
+        return [
+          '-c:v',
+          'h264_nvenc',
+          '-cq',
+          String(crf),
+          '-preset',
+          'p4',
+          '-pix_fmt',
+          'yuv420p',
+          '-c:a',
+          'aac',
+          '-b:a',
+          '128k',
+        ]
+      case 'h264_qsv':
+        return [
+          '-c:v',
+          'h264_qsv',
+          '-global_quality',
+          String(crf),
+          '-look_ahead',
+          '1',
+          '-c:a',
+          'aac',
+          '-b:a',
+          '128k',
+        ]
+      case 'h264_amf':
+        return [
+          '-c:v',
+          'h264_amf',
+          '-quality',
+          'quality',
+          '-qp_i',
+          String(crf),
+          '-qp_p',
+          String(crf),
+          '-c:a',
+          'aac',
+          '-b:a',
+          '128k',
+        ]
+      default:
+        return []
+    }
+  }
+
+  private buildGpuBitrateArgs(
+    gpuEncoder: string,
+    targetBitrate: number,
+    maxrate: number,
+    bufsize: number
+  ): string[] {
+    const bitrateArgs = [
+      '-b:v',
+      `${targetBitrate}k`,
+      '-maxrate',
+      `${maxrate}k`,
+      '-bufsize',
+      `${bufsize}k`,
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+    ]
+    switch (gpuEncoder) {
+      case 'h264_videotoolbox':
+        return ['-c:v', 'h264_videotoolbox', ...bitrateArgs]
+      case 'h264_nvenc':
+        return [
+          '-c:v',
+          'h264_nvenc',
+          '-preset',
+          'p4',
+          '-pix_fmt',
+          'yuv420p',
+          ...bitrateArgs,
+        ]
+      case 'h264_qsv':
+        return ['-c:v', 'h264_qsv', ...bitrateArgs]
+      case 'h264_amf':
+        return ['-c:v', 'h264_amf', ...bitrateArgs]
+      default:
+        return []
+    }
+  }
+
+  private async detectGpuEncoder(): Promise<string | null> {
+    if (this.gpuEncoderChecked) return this.gpuEncoder
+
+    const candidates = [
+      'h264_videotoolbox',
+      'h264_nvenc',
+      'h264_qsv',
+      'h264_amf',
+    ]
+    for (const encoder of candidates) {
+      try {
+        await (tinker.runFFmpeg([
+          '-f',
+          'lavfi',
+          '-i',
+          'color=black:s=64x64:d=0.1',
+          '-t',
+          '0.1',
+          '-c:v',
+          encoder,
+          '-an',
+          '-f',
+          'null',
+          '/dev/null',
+        ]) as unknown as Promise<void>)
+        this.gpuEncoder = encoder
+        break
+      } catch {
+        // Encoder not available, try next
+      }
+    }
+
+    this.gpuEncoderChecked = true
+    return this.gpuEncoder
+  }
+
+  private buildFFmpegArgs(
+    item: MediaItem,
+    outputPath: string,
+    gpuEncoder?: string | null
+  ): string[] {
     const args = ['-i', item.filePath]
 
     if (item.mediaType === 'video') {
       // Use source codec to select output codec rather than relying on file extension
       const videoCodec = item.videoInfo?.codec || ''
       const isVP9 = videoCodec === 'vp9' || videoCodec === 'vp8'
+      // VP9 has no widely available hardware encoder; only accelerate H.264
+      const gpu = isVP9 ? null : gpuEncoder ?? null
 
       if (this.videoCompressionMode === 'crf') {
         const crf = VIDEO_CRF_PRESETS[this.quality]
-        args.push(...this.buildCrfArgs(isVP9, crf))
+        args.push(...this.buildCrfArgs(isVP9, crf, gpu))
       } else if (this.videoCompressionMode === 'bitrate') {
-        const percentage = VIDEO_BITRATE_PERCENTAGES[this.quality]
+        const percentage = VIDEO_QUALITY_PERCENTAGES[this.quality]
         const originalBitrate = item.videoInfo?.bitrate || 0
 
         if (originalBitrate > 0) {
           const targetBitrate = Math.round((originalBitrate * percentage) / 100)
+          const maxrate = Math.round(targetBitrate * 1.5)
+          const bufsize = targetBitrate * 2
 
           if (isVP9) {
             // VBR: allow 1.5x burst headroom for complex scenes; -deadline good -cpu-used 2 for speed/quality balance
@@ -244,9 +406,9 @@ class Store extends BaseStore {
               '-b:v',
               `${targetBitrate}k`,
               '-maxrate',
-              `${Math.round(targetBitrate * 1.5)}k`,
+              `${maxrate}k`,
               '-bufsize',
-              `${targetBitrate * 2}k`,
+              `${bufsize}k`,
               '-deadline',
               'good',
               '-cpu-used',
@@ -258,6 +420,10 @@ class Store extends BaseStore {
               '-b:a',
               '128k'
             )
+          } else if (gpu) {
+            args.push(
+              ...this.buildGpuBitrateArgs(gpu, targetBitrate, maxrate, bufsize)
+            )
           } else {
             // VBR: remove -minrate to allow encoder to go below target for simple content
             args.push(
@@ -268,9 +434,9 @@ class Store extends BaseStore {
               '-b:v',
               `${targetBitrate}k`,
               '-maxrate',
-              `${Math.round(targetBitrate * 1.5)}k`,
+              `${maxrate}k`,
               '-bufsize',
-              `${targetBitrate * 2}k`,
+              `${bufsize}k`,
               '-pix_fmt',
               'yuv420p',
               '-c:a',
@@ -281,10 +447,10 @@ class Store extends BaseStore {
           }
         } else {
           const crf = VIDEO_CRF_PRESETS[this.quality]
-          args.push(...this.buildCrfArgs(isVP9, crf))
+          args.push(...this.buildCrfArgs(isVP9, crf, gpu))
         }
       } else if (this.videoCompressionMode === 'resolution') {
-        const percentage = VIDEO_RESOLUTION_PERCENTAGES[this.quality]
+        const percentage = VIDEO_QUALITY_PERCENTAGES[this.quality]
         const originalWidth = item.videoInfo?.width || 0
         const originalHeight = item.videoInfo?.height || 0
         const originalBitrate = item.videoInfo?.bitrate || 0
@@ -301,6 +467,8 @@ class Store extends BaseStore {
             const targetBitrate = Math.round(
               (originalBitrate * percentage) / 100
             )
+            const maxrate = Math.round(targetBitrate * 1.5)
+            const bufsize = targetBitrate * 2
 
             if (isVP9) {
               // Lanczos downscaling preserves sharpness better than default bilinear
@@ -312,9 +480,9 @@ class Store extends BaseStore {
                 '-b:v',
                 `${targetBitrate}k`,
                 '-maxrate',
-                `${Math.round(targetBitrate * 1.5)}k`,
+                `${maxrate}k`,
                 '-bufsize',
-                `${targetBitrate * 2}k`,
+                `${bufsize}k`,
                 '-deadline',
                 'good',
                 '-cpu-used',
@@ -325,6 +493,17 @@ class Store extends BaseStore {
                 'libopus',
                 '-b:a',
                 '128k'
+              )
+            } else if (gpu) {
+              args.push(
+                '-vf',
+                `scale=${evenWidth}:${evenHeight}:flags=lanczos`,
+                ...this.buildGpuBitrateArgs(
+                  gpu,
+                  targetBitrate,
+                  maxrate,
+                  bufsize
+                )
               )
             } else {
               args.push(
@@ -337,9 +516,9 @@ class Store extends BaseStore {
                 '-b:v',
                 `${targetBitrate}k`,
                 '-maxrate',
-                `${Math.round(targetBitrate * 1.5)}k`,
+                `${maxrate}k`,
                 '-bufsize',
-                `${targetBitrate * 2}k`,
+                `${bufsize}k`,
                 '-pix_fmt',
                 'yuv420p',
                 '-c:a',
@@ -349,6 +528,7 @@ class Store extends BaseStore {
               )
             }
           } else {
+            const crf = VIDEO_CRF_PRESETS[this.quality]
             if (isVP9) {
               args.push(
                 '-vf',
@@ -356,7 +536,7 @@ class Store extends BaseStore {
                 '-c:v',
                 'libvpx-vp9',
                 '-crf',
-                '28',
+                String(crf),
                 '-b:v',
                 '0',
                 '-deadline',
@@ -370,6 +550,12 @@ class Store extends BaseStore {
                 '-b:a',
                 '128k'
               )
+            } else if (gpu) {
+              args.push(
+                '-vf',
+                `scale=${evenWidth}:${evenHeight}:flags=lanczos`,
+                ...this.buildGpuCrfArgs(gpu, crf)
+              )
             } else {
               args.push(
                 '-vf',
@@ -379,7 +565,7 @@ class Store extends BaseStore {
                 '-preset',
                 'slow',
                 '-crf',
-                '28',
+                String(crf),
                 '-pix_fmt',
                 'yuv420p',
                 '-c:a',
@@ -391,7 +577,7 @@ class Store extends BaseStore {
           }
         } else {
           const crf = VIDEO_CRF_PRESETS[this.quality]
-          args.push(...this.buildCrfArgs(isVP9, crf))
+          args.push(...this.buildCrfArgs(isVP9, crf, gpu))
         }
       }
     } else {
@@ -558,7 +744,8 @@ class Store extends BaseStore {
 
     try {
       const outputPath = this.getOutputPath(item)
-      const ffmpegArgs = this.buildFFmpegArgs(item, outputPath)
+      const gpuEncoder = await this.detectGpuEncoder()
+      const ffmpegArgs = this.buildFFmpegArgs(item, outputPath, gpuEncoder)
 
       await (tinker.runFFmpeg(ffmpegArgs, (progress) => {
         runInAction(() => {
