@@ -1,3 +1,5 @@
+import durationFormat from 'licia/durationFormat'
+
 /**
  * Open an image file using native dialog and return File with path
  */
@@ -31,4 +33,12 @@ export async function openImageFile(options?: {
     console.error('Failed to load image:', error)
     return null
   }
+}
+
+export function mediaDurationFormat(seconds: number) {
+  if (seconds > 3600) {
+    return durationFormat(Math.round(seconds * 1000), 'hh:mm:ss')
+  }
+
+  return durationFormat(Math.round(seconds * 1000), 'mm:ss')
 }

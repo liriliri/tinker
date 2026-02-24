@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Mic, Square, Pause, Play, Save, RotateCcw } from 'lucide-react'
-import durationFormat from 'licia/durationFormat'
 import dateFormat from 'licia/dateFormat'
 import toast from 'react-hot-toast'
 import { tw } from 'share/theme'
+import { mediaDurationFormat } from 'share/lib/util'
 import store from '../store'
 import { AudioRecorder } from '../lib/AudioRecorder'
 import WaveformVisualizer from './WaveformVisualizer'
@@ -117,7 +117,7 @@ const RecorderControls = observer(() => {
       <div
         className={`text-5xl font-mono tabular-nums text-center w-[240px] ${tw.text.primary} dark:text-gray-100 mb-14`}
       >
-        {durationFormat(store.currentRecordingDuration * 1000, 'mm:ss')}
+        {mediaDurationFormat(store.currentRecordingDuration)}
       </div>
 
       {/* Play Time Display - always occupy space */}
@@ -125,7 +125,7 @@ const RecorderControls = observer(() => {
         className={`text-2xl font-mono tabular-nums text-center w-[240px] ${tw.text.secondary} dark:text-gray-400 -mt-8 mb-10`}
       >
         {store.isPreview
-          ? durationFormat(store.currentPlayTime * 1000, 'mm:ss')
+          ? mediaDurationFormat(store.currentPlayTime)
           : '\u00A0'}
       </div>
 

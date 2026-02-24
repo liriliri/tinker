@@ -2,17 +2,11 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Film, Music, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import fileSize from 'licia/fileSize'
-import durationFormat from 'licia/durationFormat'
 import { tw } from 'share/theme'
+import { mediaDurationFormat } from 'share/lib/util'
 import type { MediaItem } from '../types'
 import store from '../store'
 import { MenuItemConstructorOptions } from 'electron'
-
-function formatDuration(seconds: number): string {
-  return seconds >= 3600
-    ? durationFormat(seconds * 1000, 'H:mm:ss')
-    : durationFormat(seconds * 1000, 'm:ss')
-}
 
 function getReduction(item: MediaItem): string {
   if (!item.originalSize || !item.outputSize) return ''
@@ -151,7 +145,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
                 )}
               </span>
               <span>
-                {t('duration')}: {formatDuration(videoInfo.duration)}
+                {t('duration')}: {mediaDurationFormat(videoInfo.duration)}
               </span>
               {videoInfo.bitrate && (
                 <span>
@@ -170,7 +164,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
           {audioInfo && (
             <>
               <span>
-                {t('duration')}: {formatDuration(audioInfo.duration)}
+                {t('duration')}: {mediaDurationFormat(audioInfo.duration)}
               </span>
               {audioInfo.bitrate && (
                 <span>
