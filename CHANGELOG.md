@@ -1,3 +1,7 @@
+## v0.13.2 (26 Feb 2026)
+
+* fix(image-compressor): unable to compress jpg
+
 ## v0.13.1 (25 Feb 2026)
 
 * perf(media-compressor): use gpu if available
