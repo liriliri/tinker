@@ -34,12 +34,29 @@ export interface RunProgress {
   frame: number
   percent?: number
   q: number | string
-  size: string
+  size: number
   speed: string
   time: string
 }
 
 type ProgressCallback = (progress: RunProgress) => void
+
+function parseSizeToBytes(size: string): number {
+  const match = size.match(/^(\d+)(\w+)$/)
+  if (!match) return 0
+  const value = parseInt(match[1], 10)
+  const unit = match[2].toLowerCase()
+  switch (unit) {
+    case 'kb':
+      return value * 1024
+    case 'mb':
+      return value * 1024 * 1024
+    case 'gb':
+      return value * 1024 * 1024 * 1024
+    default:
+      return value
+  }
+}
 
 const regDuration = /Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/
 const regProgress =
@@ -114,7 +131,7 @@ class FFmpegTask {
             frame: toNum(frame),
             fps: toNum(fps),
             q: isNaN(qValue) ? q : qValue,
-            size,
+            size: parseSizeToBytes(size),
             time: `${timeH}:${timeM}:${timeS}`,
             bitrate,
             speed,

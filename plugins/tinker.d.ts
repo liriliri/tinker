@@ -17,8 +17,8 @@ interface RunProgress {
   /** 0-100, only available when duration is known */
   percent?: number
   q: number | string
-  /** e.g., "1024kB" */
-  size: string
+  /** in bytes */
+  size: number
   /** e.g., "1.5x" */
   speed: string
   /** e.g., "00:01:23.45" */

@@ -12,18 +12,6 @@ import {
   AUDIO_SAMPLERATE_BITRATES,
 } from './constants'
 
-// Parse FFmpeg size string (e.g. "1024kB", "10MB") to bytes
-export function parseFFmpegSize(sizeStr: string): number {
-  const match = sizeStr.match(/^([\d.]+)\s*(k?B|MB|GB)$/i)
-  if (!match) return 0
-  const value = parseFloat(match[1])
-  const unit = match[2].toLowerCase()
-  if (unit === 'kb') return value * 1024
-  if (unit === 'mb') return value * 1024 * 1024
-  if (unit === 'gb') return value * 1024 * 1024 * 1024
-  return value
-}
-
 // Maps CRF (0-51, lower=better) to VideoToolbox q:v (0-100, higher=better)
 function crfToQv(crf: number): number {
   return Math.round(clamp(65 - (crf - 15) * 2.75, 1, 100))

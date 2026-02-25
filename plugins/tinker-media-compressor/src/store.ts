@@ -21,7 +21,7 @@ import {
   AUDIO_SAMPLERATE_PRESETS,
   AUDIO_SAMPLERATE_BITRATES,
 } from './lib/constants'
-import { buildFFmpegArgs, parseFFmpegSize } from './lib/ffmpegArgs'
+import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
 
 export {
@@ -309,7 +309,7 @@ class Store extends BaseStore {
             progress.percent < 100 &&
             progress.size
           ) {
-            const currentBytes = parseFFmpegSize(progress.size)
+            const currentBytes = progress.size
             if (currentBytes > 0) {
               item.currentSize = currentBytes
               const count = (this.sizeUpdateCount.get(item.id) || 0) + 1
