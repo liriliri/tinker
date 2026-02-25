@@ -296,7 +296,7 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
   if (info.videoStream) {
     info.videoStream.thumbnail = await generateThumbnail(
       filePath,
-      Math.min(1, info.duration / 2)
+      info.duration * 0.1
     )
   }
 
