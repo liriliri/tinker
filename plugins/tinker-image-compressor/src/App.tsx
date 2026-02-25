@@ -26,7 +26,6 @@ export default observer(function App() {
       file.type.startsWith('image/')
     )
     if (imageFiles.length === 0) {
-      console.warn('Only image files are supported')
       return
     }
 
@@ -37,8 +36,8 @@ export default observer(function App() {
         return { file, filePath }
       })
       await store.loadImages(fileArray)
-    } catch (err) {
-      console.error('Failed to load images:', err)
+    } catch {
+      // loadImages handles errors internally
     }
   }
 

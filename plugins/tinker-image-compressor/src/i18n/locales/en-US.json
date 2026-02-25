@@ -14,12 +14,8 @@
   "original": "Original",
   "compressed": "Compressed",
   "remove": "Remove",
-  "statistics": "Statistics",
-  "totalImages": "Total Images",
-  "totalOriginalSize": "Total Original Size",
-  "totalCompressedSize": "Total Compressed Size",
-  "totalReduction": "Total Reduction",
   "overwriteOriginal": "Overwrite",
+  "keepExif": "Keep EXIF",
   "compareImages": "Compare Images",
   "copy": "Copy"
 }

@@ -14,12 +14,8 @@
   "original": "原图",
   "compressed": "压缩后",
   "remove": "移除",
-  "statistics": "统计信息",
-  "totalImages": "总图片数",
-  "totalOriginalSize": "压缩前总大小",
-  "totalCompressedSize": "压缩后总大小",
-  "totalReduction": "总减少",
   "overwriteOriginal": "覆盖原图",
+  "keepExif": "保留 EXIF",
   "compareImages": "图片对比",
   "copy": "复制"
 }
