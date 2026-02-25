@@ -38,10 +38,6 @@ Click [here](https://github.com/liriliri/tinker/releases/) to download and insta
 TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
 
 <table width="100%" style="text-align:center">
-  <colgroup>
-    <col width="50%">
-    <col width="50%">
-  </colgroup>
   <tbody>
     <tr>
       <th width="50%">Calculation Pad</th>
