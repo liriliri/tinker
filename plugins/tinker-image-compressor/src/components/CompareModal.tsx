@@ -16,7 +16,7 @@ export default observer(function CompareModal() {
     store.setCompareImageId(null)
   }
 
-  if (!image || !image.compressedDataUrl) {
+  if (!image || !image.compressedUrl) {
     return null
   }
 
@@ -45,7 +45,7 @@ export default observer(function CompareModal() {
             />
             <img
               slot="second"
-              src={image.compressedDataUrl}
+              src={image.compressedUrl}
               alt={t('compressed')}
               style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
             />

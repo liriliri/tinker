@@ -27,7 +27,7 @@ export default observer(function ImageList() {
     }
 
     // Only show compare option if image has been compressed
-    if (image.compressedDataUrl) {
+    if (image.compressedUrl) {
       menuItems.push({
         label: t('compareImages'),
         click: () => store.setCompareImageId(imageId),
@@ -71,7 +71,7 @@ export default observer(function ImageList() {
               style={getCheckboardStyle(store.isDark)}
             >
               <img
-                src={image.compressedDataUrl || image.originalImage.src}
+                src={image.compressedUrl || image.originalImage.src}
                 alt={image.fileName}
                 className="max-w-full max-h-full object-contain"
               />

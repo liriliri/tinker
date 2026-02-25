@@ -7,8 +7,6 @@ import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
 import map from 'licia/map'
 import splitPath from 'licia/splitPath'
-import base64 from 'licia/base64'
-import dataUrl from 'licia/dataUrl'
 import mime from 'licia/mime'
 import type { ImageFormat, ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
@@ -86,9 +84,10 @@ class Store extends BaseStore {
   private invalidateCompressedData() {
     for (const image of this.images) {
       if (image.compressedBlob) {
+        URL.revokeObjectURL(image.compressedUrl)
         image.compressedBlob = null
         image.compressedSize = 0
-        image.compressedDataUrl = ''
+        image.compressedUrl = ''
         image.isSaved = false
       }
     }
@@ -181,7 +180,7 @@ class Store extends BaseStore {
       originalUrl: url,
       compressedBlob: null,
       compressedSize: 0,
-      compressedDataUrl: '',
+      compressedUrl: '',
       isCompressing: false,
       isSaved: false,
     }
@@ -231,15 +230,16 @@ class Store extends BaseStore {
 
       const compressedSize = compressedBuffer.length
 
-      const base64Str = base64.encode(Array.from(compressedBuffer))
       const mimeType = mime(image.originalFormat) as string
-      const compressedDataUrl = dataUrl.stringify(base64Str, mimeType, {
-        base64: true,
-      })
+      const compressedBlob = new Blob([compressedBuffer], { type: mimeType })
+      if (image.compressedUrl) {
+        URL.revokeObjectURL(image.compressedUrl)
+      }
+      const compressedUrl = URL.createObjectURL(compressedBlob)
 
       image.compressedSize = compressedSize
-      image.compressedDataUrl = compressedDataUrl
-      image.compressedBlob = new Blob([compressedBuffer], { type: mimeType })
+      image.compressedUrl = compressedUrl
+      image.compressedBlob = compressedBlob
       image.isSaved = false
       image.isCompressing = false
     } catch (err) {
@@ -325,12 +325,20 @@ class Store extends BaseStore {
     if (index !== -1) {
       const image = this.images[index]
       URL.revokeObjectURL(image.originalUrl)
+      if (image.compressedUrl) {
+        URL.revokeObjectURL(image.compressedUrl)
+      }
       this.images.splice(index, 1)
     }
   }
 
   clear() {
-    each(this.images, (image) => URL.revokeObjectURL(image.originalUrl))
+    each(this.images, (image) => {
+      URL.revokeObjectURL(image.originalUrl)
+      if (image.compressedUrl) {
+        URL.revokeObjectURL(image.compressedUrl)
+      }
+    })
     this.images = []
   }
 

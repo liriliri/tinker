@@ -10,7 +10,7 @@ export interface ImageItem {
   originalUrl: string
   compressedBlob: Blob | null
   compressedSize: number
-  compressedDataUrl: string
+  compressedUrl: string
   isCompressing: boolean
   isSaved: boolean
 }

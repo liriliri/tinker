@@ -62,7 +62,7 @@ export default function Dialog({
                   tw.bg.secondary
                 } shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
-                <div className="p-6 pb-0 flex-shrink-0">
+                <div className="p-6 pb-2 flex-shrink-0">
                   {title && !showClose && (
                     <DialogTitle
                       as="h3"
@@ -98,7 +98,7 @@ export default function Dialog({
                     </div>
                   )}
                 </div>
-                <div className="p-6 overflow-y-auto flex-1 min-h-0">
+                <div className="p-6 pt-4 overflow-y-auto flex-1 min-h-0">
                   {children}
                 </div>
               </DialogPanel>
