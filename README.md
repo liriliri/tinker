@@ -44,7 +44,7 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
   </colgroup>
   <tbody>
     <tr>
-      <th>Calculation Pad</th>
+      <th width="50%">Calculation Pad</th>
       <th>Code Image</th>
     </tr>
     <tr>
