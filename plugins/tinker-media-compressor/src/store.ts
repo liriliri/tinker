@@ -56,6 +56,18 @@ export const AUDIO_SAMPLERATE_PRESETS = [22050, 32000, 44100, 48000, 96000]
 // Audio bitrate presets for samplerate mode (matched to quality levels)
 export const AUDIO_SAMPLERATE_BITRATES = ['96k', '128k', '192k', '256k', '320k']
 
+// Parse FFmpeg size string (e.g. "1024kB", "10MB") to bytes
+function parseFFmpegSize(sizeStr: string): number {
+  const match = sizeStr.match(/^([\d.]+)\s*(k?B|MB|GB)$/i)
+  if (!match) return 0
+  const value = parseFloat(match[1])
+  const unit = match[2].toLowerCase()
+  if (unit === 'kb') return value * 1024
+  if (unit === 'mb') return value * 1024 * 1024
+  if (unit === 'gb') return value * 1024 * 1024 * 1024
+  return value
+}
+
 class Store extends BaseStore {
   videoItems: MediaItem[] = []
   audioItems: MediaItem[] = []
@@ -67,7 +79,9 @@ class Store extends BaseStore {
 
   private gpuEncoder: string | null = null
   private gpuEncoderChecked = false
-
+  private currentTask: ReturnType<typeof tinker.runFFmpeg> | null = null
+  private cancelRequested = false
+  private sizeUpdateCount = new Map<string, number>()
   get items(): MediaItem[] {
     return this.mode === 'video' ? this.videoItems : this.audioItems
   }
@@ -77,6 +91,9 @@ class Store extends BaseStore {
     makeAutoObservable(this, {
       gpuEncoder: false,
       gpuEncoderChecked: false,
+      currentTask: false,
+      cancelRequested: false,
+      sizeUpdateCount: false,
     } as any)
     this.init()
   }
@@ -683,6 +700,8 @@ class Store extends BaseStore {
       mediaType,
       originalSize: fileSize || 0,
       outputSize: 0,
+      currentSize: 0,
+      estimatedSize: 0,
       progress: 0,
       isCompressing: false,
       isDone: false,
@@ -728,7 +747,9 @@ class Store extends BaseStore {
   }
 
   async compressAll() {
+    this.cancelRequested = false
     for (const item of this.items) {
+      if (this.cancelRequested) break
       if (!item.isDone && !item.isCompressing) {
         await this.compressItem(item.id)
       }
@@ -747,13 +768,35 @@ class Store extends BaseStore {
       const gpuEncoder = await this.detectGpuEncoder()
       const ffmpegArgs = this.buildFFmpegArgs(item, outputPath, gpuEncoder)
 
-      await (tinker.runFFmpeg(ffmpegArgs, (progress) => {
+      const task = tinker.runFFmpeg(ffmpegArgs, (progress) => {
         runInAction(() => {
           if (progress.percent !== undefined) {
             item.progress = Math.min(99, Math.round(progress.percent))
           }
+          if (
+            progress.percent &&
+            progress.percent > 0 &&
+            progress.percent < 100 &&
+            progress.size
+          ) {
+            const currentBytes = parseFFmpegSize(progress.size)
+            if (currentBytes > 0) {
+              item.currentSize = currentBytes
+              const count = (this.sizeUpdateCount.get(item.id) || 0) + 1
+              this.sizeUpdateCount.set(item.id, count)
+              if (count % 10 === 0) {
+                item.estimatedSize = Math.round(
+                  currentBytes / (progress.percent / 100)
+                )
+              }
+            }
+          }
         })
-      }) as unknown as Promise<void>)
+      })
+      this.currentTask = task
+
+      await (task as unknown as Promise<void>)
+      this.currentTask = null
 
       const info = await tinker.getMediaInfo(outputPath)
 
@@ -784,12 +827,28 @@ class Store extends BaseStore {
         }
       })
     } catch (err) {
+      this.currentTask = null
+      if (this.cancelRequested) {
+        runInAction(() => {
+          item.isCompressing = false
+          item.progress = 0
+        })
+        return
+      }
       const message = err instanceof Error ? err.message : String(err)
       console.error('Compression error:', message)
       runInAction(() => {
         item.error = message
         item.isCompressing = false
       })
+    }
+  }
+
+  cancelCompression() {
+    this.cancelRequested = true
+    if (this.currentTask) {
+      this.currentTask.quit()
+      this.currentTask = null
     }
   }
 

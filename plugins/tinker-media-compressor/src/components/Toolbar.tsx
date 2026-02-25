@@ -133,6 +133,7 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarButton
         onClick={() => store.openMediaDialog()}
+        disabled={store.isCompressing}
         title={t('openFile')}
       >
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
@@ -140,7 +141,7 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarButton
         onClick={() => store.clear()}
-        disabled={!store.hasItems}
+        disabled={!store.hasItems || store.isCompressing}
         title={t('clear')}
       >
         <ListX size={TOOLBAR_ICON_SIZE} />
@@ -214,10 +215,15 @@ export default observer(function ToolbarComponent() {
           <ToolbarSeparator />
 
           <ToolbarTextButton
-            onClick={() => store.compressAll()}
-            disabled={store.isCompressing || !store.hasUncompressed}
+            variant={store.isCompressing ? 'secondary' : 'primary'}
+            onClick={() =>
+              store.isCompressing
+                ? store.cancelCompression()
+                : store.compressAll()
+            }
+            disabled={!store.isCompressing && !store.hasUncompressed}
           >
-            {t('compress')}
+            {store.isCompressing ? t('cancel') : t('compress')}
           </ToolbarTextButton>
         </>
       )}

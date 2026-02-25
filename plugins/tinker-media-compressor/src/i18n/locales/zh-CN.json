@@ -13,6 +13,7 @@
   "qualityHigh": "高",
   "qualityExcellent": "极好",
   "compress": "压缩",
+  "cancel": "取消",
   "outputDir": "输出目录",
   "outputDirPlaceholder": "同源文件目录",
   "browseOutputDir": "浏览输出目录",

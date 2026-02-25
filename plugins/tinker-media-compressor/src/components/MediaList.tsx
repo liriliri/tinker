@@ -22,6 +22,8 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
   const { t } = useTranslation()
 
   const handleContextMenu = (e: React.MouseEvent) => {
+    if (item.isCompressing) return
+
     const menuItems: MenuItemConstructorOptions[] = []
 
     if (item.isDone && item.outputPath) {
@@ -82,7 +84,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
 
   return (
     <div
-      className={`relative flex items-center gap-3 px-3 py-3 rounded border overflow-hidden ${tw.bg.secondary} ${tw.border} select-none`}
+      className={`relative flex items-center gap-3 px-3 py-2 rounded border overflow-hidden ${tw.bg.secondary} ${tw.border} select-none`}
       onContextMenu={handleContextMenu}
     >
       {item.isCompressing && (
@@ -96,7 +98,7 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         {videoInfo?.thumbnail ? (
           <img
             src={videoInfo.thumbnail}
-            className="w-12 h-8 object-cover rounded"
+            className="w-12 h-8 object-cover"
             draggable={false}
           />
         ) : (
@@ -199,9 +201,12 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
       <div className="relative flex-shrink-0 flex items-center gap-2">
         {item.isCompressing && (
           <div className="flex items-center gap-1.5">
-            <span className={`text-xs ${tw.text.secondary}`}>
-              {item.progress}%
-            </span>
+            {item.currentSize > 0 && item.estimatedSize > 0 && (
+              <div className={`text-right text-xs ${tw.text.secondary}`}>
+                <div>{fileSize(item.currentSize)}</div>
+                <div>~{fileSize(item.estimatedSize)}</div>
+              </div>
+            )}
             <Loader2 size={14} className={`${tw.primary.text} animate-spin`} />
           </div>
         )}

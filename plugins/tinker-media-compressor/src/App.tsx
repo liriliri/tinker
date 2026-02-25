@@ -18,6 +18,8 @@ export default observer(function App() {
     e.preventDefault()
     e.stopPropagation()
 
+    if (store.isCompressing) return
+
     const extensions =
       store.mode === 'video' ? VIDEO_EXTENSIONS : AUDIO_EXTENSIONS
     const files = Array.from(e.dataTransfer.files).filter((file) => {

@@ -13,6 +13,7 @@
   "qualityHigh": "High",
   "qualityExcellent": "Excellent",
   "compress": "Compress",
+  "cancel": "Cancel",
   "outputDir": "Output Dir",
   "outputDirPlaceholder": "Same as source",
   "browseOutputDir": "Browse output directory",

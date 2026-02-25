@@ -27,6 +27,8 @@ export interface MediaItem {
   mediaType: MediaType
   originalSize: number
   outputSize: number
+  currentSize: number
+  estimatedSize: number
   progress: number
   isCompressing: boolean
   isDone: boolean
