@@ -105,7 +105,7 @@ class Store extends BaseStore {
       const fileName = filePath.split(/[\\/]/).pop() || filePath
       this.fileName = fileName
 
-      const file = new File([buffer as Uint8Array], fileName)
+      const file = new File([buffer], fileName)
       const results = await calculateFileHashes(file)
       this.fileHashResults = this.applyCase(results)
     } catch (error) {

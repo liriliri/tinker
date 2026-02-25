@@ -142,9 +142,7 @@ class Store extends BaseStore {
       const buffer = await tinker.readFile(filePath)
       const fileName = splitPath(filePath).name
 
-      // Note: Buffer is Uint8Array-compatible but File expects a Uint8Array payload
-      const uint8Array = new Uint8Array(buffer)
-      const file = new File([uint8Array], fileName, { type: 'image/*' })
+      const file = new File([buffer], fileName, { type: 'image/*' })
       files.push({ file, filePath })
     }
 
@@ -219,14 +217,12 @@ class Store extends BaseStore {
         keepExif: this.keepExif,
       })
 
-      await (tinker.runFFmpeg(ffmpegArgs) as unknown as Promise<void>)
+      await tinker.runFFmpeg(ffmpegArgs)
 
       let compressedBuffer = new Uint8Array(await tinker.readFile(outputPath))
 
       if (this.keepExif && image.originalFormat === 'jpeg' && image.filePath) {
-        const originalBuffer = new Uint8Array(
-          await tinker.readFile(image.filePath)
-        )
+        const originalBuffer = await tinker.readFile(image.filePath)
         const exifSegment = extractJpegExif(originalBuffer)
         if (exifSegment) {
           compressedBuffer = injectJpegExif(compressedBuffer, exifSegment)
@@ -300,8 +296,7 @@ class Store extends BaseStore {
 
         let buffer: Uint8Array
         if (!this.isCompressedSmaller(image) && image.filePath) {
-          const originalBuffer = await tinker.readFile(image.filePath)
-          buffer = new Uint8Array(originalBuffer)
+          buffer = await tinker.readFile(image.filePath)
         } else {
           const arrayBuffer = await image.compressedBlob.arrayBuffer()
           buffer = new Uint8Array(arrayBuffer)
