@@ -1,3 +1,7 @@
+## v0.13.1 (25 Feb 2026)
+
+* perf(media-compressor): use gpu if available
+
 ## v0.13.0 (23 Feb 2026)
 
 * feat: add mind map

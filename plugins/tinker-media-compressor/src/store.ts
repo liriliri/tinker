@@ -314,7 +314,7 @@ class Store extends BaseStore {
               item.currentSize = currentBytes
               const count = (this.sizeUpdateCount.get(item.id) || 0) + 1
               this.sizeUpdateCount.set(item.id, count)
-              if (count % 10 === 0) {
+              if (item.estimatedSize === 0 || count % 10 === 0) {
                 item.estimatedSize = Math.round(
                   currentBytes / (progress.percent / 100)
                 )
@@ -362,7 +362,10 @@ class Store extends BaseStore {
         runInAction(() => {
           item.isCompressing = false
           item.progress = 0
+          item.currentSize = 0
+          item.estimatedSize = 0
         })
+        this.sizeUpdateCount.delete(item.id)
         return
       }
       const message = err instanceof Error ? err.message : String(err)

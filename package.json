@@ -2,7 +2,7 @@
   "name": "tinker",
   "productName": "TINKER",
   "appId": "io.liriliri.tinker",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Toolbox for Everyone",
   "main": "index.js",
   "private": true,
