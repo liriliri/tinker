@@ -2,24 +2,11 @@ import { defineConfig, UserConfig, type Plugin } from 'vite'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
+import * as lucide from './lucide'
+import keys from 'licia/keys'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
-
-export const shareDeps = [
-  'react',
-  'react-dom',
-  'react-dom/client',
-  'react/jsx-runtime',
-  'use-sync-external-store/shim',
-  'mobx',
-  'mobx-react-lite',
-  'mathjs',
-  '@monaco-editor/react',
-  'idb',
-  'ag-grid-community',
-  'ag-grid-react',
-]
 
 const globals = {
   react: 'React',
@@ -34,6 +21,17 @@ const globals = {
   idb: 'idb',
   'ag-grid-community': 'AgGridCommunity',
   'ag-grid-react': 'AgGridReact',
+  'lucide-react': 'lucideReact',
+}
+
+export const shareDeps = keys(globals)
+
+const globalsExports: Record<string, string[]> = {
+  'lucide-react': keys(lucide),
+}
+
+function moduleKeys(id: string) {
+  return keys(require(id)).filter((key) => key !== 'default')
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -50,16 +48,12 @@ export function globalsExternalPlugin(): Plugin {
       const globalName = globals[id]
       if (!globalName) return null
 
-      const mod = require(id)
-      const exports = Object.keys(mod).filter((key) => key !== 'default')
+      const exports = globalsExports[id] || moduleKeys(id)
       const code = [
         `const m = globalThis.${globalName};`,
         'export default m;',
         ...exports.map((key) => {
-          const safeKey = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)
-            ? key
-            : JSON.stringify(key)
-          return `export const ${safeKey} = m[${JSON.stringify(key)}];`
+          return `export const ${key} = m[${JSON.stringify(key)}];`
         }),
       ].join('\n')
 
@@ -70,7 +64,6 @@ export function globalsExternalPlugin(): Plugin {
 
 function createConfig(
   name: string,
-  entry: string,
   globalsName: string,
   external: string[] = [],
   outDir = 'dist'
@@ -101,7 +94,7 @@ function createConfig(
       outDir,
       emptyOutDir: false,
       lib: {
-        entry: path.resolve(__dirname, entry),
+        entry: path.resolve(__dirname, `${name}.ts`),
         name: globalsName,
         fileName: () => `${name}.js`,
         formats: ['iife'],
@@ -126,7 +119,7 @@ export default defineConfig(({ mode }) => {
   const target = process.env.VENDOR_TARGET || mode || 'react'
 
   if (target === 'mobx') {
-    return createConfig('mobx', 'mobx.ts', 'PluginVendorMobx', [
+    return createConfig('mobx', 'PluginVendorMobx', [
       'react',
       'react-dom',
       'use-sync-external-store/shim',
@@ -134,17 +127,16 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'mathjs') {
-    return createConfig('mathjs', 'mathjs.ts', 'PluginVendorMathjs')
+    return createConfig('mathjs', 'PluginVendorMathjs')
   }
 
   if (target === 'idb') {
-    return createConfig('idb', 'idb.ts', 'PluginVendorIdb')
+    return createConfig('idb', 'PluginVendorIdb')
   }
 
   if (target === 'monaco') {
     return createConfig(
       'monaco',
-      'monaco.ts',
       'PluginVendorMonaco',
       ['react'],
       'dist/monaco'
@@ -152,11 +144,12 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'aggrid') {
-    return createConfig('aggrid', 'aggrid.ts', 'PluginVendorAgGrid', [
-      'react',
-      'react-dom',
-    ])
+    return createConfig('aggrid', 'PluginVendorAgGrid', ['react', 'react-dom'])
   }
 
-  return createConfig('react', 'react.ts', 'PluginVendorReact')
+  if (target === 'lucide') {
+    return createConfig('lucide', 'PluginVendorLucide', ['react'])
+  }
+
+  return createConfig('react', 'PluginVendorReact')
 })

@@ -75,7 +75,6 @@
     "i18next": "^25.7.3",
     "lerna": "^9.0.3",
     "licia": "^1.48.0",
-    "lucide-react": "^0.556.0",
     "luna-data-grid": "^2.0.2",
     "luna-drag-selector": "^0.1.0",
     "luna-icon-list": "^0.2.12",
