@@ -4,35 +4,17 @@ import BaseStore from 'share/BaseStore'
 import * as kdbxweb from 'kdbxweb'
 import i18n from './i18n'
 import toast from 'react-hot-toast'
+import {
+  convertGroup,
+  flattenGroups,
+  findKdbxGroup,
+  findKdbxEntry,
+} from './lib/kdbx'
+import { KdbxEntry, KdbxGroup } from './types'
+
+export type { KdbxEntry, KdbxGroup }
 
 const storage = new LocalStore('tinker-password-manager')
-
-export type KdbxEntry = {
-  uuid: string
-  title: string
-  username: string
-  password: kdbxweb.ProtectedValue
-  url: string
-  notes: string
-  icon: number
-  tags: string[]
-  customFields: Map<string, any>
-  times: {
-    creationTime: Date
-    lastModTime: Date
-    lastAccessTime: Date
-    expiryTime: Date | null
-    expires: boolean
-  }
-}
-
-export type KdbxGroup = {
-  uuid: string
-  name: string
-  icon: number
-  entries: KdbxEntry[]
-  groups: KdbxGroup[]
-}
 
 class Store extends BaseStore {
   // Database state
@@ -88,7 +70,12 @@ class Store extends BaseStore {
     this.recentFiles = [
       path,
       ...this.recentFiles.filter((p) => p !== path),
-    ].slice(0, 10)
+    ].slice(0, 5)
+    this.saveRecentFiles()
+  }
+
+  removeRecentFile(path: string) {
+    this.recentFiles = this.recentFiles.filter((p) => p !== path)
     this.saveRecentFiles()
   }
 
@@ -225,9 +212,6 @@ class Store extends BaseStore {
   }
 
   closeDatabase() {
-    if (this.isModified) {
-      // TODO: Show confirmation dialog
-    }
     this.db = null
     this.dbPath = ''
     this.dbName = ''
@@ -248,8 +232,8 @@ class Store extends BaseStore {
     const currentEntryId = this.selectedEntryId
 
     const defaultGroup = this.db.getDefaultGroup()
-    this.rootGroup = this.convertGroup(defaultGroup)
-    this.groups = this.flattenGroups(this.rootGroup)
+    this.rootGroup = convertGroup(defaultGroup)
+    this.groups = flattenGroups(this.rootGroup)
 
     // Restore selection
     if (currentGroupId) {
@@ -260,75 +244,6 @@ class Store extends BaseStore {
     } else if (this.groups.length > 0) {
       this.selectGroup(this.groups[0].uuid)
     }
-  }
-
-  private convertGroup(kdbxGroup: kdbxweb.KdbxGroup): KdbxGroup {
-    const group: KdbxGroup = {
-      uuid: kdbxGroup.uuid.id,
-      name: kdbxGroup.name ?? '',
-      icon: kdbxGroup.icon ?? 0,
-      entries: [],
-      groups: [],
-    }
-
-    // Convert entries
-    kdbxGroup.entries.forEach((entry) => {
-      group.entries.push(this.convertEntry(entry))
-    })
-
-    // Convert subgroups
-    kdbxGroup.groups.forEach((subGroup) => {
-      group.groups.push(this.convertGroup(subGroup))
-    })
-
-    return group
-  }
-
-  private convertEntry(kdbxEntry: kdbxweb.KdbxEntry): KdbxEntry {
-    const getFieldValue = (fieldName: string): string => {
-      const value = kdbxEntry.fields.get(fieldName)
-      if (!value) return ''
-      if (typeof value === 'string') return value
-      if (value instanceof kdbxweb.ProtectedValue) {
-        return value.getText() || ''
-      }
-      return String(value)
-    }
-
-    const getPasswordValue = (): kdbxweb.ProtectedValue => {
-      const value = kdbxEntry.fields.get('Password')
-      if (value instanceof kdbxweb.ProtectedValue) {
-        return value
-      }
-      return kdbxweb.ProtectedValue.fromString('')
-    }
-
-    return {
-      uuid: kdbxEntry.uuid.id,
-      title: getFieldValue('Title'),
-      username: getFieldValue('UserName'),
-      password: getPasswordValue(),
-      url: getFieldValue('URL'),
-      notes: getFieldValue('Notes'),
-      icon: kdbxEntry.icon ?? 0,
-      tags: kdbxEntry.tags || [],
-      customFields: kdbxEntry.fields,
-      times: {
-        creationTime: kdbxEntry.times.creationTime ?? new Date(),
-        lastModTime: kdbxEntry.times.lastModTime ?? new Date(),
-        lastAccessTime: kdbxEntry.times.lastAccessTime ?? new Date(),
-        expiryTime: kdbxEntry.times.expiryTime ?? null,
-        expires: kdbxEntry.times.expires ?? false,
-      },
-    }
-  }
-
-  private flattenGroups(group: KdbxGroup): KdbxGroup[] {
-    const result: KdbxGroup[] = [group]
-    group.groups.forEach((subGroup) => {
-      result.push(...this.flattenGroups(subGroup))
-    })
-    return result
   }
 
   // UI operations
@@ -359,12 +274,10 @@ class Store extends BaseStore {
       const query = this.searchQuery.toLowerCase()
       const allEntries: KdbxEntry[] = []
 
-      // Collect entries from all groups
       this.groups.forEach((group) => {
         allEntries.push(...group.entries)
       })
 
-      // Filter entries
       this.filteredEntries = allEntries.filter(
         (entry) =>
           entry.title.toLowerCase().includes(query) ||
@@ -382,12 +295,7 @@ class Store extends BaseStore {
     }
 
     const group = this.groups.find((g) => g.uuid === this.selectedGroupId)
-    if (!group) {
-      this.filteredEntries = []
-      return
-    }
-
-    this.filteredEntries = group.entries
+    this.filteredEntries = group ? group.entries : []
   }
 
   togglePasswordVisibility() {
@@ -398,7 +306,7 @@ class Store extends BaseStore {
   createEntry(groupId: string, title: string) {
     if (!this.db) return
 
-    const group = this.findKdbxGroup(groupId)
+    const group = findKdbxGroup(this.db, groupId)
     if (!group) return
 
     const entry = this.db.createEntry(group)
@@ -417,7 +325,7 @@ class Store extends BaseStore {
   ) {
     if (!this.db) return
 
-    const entry = this.findKdbxEntry(entryId)
+    const entry = findKdbxEntry(this.db, entryId)
     if (!entry) return
 
     entry.fields.set(field, value)
@@ -430,7 +338,7 @@ class Store extends BaseStore {
   deleteEntry(entryId: string) {
     if (!this.db) return
 
-    const entry = this.findKdbxEntry(entryId)
+    const entry = findKdbxEntry(this.db, entryId)
     if (!entry) return
 
     this.db.remove(entry)
@@ -443,7 +351,7 @@ class Store extends BaseStore {
   createGroup(parentGroupId: string, name: string) {
     if (!this.db) return
 
-    const parentGroup = this.findKdbxGroup(parentGroupId)
+    const parentGroup = findKdbxGroup(this.db, parentGroupId)
     if (!parentGroup) return
 
     const group = this.db.createGroup(parentGroup, name)
@@ -456,7 +364,7 @@ class Store extends BaseStore {
   renameGroup(groupId: string, name: string) {
     if (!this.db) return
 
-    const group = this.findKdbxGroup(groupId)
+    const group = findKdbxGroup(this.db, groupId)
     if (!group) return
 
     group.name = name
@@ -469,53 +377,13 @@ class Store extends BaseStore {
   deleteGroup(groupId: string) {
     if (!this.db) return
 
-    const group = this.findKdbxGroup(groupId)
+    const group = findKdbxGroup(this.db, groupId)
     if (!group) return
 
     this.db.remove(group)
     this.isModified = true
     this.readDatabase()
     this.selectedGroupId = null
-  }
-
-  private findKdbxGroup(groupId: string): kdbxweb.KdbxGroup | null {
-    if (!this.db) return null
-
-    const findInGroup = (
-      group: kdbxweb.KdbxGroup
-    ): kdbxweb.KdbxGroup | null => {
-      if (group.uuid.id === groupId) return group
-
-      for (const subGroup of group.groups) {
-        const found = findInGroup(subGroup)
-        if (found) return found
-      }
-
-      return null
-    }
-
-    return findInGroup(this.db.getDefaultGroup())
-  }
-
-  private findKdbxEntry(entryId: string): kdbxweb.KdbxEntry | null {
-    if (!this.db) return null
-
-    const findInGroup = (
-      group: kdbxweb.KdbxGroup
-    ): kdbxweb.KdbxEntry | null => {
-      for (const entry of group.entries) {
-        if (entry.uuid.id === entryId) return entry
-      }
-
-      for (const subGroup of group.groups) {
-        const found = findInGroup(subGroup)
-        if (found) return found
-      }
-
-      return null
-    }
-
-    return findInGroup(this.db.getDefaultGroup())
   }
 
   get selectedEntry(): KdbxEntry | null {
