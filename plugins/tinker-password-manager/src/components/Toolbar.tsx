@@ -1,14 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Save, Lock, Plus, FolderPlus, Search, Folder } from 'lucide-react'
+import { Save, Lock, Plus, FolderPlus, Folder } from 'lucide-react'
 import {
   Toolbar as ToolbarComponent,
   ToolbarSeparator,
-  ToolbarTextInput,
+  ToolbarSearch,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
 } from 'share/components/Toolbar'
-import { tw } from 'share/theme'
 import store from '../store'
 import { prompt } from 'share/components/Prompt'
 
@@ -93,18 +92,12 @@ export default observer(function Toolbar() {
 
       <ToolbarSeparator />
 
-      <div className="relative w-48">
-        <Search
-          size={14}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
-        />
-        <ToolbarTextInput
-          placeholder={t('searchPlaceholder')}
-          value={store.searchQuery}
-          onChange={(e) => store.setSearchQuery(e.target.value)}
-          className={`w-full pl-7 pr-2 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`}
-        />
-      </div>
+      <ToolbarSearch
+        placeholder={t('searchPlaceholder')}
+        value={store.searchQuery}
+        onChange={(value) => store.setSearchQuery(value)}
+        className="-ml-2"
+      />
 
       <div className="flex items-center gap-2 ml-auto">
         <ToolbarButton onClick={handleLock} title={t('lockDatabase')}>

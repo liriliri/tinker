@@ -1,21 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import {
-  Search,
-  AlignJustify,
-  FileText,
-  Image,
-  File,
-  ListX,
-} from 'lucide-react'
-import className from 'licia/className'
+import { AlignJustify, FileText, Image, File, ListX } from 'lucide-react'
 import store, { FilterTab } from '../store'
 import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
-  ToolbarTextInput,
+  ToolbarSearch,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
 } from 'share/components/Toolbar'
@@ -65,26 +57,12 @@ export default observer(function ToolbarComponent() {
       <ToolbarSeparator />
 
       {/* Search Bar */}
-      <div className="relative w-48">
-        <Search
-          size={14}
-          className={className(
-            'absolute left-2 top-1/2 -translate-y-1/2',
-            tw.text.tertiary
-          )}
-        />
-        <ToolbarTextInput
-          value={store.searchQuery}
-          onChange={(e) => store.setSearchQuery(e.target.value)}
-          placeholder={t('search')}
-          className={className(
-            'w-full pl-7 pr-2 py-1',
-            tw.bg.input,
-            `placeholder:${tw.text.tertiary}`,
-            `dark:placeholder:${tw.text.tertiary}`
-          )}
-        />
-      </div>
+      <ToolbarSearch
+        value={store.searchQuery}
+        onChange={(value) => store.setSearchQuery(value)}
+        placeholder={t('search')}
+        className="-ml-2"
+      />
 
       <ToolbarSpacer />
 

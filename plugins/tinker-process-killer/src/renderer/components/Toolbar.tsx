@@ -1,13 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Search, Cpu, HardDrive, Network } from 'lucide-react'
-import className from 'licia/className'
+import { Cpu, HardDrive, Network } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
   ToolbarSeparator,
   ToolbarSpacer,
-  ToolbarTextInput,
+  ToolbarSearch,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
@@ -53,26 +52,12 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <div className="relative w-48 ml-1">
-        <Search
-          size={14}
-          className={className(
-            'absolute left-2 top-1/2 -translate-y-1/2',
-            tw.text.tertiary
-          )}
-        />
-        <ToolbarTextInput
-          value={store.searchKeyword}
-          onChange={(e) => store.setSearchKeyword(e.target.value)}
-          placeholder={t('searchPlaceholder')}
-          className={className(
-            'w-full pl-7 pr-2 py-1',
-            tw.bg.input,
-            `placeholder:${tw.text.tertiary}`,
-            `dark:placeholder:${tw.text.tertiary}`
-          )}
-        />
-      </div>
+      <ToolbarSearch
+        value={store.searchKeyword}
+        onChange={(value) => store.setSearchKeyword(value)}
+        placeholder={t('searchPlaceholder')}
+        className="-ml-1"
+      />
 
       <ToolbarSpacer />
 

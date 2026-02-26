@@ -4,6 +4,7 @@ import React, {
   useRef,
   MouseEvent,
 } from 'react'
+import { Search, X } from 'lucide-react'
 import type { MenuItemConstructorOptions } from 'electron'
 import { tw } from '../theme'
 
@@ -240,6 +241,43 @@ export function ToolbarColor({
         className={inputClassName}
         {...rest}
       />
+    </div>
+  )
+}
+
+interface ToolbarSearchProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  className?: string
+}
+
+export function ToolbarSearch({
+  value,
+  onChange,
+  placeholder,
+  className = '',
+}: ToolbarSearchProps) {
+  return (
+    <div className={`relative w-48 ml-2 ${className}`}>
+      <Search
+        size={14}
+        className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
+      />
+      <ToolbarTextInput
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`}
+      />
+      {value && (
+        <button
+          onClick={() => onChange('')}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary} hover:${tw.text.primary}`}
+        >
+          <X size={14} />
+        </button>
+      )}
     </div>
   )
 }

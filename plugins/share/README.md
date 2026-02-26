@@ -92,7 +92,7 @@ const Button = ({ onClick, disabled = false }: ButtonProps) => (
 ### Toolbar
 
 ```typescript
-import { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer, ToolbarSearch, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
 import { Copy } from 'lucide-react'
 
 <Toolbar>
@@ -103,6 +103,11 @@ import { Copy } from 'lucide-react'
   <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggle()}>
     Toggle
   </ToolbarButton>
+  <ToolbarSearch
+    value={store.searchQuery}
+    onChange={(value) => store.setSearchQuery(value)}
+    placeholder="Search..."
+  />
   <ToolbarSpacer />
   <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>
     Menu
@@ -111,6 +116,8 @@ import { Copy } from 'lucide-react'
 ```
 
 **ToolbarButton Props**: `variant` ('action' | 'toggle'), `active`, `menu`, `longPressDuration`
+
+**ToolbarSearch Props**: `value`, `onChange`, `placeholder`, `className`
 
 ### Dialog Components
 

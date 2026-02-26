@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Search, X, Folder, RefreshCw } from 'lucide-react'
+import { X, Folder, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   Toolbar,
   ToolbarSeparator,
-  ToolbarTextInput,
+  ToolbarSearch,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
 } from 'share/components/Toolbar'
@@ -47,26 +47,11 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      <div className="relative w-48 ml-2">
-        <Search
-          size={14}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
-        />
-        <ToolbarTextInput
-          value={store.searchQuery}
-          onChange={(e) => store.setSearchQuery(e.target.value)}
-          placeholder={t('searchPlaceholder')}
-          className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`}
-        />
-        {store.searchQuery && (
-          <button
-            onClick={() => store.setSearchQuery('')}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary} hover:${tw.text.primary}`}
-          >
-            <X size={14} />
-          </button>
-        )}
-      </div>
+      <ToolbarSearch
+        value={store.searchQuery}
+        onChange={(value) => store.setSearchQuery(value)}
+        placeholder={t('searchPlaceholder')}
+      />
 
       <Checkbox
         checked={store.showCompleted}
