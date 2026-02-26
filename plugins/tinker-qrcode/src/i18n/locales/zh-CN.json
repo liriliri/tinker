@@ -3,6 +3,8 @@
   "color": "颜色",
   "background": "背景",
   "correctLevel": "容错率",
+  "setIcon": "设置图标",
+  "clearIcon": "清除图标",
   "copy": "复制到剪贴板",
   "save": "保存",
   "placeholder": "输入文本或 URL 生成二维码...",

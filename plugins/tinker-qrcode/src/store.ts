@@ -23,6 +23,7 @@ class Store extends BaseStore {
   fgColor: string = '#000000'
   bgColor: string = '#ffffff'
   correctLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
+  iconDataUrl: string = ''
 
   canvasRef: RefObject<HTMLCanvasElement | null> | null = null
 
@@ -100,6 +101,14 @@ class Store extends BaseStore {
   setCorrectLevel(level: 'L' | 'M' | 'Q' | 'H') {
     this.correctLevel = level
     storage.set(STORAGE_KEY_CORRECT_LEVEL, level)
+  }
+
+  setIcon(dataUrl: string) {
+    this.iconDataUrl = dataUrl
+  }
+
+  clearIcon() {
+    this.iconDataUrl = ''
   }
 
   setQRCodeDataURL(dataURL: string) {

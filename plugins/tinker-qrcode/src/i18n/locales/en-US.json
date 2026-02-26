@@ -3,6 +3,8 @@
   "color": "Color",
   "background": "Background",
   "correctLevel": "Error Correction",
+  "setIcon": "Set Icon",
+  "clearIcon": "Clear Icon",
   "copy": "Copy to Clipboard",
   "save": "Save",
   "placeholder": "Enter text or URL to generate QR code...",

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { Save, Copy, Check } from 'lucide-react'
+import { Save, Image } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import className from 'licia/className'
+import openFile from 'licia/openFile'
 import store from '../store'
 import Select from 'share/components/Select'
 import {
@@ -13,12 +13,10 @@ import {
   ToolbarColor,
   ToolbarLabel,
 } from 'share/components/Toolbar'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import { tw } from 'share/theme'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const { copied, copyToClipboard } = useCopyToClipboard()
 
   const CUSTOM_VALUE = 'custom'
   const sizeOptions = [
@@ -43,10 +41,8 @@ export default observer(function ToolbarComponent() {
 
   const handleSizeChange = (value: number | string) => {
     if (value === CUSTOM_VALUE) {
-      // User selected custom option
       store.setIsCustomSize(true)
     } else {
-      // User selected preset value
       store.setSize(value as number)
       store.setIsCustomSize(false)
     }
@@ -69,19 +65,15 @@ export default observer(function ToolbarComponent() {
     link.click()
   }
 
-  const handleCopy = async () => {
-    if (!store.canvasRef?.current) return
-
-    try {
-      store.canvasRef.current.toBlob(async (blob) => {
-        if (!blob) return
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'image/png': blob }),
-        ])
-        await copyToClipboard('') // Trigger the copied state
-      })
-    } catch (err) {
-      console.error('Failed to copy:', err)
+  const handleSetIcon = async () => {
+    const files = await openFile({ accept: 'image/*' })
+    if (files && files.length > 0) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        if (dataUrl) store.setIcon(dataUrl)
+      }
+      reader.readAsDataURL(files[0])
     }
   }
 
@@ -102,13 +94,7 @@ export default observer(function ToolbarComponent() {
           disabled={!store.isCustomSize}
           min="100"
           max="2000"
-          className={className(
-            'w-16 text-xs px-2 py-1 border rounded focus:outline-none dark:text-gray-200',
-            tw.bg.input,
-            tw.border,
-            tw.primary.focusBorder,
-            'disabled:opacity-50 disabled:cursor-not-allowed'
-          )}
+          className={`w-16 text-xs px-2 py-1 border rounded focus:outline-none dark:text-gray-200 ${tw.bg.input} ${tw.border} ${tw.primary.focusBorder} disabled:opacity-50 disabled:cursor-not-allowed`}
         />
       </div>
 
@@ -151,21 +137,22 @@ export default observer(function ToolbarComponent() {
         />
       </div>
 
-      <ToolbarSpacer />
+      <ToolbarSeparator />
 
-      {/* Action Buttons */}
+      {/* Icon */}
       <ToolbarButton
-        onClick={handleCopy}
-        disabled={!store.text}
-        className={className(copied && tw.primary.text)}
-        title={t('copy')}
+        onClick={handleSetIcon}
+        menu={
+          store.iconDataUrl
+            ? [{ label: t('clearIcon'), click: () => store.clearIcon() }]
+            : undefined
+        }
+        title={t('setIcon')}
       >
-        {copied ? (
-          <Check size={TOOLBAR_ICON_SIZE} />
-        ) : (
-          <Copy size={TOOLBAR_ICON_SIZE} />
-        )}
+        <Image size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+
+      <ToolbarSpacer />
 
       <ToolbarButton
         onClick={handleDownload}

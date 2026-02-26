@@ -37,14 +37,44 @@ export default observer(function QRGenerator() {
           return
         }
 
-        // Save canvas as data URL
-        const dataURL = canvasRef.current?.toDataURL('image/png')
-        if (dataURL) {
+        const canvas = canvasRef.current
+        if (!canvas) return
+
+        const drawDataUrl = () => {
+          const dataURL = canvas.toDataURL('image/png')
           store.setQRCodeDataURL(dataURL)
+        }
+
+        if (store.iconDataUrl) {
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            drawDataUrl()
+            return
+          }
+          const img = new Image()
+          img.onload = () => {
+            const iconSize = canvas.width * 0.2
+            const x = (canvas.width - iconSize) / 2
+            const y = (canvas.height - iconSize) / 2
+            // Draw white background padding behind icon
+            const padding = iconSize * 0.1
+            ctx.fillStyle = store.bgColor
+            ctx.fillRect(
+              x - padding,
+              y - padding,
+              iconSize + padding * 2,
+              iconSize + padding * 2
+            )
+            ctx.drawImage(img, x, y, iconSize, iconSize)
+            drawDataUrl()
+          }
+          img.src = store.iconDataUrl
+        } else {
+          drawDataUrl()
         }
       }
     )
-  }, [store.text, store.size, store.fgColor, store.bgColor, store.correctLevel])
+  }, [store.text, store.size, store.fgColor, store.bgColor, store.correctLevel, store.iconDataUrl])
 
   return (
     <div className="h-full flex">
