@@ -17,7 +17,7 @@ export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
   const handleReload = async () => {
-    await store.reloadTodos()
+    await store.loadTodos()
     toast.success(t('reloadSuccess'))
   }
 

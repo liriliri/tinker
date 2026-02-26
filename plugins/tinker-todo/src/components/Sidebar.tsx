@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { List, Calendar, Star, CheckCircle2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import className from 'licia/className'
-import store, { FilterType } from '../store'
+import store from '../store'
+import { type FilterType } from '../types'
 import { tw } from 'share/theme'
 
 interface CategoryItem {

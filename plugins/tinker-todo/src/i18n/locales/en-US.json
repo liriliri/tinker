@@ -7,7 +7,6 @@
   "important": "Important",
   "completed": "Completed",
   "add": "Add",
-  "addTask": "Add Task",
   "taskPlaceholder": "Enter a new task...",
   "searchPlaceholder": "Search todos...",
   "noTasks": "No tasks yet",
@@ -22,8 +21,6 @@
   "lowPriority": "Low",
   "mediumPriority": "Medium",
   "highPriority": "High",
-  "file": "File",
-  "selectFile": "Select",
   "showInFolder": "Show in Folder",
   "reload": "Reload",
   "close": "Close",
@@ -31,5 +28,8 @@
   "welcomeTitle": "Welcome to Todo",
   "welcomeDescription": "Get started by opening an existing todo.txt file or creating a new one.",
   "openFile": "Open File",
-  "createFile": "Create File"
+  "createFile": "Create File",
+  "fileNotFound": "File not found",
+  "open": "Open",
+  "removeFromRecent": "Remove from Recent"
 }

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Check, Trash2, Calendar } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import className from 'licia/className'
-import store, { TodoItem as TodoItemType } from '../store'
+import store from '../store'
+import { type TodoItem as TodoItemType } from '../types'
 import { tw } from 'share/theme'
 
 interface TodoItemProps {

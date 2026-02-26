@@ -19,10 +19,12 @@ export default observer(function App() {
     return (
       <AlertProvider locale={i18n.language}>
         <ConfirmProvider locale={i18n.language}>
-          <Welcome
-            onOpenFile={() => store.openExistingFile()}
-            onCreateFile={() => store.createNewFile()}
-          />
+          <ToasterProvider>
+            <Welcome
+              onOpenFile={() => store.openExistingFile()}
+              onCreateFile={() => store.createNewFile()}
+            />
+          </ToasterProvider>
         </ConfirmProvider>
       </AlertProvider>
     )

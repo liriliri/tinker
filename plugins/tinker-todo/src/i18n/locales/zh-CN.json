@@ -7,7 +7,6 @@
   "important": "重要",
   "completed": "已完成",
   "add": "添加",
-  "addTask": "添加任务",
   "taskPlaceholder": "输入新任务...",
   "searchPlaceholder": "搜索待办...",
   "noTasks": "暂无任务",
@@ -22,8 +21,6 @@
   "lowPriority": "低",
   "mediumPriority": "中",
   "highPriority": "高",
-  "file": "文件",
-  "selectFile": "选择",
   "showInFolder": "在文件夹中显示",
   "reload": "刷新",
   "close": "关闭",
@@ -31,5 +28,8 @@
   "welcomeTitle": "欢迎使用待办清单",
   "welcomeDescription": "打开现有的 todo.txt 文件或创建一个新文件开始使用。",
   "openFile": "打开文件",
-  "createFile": "创建文件"
+  "createFile": "创建文件",
+  "fileNotFound": "文件不存在",
+  "open": "打开",
+  "removeFromRecent": "从最近文件中移除"
 }

@@ -2,22 +2,14 @@ import { makeAutoObservable, runInAction, reaction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
+import { type Priority, type FilterType, type TodoItem } from './types'
+import { parseTodoItem, createRawTodo } from './lib/todo'
 
 const storage = new LocalStore('tinker-todo')
-
-export type Priority = 'A' | 'B' | 'C' | null
-export type FilterType = 'all' | 'today' | 'important' | 'completed'
-
-export interface TodoItem {
-  id: string
-  text: string
-  completed: boolean
-  priority: Priority
-  dueDate: string | null
-  createdDate: string | null
-  completedDate: string | null
-  raw: string
-}
+const STORAGE_KEY_CURRENT_FILTER = 'currentFilter'
+const STORAGE_KEY_SHOW_COMPLETED = 'showCompleted'
+const STORAGE_KEY_FILE_PATH = 'filePath'
+const STORAGE_KEY_RECENT_FILES = 'recentFiles'
 
 class Store extends BaseStore {
   todos: TodoItem[] = []
@@ -30,28 +22,49 @@ class Store extends BaseStore {
   isLoading: boolean = false
   error: string | null = null
   needsFileSelection: boolean = false
+  recentFiles: string[] = []
 
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadFromStorage()
     this.initializeFile()
     this.bindEvent()
   }
 
-  private loadSettings() {
-    const savedFilter = storage.get('currentFilter')
+  private loadFromStorage() {
+    const savedFilter = storage.get(STORAGE_KEY_CURRENT_FILTER)
     if (
       savedFilter &&
-      ['all', 'today', 'important', 'completed'].includes(savedFilter as string)
+      (['all', 'today', 'important', 'completed'] as FilterType[]).includes(
+        savedFilter as FilterType
+      )
     ) {
       this.currentFilter = savedFilter as FilterType
     }
 
-    const savedShowCompleted = storage.get('showCompleted')
+    const savedShowCompleted = storage.get(STORAGE_KEY_SHOW_COMPLETED)
     if (savedShowCompleted !== undefined) {
       this.showCompleted = savedShowCompleted as boolean
     }
+
+    const savedRecentFiles = storage.get(STORAGE_KEY_RECENT_FILES)
+    if (savedRecentFiles) {
+      this.recentFiles = savedRecentFiles as string[]
+    }
+  }
+
+  private addRecentFile(path: string) {
+    this.recentFiles = [
+      path,
+      ...this.recentFiles.filter((p) => p !== path),
+    ].slice(0, 5)
+    storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
+  }
+
+  removeRecentFile(path: string) {
+    this.recentFiles = this.recentFiles.filter((p) => p !== path)
+    storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
   }
 
   private bindEvent() {
@@ -70,7 +83,7 @@ class Store extends BaseStore {
   }
 
   private async initializeFile() {
-    const savedPath = storage.get('filePath')
+    const savedPath = storage.get(STORAGE_KEY_FILE_PATH)
     if (savedPath) {
       try {
         const content = await tinker.readFile(savedPath as string, 'utf-8')
@@ -79,11 +92,11 @@ class Store extends BaseStore {
         runInAction(() => {
           this.filePath = savedPath as string
           this.todos = lines.map((line, index) =>
-            this.parseTodoItem(line, `${Date.now()}-${index}`)
+            parseTodoItem(line, `${Date.now()}-${index}`)
           )
         })
       } catch (error) {
-        storage.remove('filePath')
+        storage.remove(STORAGE_KEY_FILE_PATH)
         runInAction(() => {
           this.needsFileSelection = true
           this.error =
@@ -96,9 +109,19 @@ class Store extends BaseStore {
   }
 
   async setFilePath(path: string) {
+    try {
+      await tinker.readFile(path, 'utf-8')
+    } catch {
+      runInAction(() => {
+        this.recentFiles = this.recentFiles.filter((p) => p !== path)
+        storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
+      })
+      throw new Error('fileNotFound')
+    }
     this.filePath = path
-    storage.set('filePath', path)
+    storage.set(STORAGE_KEY_FILE_PATH, path)
     this.needsFileSelection = false
+    this.addRecentFile(path)
     await this.loadTodos()
   }
 
@@ -106,7 +129,7 @@ class Store extends BaseStore {
     this.filePath = ''
     this.todos = []
     this.needsFileSelection = true
-    storage.remove('filePath')
+    storage.remove(STORAGE_KEY_FILE_PATH)
     tinker.setTitle('')
   }
 
@@ -148,7 +171,7 @@ class Store extends BaseStore {
     }
   }
 
-  private async loadTodos() {
+  async loadTodos() {
     if (!this.filePath) return
 
     this.isLoading = true
@@ -160,7 +183,7 @@ class Store extends BaseStore {
 
       runInAction(() => {
         this.todos = lines.map((line, index) =>
-          this.parseTodoItem(line, `${Date.now()}-${index}`)
+          parseTodoItem(line, `${Date.now()}-${index}`)
         )
         this.isLoading = false
       })
@@ -185,65 +208,9 @@ class Store extends BaseStore {
     }
   }
 
-  async reloadTodos() {
-    await this.loadTodos()
-  }
-
-  private parseTodoItem(raw: string, id?: string): TodoItem {
-    const item = new Item(raw)
-
-    let text = item.body() || ''
-    text = text.replace(/\s+due:\S+/g, '').trim()
-
-    const createdDate = item.created()
-    const completedDate = item.completed()
-
-    return {
-      id: id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-      text,
-      completed: item.complete() || false,
-      priority: item.priority() as Priority,
-      dueDate: this.extractDueDate(item),
-      createdDate: createdDate ? createdDate.toISOString().split('T')[0] : null,
-      completedDate: completedDate
-        ? completedDate.toISOString().split('T')[0]
-        : null,
-      raw: item.toString(),
-    }
-  }
-
-  private extractDueDate(item: Item): string | null {
-    const extensions = item.extensions()
-    if (!extensions) return null
-    const dueExt = extensions.find((ext: any) => ext.key === 'due')
-    return dueExt ? dueExt.value : null
-  }
-
-  private createRawTodo(
-    text: string,
-    priority: Priority,
-    dueDate?: string
-  ): string {
-    let raw = ''
-
-    const today = new Date().toISOString().split('T')[0]
-
-    if (priority) {
-      raw += `(${priority}) `
-    }
-
-    raw += `${today} ${text}`
-
-    if (dueDate) {
-      raw += ` due:${dueDate}`
-    }
-
-    return raw
-  }
-
   setCurrentFilter(filter: FilterType) {
     this.currentFilter = filter
-    storage.set('currentFilter', filter)
+    storage.set(STORAGE_KEY_CURRENT_FILTER, filter)
   }
 
   setSearchQuery(query: string) {
@@ -260,18 +227,18 @@ class Store extends BaseStore {
 
   setShowCompleted(show: boolean) {
     this.showCompleted = show
-    storage.set('showCompleted', show)
+    storage.set(STORAGE_KEY_SHOW_COMPLETED, show)
   }
 
   addTodo(dueDate?: string) {
     if (!this.newTodoText.trim()) return
 
-    const raw = this.createRawTodo(
+    const raw = createRawTodo(
       this.newTodoText.trim(),
       this.newTodoPriority,
       dueDate
     )
-    const todo = this.parseTodoItem(raw)
+    const todo = parseTodoItem(raw)
 
     this.todos.unshift(todo)
     this.saveTodos()
@@ -295,7 +262,7 @@ class Store extends BaseStore {
       item.setCompleted(today)
     }
 
-    const updated = this.parseTodoItem(item.toString(), id)
+    const updated = parseTodoItem(item.toString(), id)
     const index = this.todos.findIndex((t) => t.id === id)
     this.todos[index] = updated
 
@@ -314,7 +281,7 @@ class Store extends BaseStore {
     const item = new Item(todo.raw)
     item.setPriority(priority)
 
-    const updated = this.parseTodoItem(item.toString(), id)
+    const updated = parseTodoItem(item.toString(), id)
     const index = this.todos.findIndex((t) => t.id === id)
     this.todos[index] = updated
 
