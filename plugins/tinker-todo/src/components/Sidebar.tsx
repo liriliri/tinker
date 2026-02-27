@@ -57,39 +57,42 @@ export default observer(function Sidebar() {
     <div
       className={`w-52 ${tw.bg.tertiary} border-r ${tw.border} flex flex-col flex-shrink-0`}
     >
-      <div className="flex-1 overflow-y-auto p-3">
-        <div className="space-y-0.5">
-          {getCategories().map((category) => {
-            const Icon = category.icon
-            const isActive = store.currentFilter === category.id
+      <div className="flex-1 overflow-y-auto">
+        {getCategories().map((category) => {
+          const Icon = category.icon
+          const isActive = store.currentFilter === category.id
 
-            return (
-              <button
-                key={category.id}
+          return (
+            <button
+              key={category.id}
+              className={className(
+                'w-full flex items-center gap-2 py-1 px-2 transition-colors text-sm',
+                isActive
+                  ? [tw.primary.bg, 'text-white']
+                  : [tw.hover, tw.text.primary]
+              )}
+              onClick={() => store.setCurrentFilter(category.id)}
+            >
+              <Icon size={14} />
+              <span
                 className={className(
-                  'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-sm',
-                  isActive
-                    ? [tw.primary.bg, 'text-white shadow-sm']
-                    : [tw.hover, tw.text.primary]
+                  'flex-1 text-left truncate',
+                  isActive ? 'font-medium' : ''
                 )}
-                onClick={() => store.setCurrentFilter(category.id)}
               >
-                <Icon size={16} />
-                <span className="flex-1 text-left font-medium">
-                  {t(category.labelKey)}
-                </span>
-                <span
-                  className={className(
-                    'text-xs font-semibold tabular-nums min-w-[20px] text-right',
-                    isActive ? 'opacity-70' : tw.text.secondary
-                  )}
-                >
-                  {category.getCount()}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+                {t(category.labelKey)}
+              </span>
+              <span
+                className={className(
+                  'text-xs tabular-nums',
+                  isActive ? 'opacity-70' : tw.text.secondary
+                )}
+              >
+                {category.getCount()}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       <div className={`p-3 border-t ${tw.border}`}>

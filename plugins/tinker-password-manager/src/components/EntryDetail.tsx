@@ -89,16 +89,22 @@ export default observer(function EntryDetail() {
               >
                 {t('username')}
               </label>
-              <div className="flex gap-2">
+              <div className="relative">
                 <TextInput
                   type="text"
                   value={entry.username}
                   onChange={(e) =>
                     handleUpdateField('UserName', e.target.value)
                   }
-                  className={`flex-1 min-w-0 font-mono focus:ring-2 ${tw.primary.focusRing}`}
+                  className={`font-mono focus:ring-2 ${tw.primary.focusRing} pr-10`}
                 />
-                <CopyButton text={entry.username} title={t('copyUsername')} />
+                <CopyButton
+                  text={entry.username}
+                  title={t('copyUsername')}
+                  variant="icon"
+                  iconClassName={tw.text.primary}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
+                />
               </div>
             </div>
 
@@ -108,34 +114,35 @@ export default observer(function EntryDetail() {
               >
                 {t('password')}
               </label>
-              <div className="flex gap-2">
-                <div className="flex-1 min-w-0 relative">
-                  <TextInput
-                    type={store.showPassword ? 'text' : 'password'}
-                    value={passwordText}
-                    onChange={(e) =>
-                      handleUpdateField('Password', e.target.value)
-                    }
-                    className={`pr-10 font-mono focus:ring-2 ${tw.primary.focusRing}`}
-                  />
-                  <button
-                    onClick={handleTogglePassword}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover}`}
-                    title={
-                      store.showPassword ? t('hidePassword') : t('showPassword')
-                    }
-                  >
-                    {store.showPassword ? (
-                      <Eye size={16} />
-                    ) : (
-                      <EyeOff size={16} />
-                    )}
-                  </button>
-                </div>
+              <div className="relative">
+                <TextInput
+                  type={store.showPassword ? 'text' : 'password'}
+                  value={passwordText}
+                  onChange={(e) =>
+                    handleUpdateField('Password', e.target.value)
+                  }
+                  className={`pr-16 font-mono focus:ring-2 ${tw.primary.focusRing}`}
+                />
                 <CopyButton
                   text={entry.password.getText()}
                   title={t('copyPassword')}
+                  variant="icon"
+                  iconClassName={tw.text.primary}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
                 />
+                <button
+                  onClick={handleTogglePassword}
+                  className={`absolute right-10 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover}`}
+                  title={
+                    store.showPassword ? t('hidePassword') : t('showPassword')
+                  }
+                >
+                  {store.showPassword ? (
+                    <Eye size={16} />
+                  ) : (
+                    <EyeOff size={16} />
+                  )}
+                </button>
               </div>
             </div>
 

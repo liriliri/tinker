@@ -2,6 +2,7 @@ import { useState, ReactNode } from 'react'
 import { tw } from '../theme'
 import className from 'licia/className'
 import { ChevronRight, ChevronDown } from 'lucide-react'
+import type { MenuItemConstructorOptions } from 'electron'
 
 export interface TreeNodeData {
   id: string
@@ -16,6 +17,7 @@ interface TreeNodeProps<T extends TreeNodeData = TreeNodeData> {
   onNodeClick?: (node: T) => void
   activeNodeId?: string | null
   renderLabel?: (node: T, isActive: boolean) => ReactNode
+  menu?: (node: T) => MenuItemConstructorOptions[]
 }
 
 function TreeNode<T extends TreeNodeData = TreeNodeData>({
@@ -24,6 +26,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
   onNodeClick,
   activeNodeId,
   renderLabel,
+  menu,
 }: TreeNodeProps<T>) {
   const [expanded, setExpanded] = useState(true)
   const hasChildren = node.children && node.children.length > 0
@@ -38,18 +41,25 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
     setExpanded(!expanded)
   }
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (!menu) return
+    e.preventDefault()
+    tinker.showContextMenu(e.clientX, e.clientY, menu(node))
+  }
+
   const isActive = activeNodeId === node.id
 
   return (
     <div className="tree-node">
       <div
         className={`
-          flex items-center py-1 px-2 cursor-pointer rounded
+          flex items-center py-1 px-2 cursor-pointer
           transition-colors
           ${isActive ? tw.primary.bg : tw.hover}
         `}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
       >
         {hasChildren && (
           <button
@@ -84,6 +94,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
               onNodeClick={onNodeClick}
               activeNodeId={activeNodeId}
               renderLabel={renderLabel}
+              menu={menu}
             />
           ))}
         </div>
@@ -97,6 +108,7 @@ interface TreeProps<T extends TreeNodeData = TreeNodeData> {
   onNodeClick?: (node: T) => void
   activeNodeId?: string | null
   renderLabel?: (node: T, isActive: boolean) => ReactNode
+  menu?: (node: T) => MenuItemConstructorOptions[]
   emptyText?: string
   className?: string
 }
@@ -106,6 +118,7 @@ export default function Tree<T extends TreeNodeData = TreeNodeData>({
   onNodeClick,
   activeNodeId,
   renderLabel,
+  menu,
   emptyText = 'No data available',
   className: customClassName,
 }: TreeProps<T>) {
@@ -128,7 +141,7 @@ export default function Tree<T extends TreeNodeData = TreeNodeData>({
   return (
     <div
       className={className(
-        'flex-1 overflow-y-auto overflow-x-hidden py-2',
+        'flex-1 overflow-y-auto overflow-x-hidden',
         customClassName
       )}
       style={{
@@ -143,6 +156,7 @@ export default function Tree<T extends TreeNodeData = TreeNodeData>({
           onNodeClick={onNodeClick}
           activeNodeId={activeNodeId}
           renderLabel={renderLabel}
+          menu={menu}
         />
       ))}
     </div>

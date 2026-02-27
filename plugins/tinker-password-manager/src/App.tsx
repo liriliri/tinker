@@ -51,7 +51,7 @@ export default observer(function App() {
                   {/* Left Panel - Groups */}
                   <Panel id="left" minSize={200}>
                     <div
-                      className={`h-full border-r ${tw.border} overflow-hidden`}
+                      className={`h-full border-r ${tw.border} ${tw.bg.tertiary} overflow-hidden`}
                     >
                       <GroupTree />
                     </div>
