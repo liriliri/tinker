@@ -11,6 +11,7 @@ const storage = new LocalStore('tinker-color')
 
 class Store extends BaseStore {
   currentColor: string = '#5a9020'
+  alpha: number = 100
 
   constructor() {
     super()
@@ -23,6 +24,10 @@ class Store extends BaseStore {
     if (savedColor) {
       this.currentColor = savedColor
     }
+    const savedAlpha = storage.get('alpha')
+    if (savedAlpha !== undefined) {
+      this.alpha = savedAlpha
+    }
   }
 
   setColor(color: string) {
@@ -33,6 +38,11 @@ class Store extends BaseStore {
   handleColorChange(color: ColorResult) {
     this.currentColor = color.hex
     storage.set(STORAGE_KEY, color.hex)
+  }
+
+  setAlpha(alpha: number) {
+    this.alpha = alpha
+    storage.set('alpha', alpha)
   }
 
   async copyToClipboardWithToast(text: string) {

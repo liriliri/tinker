@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import CopyButton from 'share/components/CopyButton'
 import TextInput from 'share/components/TextInput'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
 import {
   hexToRgb,
@@ -111,29 +111,51 @@ export default observer(function ColorFormats() {
   const lab = rgbToLab(rgb.r, rgb.g, rgb.b)
   const hsi = rgbToHsi(rgb.r, rgb.g, rgb.b)
 
+  const checkColors = store.darkMode
+    ? THEME_COLORS.checkboard.dark
+    : THEME_COLORS.checkboard.light
+
   return (
     <div className="flex flex-col gap-6">
       {/* Color Preview */}
       <div
         className="w-full h-20 rounded-xl shadow-lg flex items-center justify-center relative overflow-hidden"
-        style={{ backgroundColor: store.currentColor }}
-      ></div>
+        style={{
+          backgroundImage: `
+            linear-gradient(45deg, ${checkColors.dark} 25%, transparent 25%),
+            linear-gradient(-45deg, ${checkColors.dark} 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, ${checkColors.dark} 75%),
+            linear-gradient(-45deg, transparent 75%, ${checkColors.dark} 75%)
+          `,
+          backgroundSize: '12px 12px',
+          backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+          backgroundColor: checkColors.light,
+        }}
+      >
+        <div
+          className="absolute inset-0 rounded-xl"
+          style={{
+            backgroundColor: store.currentColor,
+            opacity: store.alpha / 100,
+          }}
+        />
+      </div>
 
       {/* Color Formats */}
       <div className="flex flex-col gap-3">
         <FormatRow
           label="HEX"
-          value={formatHex(store.currentColor)}
+          value={formatHex(store.currentColor, store.alpha)}
           copyTitle={t('copyToClipboard')}
           format="hex"
-          cssValue={toCssHex(store.currentColor)}
+          cssValue={toCssHex(store.currentColor, store.alpha)}
         />
         <FormatRow
           label="RGB"
-          value={formatRgb(rgb)}
+          value={formatRgb(rgb, store.alpha)}
           copyTitle={t('copyToClipboard')}
           format="rgb"
-          cssValue={toCssRgb(rgb)}
+          cssValue={toCssRgb(rgb, store.alpha)}
         />
         <FormatRow
           label="HSV/HSB"
@@ -144,10 +166,10 @@ export default observer(function ColorFormats() {
         />
         <FormatRow
           label="HSL"
-          value={formatHsl(hsl)}
+          value={formatHsl(hsl, store.alpha)}
           copyTitle={t('copyToClipboard')}
           format="hsl"
-          cssValue={toCssHsl(hsl)}
+          cssValue={toCssHsl(hsl, store.alpha)}
         />
         <FormatRow
           label="CMYK"

@@ -11,5 +11,6 @@
   "pasteSuccess": "颜色已粘贴!",
   "pasteFailed": "无效的颜色格式!",
   "saturation": "饱和度",
-  "lightness": "明亮度"
+  "lightness": "明亮度",
+  "alpha": "透明度"
 }

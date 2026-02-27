@@ -11,5 +11,6 @@
   "pasteSuccess": "Color pasted successfully!",
   "pasteFailed": "Invalid color format!",
   "saturation": "Saturation",
-  "lightness": "Lightness"
+  "lightness": "Lightness",
+  "alpha": "Alpha"
 }

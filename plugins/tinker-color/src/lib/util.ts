@@ -129,16 +129,26 @@ export function rgbToHsi(
   }
 }
 
-export function formatHex(hex: string): string {
-  return hex.replace('#', '').toUpperCase()
+export function formatHex(hex: string, alpha = 100): string {
+  const base = hex.replace('#', '').toUpperCase()
+  if (alpha >= 100) return base
+  return (
+    base +
+    Math.round((alpha / 100) * 255)
+      .toString(16)
+      .padStart(2, '0')
+      .toUpperCase()
+  )
 }
 
-export function formatRgb(rgb: RGB): string {
-  return `${rgb.r}, ${rgb.g}, ${rgb.b}`
+export function formatRgb(rgb: RGB, alpha = 100): string {
+  if (alpha >= 100) return `${rgb.r}, ${rgb.g}, ${rgb.b}`
+  return `${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.round(alpha) / 100}`
 }
 
-export function formatHsl(hsl: HSL): string {
-  return `${hsl.h}, ${hsl.s}%, ${hsl.l}%`
+export function formatHsl(hsl: HSL, alpha = 100): string {
+  if (alpha >= 100) return `${hsl.h}, ${hsl.s}%, ${hsl.l}%`
+  return `${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${Math.round(alpha) / 100}`
 }
 
 export function formatHsv(hsv: HSV): string {
@@ -157,16 +167,21 @@ export function formatHsi(hsi: { h: number; s: number; i: number }): string {
   return `${hsi.h}, ${hsi.s}%, ${hsi.i}%`
 }
 
-export function toCssHex(hex: string): string {
-  return `#${hex.replace('#', '').toLowerCase()}`
+export function toCssHex(hex: string, alpha = 100): string {
+  const base = `#${hex.replace('#', '').toLowerCase()}`
+  if (alpha >= 100) return base
+  const a = Math.round((alpha / 100) * 255)
+  return base + a.toString(16).padStart(2, '0')
 }
 
-export function toCssRgb(rgb: RGB): string {
-  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+export function toCssRgb(rgb: RGB, alpha = 100): string {
+  if (alpha >= 100) return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.round(alpha) / 100})`
 }
 
-export function toCssHsl(hsl: HSL): string {
-  return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+export function toCssHsl(hsl: HSL, alpha = 100): string {
+  if (alpha >= 100) return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+  return `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${Math.round(alpha) / 100})`
 }
 
 export function toCssHsv(hsv: HSV): string {
