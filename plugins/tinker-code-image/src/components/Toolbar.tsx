@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Save, Moon, Sun, Copy, Check } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import className from 'licia/className'
 import {
   Toolbar,
@@ -16,9 +16,23 @@ import { tw } from 'share/theme'
 import store, { LANGUAGES, THEMES } from '../store'
 import * as htmlToImage from 'html-to-image'
 
+const languageOptions = Object.values(LANGUAGES).map((lang) => ({
+  label: lang.name,
+  value: lang.name,
+}))
+
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
+
+  const themeOptions = useMemo(
+    () =>
+      Object.values(THEMES).map((theme) => ({
+        label: t(`theme.${theme.id}`),
+        value: theme.id,
+      })),
+    [t]
+  )
 
   const getFrameElement = () => {
     const frameElement = document.getElementById('code-frame')
@@ -69,16 +83,6 @@ export default observer(function ToolbarComponent() {
       console.error('Failed to copy image:', error)
     }
   }
-
-  const languageOptions = Object.values(LANGUAGES).map((lang) => ({
-    label: lang.name,
-    value: lang.name,
-  }))
-
-  const themeOptions = Object.values(THEMES).map((theme) => ({
-    label: t(`theme.${theme.id}`),
-    value: theme.id,
-  }))
 
   return (
     <Toolbar>

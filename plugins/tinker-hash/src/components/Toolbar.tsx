@@ -18,20 +18,17 @@ import {
 } from 'share/components/Toolbar'
 import store from '../store'
 
-export default observer(function ToolbarCompoent() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
   const handlePaste = async () => {
     try {
-      // Try to get file paths from clipboard first
       const filePaths = await tinker.getClipboardFilePaths()
 
       if (filePaths && filePaths.length > 0) {
-        // If clipboard contains files, switch to file mode and process the first file
         store.setInputType('file')
         await store.handleFilePath(filePaths[0])
       } else {
-        // Otherwise, try to get text from clipboard
         const text = await navigator.clipboard.readText()
         if (text) {
           store.setInput(text)

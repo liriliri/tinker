@@ -51,7 +51,6 @@ function FormatRow({
     const newValue = e.target.value
     setLocalValue(newValue)
 
-    // Try to parse and apply immediately if valid
     const hex = parseColorToHex(newValue, format)
     if (hex) {
       store.setColor(hex)
@@ -60,7 +59,6 @@ function FormatRow({
 
   const handleBlur = () => {
     setIsEditing(false)
-    // Reset to current formatted value when blur
     setLocalValue(value)
   }
 
@@ -111,7 +109,7 @@ export default observer(function ColorFormats() {
   const lab = rgbToLab(rgb.r, rgb.g, rgb.b)
   const hsi = rgbToHsi(rgb.r, rgb.g, rgb.b)
 
-  const checkColors = store.darkMode
+  const checkColors = store.isDark
     ? THEME_COLORS.checkboard.dark
     : THEME_COLORS.checkboard.light
 

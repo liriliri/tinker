@@ -521,7 +521,6 @@ export const THEMES: { [index: string]: Theme } = {
   },
 }
 
-// Helper function to convert syntax colors to CSS properties
 export function convertToShikiTheme(syntaxObject: SyntaxColors): CSSProperties {
   return {
     '--shiki-foreground': syntaxObject.foreground,
@@ -538,7 +537,6 @@ export function convertToShikiTheme(syntaxObject: SyntaxColors): CSSProperties {
   } as CSSProperties
 }
 
-// Create shiki theme
 export const shikiTheme = createCssVariablesTheme({
   name: 'css-variables',
   variablePrefix: '--shiki-',

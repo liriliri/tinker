@@ -1,6 +1,8 @@
+import type { DynamicImportLanguageRegistration } from 'shiki'
+
 export interface Language {
   name: string
-  src: () => Promise<any>
+  src: DynamicImportLanguageRegistration
 }
 
 export const LANGUAGES: { [index: string]: Language } = {

@@ -21,7 +21,7 @@ export default observer(function CodeEditor({
   }
 
   const handleEditorWillMount = (monaco: Monaco) => {
-    // 禁用 TypeScript 和 JavaScript 的语法错误提示
+    // Disable syntax/semantic validation to avoid false errors in the editor
     monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: true,
       noSyntaxValidation: true,

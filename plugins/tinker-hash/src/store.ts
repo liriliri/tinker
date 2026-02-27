@@ -60,7 +60,6 @@ class Store extends BaseStore {
   setUppercase(value: boolean) {
     this.uppercase = value
     storage.set(STORAGE_KEY_UPPERCASE, value)
-    // Recalculate both text and file hashes with new case setting
     this.calculateHashes()
     this.recalculateFileHashes()
   }

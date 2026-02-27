@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import CopyButton from 'share/components/CopyButton'
 import { tw } from 'share/theme'
 
@@ -8,6 +9,8 @@ interface HashResultProps {
 }
 
 export default observer(function HashResult({ label, value }: HashResultProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="relative">
       <textarea
@@ -27,7 +30,7 @@ export default observer(function HashResult({ label, value }: HashResultProps) {
         size={16}
         disabled={!value}
         className="absolute bottom-2 right-2 w-8 h-8 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        title="Copy to clipboard"
+        title={t('copy')}
       />
     </div>
   )

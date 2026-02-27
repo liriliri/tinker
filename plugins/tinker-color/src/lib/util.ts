@@ -185,12 +185,10 @@ export function toCssHsl(hsl: HSL, alpha = 100): string {
 }
 
 export function toCssHsv(hsv: HSV): string {
-  // HSV doesn't have native CSS support, return as hsv() format for consistency
   return `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`
 }
 
 export function toCssCmyk(cmyk: CMYK): string {
-  // CMYK doesn't have native CSS support, return as device-cmyk() format
   return `device-cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`
 }
 
@@ -199,7 +197,6 @@ export function toCssLab(lab: LAB): string {
 }
 
 export function toCssHsi(hsi: { h: number; s: number; i: number }): string {
-  // HSI doesn't have native CSS support, return formatted string
   return `hsi(${hsi.h}, ${hsi.s}%, ${hsi.i}%)`
 }
 

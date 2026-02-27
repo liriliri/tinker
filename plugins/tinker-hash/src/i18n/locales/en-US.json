@@ -5,6 +5,7 @@
   "file": "File",
   "paste": "Paste",
   "clear": "Clear",
+  "copy": "Copy to clipboard",
   "placeholder": "Enter text to hash...",
   "openFile": "Click or drag file here",
   "allFiles": "All file formats supported"
