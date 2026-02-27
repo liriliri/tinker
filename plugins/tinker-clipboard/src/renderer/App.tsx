@@ -12,12 +12,10 @@ export default observer(function App() {
   const { i18n } = useTranslation()
 
   useEffect(() => {
-    // Start monitoring clipboard when component mounts
     clipboard.startMonitoring((item) => {
       store.addItem(item)
     })
 
-    // Cleanup: stop monitoring when component unmounts
     return () => {
       clipboard.stopMonitoring()
     }

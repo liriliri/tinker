@@ -1,7 +1,6 @@
-// Format timestamp to relative time
 export function formatRelativeTime(
   timestamp: number,
-  t: (key: string, options?: any) => string
+  t: (key: string, options?: Record<string, unknown>) => string
 ): string {
   const now = Date.now()
   const diff = now - timestamp

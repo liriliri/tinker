@@ -18,10 +18,11 @@ import {
   ToolbarButtonGroup,
 } from 'share/components/Toolbar'
 import type { CalendarApi } from '@fullcalendar/core'
+import FullCalendar from '@fullcalendar/react'
 import store from '../store'
 
 interface ToolbarComponentProps {
-  calendarRef: React.RefObject<{ getApi: () => CalendarApi }>
+  calendarRef: React.RefObject<FullCalendar | null>
   currentView: string
   setCurrentView: (view: string) => void
 }

@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import truncate from 'licia/truncate'
 import { tw } from 'share/theme'
 import { LoadingCircle } from 'share/components/Loading'
 import Toolbar from './Toolbar'
@@ -9,13 +8,8 @@ import store from '../store'
 
 export default observer(function DualPanel() {
   const { t } = useTranslation()
-  const maxOutputLength = 8000
-  const truncatedOutputText = store.outputText
-    ? truncate(store.outputText, maxOutputLength)
-    : ''
-  const truncatedFileBase64 = store.fileBase64
-    ? truncate(store.fileBase64, maxOutputLength)
-    : ''
+  const truncatedOutputText = store.truncatedOutputText
+  const truncatedFileBase64 = store.truncatedFileBase64
 
   const renderTextMode = () => (
     <div className="flex-1 flex overflow-hidden">

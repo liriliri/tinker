@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import FullCalendar from '@fullcalendar/react'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { tw } from 'share/theme'
@@ -11,7 +12,7 @@ import store from './store'
 
 export default observer(function App() {
   const { i18n } = useTranslation()
-  const calendarRef = useRef<any>(null)
+  const calendarRef = useRef<FullCalendar | null>(null)
   const [currentView, setCurrentView] = useState<string>('dayGridMonth')
 
   return (

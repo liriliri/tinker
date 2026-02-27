@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
+import { THEME_COLORS } from 'share/theme'
 import store from '../store'
 import { getTimeForTimezone } from '../lib/timezone'
 
@@ -9,8 +10,12 @@ const DigitalClock = observer(() => {
   useEffect(() => {
     if (!containerRef.current) return
 
-    const color = '#fff'
-    const backgroundColor = '#000'
+    const color = store.isDark
+      ? THEME_COLORS.text.dark.primary
+      : THEME_COLORS.text.light.primary
+    const backgroundColor = store.isDark
+      ? THEME_COLORS.bg.dark.primary
+      : THEME_COLORS.bg.light.primary
 
     const timeObj = {
       numberPathsD: {
@@ -301,7 +306,7 @@ const DigitalClock = observer(() => {
   return (
     <div
       ref={containerRef}
-      className="w-[clamp(400px,70vw,900px)] rounded-3xl p-4 bg-black"
+      className="w-[clamp(400px,70vw,900px)] rounded-3xl p-4 bg-[#1e1e1e] dark:bg-[#1e1e1e]"
     />
   )
 })

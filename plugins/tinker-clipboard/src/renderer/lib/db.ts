@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
-import { ClipboardItem } from '../store'
+import { ClipboardItem } from '../../common/types'
 
 interface ClipboardDB extends DBSchema {
   items: {

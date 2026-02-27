@@ -8,6 +8,7 @@ import i18n from './i18n'
 
 const storage = new LocalStore('tinker-calendar')
 const SIDEBAR_KEY = 'sidebar-open'
+const HOLIDAY_COLOR = '#fb923c'
 
 export type CalendarEvent = {
   id: string
@@ -217,8 +218,8 @@ class Store extends BaseStore {
       start: `${holiday.date}T00:00`,
       allDay: true,
       classNames: ['holiday-event'],
-      backgroundColor: '#fb923c',
-      borderColor: '#fb923c',
+      backgroundColor: HOLIDAY_COLOR,
+      borderColor: HOLIDAY_COLOR,
       editable: false,
       order: 0,
     }))

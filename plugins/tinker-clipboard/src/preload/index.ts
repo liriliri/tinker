@@ -1,15 +1,6 @@
 import { contextBridge, clipboard, nativeImage } from 'electron'
 import md5 from 'licia/md5'
-
-type ClipboardType = 'text' | 'image' | 'file'
-
-interface ClipboardItem {
-  id: string
-  type: ClipboardType
-  data: string
-  preview?: string
-  timestamp: number
-}
+import { ClipboardItem } from '../common/types'
 
 let monitoringInterval: NodeJS.Timeout | null = null
 let lastItemId = ''
@@ -22,7 +13,6 @@ function createPreview(text: string, maxLength = 200): string {
 
 async function getClipboardItem(): Promise<ClipboardItem | null> {
   try {
-    // Check for files first (highest priority)
     const filePaths = await tinker.getClipboardFilePaths()
     if (filePaths && filePaths.length > 0) {
       const data = JSON.stringify(filePaths)
@@ -52,7 +42,6 @@ async function getClipboardItem(): Promise<ClipboardItem | null> {
       }
     }
 
-    // Check for text last
     const text = clipboard.readText()
     if (text && text.trim()) {
       return {
@@ -76,7 +65,6 @@ async function checkClipboard() {
 
   if (!item) return
 
-  // Only trigger callback if content changed
   if (item.id !== lastItemId) {
     lastItemId = item.id
     onClipboardChangeCallback?.(item)

@@ -114,6 +114,7 @@ export const tw = {
   primary: {
     bg: 'bg-[#0fc25e]',
     bgHover: 'hover:bg-[#0da84f]',
+    bgActive: 'active:bg-[#0da84f]',
     text: 'text-[#0fc25e]',
     textHover: 'hover:!text-[#0fc25e]',
     border: 'border-[#0fc25e]',
@@ -144,6 +145,7 @@ export const tw = {
 
   // Active state utilities
   active: 'bg-gray-300 dark:bg-[#4a4a4a]',
+  activeFeedback: 'active:bg-gray-200 dark:active:bg-[#3a3a3c]',
 
   // Text color utilities
   text: {

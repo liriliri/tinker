@@ -1,11 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
-import { clock, css, flipClock, theme } from 'flipclock'
+import {
+  clock,
+  css,
+  flipClock,
+  theme,
+  FlipClock as FlipClockType,
+  Clock,
+} from 'flipclock'
 import store from '../store'
 
 export default observer(function FlipClock() {
   const clockRef = useRef<HTMLDivElement>(null)
-  const instanceRef = useRef<any>(null)
+  const instanceRef = useRef<FlipClockType<Clock> | null>(null)
 
   useEffect(() => {
     if (!clockRef.current) return

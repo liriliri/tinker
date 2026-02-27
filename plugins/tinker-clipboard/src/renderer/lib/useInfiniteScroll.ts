@@ -24,7 +24,6 @@ export function useInfiniteScroll({
       const scrollHeight =
         document.documentElement.scrollHeight || document.body.scrollHeight
 
-      // Check if near bottom
       if (scrollTop + windowHeight >= scrollHeight - threshold) {
         isLoadingRef.current = true
         onLoadMore()

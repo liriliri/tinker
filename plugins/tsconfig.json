@@ -22,5 +22,6 @@
       "share/*": ["./share/*"]
     }
   },
+  "exclude": ["**/references/**"],
   "references": [{ "path": "../tsconfig.node.json" }]
 }

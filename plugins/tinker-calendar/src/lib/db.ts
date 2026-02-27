@@ -30,7 +30,6 @@ function getDB(): Promise<IDBPDatabase<CalendarDB>> {
 export async function getAllEvents(): Promise<CalendarEvent[]> {
   const db = await getDB()
   const events = await db.getAll(STORE_NAME)
-  console.log('Events loaded from IndexedDB:', events.length)
   return events
 }
 
@@ -86,5 +85,4 @@ export async function saveEvents(events: CalendarEvent[]): Promise<void> {
   }
 
   await tx.done
-  console.log('Events saved to IndexedDB:', events.length)
 }

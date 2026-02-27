@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
 import TextInput from 'share/components/TextInput'
+import { tw } from 'share/theme'
 import TimeSelect from './TimeSelect'
 import DateSelect from './DateSelect'
 
@@ -93,7 +94,6 @@ const EventDialog = observer(
         className="w-full max-w-lg"
       >
         <div className="space-y-4">
-          {/* Title Input */}
           <div>
             <TextInput
               value={title}
@@ -104,10 +104,9 @@ const EventDialog = observer(
             />
           </div>
 
-          {/* Time Selects */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12">
+              <span className={`text-sm font-medium ${tw.text.secondary} w-12`}>
                 {t('startTime')}
               </span>
               <DateSelect
@@ -122,7 +121,7 @@ const EventDialog = observer(
               />
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-12">
+              <span className={`text-sm font-medium ${tw.text.secondary} w-12`}>
                 {t('endTime')}
               </span>
               <DateSelect
@@ -138,7 +137,6 @@ const EventDialog = observer(
             </div>
           </div>
 
-          {/* All Day Toggle */}
           <div className="pt-2">
             <Checkbox checked={isAllDay} onChange={setIsAllDay}>
               {t('allDay')}
@@ -146,7 +144,6 @@ const EventDialog = observer(
           </div>
         </div>
 
-        {/* Footer Buttons */}
         <div className="flex justify-end gap-2 mt-6">
           <DialogButton variant="text" onClick={onClose}>
             {t('cancel')}

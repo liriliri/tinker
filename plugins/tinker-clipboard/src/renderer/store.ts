@@ -2,18 +2,10 @@ import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import * as db from './lib/db'
+import { ClipboardItem, ClipboardType } from '../common/types'
+import { FilterTab } from './types'
 
-export type ClipboardType = 'text' | 'image' | 'file'
-
-export type FilterTab = 'all' | 'text' | 'image' | 'file'
-
-export interface ClipboardItem {
-  id: string
-  type: ClipboardType
-  data: string // For text: plain text, For image: base64, For file: JSON stringified file paths
-  preview?: string // Preview text (first 200 chars for text, file names for files)
-  timestamp: number
-}
+export type { ClipboardType, ClipboardItem, FilterTab }
 
 const STORAGE_KEY_FILTER_TAB = 'filter-tab'
 const STORAGE_KEY_SEARCH_QUERY = 'search-query'
@@ -29,8 +21,8 @@ class Store extends BaseStore {
 
   isLoaded = false
 
-  private lazyIndex = 20 // Show 20 items initially
-  private readonly lazyStep = 20 // Load 20 more each time
+  private lazyIndex = 20
+  private readonly lazyStep = 20
 
   constructor() {
     super()
@@ -38,7 +30,6 @@ class Store extends BaseStore {
     this.loadFromStorage()
   }
 
-  // Computed: all filtered items (not displayed directly)
   private get allFilteredItems(): ClipboardItem[] {
     let result = this.items
 
@@ -57,7 +48,6 @@ class Store extends BaseStore {
     return result
   }
 
-  // Computed: items to display (lazy loaded)
   get filteredItems(): ClipboardItem[] {
     return this.allFilteredItems.slice(0, this.lazyIndex)
   }

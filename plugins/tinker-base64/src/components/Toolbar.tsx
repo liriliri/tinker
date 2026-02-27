@@ -103,7 +103,7 @@ export default observer(function ToolbarComponent() {
               disabled={isStrBlank(store.inputText)}
               className="flex items-center gap-1"
             >
-              <Save size={12} />
+              <Save size={TOOLBAR_ICON_SIZE} />
               {t('decodeToFile')}
             </ToolbarTextButton>
           </>

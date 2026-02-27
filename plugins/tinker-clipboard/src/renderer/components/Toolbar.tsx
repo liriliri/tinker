@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { AlignJustify, FileText, Image, File, ListX } from 'lucide-react'
-import store, { FilterTab } from '../store'
+import store from '../store'
+import { FilterTab } from '../types'
 import { tw } from 'share/theme'
 import {
   Toolbar,
@@ -35,7 +36,6 @@ export default observer(function ToolbarComponent() {
 
   return (
     <Toolbar>
-      {/* Tab Navigation */}
       {tabs.map((tab) => {
         const Icon = tab.icon
         const isActive = store.filterTab === tab.id
@@ -56,7 +56,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      {/* Search Bar */}
       <ToolbarSearch
         value={store.searchQuery}
         onChange={(value) => store.setSearchQuery(value)}
@@ -66,14 +65,12 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
 
-      {/* Item Count */}
       {store.items.length > 0 && (
         <span className={`text-xs ${tw.text.tertiary} mr-2`}>
           {t('itemCount', { count: store.filteredItems.length })}
         </span>
       )}
 
-      {/* Clear All Button */}
       <ToolbarButton
         onClick={handleClearAll}
         disabled={store.items.length === 0}

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { X, FileText, Image as ImageIcon } from 'lucide-react'
-import { ClipboardItem as ClipboardItemType } from '../store'
+import { ClipboardItem as ClipboardItemType } from '../../common/types'
 import { tw } from 'share/theme'
 import { formatRelativeTime } from '../lib/timeFormat'
 
@@ -66,12 +66,10 @@ export default observer(function ClipboardItem({
       className={`group px-4 py-3 border-b ${tw.border} ${tw.hover} transition-colors cursor-pointer`}
     >
       <div className="flex items-start gap-3">
-        {/* Preview */}
         <div className="flex-1 min-w-0" onClick={onCopy}>
           {renderPreview()}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center">
           <button
             onClick={(e) => {
@@ -89,7 +87,6 @@ export default observer(function ClipboardItem({
         </div>
       </div>
 
-      {/* Timestamp */}
       <div className={`mt-2 text-xs ${tw.text.tertiary}`}>
         {formatRelativeTime(item.timestamp, t)}
       </div>

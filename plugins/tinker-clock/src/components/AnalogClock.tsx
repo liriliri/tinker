@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
 import { getTimeForTimezone } from '../lib/timezone'
 
@@ -102,7 +102,9 @@ export default observer(function AnalogClock() {
                 <div
                   className="mx-auto"
                   style={{
-                    backgroundColor: isDark ? '#9ca3af' : '#4b5563',
+                    backgroundColor: isDark
+                      ? THEME_COLORS.text.dark.secondary
+                      : THEME_COLORS.text.dark.tertiary,
                     width: isHourMarker
                       ? 'clamp(1.5px, 0.4vw, 3px)'
                       : 'clamp(1px, 0.2vw, 2px)',
@@ -181,7 +183,9 @@ export default observer(function AnalogClock() {
             <div
               className="w-full h-full rounded-full"
               style={{
-                backgroundColor: isDark ? '#d4d4d4' : '#1a1a1a',
+                backgroundColor: isDark
+                  ? THEME_COLORS.text.dark.primary
+                  : THEME_COLORS.text.light.primary,
                 boxShadow: isDark
                   ? '0 0 8px rgba(255,255,255,0.3)'
                   : '0 0 8px rgba(0,0,0,0.3)',
@@ -215,7 +219,9 @@ export default observer(function AnalogClock() {
             <div
               className="w-full h-full rounded-full"
               style={{
-                backgroundColor: isDark ? '#d4d4d4' : '#1a1a1a',
+                backgroundColor: isDark
+                  ? THEME_COLORS.text.dark.primary
+                  : THEME_COLORS.text.light.primary,
                 boxShadow: isDark
                   ? '0 0 8px rgba(255,255,255,0.3)'
                   : '0 0 8px rgba(0,0,0,0.3)',

@@ -48,7 +48,7 @@ class Store extends BaseStore {
       line.id === id ? { ...line, expression: value, result } : line
     )
 
-    // If current line has result and is the last line, auto add new line
+    // keep the last line editable after a valid result is entered
     const currentIndex = this.lines.findIndex((line) => line.id === id)
     const isLastLine = currentIndex === this.lines.length - 1
     const hasResult = result !== ''
@@ -69,7 +69,6 @@ class Store extends BaseStore {
     })
     this.activeLineId = newId
 
-    // Focus the new input
     setTimeout(() => {
       this.inputRefs[newId]?.focus()
     }, 0)

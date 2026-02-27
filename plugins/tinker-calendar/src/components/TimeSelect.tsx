@@ -30,7 +30,7 @@ const TimeSelect = observer(
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className={`w-full px-3 py-2 pr-8 border ${tw.border} rounded ${tw.bg.input} text-gray-800 dark:text-gray-200 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0fc25e] disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full px-3 py-2 pr-8 border ${tw.border} rounded ${tw.bg.input} text-gray-800 dark:text-gray-200 appearance-none cursor-pointer focus:outline-none focus:ring-2 ${tw.primary.focusRing} disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {TIME_OPTIONS.map((time) => (
             <option key={time} value={time}>

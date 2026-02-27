@@ -12,6 +12,8 @@ import type {
   EventClickArg,
   EventDropArg,
   DatesSetArg,
+  EventContentArg,
+  DayCellContentArg,
 } from '@fullcalendar/core'
 import { useTranslation } from 'react-i18next'
 import EventDialog, { type EventFormData } from './EventDialog'
@@ -19,7 +21,7 @@ import store from '../store'
 import { getLunarDate } from '../lib/lunar'
 
 interface CalendarViewProps {
-  calendarRef: React.RefObject<any>
+  calendarRef: React.RefObject<FullCalendar | null>
   setCurrentView: (view: string) => void
 }
 
@@ -28,8 +30,9 @@ const CalendarView = observer(
     const { i18n, t } = useTranslation()
     const clickTimerRef = useRef<NodeJS.Timeout | null>(null)
     const lastClickInfoRef = useRef<DateClickArg | null>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
-    // Watch for sidebar state changes and update calendar size
+    // Delay resize to allow sidebar animation to complete before recalculating
     useEffect(() => {
       const timer = setTimeout(() => {
         calendarRef.current?.getApi()?.updateSize()
@@ -37,14 +40,9 @@ const CalendarView = observer(
       return () => clearTimeout(timer)
     }, [store.sidebarOpen, calendarRef])
 
-    // Watch for selected date changes and trigger re-render
     useEffect(() => {
-      calendarRef.current?.getApi()?.render()
-    }, [store.selectedDate, calendarRef])
-
-    useEffect(() => {
-      const calendarEl = calendarRef.current?.getApi().el
-      if (!calendarEl) return
+      const container = containerRef.current
+      if (!container) return
 
       const handleDoubleClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement
@@ -55,9 +53,9 @@ const CalendarView = observer(
         }
       }
 
-      calendarEl.addEventListener('dblclick', handleDoubleClick)
+      container.addEventListener('dblclick', handleDoubleClick)
       return () => {
-        calendarEl.removeEventListener('dblclick', handleDoubleClick)
+        container.removeEventListener('dblclick', handleDoubleClick)
       }
     }, [])
     const calendarLocale = useMemo(
@@ -70,16 +68,14 @@ const CalendarView = observer(
     )
 
     const handleDateClick = async (info: DateClickArg) => {
-      // Save click info for potential double click
       lastClickInfoRef.current = info
 
-      // Clear existing timer
       if (clickTimerRef.current) {
         clearTimeout(clickTimerRef.current)
         clickTimerRef.current = null
       }
 
-      // Set timer for single click (select date only)
+      // Delay single-click action to allow double-click to cancel it
       clickTimerRef.current = setTimeout(() => {
         store.setSelectedDate(info.dateStr)
         clickTimerRef.current = null
@@ -166,7 +162,7 @@ const CalendarView = observer(
       return []
     }
 
-    const handleEventContent = (arg: any) => {
+    const handleEventContent = (arg: EventContentArg) => {
       if (arg.event.classNames.includes('holiday-event')) {
         return {
           html: `<div class="fc-event-title">${t(arg.event.title)}</div>`,
@@ -175,11 +171,7 @@ const CalendarView = observer(
       return true
     }
 
-    const handleDayCellContent = (arg: {
-      date: Date
-      dayNumberText: string
-      view: any
-    }) => {
+    const handleDayCellContent = (arg: DayCellContentArg) => {
       const isZhCN = i18n.language === 'zh-CN'
       const isMonthView = arg.view.type === 'dayGridMonth'
 
@@ -205,32 +197,34 @@ const CalendarView = observer(
 
     return (
       <>
-        <FullCalendar
-          ref={calendarRef}
-          plugins={calendarPlugins}
-          initialView="dayGridMonth"
-          headerToolbar={false}
-          height="100%"
-          expandRows={true}
-          fixedWeekCount={false}
-          firstDay={0}
-          dayMaxEvents={3}
-          eventOrder="order,start,title"
-          events={store.calendarEvents}
-          locale={calendarLocale}
-          editable={true}
-          navLinks={true}
-          navLinkDayClick="timeGridDay"
-          moreLinkClick="popover"
-          dateClick={handleDateClick}
-          eventClick={handleEventClick}
-          eventDrop={handleEventDrop}
-          eventResize={handleEventResize}
-          datesSet={handleDatesSet}
-          dayCellClassNames={dayCellClassNames}
-          dayCellContent={handleDayCellContent}
-          eventContent={handleEventContent}
-        />
+        <div ref={containerRef} className="h-full">
+          <FullCalendar
+            ref={calendarRef}
+            plugins={calendarPlugins}
+            initialView="dayGridMonth"
+            headerToolbar={false}
+            height="100%"
+            expandRows={true}
+            fixedWeekCount={false}
+            firstDay={0}
+            dayMaxEvents={3}
+            eventOrder="order,start,title"
+            events={store.calendarEvents}
+            locale={calendarLocale}
+            editable={true}
+            navLinks={true}
+            navLinkDayClick="timeGridDay"
+            moreLinkClick="popover"
+            dateClick={handleDateClick}
+            eventClick={handleEventClick}
+            eventDrop={handleEventDrop}
+            eventResize={handleEventResize}
+            datesSet={handleDatesSet}
+            dayCellClassNames={dayCellClassNames}
+            dayCellContent={handleDayCellContent}
+            eventContent={handleEventContent}
+          />
+        </div>
         <EventDialog
           isOpen={store.eventDialogOpen}
           onClose={() => store.closeEventDialog()}

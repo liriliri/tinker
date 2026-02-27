@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import truncate from 'licia/truncate'
 import BaseStore from 'share/BaseStore'
 import toast from 'react-hot-toast'
 import isDataUrl from 'licia/isDataUrl'
@@ -32,6 +33,20 @@ class Store extends BaseStore {
       return dataUrl.stringify(this._fileBase64Raw, this._fileMimeType)
     }
     return this._fileBase64Raw
+  }
+
+  private static readonly MAX_DISPLAY_LENGTH = 8000
+
+  get truncatedOutputText(): string {
+    return this.outputText
+      ? truncate(this.outputText, Store.MAX_DISPLAY_LENGTH)
+      : ''
+  }
+
+  get truncatedFileBase64(): string {
+    return this.fileBase64
+      ? truncate(this.fileBase64, Store.MAX_DISPLAY_LENGTH)
+      : ''
   }
 
   constructor() {
@@ -186,6 +201,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

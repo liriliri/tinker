@@ -20,10 +20,10 @@ const KIND_CLASSES: Record<KeyKind, string> = {
 const BASE_BUTTON =
   'h-11 md:h-12 rounded-full font-semibold transition-colors flex items-center justify-center'
 const OPERATOR_ICON_SIZE = 18
-const ACTIVE_FEEDBACK_STYLE = 'active:bg-gray-200 dark:active:bg-[#3a3a3c]'
+const ACTIVE_FEEDBACK_STYLE = tw.activeFeedback
 const LEFT_KEY_STYLE = `${tw.bg.primary} ${ACTIVE_FEEDBACK_STYLE}`
 const NUMBER_KEY_STYLE = `${tw.bg.tertiary} ${ACTIVE_FEEDBACK_STYLE}`
-const OPERATOR_KEY_STYLE = `${tw.primary.bg} active:bg-[#0da84f]`
+const OPERATOR_KEY_STYLE = `${tw.primary.bg} ${tw.primary.bgActive}`
 
 const EqualIcon = (
   <span className="flex flex-col items-center justify-center gap-[3px]">
