@@ -122,7 +122,7 @@ export default observer(function ToolbarComponent() {
           <ToolbarSeparator />
 
           <ToolbarTextButton
-            variant={store.isConverting ? 'primary' : 'secondary'}
+            variant={store.isConverting ? 'secondary' : 'primary'}
             onClick={() =>
               store.isConverting ? store.cancelConversion() : store.convertAll()
             }

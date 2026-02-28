@@ -289,7 +289,11 @@ class Store extends BaseStore {
     item.progress = 0
 
     try {
-      const outputPath = getOutputPath(item, this.outputDir, this.outputFormat)
+      const outputPath = await getOutputPath(
+        item,
+        this.outputDir,
+        this.outputFormat
+      )
       const ffmpegArgs = buildFFmpegArgs(item, outputPath, this.outputFormat)
 
       const task = tinker.runFFmpeg(ffmpegArgs, (progress) => {

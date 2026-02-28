@@ -4,6 +4,7 @@ import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
 import { type Priority, type FilterType, type TodoItem } from './types'
 import { parseTodoItem, createRawTodo } from './lib/todo'
+import { fileExists } from 'share/lib/util'
 
 const storage = new LocalStore('tinker-todo')
 const STORAGE_KEY_CURRENT_FILTER = 'currentFilter'
@@ -109,9 +110,7 @@ class Store extends BaseStore {
   }
 
   async setFilePath(path: string) {
-    try {
-      await tinker.readFile(path, 'utf-8')
-    } catch {
+    if (!(await fileExists(path))) {
       runInAction(() => {
         this.recentFiles = this.recentFiles.filter((p) => p !== path)
         storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)

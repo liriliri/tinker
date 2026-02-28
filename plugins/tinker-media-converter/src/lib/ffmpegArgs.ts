@@ -1,4 +1,6 @@
 import type { MediaItem } from '../types'
+import splitPath from 'licia/splitPath'
+import { resolveSavePath } from 'share/lib/util'
 
 function getVideoCodecArgs(outputFormat: string): string[] {
   switch (outputFormat) {
@@ -139,25 +141,18 @@ export function buildFFmpegArgs(
   return args
 }
 
-export function getOutputPath(
+export async function getOutputPath(
   item: MediaItem,
   outputDir: string,
   outputFormat: string
-): string {
-  const filePath = item.filePath
-  const lastSlash = Math.max(
-    filePath.lastIndexOf('/'),
-    filePath.lastIndexOf('\\')
-  )
-  const dir = lastSlash >= 0 ? filePath.slice(0, lastSlash) : ''
-  const fullName = lastSlash >= 0 ? filePath.slice(lastSlash + 1) : filePath
-  const dotIdx = fullName.lastIndexOf('.')
-  const baseName = dotIdx >= 0 ? fullName.slice(0, dotIdx) : fullName
-  const ext = '.' + outputFormat
+): Promise<string> {
+  const { dir, name, ext } = splitPath(item.filePath)
+  const baseName = ext ? name.slice(0, -ext.length) : name
+  const outExt = '.' + outputFormat
 
   if (outputDir) {
-    return `${outputDir}/${baseName}${ext}`
+    return resolveSavePath(`${outputDir}/${baseName}${outExt}`)
   }
 
-  return `${dir}/${baseName}_converted${ext}`
+  return resolveSavePath(`${dir}${baseName}${outExt}`)
 }

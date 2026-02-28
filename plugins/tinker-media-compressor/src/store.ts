@@ -14,6 +14,7 @@ import BaseStore from 'share/BaseStore'
 import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
 import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
+import { resolveSavePath } from 'share/lib/util'
 
 const STORAGE_KEY_QUALITY = 'quality'
 const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
@@ -138,15 +139,14 @@ class Store extends BaseStore {
     return 'audio'
   }
 
-  getOutputPath(item: MediaItem): string {
-    const { dir, name, ext } = splitPath(item.filePath)
-    const baseName = ext ? name.slice(0, -ext.length) : name
+  async getOutputPath(item: MediaItem): Promise<string> {
+    const { dir, name } = splitPath(item.filePath)
 
     if (this.outputDir) {
-      return `${this.outputDir}/${baseName}${ext}`
+      return resolveSavePath(`${this.outputDir}/${name}`)
     }
 
-    return `${dir}${baseName}_compressed${ext}`
+    return resolveSavePath(`${dir}${name}`)
   }
 
   async openMediaDialog() {
@@ -267,7 +267,7 @@ class Store extends BaseStore {
     item.progress = 0
 
     try {
-      const outputPath = this.getOutputPath(item)
+      const outputPath = await this.getOutputPath(item)
       const gpuEncoder = await detectGpuEncoder()
       const ffmpegArgs = buildFFmpegArgs(item, outputPath, {
         videoMode: this.videoCompressionMode,

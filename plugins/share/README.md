@@ -287,6 +287,29 @@ if (result) {
 
 Opens native file dialog for images. Returns `{ file: File, filePath: string } | null`.
 
+### fileExists
+
+```typescript
+import { fileExists } from 'share/lib/util'
+
+const exists = await fileExists('/path/to/file')
+```
+
+Checks whether a file or directory exists at the given path. Returns `boolean`.
+
+### resolveSavePath
+
+```typescript
+import { resolveSavePath } from 'share/lib/util'
+
+const savePath = await resolveSavePath('/path/to/recording.mp3')
+// Returns '/path/to/recording.mp3' if it doesn't exist
+// Returns '/path/to/recording-2026022822.mp3' if base path exists
+// Returns '/path/to/recording-202602281030.mp3' if hour path also exists
+```
+
+Resolves a unique save path. If the given path already exists, appends a `-yyyymmddHH` timestamp suffix; if that also exists, appends `-yyyymmddHHMM`.
+
 ## Best Practices
 
 **Performance**: Use computed properties for cached calculations.
