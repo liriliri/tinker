@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
-import type { MediaItem, MediaType, AudioInfo, ImageInfo } from './types'
+import type { MediaItem, MediaType, AudioInfo } from './types'
 import BaseStore from 'share/BaseStore'
 import {
   VIDEO_EXTENSIONS,
@@ -221,21 +221,35 @@ class Store extends BaseStore {
 
     try {
       if (mediaType === 'image') {
-        const info = await tinker.getMediaInfo(filePath)
+        const buffer = await tinker.readFile(filePath)
         const storedItem = this.items.find((i) => i.id === item.id)
         if (!storedItem) return
 
-        if (!fileSize && info.size) {
-          storedItem.originalSize = info.size
+        if (!fileSize) {
+          storedItem.originalSize = buffer.byteLength
         }
 
-        if (info.videoStream) {
-          const imageInfo: ImageInfo = {
-            width: info.videoStream.width,
-            height: info.videoStream.height,
-            thumbnail: info.videoStream.thumbnail,
+        const blob = new Blob([buffer])
+        const url = URL.createObjectURL(blob)
+
+        const img = new Image()
+        await new Promise<void>((resolve) => {
+          img.onload = () => resolve()
+          img.onerror = () => {
+            URL.revokeObjectURL(url)
+            resolve()
           }
-          storedItem.imageInfo = imageInfo
+          img.src = url
+        })
+
+        if (img.naturalWidth > 0) {
+          storedItem.imageInfo = {
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            url,
+          }
+        } else {
+          URL.revokeObjectURL(url)
         }
       } else {
         const info = await tinker.getMediaInfo(filePath)
@@ -308,10 +322,17 @@ class Store extends BaseStore {
       await (task as unknown as Promise<void>)
       this.currentTask = null
 
-      const info = await tinker.getMediaInfo(outputPath)
+      let outputSize = 0
+      if (item.mediaType === 'image') {
+        const buffer = await tinker.readFile(outputPath)
+        outputSize = buffer.byteLength
+      } else {
+        const info = await tinker.getMediaInfo(outputPath)
+        outputSize = info.size || 0
+      }
 
       runInAction(() => {
-        item.outputSize = info.size || 0
+        item.outputSize = outputSize
         item.progress = 100
         item.outputPath = outputPath
         item.isDone = true
@@ -346,11 +367,20 @@ class Store extends BaseStore {
   removeItem(id: string) {
     const index = this.items.findIndex((i) => i.id === id)
     if (index !== -1) {
+      const item = this.items[index]
+      if (item.imageInfo?.url) {
+        URL.revokeObjectURL(item.imageInfo.url)
+      }
       this.items.splice(index, 1)
     }
   }
 
   clear() {
+    for (const item of this.items) {
+      if (item.imageInfo?.url) {
+        URL.revokeObjectURL(item.imageInfo.url)
+      }
+    }
     if (this.mode === 'video') {
       this.videoItems = []
     } else if (this.mode === 'audio') {

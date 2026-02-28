@@ -20,7 +20,7 @@ export interface AudioInfo {
 export interface ImageInfo {
   width: number
   height: number
-  thumbnail: string
+  url: string
 }
 
 export interface MediaItem {
