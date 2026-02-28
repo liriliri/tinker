@@ -8,7 +8,7 @@ import { FileText, Monitor, Plus } from 'lucide-react'
 import contain from 'licia/contain'
 import className from 'licia/className'
 import store from '../store'
-import { HostsConfig } from '../types'
+import { HostsConfig } from '../../common/types'
 
 export default observer(function Sidebar() {
   const { t } = useTranslation()

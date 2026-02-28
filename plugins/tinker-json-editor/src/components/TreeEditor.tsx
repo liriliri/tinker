@@ -14,8 +14,6 @@ export default observer(function TreeEditor() {
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Map i18n language to jsoneditor language
-    // jsoneditor uses 'en' for English, but i18n uses 'en-US'
     const languageMap: Record<string, string> = {
       'en-US': 'en',
       'zh-CN': 'zh-CN',
@@ -45,7 +43,6 @@ export default observer(function TreeEditor() {
     editorRef.current = new JSONEditor(containerRef.current, options)
     store.setTreeEditorInstance(editorRef.current)
 
-    // Set initial value
     try {
       const json = store.jsonInput ? JSON.parse(store.jsonInput) : {}
       editorRef.current.set(json)

@@ -8,7 +8,7 @@ class UndoQueue {
     return this.inner_.pop()
   }
 
-  push(e: any) {
+  push(e: unknown) {
     this.inner_.push(e)
     while (this.length > this.size_) {
       this.inner_.shift()
@@ -38,13 +38,13 @@ export class UndoRedoBase {
     this.isTracking = true
   }
 
-  push(state: any) {
+  push(state: unknown) {
     if (!this.isTracking) return
     this.undoStates.push(state)
     this.redoStates = new UndoQueue()
   }
 
-  undo(redoState: any) {
+  undo(redoState: unknown) {
     if (this.isUndoing) return
     if (!this.canUndo) throw new Error('Nothing to undo')
     this.isUndoing = true
@@ -54,7 +54,7 @@ export class UndoRedoBase {
     return state
   }
 
-  redo(undoState: any) {
+  redo(undoState: unknown) {
     if (this.isUndoing) return
     if (!this.canRedo) throw new Error('Nothing to redo')
     this.isUndoing = true

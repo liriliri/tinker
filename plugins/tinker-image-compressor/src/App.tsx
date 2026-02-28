@@ -21,7 +21,6 @@ export default observer(function App() {
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    // Filter image files only
     const imageFiles = Array.from(files).filter((file) =>
       file.type.startsWith('image/')
     )
@@ -32,7 +31,7 @@ export default observer(function App() {
     try {
       const fileArray = imageFiles.map((file) => {
         // In Electron, the File object has a path property
-        const filePath = (file as any).path
+        const filePath = (file as File & { path?: string }).path
         return { file, filePath }
       })
       await store.loadImages(fileArray)
@@ -49,7 +48,6 @@ export default observer(function App() {
     >
       <Toolbar />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {!store.hasImages ? (
           <ImageOpen
@@ -62,7 +60,6 @@ export default observer(function App() {
         )}
       </div>
 
-      {/* Compare Modal */}
       <CompareModal />
     </div>
   )

@@ -8,6 +8,24 @@ interface FfmpegArgsOptions {
   keepExif: boolean
 }
 
+export function detectImageFormat(fileName: string): ImageFormat {
+  const ext = fileName.toLowerCase().split('.').pop() || ''
+  if (ext === 'png') return 'png'
+  if (ext === 'webp') return 'webp'
+  return 'jpeg'
+}
+
+export function getFormatExtension(format: ImageFormat): string {
+  switch (format) {
+    case 'jpeg':
+      return 'jpg'
+    case 'png':
+      return 'png'
+    case 'webp':
+      return 'webp'
+  }
+}
+
 export function buildFfmpegArgs({
   filePath,
   outputPath,

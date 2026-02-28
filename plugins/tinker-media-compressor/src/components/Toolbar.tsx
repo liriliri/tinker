@@ -149,9 +149,8 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      {/* Output directory */}
       <div
-        className="flex items-center w-52 px-1 py-1 text-xs rounded border border-[#e0e0e0] dark:border-[#4a4a4a] bg-white dark:bg-[#2d2d2d] focus-within:ring-1 focus-within:ring-[#0fc25e]"
+        className={`flex items-center w-52 px-1 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} focus-within:ring-1 ${tw.primary.focusRing}`}
         title={store.outputDir || t('outputDirPlaceholder')}
       >
         <button

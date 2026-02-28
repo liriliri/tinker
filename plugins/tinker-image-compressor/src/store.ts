@@ -8,9 +8,13 @@ import sum from 'licia/sum'
 import map from 'licia/map'
 import splitPath from 'licia/splitPath'
 import mime from 'licia/mime'
-import type { ImageFormat, ImageItem } from './types'
+import type { ImageItem } from './types'
 import BaseStore from 'share/BaseStore'
-import { buildFfmpegArgs } from './lib/compress'
+import {
+  buildFfmpegArgs,
+  detectImageFormat,
+  getFormatExtension,
+} from './lib/compress'
 import { extractJpegExif, injectJpegExif } from './lib/exif'
 
 const STORAGE_KEY_QUALITY = 'quality'
@@ -99,24 +103,6 @@ class Store extends BaseStore {
     }
   }
 
-  private detectImageFormat(fileName: string): ImageFormat {
-    const ext = fileName.toLowerCase().split('.').pop() || ''
-    if (ext === 'png') return 'png'
-    if (ext === 'webp') return 'webp'
-    return 'jpeg'
-  }
-
-  private getFormatExtension(format: ImageFormat): string {
-    switch (format) {
-      case 'jpeg':
-        return 'jpg'
-      case 'png':
-        return 'png'
-      case 'webp':
-        return 'webp'
-    }
-  }
-
   private isCompressedSmaller(image: ImageItem): boolean {
     return image.compressedSize < image.originalSize
   }
@@ -154,7 +140,7 @@ class Store extends BaseStore {
     }
 
     const id = `${Date.now()}-${Math.random()}`
-    const originalFormat = this.detectImageFormat(file.name)
+    const originalFormat = detectImageFormat(file.name)
 
     const img = new Image()
     const url = URL.createObjectURL(file)
@@ -205,7 +191,7 @@ class Store extends BaseStore {
     try {
       const tmpDir = tinker.tmpdir()
       const timestamp = Date.now()
-      const extension = this.getFormatExtension(image.originalFormat)
+      const extension = getFormatExtension(image.originalFormat)
       const outputPath = `${tmpDir}/tinker-compressed-${timestamp}-${id}.${extension}`
 
       const ffmpegArgs = buildFfmpegArgs({
@@ -290,7 +276,7 @@ class Store extends BaseStore {
       for (const image of compressedImages) {
         if (!image.compressedBlob) continue
 
-        const extension = this.getFormatExtension(image.originalFormat)
+        const extension = getFormatExtension(image.originalFormat)
         const fileName = image.fileName.replace(/\.[^.]+$/, `.${extension}`)
         const filePath = `${directory}/${fileName}`
 
@@ -359,7 +345,7 @@ class Store extends BaseStore {
       (img) =>
         img.compressedBlob !== null &&
         !img.isSaved &&
-        this.isCompressedSmaller(img) // Only count if compressed is smaller
+        this.isCompressedSmaller(img)
     )
   }
 

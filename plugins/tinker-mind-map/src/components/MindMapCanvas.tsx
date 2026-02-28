@@ -7,6 +7,7 @@ import KeyboardNavigation from 'simple-mind-map/src/plugins/KeyboardNavigation.j
 import Drag from 'simple-mind-map/src/plugins/Drag.js'
 import Select from 'simple-mind-map/src/plugins/Select.js'
 import Export from 'simple-mind-map/src/plugins/Export.js'
+import type { MindMapNode, MindMapInstance } from '../types'
 import store from '../store'
 
 MindMap.usePlugin(MiniMap)
@@ -29,14 +30,14 @@ export default observer(function MindMapCanvas() {
       data: data.root,
       layout: data.layout || store.currentLayout,
       theme: data.theme || store.currentTheme,
-    } as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any) as unknown as MindMapInstance
 
     store.setMindMap(mindMap)
 
-    // Listen for node right-click events
-    mindMap.on('node_contextmenu', (e: any, node: any) => {
-      e.preventDefault()
-      store.showNodeContextMenu(e, node)
+    mindMap.on('node_contextmenu', (e: unknown, node: unknown) => {
+      ;(e as Event).preventDefault()
+      store.showNodeContextMenu(e as MouseEvent, node as MindMapNode)
     })
 
     const handleResize = () => {

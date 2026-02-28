@@ -10,17 +10,9 @@ import i18n from './i18n'
 import { Rect, Text, type App, type Frame } from 'leafer-ui'
 import { textToSvg } from './lib/watermark'
 import { UndoRedoBase } from './lib/undoRedo'
+import type { ToolType, ShapeType } from './types'
 
-export type ToolType =
-  | 'select'
-  | 'move'
-  | 'shape'
-  | 'pen'
-  | 'text'
-  | 'magnifier'
-  | 'mosaic'
-
-export type ShapeType = 'rect' | 'ellipse' | 'line' | 'arrow'
+export type { ToolType, ShapeType }
 
 const STORAGE_FOREGROUND_KEY = 'foreground-color'
 const STORAGE_BACKGROUND_KEY = 'background-color'
@@ -388,7 +380,6 @@ class Store extends BaseStore {
       }
       if (format === 'jpg' || format === 'webp') {
         exportOptions.quality = 0.9
-        exportOptions.fill = '#ffffff'
       }
 
       const exportResult = await this.app.tree.export(format, exportOptions)

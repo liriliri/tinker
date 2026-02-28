@@ -15,7 +15,6 @@ class Store extends BaseStore {
   }
 
   private bindEvent() {
-    // Automatically update title when currentFileName changes
     reaction(
       () => this.currentFileName,
       (fileName) => {

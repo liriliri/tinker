@@ -93,7 +93,6 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
           style={{ width: `${item.progress}%` }}
         />
       )}
-      {/* Thumbnail or media type icon */}
       <div className="flex-shrink-0">
         {videoInfo?.thumbnail ? (
           <img
@@ -114,7 +113,6 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         )}
       </div>
 
-      {/* File info */}
       <div className="flex-1 min-w-0">
         <div className={`text-xs font-medium truncate ${tw.text.primary}`}>
           {item.fileName}
@@ -197,7 +195,6 @@ const MediaRow = observer(({ item }: { item: MediaItem }) => {
         </div>
       </div>
 
-      {/* Status area */}
       <div className="relative flex-shrink-0 flex items-center gap-2">
         {item.isCompressing && (
           <div className="flex items-center gap-1.5">

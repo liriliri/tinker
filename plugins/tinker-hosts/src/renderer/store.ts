@@ -3,7 +3,8 @@ import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
 import contain from 'licia/contain'
 import remove from 'licia/remove'
-import { HostsConfig, ViewMode } from './types'
+import { HostsConfig } from '../common/types'
+import { ViewMode } from './types'
 import BaseStore from 'share/BaseStore'
 import i18n from './i18n'
 
@@ -107,7 +108,6 @@ class Store extends BaseStore {
     this.configs = newConfigs
     this.saveConfigs()
 
-    // Auto-apply hosts if this config is active
     if (contain(this.activeIds, id)) {
       this.applyHosts().catch((error) => {
         console.error('Failed to auto-apply hosts after update:', error)
@@ -146,7 +146,6 @@ class Store extends BaseStore {
     this.saveConfigs()
     this.saveActiveIds()
 
-    // If the deleted config was active, apply hosts to update system
     if (wasActive) {
       this.applyHosts().catch((error) => {
         console.error(
@@ -167,7 +166,6 @@ class Store extends BaseStore {
 
     this.saveActiveIds()
 
-    // Auto-apply hosts when toggling
     this.applyHosts().catch((error) => {
       console.error('Failed to auto-apply hosts after toggle:', error)
     })

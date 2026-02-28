@@ -415,7 +415,7 @@ const Canvas = observer(() => {
           y: startPoint.y,
           width: 1,
           height: 1,
-          stroke: store.isDark ? '#ffffff90' : '#ffffff90',
+          stroke: store.isDark ? '#ffffff90' : '#00000030',
           strokeWidth: 4,
           strokeAlign: 'outside',
           shadow: {
@@ -436,7 +436,7 @@ const Canvas = observer(() => {
           y: startPoint.y,
           width: 1,
           height: 1,
-          stroke: store.isDark ? '#ffffff90' : '#ffffff90',
+          stroke: store.isDark ? '#ffffff90' : '#00000030',
           strokeWidth: 2,
           strokeAlign: 'outside',
           shadow: {
@@ -539,7 +539,12 @@ const Canvas = observer(() => {
       const offsetY = -magnifier.y * 2 - magnifier.height / 2
 
       magnifier.fill = [
-        { type: 'solid', color: store.isDark ? '#000000' : '#ffffff' },
+        {
+          type: 'solid',
+          color: store.isDark
+            ? THEME_COLORS.bg.dark.primary
+            : THEME_COLORS.bg.light.primary,
+        },
         {
           type: 'image',
           url: store.snapshot.data,
@@ -555,8 +560,11 @@ const Canvas = observer(() => {
           from: 'top',
           to: 'bottom',
           stops: [
-            { offset: 0, color: store.isDark ? '#000000aa' : '#ffffffaa' },
-            { offset: 0.48, color: store.isDark ? '#00000000' : '#ffffff00' },
+            {
+              offset: 0,
+              color: store.isDark ? '#1e1e1eaa' : '#ffffffaa',
+            },
+            { offset: 0.48, color: store.isDark ? '#1e1e1e00' : '#ffffff00' },
           ],
         },
       ]
@@ -585,7 +593,7 @@ const Canvas = observer(() => {
         applyMagnifierFill(magnifier)
       }
 
-      magnifier.on(PropertyEvent.CHANGE, (event: any) => {
+      magnifier.on(PropertyEvent.CHANGE, (event: PropertyEvent) => {
         if (!store.snapshot) return
         if (!['x', 'y', 'width', 'height'].includes(event.attrName)) return
         updateFill()
@@ -700,7 +708,7 @@ const Canvas = observer(() => {
         await applyMosaicFill(mosaic)
       }
 
-      mosaic.on(PropertyEvent.CHANGE, (event: any) => {
+      mosaic.on(PropertyEvent.CHANGE, (event: PropertyEvent) => {
         if (!store.snapshot) return
         if (!['x', 'y', 'width', 'height'].includes(event.attrName)) return
         updateFill()

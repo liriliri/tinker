@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Tree, { TreeNodeData } from 'share/components/Tree'
+import type { MindMapNode } from '../types'
 import store from '../store'
 
 interface OutlineNode extends TreeNodeData {
@@ -17,10 +18,10 @@ export default observer(function Outline() {
   useEffect(() => {
     if (!store.mindMap) return
 
-    const transformNode = (node: any): OutlineNode => {
+    const transformNode = (node: MindMapNode): OutlineNode => {
       return {
-        id: node.data.uid,
-        label: node.data.text || '',
+        id: node.data.uid as string,
+        label: (node.data.text as string) || '',
         children: node.children ? node.children.map(transformNode) : [],
         isRoot: node.isRoot,
       }
@@ -29,7 +30,7 @@ export default observer(function Outline() {
     const updateOutline = () => {
       const data = store.mindMap?.getData(true)
       if (data && data.root) {
-        const transformedData = transformNode(data.root)
+        const transformedData = transformNode(data.root as MindMapNode)
         setOutlineData(transformedData)
       }
     }
@@ -40,9 +41,9 @@ export default observer(function Outline() {
       updateOutline()
     }
 
-    const handleNodeActive = (_node: any, nodeList: any[]) => {
+    const handleNodeActive = (_node: unknown, nodeList: MindMapNode[]) => {
       if (nodeList.length > 0) {
-        setActiveNodeUid(nodeList[0].getData('uid'))
+        setActiveNodeUid(nodeList[0].getData('uid') as string)
       } else {
         setActiveNodeUid(null)
       }

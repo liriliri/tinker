@@ -3,13 +3,13 @@ import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
+import type { MenuItemConstructorOptions } from 'electron'
 import i18n from './i18n'
+import type { MindMapNode, MindMapInstance } from './types'
 
 const storage = new LocalStore('tinker-mind-map')
 const FILE_PATH_KEY = 'file-path'
 const STORAGE_KEY_SIDEBAR_OPEN = 'sidebarOpen'
-
-type MindMapInstance = any
 
 class Store extends BaseStore {
   mindMap: MindMapInstance | null = null
@@ -115,8 +115,8 @@ class Store extends BaseStore {
   private setupListeners() {
     if (!this.mindMap) return
 
-    this.mindMap.on('node_active', (_node: any, _nodeList: any[]) => {
-      this.hasActiveNode = _nodeList.length > 0
+    this.mindMap.on('node_active', (_node: unknown, _nodeList: unknown[]) => {
+      this.hasActiveNode = (_nodeList as unknown[]).length > 0
     })
 
     this.mindMap.on('back_forward', (index: number, len: number) => {
@@ -300,7 +300,7 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
-  showNodeContextMenu(e: any, node: any) {
+  showNodeContextMenu(e: MouseEvent, node: MindMapNode) {
     const isRoot = node.isRoot
     const isGeneralization = node.isGeneralization
     const hasHyperlink = !!node.getData('hyperlink')
@@ -308,13 +308,13 @@ class Store extends BaseStore {
 
     const parent = node.parent
     const siblings = parent?.children || []
-    const nodeIndex = siblings.findIndex((n: any) => n === node)
+    const nodeIndex = siblings.findIndex((n: MindMapNode) => n === node)
     const canMoveUp = !isRoot && !isGeneralization && nodeIndex > 0
     const canMoveDown =
       !isRoot && !isGeneralization && nodeIndex < siblings.length - 1
     const canInsertSibling = !isRoot && !isGeneralization
 
-    const items: any[] = [
+    const items: MenuItemConstructorOptions[] = [
       {
         label: i18n.t('insertChildNode'),
         enabled: !isGeneralization,
@@ -381,7 +381,7 @@ class Store extends BaseStore {
     tinker.showContextMenu(
       e.clientX,
       e.clientY,
-      items.filter((item: any) => {
+      items.filter((item: MenuItemConstructorOptions) => {
         if (item.type === 'separator') return true
         return item.enabled !== false
       })

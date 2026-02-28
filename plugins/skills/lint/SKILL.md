@@ -57,8 +57,10 @@ Go through each category below and report violations with file path and line num
 ### 6. TypeScript
 
 - No `any` types — use proper types or union types
-- Types/interfaces referenced in more than one renderer file must be extracted to `src/renderer/types.ts`
-- Types/interfaces shared between `preload` and `renderer` must be extracted to `src/common/types.ts`
+- Types/interfaces referenced in more than one file must be extracted:
+  - Plugins with `src/renderer/` directory: extract to `src/renderer/types.ts`
+  - Simple plugins without `src/renderer/` directory: extract to `src/types.ts`
+  - Types/interfaces shared between `preload` and `renderer` must be extracted to `src/common/types.ts`
 
 ### 7. Internationalization
 
@@ -75,6 +77,7 @@ Go through each category below and report violations with file path and line num
 
 - SCSS (`index.scss`) should only be used for third-party library style overrides
 - Application styles must use Tailwind CSS classes
+- Hardcoded colors inside third-party library style overrides in SCSS are allowed
 
 ### 10. Icons
 

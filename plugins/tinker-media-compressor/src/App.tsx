@@ -4,7 +4,8 @@ import { FilePlus2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MediaList from './components/MediaList'
-import store, { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './store'
+import store from './store'
+import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
 
 export default observer(function App() {
   const { t } = useTranslation()
@@ -30,7 +31,7 @@ export default observer(function App() {
     if (files.length === 0) return
 
     for (const file of files) {
-      const filePath = (file as any).path
+      const filePath = (file as File & { path?: string }).path
       if (filePath) {
         await store.loadMedia(filePath, file.size)
       }
@@ -49,11 +50,11 @@ export default observer(function App() {
         {!store.hasItems ? (
           <div
             onClick={() => store.openMediaDialog()}
-            className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 border-[#8a8a8a] dark:border-[#6e6e6e] ${tw.primary.hoverBorder}`}
+            className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${tw.gray.border400} ${tw.primary.hoverBorder}`}
           >
             <div className="text-center p-8 pointer-events-none">
               <FilePlus2
-                className="w-16 h-16 mx-auto mb-4 text-[#8a8a8a] dark:text-[#6e6e6e]"
+                className={`w-16 h-16 mx-auto mb-4 ${tw.gray.text400}`}
                 strokeWidth={1.5}
               />
               <p className={`text-lg font-medium ${tw.text.primary}`}>

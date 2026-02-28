@@ -24,7 +24,6 @@ export default observer(function App() {
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    // Only take the first file
     const file = files[0]
     if (!file.type.startsWith('image/')) {
       console.warn('Only image files are supported')
@@ -32,8 +31,7 @@ export default observer(function App() {
     }
 
     try {
-      // In Electron, the File object has a path property
-      const filePath = (file as any).path
+      const filePath = (file as File & { path?: string }).path
       await store.loadImage(file, filePath)
     } catch (err) {
       console.error('Failed to load image:', err)
@@ -47,12 +45,10 @@ export default observer(function App() {
     const canvas = cropper.getCanvas()
     if (!canvas) return
 
-    // Convert canvas to blob
     canvas.toBlob((blob) => {
       if (blob) {
         const dataUrl = canvas.toDataURL()
         store.setCroppedImage(blob, dataUrl, canvas.width, canvas.height)
-        // Apply cropped image as new original
         store.applyCroppedImage()
       }
     })

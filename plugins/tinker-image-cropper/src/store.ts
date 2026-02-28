@@ -135,7 +135,6 @@ class Store extends BaseStore {
   applyCroppedImage() {
     if (!this.croppedBlob || !this.croppedDataUrl || !this.image) return
 
-    // Clean up old image URL (but not if it's in history)
     const oldUrl = this.image.originalUrl
     const isInHistory = this.history.some(
       (h) => h.imageInfo.originalUrl === oldUrl
@@ -152,7 +151,6 @@ class Store extends BaseStore {
       originalSize: this.croppedBlob.size,
     }
 
-    // Add to history (remove any forward history if we're not at the end)
     if (this.historyIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.historyIndex + 1)
     }
@@ -168,7 +166,6 @@ class Store extends BaseStore {
     this.croppedWidth = 0
     this.croppedHeight = 0
 
-    // Mark as unsaved since we have a new cropped version
     this.isSaved = false
   }
 
@@ -239,13 +236,11 @@ class Store extends BaseStore {
     const state = this.history[this.historyIndex]
     this.image = { ...state.imageInfo }
 
-    // Reset cropped result
     this.croppedBlob = null
     this.croppedDataUrl = ''
     this.croppedWidth = 0
     this.croppedHeight = 0
 
-    // Mark as unsaved since we changed state
     this.isSaved = false
   }
 

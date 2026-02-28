@@ -31,7 +31,6 @@ class Store extends BaseStore {
   }
 
   private bindEvent() {
-    // Automatically update title when currentFileName changes
     reaction(
       () => this.currentFileName,
       (fileName) => {
@@ -41,9 +40,7 @@ class Store extends BaseStore {
   }
 
   private async init() {
-    // Load from localStorage first (as fallback)
     this.loadFromStorage()
-    // Load saved file if exists
     await this.loadSavedFile()
   }
 
@@ -56,7 +53,6 @@ class Store extends BaseStore {
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.jsonInput = content
-        // Clear localStorage content since we're loading from a file
         storage.remove(STORAGE_KEY)
       } catch {
         // File no longer exists or can't be read, clear the saved path
@@ -120,8 +116,6 @@ class Store extends BaseStore {
 
   setJsonInput(value: string) {
     this.jsonInput = value
-    // Only save to localStorage if there's no file path
-    // When editing a file, content is managed by the file system
     if (!this.currentFilePath) {
       storage.set(STORAGE_KEY, value)
     }
@@ -168,7 +162,6 @@ class Store extends BaseStore {
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
-      // Clear localStorage content since we're now editing a file
       storage.remove(STORAGE_KEY)
     }
     this.setJsonInput(content)
@@ -178,7 +171,6 @@ class Store extends BaseStore {
     this.currentFilePath = null
     this.savedContent = ''
     storage.remove(FILE_PATH_KEY)
-    // Clear localStorage content when creating new file
     storage.remove(STORAGE_KEY)
     this.clearJson()
   }
@@ -206,7 +198,6 @@ class Store extends BaseStore {
       this.currentFilePath = filePath
       this.savedContent = content
       storage.set(FILE_PATH_KEY, filePath)
-      // Clear localStorage content since we're now editing a file
       storage.remove(STORAGE_KEY)
       this.loadFromFile(content)
     } catch (err) {
@@ -217,11 +208,9 @@ class Store extends BaseStore {
   async saveFile() {
     try {
       if (this.currentFilePath) {
-        // Save to existing file
         await tinker.writeFile(this.currentFilePath, this.jsonInput, 'utf-8')
         this.savedContent = this.jsonInput
       } else {
-        // Show save dialog
         await this.saveFileAs()
       }
     } catch (err) {
@@ -247,7 +236,6 @@ class Store extends BaseStore {
       this.currentFilePath = result.filePath
       this.savedContent = this.jsonInput
       storage.set(FILE_PATH_KEY, result.filePath)
-      // Clear localStorage content since we now have a file path
       storage.remove(STORAGE_KEY)
     } catch (err) {
       console.error('Failed to save file as:', err)

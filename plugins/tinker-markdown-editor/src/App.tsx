@@ -31,7 +31,7 @@ export default observer(function App() {
       }
 
       try {
-        const filePath = (file as any).path
+        const filePath = (file as File & { path: string }).path
         const content = await file.text()
         store.loadFromFile(content, filePath)
       } catch (err) {

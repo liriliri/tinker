@@ -11,29 +11,9 @@ import type {
   AudioCompressionMode,
 } from './types'
 import BaseStore from 'share/BaseStore'
-import {
-  VIDEO_EXTENSIONS,
-  AUDIO_EXTENSIONS,
-  SUPPORTED_EXTENSIONS,
-  VIDEO_CRF_PRESETS,
-  VIDEO_QUALITY_PERCENTAGES,
-  AUDIO_BITRATE_PRESETS,
-  AUDIO_SAMPLERATE_PRESETS,
-  AUDIO_SAMPLERATE_BITRATES,
-} from './lib/constants'
+import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
 import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
-
-export {
-  VIDEO_EXTENSIONS,
-  AUDIO_EXTENSIONS,
-  SUPPORTED_EXTENSIONS,
-  VIDEO_CRF_PRESETS,
-  VIDEO_QUALITY_PERCENTAGES,
-  AUDIO_BITRATE_PRESETS,
-  AUDIO_SAMPLERATE_PRESETS,
-  AUDIO_SAMPLERATE_BITRATES,
-}
 
 const STORAGE_KEY_QUALITY = 'quality'
 const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
@@ -65,7 +45,7 @@ class Store extends BaseStore {
       currentTask: false,
       cancelRequested: false,
       sizeUpdateCount: false,
-    } as any)
+    } as Record<string, false>)
     this.init()
   }
 
@@ -136,7 +116,6 @@ class Store extends BaseStore {
   }
 
   setOutputDir(dir: string) {
-    // Remove trailing slashes to normalize
     this.outputDir = dir.replace(/[/\\]+$/, '')
     storage.set(STORAGE_KEY_OUTPUT_DIR, this.outputDir)
   }
@@ -210,7 +189,6 @@ class Store extends BaseStore {
   }
 
   async loadMedia(filePath: string, fileSize?: number) {
-    // Skip duplicates
     if (this.items.some((i) => i.filePath === filePath)) return
 
     const mediaType = this.detectMediaType(filePath)

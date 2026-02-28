@@ -13,7 +13,6 @@ export default observer(function TextEditor() {
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
     store.setTextEditorInstance(editor)
 
-    // Listen to model content changes to update undo/redo state
     const model = editor.getModel()
     if (model) {
       model.onDidChangeContent(() => {

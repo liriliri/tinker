@@ -23,14 +23,13 @@ export default observer(function App() {
 
       const file = files[0]
 
-      // Check if the file is a JSON file
       if (!endWith(file.name, '.json')) {
         console.warn('Only .json files are supported')
         return
       }
 
       try {
-        const filePath = (file as any).path
+        const filePath = (file as File & { path?: string }).path
         const content = await file.text()
         store.loadFromFile(content, filePath)
       } catch (err) {
@@ -51,7 +50,6 @@ export default observer(function App() {
     <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
       <Toolbar />
 
-      {/* Main Content */}
       <div className={`flex-1 overflow-hidden ${tw.bg.primary}`}>
         {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
       </div>

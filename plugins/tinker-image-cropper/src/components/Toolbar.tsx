@@ -37,7 +37,10 @@ interface ToolbarProps {
   cropperRef?: RefObject<CropperRef | null>
 }
 
-export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
+export default observer(function ToolbarComponent({
+  onCrop,
+  cropperRef,
+}: ToolbarProps) {
   const { t } = useTranslation()
   const [showSizeDialog, setShowSizeDialog] = useState(false)
   const [showResizeDialog, setShowResizeDialog] = useState(false)
@@ -142,7 +145,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
   const handleAspectRatioChange = (value: number) => {
     store.setAspectRatio(value === 0 ? null : value)
 
-    // Update crop box size after aspect ratio change
     setTimeout(() => {
       if (!cropperRef?.current) return
       const state = cropperRef.current.getState()
@@ -160,10 +162,8 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
     const { coordinates } = state
     if (!coordinates) return
 
-    // Set aspect ratio to free when manually setting crop size
     store.setAspectRatio(null)
 
-    // Calculate new coordinates to center the crop box
     const newLeft = coordinates.left + (coordinates.width - width) / 2
     const newTop = coordinates.top + (coordinates.height - height) / 2
 
@@ -179,7 +179,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
     if (!store.image) return
 
     try {
-      // Create an image element
       const img = new Image()
       img.src = store.image.originalUrl
 
@@ -188,7 +187,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
         img.onerror = () => reject(new Error('Failed to load image'))
       })
 
-      // Create canvas and resize
       const canvas = document.createElement('canvas')
       canvas.width = width
       canvas.height = height
@@ -197,7 +195,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
 
       ctx.drawImage(img, 0, 0, width, height)
 
-      // Convert to blob
       const blob = await new Promise<Blob | null>((resolve) => {
         canvas.toBlob(resolve)
       })
@@ -206,7 +203,6 @@ export default observer(({ onCrop, cropperRef }: ToolbarProps) => {
 
       const dataUrl = canvas.toDataURL()
 
-      // Update store with resized image
       store.setCroppedImage(blob, dataUrl, width, height)
       store.applyCroppedImage()
     } catch (err) {

@@ -88,8 +88,14 @@ export default observer(function SideToolbar() {
           <div
             className={`absolute left-1 top-1 h-5 w-5 shadow-md z-10 p-[1px]`}
             style={{
-              backgroundColor: THEME_COLORS.bg.light.primary,
-              border: `1px solid ${THEME_COLORS.text.light.primary}`,
+              backgroundColor: store.isDark
+                ? THEME_COLORS.bg.dark.primary
+                : THEME_COLORS.bg.light.primary,
+              border: `1px solid ${
+                store.isDark
+                  ? THEME_COLORS.text.dark.primary
+                  : THEME_COLORS.text.light.primary
+              }`,
             }}
           >
             <input
@@ -108,8 +114,14 @@ export default observer(function SideToolbar() {
           <div
             className={`absolute left-4 top-4 h-5 w-5 shadow-sm z-0 p-[1px]`}
             style={{
-              backgroundColor: THEME_COLORS.bg.light.primary,
-              border: `1px solid ${THEME_COLORS.text.light.primary}`,
+              backgroundColor: store.isDark
+                ? THEME_COLORS.bg.dark.primary
+                : THEME_COLORS.bg.light.primary,
+              border: `1px solid ${
+                store.isDark
+                  ? THEME_COLORS.text.dark.primary
+                  : THEME_COLORS.text.light.primary
+              }`,
             }}
           >
             <input
