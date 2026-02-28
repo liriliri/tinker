@@ -10,7 +10,6 @@ export default observer(function App() {
     <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
       <Toolbar />
 
-      {/* Main Content */}
       <div className={`flex-1 overflow-hidden ${tw.bg.primary}`}>
         {store.mode === 'edit' ? <DualEditor /> : <DiffEditor />}
       </div>

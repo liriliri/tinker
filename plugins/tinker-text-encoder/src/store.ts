@@ -32,7 +32,7 @@ class Store extends BaseStore {
         this.inputText = input || ''
         this.outputText = output || ''
       } catch {
-        // Ignore parsing errors
+        // ignore
       }
     }
 

@@ -178,6 +178,39 @@ import Slider from 'share/components/Slider'
 <Slider min={0} max={100} value={store.size} onChange={store.setSize} disabled={!store.enabled} />
 ```
 
+### Grid
+
+Data grid component wrapping AG Grid with Tinker theme integration.
+
+```typescript
+import Grid from 'share/components/Grid'
+import { ColDef } from 'ag-grid-community'
+import { useRef } from 'react'
+import { AgGridReact } from 'ag-grid-react'
+
+interface RowData {
+  id: string
+  name: string
+}
+
+const columnDefs: ColDef<RowData>[] = [
+  { field: 'name', headerName: 'Name', flex: 1, sortable: true },
+]
+
+const gridRef = useRef<AgGridReact<RowData>>(null)
+
+<Grid<RowData>
+  isDark={store.isDark}
+  ref={gridRef}
+  columnDefs={columnDefs}
+  rowData={rowData}
+  headerHeight={40}
+  rowHeight={40}
+/>
+```
+
+**Props**: All `AgGridReactProps` plus `isDark: boolean` for theme switching. Supports `ref` forwarding to access the AG Grid API.
+
 ### Other Components
 
 ```typescript

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
-import type { SystemInfoData } from '../preload'
+import type { SystemInfoData } from '../common/types'
 
 class Store extends BaseStore {
   systemInfo: SystemInfoData | null = null
@@ -27,6 +27,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

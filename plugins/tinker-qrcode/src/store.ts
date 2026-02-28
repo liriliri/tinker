@@ -30,7 +30,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this, {
-      canvasRef: false, // Don't make canvasRef observable
+      canvasRef: false,
     })
     this.loadSettings()
   }
@@ -48,7 +48,6 @@ class Store extends BaseStore {
     if (savedIsCustomSize !== null) {
       this.isCustomSize = savedIsCustomSize === 'true'
     } else {
-      // If not saved before, determine based on whether size is a preset value
       this.isCustomSize = !PRESET_SIZES.includes(this.size)
     }
 
@@ -75,7 +74,6 @@ class Store extends BaseStore {
   setSize(size: number) {
     this.size = size
     storage.set(STORAGE_KEY_SIZE, String(size))
-    // Automatically determine if it's a custom value when setting size
     const wasCustom = this.isCustomSize
     this.isCustomSize = !PRESET_SIZES.includes(size)
     if (wasCustom !== this.isCustomSize) {

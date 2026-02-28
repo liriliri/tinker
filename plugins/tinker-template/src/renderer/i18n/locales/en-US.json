@@ -14,8 +14,6 @@
   "getSystemInfoAPI": "template.getSystemInfo() - Get system information",
   "getCurrentTimeAPI": "template.getCurrentTime() - Get current time",
   "getGreetingAPI": "template.getGreeting(name) - Get greeting message",
-  "readFileAPI": "template.readFile(path) - Read file content",
-  "writeFileAPI": "template.writeFile(path, content) - Write file",
   "getAppDataPathAPI": "template.getAppDataPath() - Get app data directory",
   "currentTheme": "Current Theme",
   "darkMode": "Dark Mode",

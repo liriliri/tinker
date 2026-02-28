@@ -10,24 +10,28 @@ import { useRegexHighlight } from '../hooks/useRegexHighlight'
 import { getTipForToken } from '../lib/reference'
 import type { Token } from '../lib/ExpressionLexer'
 
+interface TooltipState {
+  content: string | null
+  x: number
+  y: number
+  visible: boolean
+}
+
+const TOOLTIP_HIDDEN: TooltipState = {
+  content: null,
+  x: 0,
+  y: 0,
+  visible: false,
+}
+
 export default observer(function ExpressionSection() {
   const { t } = useTranslation()
   const [editor, setEditor] = useState<CodeMirror.Editor | null>(null)
-  const [tooltip, setTooltip] = useState<{
-    content: string | null
-    x: number
-    y: number
-    visible: boolean
-  }>({
-    content: null,
-    x: 0,
-    y: 0,
-    visible: false,
-  })
+  const [tooltip, setTooltip] = useState<TooltipState>(TOOLTIP_HIDDEN)
 
   const handleTokenHover = (token: Token | null, event?: MouseEvent) => {
     if (!token || !event) {
-      setTooltip({ content: null, x: 0, y: 0, visible: false })
+      setTooltip(TOOLTIP_HIDDEN)
       return
     }
 

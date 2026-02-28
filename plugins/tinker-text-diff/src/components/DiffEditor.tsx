@@ -11,7 +11,7 @@ export default observer(function DiffEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleEditorWillMount = (monaco: Monaco) => {
-    // 禁用 TypeScript 和 JavaScript 的语法错误提示
+    // Disable syntax and semantic validation to avoid false errors in diff view
     monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: true,
       noSyntaxValidation: true,
@@ -46,17 +46,11 @@ export default observer(function DiffEditor() {
                   1
                 : 0
 
-            // Pure addition (no original lines)
             if (originalLines === 0 && modifiedLines > 0) {
               additions += modifiedLines
-            }
-            // Pure deletion (no modified lines)
-            else if (modifiedLines === 0 && originalLines > 0) {
+            } else if (modifiedLines === 0 && originalLines > 0) {
               deletions += originalLines
-            }
-            // Modification (both have lines)
-            else if (originalLines > 0 && modifiedLines > 0) {
-              // Count all modified lines as both additions and deletions
+            } else if (originalLines > 0 && modifiedLines > 0) {
               additions += modifiedLines
               deletions += originalLines
             }
@@ -69,10 +63,8 @@ export default observer(function DiffEditor() {
       }, 100)
     }
 
-    // Update stats on mount
     updateDiffStats()
 
-    // Update stats when content changes
     const originalModel = editor.getOriginalEditor().getModel()
     const modifiedModel = editor.getModifiedEditor().getModel()
 
@@ -121,7 +113,6 @@ export default observer(function DiffEditor() {
       try {
         const content = await file.text()
 
-        // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
 

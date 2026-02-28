@@ -26,7 +26,6 @@ export default function TextHighlighter({
     const parent = editorWrapper.parentElement
 
     if (parent && !parent.contains(canvas)) {
-      // Position canvas
       canvas.style.position = 'absolute'
       canvas.style.pointerEvents = 'none'
       canvas.style.zIndex = '1'
@@ -66,7 +65,6 @@ export default function TextHighlighter({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     if (!matches.length) return
@@ -74,7 +72,6 @@ export default function TextHighlighter({
     const doc = editor.getDoc()
     const scrollInfo = editor.getScrollInfo()
 
-    // Find visible range
     const topCoords = editor.coordsChar(
       { left: 0, top: scrollInfo.top },
       'local'
@@ -104,7 +101,6 @@ export default function TextHighlighter({
       const startRect = editor.charCoords(startPos, 'local')
       const endRect = editor.charCoords(endPos, 'local')
 
-      // Set fill style
       if (isEmphasis) {
         ctx.fillStyle = 'rgba(64, 158, 255, 0.4)'
       } else {
@@ -112,7 +108,6 @@ export default function TextHighlighter({
       }
 
       if (startRect.bottom === endRect.bottom) {
-        // Single line
         const top = startRect.top - scrollInfo.top
         const height = startRect.bottom - startRect.top
         const width = endRect.right - startRect.left
@@ -124,11 +119,9 @@ export default function TextHighlighter({
           ctx.strokeRect(startRect.left, top, width, height)
         }
       } else {
-        // Multi-line
         const lineHeight = editor.defaultTextHeight()
         const scrollWidth = scrollInfo.clientWidth
 
-        // First line
         let top = startRect.top - scrollInfo.top
         let height = startRect.bottom - startRect.top
         let width = scrollWidth - startRect.left
@@ -139,7 +132,6 @@ export default function TextHighlighter({
           ctx.strokeRect(startRect.left, top, width, height)
         }
 
-        // Middle lines
         let y = startRect.top
         while ((y += lineHeight) < endRect.top - 1) {
           top = y - scrollInfo.top
@@ -149,7 +141,6 @@ export default function TextHighlighter({
           }
         }
 
-        // Last line
         top = endRect.top - scrollInfo.top
         height = endRect.bottom - endRect.top
         width = endRect.right
@@ -164,8 +155,7 @@ export default function TextHighlighter({
   return (
     <canvas
       ref={canvasRef}
-      className="text-highlighter-canvas"
-      style={{ position: 'absolute', pointerEvents: 'none' }}
+      className="text-highlighter-canvas absolute pointer-events-none"
     />
   )
 }

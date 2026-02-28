@@ -9,15 +9,19 @@ import CodeMirrorEditor from './CodeMirrorEditor'
 import TextHighlighter from './TextHighlighter'
 import Tooltip from 'share/components/Tooltip'
 
+interface TooltipState {
+  visible: boolean
+  x: number
+  y: number
+}
+
+const TOOLTIP_HIDDEN: TooltipState = { visible: false, x: 0, y: 0 }
+
 export default observer(function TextSection() {
   const { t } = useTranslation()
   const [editor, setEditor] = useState<CodeMirror.Editor | null>(null)
   const [hoverMatch, setHoverMatch] = useState<Match | null>(null)
-  const [tooltip, setTooltip] = useState({
-    visible: false,
-    x: 0,
-    y: 0,
-  })
+  const [tooltip, setTooltip] = useState<TooltipState>(TOOLTIP_HIDDEN)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const getMatchAt = (index: number): Match | null => {
@@ -53,21 +57,13 @@ export default observer(function TextSection() {
         })
       } else {
         setHoverMatch(null)
-        setTooltip({
-          visible: false,
-          x: 0,
-          y: 0,
-        })
+        setTooltip(TOOLTIP_HIDDEN)
       }
     }
 
     const handleMouseLeave = () => {
       setHoverMatch(null)
-      setTooltip({
-        visible: false,
-        x: 0,
-        y: 0,
-      })
+      setTooltip(TOOLTIP_HIDDEN)
     }
 
     const lineDiv = editor

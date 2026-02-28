@@ -10,6 +10,7 @@ import {
 } from 'share/components/Toolbar'
 import Select from 'share/components/Select'
 import store from '../store'
+import type { EncodingType } from '../store'
 import {
   urlEncode,
   urlDecode,
@@ -83,7 +84,7 @@ export default observer(function ToolbarComponent() {
         <Select
           value={store.encodingType}
           onChange={(value) => {
-            store.setEncodingType(value as any)
+            store.setEncodingType(value as EncodingType)
             store.clearOutput()
           }}
           options={encodingOptions}

@@ -5,7 +5,7 @@ import capitalize from 'licia/capitalize'
 
 function fillTags(str: string, token: Token): string {
   return str.replace(/{{(\w+)}}/g, (match, key) => {
-    const value = (token as any)[key]
+    const value = (token as unknown as Record<string, unknown>)[key]
     if (value === undefined) return match
     if (key === 'code' && typeof value === 'number') {
       const chr = String.fromCharCode(value)

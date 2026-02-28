@@ -24,10 +24,15 @@ export function parseTodoItem(raw: string, id?: string): TodoItem {
   }
 }
 
+interface Extension {
+  key: string
+  value: string
+}
+
 function extractDueDate(item: Item): string | null {
-  const extensions = item.extensions()
+  const extensions = item.extensions() as Extension[] | null
   if (!extensions) return null
-  const dueExt = extensions.find((ext: any) => ext.key === 'due')
+  const dueExt = extensions.find((ext) => ext.key === 'due')
   return dueExt ? dueExt.value : null
 }
 

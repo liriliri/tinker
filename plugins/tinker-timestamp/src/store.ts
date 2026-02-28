@@ -9,7 +9,6 @@ const STORAGE_KEY_UNIT = 'unit'
 const STORAGE_KEY_TIMEZONE = 'timezone'
 const storage = new LocalStore('tinker-timestamp')
 
-// Timezone key mapping
 const TIMEZONE_KEYS: Record<string, string> = {
   'UTC+00:00': 'utcLondon',
   'UTC+01:00': 'utcBerlin',
@@ -136,10 +135,9 @@ class Store extends BaseStore {
   }
 
   dateToTimestamp(date: Date): string {
-    // Apply timezone offset
-    const localOffset = date.getTimezoneOffset() / 60 // Local timezone offset in hours
-    const targetOffset = this.timezoneOffset // Target timezone offset
-    const offsetDiff = targetOffset - -localOffset // Difference in hours
+    const localOffset = date.getTimezoneOffset() / 60
+    const targetOffset = this.timezoneOffset
+    const offsetDiff = targetOffset - -localOffset
 
     const adjustedDate = new Date(date.getTime() + offsetDiff * 60 * 60 * 1000)
     const timestamp = adjustedDate.getTime()
@@ -158,7 +156,6 @@ class Store extends BaseStore {
 
     switch (this.timestampUnit) {
       case 'millisecond':
-        // Already in milliseconds
         break
       case 'second':
         ts = ts * 1000
@@ -167,7 +164,6 @@ class Store extends BaseStore {
 
     const date = new Date(ts)
 
-    // Apply timezone offset in reverse
     const localOffset = date.getTimezoneOffset() / 60
     const targetOffset = this.timezoneOffset
     const offsetDiff = targetOffset - -localOffset
@@ -176,7 +172,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export { TIMEZONE_KEYS }
-export default store
+export default new Store()

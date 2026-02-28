@@ -17,37 +17,32 @@ export function useRegexHighlight(
   const hoverMarksRef = useRef<CodeMirror.TextMarker[]>([])
   const hoverTokenRef = useRef<Token | null>(null)
 
-  // Set profile
   useEffect(() => {
     lexerRef.current.profile = javascriptProfile
   }, [])
 
-  // Clear all marks
   const clearMarks = useCallback(() => {
     marksRef.current.forEach((mark) => mark.clear())
     marksRef.current = []
   }, [])
 
-  // Clear hover marks
   const clearHoverMarks = useCallback(() => {
     hoverMarksRef.current.forEach((mark) => mark.clear())
     hoverMarksRef.current = []
   }, [])
 
-  // Calculate token position in CodeMirror
   // Note: We subtract 1 from token.i because the lexer parses "/pattern/"
   // but the editor only contains "pattern" (/ is outside the editor)
   const calcTokenPos = useCallback(
     (editor: CodeMirror.Editor, token: Token) => {
       const doc = editor.getDoc()
-      const offset = token.i - 1 // Adjust for the leading / not in editor
+      const offset = token.i - 1
       token.startPos = doc.posFromIndex(offset)
       token.endPos = doc.posFromIndex(offset + token.l)
     },
     []
   )
 
-  // Draw highlights
   const drawHighlights = useCallback(
     (editor: CodeMirror.Editor, token: Token | null) => {
       clearMarks()
@@ -66,7 +61,6 @@ export function useRegexHighlight(
 
       let currentToken: Token | null = token
       while (currentToken) {
-        // Skip the leading and trailing / tokens and ignored tokens
         if (
           !currentToken.ignore &&
           currentToken.type !== 'open' &&
@@ -74,10 +68,8 @@ export function useRegexHighlight(
         ) {
           calcTokenPos(editor, currentToken)
 
-          // Add class based on token type
           let className = `exp-${currentToken.clss || currentToken.type}`
 
-          // Add error class
           if (currentToken.error) {
             className += ` exp-${
               currentToken.error.warning ? 'warning' : 'error'
@@ -90,14 +82,12 @@ export function useRegexHighlight(
             })
           )
 
-          // Add group/set highlighting for paired tokens
           if (currentToken.close) {
             calcTokenPos(editor, currentToken.close)
             const tokenType = currentToken.clss || currentToken.type
             let groupClass = groupClassByType[tokenType]
 
             if (groupClass) {
-              // Replace %depth% placeholder with actual depth
               groupClass = groupClass.replace(
                 '%depth%',
                 String(Math.min(currentToken.depth || 0, 3))
@@ -129,10 +119,8 @@ export function useRegexHighlight(
       let current: Token | null = token
       let target: Token | null = null
 
-      // Adjust index for the leading / not in editor
       const adjustedIndex = index + 1
 
-      // First pass: find the token at the index
       while (current) {
         if (
           adjustedIndex >= current.i &&
@@ -172,7 +160,6 @@ export function useRegexHighlight(
 
       const hoveredToken = getTokenAtIndex(token, index)
 
-      // Don't update if it's the same token
       if (hoveredToken === hoverTokenRef.current) return
 
       // Don't update if hovering within the same range set (e.g., a-z)
@@ -216,12 +203,10 @@ export function useRegexHighlight(
           )
         }
 
-        // Highlight the hovered token
         // Note: hoveredToken has already been resolved through getTokenAtIndex
         // so we don't need to check token.open again
         drawSelect(hoveredToken)
 
-        // Highlight related tokens
         if (hoveredToken.related) {
           hoveredToken.related.forEach((relToken) => {
             drawSelect(relToken, 'exp-related')
@@ -241,7 +226,6 @@ export function useRegexHighlight(
   // Store the current token in a ref so hover can access it
   const tokenRef = useRef<Token | null>(null)
 
-  // Parse and draw highlights (only when pattern changes)
   useEffect(() => {
     if (!editor) return
 

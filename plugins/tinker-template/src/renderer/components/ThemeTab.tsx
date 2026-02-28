@@ -9,9 +9,7 @@ export default observer(function ThemeTab() {
   return (
     <div className="space-y-6">
       <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
-        <h2
-          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.primary}`}
-        >
+        <h2 className={`text-xl font-semibold mb-4 ${tw.text.primary}`}>
           {t('currentTheme')}
         </h2>
         <div className="flex items-center gap-4">
@@ -27,9 +25,7 @@ export default observer(function ThemeTab() {
       </div>
 
       <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
-        <h2
-          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.primary}`}
-        >
+        <h2 className={`text-xl font-semibold mb-4 ${tw.text.primary}`}>
           {t('colorPalette')}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

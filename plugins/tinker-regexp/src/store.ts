@@ -109,6 +109,4 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

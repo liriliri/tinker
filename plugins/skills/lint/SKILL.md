@@ -61,6 +61,7 @@ Go through each category below and report violations with file path and line num
   - Plugins with `src/renderer/` directory: extract to `src/renderer/types.ts`
   - Simple plugins without `src/renderer/` directory: extract to `src/types.ts`
   - Types/interfaces shared between `preload` and `renderer` must be extracted to `src/common/types.ts`
+- Each file must import types directly from the source file where they are defined — **never import a type just to re-export it** (e.g. `import type { Foo } from './types'; export type { Foo }` in an unrelated file is forbidden)
 
 ### 7. Internationalization
 

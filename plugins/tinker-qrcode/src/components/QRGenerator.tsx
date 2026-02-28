@@ -56,7 +56,6 @@ export default observer(function QRGenerator() {
             const iconSize = canvas.width * 0.2
             const x = (canvas.width - iconSize) / 2
             const y = (canvas.height - iconSize) / 2
-            // Draw white background padding behind icon
             const padding = iconSize * 0.1
             ctx.fillStyle = store.bgColor
             ctx.fillRect(
@@ -98,29 +97,12 @@ export default observer(function QRGenerator() {
           <div
             onClick={() => store.copyQRCodeToClipboardWithToast()}
             title={t('copy')}
-            className="rounded-lg"
-            style={{
-              padding: '12px',
-              backgroundColor: store.bgColor,
-              maxWidth: '100%',
-              maxHeight: '100%',
-              aspectRatio: '1',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
+            className="rounded-lg p-3 max-w-full max-h-full aspect-square flex items-center justify-center cursor-pointer"
+            style={{ backgroundColor: store.bgColor }}
           >
             <canvas
               ref={canvasRef}
-              style={{
-                display: 'block',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                width: 'auto',
-                height: 'auto',
-                objectFit: 'contain',
-              }}
+              className="block max-w-full max-h-full w-auto h-auto object-contain"
             />
           </div>
         ) : (

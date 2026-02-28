@@ -8,29 +8,13 @@ import isWindows from 'licia/isWindows'
 import defaultIcon from './assets/default-icon.png'
 import defaultWinIcon from './assets/default-win-icon.png'
 import toast from 'react-hot-toast'
+import type { ProcessInfo, NetworkConnection } from '../common/types'
+import type { SortField, SortOrder, ViewMode } from './types'
 
 const STORAGE_KEY_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-process-killer')
 const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
-
-export interface ProcessInfo {
-  pid: number
-  name: string
-  cpu: number
-  mem: number
-  memRss: number
-  user: string
-  command?: string
-  path?: string
-  state?: string
-  ports?: string
-  icon?: string
-}
-
-export type SortField = 'pid' | 'name' | 'cpu' | 'memRss' | 'ports'
-export type SortOrder = 'asc' | 'desc'
-export type ViewMode = 'cpu' | 'memory' | 'port'
 
 class Store extends BaseStore {
   processes: ProcessInfo[] = []
@@ -67,7 +51,7 @@ class Store extends BaseStore {
       ])
 
       const portsByPid = new Map<number, Set<string>>()
-      networkConnections.forEach((conn: any) => {
+      networkConnections.forEach((conn: NetworkConnection) => {
         if (conn.pid && conn.localPort) {
           if (!portsByPid.has(conn.pid)) {
             portsByPid.set(conn.pid, new Set())
@@ -181,17 +165,21 @@ class Store extends BaseStore {
     }
 
     return filtered.slice().sort((a, b) => {
-      let aVal: any = a[this.sortField]
-      let bVal: any = b[this.sortField]
+      let aVal: string | number | undefined = a[this.sortField]
+      let bVal: string | number | undefined = b[this.sortField]
 
-      if (typeof aVal === 'string') {
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
         aVal = aVal.toLowerCase()
         bVal = bVal.toLowerCase()
       }
 
       if (this.sortOrder === 'asc') {
+        if (aVal === undefined) return 1
+        if (bVal === undefined) return -1
         return aVal > bVal ? 1 : -1
       } else {
+        if (aVal === undefined) return 1
+        if (bVal === undefined) return -1
         return aVal < bVal ? 1 : -1
       }
     })

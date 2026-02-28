@@ -168,7 +168,6 @@ export class ExpressionLexer {
         }
       }
 
-      // post process token
       if (token.clss === 'quant') {
         if (
           !prv ||
@@ -182,7 +181,6 @@ export class ExpressionLexer {
         }
       }
 
-      // range validation
       if (prv && prv.type === 'range' && prv.l === 1) {
         this.validateRange(str, token)
       }
@@ -198,7 +196,6 @@ export class ExpressionLexer {
       if (!token.ignore) prv = token
     }
 
-    // post processing
     while (groups.length) {
       this.addError(groups.pop()!, { id: 'groupopen' })
     }
@@ -366,10 +363,11 @@ export class ExpressionLexer {
         return token
       }
 
-      token.code = this.profile!.escCharCodes[c]
-      if (token.code === undefined || token.code === false) {
+      const escCode = this.profile!.escCharCodes[c]
+      if (escCode === undefined || escCode === false) {
         return this.parseEscChar(token, c)
       }
+      token.code = escCode
 
       token.l++
       token.type = 'esc_' + token.code
@@ -419,7 +417,8 @@ export class ExpressionLexer {
     } else {
       token.clss = 'set'
       if (prv.code > next.code) {
-        this.errors.push((token.error = { id: 'rangerev' }))
+        token.error = { id: 'rangerev' }
+        this.errors.push(token)
       }
       next.proxy = prv.proxy = token
       token.set = [prv, token, next]

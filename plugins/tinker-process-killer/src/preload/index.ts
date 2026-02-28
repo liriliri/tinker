@@ -2,20 +2,13 @@ import { contextBridge } from 'electron'
 import si from 'systeminformation'
 import path from 'path'
 import { promises as fs } from 'fs'
+import type { ProcessInfo, NetworkConnection } from '../common/types'
 
-interface ProcessInfo {
-  pid: number
-  name: string
-  cpu: number
-  mem: number
-  memRss: number
-  user: string
-  command?: string
-  path?: string
-  state?: string
-}
+type SiProcess = Awaited<ReturnType<typeof si.processes>>['list'][number]
 
-async function extractExecutablePath(proc: any): Promise<string | undefined> {
+async function extractExecutablePath(
+  proc: SiProcess
+): Promise<string | undefined> {
   let execPath = proc.path || ''
 
   if (!execPath && !proc.command) {
@@ -87,7 +80,7 @@ const processKillerObj = {
     }
   },
 
-  async getNetworkConnections(): Promise<any[]> {
+  async getNetworkConnections(): Promise<NetworkConnection[]> {
     try {
       return await si.networkConnections()
     } catch (error) {

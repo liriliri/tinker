@@ -404,7 +404,7 @@ const format = (_num: string): string => {
   if (strNum.indexOf('.') > -1) {
     const match = strNum.match(/\.\d+e[+-](\d+)$/)
     if (match && match[1]) {
-      isFloat = (match[1] as any) * 1 < MAX_NUM - 1
+      isFloat = Number(match[1]) < MAX_NUM - 1
     } else {
       isFloat = true
     }

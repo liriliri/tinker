@@ -11,17 +11,17 @@ type TimerMode = 'focus' | 'shortBreak' | 'longBreak'
 
 class Store extends BaseStore {
   mode: TimerMode = 'focus'
-  timeLeft: number = 25 * 60 // seconds
+  timeLeft: number = 25 * 60
   isRunning: boolean = false
   currentRound: number = 1
   totalRounds: number = 4
-  totalFocusCompleted: number = 0 // Total focus sessions completed
+  totalFocusCompleted: number = 0
 
   focusTime: number = 25
   shortBreakTime: number = 5
   longBreakTime: number = 15
 
-  volume: number = 100 // 0-100
+  volume: number = 100
 
   private worker: Worker | null = null
 
@@ -129,8 +129,12 @@ class Store extends BaseStore {
     if (this.volume === 0) return
 
     try {
-      const audioCtx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)()
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext
+      if (!AudioContextClass) return
+      const audioCtx = new AudioContextClass()
       const oscillator = audioCtx.createOscillator()
       const gainNode = audioCtx.createGain()
 
@@ -197,6 +201,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

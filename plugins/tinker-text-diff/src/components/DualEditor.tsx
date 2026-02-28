@@ -53,7 +53,6 @@ export default observer(function DualEditor() {
         store.setOriginalText(content)
         store.setOriginalFileName(file.name)
 
-        // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
       }
@@ -71,7 +70,6 @@ export default observer(function DualEditor() {
         store.setModifiedText(content)
         store.setModifiedFileName(file.name)
 
-        // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
       }
@@ -106,12 +104,10 @@ export default observer(function DualEditor() {
       try {
         const content = await file.text()
 
-        // Determine which editor based on drop position
         const containerRect = container.getBoundingClientRect()
         const mouseX = e.clientX - containerRect.left
         const containerWidth = containerRect.width
 
-        // Auto-detect language from file extension
         const detectedLanguage = detectLanguageFromFileName(file.name)
         store.setLanguage(detectedLanguage)
 
@@ -140,7 +136,6 @@ export default observer(function DualEditor() {
   return (
     <div className="h-full flex flex-col">
       <div ref={containerRef} className="flex-1 w-full flex overflow-hidden">
-        {/* Left Editor - Original */}
         <div className={`flex-1 min-w-0 border-r ${tw.border}`}>
           <Editor
             value={store.originalText}
@@ -161,7 +156,6 @@ export default observer(function DualEditor() {
           />
         </div>
 
-        {/* Right Editor - Modified */}
         <div className="flex-1 min-w-0">
           <Editor
             value={store.modifiedText}
@@ -183,9 +177,7 @@ export default observer(function DualEditor() {
         </div>
       </div>
 
-      {/* Bottom Toolbars */}
       <div className="flex">
-        {/* Left Toolbar - Original */}
         <div className={`flex-1 border-r ${tw.border}`}>
           <Toolbar className="justify-between border-t">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
@@ -218,7 +210,6 @@ export default observer(function DualEditor() {
           </Toolbar>
         </div>
 
-        {/* Right Toolbar - Modified */}
         <div className="flex-1">
           <Toolbar className="justify-between border-t">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">

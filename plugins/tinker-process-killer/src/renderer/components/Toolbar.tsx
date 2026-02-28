@@ -16,7 +16,7 @@ export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
   return (
-    <Toolbar className="!border-b-0">
+    <Toolbar>
       <ToolbarButton
         variant="toggle"
         active={store.viewMode === 'cpu'}

@@ -3,6 +3,8 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { alert } from 'share/components/Alert'
 
+const SAVED_DATA_KEY = 'saved-data'
+
 const storage = new LocalStore('tinker-template')
 
 type SystemInfo = {
@@ -23,11 +25,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSavedData()
+    this.loadFromStorage()
   }
 
-  private loadSavedData() {
-    const saved = storage.get('template-saved-data')
+  private loadFromStorage() {
+    const saved = storage.get(SAVED_DATA_KEY)
     if (saved) {
       this.savedData = saved
     }
@@ -60,17 +62,15 @@ class Store extends BaseStore {
   }
 
   saveData() {
-    storage.set('template-saved-data', this.savedData)
+    storage.set(SAVED_DATA_KEY, this.savedData)
     alert({ title: 'Data saved to localStorage!' })
   }
 
   clearData() {
-    storage.remove('template-saved-data')
+    storage.remove(SAVED_DATA_KEY)
     this.savedData = ''
     alert({ title: 'Data cleared!' })
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

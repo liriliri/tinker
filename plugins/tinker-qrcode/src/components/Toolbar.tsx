@@ -15,28 +15,38 @@ import {
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
 
+const CUSTOM_VALUE = 'custom'
+
+const PRESET_SIZE_OPTIONS: { label: string; value: number }[] = [
+  { label: '300', value: 300 },
+  { label: '400', value: 400 },
+  { label: '500', value: 500 },
+  { label: '600', value: 600 },
+]
+
+const CORRECT_LEVEL_OPTIONS: { label: string; value: string }[] = [
+  { label: 'L (7%)', value: 'L' },
+  { label: 'M (15%)', value: 'M' },
+  { label: 'Q (25%)', value: 'Q' },
+  { label: 'H (30%)', value: 'H' },
+]
+
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const CUSTOM_VALUE = 'custom'
-  const sizeOptions = [
-    { label: '300', value: 300 },
-    { label: '400', value: 400 },
-    { label: '500', value: 500 },
-    { label: '600', value: 600 },
-    { label: t('custom'), value: CUSTOM_VALUE as any },
+  const sizeOptions: { label: string; value: number | string }[] = [
+    ...PRESET_SIZE_OPTIONS,
+    { label: t('custom'), value: CUSTOM_VALUE },
   ]
 
-  // Determine current select value
-  const getCurrentSizeValue = () => {
+  const getCurrentSizeValue = (): number | string => {
     if (store.isCustomSize) {
-      return CUSTOM_VALUE as any
+      return CUSTOM_VALUE
     }
-    const presetSizes = [300, 400, 500, 600]
-    if (presetSizes.includes(store.size)) {
+    if (PRESET_SIZE_OPTIONS.some((o) => o.value === store.size)) {
       return store.size
     }
-    return CUSTOM_VALUE as any
+    return CUSTOM_VALUE
   }
 
   const handleSizeChange = (value: number | string) => {
@@ -70,8 +80,8 @@ export default observer(function ToolbarComponent() {
     if (files && files.length > 0) {
       const reader = new FileReader()
       reader.onload = (e) => {
-        const dataUrl = e.target?.result as string
-        if (dataUrl) store.setIcon(dataUrl)
+        const dataUrl = e.target?.result
+        if (typeof dataUrl === 'string') store.setIcon(dataUrl)
       }
       reader.readAsDataURL(files[0])
     }
@@ -108,12 +118,7 @@ export default observer(function ToolbarComponent() {
           onChange={(value) =>
             store.setCorrectLevel(value as 'L' | 'M' | 'Q' | 'H')
           }
-          options={[
-            { label: 'L (7%)', value: 'L' },
-            { label: 'M (15%)', value: 'M' },
-            { label: 'Q (25%)', value: 'Q' },
-            { label: 'H (30%)', value: 'H' },
-          ]}
+          options={CORRECT_LEVEL_OPTIONS}
         />
       </div>
 

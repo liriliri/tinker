@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { tw } from 'share/theme'
 import { mediaDurationFormat } from 'share/lib/util'
 import store from '../store'
-import { AudioRecorder } from '../lib/AudioRecorder'
+import { AudioRecorder } from '../lib/audioRecorder'
 import WaveformVisualizer from './WaveformVisualizer'
 import AudioWaveform from './AudioWaveform'
 import WaveformLoading from './WaveformLoading'
@@ -115,14 +115,14 @@ const RecorderControls = observer(() => {
     >
       {/* Timer Display */}
       <div
-        className={`text-5xl font-mono tabular-nums text-center w-[240px] ${tw.text.primary} dark:text-gray-100 mb-14`}
+        className={`text-5xl font-mono tabular-nums text-center w-[240px] ${tw.text.primary} mb-14`}
       >
         {mediaDurationFormat(store.currentRecordingDuration)}
       </div>
 
       {/* Play Time Display - always occupy space */}
       <div
-        className={`text-2xl font-mono tabular-nums text-center w-[240px] ${tw.text.secondary} dark:text-gray-400 -mt-8 mb-10`}
+        className={`text-2xl font-mono tabular-nums text-center w-[240px] ${tw.text.secondary} -mt-8 mb-10`}
       >
         {store.isPreview
           ? mediaDurationFormat(store.currentPlayTime)

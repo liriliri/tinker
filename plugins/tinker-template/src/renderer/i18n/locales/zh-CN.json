@@ -14,8 +14,6 @@
   "getSystemInfoAPI": "template.getSystemInfo() - 获取系统信息",
   "getCurrentTimeAPI": "template.getCurrentTime() - 获取当前时间",
   "getGreetingAPI": "template.getGreeting(name) - 获取问候消息",
-  "readFileAPI": "template.readFile(path) - 读取文件内容",
-  "writeFileAPI": "template.writeFile(path, content) - 写入文件",
   "getAppDataPathAPI": "template.getAppDataPath() - 获取应用数据目录",
   "currentTheme": "当前主题",
   "darkMode": "暗黑模式",

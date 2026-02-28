@@ -9,9 +9,7 @@ export default observer(function StorageTab() {
   return (
     <div className="space-y-6">
       <div className={`${tw.bg.primary} rounded-lg p-6 border ${tw.border}`}>
-        <h2
-          className={`text-xl font-semibold mb-4 text-gray-900 ${tw.text.primary}`}
-        >
+        <h2 className={`text-xl font-semibold mb-4 ${tw.text.primary}`}>
           {t('localStorageDemo')}
         </h2>
         <div className="space-y-4">

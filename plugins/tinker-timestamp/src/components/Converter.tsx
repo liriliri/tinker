@@ -45,12 +45,24 @@ export default observer(function Converter() {
     ? store.timestampToDate(store.timestampInput)
     : null
 
-  // Get locale based on current language
   const locale = i18n.language === 'zh-CN' ? 'zh-CN' : 'en-US'
 
-  // Extract city name from timezone label (e.g., "UTC+08:00 | Beijing" -> "Beijing")
   const currentTimezoneLabel = t(store.getTimezoneKey(store.timezone))
   const cityName = currentTimezoneLabel.split(' | ')[1] || currentTimezoneLabel
+
+  const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }
+
+  const timestampToDateDisplay = timestampToDateResult
+    ? timestampToDateResult.toLocaleString(locale, dateTimeFormatOptions)
+    : '-'
 
   return (
     <div className={`h-full flex flex-col ${tw.bg.secondary}`}>
@@ -108,33 +120,12 @@ export default observer(function Converter() {
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded bg-gray-50 ${tw.bg.tertiary}`}
             >
               <div className="flex-1 text-gray-800 dark:text-gray-100">
-                {timestampToDateResult
-                  ? timestampToDateResult.toLocaleString(locale, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false,
-                    })
-                  : '-'}
+                {timestampToDateDisplay}
               </div>
               <button
                 onClick={() =>
                   timestampToDateResult &&
-                  copyToClipboard(
-                    timestampToDateResult.toLocaleString(locale, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false,
-                    }),
-                    'timestamp'
-                  )
+                  copyToClipboard(timestampToDateDisplay, 'timestamp')
                 }
                 disabled={!timestampToDateResult}
                 className={

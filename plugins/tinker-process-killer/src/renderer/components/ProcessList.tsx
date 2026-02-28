@@ -1,21 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import store, { ProcessInfo } from '../store'
+import store from '../store'
+import type { ProcessInfo } from '../../common/types'
+import Grid from 'share/components/Grid'
 import { AgGridReact } from 'ag-grid-react'
 import {
   ColDef,
-  ModuleRegistry,
-  AllCommunityModule,
-  themeAlpine,
   GetRowIdParams,
   RowClickedEvent,
   ICellRendererParams,
 } from 'ag-grid-community'
 import { useMemo, useCallback, useRef, useEffect } from 'react'
 import fileSize from 'licia/fileSize'
-
-ModuleRegistry.registerModules([AllCommunityModule])
 
 const ProcessNameCell = observer(
   ({ data }: ICellRendererParams<ProcessInfo>) => {
@@ -139,23 +136,6 @@ export default observer(function ProcessList() {
     }
   }, [])
 
-  const theme = useMemo(() => {
-    return themeAlpine.withParams({
-      accentColor: '#0fc25e',
-      backgroundColor: store.isDark ? '#1e1e1e' : '#ffffff',
-      foregroundColor: store.isDark ? '#d4d4d4' : '#000000',
-      browserColorScheme: store.isDark ? 'dark' : 'light',
-      borderWidth: 1,
-      borderColor: store.isDark ? '#3f3f46' : '#e5e7eb',
-      borderRadius: 0,
-      headerBackgroundColor: store.isDark ? '#27272a' : '#f9fafb',
-      headerTextColor: store.isDark ? '#d4d4d4' : '#000000',
-      oddRowBackgroundColor: store.isDark ? '#1e1e1e' : '#ffffff',
-      rowHoverColor: store.isDark ? '#27272a' : '#f3f4f6',
-      selectedRowBackgroundColor: store.isDark ? '#27272a' : '#f3f4f6',
-    })
-  }, [store.isDark])
-
   const localeText = useMemo(
     () => ({
       noRowsToShow: store.searchKeyword ? t('noProcesses') : '',
@@ -205,23 +185,21 @@ export default observer(function ProcessList() {
   }
 
   return (
-    <div className="h-full">
-      <AgGridReact<ProcessInfo>
-        ref={gridRef}
-        theme={theme}
-        columnDefs={columnDefs}
-        rowData={store.filteredProcesses}
-        getRowId={getRowId}
-        onRowClicked={onRowClicked}
-        headerHeight={40}
-        rowHeight={40}
-        animateRows={false}
-        enableCellTextSelection={true}
-        suppressCellFocus={true}
-        localeText={localeText}
-        onSortChanged={onSortChanged}
-        tooltipShowDelay={500}
-      />
-    </div>
+    <Grid<ProcessInfo>
+      isDark={store.isDark}
+      ref={gridRef}
+      columnDefs={columnDefs}
+      rowData={store.filteredProcesses}
+      getRowId={getRowId}
+      onRowClicked={onRowClicked}
+      headerHeight={40}
+      rowHeight={40}
+      animateRows={false}
+      enableCellTextSelection={true}
+      suppressCellFocus={true}
+      localeText={localeText}
+      onSortChanged={onSortChanged}
+      tooltipShowDelay={500}
+    />
   )
 })
