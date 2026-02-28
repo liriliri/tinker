@@ -164,6 +164,19 @@ export const tw = {
     border500: 'border-[#6e6e6e]',
     border100: 'dark:border-[#3a3a3c]',
     border200: 'border-[#4a4a4a] dark:border-[#4a4a4a]',
+    border600: 'border-[#d0d0d0] dark:border-[#555555]',
+  },
+
+  // Secondary action button (non-primary, neutral gray)
+  secondary: {
+    bg: 'bg-[#8a8a8a] hover:bg-[#757575] disabled:bg-[#8a8a8a]',
+  },
+
+  // Tooltip
+  tooltip: {
+    bg: 'bg-white dark:bg-[#2c2d30]',
+    border: 'border-[#dcdfe6] dark:border-[#4c4d50]',
+    text: 'text-gray-800 dark:text-[#f0f1f2]',
   },
 } as const
 

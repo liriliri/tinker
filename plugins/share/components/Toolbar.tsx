@@ -146,9 +146,9 @@ export function ToolbarTextButton({
 }: ToolbarTextButtonProps) {
   const variantClass =
     variant === 'secondary'
-      ? 'bg-[#8a8a8a] hover:bg-[#757575]'
+      ? `${tw.secondary.bg}`
       : `${tw.primary.bg} ${tw.primary.bgHover}`
-  const baseClass = `px-3 py-1 text-xs rounded ${variantClass} text-white disabled:bg-[#8a8a8a] disabled:cursor-not-allowed`
+  const baseClass = `px-3 py-1 text-xs rounded ${variantClass} text-white disabled:cursor-not-allowed`
 
   return (
     <button className={`${baseClass} ${className}`} {...props}>

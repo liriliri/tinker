@@ -20,7 +20,6 @@ export default class BaseStore {
       const theme = await tinker.getTheme()
       this.isDark = theme === 'dark'
 
-      // Listen for theme changes
       tinker.on('changeTheme', async () => {
         const newTheme = await tinker.getTheme()
         this.setIsDark(newTheme === 'dark')

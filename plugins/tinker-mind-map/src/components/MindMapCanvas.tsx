@@ -30,7 +30,6 @@ export default observer(function MindMapCanvas() {
       data: data.root,
       layout: data.layout || store.currentLayout,
       theme: data.theme || store.currentTheme,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any) as unknown as MindMapInstance
 
     store.setMindMap(mindMap)

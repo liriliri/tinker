@@ -8,7 +8,7 @@ export interface TreeNodeData {
   id: string
   label: string
   children?: TreeNodeData[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface TreeNodeProps<T extends TreeNodeData = TreeNodeData> {

@@ -27,9 +27,7 @@ interface MindMapRenderer {
 export interface MindMapInstance {
   view: MindMapView
   renderer: MindMapRenderer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on(event: string, handler: (...args: any[]) => void): void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   off(event: string, handler: (...args: any[]) => void): void
   execCommand(command: string, ...args: unknown[]): void
   setData(data: unknown): void
