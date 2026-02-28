@@ -19,7 +19,7 @@ import * as htmlToImage from 'html-to-image'
 import store from '../store'
 import CanvasSizeDialog from './CanvasSizeDialog'
 
-export default observer(() => {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const [showSizeDialog, setShowSizeDialog] = useState(false)
@@ -100,7 +100,7 @@ export default observer(() => {
         <ToolbarSeparator />
 
         <button
-          className="text-xs px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors cursor-pointer"
+          className={`text-xs px-2 py-1 ${tw.hover} rounded transition-colors cursor-pointer`}
           onClick={() => setShowSizeDialog(true)}
           title={t('setCanvasSize')}
         >

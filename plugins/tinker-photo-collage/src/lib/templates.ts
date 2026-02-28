@@ -1,4 +1,4 @@
-import { LayoutTemplate } from '../store'
+import { LayoutTemplate } from '../types'
 import { templates1to5 } from './templates-2-5'
 import { templates6to10 } from './templates-6-10'
 import { templates11to16 } from './templates-11-16'

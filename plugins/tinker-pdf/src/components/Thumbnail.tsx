@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { tw, THEME_COLORS } from 'share/theme'
 import className from 'licia/className'
-import type { PDFPageProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist'
 import { THUMBNAIL_WIDTH } from '../lib/constants'
 
 interface ThumbnailProps {
   pageNum: number
-  pdfDoc: any
+  pdfDoc: PDFDocumentProxy | null
   scale: number
   isActive: boolean
   onClick: () => void
@@ -28,16 +28,14 @@ export default function Thumbnail({
   const [dimensions, setDimensions] = useState(
     preCalculatedDimensions || { width: THUMBNAIL_WIDTH, height: 100 }
   )
-  const renderTaskRef = useRef<any>(null)
+  const renderTaskRef = useRef<RenderTask | null>(null)
 
-  // Update dimensions when preCalculatedDimensions changes
   useEffect(() => {
     if (preCalculatedDimensions) {
       setDimensions(preCalculatedDimensions)
     }
   }, [preCalculatedDimensions])
 
-  // Intersection Observer for lazy loading
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -75,7 +73,6 @@ export default function Thumbnail({
         const page: PDFPageProxy = await pdfDoc.getPage(pageNum)
         const viewport = page.getViewport({ scale: 1 })
 
-        // Calculate thumbnail dimensions
         const ratio = viewport.width / viewport.height
         const canvasWidth = THUMBNAIL_WIDTH
         const canvasHeight = (canvasWidth / ratio) | 0
@@ -113,8 +110,10 @@ export default function Thumbnail({
         await renderTaskRef.current.promise
 
         setRendered(true)
-      } catch (error: any) {
-        if (error?.name !== 'RenderingCancelledException') {
+      } catch (error: unknown) {
+        if (
+          (error as { name?: string })?.name !== 'RenderingCancelledException'
+        ) {
           console.error(`Error rendering thumbnail ${pageNum}:`, error)
         }
       } finally {
@@ -148,32 +147,36 @@ export default function Thumbnail({
     >
       <div
         className={className(
-          'relative bg-white overflow-hidden rounded-lg transition-shadow',
-          !isActive &&
-            'shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_1px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)] hover:shadow-[0_0.375px_1.5px_0_rgba(0,0,0,0.05),0_0_0_2px_rgba(207,207,216,1),0_3px_12px_0_rgba(0,0,0,0.1)]'
+          `relative ${tw.bg.primary} overflow-hidden rounded-lg transition-shadow`
         )}
         style={{
           width: dimensions.width,
           height: dimensions.height,
           minHeight: dimensions.height,
-          boxShadow: isActive ? `0 0 0 2px ${THEME_COLORS.primary}` : undefined,
+          boxShadow: isActive
+            ? `0 0 0 2px ${THEME_COLORS.primary}`
+            : `0 0.375px 1.5px 0 rgba(0,0,0,0.05), 0 0 0 1px ${THEME_COLORS.border.light}, 0 3px 12px 0 rgba(0,0,0,0.1)`,
         }}
       >
         <canvas
           ref={canvasRef}
-          className="block"
+          className={`block ${tw.bg.primary}`}
           style={{
             width: '100%',
             height: '100%',
           }}
         />
         {!rendered && !rendering && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white text-gray-400 text-xs">
+          <div
+            className={`absolute inset-0 flex items-center justify-center ${tw.bg.primary} ${tw.text.tertiary} text-xs`}
+          >
             <p>{pageNum}</p>
           </div>
         )}
         {rendering && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white text-gray-400 text-xs">
+          <div
+            className={`absolute inset-0 flex items-center justify-center ${tw.bg.primary} ${tw.text.tertiary} text-xs`}
+          >
             <p>...</p>
           </div>
         )}

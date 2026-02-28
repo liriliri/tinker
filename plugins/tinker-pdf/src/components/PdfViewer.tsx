@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import store from '../store'
 import { tw } from 'share/theme'
 import FileOpen from 'share/components/FileOpen'
+import type { RenderTask } from 'pdfjs-dist'
 
 interface PageRenderState {
   rendered: boolean
@@ -17,13 +18,12 @@ export default observer(function PdfViewer() {
   const containerRef = useRef<HTMLDivElement>(null)
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map())
-  const renderTasksRef = useRef<Map<number, any>>(new Map())
+  const renderTasksRef = useRef<Map<number, RenderTask>>(new Map())
   const [pageStates, setPageStates] = useState<Map<number, PageRenderState>>(
     new Map()
   )
   const observerRef = useRef<IntersectionObserver | null>(null)
 
-  // Initialize page states when document loads
   useEffect(() => {
     if (!store.pdfDoc) {
       setPageStates(new Map())
@@ -31,16 +31,12 @@ export default observer(function PdfViewer() {
       return
     }
 
-    // Pre-calculate dimensions for all pages
     const initializePageStates = async () => {
       const states = new Map<number, PageRenderState>()
 
-      // Get the first page to determine default viewport
       const firstPage = await store.pdfDoc!.getPage(1)
       const viewport = firstPage.getViewport({ scale: store.scale })
 
-      // Assume all pages have the same size (common case)
-      // If pages have different sizes, they'll update when rendered
       for (let i = 1; i <= store.numPages; i++) {
         states.set(i, {
           rendered: false,
@@ -56,31 +52,25 @@ export default observer(function PdfViewer() {
     initializePageStates()
   }, [store.pdfDoc, store.numPages])
 
-  // Auto-fit width on initial load only
   useEffect(() => {
     if (!store.pdfDoc || !containerRef.current || store.userHasZoomed) return
 
     const adjustScale = async () => {
       try {
-        // Get the first page to determine dimensions
         const page = await store.pdfDoc!.getPage(1)
         const viewport = page.getViewport({ scale: 1.0 })
         const pageWidth = viewport.width
 
-        // Get container width (minus padding)
         const container = containerRef.current!
         const containerWidth = container.clientWidth
-        const availableWidth = containerWidth - 32 // Account for padding (16px * 2)
+        const availableWidth = containerWidth - 32
 
-        // If page is wider than container, scale it down to fit (initial load only)
         if (pageWidth * store.scale > availableWidth) {
           const fitScale = availableWidth / pageWidth
-          // Round to 2 decimal places
           const adjustedScale = Math.round(fitScale * 100) / 100
-          store.setScale(adjustedScale, false) // Not a user action
+          store.setScale(adjustedScale, false)
         }
 
-        // Store container width for future reference
         store.setContainerWidth(containerWidth)
       } catch (error) {
         console.error('Error adjusting scale:', error)
@@ -115,7 +105,6 @@ export default observer(function PdfViewer() {
     }
   }, [])
 
-  // Render a specific page
   const renderPage = useCallback(
     async (pageNum: number) => {
       if (!store.pdfDoc) return
@@ -126,7 +115,6 @@ export default observer(function PdfViewer() {
       const state = pageStates.get(pageNum)
       if (!state || state.rendering || state.rendered) return
 
-      // Update state to rendering and update dimensions
       setPageStates((prev) => {
         const next = new Map(prev)
         const pageState = next.get(pageNum)
@@ -144,10 +132,8 @@ export default observer(function PdfViewer() {
 
         const viewport = page.getViewport({ scale: store.scale })
 
-        // Get device pixel ratio for high DPI displays
         const outputScale = window.devicePixelRatio || 1
 
-        // Update dimensions in state first (before rendering)
         setPageStates((prev) => {
           const next = new Map(prev)
           const pageState = next.get(pageNum)
@@ -158,13 +144,11 @@ export default observer(function PdfViewer() {
           return next
         })
 
-        // Set canvas dimensions with device pixel ratio
         canvas.width = Math.floor(viewport.width * outputScale)
         canvas.height = Math.floor(viewport.height * outputScale)
         canvas.style.width = `${Math.floor(viewport.width)}px`
         canvas.style.height = `${Math.floor(viewport.height)}px`
 
-        // Scale the context to match device pixel ratio
         context.setTransform(outputScale, 0, 0, outputScale, 0, 0)
 
         const renderContext = {
@@ -173,7 +157,6 @@ export default observer(function PdfViewer() {
           canvas: canvas,
         }
 
-        // Start render task
         const renderTask = page.render(renderContext)
         renderTasksRef.current.set(pageNum, renderTask)
 
@@ -181,7 +164,6 @@ export default observer(function PdfViewer() {
 
         renderTasksRef.current.delete(pageNum)
 
-        // Mark as rendered
         setPageStates((prev) => {
           const next = new Map(prev)
           const pageState = next.get(pageNum)
@@ -191,11 +173,13 @@ export default observer(function PdfViewer() {
           }
           return next
         })
-      } catch (error: any) {
+      } catch (error: unknown) {
         renderTasksRef.current.delete(pageNum)
 
         // Ignore cancellation errors
-        if (error?.name === 'RenderingCancelledException') {
+        if (
+          (error as { name?: string })?.name === 'RenderingCancelledException'
+        ) {
           setPageStates((prev) => {
             const next = new Map(prev)
             const pageState = next.get(pageNum)
@@ -404,6 +388,7 @@ export default observer(function PdfViewer() {
       <FileOpen
         onOpenFile={(file) => store.openFileFromFile(file)}
         openTitle={t('openTitle')}
+        supportedFormats={t('supportedFormats')}
         fileName={store.fileName}
       />
     )
@@ -413,13 +398,13 @@ export default observer(function PdfViewer() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className={`text-center ${tw.text.secondary}`}>
-          <p>Loading...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     )
   }
 
-  const pages = Array.from({ length: store.numPages }, (_, i) => i + 1)
+  const pages = store.pages
 
   return (
     <div
@@ -443,7 +428,7 @@ export default observer(function PdfViewer() {
                 }
               }}
               data-page-number={pageNum}
-              className="relative bg-white shadow-lg"
+              className={`relative ${tw.bg.primary} shadow-lg`}
               style={{
                 width: width > 0 ? `${width}px` : 'auto',
                 height: height > 0 ? `${height}px` : 'auto',
@@ -458,16 +443,20 @@ export default observer(function PdfViewer() {
                     canvasRefs.current.delete(pageNum)
                   }
                 }}
-                className="block"
+                className={`block ${tw.bg.primary}`}
               />
               {!pageState?.rendered && !pageState?.rendering && (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                  <p>Page {pageNum}</p>
+                <div
+                  className={`absolute inset-0 flex items-center justify-center ${tw.text.tertiary}`}
+                >
+                  <p>{t('page', { pageNum })}</p>
                 </div>
               )}
               {pageState?.rendering && (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                  <p>Rendering...</p>
+                <div
+                  className={`absolute inset-0 flex items-center justify-center ${tw.text.tertiary}`}
+                >
+                  <p>{t('rendering')}</p>
                 </div>
               )}
             </div>

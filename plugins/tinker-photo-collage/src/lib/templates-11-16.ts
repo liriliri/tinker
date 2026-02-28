@@ -1,4 +1,4 @@
-import { LayoutTemplate } from '../store'
+import { LayoutTemplate } from '../types'
 
 export const templates11to16: LayoutTemplate[] = [
   {

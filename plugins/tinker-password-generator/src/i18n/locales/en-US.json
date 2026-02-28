@@ -19,5 +19,7 @@
   "symbols": "!@#$%",
   "generatedPassword": "Generated password",
   "copyToClipboard": "Copy",
-  "copied": "Copied!"
+  "copied": "Copied!",
+  "showPassphrase": "Show passphrase",
+  "hidePassphrase": "Hide passphrase"
 }

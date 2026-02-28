@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import store from '../store'
 import Thumbnail from './Thumbnail'
@@ -12,7 +13,8 @@ interface ThumbnailDimensions {
   height: number
 }
 
-export default observer(function ThumbnailSidebar() {
+export default observer(function Sidebar() {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const thumbnailRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const [thumbnailDimensions, setThumbnailDimensions] = useState<
@@ -32,11 +34,9 @@ export default observer(function ThumbnailSidebar() {
       try {
         if (!store.pdfDoc) return
 
-        // Get the first page to determine default dimensions
         const firstPage = await store.pdfDoc.getPage(1)
         const viewport = firstPage.getViewport({ scale: 1 })
 
-        // Calculate thumbnail dimensions (same logic as Thumbnail component)
         const ratio = viewport.width / viewport.height
         const width = THUMBNAIL_WIDTH
         const height = (width / ratio) | 0
@@ -69,7 +69,6 @@ export default observer(function ThumbnailSidebar() {
 
     if (!thumbnailDiv || !container) return
 
-    // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
       const thumbnailRect = thumbnailDiv.getBoundingClientRect()
       const containerRect = container.getBoundingClientRect()
@@ -97,9 +96,7 @@ export default observer(function ThumbnailSidebar() {
     store.scrollToPage = pageNum
   }
 
-  const pages = store.pdfDoc
-    ? Array.from({ length: store.numPages }, (_, i) => i + 1)
-    : []
+  const pages = store.pdfDoc ? store.pages : []
 
   // Hide sidebar if not open or no PDF loaded
   const isVisible = store.sidebarOpen && store.pdfDoc
@@ -181,7 +178,7 @@ export default observer(function ThumbnailSidebar() {
                 : tw.text.secondary
             }
           `}
-          title="Thumbnails"
+          title={t('thumbnails')}
         >
           <LayoutGrid size={16} />
         </button>
@@ -196,7 +193,7 @@ export default observer(function ThumbnailSidebar() {
                 : tw.text.secondary
             }
           `}
-          title="Outline"
+          title={t('outline')}
         >
           <List size={16} />
         </button>

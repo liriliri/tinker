@@ -3,6 +3,9 @@ import LocalStore from 'licia/LocalStore'
 import shuffle from 'licia/shuffle'
 import BaseStore from 'share/BaseStore'
 import { getTemplatesByPhotoCount, getTemplateById } from './lib/templates'
+import type { Photo, LayoutTemplate, PhotoSlot } from './types'
+
+export type { Photo, LayoutTemplate, PhotoSlot }
 
 const STORAGE_KEY_CANVAS_BG_COLOR = 'canvasBgColor'
 const STORAGE_KEY_IMAGE_BG_COLOR = 'imageBgColor'
@@ -14,28 +17,6 @@ const STORAGE_KEY_RADIUS = 'radius'
 const STORAGE_KEY_CANVAS_WIDTH = 'canvasWidth'
 const STORAGE_KEY_CANVAS_HEIGHT = 'canvasHeight'
 const storage = new LocalStore('tinker-photo-collage')
-
-export type Photo = {
-  id: string
-  url: string
-  file: File
-}
-
-export type LayoutTemplate = {
-  id: string
-  photoCount: number
-  gridTemplate: string
-  gridAreas: string
-  areas: string[]
-}
-
-export type PhotoSlot = {
-  areaName: string
-  photoId: string | null
-  scale: number
-  offsetX: number
-  offsetY: number
-}
 
 class Store extends BaseStore {
   photos: Photo[] = []
@@ -315,6 +296,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

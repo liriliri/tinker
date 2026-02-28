@@ -57,7 +57,7 @@ export default observer(function InputFields({
             type="button"
             onClick={() => store.toggleShowPhrase()}
             className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${tw.text.secondary} hover:opacity-70 transition-opacity`}
-            title={store.showPhrase ? 'Hide passphrase' : 'Show passphrase'}
+            title={store.showPhrase ? t('hidePassphrase') : t('showPassphrase')}
           >
             {store.showPhrase ? <Eye size={18} /> : <EyeOff size={18} />}
           </button>

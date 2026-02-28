@@ -7,7 +7,6 @@ import CharacterTypesTable from './components/CharacterTypesTable'
 import GeneratedPassword from './components/GeneratedPassword'
 
 export default observer(function App() {
-  // Auto-generate on input change
   const handleInputChange = () => {
     if (store.phrase && store.service) {
       try {
@@ -16,7 +15,6 @@ export default observer(function App() {
         console.error('Failed to generate password:', error)
       }
     } else {
-      // Clear password if either field is empty
       store.generatedPassword = ''
     }
   }

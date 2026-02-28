@@ -126,8 +126,11 @@ class Store extends BaseStore {
       this.isModified = false
       this.addRecentFile(path)
       this.readDatabase()
-    } catch (error: any) {
-      if (error.code === kdbxweb.Consts.ErrorCodes.InvalidKey) {
+    } catch (error: unknown) {
+      if (
+        (error as { code?: string }).code ===
+        kdbxweb.Consts.ErrorCodes.InvalidKey
+      ) {
         toast.error(i18n.t('invalidPassword'))
       } else {
         toast.error(i18n.t('failedToOpenDatabase'))
@@ -250,7 +253,7 @@ class Store extends BaseStore {
   selectGroup(groupId: string) {
     this.selectedGroupId = groupId
     this.selectedEntryId = null
-    this.searchQuery = '' // Clear search when switching groups
+    this.searchQuery = ''
     this.updateFilteredEntries()
   }
 
@@ -269,7 +272,6 @@ class Store extends BaseStore {
   }
 
   private updateFilteredEntries() {
-    // Global search when query exists
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase()
       const allEntries: KdbxEntry[] = []
@@ -288,7 +290,6 @@ class Store extends BaseStore {
       return
     }
 
-    // Show current group entries when no search query
     if (!this.selectedGroupId) {
       this.filteredEntries = []
       return
@@ -403,6 +404,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

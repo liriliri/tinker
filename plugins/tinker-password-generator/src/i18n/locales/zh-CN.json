@@ -19,5 +19,7 @@
   "symbols": "!@#$%",
   "generatedPassword": "生成的密码",
   "copyToClipboard": "复制",
-  "copied": "已复制!"
+  "copied": "已复制!",
+  "showPassphrase": "显示密码短语",
+  "hidePassphrase": "隐藏密码短语"
 }

@@ -2,17 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
-import store, { CharsetState } from '../store'
+import store from '../store'
 
 interface CharacterTypesTableProps {
   onInputChange: () => void
-}
-
-interface CharType {
-  key: string
-  label: string
-  state: CharsetState
-  setter: (state: CharsetState) => void
 }
 
 export default observer(function CharacterTypesTable({
@@ -20,64 +13,24 @@ export default observer(function CharacterTypesTable({
 }: CharacterTypesTableProps) {
   const { t } = useTranslation()
 
-  const charTypes: CharType[] = [
-    {
-      key: 'lower',
-      label: t('lowercase'),
-      state: store.lower,
-      setter: (state: CharsetState) => store.setLower(state),
-    },
-    {
-      key: 'upper',
-      label: t('uppercase'),
-      state: store.upper,
-      setter: (state: CharsetState) => store.setUpper(state),
-    },
-    {
-      key: 'number',
-      label: t('numbers'),
-      state: store.number,
-      setter: (state: CharsetState) => store.setNumber(state),
-    },
-    {
-      key: 'dash',
-      label: t('dashUnderscore'),
-      state: store.dash,
-      setter: (state: CharsetState) => store.setDash(state),
-    },
-    {
-      key: 'space',
-      label: t('space'),
-      state: store.space,
-      setter: (state: CharsetState) => store.setSpace(state),
-    },
-    {
-      key: 'symbol',
-      label: t('symbols'),
-      state: store.symbol,
-      setter: (state: CharsetState) => store.setSymbol(state),
-    },
-  ]
-
   return (
     <div className={`overflow-x-auto rounded border ${tw.border}`}>
       <table className="w-full border-collapse">
         <thead>
           <tr className={`${tw.bg.secondary}`}>
             <td className="w-32"></td>
-            {charTypes.map((char) => (
+            {store.charTypes.map((char) => (
               <th
                 key={char.key}
                 scope="col"
                 className={`px-4 py-2.5 text-xs font-semibold text-center ${tw.text.primary}`}
               >
-                {char.label}
+                {t(char.labelKey)}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {/* Required Row */}
           <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
@@ -98,7 +51,7 @@ export default observer(function CharacterTypesTable({
                 />
               </label>
             </th>
-            {charTypes.map((char) => (
+            {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
                 <input
                   type="radio"
@@ -114,7 +67,6 @@ export default observer(function CharacterTypesTable({
             ))}
           </tr>
 
-          {/* Allowed Row */}
           <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
@@ -122,7 +74,7 @@ export default observer(function CharacterTypesTable({
             >
               {t('allowed')}
             </th>
-            {charTypes.map((char) => (
+            {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
                 <input
                   type="radio"
@@ -138,7 +90,6 @@ export default observer(function CharacterTypesTable({
             ))}
           </tr>
 
-          {/* Forbidden Row */}
           <tr className={`border-t ${tw.border} ${tw.hover} transition-colors`}>
             <th
               scope="row"
@@ -146,7 +97,7 @@ export default observer(function CharacterTypesTable({
             >
               {t('forbidden')}
             </th>
-            {charTypes.map((char) => (
+            {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
                 <input
                   type="radio"

@@ -5,13 +5,22 @@ import { tw } from 'share/theme'
 import className from 'licia/className'
 import Tree, { TreeNodeData } from 'share/components/Tree'
 import store from '../store'
+import type { RefProxy } from 'pdfjs-dist/types/src/display/api'
 
 interface OutlineItem extends TreeNodeData {
   title: string
-  dest: any
+  dest: string | Array<RefProxy | number | null> | null
   items?: OutlineItem[]
   bold?: boolean
   italic?: boolean
+}
+
+interface RawOutlineItem {
+  title: string
+  bold: boolean
+  italic: boolean
+  dest: string | Array<RefProxy | number | null> | null
+  items?: RawOutlineItem[]
 }
 
 export default observer(function Outline() {
@@ -28,7 +37,7 @@ export default observer(function Outline() {
       try {
         const outlineData = await store.pdfDoc.getOutline()
         if (outlineData) {
-          const transformOutline = (items: any[]): OutlineItem[] => {
+          const transformOutline = (items: RawOutlineItem[]): OutlineItem[] => {
             return items.map((item, index) => ({
               id: `outline-${index}-${item.title}`,
               label: item.title,
@@ -40,7 +49,7 @@ export default observer(function Outline() {
               italic: item.italic,
             }))
           }
-          setOutline(transformOutline(outlineData))
+          setOutline(transformOutline(outlineData as RawOutlineItem[]))
         } else {
           setOutline(null)
         }

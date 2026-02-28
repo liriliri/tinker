@@ -7,8 +7,13 @@
   "zoomIn": "放大",
   "zoomOut": "缩小",
   "resetZoom": "重置缩放",
-  "openTitle": "拖拽 PDF 文件到此处或点击打开",
+  "supportedFormats": "支持 PDF 文件",
   "noOutline": "无大纲",
   "errorLoadPdf": "加载 PDF 文件失败",
-  "errorGetFilePath": "无法获取文件路径"
+  "errorGetFilePath": "无法获取文件路径",
+  "loading": "加载中...",
+  "page": "第 {{pageNum}} 页",
+  "rendering": "渲染中...",
+  "thumbnails": "缩略图",
+  "outline": "大纲"
 }

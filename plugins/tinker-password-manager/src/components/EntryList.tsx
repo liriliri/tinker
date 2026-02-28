@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
 import { AgGridReact } from 'ag-grid-react'
 import {
@@ -82,27 +82,41 @@ export default observer(function EntryList() {
     return ''
   }, [])
 
-  // 当选中的 entry 变化时，刷新所有行的样式
+  // Refresh row styles when selected entry changes
   useEffect(() => {
     if (gridRef.current?.api) {
       gridRef.current.api.redrawRows()
     }
   }, [store.selectedEntryId])
 
-  // 使用 AG Grid 的主题 API，直接使用 store.isDark
   const theme = useMemo(() => {
+    const isDark = store.isDark
     return themeAlpine.withParams({
-      accentColor: '#0fc25e',
-      backgroundColor: store.isDark ? '#1e1e1e' : '#ffffff',
-      foregroundColor: store.isDark ? '#d4d4d4' : '#000000',
-      browserColorScheme: store.isDark ? 'dark' : 'light',
+      accentColor: THEME_COLORS.primary,
+      backgroundColor: isDark
+        ? THEME_COLORS.bg.dark.primary
+        : THEME_COLORS.bg.light.primary,
+      foregroundColor: isDark
+        ? THEME_COLORS.text.dark.primary
+        : THEME_COLORS.text.light.primary,
+      browserColorScheme: isDark ? 'dark' : 'light',
       borderWidth: 0,
       borderRadius: 0,
-      headerBackgroundColor: store.isDark ? '#303133' : '#f0f1f2',
-      headerTextColor: store.isDark ? '#d4d4d4' : '#000000',
-      oddRowBackgroundColor: store.isDark ? '#252526' : '#ffffff',
-      rowHoverColor: store.isDark ? '#3a3a3c' : '#e5e5e5',
-      selectedRowBackgroundColor: store.isDark ? '#0fc25e33' : '#0fc25e22',
+      headerBackgroundColor: isDark
+        ? THEME_COLORS.bg.dark.secondary
+        : THEME_COLORS.bg.light.secondary,
+      headerTextColor: isDark
+        ? THEME_COLORS.text.dark.primary
+        : THEME_COLORS.text.light.primary,
+      oddRowBackgroundColor: isDark
+        ? THEME_COLORS.bg.dark.tertiary
+        : THEME_COLORS.bg.light.primary,
+      rowHoverColor: isDark
+        ? THEME_COLORS.hover.dark
+        : THEME_COLORS.hover.light,
+      selectedRowBackgroundColor: isDark
+        ? `${THEME_COLORS.primary}33`
+        : `${THEME_COLORS.primary}22`,
     })
   }, [store.isDark])
 

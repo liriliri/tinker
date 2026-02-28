@@ -23,13 +23,10 @@ class Store extends BaseStore {
 
   fileName: string = ''
 
-  // Scroll trigger for programmatic navigation
   scrollToPage: number = 0
 
-  // Container width for auto-fit calculation
   containerWidth: number = 0
 
-  // Track if user has manually changed scale
   userHasZoomed: boolean = false
 
   sidebarOpen: boolean = true
@@ -55,7 +52,6 @@ class Store extends BaseStore {
   }
 
   private bindEvent() {
-    // Automatically update title when fileName changes
     reaction(
       () => this.fileName,
       (fileName) => {
@@ -64,13 +60,12 @@ class Store extends BaseStore {
     )
   }
 
-  // Set PDF document
   setPdfDoc(doc: PDFDocumentProxy | null) {
     this.pdfDoc = doc
     if (doc) {
       this.numPages = doc.numPages
       this.currentPage = 1
-      this.userHasZoomed = false // Reset zoom flag for new document
+      this.userHasZoomed = false
     } else {
       this.numPages = 0
       this.currentPage = 1
@@ -78,7 +73,10 @@ class Store extends BaseStore {
     }
   }
 
-  // Page navigation
+  get pages(): number[] {
+    return Array.from({ length: this.numPages }, (_, i) => i + 1)
+  }
+
   setCurrentPage(page: number) {
     if (page >= 1 && page <= this.numPages) {
       this.currentPage = page
@@ -99,7 +97,6 @@ class Store extends BaseStore {
     }
   }
 
-  // Zoom controls
   setScale(scale: number, isUserAction: boolean = false) {
     // Round to avoid floating point issues
     const newScale = Math.round(scale * 100) / 100
@@ -113,24 +110,23 @@ class Store extends BaseStore {
 
   zoomIn() {
     const newScale = this.scale + 0.25
-    this.setScale(newScale, true) // Mark as user action
+    this.setScale(newScale, true)
   }
 
   zoomOut() {
     const newScale = this.scale - 0.25
-    this.setScale(newScale, true) // Mark as user action
+    this.setScale(newScale, true)
   }
 
   resetZoom() {
     this.scale = 1.0
-    this.userHasZoomed = true // Mark as user action
+    this.userHasZoomed = true
   }
 
   setContainerWidth(width: number) {
     this.containerWidth = width
   }
 
-  // Sidebar controls
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
     storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
@@ -146,22 +142,18 @@ class Store extends BaseStore {
     storage.set(STORAGE_KEY_SIDEBAR_VIEW, view)
   }
 
-  // Loading state
   setLoading(loading: boolean) {
     this.isLoading = loading
   }
 
-  // File info
   setFileName(name: string) {
     this.fileName = name
   }
 
-  // Error handling
   showError(key: string) {
     toast.error(i18n.t(key))
   }
 
-  // Load PDF file
   async loadPdfFile(filePath: string) {
     this.setLoading(true)
 
@@ -181,9 +173,8 @@ class Store extends BaseStore {
     }
   }
 
-  // Open file from File object (for FileOpen component)
   async openFileFromFile(file: File) {
-    const filePath = (file as any).path
+    const filePath = (file as { path?: string }).path
     if (!filePath) {
       this.showError('errorGetFilePath')
       return
@@ -192,7 +183,6 @@ class Store extends BaseStore {
     await this.loadPdfFile(filePath)
   }
 
-  // Open file dialog
   async openFile() {
     try {
       const result = await tinker.showOpenDialog({
@@ -210,6 +200,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

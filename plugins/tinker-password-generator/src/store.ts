@@ -5,6 +5,13 @@ import Vault from './lib/vault'
 
 export type CharsetState = 'required' | 'allowed' | 'forbidden'
 
+export interface CharType {
+  key: string
+  labelKey: string
+  state: CharsetState
+  setter: (state: CharsetState) => void
+}
+
 const storage = new LocalStore('tinker-password-generator')
 
 interface StorageData {
@@ -129,6 +136,47 @@ class Store extends BaseStore {
     this.saveSettings()
   }
 
+  get charTypes(): CharType[] {
+    return [
+      {
+        key: 'lower',
+        labelKey: 'lowercase',
+        state: this.lower,
+        setter: (s) => this.setLower(s),
+      },
+      {
+        key: 'upper',
+        labelKey: 'uppercase',
+        state: this.upper,
+        setter: (s) => this.setUpper(s),
+      },
+      {
+        key: 'number',
+        labelKey: 'numbers',
+        state: this.number,
+        setter: (s) => this.setNumber(s),
+      },
+      {
+        key: 'dash',
+        labelKey: 'dashUnderscore',
+        state: this.dash,
+        setter: (s) => this.setDash(s),
+      },
+      {
+        key: 'space',
+        labelKey: 'space',
+        state: this.space,
+        setter: (s) => this.setSpace(s),
+      },
+      {
+        key: 'symbol',
+        labelKey: 'symbols',
+        state: this.symbol,
+        setter: (s) => this.setSymbol(s),
+      },
+    ]
+  }
+
   generatePassword() {
     if (!this.phrase || !this.service) {
       this.generatedPassword = ''
@@ -142,7 +190,6 @@ class Store extends BaseStore {
         repeat: this.repeat || undefined,
       }
 
-      // Handle character types
       const charTypes = [
         { name: 'lower', state: this.lower },
         { name: 'upper', state: this.upper },
@@ -158,7 +205,6 @@ class Store extends BaseStore {
         } else if (state === 'forbidden') {
           settings[name] = 0
         }
-        // 'allowed' state doesn't need to be set explicitly
       })
 
       const vault = new Vault(settings)

@@ -9,7 +9,7 @@ export type KdbxEntry = {
   notes: string
   icon: number
   tags: string[]
-  customFields: Map<string, any>
+  customFields: Map<string, string | kdbxweb.ProtectedValue>
   times: {
     creationTime: Date
     lastModTime: Date
