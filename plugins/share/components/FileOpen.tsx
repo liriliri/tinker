@@ -6,7 +6,7 @@ import { tw } from 'share/theme'
 interface FileOpenProps {
   onOpenFile: (file: File) => Promise<void>
   openTitle: string
-  supportedFormats: string
+  supportedFormats?: string
   fileName?: string
 }
 

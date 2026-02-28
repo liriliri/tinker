@@ -274,6 +274,23 @@ class Store extends BaseStore {
     this.saveTodos()
   }
 
+  updateTodo(id: string, text: string, priority: Priority, dueDate?: string) {
+    const todo = this.todos.find((t) => t.id === id)
+    if (!todo) return
+
+    const item = new Item(todo.raw)
+    item.setPriority(priority)
+
+    const body = dueDate ? `${text} due:${dueDate}` : text
+    item.setBody(body)
+
+    const updated = parseTodoItem(item.toString(), id)
+    const index = this.todos.findIndex((t) => t.id === id)
+    this.todos[index] = updated
+
+    this.saveTodos()
+  }
+
   updateTodoPriority(id: string, priority: Priority) {
     const todo = this.todos.find((t) => t.id === id)
     if (!todo) return

@@ -66,7 +66,7 @@ Available in renderer process and preload scripts. See `tinker.d.ts` for details
 
 ## Coding Standards
 
-Run `/lint <plugin-name>` after implementing features to verify compliance.
+**MANDATORY**: After every code change to a plugin, you MUST immediately run `/lint <changed-file-path>` on the modified files before considering the task complete. This is not optional — do not skip this step, do not wait to be asked. If lint reports errors, fix them and re-run lint until it passes.
 
 ## New Plugin
 

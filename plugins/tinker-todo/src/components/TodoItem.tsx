@@ -1,11 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Check, Trash2, Calendar } from 'lucide-react'
+import { useState } from 'react'
+import { Check, Calendar } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import className from 'licia/className'
 import store from '../store'
 import { type TodoItem as TodoItemType } from '../types'
 import { tw } from 'share/theme'
+import EditTodo from './EditTodo'
 
 interface TodoItemProps {
   todo: TodoItemType
@@ -43,6 +45,7 @@ const PRIORITY_STYLES: Record<
 
 export default observer(function TodoItem({ todo }: TodoItemProps) {
   const { t } = useTranslation()
+  const [isEditing, setIsEditing] = useState(false)
 
   const handleDelete = async () => {
     const confirmed = await confirm({
@@ -51,6 +54,14 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
     if (confirmed) {
       store.deleteTodo(todo.id)
     }
+  }
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    tinker.showContextMenu(e.clientX, e.clientY, [
+      { label: t('edit'), click: () => setIsEditing(true) },
+      { label: t('delete'), click: handleDelete },
+    ])
   }
 
   const formatDate = (dateStr: string | null): string => {
@@ -84,6 +95,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
         tw.border,
         todo.completed && 'opacity-60'
       )}
+      onContextMenu={handleContextMenu}
     >
       <div className="flex items-center gap-2.5">
         <button
@@ -129,17 +141,10 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
             )}
           </div>
         </div>
-
-        <div className="flex-shrink-0 flex items-center gap-0.5">
-          <button
-            onClick={handleDelete}
-            className={`p-1.5 ${tw.text.secondary} ${tw.hover} rounded-md transition-colors`}
-            title={t('delete')}
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
       </div>
+      {isEditing && (
+        <EditTodo todo={todo} onClose={() => setIsEditing(false)} />
+      )}
     </div>
   )
 })

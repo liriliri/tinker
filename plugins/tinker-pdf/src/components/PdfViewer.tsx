@@ -388,7 +388,6 @@ export default observer(function PdfViewer() {
       <FileOpen
         onOpenFile={(file) => store.openFileFromFile(file)}
         openTitle={t('openTitle')}
-        supportedFormats={t('supportedFormats')}
         fileName={store.fileName}
       />
     )
