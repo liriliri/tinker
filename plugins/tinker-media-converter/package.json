@@ -1,0 +1,18 @@
+{
+  "name": "tinker-media-converter",
+  "version": "0.1.0",
+  "description": "Media Converter Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Media Converter",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "媒体转换"
+      }
+    }
+  }
+}
