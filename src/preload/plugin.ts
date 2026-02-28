@@ -18,6 +18,7 @@ import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import types from 'licia/types'
 import { i18n } from 'common/util'
+import fs from 'node:fs'
 
 window.addEventListener('DOMContentLoaded', () => {
   tinkerObj.setTitle('')
@@ -96,6 +97,18 @@ const tinkerObj = {
   loadData,
   readFile: nodeObj.readFile,
   writeFile: nodeObj.writeFile,
+  fstat: async (file: string) => {
+    const stats = await fs.promises.stat(file)
+    return {
+      size: stats.size,
+      mtime: stats.mtime,
+      atime: stats.atime,
+      ctime: stats.ctime,
+      isFile: stats.isFile(),
+      isDirectory: stats.isDirectory(),
+      isSymbolicLink: stats.isSymbolicLink(),
+    }
+  },
   tmpdir: nodeObj.tmpdir,
   on: mainObj.on,
   runFFmpeg,

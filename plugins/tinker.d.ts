@@ -9,6 +9,20 @@ import type {
 type ReadFile = typeof import('node:fs/promises').readFile
 type WriteFile = typeof import('node:fs/promises').writeFile
 
+interface FileStats {
+  /** File size in bytes */
+  size: number
+  /** Last modification time */
+  mtime: Date
+  /** Last access time */
+  atime: Date
+  /** Last status change time */
+  ctime: Date
+  isFile: boolean
+  isDirectory: boolean
+  isSymbolicLink: boolean
+}
+
 interface RunProgress {
   /** e.g., "1024kbits/s" */
   bitrate: string
@@ -101,6 +115,9 @@ declare global {
 
     /** Wraps Node's fs.promises.writeFile */
     writeFile: WriteFile
+
+    /** Get file stats (size, timestamps, type flags). */
+    fstat(path: string): Promise<FileStats>
 
     /** Returns the OS temp directory path. */
     tmpdir(): string
