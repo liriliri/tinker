@@ -1,3 +1,11 @@
+## v1.0.0 (1 Mar 2026)
+
+* feat: add media converter
+* feat(todo): recent files
+* feat(password-manager): better welcome ui
+* feat(qrcode): set icon
+* feat(todo): edit
+
 ## v0.13.2 (26 Feb 2026)
 
 * fix(image-compressor): unable to compress jpg
