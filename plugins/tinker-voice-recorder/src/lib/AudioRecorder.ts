@@ -1,4 +1,4 @@
-export class AudioRecorder {
+export default class AudioRecorder {
   private mediaRecorder: MediaRecorder | null = null
   private audioChunks: Blob[] = []
   private stream: MediaStream | null = null
