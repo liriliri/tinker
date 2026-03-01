@@ -37,12 +37,6 @@ export const IMAGE_EXTENSIONS = new Set([
   '.avif',
 ])
 
-export const SUPPORTED_EXTENSIONS = new Set([
-  ...VIDEO_EXTENSIONS,
-  ...AUDIO_EXTENSIONS,
-  ...IMAGE_EXTENSIONS,
-])
-
 export const VIDEO_OUTPUT_FORMATS = [
   'mp4',
   'mkv',

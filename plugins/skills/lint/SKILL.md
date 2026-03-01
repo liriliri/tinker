@@ -1,7 +1,6 @@
 ---
 description: Check code against Tinker plugin coding standards
 argument-hint: <plugin-name-or-file-path>
-allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # Lint Plugin Code
@@ -109,9 +108,12 @@ If no violations are found, report: **No violations found.**
 1. Identify the target: if a plugin name is given, glob all `.ts`, `.tsx`, `.scss` files under `<plugin-name>/src/`. If a file path is given, check that file only.
 2. Read each file and check against the checklist above.
 3. Report all violations grouped by category, including total violation count and which categories had issues.
-4. Run prettier and eslint on the plugin (replace `<plugin-name>` with the actual folder name, run from the repo root `../`):
+4. Run prettier and eslint on the plugin (replace `<plugin-name>` with the actual folder name):
 
-**IMPORTANT**: You MUST use `lsla prettier` for prettier (do NOT use `npx prettier`). For eslint, use the local installation via `node_modules/.bin/eslint` (do NOT use `npx eslint`).
+**IMPORTANT**:
+- `lsla` is a **global command** — use it directly, do NOT use `npx prettier`
+- `eslint` lives at the **Tinker monorepo root** (`../node_modules/.bin/eslint` relative to the current workspace) — do NOT look elsewhere, do NOT use `npx eslint`
+- Both commands must run from the **Tinker monorepo root** (`../` relative to the current workspace). Plugins live under `plugins/` at that root.
 
 ```bash
 cd .. && lsla prettier "plugins/<plugin-name>/src/**/*.{ts,tsx,json,scss}" --write
@@ -120,7 +122,7 @@ cd .. && node_modules/.bin/eslint "plugins/<plugin-name>/src/**/*.{ts,tsx}"
 
 If eslint reports errors, fix them by editing the relevant files, then re-run eslint to confirm all errors are resolved.
 
-5. Run the build to ensure there are no compilation errors (run from the plugin directory):
+5. Run the build to ensure there are no compilation errors (run from the plugin directory in the current workspace):
 
 ```bash
 cd <plugin-name> && npm run build
@@ -128,7 +130,7 @@ cd <plugin-name> && npm run build
 
 If the build fails, fix the errors, then re-run the build to confirm it succeeds.
 
-6. Run TypeScript type checking (run from the plugin directory):
+6. Run TypeScript type checking (run from the plugin directory in the current workspace):
 
 ```bash
 cd <plugin-name> && npx tsc --noEmit

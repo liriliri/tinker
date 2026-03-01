@@ -9,7 +9,6 @@
   "openTitleImage": "拖拽图片到此处或点击打开",
   "convert": "转换",
   "cancel": "取消",
-  "outputDir": "输出目录",
   "outputDirPlaceholder": "同源文件目录",
   "browseOutputDir": "浏览输出目录",
   "clearOutputDir": "清除输出目录",

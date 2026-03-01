@@ -19,13 +19,6 @@ function getVideoCodecArgs(outputFormat: string): string[] {
         '-c:a',
         'libopus',
       ]
-    case 'gif':
-      return [
-        '-vf',
-        'fps=15,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
-        '-loop',
-        '0',
-      ]
     case 'ts':
       return [
         '-c:v',

@@ -9,7 +9,6 @@
   "openTitleImage": "Drop image files here or click to open",
   "convert": "Convert",
   "cancel": "Cancel",
-  "outputDir": "Output Dir",
   "outputDirPlaceholder": "Same as source",
   "browseOutputDir": "Browse output directory",
   "clearOutputDir": "Clear output directory",

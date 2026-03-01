@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import fileSize from 'licia/fileSize'
 import className from 'licia/className'
+import splitPath from 'licia/splitPath'
 import { tw, THEME_COLORS } from 'share/theme'
 import { mediaDurationFormat } from 'share/lib/util'
 import { LoadingCircle } from 'share/components/Loading'
@@ -43,10 +44,10 @@ interface MediaItemProps {
   item: MediaItem
 }
 
-const ImageCard = observer(({ item }: MediaItemProps) => {
+function useContextMenu(item: MediaItem) {
   const { t } = useTranslation()
 
-  const handleContextMenu = (e: React.MouseEvent) => {
+  return (e: React.MouseEvent) => {
     if (item.isConverting) return
 
     const menuItems: MenuItemConstructorOptions[] = []
@@ -66,6 +67,10 @@ const ImageCard = observer(({ item }: MediaItemProps) => {
 
     tinker.showContextMenu(e.clientX, e.clientY, menuItems)
   }
+}
+
+const ImageCard = observer(({ item }: MediaItemProps) => {
+  const handleContextMenu = useContextMenu(item)
 
   const thumbnail = item.imageInfo?.url
 
@@ -97,19 +102,6 @@ const ImageCard = observer(({ item }: MediaItemProps) => {
             <LoadingCircle className="w-8 h-8" />
           </div>
         )}
-        {item.isDone && (
-          <div className="absolute top-1 right-1">
-            <CheckCircle2
-              size={14}
-              className="text-green-500 dark:text-green-400"
-            />
-          </div>
-        )}
-        {item.error && (
-          <div className="absolute top-1 right-1" title={item.error}>
-            <AlertCircle size={14} className="text-red-500 dark:text-red-400" />
-          </div>
-        )}
       </div>
 
       <div className={`p-2 ${tw.bg.secondary} flex-shrink-0`}>
@@ -130,7 +122,24 @@ const ImageCard = observer(({ item }: MediaItemProps) => {
                 <span className={`font-medium ${tw.text.primary}`}>
                   {fileSize(item.outputSize)}
                 </span>
+                <span className="uppercase font-medium text-green-500 dark:text-green-400">
+                  {splitPath(item.outputPath!).ext.slice(1)}
+                </span>
+                <CheckCircle2
+                  size={12}
+                  className="text-green-500 dark:text-green-400"
+                />
               </div>
+            </div>
+          ) : item.error ? (
+            <div className="flex items-center gap-1" title={item.error}>
+              <span>
+                {item.originalSize > 0 ? fileSize(item.originalSize) : '--'}
+              </span>
+              <AlertCircle
+                size={12}
+                className="text-red-500 dark:text-red-400"
+              />
             </div>
           ) : (
             <div className="text-left">
@@ -143,33 +152,9 @@ const ImageCard = observer(({ item }: MediaItemProps) => {
   )
 })
 
-interface MediaRowProps {
-  item: MediaItem
-}
-
-const MediaRow = observer(({ item }: MediaRowProps) => {
+const MediaRow = observer(({ item }: MediaItemProps) => {
   const { t } = useTranslation()
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    if (item.isConverting) return
-
-    const menuItems: MenuItemConstructorOptions[] = []
-
-    if (item.isDone && item.outputPath) {
-      menuItems.push({
-        label: t('showInFileManager'),
-        click: () => tinker.showItemInPath(item.outputPath!),
-      })
-      menuItems.push({ type: 'separator' as const })
-    }
-
-    menuItems.push({
-      label: t('remove'),
-      click: () => store.removeItem(item.id),
-    })
-
-    tinker.showContextMenu(e.clientX, e.clientY, menuItems)
-  }
+  const handleContextMenu = useContextMenu(item)
 
   const { videoInfo, audioInfo, imageInfo } = item
   const thumbnail = videoInfo?.thumbnail
@@ -281,6 +266,9 @@ const MediaRow = observer(({ item }: MediaRowProps) => {
             <div className={`text-xs font-medium ${tw.text.primary}`}>
               {fileSize(item.outputSize)}
             </div>
+            <span className="text-xs uppercase font-medium text-green-500 dark:text-green-400">
+              {splitPath(item.outputPath!).ext.slice(1)}
+            </span>
             <CheckCircle2
               size={14}
               className="text-green-500 dark:text-green-400 flex-shrink-0"
