@@ -1,75 +1,111 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import { alert } from 'share/components/Alert'
-
-const SAVED_DATA_KEY = 'saved-data'
-
-const storage = new LocalStore('tinker-template')
-
-type SystemInfo = {
-  platform: string
-  arch: string
-  homeDir: string
-  nodeVersion: string
-}
+import type { SystemInfo } from '../common/types'
 
 class Store extends BaseStore {
-  activeTab: string = 'preload'
+  activeTab: string = 'components'
+
+  sliderValue: number = 50
+  checkboxChecked: boolean = false
+  selectValue: string = 'option1'
+  textInputValue: string = ''
+  isLoading: boolean = false
+
+  theme: string = ''
+  language: string = ''
+  windowTitle: string = ''
+  openedFilePath: string = ''
+  clipboardFiles: string[] = []
+
+  cmdInput: string = ''
+  cmdOutput: string = ''
+  cmdError: string = ''
+  cmdRunning: boolean = false
 
   systemInfo: SystemInfo | null = null
-  currentTime: string = ''
-
-  savedData: string = ''
 
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
-  }
-
-  private loadFromStorage() {
-    const saved = storage.get(SAVED_DATA_KEY)
-    if (saved) {
-      this.savedData = saved
-    }
   }
 
   setActiveTab(tabId: string) {
     this.activeTab = tabId
   }
 
-  getSystemInfo() {
-    try {
-      const info = template.getSystemInfo()
-      this.systemInfo = info
-    } catch {
-      alert({ title: 'Failed to get system info' })
+  setSliderValue(value: number) {
+    this.sliderValue = value
+  }
+
+  setCheckboxChecked(checked: boolean) {
+    this.checkboxChecked = checked
+  }
+
+  setSelectValue(value: string) {
+    this.selectValue = value
+  }
+
+  setTextInputValue(value: string) {
+    this.textInputValue = value
+  }
+
+  toggleLoading() {
+    this.isLoading = true
+    setTimeout(() => {
+      this.isLoading = false
+    }, 2000)
+  }
+
+  async fetchTheme() {
+    this.theme = await tinker.getTheme()
+  }
+
+  async fetchLanguage() {
+    this.language = await tinker.getLanguage()
+  }
+
+  setWindowTitle(title: string) {
+    this.windowTitle = title
+  }
+
+  applyWindowTitle() {
+    tinker.setTitle(this.windowTitle)
+  }
+
+  async openFile() {
+    const result = await tinker.showOpenDialog({ properties: ['openFile'] })
+    if (!result.canceled && result.filePaths.length > 0) {
+      this.openedFilePath = result.filePaths[0]
     }
   }
 
-  getCurrentTime() {
-    try {
-      const time = template.getCurrentTime()
-      this.currentTime = time
-    } catch {
-      alert({ title: 'Failed to get current time' })
+  showInFinder() {
+    if (this.openedFilePath) {
+      tinker.showItemInPath(this.openedFilePath)
     }
   }
 
-  setSavedData(data: string) {
-    this.savedData = data
+  async fetchClipboardFiles() {
+    this.clipboardFiles = await tinker.getClipboardFilePaths()
   }
 
-  saveData() {
-    storage.set(SAVED_DATA_KEY, this.savedData)
-    alert({ title: 'Data saved to localStorage!' })
+  setCmdInput(cmd: string) {
+    this.cmdInput = cmd
   }
 
-  clearData() {
-    storage.remove(SAVED_DATA_KEY)
-    this.savedData = ''
-    alert({ title: 'Data cleared!' })
+  async runCommand() {
+    if (!this.cmdInput || this.cmdRunning) return
+    this.cmdRunning = true
+    this.cmdOutput = ''
+    this.cmdError = ''
+    const result = await template.execCommand(this.cmdInput)
+    this.cmdOutput = result.stdout
+    this.cmdError = result.stderr
+    this.cmdRunning = false
+  }
+
+  fetchSystemInfo() {
+    this.systemInfo = template.getSystemInfo()
   }
 }
 
