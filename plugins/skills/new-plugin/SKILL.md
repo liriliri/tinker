@@ -1,7 +1,6 @@
 ---
 description: Create a new Tinker plugin from the template
 argument-hint: <plugin-name> [description]
-allowed-tools: Bash, Read, Write, Edit, Glob
 ---
 
 # New Plugin
