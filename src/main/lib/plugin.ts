@@ -41,6 +41,8 @@ import { getSettingsStore } from './store'
 import { captureScreen } from './screen'
 import { getFileIcon as getFileIconBuffer } from './fileIcon'
 import PQueue from 'p-queue'
+import toNum from 'licia/toNum'
+import toStr from 'licia/toStr'
 
 const logger = log('plugin')
 
@@ -498,11 +500,39 @@ export function init() {
     }
 
     const type = mime.getType(filePath) || 'application/octet-stream'
+    const fileStat = await fs.stat(filePath)
+    const fileSize = fileStat.size
+
+    const rangeHeader = request.headers.get('range')
+    if (rangeHeader) {
+      const [startStr, endStr] = rangeHeader.replace('bytes=', '').split('-')
+      const start = toNum(startStr)
+      const end = endStr ? toNum(endStr) : fileSize - 1
+      const chunkSize = end - start + 1
+
+      const nodeStream = fs.createReadStream(filePath, { start, end })
+      const webStream = nodeStreamToWeb(nodeStream)
+
+      return new Response(webStream, {
+        status: 206,
+        headers: {
+          'Content-Type': type,
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': toStr(chunkSize),
+        },
+      })
+    }
+
     const nodeStream = fs.createReadStream(filePath)
     const webStream = nodeStreamToWeb(nodeStream)
 
     return new Response(webStream, {
-      headers: { 'Content-Type': type },
+      headers: {
+        'Content-Type': type,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': toStr(fileSize),
+      },
     })
   })
 }
