@@ -1,0 +1,14 @@
+{
+  "undo": "Undo",
+  "redo": "Redo",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear",
+  "openFile": "Open File",
+  "newFile": "New File",
+  "save": "Save",
+  "increaseFontSize": "Increase Font Size",
+  "decreaseFontSize": "Decrease Font Size",
+  "search": "Search",
+  "cursor": "Ln {{line}}, Col {{col}}"
+}

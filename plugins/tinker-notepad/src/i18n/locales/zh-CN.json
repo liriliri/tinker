@@ -1,0 +1,14 @@
+{
+  "undo": "撤销",
+  "redo": "重做",
+  "copy": "复制",
+  "paste": "粘贴",
+  "clear": "清空",
+  "openFile": "打开文件",
+  "newFile": "新建",
+  "save": "保存",
+  "increaseFontSize": "增大字体",
+  "decreaseFontSize": "减小字体",
+  "search": "搜索",
+  "cursor": "Ln {{line}}, Col {{col}}"
+}

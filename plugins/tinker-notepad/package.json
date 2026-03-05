@@ -1,0 +1,19 @@
+{
+  "name": "tinker-notepad",
+  "version": "0.1.0",
+  "description": "Notepad Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Notepad",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "记事本"
+      }
+    }
+  }
+}

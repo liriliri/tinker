@@ -1,28 +1,31 @@
 import { makeAutoObservable, reaction } from 'mobx'
-import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
-type EditorMode = 'text' | 'tree'
-
-const STORAGE_KEY = 'tinker-json-editor-content'
-const MODE_STORAGE_KEY = 'tinker-json-editor-mode'
+const STORAGE_KEY = 'content'
 const FILE_PATH_KEY = 'file-path'
+const FONT_SIZE_KEY = 'font-size'
 
-const storage = new LocalStore('tinker-json-editor')
+const DEFAULT_FONT_SIZE = 14
+const MIN_FONT_SIZE = 10
+const MAX_FONT_SIZE = 32
+
+const storage = new LocalStore('tinker-notepad')
 
 class Store extends BaseStore {
-  jsonInput: string = ''
-  mode: EditorMode = 'text'
-  treeEditorInstance: JSONEditor | null = null
-  textEditorInstance: editor.IStandaloneCodeEditor | null = null
+  content: string = ''
+  editorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
   fileVersion: number = 0
   currentFilePath: string | null = null
   savedContent: string = ''
+  language: string = 'plaintext'
+  fontSize: number = DEFAULT_FONT_SIZE
+  cursorLine: number = 1
+  cursorColumn: number = 1
 
   constructor() {
     super()
@@ -41,8 +44,9 @@ class Store extends BaseStore {
   }
 
   private async init() {
-    this.loadFromStorage()
+    this.loadFromLocalStorage()
     await this.loadSavedFile()
+    this.fontSize = Number(storage.get(FONT_SIZE_KEY)) || DEFAULT_FONT_SIZE
   }
 
   private async loadSavedFile() {
@@ -53,45 +57,26 @@ class Store extends BaseStore {
         const content = await tinker.readFile(savedFilePath, 'utf-8')
         this.currentFilePath = savedFilePath
         this.savedContent = content
-        this.jsonInput = content
+        this.content = content
         storage.remove(STORAGE_KEY)
       } catch {
-        // File no longer exists or can't be read, clear the saved path
         storage.remove(FILE_PATH_KEY)
-        console.log('Failed to load saved file')
       }
     }
   }
 
   get isEmpty() {
-    return isStrBlank(this.jsonInput)
+    return isStrBlank(this.content)
   }
 
   get canUndo() {
-    // Access undoRedoVersion to make this reactive
     void this.undoRedoVersion
-    return this.textEditorInstance?.getModel()?.canUndo() ?? false
+    return this.editorInstance?.getModel()?.canUndo() ?? false
   }
 
   get canRedo() {
-    // Access undoRedoVersion to make this reactive
     void this.undoRedoVersion
-    return this.textEditorInstance?.getModel()?.canRedo() ?? false
-  }
-
-  get lineCount() {
-    if (!this.jsonInput) return 0
-    return this.jsonInput.split('\n').length
-  }
-
-  get jsonError() {
-    if (isStrBlank(this.jsonInput)) return null
-    try {
-      JSON.parse(this.jsonInput)
-      return null
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Invalid JSON'
-    }
+    return this.editorInstance?.getModel()?.canRedo() ?? false
   }
 
   get currentFileName() {
@@ -100,59 +85,58 @@ class Store extends BaseStore {
   }
 
   get hasUnsavedChanges() {
-    return this.jsonInput !== this.savedContent
+    return this.content !== this.savedContent
   }
 
-  private loadFromStorage() {
+  private loadFromLocalStorage() {
     const savedContent = storage.get(STORAGE_KEY)
-    const savedMode = storage.get(MODE_STORAGE_KEY)
-
     if (savedContent) {
-      this.jsonInput = savedContent
-    }
-    if (savedMode) {
-      this.mode = savedMode as EditorMode
+      this.content = savedContent
     }
   }
 
-  setJsonInput(value: string) {
-    this.jsonInput = value
+  setContent(value: string) {
+    this.content = value
     if (!this.currentFilePath) {
       storage.set(STORAGE_KEY, value)
     }
   }
 
-  setMode(mode: EditorMode) {
-    this.mode = mode
-    storage.set(MODE_STORAGE_KEY, mode)
+  setLanguage(lang: string) {
+    this.language = lang
   }
 
-  formatJson() {
-    if (this.isEmpty) return
+  setCursor(line: number, column: number) {
+    this.cursorLine = line
+    this.cursorColumn = column
+  }
 
-    try {
-      const parsed = JSON.parse(this.jsonInput)
-      this.setJsonInput(JSON.stringify(parsed, null, 2))
-    } catch (err) {
-      console.error('Format error:', err)
+  increaseFontSize() {
+    if (this.fontSize < MAX_FONT_SIZE) {
+      this.fontSize = this.fontSize + 1
+      storage.set(FONT_SIZE_KEY, this.fontSize)
     }
   }
 
-  minifyJson() {
-    if (this.isEmpty) return
-
-    try {
-      const parsed = JSON.parse(this.jsonInput)
-      this.setJsonInput(JSON.stringify(parsed))
-    } catch (err) {
-      console.error('Minify error:', err)
+  decreaseFontSize() {
+    if (this.fontSize > MIN_FONT_SIZE) {
+      this.fontSize = this.fontSize - 1
+      storage.set(FONT_SIZE_KEY, this.fontSize)
     }
+  }
+
+  setEditorInstance(editor: editor.IStandaloneCodeEditor | null) {
+    this.editorInstance = editor
+  }
+
+  updateUndoRedoState() {
+    this.undoRedoVersion++
   }
 
   async pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText()
-      this.setJsonInput(text)
+      this.setContent(text)
     } catch (err) {
       console.error('Failed to paste:', err)
     }
@@ -165,7 +149,7 @@ class Store extends BaseStore {
       storage.set(FILE_PATH_KEY, filePath)
       storage.remove(STORAGE_KEY)
     }
-    this.setJsonInput(content)
+    this.setContent(content)
     this.fileVersion++
   }
 
@@ -174,7 +158,7 @@ class Store extends BaseStore {
     this.savedContent = ''
     storage.remove(FILE_PATH_KEY)
     storage.remove(STORAGE_KEY)
-    this.clearJson()
+    this.setContent('')
     this.fileVersion++
   }
 
@@ -182,7 +166,7 @@ class Store extends BaseStore {
     try {
       const result = await tinker.showOpenDialog({
         filters: [
-          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'Text Files', extensions: ['txt', 'log', 'csv'] },
           { name: 'All Files', extensions: ['*'] },
         ],
         properties: ['openFile'],
@@ -198,11 +182,7 @@ class Store extends BaseStore {
 
       const filePath = result.filePaths[0]
       const content = await tinker.readFile(filePath, 'utf-8')
-      this.currentFilePath = filePath
-      this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
-      storage.remove(STORAGE_KEY)
-      this.loadFromFile(content)
+      this.loadFromFile(content, filePath)
     } catch (err) {
       console.error('Failed to open file:', err)
     }
@@ -211,8 +191,8 @@ class Store extends BaseStore {
   async saveFile() {
     try {
       if (this.currentFilePath) {
-        await tinker.writeFile(this.currentFilePath, this.jsonInput, 'utf-8')
-        this.savedContent = this.jsonInput
+        await tinker.writeFile(this.currentFilePath, this.content, 'utf-8')
+        this.savedContent = this.content
       } else {
         await this.saveFileAs()
       }
@@ -224,9 +204,9 @@ class Store extends BaseStore {
   async saveFileAs() {
     try {
       const result = await tinker.showSaveDialog({
-        defaultPath: this.currentFileName || 'untitled.json',
+        defaultPath: this.currentFileName || 'untitled.txt',
         filters: [
-          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'Text Files', extensions: ['txt'] },
           { name: 'All Files', extensions: ['*'] },
         ],
       })
@@ -235,9 +215,9 @@ class Store extends BaseStore {
         return
       }
 
-      await tinker.writeFile(result.filePath, this.jsonInput, 'utf-8')
+      await tinker.writeFile(result.filePath, this.content, 'utf-8')
       this.currentFilePath = result.filePath
-      this.savedContent = this.jsonInput
+      this.savedContent = this.content
       storage.set(FILE_PATH_KEY, result.filePath)
       storage.remove(STORAGE_KEY)
     } catch (err) {
@@ -245,43 +225,21 @@ class Store extends BaseStore {
     }
   }
 
-  clearJson() {
-    this.setJsonInput('')
-  }
-
-  setTreeEditorInstance(instance: JSONEditor | null) {
-    this.treeEditorInstance = instance
-  }
-
-  setTextEditorInstance(instance: editor.IStandaloneCodeEditor | null) {
-    this.textEditorInstance = instance
-  }
-
-  updateUndoRedoState() {
-    this.undoRedoVersion++
-  }
-
-  expandAll() {
-    if (this.treeEditorInstance) {
-      this.treeEditorInstance.expandAll()
-    }
-  }
-
-  collapseAll() {
-    if (this.treeEditorInstance) {
-      this.treeEditorInstance.collapseAll()
-    }
-  }
-
   undo() {
-    if (this.textEditorInstance) {
-      this.textEditorInstance.trigger('keyboard', 'undo', null)
+    if (this.editorInstance) {
+      this.editorInstance.trigger('keyboard', 'undo', null)
     }
   }
 
   redo() {
-    if (this.textEditorInstance) {
-      this.textEditorInstance.trigger('keyboard', 'redo', null)
+    if (this.editorInstance) {
+      this.editorInstance.trigger('keyboard', 'redo', null)
+    }
+  }
+
+  openSearch() {
+    if (this.editorInstance) {
+      this.editorInstance.trigger('keyboard', 'actions.find', null)
     }
   }
 }

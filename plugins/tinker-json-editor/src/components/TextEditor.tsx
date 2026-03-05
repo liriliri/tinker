@@ -1,9 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
+import { useEffect, useRef } from 'react'
 import store from '../store'
 import type { editor } from 'monaco-editor'
 
 export default observer(function TextEditor() {
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       store.setJsonInput(value)
@@ -11,6 +14,7 @@ export default observer(function TextEditor() {
   }
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editor
     store.setTextEditorInstance(editor)
 
     const model = editor.getModel()
@@ -21,10 +25,19 @@ export default observer(function TextEditor() {
     }
   }
 
+  // Reset undo history when a new file is loaded
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+
+    editor.getModel()?.setValue(store.jsonInput)
+    store.updateUndoRedoState()
+  }, [store.fileVersion])
+
   return (
     <div className="h-full w-full">
       <Editor
-        value={store.jsonInput}
+        defaultValue={store.jsonInput}
         language="json"
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}

@@ -17,6 +17,7 @@ class Store extends BaseStore {
   markdownInput: string = ''
   editorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
+  fileVersion: number = 0
   scrollPercent: number = 0
   currentFilePath: string | null = null
   savedContent: string = ''
@@ -150,6 +151,7 @@ class Store extends BaseStore {
       storage.remove(STORAGE_KEY)
     }
     this.setMarkdownInput(content)
+    this.fileVersion++
   }
 
   newFile() {
@@ -159,6 +161,7 @@ class Store extends BaseStore {
     // Clear localStorage content when creating new file
     storage.remove(STORAGE_KEY)
     this.clearMarkdown()
+    this.fileVersion++
   }
 
   async openFile() {

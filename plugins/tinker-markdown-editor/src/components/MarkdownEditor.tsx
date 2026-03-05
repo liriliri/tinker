@@ -64,10 +64,19 @@ export default observer(function MarkdownEditor() {
     }
   }, [store.scrollPercent])
 
+  // Reset undo history when a new file is loaded
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+
+    editor.getModel()?.setValue(store.markdownInput)
+    store.updateUndoRedoState()
+  }, [store.fileVersion])
+
   return (
     <div className="h-full w-full">
       <Editor
-        value={store.markdownInput}
+        defaultValue={store.markdownInput}
         language="markdown"
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
