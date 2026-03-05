@@ -1,3 +1,9 @@
+## v1.1.0 (5 Mar 2026)
+
+* feat: add notepad
+* feat(clock): fullscreen
+* fix: media range not supported
+
 ## v1.0.0 (1 Mar 2026)
 
 * feat: add media converter
