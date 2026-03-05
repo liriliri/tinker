@@ -1,5 +1,5 @@
 import { uIOhook, UiohookKey } from 'uiohook-napi'
-import { globalShortcut } from 'electron'
+import { app, globalShortcut } from 'electron'
 import once from 'licia/once'
 import { getSettingsStore, getMainStore } from './store'
 import * as main from '../window/main'
@@ -102,7 +102,19 @@ const startUIOhook = once(() => {
   if (isMac && !mainStore.get('uIOhookCalled')) {
     mainStore.set('uIOhookCalled', true)
   }
-  setTimeout(() => uIOhook.start(), 1000)
+  setTimeout(() => {
+    uIOhook.start()
+    if (isMac) {
+      const timer = setInterval(() => {
+        const status = nodeMacPermissions?.getAuthStatus('accessibility')
+        if (status === 'denied') {
+          clearInterval(timer)
+          uIOhook.stop()
+        }
+      }, 5000)
+    }
+    app.on('will-quit', () => uIOhook.stop())
+  }, 1000)
 })
 
 export async function init() {
