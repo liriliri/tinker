@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import fullscreen from 'licia/fullscreen'
 import { tw } from 'share/theme'
 import store from './store'
 import AnalogClock from './components/AnalogClock'
@@ -30,6 +31,15 @@ export default observer(function App() {
         type: 'checkbox',
         checked: store.theme === 'digital',
         click: () => store.setTheme('digital'),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: t('fullscreen'),
+        type: 'checkbox',
+        checked: fullscreen.isActive(),
+        click: () => fullscreen.toggle(),
       },
       {
         type: 'separator',

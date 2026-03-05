@@ -62,8 +62,20 @@ export function showWin() {
     }
   })
 
+  win.on('enter-full-screen', onToggleFullscreen)
+  win.on('leave-full-screen', onToggleFullscreen)
+
   dock.hide()
   window.loadPage(win)
+}
+
+function onToggleFullscreen() {
+  if (win) {
+    const plugin = getAttachedPlugin(win)
+    if (plugin) {
+      layoutPlugin(plugin.id)
+    }
+  }
 }
 
 const initIpc = once(() => {

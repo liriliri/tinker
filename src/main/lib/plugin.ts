@@ -347,6 +347,9 @@ export function layoutPlugin(id: string) {
       }
     }
   }
+  if (win.isFullScreen()) {
+    titleBarHeight = 0
+  }
   const bounds = win.contentView.getBounds()
   view.setBounds({
     x: bounds.x,

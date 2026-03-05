@@ -28,6 +28,18 @@ export function showWin(plugin: IPlugin) {
     }
   })
 
+  win.on('enter-full-screen', onToggleFullscreen)
+  win.on('leave-full-screen', onToggleFullscreen)
+
+  function onToggleFullscreen() {
+    if (win) {
+      const plugin = getAttachedPlugin(win)
+      if (plugin) {
+        layoutPlugin(plugin.id)
+      }
+    }
+  }
+
   dock.show()
 
   window.loadPage(win, {
