@@ -44,7 +44,7 @@ export function injectApi() {
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,
     fstat: _tinker.fstat,
-    tmpdir: _tinker.tmpdir,
+    getPath: _tinker.getPath,
     getFileIcon: _tinker.getFileIcon,
     on: _tinker.on,
     runFFmpeg,

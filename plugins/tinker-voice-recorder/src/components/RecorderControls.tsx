@@ -83,7 +83,7 @@ const RecorderControls = observer(() => {
 
       if (result.canceled) return
 
-      const tmpDir = tinker.tmpdir()
+      const tmpDir = await tinker.getPath('temp')
       const tempInput = `${tmpDir}/tinker-voice-${Date.now()}.webm`
       const buffer = await store.recordedBlob.arrayBuffer()
       await tinker.writeFile(tempInput, new Uint8Array(buffer))

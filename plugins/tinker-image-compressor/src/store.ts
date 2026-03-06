@@ -189,7 +189,7 @@ class Store extends BaseStore {
     image.isCompressing = true
 
     try {
-      const tmpDir = tinker.tmpdir()
+      const tmpDir = await tinker.getPath('temp')
       const timestamp = Date.now()
       const extension = getFormatExtension(image.originalFormat)
       const outputPath = `${tmpDir}/tinker-compressed-${timestamp}-${id}.${extension}`

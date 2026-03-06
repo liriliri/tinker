@@ -109,7 +109,7 @@ const tinkerObj = {
       isSymbolicLink: stats.isSymbolicLink(),
     }
   },
-  tmpdir: nodeObj.tmpdir,
+  getPath: mainObj.getPath,
   on: mainObj.on,
   runFFmpeg,
   killFFmpeg,

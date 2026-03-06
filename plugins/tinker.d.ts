@@ -4,6 +4,7 @@ import type {
   SaveDialogOptions,
   SaveDialogReturnValue,
   MenuItemConstructorOptions,
+  App,
 } from 'electron'
 
 type ReadFile = typeof import('node:fs/promises').readFile
@@ -119,8 +120,11 @@ declare global {
     /** Get file stats (size, timestamps, type flags). */
     fstat(path: string): Promise<FileStats>
 
-    /** Returns the OS temp directory path. */
-    tmpdir(): string
+    /**
+     * Get the path to a special directory or file associated with name.
+     * Equivalent to Electron's app.getPath(name).
+     */
+    getPath(name: Parameters<App['getPath']>[0]): Promise<string>
 
     /**
      * Register an event listener.
