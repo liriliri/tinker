@@ -37,11 +37,29 @@ const config = {
     electronLanguages: ['zh_CN', 'en'],
     entitlements: 'build/entitlements.mac.plist',
     entitlementsInherit: 'build/entitlements.mac.plist',
+    minimumSystemVersion: '10.13',
     target: [
       {
         target: 'dmg',
       },
     ],
+    extendInfo: {
+      LSEnvironment: {
+        MallocNanoZone: '0',
+      },
+      LSUIElement: true,
+      NSBluetoothAlwaysUsageDescription: 'This app needs access to Bluetooth',
+      NSBluetoothPeripheralUsageDescription:
+        'This app needs access to Bluetooth',
+      NSCameraUsageDescription: 'This app needs access to the camera',
+      NSMicrophoneUsageDescription:
+        'Voice recognition requires microphone access.',
+      NSScreenCaptureUsageDescription:
+        'Screenshot and color picker features require screen recording access.',
+      NSRequiresAquaSystemAppearance: false,
+      NSQuitAlwaysKeepsWindows: false,
+      NSSupportsAutomaticGraphicsSwitching: true,
+    },
   },
   publish: {
     provider: 'generic',
