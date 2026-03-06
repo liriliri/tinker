@@ -34,6 +34,7 @@ const config = {
     ],
   },
   mac: {
+    hardenedRuntime: true,
     electronLanguages: ['zh_CN', 'en'],
     entitlements: 'build/entitlements.mac.plist',
     entitlementsInherit: 'build/entitlements.mac.plist',
