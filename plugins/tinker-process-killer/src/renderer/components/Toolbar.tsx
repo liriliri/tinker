@@ -21,10 +21,11 @@ export default observer(function ToolbarComponent() {
         variant="toggle"
         active={store.viewMode === 'cpu'}
         onClick={() => store.setViewMode('cpu')}
+        className="px-2 py-1 text-xs"
       >
         <div className="flex items-center gap-1.5">
           <Cpu size={TOOLBAR_ICON_SIZE} />
-          <span className="text-xs">{t('cpu')}</span>
+          {t('cpu')}
         </div>
       </ToolbarButton>
 
@@ -32,10 +33,11 @@ export default observer(function ToolbarComponent() {
         variant="toggle"
         active={store.viewMode === 'memory'}
         onClick={() => store.setViewMode('memory')}
+        className="px-2 py-1 text-xs"
       >
         <div className="flex items-center gap-1.5">
           <HardDrive size={TOOLBAR_ICON_SIZE} />
-          <span className="text-xs">{t('memory')}</span>
+          {t('memory')}
         </div>
       </ToolbarButton>
 
@@ -43,10 +45,11 @@ export default observer(function ToolbarComponent() {
         variant="toggle"
         active={store.viewMode === 'port'}
         onClick={() => store.setViewMode('port')}
+        className="px-2 py-1 text-xs"
       >
         <div className="flex items-center gap-1.5">
           <Network size={TOOLBAR_ICON_SIZE} />
-          <span className="text-xs">{t('port')}</span>
+          {t('port')}
         </div>
       </ToolbarButton>
 

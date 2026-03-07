@@ -1,0 +1,26 @@
+{
+  "allFeeds": "All Feeds",
+  "addFeed": "Add Feed",
+  "refreshFeed": "Refresh",
+  "deleteFeed": "Delete Feed",
+  "deleteFeedConfirm": "Are you sure you want to delete this feed?",
+  "hideSidebar": "Hide Sidebar",
+  "showSidebar": "Show Sidebar",
+  "noFeeds": "No feeds yet.\nClick + to add one.",
+
+  "all": "All",
+  "unread": "Unread",
+  "markAllRead": "Mark All Read",
+  "search": "Search articles...",
+  "noArticles": "No articles",
+
+  "addingFeed": "Fetching feed...",
+  "feedAdded": "Feed added",
+  "enterFeedUrl": "Enter the RSS/Atom feed URL:",
+
+  "openInBrowser": "Open in Browser",
+  "noContent": "No content available",
+
+  "listView": "List View",
+  "cardView": "Card View"
+}

@@ -45,10 +45,11 @@ export default observer(function ToolbarComponent() {
             variant="toggle"
             active={isActive}
             onClick={() => store.setFilterTab(tab.id)}
+            className="px-2 py-1 text-xs"
           >
             <div className="flex items-center gap-1.5">
               <Icon size={TOOLBAR_ICON_SIZE} />
-              <span className="text-xs">{t(tab.label)}</span>
+              {t(tab.label)}
             </div>
           </ToolbarButton>
         )
