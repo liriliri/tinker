@@ -74,11 +74,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
     this.updateCurrentTimestamp()
   }
 
-  loadSettings() {
+  loadStorage() {
     const savedUnit = storage.get(STORAGE_KEY_UNIT)
     if (savedUnit === 'millisecond' || savedUnit === 'second') {
       this.timestampUnit = savedUnit

@@ -41,7 +41,7 @@ class Store extends BaseStore {
   }
 
   private async init() {
-    this.loadFromStorage()
+    this.loadStorage()
     await this.loadSavedFile()
   }
 
@@ -103,7 +103,7 @@ class Store extends BaseStore {
     return this.jsonInput !== this.savedContent
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedContent = storage.get(STORAGE_KEY)
     const savedMode = storage.get(MODE_STORAGE_KEY)
 

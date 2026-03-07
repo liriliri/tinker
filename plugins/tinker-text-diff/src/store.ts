@@ -28,7 +28,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
   get isEmpty() {
@@ -39,7 +39,7 @@ class Store extends BaseStore {
     this.diffStats = stats
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedContent = storage.get(STORAGE_KEY)
     const savedMode = storage.get(MODE_STORAGE_KEY)
     const savedLanguage = storage.get(LANGUAGE_STORAGE_KEY)

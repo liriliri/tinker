@@ -28,12 +28,12 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
     this.initializeFile()
     this.bindEvent()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedFilter = storage.get(STORAGE_KEY_CURRENT_FILTER)
     if (
       savedFilter &&

@@ -41,14 +41,14 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
 
     if (this.photoSlots.length === 0) {
       this.setSelectedPhotoCount(this.selectedPhotoCount)
     }
   }
 
-  loadSettings() {
+  loadStorage() {
     const savedCanvasBgColor = storage.get(STORAGE_KEY_CANVAS_BG_COLOR)
     if (savedCanvasBgColor) {
       this.canvasBgColor = savedCanvasBgColor

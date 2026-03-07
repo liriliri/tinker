@@ -25,10 +25,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     try {
       const savedConfigs = storage.get(STORAGE_KEY_CONFIGS)
       const savedActiveIds = storage.get(STORAGE_KEY_ACTIVE_IDS)

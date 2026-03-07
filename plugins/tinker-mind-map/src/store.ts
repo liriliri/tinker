@@ -27,11 +27,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
     this.bindEvent()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedSidebarOpen = storage.get(STORAGE_KEY_SIDEBAR_OPEN)
     if (savedSidebarOpen !== undefined) {
       this.sidebarOpen = savedSidebarOpen

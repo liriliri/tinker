@@ -55,10 +55,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedLanguage = storage.get(STORAGE_KEY_LANGUAGE)
     if (savedLanguage && LANGUAGES[savedLanguage]) {
       this.selectedLanguage = LANGUAGES[savedLanguage]

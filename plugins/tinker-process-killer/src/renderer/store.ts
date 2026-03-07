@@ -33,7 +33,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
     this.init()
   }
 
@@ -185,7 +185,7 @@ class Store extends BaseStore {
     })
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     try {
       const viewMode = storage.get(STORAGE_KEY_VIEW_MODE)
       if (viewMode) {

@@ -27,7 +27,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
   private get allFilteredItems(): ClipboardItem[] {
@@ -102,7 +102,7 @@ class Store extends BaseStore {
     db.clearAll()
   }
 
-  private async loadFromStorage() {
+  private async loadStorage() {
     try {
       const filterTab = storage.get(STORAGE_KEY_FILTER_TAB)
       const searchQuery = storage.get(STORAGE_KEY_SEARCH_QUERY)

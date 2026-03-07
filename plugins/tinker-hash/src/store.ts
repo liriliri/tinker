@@ -37,10 +37,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
   }
 
-  private loadSettings() {
+  private loadStorage() {
     const savedUppercase = storage.get(STORAGE_KEY_UPPERCASE)
     if (savedUppercase !== null) {
       this.uppercase = savedUppercase === true || savedUppercase === 'true'

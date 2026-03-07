@@ -39,10 +39,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
   }
 
-  private loadSettings() {
+  private loadStorage() {
     const savedTab = storage.get('tab') as Tab | undefined
     if (savedTab) this.tab = savedTab
 

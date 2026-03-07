@@ -19,10 +19,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedContent = storage.get(STORAGE_KEY)
     const savedEncodingType = storage.get(ENCODING_TYPE_KEY)
 

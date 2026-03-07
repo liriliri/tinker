@@ -28,7 +28,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
     this.initWorker()
   }
 
@@ -50,7 +50,7 @@ class Store extends BaseStore {
     }
   }
 
-  private loadSettings() {
+  private loadStorage() {
     const savedFocus = storage.get('focus-time')
     const savedShortBreak = storage.get('short-break-time')
     const savedLongBreak = storage.get('long-break-time')

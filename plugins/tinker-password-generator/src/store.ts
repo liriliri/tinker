@@ -46,10 +46,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSettings()
+    this.loadStorage()
   }
 
-  private loadSettings() {
+  private loadStorage() {
     const saved = storage.get('settings') as StorageData | undefined
     if (saved) {
       this.length = saved.length ?? 12

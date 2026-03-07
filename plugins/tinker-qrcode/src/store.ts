@@ -32,10 +32,10 @@ class Store extends BaseStore {
     makeAutoObservable(this, {
       canvasRef: false,
     })
-    this.loadSettings()
+    this.loadStorage()
   }
 
-  loadSettings() {
+  loadStorage() {
     const savedSize = storage.get(STORAGE_KEY_SIZE)
     if (savedSize) {
       const size = Number(savedSize)

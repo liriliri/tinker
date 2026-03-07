@@ -52,10 +52,10 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
-  private loadFromStorage() {
+  private loadStorage() {
     const savedInputType = storage.get(STORAGE_KEY_INPUT_TYPE)
     if (savedInputType === 'text' || savedInputType === 'file') {
       this.inputType = savedInputType

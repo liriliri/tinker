@@ -29,7 +29,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadFromStorage()
+    this.loadStorage()
   }
 
   private getTodayKey() {
@@ -50,7 +50,7 @@ class Store extends BaseStore {
     return dateTimeStr.slice(11, 16)
   }
 
-  private async loadFromStorage() {
+  private async loadStorage() {
     try {
       const saved = storage.get(SIDEBAR_KEY)
       if (saved !== null && saved !== undefined) {
