@@ -41,22 +41,21 @@ const ImageOpen: React.FC<ImageOpenProps> = ({
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${
-        isDragging
-          ? `${tw.primary.border}`
-          : `${tw.gray.border400} ${tw.primary.hoverBorder}`
+      className={`flex-1 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+        isDragging ? tw.bg.secondary : ''
       }`}
     >
-      <div className="text-center p-8 pointer-events-none">
+      <div className="flex flex-col items-center gap-3 pointer-events-none">
         <ImagePlus
-          className={`w-16 h-16 mx-auto mb-4 ${tw.gray.text400}`}
+          className={`w-10 h-10 ${tw.gray.text400}`}
           strokeWidth={1.5}
         />
-
-        <p className={`text-lg font-medium ${tw.text.primary} mb-2`}>
-          {openTitle}
-        </p>
-        <p className={`text-sm ${tw.text.secondary}`}>{supportedFormats}</p>
+        <div className="text-center">
+          <p className={`text-sm ${tw.text.primary}`}>{openTitle}</p>
+          <p className={`text-xs mt-1 ${tw.text.secondary}`}>
+            {supportedFormats}
+          </p>
+        </div>
       </div>
     </div>
   )
