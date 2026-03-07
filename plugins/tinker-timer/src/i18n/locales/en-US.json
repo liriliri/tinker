@@ -1,0 +1,17 @@
+{
+  "stopwatch": "Stopwatch",
+  "countdown": "Countdown",
+  "start": "Start",
+  "pause": "Pause",
+  "resume": "Resume",
+  "reset": "Reset",
+  "lap": "Lap",
+  "cancel": "Cancel",
+  "startTimer": "Start",
+  "lapLabel": "Lap",
+  "splitLabel": "Split",
+  "totalLabel": "Total",
+  "hours": "Hours",
+  "minutes": "Minutes",
+  "seconds": "Seconds"
+}

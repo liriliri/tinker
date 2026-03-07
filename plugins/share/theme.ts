@@ -115,6 +115,7 @@ export const tw = {
     bg: 'bg-[#0fc25e]',
     bgHover: 'hover:bg-[#0da84f]',
     bgActive: 'active:bg-[#0da84f]',
+    bgFocused: 'bg-[#0fc25e]/20',
     text: 'text-[#0fc25e]',
     textHover: 'hover:!text-[#0fc25e]',
     border: 'border-[#0fc25e]',

@@ -1,0 +1,22 @@
+{
+  "name": "tinker-timer",
+  "version": "0.1.0",
+  "description": "Timer Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Countdown",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "计时器"
+      }
+    }
+  },
+  "devDependencies": {
+    "flipclock": "^1.0.1"
+  }
+}

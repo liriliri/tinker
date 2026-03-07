@@ -1,0 +1,17 @@
+{
+  "stopwatch": "秒表",
+  "countdown": "倒计时",
+  "start": "启动",
+  "pause": "暂停",
+  "resume": "继续",
+  "reset": "复位",
+  "lap": "计次",
+  "cancel": "取消",
+  "startTimer": "开始计时",
+  "lapLabel": "分段",
+  "splitLabel": "单段",
+  "totalLabel": "累计",
+  "hours": "小时",
+  "minutes": "分钟",
+  "seconds": "秒"
+}
