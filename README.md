@@ -191,6 +191,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/media_converter.png"/></th>
       <th><img src="https://tinker.liriliri.io/notepad.png"/></th>
     </tr>
+    <tr>
+      <th>Timer</th>
+      <th>RSS Reader</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/timer.png"/></th>
+      <th><img src="https://tinker.liriliri.io/rss_reader.png"/></th>
+    </tr>
   </tbody>
 </table>
 
