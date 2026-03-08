@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { FilePlus2 } from 'lucide-react'
+import { File } from 'lucide-react'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MediaList from './components/MediaList'
@@ -9,6 +10,19 @@ import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
 
 export default observer(function App() {
   const { t } = useTranslation()
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -18,6 +32,7 @@ export default observer(function App() {
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    setIsDragging(false)
 
     if (store.isCompressing) return
 
@@ -50,14 +65,18 @@ export default observer(function App() {
         {!store.hasItems ? (
           <div
             onClick={() => store.openMediaDialog()}
-            className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors m-4 ${tw.gray.border400} ${tw.primary.hoverBorder}`}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            className={`flex-1 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+              isDragging ? tw.bg.secondary : ''
+            }`}
           >
-            <div className="text-center p-8 pointer-events-none">
-              <FilePlus2
-                className={`w-16 h-16 mx-auto mb-4 ${tw.gray.text400}`}
+            <div className="flex flex-col items-center gap-3 pointer-events-none">
+              <File
+                className={`w-10 h-10 ${tw.gray.text400}`}
                 strokeWidth={1.5}
               />
-              <p className={`text-lg font-medium ${tw.text.primary}`}>
+              <p className={`text-sm ${tw.text.primary}`}>
                 {store.mode === 'video'
                   ? t('openTitleVideo')
                   : t('openTitleAudio')}
