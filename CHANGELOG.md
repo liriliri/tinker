@@ -1,3 +1,8 @@
+## v1.2.0 (8 Mar 2026)
+
+* feat: add timer
+* feat: add rss reader
+
 ## v1.1.0 (5 Mar 2026)
 
 * feat: add notepad
