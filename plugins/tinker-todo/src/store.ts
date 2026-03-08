@@ -1,5 +1,12 @@
 import { makeAutoObservable, runInAction, reaction } from 'mobx'
+import filter from 'licia/filter'
 import LocalStore from 'licia/LocalStore'
+import find from 'licia/find'
+import findIdx from 'licia/findIdx'
+import isStrBlank from 'licia/isStrBlank'
+import lowerCase from 'licia/lowerCase'
+import sortBy from 'licia/sortBy'
+import trim from 'licia/trim'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
 import { type Priority, type FilterType, type TodoItem } from './types'
@@ -88,7 +95,7 @@ class Store extends BaseStore {
     if (savedPath) {
       try {
         const content = await tinker.readFile(savedPath as string, 'utf-8')
-        const lines = content.split('\n').filter((line) => line.trim())
+        const lines = content.split('\n').filter((line) => !isStrBlank(line))
 
         runInAction(() => {
           this.filePath = savedPath as string
@@ -178,7 +185,7 @@ class Store extends BaseStore {
 
     try {
       const content = await tinker.readFile(this.filePath, 'utf-8')
-      const lines = content.split('\n').filter((line) => line.trim())
+      const lines = content.split('\n').filter((line) => !isStrBlank(line))
 
       runInAction(() => {
         this.todos = lines.map((line, index) =>
@@ -230,10 +237,10 @@ class Store extends BaseStore {
   }
 
   addTodo(dueDate?: string) {
-    if (!this.newTodoText.trim()) return
+    if (isStrBlank(this.newTodoText)) return
 
     const raw = createRawTodo(
-      this.newTodoText.trim(),
+      trim(this.newTodoText),
       this.newTodoPriority,
       dueDate
     )
@@ -247,7 +254,7 @@ class Store extends BaseStore {
   }
 
   toggleTodo(id: string) {
-    const todo = this.todos.find((t) => t.id === id)
+    const todo = find(this.todos, (t) => t.id === id)
     if (!todo) return
 
     const item = new Item(todo.raw)
@@ -262,7 +269,7 @@ class Store extends BaseStore {
     }
 
     const updated = parseTodoItem(item.toString(), id)
-    const index = this.todos.findIndex((t) => t.id === id)
+    const index = findIdx(this.todos, (t) => t.id === id)
     this.todos[index] = updated
 
     this.saveTodos()
@@ -274,7 +281,7 @@ class Store extends BaseStore {
   }
 
   updateTodo(id: string, text: string, priority: Priority, dueDate?: string) {
-    const todo = this.todos.find((t) => t.id === id)
+    const todo = find(this.todos, (t) => t.id === id)
     if (!todo) return
 
     const item = new Item(todo.raw)
@@ -284,28 +291,28 @@ class Store extends BaseStore {
     item.setBody(body)
 
     const updated = parseTodoItem(item.toString(), id)
-    const index = this.todos.findIndex((t) => t.id === id)
+    const index = findIdx(this.todos, (t) => t.id === id)
     this.todos[index] = updated
 
     this.saveTodos()
   }
 
   updateTodoPriority(id: string, priority: Priority) {
-    const todo = this.todos.find((t) => t.id === id)
+    const todo = find(this.todos, (t) => t.id === id)
     if (!todo) return
 
     const item = new Item(todo.raw)
     item.setPriority(priority)
 
     const updated = parseTodoItem(item.toString(), id)
-    const index = this.todos.findIndex((t) => t.id === id)
+    const index = findIdx(this.todos, (t) => t.id === id)
     this.todos[index] = updated
 
     this.saveTodos()
   }
 
   clearCompleted() {
-    this.todos = this.todos.filter((t) => !t.completed)
+    this.todos = filter(this.todos, (t) => !t.completed)
     this.saveTodos()
   }
 
@@ -314,43 +321,41 @@ class Store extends BaseStore {
 
     if (this.currentFilter === 'today') {
       const today = new Date().toISOString().split('T')[0]
-      filtered = filtered.filter((t) => t.dueDate === today)
+      filtered = filter(filtered, (t) => t.dueDate === today)
     } else if (this.currentFilter === 'important') {
-      filtered = filtered.filter((t) => t.priority === 'A')
+      filtered = filter(filtered, (t) => t.priority === 'A')
     } else if (this.currentFilter === 'completed') {
-      filtered = filtered.filter((t) => t.completed)
+      filtered = filter(filtered, (t) => t.completed)
     }
 
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase()
-      filtered = filtered.filter((t) => t.text.toLowerCase().includes(query))
+    if (!isStrBlank(this.searchQuery)) {
+      const query = lowerCase(this.searchQuery)
+      filtered = filter(filtered, (t) => lowerCase(t.text).includes(query))
     }
 
     if (!this.showCompleted && this.currentFilter !== 'completed') {
-      filtered = filtered.filter((t) => !t.completed)
+      filtered = filter(filtered, (t) => !t.completed)
     }
 
-    return filtered.sort((a, b) => {
-      if (a.completed !== b.completed) return a.completed ? 1 : -1
-
+    return sortBy(filtered, (todo) => {
       const priorityOrder: Record<string, number> = { A: 0, B: 1, C: 2 }
-      const aPri = a.priority ? priorityOrder[a.priority] : 3
-      const bPri = b.priority ? priorityOrder[b.priority] : 3
-
-      if (aPri !== bPri) return aPri - bPri
-
-      return this.todos.indexOf(a) - this.todos.indexOf(b)
+      const priority = todo.priority ? priorityOrder[todo.priority] : 3
+      return `${todo.completed ? 1 : 0}-${priority}-${String(
+        this.todos.indexOf(todo)
+      ).padStart(6, '0')}`
     })
   }
 
   get stats() {
     const total = this.todos.length
-    const completed = this.todos.filter((t) => t.completed).length
+    const completed = filter(this.todos, (t) => t.completed).length
     const today = new Date().toISOString().split('T')[0]
-    const todayCount = this.todos.filter(
+    const todayCount = filter(
+      this.todos,
       (t) => t.dueDate === today && !t.completed
     ).length
-    const important = this.todos.filter(
+    const important = filter(
+      this.todos,
       (t) => t.priority === 'A' && !t.completed
     ).length
 

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Save, Moon, Sun, Copy, Check } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import className from 'licia/className'
+import find from 'licia/find'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -89,7 +90,7 @@ export default observer(function ToolbarComponent() {
       <Select
         value={store.selectedLanguage.name}
         onChange={(value) => {
-          const lang = Object.values(LANGUAGES).find((l) => l.name === value)
+          const lang = find(Object.values(LANGUAGES), (l) => l.name === value)
           if (lang) store.setLanguage(lang)
         }}
         options={languageOptions}
@@ -100,7 +101,7 @@ export default observer(function ToolbarComponent() {
       <Select
         value={store.selectedTheme.id}
         onChange={(value) => {
-          const theme = Object.values(THEMES).find((t) => t.id === value)
+          const theme = find(Object.values(THEMES), (t) => t.id === value)
           if (theme) store.setTheme(theme)
         }}
         options={themeOptions}

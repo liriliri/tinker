@@ -13,6 +13,7 @@ import {
 } from './lib/themes'
 import isStrBlank from 'licia/isStrBlank'
 import isUndef from 'licia/isUndef'
+import findKey from 'licia/findKey'
 
 const storage = new LocalStore('tinker-code-image')
 const STORAGE_KEY_LANGUAGE = 'language'
@@ -101,9 +102,7 @@ class Store extends BaseStore {
 
   setLanguage(language: Language) {
     this.selectedLanguage = language
-    const langKey = Object.keys(LANGUAGES).find(
-      (key) => LANGUAGES[key] === language
-    )
+    const langKey = findKey(LANGUAGES, (value) => value === language)
     if (langKey) {
       storage.set(STORAGE_KEY_LANGUAGE, langKey)
     }

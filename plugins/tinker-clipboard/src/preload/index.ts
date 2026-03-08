@@ -1,5 +1,7 @@
 import { contextBridge, clipboard, nativeImage } from 'electron'
+import isStrBlank from 'licia/isStrBlank'
 import md5 from 'licia/md5'
+import splitPath from 'licia/splitPath'
 import { ClipboardItem } from '../common/types'
 
 let monitoringInterval: NodeJS.Timeout | null = null
@@ -16,10 +18,7 @@ async function getClipboardItem(): Promise<ClipboardItem | null> {
     const filePaths = await tinker.getClipboardFilePaths()
     if (filePaths && filePaths.length > 0) {
       const data = JSON.stringify(filePaths)
-      const fileNames = filePaths.map((path) => {
-        const parts = path.split(/[/\\]/)
-        return parts[parts.length - 1]
-      })
+      const fileNames = filePaths.map((path) => splitPath(path).name)
 
       return {
         id: md5(data),
@@ -43,7 +42,7 @@ async function getClipboardItem(): Promise<ClipboardItem | null> {
     }
 
     const text = clipboard.readText()
-    if (text && text.trim()) {
+    if (!isStrBlank(text)) {
       return {
         id: md5(text),
         type: 'text',

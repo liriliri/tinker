@@ -1,6 +1,8 @@
 import { contextBridge } from 'electron'
 import * as fs from 'fs'
+import filter from 'licia/filter'
 import isWindows from 'licia/isWindows'
+import trim from 'licia/trim'
 import type { HostsConfig } from '../common/types'
 
 const HOSTS_PATH = isWindows
@@ -39,7 +41,7 @@ const hostsObj = {
     const CONTENT_END = '# --- TINKER-HOSTS_CONTENT_END ---'
 
     try {
-      const activeConfigs = configs.filter((c) => configIds.includes(c.id))
+      const activeConfigs = filter(configs, (c) => configIds.includes(c.id))
       const mergedContent = activeConfigs.map((c) => c.content).join('\n\n')
 
       const currentHosts = await hostsObj.readSystemHosts()
@@ -63,7 +65,7 @@ const hostsObj = {
         afterContent = ''
       }
 
-      if (activeConfigs.length === 0 || mergedContent.trim().length === 0) {
+      if (activeConfigs.length === 0 || trim(mergedContent).length === 0) {
         const finalContent =
           afterContent.length > 0
             ? `${beforeContent}\n\n${afterContent}`

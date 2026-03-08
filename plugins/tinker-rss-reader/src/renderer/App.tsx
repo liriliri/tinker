@@ -4,6 +4,8 @@ import { AlertProvider } from 'share/components/Alert'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider, prompt } from 'share/components/Prompt'
 import { ToasterProvider } from 'share/components/Toaster'
+import isStrBlank from 'licia/isStrBlank'
+import trim from 'licia/trim'
 import { tw } from 'share/theme'
 import toast from 'react-hot-toast'
 import store from './store'
@@ -25,8 +27,8 @@ export default observer(function App() {
       placeholder: 'https://example.com/feed.xml',
     })
     if (!url) return
-    const trimmed = url.trim()
-    if (!trimmed) return
+    const trimmed = trim(url)
+    if (isStrBlank(trimmed)) return
     const loadingToast = toast.loading(t('addingFeed'))
     try {
       await store.addSource(trimmed)

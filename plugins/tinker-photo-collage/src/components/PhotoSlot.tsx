@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Plus } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
+import find from 'licia/find'
 import openFile from 'licia/openFile'
 import store from '../store'
 
@@ -9,9 +10,9 @@ interface PhotoSlotProps {
 }
 
 const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
-  const slot = store.photoSlots.find((s) => s.areaName === areaName)
+  const slot = find(store.photoSlots, (s) => s.areaName === areaName)
   const photo = slot?.photoId
-    ? store.photos.find((p) => p.id === slot.photoId)
+    ? find(store.photos, (p) => p.id === slot.photoId)
     : null
 
   const containerRef = useRef<HTMLDivElement>(null)

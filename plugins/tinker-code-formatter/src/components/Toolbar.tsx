@@ -12,6 +12,7 @@ import CopyButton from 'share/components/CopyButton'
 import { alert } from 'share/components/Alert'
 import { Clipboard, Eraser } from 'lucide-react'
 import Select from 'share/components/Select'
+import isStrBlank from 'licia/isStrBlank'
 import store from '../store'
 import formatter from '../lib/formatter'
 import { LANGUAGES } from '../lib/languages'
@@ -33,7 +34,7 @@ export default observer(function ToolbarComponent() {
   ]
 
   const handleFormat = async () => {
-    if (!store.input.trim()) {
+    if (isStrBlank(store.input)) {
       await alert({ title: t('emptyInput') })
       return
     }
@@ -68,7 +69,7 @@ export default observer(function ToolbarComponent() {
     store.setInput('')
   }
 
-  const isEmpty = !store.input.trim()
+  const isEmpty = isStrBlank(store.input)
 
   return (
     <Toolbar>

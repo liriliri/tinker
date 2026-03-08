@@ -1,5 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import splitPath from 'licia/splitPath'
+import trim from 'licia/trim'
 import truncate from 'licia/truncate'
 import BaseStore from 'share/BaseStore'
 import toast from 'react-hot-toast'
@@ -138,7 +140,7 @@ class Store extends BaseStore {
       const bytes = base64ToUint8Array(this.inputText)
 
       let defaultFileName = 'decoded.bin'
-      const trimmed = this.inputText.trim()
+      const trimmed = trim(this.inputText)
 
       if (isDataUrl(trimmed)) {
         const parsed = dataUrl.parse(trimmed)
@@ -183,7 +185,7 @@ class Store extends BaseStore {
     this._fileBase64Raw = ''
     try {
       const buffer = await tinker.readFile(filePath)
-      const fileName = filePath.split(/[\\/]/).pop() || filePath
+      const fileName = splitPath(filePath).name || filePath
       this.fileName = fileName
 
       const base64Str = await encodeBytesBase64(buffer)

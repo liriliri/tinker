@@ -1,11 +1,13 @@
 import { Item } from 'jstodotxt'
+import find from 'licia/find'
+import trim from 'licia/trim'
 import { type Priority, type TodoItem } from '../types'
 
 export function parseTodoItem(raw: string, id?: string): TodoItem {
   const item = new Item(raw)
 
   let text = item.body() || ''
-  text = text.replace(/\s+due:\S+/g, '').trim()
+  text = trim(text.replace(/\s+due:\S+/g, ''))
 
   const createdDate = item.created()
   const completedDate = item.completed()
@@ -32,7 +34,7 @@ interface Extension {
 function extractDueDate(item: Item): string | null {
   const extensions = item.extensions() as Extension[] | null
   if (!extensions) return null
-  const dueExt = extensions.find((ext) => ext.key === 'due')
+  const dueExt = find(extensions, (ext) => ext.key === 'due')
   return dueExt ? dueExt.value : null
 }
 

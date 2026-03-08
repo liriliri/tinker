@@ -1,5 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import isStrBlank from 'licia/isStrBlank'
+import lowerCase from 'licia/lowerCase'
+import sortBy from 'licia/sortBy'
 import BaseStore from 'share/BaseStore'
 import * as db from './lib/db'
 import { ClipboardItem, ClipboardType } from '../common/types'
@@ -37,11 +40,11 @@ class Store extends BaseStore {
       result = result.filter((item) => item.type === this.filterTab)
     }
 
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase()
+    if (!isStrBlank(this.searchQuery)) {
+      const query = lowerCase(this.searchQuery)
       result = result.filter((item) => {
         const preview = item.preview || item.data
-        return preview.toLowerCase().includes(query)
+        return lowerCase(preview).includes(query)
       })
     }
 
@@ -116,7 +119,7 @@ class Store extends BaseStore {
 
       const items = await db.getAllItems()
       if (items.length > 0) {
-        this.items = items.sort((a, b) => b.timestamp - a.timestamp)
+        this.items = sortBy(items, (item) => -item.timestamp)
       }
       this.isLoaded = true
     } catch (error) {

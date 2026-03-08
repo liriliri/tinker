@@ -1,10 +1,13 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import { confirm } from 'share/components/Confirm'
+import find from 'licia/find'
+import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import i18n from './i18n'
 import isMac from 'licia/isMac'
 import isWindows from 'licia/isWindows'
+import lowerCase from 'licia/lowerCase'
 import defaultIcon from './assets/default-icon.png'
 import defaultWinIcon from './assets/default-win-icon.png'
 import toast from 'react-hot-toast'
@@ -153,14 +156,14 @@ class Store extends BaseStore {
       filtered = filtered.filter((proc) => proc.ports)
     }
 
-    if (this.searchKeyword) {
-      const keyword = this.searchKeyword.toLowerCase()
+    if (!isStrBlank(this.searchKeyword)) {
+      const keyword = lowerCase(this.searchKeyword)
       filtered = filtered.filter(
         (proc) =>
-          proc.name.toLowerCase().includes(keyword) ||
+          lowerCase(proc.name).includes(keyword) ||
           proc.pid.toString().includes(keyword) ||
-          proc.user?.toLowerCase().includes(keyword) ||
-          proc.ports?.toLowerCase().includes(keyword)
+          lowerCase(proc.user || '').includes(keyword) ||
+          lowerCase(proc.ports || '').includes(keyword)
       )
     }
 
@@ -169,8 +172,8 @@ class Store extends BaseStore {
       let bVal: string | number | undefined = b[this.sortField]
 
       if (typeof aVal === 'string' && typeof bVal === 'string') {
-        aVal = aVal.toLowerCase()
-        bVal = bVal.toLowerCase()
+        aVal = lowerCase(aVal)
+        bVal = lowerCase(bVal)
       }
 
       if (this.sortOrder === 'asc') {
@@ -205,7 +208,7 @@ class Store extends BaseStore {
   }
 
   async loadProcessIcon(pid: number) {
-    const process = this.processes.find((p) => p.pid === pid)
+    const process = find(this.processes, (p) => p.pid === pid)
     if (!process) {
       return
     }
@@ -245,7 +248,7 @@ class Store extends BaseStore {
       }
       this.iconCache.set(cacheKey, icon)
 
-      const currentProcess = this.processes.find((p) => p.pid === pid)
+      const currentProcess = find(this.processes, (p) => p.pid === pid)
       if (currentProcess) {
         currentProcess.icon = icon
       }

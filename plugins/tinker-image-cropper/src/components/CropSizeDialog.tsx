@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
+import isStrBlank from 'licia/isStrBlank'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 
@@ -58,8 +59,8 @@ export default function CropSizeDialog({
   }
 
   const isValid =
-    width.trim() !== '' &&
-    height.trim() !== '' &&
+    !isStrBlank(width) &&
+    !isStrBlank(height) &&
     !isNaN(parseInt(width, 10)) &&
     !isNaN(parseInt(height, 10)) &&
     parseInt(width, 10) > 0 &&

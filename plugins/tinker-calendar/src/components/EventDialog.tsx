@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import isStrBlank from 'licia/isStrBlank'
+import trim from 'licia/trim'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
 import TextInput from 'share/components/TextInput'
@@ -66,10 +68,10 @@ const EventDialog = observer(
     ])
 
     const handleSave = () => {
-      if (!title.trim()) return
+      if (isStrBlank(title)) return
 
       onSave({
-        title: title.trim(),
+        title: trim(title),
         startDate,
         endDate,
         startTime,
@@ -148,7 +150,7 @@ const EventDialog = observer(
           <DialogButton variant="text" onClick={onClose}>
             {t('cancel')}
           </DialogButton>
-          <DialogButton onClick={handleSave} disabled={!title.trim()}>
+          <DialogButton onClick={handleSave} disabled={isStrBlank(title)}>
             {t('save')}
           </DialogButton>
         </div>

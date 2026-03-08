@@ -1,4 +1,5 @@
 import calendar from 'js-calendar-converter'
+import filter from 'licia/filter'
 
 export type Holiday = {
   id: string
@@ -192,8 +193,8 @@ export function getHolidaysForYearRange(
   // Filter holidays based on locale
   const allHolidays = [...HOLIDAYS, ...CHINESE_SOLAR_HOLIDAYS]
   const holidaysToProcess = locale
-    ? allHolidays.filter((h) => !h.locale || h.locale === locale)
-    : allHolidays.filter((h) => !h.locale)
+    ? filter(allHolidays, (h) => !h.locale || h.locale === locale)
+    : filter(allHolidays, (h) => !h.locale)
 
   for (let year = startYear; year <= endYear; year++) {
     // Process solar calendar holidays

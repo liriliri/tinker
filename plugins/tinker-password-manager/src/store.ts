@@ -1,5 +1,8 @@
 import { makeAutoObservable, reaction } from 'mobx'
+import find from 'licia/find'
 import LocalStore from 'licia/LocalStore'
+import lowerCase from 'licia/lowerCase'
+import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 import * as kdbxweb from 'kdbxweb'
 import i18n from './i18n'
@@ -121,7 +124,7 @@ class Store extends BaseStore {
 
       this.db = await kdbxweb.Kdbx.load(buffer, credentials)
       this.dbPath = path
-      this.dbName = path.split('/').pop() || 'Database'
+      this.dbName = splitPath(path).name || 'Database'
       this.isLocked = false
       this.isModified = false
       this.addRecentFile(path)
@@ -164,7 +167,7 @@ class Store extends BaseStore {
         if (result && !result.canceled && result.filePath) {
           await tinker.writeFile(result.filePath, new Uint8Array(data))
           this.dbPath = result.filePath
-          this.dbName = result.filePath.split('/').pop() || 'Database'
+          this.dbName = splitPath(result.filePath).name || 'Database'
           this.isModified = false
           this.addRecentFile(result.filePath)
         }
@@ -194,7 +197,7 @@ class Store extends BaseStore {
         const data = await this.db.save()
         await tinker.writeFile(result.filePath, new Uint8Array(data))
         this.dbPath = result.filePath
-        this.dbName = result.filePath.split('/').pop() || 'Database'
+        this.dbName = splitPath(result.filePath).name || 'Database'
         this.isModified = false
         this.addRecentFile(result.filePath)
       }
@@ -273,7 +276,7 @@ class Store extends BaseStore {
 
   private updateFilteredEntries() {
     if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase()
+      const query = lowerCase(this.searchQuery)
       const allEntries: KdbxEntry[] = []
 
       this.groups.forEach((group) => {
@@ -282,10 +285,10 @@ class Store extends BaseStore {
 
       this.filteredEntries = allEntries.filter(
         (entry) =>
-          entry.title.toLowerCase().includes(query) ||
-          entry.username.toLowerCase().includes(query) ||
-          entry.url.toLowerCase().includes(query) ||
-          entry.notes.toLowerCase().includes(query)
+          lowerCase(entry.title).includes(query) ||
+          lowerCase(entry.username).includes(query) ||
+          lowerCase(entry.url).includes(query) ||
+          lowerCase(entry.notes).includes(query)
       )
       return
     }
@@ -295,7 +298,7 @@ class Store extends BaseStore {
       return
     }
 
-    const group = this.groups.find((g) => g.uuid === this.selectedGroupId)
+    const group = find(this.groups, (g) => g.uuid === this.selectedGroupId)
     this.filteredEntries = group ? group.entries : []
   }
 
@@ -390,7 +393,8 @@ class Store extends BaseStore {
   get selectedEntry(): KdbxEntry | null {
     if (!this.selectedEntryId) return null
     return (
-      this.filteredEntries.find(
+      find(
+        this.filteredEntries,
         (entry) => entry.uuid === this.selectedEntryId
       ) || null
     )
@@ -399,7 +403,7 @@ class Store extends BaseStore {
   get selectedGroup(): KdbxGroup | null {
     if (!this.selectedGroupId) return null
     return (
-      this.groups.find((group) => group.uuid === this.selectedGroupId) || null
+      find(this.groups, (group) => group.uuid === this.selectedGroupId) || null
     )
   }
 }

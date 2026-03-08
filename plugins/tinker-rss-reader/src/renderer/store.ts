@@ -1,5 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import find from 'licia/find'
+import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
+import lowerCase from 'licia/lowerCase'
+import sortBy from 'licia/sortBy'
 import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import type { RSSSource, RSSItem } from '../common/types'
@@ -40,19 +44,19 @@ class Store extends BaseStore {
       : this.items.slice()
     if (this.filter === 'unread')
       result = result.filter((item) => !item.hasRead)
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase()
+    if (!isStrBlank(this.searchQuery)) {
+      const q = lowerCase(this.searchQuery)
       result = result.filter(
         (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.snippet.toLowerCase().includes(q)
+          lowerCase(item.title).includes(q) ||
+          lowerCase(item.snippet).includes(q)
       )
     }
-    return result.slice().sort((a, b) => b.date - a.date)
+    return sortBy(result, (item) => -item.date)
   }
 
   get selectedItem(): RSSItem | null {
-    return this.items.find((i) => i.id === this.selectedItemId) || null
+    return find(this.items, (i) => i.id === this.selectedItemId) || null
   }
 
   get totalUnread(): number {
@@ -78,10 +82,10 @@ class Store extends BaseStore {
     this.selectedItemId = id
     this.fullContent = null
     this.fullContentLoading = false
-    const item = this.items.find((i) => i.id === id)
+    const item = find(this.items, (i) => i.id === id)
     if (item && !item.hasRead) {
       item.hasRead = true
-      const source = this.sources.find((s) => s.id === item.sourceId)
+      const source = find(this.sources, (s) => s.id === item.sourceId)
       if (source) source.unreadCount = Math.max(0, source.unreadCount - 1)
       storage.set('sources', this.sources)
       putItem(item)
@@ -123,10 +127,10 @@ class Store extends BaseStore {
   }
 
   toggleRead(id: string) {
-    const item = this.items.find((i) => i.id === id)
+    const item = find(this.items, (i) => i.id === id)
     if (!item) return
     item.hasRead = !item.hasRead
-    const source = this.sources.find((s) => s.id === item.sourceId)
+    const source = find(this.sources, (s) => s.id === item.sourceId)
     if (source) {
       source.unreadCount = this.items.filter(
         (i) => i.sourceId === source.id && !i.hasRead
@@ -194,7 +198,7 @@ class Store extends BaseStore {
   }
 
   async refreshSource(id: string): Promise<void> {
-    const source = this.sources.find((s) => s.id === id)
+    const source = find(this.sources, (s) => s.id === id)
     if (!source || this.refreshing[id]) return
     runInAction(() => {
       this.refreshing[id] = true

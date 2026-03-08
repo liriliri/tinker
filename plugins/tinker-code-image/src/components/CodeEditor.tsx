@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import className from 'licia/className'
+import lowerCase from 'licia/lowerCase'
 import store, { shikiTheme } from '../store'
 
 export default observer(function CodeEditor() {
@@ -12,18 +13,15 @@ export default observer(function CodeEditor() {
       if (!store.highlighter) return ''
 
       const loadedLanguages = store.highlighter.getLoadedLanguages() || []
-      const hasLoadedLanguage = loadedLanguages.includes(
-        store.selectedLanguage.name.toLowerCase()
-      )
+      const languageName = lowerCase(store.selectedLanguage.name)
+      const hasLoadedLanguage = loadedLanguages.includes(languageName)
 
       if (!hasLoadedLanguage && store.selectedLanguage.src) {
         await store.highlighter.loadLanguage(store.selectedLanguage.src)
       }
 
-      const lang = store.selectedLanguage.name.toLowerCase()
-
       return store.highlighter.codeToHtml(store.code, {
-        lang: lang,
+        lang: languageName,
         theme: shikiTheme,
         transformers: [
           {

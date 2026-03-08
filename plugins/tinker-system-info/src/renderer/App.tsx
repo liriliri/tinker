@@ -6,6 +6,7 @@ import { ToasterProvider } from 'share/components/Toaster'
 import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import fileSize from 'licia/fileSize'
+import filter from 'licia/filter'
 import lowerCase from 'licia/lowerCase'
 import store from './store'
 import InfoSection from './components/InfoSection'
@@ -14,6 +15,10 @@ import { formatSpeed } from './lib/format'
 
 export default observer(function App() {
   const { t } = useTranslation()
+  const externalNetworkInterfaces = filter(
+    store.systemInfo?.networkInterfaces || [],
+    (ni) => !ni.internal
+  )
 
   if (store.isLoading || !store.systemInfo) {
     return (
@@ -29,16 +34,8 @@ export default observer(function App() {
     )
   }
 
-  const {
-    system,
-    cpu,
-    mem,
-    graphics,
-    osInfo,
-    diskLayout,
-    audio,
-    networkInterfaces,
-  } = store.systemInfo
+  const { system, cpu, mem, graphics, osInfo, diskLayout, audio } =
+    store.systemInfo
 
   return (
     <ToasterProvider>
@@ -184,28 +181,25 @@ export default observer(function App() {
               </InfoSection>
             )}
 
-            {networkInterfaces &&
-              networkInterfaces.filter((ni) => !ni.internal).length > 0 && (
-                <InfoSection title={t('network')}>
-                  {networkInterfaces
-                    .filter((ni) => !ni.internal)
-                    .map((ni, index) => (
-                      <div key={index}>
-                        {ni.iface && ni.ip4 && (
-                          <InfoRow
-                            label={
-                              <div className="flex items-center gap-2">
-                                <Wifi size={14} className={tw.primary.text} />
-                                <span>{ni.iface}</span>
-                              </div>
-                            }
-                            value={ni.ip4}
-                          />
-                        )}
-                      </div>
-                    ))}
-                </InfoSection>
-              )}
+            {externalNetworkInterfaces.length > 0 && (
+              <InfoSection title={t('network')}>
+                {externalNetworkInterfaces.map((ni, index) => (
+                  <div key={index}>
+                    {ni.iface && ni.ip4 && (
+                      <InfoRow
+                        label={
+                          <div className="flex items-center gap-2">
+                            <Wifi size={14} className={tw.primary.text} />
+                            <span>{ni.iface}</span>
+                          </div>
+                        }
+                        value={ni.ip4}
+                      />
+                    )}
+                  </div>
+                ))}
+              </InfoSection>
+            )}
           </div>
         </div>
       </AlertProvider>

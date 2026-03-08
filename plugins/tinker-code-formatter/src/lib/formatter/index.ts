@@ -1,4 +1,5 @@
 import { Config, Languages, Format } from './types'
+import sortBy from 'licia/sortBy'
 
 const languages: { [k in Languages]: Config<k> } = {
   javascript: {
@@ -33,7 +34,7 @@ const languages: { [k in Languages]: Config<k> } = {
   },
 }
 
-const allLanguageType = Object.keys(languages).sort() as Languages[]
+const allLanguageType = sortBy(Object.keys(languages)) as Languages[]
 
 const load = async <T extends Languages>(name: T): Promise<Format<T>> => {
   const handle = await languages[name].load()

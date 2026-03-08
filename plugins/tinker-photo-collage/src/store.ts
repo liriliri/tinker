@@ -1,4 +1,6 @@
 import { makeAutoObservable } from 'mobx'
+import filter from 'licia/filter'
+import find from 'licia/find'
 import LocalStore from 'licia/LocalStore'
 import shuffle from 'licia/shuffle'
 import BaseStore from 'share/BaseStore'
@@ -121,7 +123,7 @@ class Store extends BaseStore {
   }
 
   removePhoto(id: string) {
-    const photo = this.photos.find((p) => p.id === id)
+    const photo = find(this.photos, (p) => p.id === id)
     if (photo) {
       URL.revokeObjectURL(photo.url)
     }
@@ -135,7 +137,7 @@ class Store extends BaseStore {
   }
 
   setPhotoToSlot(areaName: string, photoId: string | null) {
-    const slot = this.photoSlots.find((s) => s.areaName === areaName)
+    const slot = find(this.photoSlots, (s) => s.areaName === areaName)
     if (slot) {
       slot.photoId = photoId
     }
@@ -233,14 +235,14 @@ class Store extends BaseStore {
   }
 
   setPhotoScale(areaName: string, scale: number) {
-    const slot = this.photoSlots.find((s) => s.areaName === areaName)
+    const slot = find(this.photoSlots, (s) => s.areaName === areaName)
     if (slot) {
       slot.scale = scale
     }
   }
 
   setPhotoOffset(areaName: string, offsetX: number, offsetY: number) {
-    const slot = this.photoSlots.find((s) => s.areaName === areaName)
+    const slot = find(this.photoSlots, (s) => s.areaName === areaName)
     if (slot) {
       slot.offsetX = offsetX
       slot.offsetY = offsetY
@@ -287,7 +289,7 @@ class Store extends BaseStore {
   }
 
   autoFillSlots(photoIds: string[]) {
-    const emptySlots = this.photoSlots.filter((slot) => slot.photoId === null)
+    const emptySlots = filter(this.photoSlots, (slot) => slot.photoId === null)
     photoIds.forEach((photoId, index) => {
       if (index < emptySlots.length) {
         emptySlots[index].photoId = photoId

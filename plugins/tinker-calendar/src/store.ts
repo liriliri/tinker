@@ -1,5 +1,9 @@
 import { makeAutoObservable } from 'mobx'
+import filter from 'licia/filter'
+import find from 'licia/find'
 import LocalStore from 'licia/LocalStore'
+import sortBy from 'licia/sortBy'
+import trim from 'licia/trim'
 import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import { getHolidaysForYearRange } from './lib/holidays'
@@ -104,7 +108,7 @@ class Store extends BaseStore {
     const endDateKey = endDate ? this.normalizeDateKey(endDate) : startDateKey
     const newEvent: CalendarEvent = {
       id: uuid(),
-      title: title.trim(),
+      title: trim(title),
       start: isAllDay
         ? `${startDateKey}T00:00`
         : `${startDateKey}T${startTime}`,
@@ -131,7 +135,7 @@ class Store extends BaseStore {
     endTime = '10:00',
     endDate?: string
   ) {
-    const trimmed = title.trim()
+    const trimmed = trim(title)
     if (!trimmed) return
 
     const startDateKey = startDate
@@ -156,7 +160,7 @@ class Store extends BaseStore {
         allDay: isAllDay,
       }
     })
-    const updatedEvent = this.events.find((e) => e.id === id)
+    const updatedEvent = find(this.events, (e) => e.id === id)
     if (updatedEvent) {
       db.updateEvent(updatedEvent)
     }
@@ -177,14 +181,14 @@ class Store extends BaseStore {
         end: endTime ? `${dateKey}T${endTime}` : undefined,
       }
     })
-    const updatedEvent = this.events.find((e) => e.id === id)
+    const updatedEvent = find(this.events, (e) => e.id === id)
     if (updatedEvent) {
       db.updateEvent(updatedEvent)
     }
   }
 
   removeEvent(id: string) {
-    this.events = this.events.filter((event) => event.id !== id)
+    this.events = filter(this.events, (event) => event.id !== id)
     db.removeEvent(id)
   }
 
@@ -195,10 +199,12 @@ class Store extends BaseStore {
 
   clearEventsForDate(date: string | Date) {
     const dateKey = this.normalizeDateKey(date)
-    const toRemove = this.events.filter(
+    const toRemove = filter(
+      this.events,
       (event) => event.start.slice(0, 10) === dateKey
     )
-    this.events = this.events.filter(
+    this.events = filter(
+      this.events,
       (event) => event.start.slice(0, 10) !== dateKey
     )
     toRemove.forEach((event) => db.removeEvent(event.id))
@@ -239,8 +245,8 @@ class Store extends BaseStore {
   }
 
   get eventsForSelectedDate() {
-    return this.events
-      .filter((event) => {
+    return sortBy(
+      filter(this.events, (event) => {
         const startDate = event.start.slice(0, 10)
         const endDate = event.end?.slice(0, 10)
 
@@ -249,21 +255,18 @@ class Store extends BaseStore {
         }
 
         return this.selectedDate >= startDate && this.selectedDate <= endDate
-      })
-      .sort((a, b) => {
-        if (a.allDay && !b.allDay) return 1
-        if (!a.allDay && b.allDay) return -1
-        if (!a.allDay && !b.allDay) {
-          const aTime = this.extractTime(a.start)
-          const bTime = this.extractTime(b.start)
-          return aTime.localeCompare(bTime)
+      }),
+      (event) => {
+        if (!event.allDay) {
+          return `0-${this.extractTime(event.start)}-${event.title}`
         }
-        return a.title.localeCompare(b.title)
-      })
+        return `1-99:99-${event.title}`
+      }
+    )
   }
 
   getEventById(id: string) {
-    return this.events.find((event) => event.id === id)
+    return find(this.events, (event) => event.id === id)
   }
 
   get hasEvents() {
