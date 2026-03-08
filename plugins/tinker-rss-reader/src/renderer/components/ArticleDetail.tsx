@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ExternalLink, X } from 'lucide-react'
+import { ExternalLink, FileText, Loader2, X } from 'lucide-react'
 import escape from 'licia/escape'
 import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
@@ -178,7 +178,6 @@ export default observer(function ArticleDetail() {
 
   const source = store.sources.find((s) => s.id === item.sourceId)
   const isDark = store.isDark
-
   const bodyText = isDark
     ? THEME_COLORS.text.dark.primary
     : THEME_COLORS.text.light.primary
@@ -204,6 +203,8 @@ export default observer(function ArticleDetail() {
     ? THEME_COLORS.bg.dark.primary
     : THEME_COLORS.bg.light.primary
 
+  const displayContent = store.fullContent ?? item.content
+
   const iframeContent = buildIframeContent(
     item.title,
     item.thumb,
@@ -215,7 +216,7 @@ export default observer(function ArticleDetail() {
     borderColor,
     headingText,
     bgPrimary,
-    item.content
+    displayContent
   )
 
   return (
@@ -243,6 +244,26 @@ export default observer(function ArticleDetail() {
             <div className="flex shrink-0 items-center gap-1">
               {item.link && (
                 <button
+                  className={`p-1.5 rounded-md ${tw.hover} ${
+                    store.fullContent ? tw.text.primary : tw.text.secondary
+                  } ${
+                    store.fullContentLoading
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
+                  title={t('loadFullContent')}
+                  disabled={store.fullContentLoading}
+                  onClick={() => store.loadFullContent()}
+                >
+                  {store.fullContentLoading ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <FileText size={15} />
+                  )}
+                </button>
+              )}
+              {item.link && (
+                <button
                   className={`p-1.5 rounded-md ${tw.hover} ${tw.text.secondary}`}
                   title={t('openInBrowser')}
                   onClick={() => rssReader.openExternal(item.link)}
@@ -260,7 +281,13 @@ export default observer(function ArticleDetail() {
           </div>
         </div>
 
-        {item.content ? (
+        {store.fullContentLoading ? (
+          <div
+            className={`flex-1 flex items-center justify-center text-sm ${tw.text.tertiary}`}
+          >
+            {t('loadingFullContent')}
+          </div>
+        ) : displayContent ? (
           <iframe
             srcDoc={iframeContent}
             sandbox="allow-same-origin"

@@ -18,6 +18,8 @@ class Store extends BaseStore {
   refreshing: Record<string, boolean> = {}
   sidebarOpen: boolean = true
   viewMode: ViewMode = 'list'
+  fullContent: string | null = null
+  fullContentLoading: boolean = false
 
   constructor() {
     super()
@@ -74,6 +76,8 @@ class Store extends BaseStore {
 
   setSelectedItem(id: string) {
     this.selectedItemId = id
+    this.fullContent = null
+    this.fullContentLoading = false
     const item = this.items.find((i) => i.id === id)
     if (item && !item.hasRead) {
       item.hasRead = true
@@ -86,6 +90,26 @@ class Store extends BaseStore {
 
   closeArticle() {
     this.selectedItemId = null
+    this.fullContent = null
+    this.fullContentLoading = false
+  }
+
+  async loadFullContent(): Promise<void> {
+    const item = this.selectedItem
+    if (!item?.link || this.fullContentLoading) return
+    this.fullContentLoading = true
+    this.fullContent = null
+    try {
+      const result = await rssReader.fetchFullContent(item.link)
+      runInAction(() => {
+        this.fullContent = result.error ? null : result.content ?? null
+        this.fullContentLoading = false
+      })
+    } catch {
+      runInAction(() => {
+        this.fullContentLoading = false
+      })
+    }
   }
 
   setFilter(filter: Filter) {

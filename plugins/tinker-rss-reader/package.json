@@ -22,6 +22,8 @@
     }
   },
   "devDependencies": {
+    "@postlight/parser": "^2.2.3",
+    "got": "^11.8.6",
     "rss-parser": "^3.13.0"
   }
 }

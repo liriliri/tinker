@@ -20,6 +20,8 @@
 
   "openInBrowser": "Open in Browser",
   "noContent": "No content available",
+  "loadFullContent": "Load Full Content",
+  "loadingFullContent": "Loading full content...",
 
   "listView": "List View",
   "cardView": "Card View"

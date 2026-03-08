@@ -1,4 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
+import { toJS } from 'mobx'
 import type { RSSItem } from '../../common/types'
 
 interface RSSReaderDB extends DBSchema {
@@ -38,14 +39,14 @@ export async function addItems(items: RSSItem[]): Promise<void> {
   const db = await getDB()
   const tx = db.transaction(STORE_NAME, 'readwrite')
   for (const item of items) {
-    await tx.store.put(item)
+    await tx.store.put(toJS(item))
   }
   await tx.done
 }
 
 export async function putItem(item: RSSItem): Promise<void> {
   const db = await getDB()
-  await db.put(STORE_NAME, item)
+  await db.put(STORE_NAME, toJS(item))
 }
 
 export async function deleteItemsBySource(sourceId: string): Promise<void> {
