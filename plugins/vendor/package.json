@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
@@ -9,7 +9,8 @@
     "build:monaco": "vite build --config vite.config.ts --mode monaco",
     "build:aggrid": "vite build --config vite.config.ts --mode aggrid",
     "build:lucide": "vite build --config vite.config.ts --mode lucide",
-    "build:htmltoimage": "vite build --config vite.config.ts --mode htmltoimage"
+    "build:htmltoimage": "vite build --config vite.config.ts --mode htmltoimage",
+    "build:wavesurfer": "vite build --config vite.config.ts --mode wavesurfer"
   },
   "dependencies": {
     "got": "^11.8.6",
@@ -23,6 +24,7 @@
     "idb": "^8.0.3",
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
-    "monaco-editor": "^0.55.1"
+    "monaco-editor": "^0.55.1",
+    "wavesurfer.js": "^7.12.1"
   }
 }

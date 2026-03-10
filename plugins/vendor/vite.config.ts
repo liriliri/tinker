@@ -23,6 +23,7 @@ const globals = {
   'ag-grid-react': 'AgGridReact',
   'lucide-react': 'lucideReact',
   'html-to-image': 'htmlToImage',
+  'wavesurfer.js': 'wavesurfer',
 }
 
 export const shareExternal = ['systeminformation']
@@ -156,6 +157,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'htmltoimage') {
     return createConfig('htmltoimage', 'PluginVendorHtmlToImage')
+  }
+
+  if (target === 'wavesurfer') {
+    return createConfig('wavesurfer', 'PluginVendorWavesurfer')
   }
 
   return createConfig('react', 'PluginVendorReact')

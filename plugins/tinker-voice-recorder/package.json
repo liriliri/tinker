@@ -16,7 +16,5 @@
       }
     }
   },
-  "devDependencies": {
-    "wavesurfer.js": "^7.12.1"
-  }
+  "devDependencies": {}
 }

@@ -24,8 +24,14 @@ The vendor entry file name and build mode/script name are derived from `global-c
 
 ### 2. Create vendor entry file
 
+First check how the plugin imports the package:
+
+- **Named exports** (`import { foo } from '...'` or `import * as foo from '...'`): use `import *`
+- **Default export** (`import Foo from '...'`): use default import
+
 Create `vendor/<lowerName>.ts`:
 
+**Named exports:**
 ```ts
 import * as <global-camel-name> from '<package-name>'
 
@@ -34,6 +40,17 @@ const g = globalThis as Record<string, unknown>
 g.<global-camel-name> = <global-camel-name>
 
 export { <global-camel-name> }
+```
+
+**Default export:**
+```ts
+import <global-camel-name> from '<package-name>'
+
+const g = globalThis as Record<string, unknown>
+
+g.<global-camel-name> = <global-camel-name>
+
+export default <global-camel-name>
 ```
 
 ### 3. Update `vendor/vite.config.ts`
