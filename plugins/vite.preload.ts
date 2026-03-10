@@ -1,10 +1,10 @@
 import { defineConfig, UserConfig } from 'vite'
-import { resolve } from 'path'
 import { builtinModules } from 'node:module'
 import path from 'path'
+import { shareExternal } from './vendor/vite.config'
 
-const builtins = builtinModules.filter((e) => !e.startsWith('_'))
-builtins.push('electron', ...builtins.map((m) => `node:${m}`))
+const external = builtinModules.filter((e) => !e.startsWith('_'))
+external.push('electron', ...shareExternal, ...external.map((m) => `node:${m}`))
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const cwd = process.cwd()
@@ -23,7 +23,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
         formats: ['cjs'],
       },
       rollupOptions: {
-        external: builtins,
+        external,
       },
     },
   }

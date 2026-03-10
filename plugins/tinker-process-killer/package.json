@@ -20,8 +20,5 @@
         "name": "进程清理"
       }
     }
-  },
-  "devDependencies": {
-    "systeminformation": "^5.30.7"
   }
 }

@@ -20,8 +20,5 @@
         "name": "系统信息"
       }
     }
-  },
-  "devDependencies": {
-    "systeminformation": "^5.30.7"
   }
 }

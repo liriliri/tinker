@@ -10,6 +10,10 @@
     "build:aggrid": "vite build --config vite.config.ts --mode aggrid",
     "build:lucide": "vite build --config vite.config.ts --mode lucide"
   },
+  "dependencies": {
+    "got": "^11.8.6",
+    "systeminformation": "^5.30.7"
+  },
   "devDependencies": {
     "@monaco-editor/react": "^4.7.0",
     "ag-grid-community": "^35.0.0",

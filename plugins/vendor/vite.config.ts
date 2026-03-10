@@ -24,6 +24,8 @@ const globals = {
   'lucide-react': 'lucideReact',
 }
 
+export const shareExternal = ['systeminformation']
+
 export const shareDeps = keys(globals)
 
 const globalsExports: Record<string, string[]> = {

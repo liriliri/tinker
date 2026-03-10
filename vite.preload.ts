@@ -3,8 +3,8 @@ import { resolve } from 'path'
 import { builtinModules } from 'node:module'
 import { alias } from './vite.config'
 
-const builtins = builtinModules.filter((e) => !e.startsWith('_'))
-builtins.push('electron', 'ffmpeg-static', ...builtins.map((m) => `node:${m}`))
+const external = builtinModules.filter((e) => !e.startsWith('_'))
+external.push('electron', 'ffmpeg-static', ...external.map((m) => `node:${m}`))
 
 export default defineConfig({
   build: {
@@ -19,7 +19,7 @@ export default defineConfig({
       formats: ['cjs'],
     },
     rollupOptions: {
-      external: builtins,
+      external,
     },
   },
   resolve: {

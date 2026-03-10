@@ -32,6 +32,14 @@ pkg.scripts = {
 }
 pkg.main = 'main/index.js'
 
+const vendorPkg = await fs.readJson('plugins/vendor/package.json')
+each(vendorPkg.dependencies, (version, name) => {
+  if (pkg.dependencies[name]) {
+    return
+  }
+  pkg.dependencies[name] = version
+})
+
 await $`npm run build:main`
 await $`npm run build:preload`
 await $`npm run build:renderer`

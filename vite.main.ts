@@ -5,14 +5,14 @@ import fs from 'fs-extra'
 import path from 'path'
 import { alias } from './vite.config'
 
-const builtins = builtinModules.filter((e) => !e.startsWith('_'))
-builtins.push(
+const external = builtinModules.filter((e) => !e.startsWith('_'))
+external.push(
   'electron',
   'uiohook-napi',
   'node-mac-permissions',
   'registry-js',
   'file-icon',
-  ...builtins.map((m) => `node:${m}`)
+  ...external.map((m) => `node:${m}`)
 )
 
 export default defineConfig(async (): Promise<UserConfig> => {
@@ -27,7 +27,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
         formats: ['cjs'],
       },
       rollupOptions: {
-        external: builtins,
+        external,
       },
     },
     resolve: {
