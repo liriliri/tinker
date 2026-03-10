@@ -243,6 +243,20 @@ import Tree, { TreeNodeData } from 'share/components/Tree'
 // Tooltip
 <Tooltip visible={show} x={x} y={y} content="Hint" />
 
+// NavList - Vertical navigation list with icon, label, count and active state
+import NavList, { NavListItem } from 'share/components/NavList'
+import { List } from 'lucide-react'
+
+const items: NavListItem[] = [
+  { id: 'all', icon: List, label: t('all'), count: store.total },
+]
+
+<NavList
+  items={items}
+  activeId={store.currentId}
+  onSelect={(id) => store.setCurrentId(id)}
+/>
+
 // Tree - Generic tree view with expand/collapse and highlighting
 interface MyNode extends TreeNodeData {
   customField: string
