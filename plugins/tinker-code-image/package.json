@@ -17,7 +17,6 @@
     }
   },
   "devDependencies": {
-    "html-to-image": "^1.11.13",
     "shiki": "^1.22.0"
   }
 }

@@ -22,6 +22,7 @@ const globals = {
   'ag-grid-community': 'AgGridCommunity',
   'ag-grid-react': 'AgGridReact',
   'lucide-react': 'lucideReact',
+  'html-to-image': 'htmlToImage',
 }
 
 export const shareExternal = ['systeminformation']
@@ -151,6 +152,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'lucide') {
     return createConfig('lucide', 'PluginVendorLucide', ['react'])
+  }
+
+  if (target === 'htmltoimage') {
+    return createConfig('htmltoimage', 'PluginVendorHtmlToImage')
   }
 
   return createConfig('react', 'PluginVendorReact')
