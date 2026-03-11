@@ -194,6 +194,7 @@ function createPluginView() {
     webPreferences: {
       preload: path.join(__dirname, '../preload/plugin.js'),
       partition: PLUGIN_PARTITION,
+      webSecurity: false,
       sandbox: false,
     },
   })

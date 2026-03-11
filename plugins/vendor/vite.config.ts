@@ -24,6 +24,7 @@ const globals = {
   'lucide-react': 'lucideReact',
   'html-to-image': 'htmlToImage',
   'wavesurfer.js': 'wavesurfer',
+  'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
 }
 
 export const shareExternal = ['systeminformation']
