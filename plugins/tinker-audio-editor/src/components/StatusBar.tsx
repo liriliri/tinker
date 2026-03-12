@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import last from 'licia/last'
 import { tw } from 'share/theme'
 import store from '../store'
 import { formatTime } from '../lib/audioUtils'
@@ -18,9 +17,6 @@ export default observer(function StatusBar() {
       <span className="shrink-0">
         {t('cursor')}: {formatTime(store.currentTime)}
       </span>
-      {store.canUndo && (
-        <span className="shrink-0">{last(store.undoStack)?.label}</span>
-      )}
       {store.hasSelection && (
         <span className={`ml-auto shrink-0 ${tw.primary.text}`}>
           {formatTime(store.selectionStart!)} -{' '}

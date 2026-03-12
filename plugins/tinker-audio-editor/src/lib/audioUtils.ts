@@ -50,6 +50,24 @@ export function deleteBuffer(
   return result
 }
 
+export function insertSilenceBuffer(
+  buffer: AudioBuffer,
+  offset: number,
+  duration: number
+): AudioBuffer {
+  const o = secToSample(buffer, offset)
+  const silenceSamples = secToSample(buffer, duration)
+  const result = newBuffer(buffer, buffer.length + silenceSamples)
+  for (let i = 0; i < buffer.numberOfChannels; i++) {
+    const src = buffer.getChannelData(i)
+    const dst = result.getChannelData(i)
+    dst.set(src.subarray(0, o))
+    // silence region is already zero-filled by default
+    dst.set(src.subarray(o), o + silenceSamples)
+  }
+  return result
+}
+
 export function silenceBuffer(
   buffer: AudioBuffer,
   start: number,
@@ -66,12 +84,20 @@ export function silenceBuffer(
   return result
 }
 
-export function gainBuffer(buffer: AudioBuffer, factor: number): AudioBuffer {
+export function gainBuffer(
+  buffer: AudioBuffer,
+  start: number,
+  end: number,
+  factor: number
+): AudioBuffer {
+  const s = secToSample(buffer, start)
+  const e = secToSample(buffer, end)
   const result = newBuffer(buffer, buffer.length)
   for (let i = 0; i < buffer.numberOfChannels; i++) {
     const src = buffer.getChannelData(i)
     const dst = result.getChannelData(i)
-    for (let j = 0; j < src.length; j++) dst[j] = src[j] * factor
+    dst.set(src)
+    for (let j = s; j < e; j++) dst[j] = src[j] * factor
   }
   return result
 }
@@ -79,26 +105,77 @@ export function gainBuffer(buffer: AudioBuffer, factor: number): AudioBuffer {
 export function normalizeBuffer(
   buffer: AudioBuffer,
   start: number,
-  end: number
+  end: number,
+  maxVal = 1.0,
+  equally = true
 ): AudioBuffer {
   const s = secToSample(buffer, start)
   const e = secToSample(buffer, end)
-  let peak = 0
-  for (let i = 0; i < buffer.numberOfChannels; i++) {
-    const data = buffer.getChannelData(i)
-    for (let j = s; j < e; j++) {
-      const abs = Math.abs(data[j])
-      if (abs > peak) peak = abs
+  const result = newBuffer(buffer, buffer.length)
+
+  if (equally) {
+    let peak = 0
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      const data = buffer.getChannelData(i)
+      for (let j = s; j < e; j++) {
+        const abs = Math.abs(data[j])
+        if (abs > peak) peak = abs
+      }
+    }
+    if (peak === 0) return buffer
+    const factor = maxVal / peak
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      const src = buffer.getChannelData(i)
+      const dst = result.getChannelData(i)
+      dst.set(src)
+      for (let j = s; j < e; j++) dst[j] = src[j] * factor
+    }
+  } else {
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      const src = buffer.getChannelData(i)
+      const dst = result.getChannelData(i)
+      dst.set(src)
+      let peak = 0
+      for (let j = s; j < e; j++) {
+        const abs = Math.abs(src[j])
+        if (abs > peak) peak = abs
+      }
+      if (peak === 0) continue
+      const factor = maxVal / peak
+      for (let j = s; j < e; j++) dst[j] = src[j] * factor
     }
   }
-  if (peak === 0) return buffer
-  const factor = 1 / peak
-  const result = newBuffer(buffer, buffer.length)
+
+  return result
+}
+
+export function speedBuffer(
+  buffer: AudioBuffer,
+  start: number,
+  end: number,
+  rate: number
+): AudioBuffer {
+  const s = secToSample(buffer, start)
+  const e = secToSample(buffer, end)
+  const selLen = e - s
+  // New length of the selection after resampling (inverse of rate)
+  const newSelLen = Math.round(selLen / rate)
+  const result = newBuffer(buffer, buffer.length - selLen + newSelLen)
   for (let i = 0; i < buffer.numberOfChannels; i++) {
     const src = buffer.getChannelData(i)
     const dst = result.getChannelData(i)
-    dst.set(src)
-    for (let j = s; j < e; j++) dst[j] = src[j] * factor
+    // Copy pre-selection
+    dst.set(src.subarray(0, s))
+    // Resample selection with linear interpolation
+    for (let j = 0; j < newSelLen; j++) {
+      const srcPos = (j / newSelLen) * selLen
+      const lo = Math.floor(srcPos)
+      const hi = Math.min(lo + 1, selLen - 1)
+      const frac = srcPos - lo
+      dst[s + j] = src[s + lo] * (1 - frac) + src[s + hi] * frac
+    }
+    // Copy post-selection
+    dst.set(src.subarray(e), s + newSelLen)
   }
   return result
 }
@@ -203,16 +280,9 @@ function tmpPath(suffix: string): Promise<string> {
     .then((d) => `${d}/tinker-audio-${Date.now()}${suffix}`)
 }
 
-function runFFmpeg(args: string[]): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const task = tinker.runFFmpeg(args)
-    ;(task as unknown as Promise<void>).then(resolve).catch(reject)
-  })
-}
-
 export async function loadAudioFile(filePath: string): Promise<AudioBuffer> {
   const out = await tmpPath('.wav')
-  await runFFmpeg(['-i', filePath, '-y', out])
+  await tinker.runFFmpeg(['-i', filePath, '-y', out])
   const response = await fetch(`file://${out}`)
   const arrayBuffer = await response.arrayBuffer()
   return getAudioCtx().decodeAudioData(arrayBuffer)
@@ -225,7 +295,7 @@ export async function exportAudio(
   const wav = encodeWav(buffer)
   const tmp = await tmpPath('.wav')
   await tinker.writeFile(tmp, new Uint8Array(wav))
-  await runFFmpeg(['-i', tmp, '-y', outputPath])
+  await tinker.runFFmpeg(['-i', tmp, '-y', outputPath])
 }
 
 export function formatTime(seconds: number): string {

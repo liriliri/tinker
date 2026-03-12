@@ -63,7 +63,7 @@ const Slider = ({
   return (
     <div
       ref={trackRef}
-      className={`relative h-1.5 rounded-full ${tw.bg.secondary} ${
+      className={`relative h-1.5 rounded-full ${tw.bg.input} ${
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
       }`}
       onMouseDown={handleMouseDown}

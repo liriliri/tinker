@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import clamp from 'licia/clamp'
@@ -9,6 +9,10 @@ import store from './store'
 import AudioEditor, { AudioEditorHandle } from './components/AudioEditor'
 import Toolbar from './components/Toolbar'
 import StatusBar from './components/StatusBar'
+import NormalizeDialog from './components/NormalizeDialog'
+import GainDialog from './components/GainDialog'
+import SpeedDialog from './components/SpeedDialog'
+import InsertSilenceDialog from './components/InsertSilenceDialog'
 import {
   loadAudioFile,
   trimBuffer,
@@ -16,16 +20,22 @@ import {
   silenceBuffer,
   gainBuffer,
   normalizeBuffer,
+  speedBuffer,
   copyBuffer,
   pasteBuffer,
   fadeInBuffer,
   fadeOutBuffer,
+  insertSilenceBuffer,
   exportAudio,
 } from './lib/audioUtils'
 
 export default observer(function App() {
   const { t } = useTranslation()
   const editorRef = useRef<AudioEditorHandle>(null)
+  const [normalizeOpen, setNormalizeOpen] = useState(false)
+  const [gainOpen, setGainOpen] = useState(false)
+  const [speedOpen, setSpeedOpen] = useState(false)
+  const [insertSilenceOpen, setInsertSilenceOpen] = useState(false)
 
   const applyOp = useCallback((label: string, op: () => AudioBuffer) => {
     store.pushUndo(label)
@@ -89,7 +99,7 @@ export default observer(function App() {
   const handleExport = useCallback(async () => {
     if (!store.audioBuffer) return
     const result = await tinker.showSaveDialog({
-      defaultPath: store.fileName.replace(/\.[^.]+$/, '') + '_edited.wav',
+      defaultPath: store.fileName.replace(/\.[^.]+$/, '') + '.wav',
       filters: [{ name: 'WAV Audio', extensions: ['wav'] }],
     })
     if (result.canceled || !result.filePath) return
@@ -142,6 +152,20 @@ export default observer(function App() {
     )
   }, [])
 
+  const handleCut = useCallback(() => {
+    if (!store.hasSelection || !store.audioBuffer) return
+    store.setClipboardBuffer(
+      copyBuffer(store.audioBuffer, store.selectionStart!, store.selectionEnd!)
+    )
+    applyOp(t('cut'), () =>
+      deleteBuffer(
+        store.audioBuffer!,
+        store.selectionStart!,
+        store.selectionEnd!
+      )
+    )
+  }, [t, applyOp])
+
   const handlePaste = useCallback(() => {
     if (!store.clipboardBuffer || !store.audioBuffer) return
     const offset = editorRef.current?.getCurrentTime() ?? store.currentTime
@@ -174,44 +198,154 @@ export default observer(function App() {
 
   const handleNormalize = useCallback(() => {
     if (!store.hasSelection || !store.audioBuffer) return
-    applyOp(t('normalize'), () =>
-      normalizeBuffer(
-        store.audioBuffer!,
-        store.selectionStart!,
-        store.selectionEnd!
+    setNormalizeOpen(true)
+  }, [])
+
+  const handleNormalizeConfirm = useCallback(
+    (maxVal: number, equally: boolean) => {
+      setNormalizeOpen(false)
+      if (!store.hasSelection || !store.audioBuffer) return
+      applyOp(t('normalize'), () =>
+        normalizeBuffer(
+          store.audioBuffer!,
+          store.selectionStart!,
+          store.selectionEnd!,
+          maxVal,
+          equally
+        )
       )
-    )
-  }, [t, applyOp])
+    },
+    [t, applyOp]
+  )
+
+  const handleNormalizeCancel = useCallback(() => {
+    setNormalizeOpen(false)
+  }, [])
 
   const handleGain = useCallback(() => {
-    if (!store.hasAudio || !store.audioBuffer) return
-    const input = prompt(t('gainPrompt'), '1.5')
-    if (input === null) return
-    const factor = parseFloat(input)
-    if (isNaN(factor) || factor <= 0) return
-    applyOp(t('gain'), () => gainBuffer(store.audioBuffer!, factor))
-  }, [t, applyOp])
+    if (!store.hasSelection || !store.audioBuffer) return
+    setGainOpen(true)
+  }, [])
+
+  const handleGainConfirm = useCallback(
+    (factor: number) => {
+      setGainOpen(false)
+      if (!store.hasSelection || !store.audioBuffer) return
+      applyOp(t('gain'), () =>
+        gainBuffer(
+          store.audioBuffer!,
+          store.selectionStart!,
+          store.selectionEnd!,
+          factor
+        )
+      )
+    },
+    [t, applyOp]
+  )
+
+  const handleGainCancel = useCallback(() => {
+    setGainOpen(false)
+  }, [])
+
+  const handleSpeed = useCallback(() => {
+    if (!store.hasSelection || !store.audioBuffer) return
+    setSpeedOpen(true)
+  }, [])
+
+  const handleSpeedConfirm = useCallback(
+    (rate: number) => {
+      setSpeedOpen(false)
+      if (!store.hasSelection || !store.audioBuffer) return
+      applyOp(t('speed'), () =>
+        speedBuffer(
+          store.audioBuffer!,
+          store.selectionStart!,
+          store.selectionEnd!,
+          rate
+        )
+      )
+    },
+    [t, applyOp]
+  )
+
+  const handleSpeedCancel = useCallback(() => {
+    setSpeedOpen(false)
+  }, [])
+
+  const handleInsertSilence = useCallback(() => {
+    if (!store.audioBuffer) return
+    setInsertSilenceOpen(true)
+  }, [])
+
+  const handleInsertSilenceConfirm = useCallback(
+    (duration: number) => {
+      setInsertSilenceOpen(false)
+      if (!store.audioBuffer) return
+      const offset = editorRef.current?.getCurrentTime() ?? store.currentTime
+      applyOp(t('insertSilence'), () =>
+        insertSilenceBuffer(store.audioBuffer!, offset, duration)
+      )
+    },
+    [t, applyOp]
+  )
+
+  const handleInsertSilenceCancel = useCallback(() => {
+    setInsertSilenceOpen(false)
+  }, [])
 
   const handleUndo = useCallback(() => store.undo(), [])
   const handleRedo = useCallback(() => store.redo(), [])
 
+  const handleSeekLeft = useCallback(() => editorRef.current?.seekLeft(), [])
+  const handleSeekRight = useCallback(() => editorRef.current?.seekRight(), [])
+  const handleSeekStart = useCallback(() => editorRef.current?.seekStart(), [])
+  const handleSeekEnd = useCallback(() => editorRef.current?.seekEnd(), [])
+
+  const handleSelectAll = useCallback(() => {
+    if (!store.audioBuffer) return
+    editorRef.current?.selectAll()
+  }, [])
+
+  const handleClearSelection = useCallback(() => {
+    editorRef.current?.clearSelection()
+  }, [])
+
   const handleSelectionContextMenu = useCallback(
     (x: number, y: number) => {
+      const hasSelection = store.hasSelection
       tinker.showContextMenu(x, y, [
-        { label: t('trim'), click: handleTrim },
-        { label: t('delete'), click: handleDelete },
-        { label: t('silence'), click: handleSilence },
-        { label: t('normalize'), click: handleNormalize },
-        { type: 'separator' },
-        { label: t('copy'), click: handleCopy },
+        ...(hasSelection
+          ? [
+              { label: t('trim'), click: handleTrim },
+              { label: t('delete'), click: handleDelete },
+              { label: t('silence'), click: handleSilence },
+              { label: t('gain'), click: handleGain },
+              { label: t('normalize'), click: handleNormalize },
+              { label: t('speed'), click: handleSpeed },
+              { type: 'separator' as const },
+            ]
+          : []),
+        { label: t('copy'), enabled: hasSelection, click: handleCopy },
+        { label: t('cut'), enabled: hasSelection, click: handleCut },
         {
           label: t('paste'),
           enabled: !!store.clipboardBuffer,
           click: handlePaste,
         },
-        { type: 'separator' },
-        { label: t('fadeIn'), click: handleFadeIn },
-        { label: t('fadeOut'), click: handleFadeOut },
+        { type: 'separator' as const },
+        { label: t('insertSilence'), click: handleInsertSilence },
+        ...(hasSelection
+          ? [
+              { type: 'separator' as const },
+              { label: t('fadeIn'), click: handleFadeIn },
+              { label: t('fadeOut'), click: handleFadeOut },
+            ]
+          : []),
+        { type: 'separator' as const },
+        { label: t('selectAll'), click: handleSelectAll },
+        ...(hasSelection
+          ? [{ label: t('clearSelection'), click: handleClearSelection }]
+          : []),
       ])
     },
     [
@@ -219,11 +353,17 @@ export default observer(function App() {
       handleTrim,
       handleDelete,
       handleSilence,
+      handleGain,
       handleNormalize,
+      handleSpeed,
       handleCopy,
+      handleCut,
       handlePaste,
       handleFadeIn,
       handleFadeOut,
+      handleInsertSilence,
+      handleSelectAll,
+      handleClearSelection,
     ]
   )
 
@@ -254,13 +394,16 @@ export default observer(function App() {
         handleCopy()
       } else if (mod && e.code === 'KeyV') {
         handlePaste()
+      } else if (mod && e.code === 'KeyA') {
+        e.preventDefault()
+        handleSelectAll()
       } else if (e.code === 'Delete' || e.code === 'Backspace') {
         if (store.hasSelection) handleDelete()
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [handlePlayPause, handleUndo, handleRedo, handleCopy, handlePaste, handleDelete])
+  }, [handlePlayPause, handleUndo, handleRedo, handleCopy, handlePaste, handleSelectAll, handleDelete])
 
   return (
     <ToasterProvider>
@@ -272,9 +415,12 @@ export default observer(function App() {
           onExport={handleExport}
           onPlayPause={handlePlayPause}
           onStop={handleStop}
-          onGain={handleGain}
           onUndo={handleUndo}
           onRedo={handleRedo}
+          onSeekLeft={handleSeekLeft}
+          onSeekRight={handleSeekRight}
+          onSeekStart={handleSeekStart}
+          onSeekEnd={handleSeekEnd}
           onHeightIncrease={handleHeightIncrease}
           onHeightDecrease={handleHeightDecrease}
         />
@@ -284,6 +430,26 @@ export default observer(function App() {
           onSelectionContextMenu={handleSelectionContextMenu}
         />
         <StatusBar />
+        <NormalizeDialog
+          open={normalizeOpen}
+          onConfirm={handleNormalizeConfirm}
+          onCancel={handleNormalizeCancel}
+        />
+        <GainDialog
+          open={gainOpen}
+          onConfirm={handleGainConfirm}
+          onCancel={handleGainCancel}
+        />
+        <SpeedDialog
+          open={speedOpen}
+          onConfirm={handleSpeedConfirm}
+          onCancel={handleSpeedCancel}
+        />
+        <InsertSilenceDialog
+          open={insertSilenceOpen}
+          onConfirm={handleInsertSilenceConfirm}
+          onCancel={handleInsertSilenceCancel}
+        />
       </div>
     </ToasterProvider>
   )

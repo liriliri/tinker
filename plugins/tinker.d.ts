@@ -40,7 +40,7 @@ interface RunProgress {
   time: string
 }
 
-interface FFmpegTask {
+interface FFmpegTask extends Promise<void> {
   /** Force kill (SIGKILL) */
   kill(): void
   /** Graceful quit (SIGTERM) */

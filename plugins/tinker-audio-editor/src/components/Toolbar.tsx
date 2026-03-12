@@ -7,10 +7,13 @@ import {
   Play,
   Pause,
   Square,
-  Plus,
   FoldVertical,
   UnfoldVertical,
   Save,
+  SkipBack,
+  SkipForward,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import {
   Toolbar,
@@ -26,9 +29,12 @@ interface Props {
   onExport: () => void
   onPlayPause: () => void
   onStop: () => void
-  onGain: () => void
   onUndo: () => void
   onRedo: () => void
+  onSeekLeft: () => void
+  onSeekRight: () => void
+  onSeekStart: () => void
+  onSeekEnd: () => void
   onHeightIncrease: () => void
   onHeightDecrease: () => void
 }
@@ -64,6 +70,20 @@ export default observer(function ToolbarComponent(props: Props) {
       <ToolbarSeparator />
 
       <ToolbarButton
+        onClick={props.onSeekStart}
+        disabled={!hasAudio}
+        title={t('seekStart')}
+      >
+        <SkipBack size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={props.onSeekLeft}
+        disabled={!hasAudio}
+        title={t('seekLeft')}
+      >
+        <ChevronLeft size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
         onClick={props.onPlayPause}
         disabled={!hasAudio}
         title={isPlaying ? t('pause') : t('play')}
@@ -81,15 +101,19 @@ export default observer(function ToolbarComponent(props: Props) {
       >
         <Square size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
-
-      <ToolbarSeparator />
-
       <ToolbarButton
-        onClick={props.onGain}
+        onClick={props.onSeekRight}
         disabled={!hasAudio}
-        title={t('gain')}
+        title={t('seekRight')}
       >
-        <Plus size={TOOLBAR_ICON_SIZE} />
+        <ChevronRight size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={props.onSeekEnd}
+        disabled={!hasAudio}
+        title={t('seekEnd')}
+      >
+        <SkipForward size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSeparator />

@@ -14,6 +14,7 @@ import RegionsPlugin from 'wavesurfer.js/plugins/regions'
 import TimelinePlugin from 'wavesurfer.js/plugins/timeline'
 import { tw, THEME_COLORS } from 'share/theme'
 import FileOpen from 'share/components/FileOpen'
+import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
 import ChannelLabels from './ChannelLabels'
 import { useWaveScrollbar, WaveScrollbarView } from './WaveScrollbar'
@@ -22,11 +23,26 @@ import VuMeter from './VuMeter'
 export interface AudioEditorHandle {
   getCurrentTime: () => number
   seekTo: (time: number) => void
+  seekLeft: () => void
+  seekRight: () => void
+  seekStart: () => void
+  seekEnd: () => void
+  clearSelection: () => void
+  selectAll: () => void
 }
 
 interface AudioEditorProps {
   onOpenFile: (file: File) => Promise<void>
   onSelectionContextMenu: (x: number, y: number) => void
+}
+
+function seekBy(ws: WaveSurfer | null, direction: 1 | -1) {
+  if (!ws) return
+  const dur = ws.getDuration()
+  if (!dur) return
+  const step = Math.min(dur / 20, 5)
+  const next = Math.max(0, Math.min(dur, ws.getCurrentTime() + direction * step))
+  ws.seekTo(next / dur)
 }
 
 const MIN_PX_PER_SEC = 10
@@ -53,7 +69,6 @@ const AudioEditor = observer(
     } | null>(null)
     const isDark = store.isDark
 
-    // Audio routing for per-channel muting
     const audioCtxRef = useRef<AudioContext | null>(null)
     const leftGainRef = useRef<GainNode | null>(null)
     const rightGainRef = useRef<GainNode | null>(null)
@@ -266,7 +281,6 @@ const AudioEditor = observer(
       if (timelineWrapper) timelineWrapper.style.color = timelineTextColor
     }, [isDark, store.barHeight, store.leftMuted, store.rightMuted])
 
-    // Reload waveform when audio changes
     useEffect(() => {
       if (!wsRef.current || !store.audioBlobUrl) return
       if (!store.isNewAudio) {
@@ -291,7 +305,6 @@ const AudioEditor = observer(
       })
     }, [store.audioBlobUrl])
 
-    // Sync play/pause
     useEffect(() => {
       if (!wsRef.current) return
       if (store.isPlaying) {
@@ -301,7 +314,6 @@ const AudioEditor = observer(
       }
     }, [store.isPlaying])
 
-    // Apply channel gain for audio muting
     useEffect(() => {
       if (leftGainRef.current)
         leftGainRef.current.gain.value = store.leftMuted ? 0 : 1
@@ -309,7 +321,6 @@ const AudioEditor = observer(
         rightGainRef.current.gain.value = store.rightMuted ? 0 : 1
     }, [store.leftMuted, store.rightMuted])
 
-    // Mouse wheel zoom
     useEffect(() => {
       const el = containerRef.current
       if (!el) return
@@ -339,18 +350,17 @@ const AudioEditor = observer(
       return () => el.removeEventListener('wheel', onWheel)
     }, [store.hasAudio])
 
-    // Context menu on selection
     useEffect(() => {
       const el = containerRef.current
       if (!el) return
       const onContextMenu = (e: MouseEvent) => {
-        if (!store.hasSelection) return
+        if (!store.hasAudio) return
         e.preventDefault()
         onSelectionContextMenu(e.clientX, e.clientY)
       }
       el.addEventListener('contextmenu', onContextMenu)
       return () => el.removeEventListener('contextmenu', onContextMenu)
-    }, [store.hasAudio, onSelectionContextMenu])
+    }, [store.hasAudio, store.hasSelection, onSelectionContextMenu])
 
     useImperativeHandle(ref, () => ({
       getCurrentTime: () => wsRef.current?.getCurrentTime() ?? 0,
@@ -358,13 +368,45 @@ const AudioEditor = observer(
         const dur = wsRef.current?.getDuration() ?? 0
         if (dur > 0) wsRef.current?.seekTo(time / dur)
       },
+      seekLeft: () => seekBy(wsRef.current, -1),
+      seekRight: () => seekBy(wsRef.current, 1),
+      seekStart: () => {
+        const ws = wsRef.current
+        if (!ws || !ws.getDuration()) return
+        ws.seekTo(0)
+      },
+      seekEnd: () => {
+        const ws = wsRef.current
+        if (!ws || !ws.getDuration()) return
+        ws.seekTo(1)
+      },
+      clearSelection: () => {
+        regionsRef.current?.clearRegions()
+        activeRegionRef.current = null
+        store.clearSelection()
+      },
+      selectAll: () => {
+        const dur = wsRef.current?.getDuration() ?? 0
+        if (!dur) return
+        regionsRef.current?.clearRegions()
+        const region = regionsRef.current?.addRegion({
+          start: 0,
+          end: dur,
+          color: 'rgba(59, 130, 246, 0.25)',
+        })
+        if (region) activeRegionRef.current = region
+        store.setSelection(0, dur)
+      },
     }))
 
     return !store.hasAudio ? (
-      <FileOpen
-        onOpenFile={onOpenFile}
-        openTitle={store.isLoading ? t('loading') : t('noFile')}
-      />
+      store.isLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingCircle />
+        </div>
+      ) : (
+        <FileOpen onOpenFile={onOpenFile} openTitle={t('noFile')} />
+      )
     ) : (
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-row overflow-hidden">
