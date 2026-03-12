@@ -240,7 +240,7 @@ const CollageCanvas = observer(() => {
         <div style={{ position: 'relative' }}>
           <div id="collage-canvas" ref={canvasRef} style={canvasStyle}>
             {template.areas.map((area) => (
-              <PhotoSlot key={area} areaName={area} />
+              <PhotoSlot key={area} areaName={area} canvasScale={scale} />
             ))}
           </div>
 

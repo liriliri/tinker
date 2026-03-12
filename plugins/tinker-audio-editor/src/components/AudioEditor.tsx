@@ -41,7 +41,10 @@ function seekBy(ws: WaveSurfer | null, direction: 1 | -1) {
   const dur = ws.getDuration()
   if (!dur) return
   const step = Math.min(dur / 20, 5)
-  const next = Math.max(0, Math.min(dur, ws.getCurrentTime() + direction * step))
+  const next = Math.max(
+    0,
+    Math.min(dur, ws.getCurrentTime() + direction * step)
+  )
   ws.seekTo(next / dur)
 }
 
@@ -201,10 +204,12 @@ const AudioEditor = observer(
         }
         activeRegionRef.current = region
         store.setSelection(region.start, region.end)
+        if (!store.isPlaying) ws.seekTo(region.start / ws.getDuration())
       })
 
       regions.on('region-updated', (region) => {
         store.setSelection(region.start, region.end)
+        if (!store.isPlaying) ws.seekTo(region.start / ws.getDuration())
       })
     }, [])
 
@@ -354,13 +359,18 @@ const AudioEditor = observer(
       const el = containerRef.current
       if (!el) return
       const onContextMenu = (e: MouseEvent) => {
-        if (!store.hasAudio) return
+        if (!store.hasAudio || store.isPlaying) return
         e.preventDefault()
         onSelectionContextMenu(e.clientX, e.clientY)
       }
       el.addEventListener('contextmenu', onContextMenu)
       return () => el.removeEventListener('contextmenu', onContextMenu)
-    }, [store.hasAudio, store.hasSelection, onSelectionContextMenu])
+    }, [
+      store.hasAudio,
+      store.isPlaying,
+      store.hasSelection,
+      onSelectionContextMenu,
+    ])
 
     useImperativeHandle(ref, () => ({
       getCurrentTime: () => wsRef.current?.getCurrentTime() ?? 0,

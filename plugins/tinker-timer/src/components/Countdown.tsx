@@ -87,7 +87,7 @@ const TimeSegment = observer(function TimeSegment({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           readOnly={!editable}
-          className={`w-28 text-[5rem] font-thin leading-none tracking-tight text-center
+          className={`w-28 text-[5rem] font-thin leading-none tracking-tight text-center tabular-nums
             bg-transparent outline-none py-0 ${
               editable ? 'cursor-text' : 'cursor-default'
             } ${tw.text.primary}`}

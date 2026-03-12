@@ -1,24 +1,27 @@
 import { observer } from 'mobx-react-lite'
 import { Plus } from 'lucide-react'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import find from 'licia/find'
 import openFile from 'licia/openFile'
 import store from '../store'
 
 interface PhotoSlotProps {
   areaName: string
+  canvasScale: number
 }
 
-const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
+const PhotoSlot = observer(({ areaName, canvasScale }: PhotoSlotProps) => {
   const slot = find(store.photoSlots, (s) => s.areaName === areaName)
   const photo = slot?.photoId
     ? find(store.photos, (p) => p.id === slot.photoId)
     : null
 
+  const canvasScaleRef = useRef(canvasScale)
+  canvasScaleRef.current = canvasScale
   const containerRef = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const [hasDragged, setHasDragged] = useState(false)
+  const isDraggingRef = useRef(false)
+  const hasDraggedRef = useRef(false)
+  const dragStartRef = useRef({ x: 0, y: 0 })
 
   const handleSelectImage = async () => {
     try {
@@ -34,10 +37,7 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
   }
 
   const handleClick = () => {
-    if (hasDragged) {
-      setHasDragged(false)
-      return
-    }
+    if (hasDraggedRef.current) return
     handleSelectImage()
   }
 
@@ -54,30 +54,41 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
     if (!photo) return
     if ((e.target as HTMLElement).closest('button')) return
     e.preventDefault()
-    setIsDragging(true)
-    setHasDragged(false)
-    setDragStart({ x: e.clientX, y: e.clientY })
+    isDraggingRef.current = true
+    hasDraggedRef.current = false
+    dragStartRef.current = { x: e.clientX, y: e.clientY }
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grabbing'
+    }
   }
 
   useEffect(() => {
-    if (!isDragging || !slot) return
-
     const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - dragStart.x
-      const deltaY = e.clientY - dragStart.y
+      if (!isDraggingRef.current) return
+      const slot = find(store.photoSlots, (s) => s.areaName === areaName)
+      if (!slot) return
+
+      const deltaX =
+        (e.clientX - dragStartRef.current.x) / canvasScaleRef.current
+      const deltaY =
+        (e.clientY - dragStartRef.current.y) / canvasScaleRef.current
       if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
-        setHasDragged(true)
+        hasDraggedRef.current = true
       }
       store.setPhotoOffset(
         areaName,
         slot.offsetX + deltaX,
         slot.offsetY + deltaY
       )
-      setDragStart({ x: e.clientX, y: e.clientY })
+      dragStartRef.current = { x: e.clientX, y: e.clientY }
     }
 
     const handleMouseUp = () => {
-      setIsDragging(false)
+      if (!isDraggingRef.current) return
+      isDraggingRef.current = false
+      if (containerRef.current) {
+        containerRef.current.style.cursor = ''
+      }
     }
 
     document.addEventListener('mousemove', handleMouseMove)
@@ -87,7 +98,25 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [isDragging, dragStart, areaName, slot])
+  }, [areaName])
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith('image/')
+    )
+    if (files.length > 0) {
+      store.addPhotos([files[0]])
+      const newPhoto = store.photos[store.photos.length - 1]
+      store.setPhotoToSlot(areaName, newPhoto.id)
+    }
+  }
 
   const borderRadiusStyle = `${store.radius}px`
 
@@ -101,15 +130,18 @@ const PhotoSlot = observer(({ areaName }: PhotoSlotProps) => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden flex items-center justify-center cursor-pointer"
+      className="relative w-full h-full overflow-hidden flex items-center justify-center"
       style={{
         gridArea: areaName,
         borderRadius: borderRadiusStyle,
         backgroundColor: store.imageBgColor,
+        cursor: photo ? 'grab' : 'pointer',
       }}
       onClick={handleClick}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       {photo ? (
         <img
