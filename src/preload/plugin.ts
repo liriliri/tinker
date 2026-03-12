@@ -115,6 +115,9 @@ const tinkerObj = {
   killFFmpeg,
   quitFFmpeg,
   getMediaInfo,
+  async getApps() {
+    return await mainObj.getApps()
+  },
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)

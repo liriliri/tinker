@@ -75,6 +75,14 @@ interface MediaInfo {
   audioStream?: AudioStream
 }
 
+interface AppInfo {
+  name: string
+  /** Absolute path to the application icon */
+  icon: string
+  /** Absolute path to the application */
+  path: string
+}
+
 declare global {
   const tinker: {
     /** @returns 'light' or 'dark' */
@@ -153,6 +161,9 @@ declare global {
      * Throws if the file is not a valid media file.
      */
     getMediaInfo(filePath: string): Promise<MediaInfo>
+
+    /** Get a list of installed applications. */
+    getApps(): Promise<AppInfo[]>
 
     /**
      * Show a context menu at the specified position.
