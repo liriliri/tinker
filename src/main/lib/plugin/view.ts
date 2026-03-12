@@ -38,7 +38,7 @@ let preloadPluginView: WebContentsView | null = null
 function createPluginView() {
   const view = new WebContentsView({
     webPreferences: {
-      preload: path.join(__dirname, '../../preload/plugin.js'),
+      preload: path.join(__dirname, '../preload/plugin.js'),
       partition: PLUGIN_PARTITION,
       webSecurity: false,
       sandbox: false,

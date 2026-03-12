@@ -23,7 +23,7 @@ const DEFAULT_ICON = resolveResources('default-plugin.png')
 export const plugins: types.PlainObj<IPlugin> = {}
 
 export function getBuiltinPluginDir() {
-  return path.join(__dirname, isDev() ? '../../../plugins' : '../../plugins')
+  return path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
 }
 
 function normalizePluginId(id: string) {
