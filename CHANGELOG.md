@@ -1,3 +1,8 @@
+## v1.3.0 (12 Mar 2026)
+
+* feat: add config editor
+* feat: add audio editor
+
 ## v1.2.0 (8 Mar 2026)
 
 * feat: add timer
