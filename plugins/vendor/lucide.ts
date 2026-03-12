@@ -1,6 +1,10 @@
 import {
   AlertCircle,
   AlignJustify,
+  AlignVerticalDistributeCenter,
+  AlignVerticalJustifyCenter,
+  FoldVertical,
+  UnfoldVertical,
   ArrowLeftRight,
   BarChart3,
   ArrowRight,
@@ -103,6 +107,10 @@ const g = globalThis as Record<string, unknown>
 const lucideReact = {
   AlertCircle,
   AlignJustify,
+  AlignVerticalDistributeCenter,
+  AlignVerticalJustifyCenter,
+  FoldVertical,
+  UnfoldVertical,
   ArrowLeftRight,
   BarChart3,
   ArrowRight,
@@ -205,6 +213,10 @@ g.lucideReact = lucideReact
 export {
   AlertCircle,
   AlignJustify,
+  AlignVerticalDistributeCenter,
+  AlignVerticalJustifyCenter,
+  FoldVertical,
+  UnfoldVertical,
   ArrowLeftRight,
   BarChart3,
   ArrowRight,

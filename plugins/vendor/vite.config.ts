@@ -25,6 +25,7 @@ const globals = {
   'html-to-image': 'htmlToImage',
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
+  'wavesurfer.js/plugins/timeline': 'wavesurferTimelinePlugin',
 }
 
 export const shareExternal = ['systeminformation']
