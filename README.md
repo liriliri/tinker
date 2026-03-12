@@ -199,6 +199,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/timer.png"/></th>
       <th><img src="https://tinker.liriliri.io/rss_reader.png"/></th>
     </tr>
+    <tr>
+      <th>Config Editor</th>
+      <th>Audio Editor</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/config_editor.png"/></th>
+      <th><img src="https://tinker.liriliri.io/audio_editor.png"/></th>
+    </tr>
   </tbody>
 </table>
 
