@@ -3,6 +3,13 @@ import find from 'licia/find'
 import trim from 'licia/trim'
 import { type Priority, type TodoItem } from '../types'
 
+export function getLocalDateStr(date = new Date()): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 export function parseTodoItem(raw: string, id?: string): TodoItem {
   const item = new Item(raw)
 
@@ -18,10 +25,8 @@ export function parseTodoItem(raw: string, id?: string): TodoItem {
     completed: item.complete() || false,
     priority: item.priority() as Priority,
     dueDate: extractDueDate(item),
-    createdDate: createdDate ? createdDate.toISOString().split('T')[0] : null,
-    completedDate: completedDate
-      ? completedDate.toISOString().split('T')[0]
-      : null,
+    createdDate: createdDate ? getLocalDateStr(createdDate) : null,
+    completedDate: completedDate ? getLocalDateStr(completedDate) : null,
     raw: item.toString(),
   }
 }
@@ -45,7 +50,7 @@ export function createRawTodo(
 ): string {
   let raw = ''
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateStr()
 
   if (priority) {
     raw += `(${priority}) `

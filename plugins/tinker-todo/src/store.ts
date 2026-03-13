@@ -10,7 +10,7 @@ import trim from 'licia/trim'
 import BaseStore from 'share/BaseStore'
 import { Item } from 'jstodotxt'
 import { type Priority, type FilterType, type TodoItem } from './types'
-import { parseTodoItem, createRawTodo } from './lib/todo'
+import { parseTodoItem, createRawTodo, getLocalDateStr } from './lib/todo'
 import { fileExists } from 'share/lib/util'
 
 const storage = new LocalStore('tinker-todo')
@@ -264,7 +264,7 @@ class Store extends BaseStore {
       item.setCompleted(null)
     } else {
       item.setComplete(true)
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalDateStr()
       item.setCompleted(today)
     }
 
@@ -320,7 +320,7 @@ class Store extends BaseStore {
     let filtered = this.todos.slice()
 
     if (this.currentFilter === 'today') {
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalDateStr()
       filtered = filter(filtered, (t) => t.dueDate === today)
     } else if (this.currentFilter === 'important') {
       filtered = filter(filtered, (t) => t.priority === 'A')
@@ -349,7 +349,7 @@ class Store extends BaseStore {
   get stats() {
     const total = this.todos.length
     const completed = filter(this.todos, (t) => t.completed).length
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateStr()
     const todayCount = filter(
       this.todos,
       (t) => t.dueDate === today && !t.completed

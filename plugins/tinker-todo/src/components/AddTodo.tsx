@@ -6,6 +6,7 @@ import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
 import { type Priority } from '../types'
+import { getLocalDateStr } from '../lib/todo'
 
 const PRIORITY_COLORS = {
   A: { bg: 'bg-red-500', hover: 'hover:bg-red-600' },
@@ -28,7 +29,7 @@ const PRIORITIES: readonly PriorityOption[] = [
 
 export default observer(function AddTodo() {
   const { t } = useTranslation()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateStr()
   const [dueDate, setDueDate] = useState(today)
 
   const handleAdd = () => {
