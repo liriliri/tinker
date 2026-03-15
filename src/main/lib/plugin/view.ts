@@ -42,6 +42,7 @@ function createPluginView() {
       partition: PLUGIN_PARTITION,
       webSecurity: false,
       sandbox: false,
+      webviewTag: true,
     },
   })
   view.webContents.loadURL('about:blank')
