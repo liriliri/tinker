@@ -142,16 +142,22 @@ export function ToolbarTextButton({
   children,
   className = '',
   variant = 'primary',
+  disabled,
   ...props
 }: ToolbarTextButtonProps) {
+  const effectiveVariant = disabled ? 'secondary' : variant
   const variantClass =
-    variant === 'secondary'
+    effectiveVariant === 'secondary'
       ? `${tw.secondary.bg}`
       : `${tw.primary.bg} ${tw.primary.bgHover}`
   const baseClass = `px-3 py-1 text-xs rounded ${variantClass} text-white disabled:cursor-not-allowed`
 
   return (
-    <button className={`${baseClass} ${className}`} {...props}>
+    <button
+      className={`${baseClass} ${className}`}
+      disabled={disabled}
+      {...props}
+    >
       {children}
     </button>
   )

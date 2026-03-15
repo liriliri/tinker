@@ -12,7 +12,7 @@
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "媒体转换"
+        "name": "媒体格式转换"
       }
     }
   }
