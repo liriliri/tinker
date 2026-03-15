@@ -10,6 +10,7 @@ import {
   VIDEO_OUTPUT_FORMATS,
   AUDIO_OUTPUT_FORMATS,
   IMAGE_OUTPUT_FORMATS,
+  FFPROBE_CODEC_MAP,
 } from './lib/constants'
 import { buildFFmpegArgs, getOutputPath } from './lib/ffmpegArgs'
 
@@ -26,7 +27,7 @@ class Store extends BaseStore {
   imageItems: MediaItem[] = []
   outputDir: string = ''
   mode: MediaType = 'video'
-  videoOutputFormat: string = VIDEO_OUTPUT_FORMATS[0]
+  videoOutputFormat: string = VIDEO_OUTPUT_FORMATS[0].value
   audioOutputFormat: string = AUDIO_OUTPUT_FORMATS[0]
   imageOutputFormat: string = IMAGE_OUTPUT_FORMATS[0]
 
@@ -45,10 +46,21 @@ class Store extends BaseStore {
     return this.imageOutputFormat
   }
 
-  get outputFormatOptions(): string[] {
-    if (this.mode === 'video') return VIDEO_OUTPUT_FORMATS
-    if (this.mode === 'audio') return AUDIO_OUTPUT_FORMATS
-    return IMAGE_OUTPUT_FORMATS
+  get outputFormatOptions(): { label: string; value: string }[] {
+    if (this.mode === 'video')
+      return VIDEO_OUTPUT_FORMATS.map((f) => ({
+        label: f.label,
+        value: f.value,
+      }))
+    if (this.mode === 'audio')
+      return AUDIO_OUTPUT_FORMATS.map((f) => ({
+        label: f.toUpperCase(),
+        value: f,
+      }))
+    return IMAGE_OUTPUT_FORMATS.map((f) => ({
+      label: f.toUpperCase(),
+      value: f,
+    }))
   }
 
   constructor() {
@@ -84,7 +96,7 @@ class Store extends BaseStore {
 
   private loadVideoFormat() {
     const saved = storage.get(STORAGE_KEY_VIDEO_FORMAT)
-    if (saved && VIDEO_OUTPUT_FORMATS.includes(saved)) {
+    if (saved && VIDEO_OUTPUT_FORMATS.some((f) => f.value === saved)) {
       this.videoOutputFormat = saved
     }
   }
@@ -396,7 +408,19 @@ class Store extends BaseStore {
 
   isConvertible(item: MediaItem): boolean {
     const { ext } = splitPath(item.filePath)
-    return ext.toLowerCase().slice(1) !== this.outputFormat
+    const fileExt = ext.toLowerCase().slice(1)
+    if (this.mode === 'video') {
+      const fmt = VIDEO_OUTPUT_FORMATS.find(
+        (f) => f.value === this.videoOutputFormat
+      )
+      if (!fmt) return true
+      if (fileExt !== fmt.ext) return true
+      const fileCodec = item.videoInfo
+        ? FFPROBE_CODEC_MAP[item.videoInfo.codec]
+        : undefined
+      return fileCodec !== fmt.codec
+    }
+    return fileExt !== this.outputFormat
   }
 
   get hasUnconverted() {

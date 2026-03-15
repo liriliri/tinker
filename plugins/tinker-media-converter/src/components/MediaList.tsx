@@ -205,6 +205,7 @@ const MediaRow = observer(({ item }: MediaItemProps) => {
           </span>
           {videoInfo && (
             <>
+              <span className="uppercase">{videoInfo.codec}</span>
               <span>
                 {t('resolution')}: {videoInfo.width}×{videoInfo.height}
               </span>

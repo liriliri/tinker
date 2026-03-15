@@ -18,10 +18,7 @@ import store from '../store'
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
-  const formatOptions = store.outputFormatOptions.map((fmt) => ({
-    label: fmt.toUpperCase(),
-    value: fmt,
-  }))
+  const formatOptions = store.outputFormatOptions
 
   return (
     <Toolbar>
@@ -115,7 +112,7 @@ export default observer(function ToolbarComponent() {
               onChange={(v) => store.setOutputFormat(v)}
               options={formatOptions}
               disabled={store.isConverting}
-              className="w-24"
+              className="w-32"
             />
           </div>
 
