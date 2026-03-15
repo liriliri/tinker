@@ -1,6 +1,6 @@
 ## v1.3.1 (15 Mar 2026)
 
-* fix(todo): implement getLocalDateStr for consistent date formatting
+* fix(todo): date formatting
 
 ## v1.3.0 (12 Mar 2026)
 
