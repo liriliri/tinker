@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen, ListX, Folder, X, Video, Music } from 'lucide-react'
 import Select from 'share/components/Select'
@@ -15,6 +16,7 @@ import {
 import { tw } from 'share/theme'
 import store from '../store'
 import type { VideoCompressionMode, AudioCompressionMode } from '../types'
+import TargetSizeDialog from './TargetSizeDialog'
 
 const VIDEO_COMPRESSION_MODES: Array<{
   label: string
@@ -23,6 +25,7 @@ const VIDEO_COMPRESSION_MODES: Array<{
   { label: 'videoCrf', value: 'crf' },
   { label: 'videoBitrate', value: 'bitrate' },
   { label: 'videoResolution', value: 'resolution' },
+  { label: 'targetSize', value: 'targetsize' },
 ]
 
 const AUDIO_COMPRESSION_MODES: Array<{
@@ -31,6 +34,7 @@ const AUDIO_COMPRESSION_MODES: Array<{
 }> = [
   { label: 'audioBitrate', value: 'bitrate' },
   { label: 'audioSamplerate', value: 'samplerate' },
+  { label: 'targetSize', value: 'targetsize' },
 ]
 
 const CRF_LEVELS = [
@@ -67,6 +71,11 @@ const AUDIO_SAMPLERATE_LEVELS = [
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
+  const [targetSizeDialogOpen, setTargetSizeDialogOpen] = useState(false)
+
+  const isTargetSize =
+    (store.mode === 'video' && store.videoCompressionMode === 'targetsize') ||
+    (store.mode === 'audio' && store.audioCompressionMode === 'targetsize')
 
   const videoModeOptions = VIDEO_COMPRESSION_MODES.map((mode) => ({
     label: t(mode.label),
@@ -203,13 +212,23 @@ export default observer(function ToolbarComponent() {
 
           <ToolbarSeparator />
 
-          <Select
-            value={store.quality}
-            onChange={(v) => store.setQuality(v)}
-            options={qualityOptions}
-            disabled={store.isCompressing}
-            className="w-24"
-          />
+          {isTargetSize ? (
+            <button
+              onClick={() => setTargetSizeDialogOpen(true)}
+              disabled={store.isCompressing}
+              className={`px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} ${tw.hover} disabled:opacity-50 disabled:cursor-not-allowed w-24 text-left`}
+            >
+              {`${store.targetSize} ${store.targetSizeUnit}`}
+            </button>
+          ) : (
+            <Select
+              value={store.quality}
+              onChange={(v) => store.setQuality(v)}
+              options={qualityOptions}
+              disabled={store.isCompressing}
+              className="w-24"
+            />
+          )}
 
           <ToolbarSeparator />
 
@@ -226,6 +245,11 @@ export default observer(function ToolbarComponent() {
           </ToolbarTextButton>
         </>
       )}
+
+      <TargetSizeDialog
+        open={targetSizeDialogOpen}
+        onClose={() => setTargetSizeDialogOpen(false)}
+      />
     </Toolbar>
   )
 })

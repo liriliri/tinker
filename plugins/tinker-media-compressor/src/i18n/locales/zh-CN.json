@@ -53,5 +53,7 @@
   "samplerate32000": "32 kHz",
   "samplerate44100": "44.1 kHz",
   "samplerate48000": "48 kHz",
-  "samplerate96000": "96 kHz"
+  "samplerate96000": "96 kHz",
+  "targetSize": "目标大小",
+  "confirm": "确认"
 }

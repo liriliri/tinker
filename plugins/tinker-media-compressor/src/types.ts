@@ -1,7 +1,13 @@
 export type MediaType = 'video' | 'audio'
 
-export type VideoCompressionMode = 'crf' | 'bitrate' | 'resolution'
-export type AudioCompressionMode = 'bitrate' | 'samplerate'
+export type VideoCompressionMode =
+  | 'crf'
+  | 'bitrate'
+  | 'resolution'
+  | 'targetsize'
+export type AudioCompressionMode = 'bitrate' | 'samplerate' | 'targetsize'
+
+export type TargetSizeUnit = 'KB' | 'MB' | 'GB'
 
 export interface VideoInfo {
   codec: string

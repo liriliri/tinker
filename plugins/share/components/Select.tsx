@@ -1,4 +1,5 @@
 import React from 'react'
+import { ChevronDown } from 'lucide-react'
 import { tw } from '../theme'
 
 export interface SelectOption<T = string> {
@@ -35,18 +36,24 @@ export default function Select<T extends string | number = string>({
   }
 
   return (
-    <select
-      value={String(value)}
-      onChange={handleChange}
-      disabled={disabled}
-      className={`text-xs px-2 py-1 ${tw.bg.select} border ${tw.gray.border600} rounded cursor-pointer focus:outline-none ${tw.primary.focusBorder} ${tw.text.primary} disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-      title={title}
-    >
-      {options.map((option) => (
-        <option key={String(option.value)} value={String(option.value)}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className={`relative inline-flex items-center ${className}`}>
+      <select
+        value={String(value)}
+        onChange={handleChange}
+        disabled={disabled}
+        className={`w-full h-full appearance-none text-xs pl-2 pr-6 py-1 ${tw.bg.select} border ${tw.gray.border600} rounded cursor-pointer focus:outline-none ${tw.primary.focusBorder} ${tw.text.primary} disabled:opacity-50 disabled:cursor-not-allowed`}
+        title={title}
+      >
+        {options.map((option) => (
+          <option key={String(option.value)} value={String(option.value)}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        size={12}
+        className={`pointer-events-none absolute right-1.5 ${tw.text.secondary}`}
+      />
+    </div>
   )
 }

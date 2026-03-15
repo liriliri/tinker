@@ -171,12 +171,19 @@ export interface FFmpegArgsOptions {
   audioMode: AudioCompressionMode
   quality: number
   gpuEncoder?: string | null
+  targetSizeBytes?: number
 }
 
 export function buildFFmpegArgs(
   item: MediaItem,
   outputPath: string,
-  { videoMode, audioMode, quality, gpuEncoder }: FFmpegArgsOptions
+  {
+    videoMode,
+    audioMode,
+    quality,
+    gpuEncoder,
+    targetSizeBytes = 0,
+  }: FFmpegArgsOptions
 ): string[] {
   const args = ['-i', item.filePath]
 
@@ -187,7 +194,72 @@ export function buildFFmpegArgs(
     // VP9 has no widely available hardware encoder; only accelerate H.264
     const gpu = isVP9 ? null : gpuEncoder ?? null
 
-    if (videoMode === 'crf') {
+    if (videoMode === 'targetsize') {
+      const duration = item.videoInfo?.duration || 0
+      if (duration > 0 && targetSizeBytes > 0) {
+        // Reserve ~10% for audio (128k), calculate video bitrate from remaining budget
+        const audioBitrateKbps = 128
+        const totalBitrateKbps = Math.floor(
+          (targetSizeBytes * 8) / (duration * 1000)
+        )
+        const videoBitrateKbps = Math.max(
+          100,
+          totalBitrateKbps - audioBitrateKbps
+        )
+        const maxrate = Math.round(videoBitrateKbps * 1.5)
+        const bufsize = videoBitrateKbps * 2
+
+        if (isVP9) {
+          args.push(
+            '-c:v',
+            'libvpx-vp9',
+            '-b:v',
+            `${videoBitrateKbps}k`,
+            '-maxrate',
+            `${maxrate}k`,
+            '-bufsize',
+            `${bufsize}k`,
+            '-deadline',
+            'good',
+            '-cpu-used',
+            '2',
+            '-row-mt',
+            '1',
+            '-c:a',
+            'libopus',
+            '-b:a',
+            `${audioBitrateKbps}k`
+          )
+        } else if (gpu) {
+          args.push(
+            ...buildGpuBitrateArgs(gpu, videoBitrateKbps, maxrate, bufsize)
+          )
+        } else {
+          args.push(
+            '-c:v',
+            'libx264',
+            '-preset',
+            'slow',
+            '-b:v',
+            `${videoBitrateKbps}k`,
+            '-maxrate',
+            `${maxrate}k`,
+            '-bufsize',
+            `${bufsize}k`,
+            '-pix_fmt',
+            'yuv420p',
+            '-c:a',
+            'aac',
+            '-b:a',
+            `${audioBitrateKbps}k`
+          )
+        }
+      } else {
+        // Fallback to default CRF if no duration info
+        const crf = VIDEO_CRF_PRESETS[quality]
+        args.push(...buildCrfArgs(isVP9, crf, gpu))
+      }
+    } else if (videoMode === 'crf') {
       const crf = VIDEO_CRF_PRESETS[quality]
       args.push(...buildCrfArgs(isVP9, crf, gpu))
     } else if (videoMode === 'bitrate') {
@@ -391,7 +463,18 @@ export function buildFFmpegArgs(
     // Lossless codecs (flac, pcm) don't support bitrate control
     const isLossless = audioCodec === 'flac' || audioCodec.startsWith('pcm_')
 
-    if (audioMode === 'bitrate') {
+    if (audioMode === 'targetsize') {
+      const duration = item.audioInfo?.duration || 0
+      if (duration > 0 && targetSizeBytes > 0 && !isLossless) {
+        const totalBitrateKbps = Math.floor(
+          (targetSizeBytes * 8) / (duration * 1000)
+        )
+        const bitrateKbps = Math.max(32, totalBitrateKbps)
+        args.push('-c:a', encoder, '-b:a', `${bitrateKbps}k`)
+      } else {
+        args.push('-c:a', encoder)
+      }
+    } else if (audioMode === 'bitrate') {
       const bitrate = AUDIO_BITRATE_PRESETS[quality]
       if (isLossless) {
         args.push('-c:a', encoder)

@@ -9,6 +9,7 @@ import type {
   AudioInfo,
   VideoCompressionMode,
   AudioCompressionMode,
+  TargetSizeUnit,
 } from './types'
 import BaseStore from 'share/BaseStore'
 import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
@@ -21,6 +22,8 @@ const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
 const STORAGE_KEY_MODE = 'mode'
 const STORAGE_KEY_VIDEO_MODE = 'videoMode'
 const STORAGE_KEY_AUDIO_MODE = 'audioMode'
+const STORAGE_KEY_TARGET_SIZE = 'targetSize'
+const STORAGE_KEY_TARGET_SIZE_UNIT = 'targetSizeUnit'
 const storage = new LocalStore('tinker-media-compressor')
 
 class Store extends BaseStore {
@@ -31,6 +34,8 @@ class Store extends BaseStore {
   mode: MediaType = 'video'
   videoCompressionMode: VideoCompressionMode = 'crf'
   audioCompressionMode: AudioCompressionMode = 'bitrate'
+  targetSize: number = 10
+  targetSizeUnit: TargetSizeUnit = 'MB'
 
   private currentTask: ReturnType<typeof tinker.runFFmpeg> | null = null
   private cancelRequested = false
@@ -56,6 +61,7 @@ class Store extends BaseStore {
     this.loadMode()
     this.loadVideoMode()
     this.loadAudioMode()
+    this.loadTargetSize()
   }
 
   private loadQuality() {
@@ -84,15 +90,38 @@ class Store extends BaseStore {
 
   private loadVideoMode() {
     const saved = storage.get(STORAGE_KEY_VIDEO_MODE)
-    if (saved === 'crf' || saved === 'bitrate' || saved === 'resolution') {
+    if (
+      saved === 'crf' ||
+      saved === 'bitrate' ||
+      saved === 'resolution' ||
+      saved === 'targetsize'
+    ) {
       this.videoCompressionMode = saved
     }
   }
 
   private loadAudioMode() {
     const saved = storage.get(STORAGE_KEY_AUDIO_MODE)
-    if (saved === 'bitrate' || saved === 'samplerate') {
+    if (
+      saved === 'bitrate' ||
+      saved === 'samplerate' ||
+      saved === 'targetsize'
+    ) {
       this.audioCompressionMode = saved
+    }
+  }
+
+  private loadTargetSize() {
+    const savedSize = storage.get(STORAGE_KEY_TARGET_SIZE)
+    if (savedSize != null) {
+      const s = toNum(savedSize)
+      if (!isNaN(s) && s > 0) {
+        this.targetSize = s
+      }
+    }
+    const savedUnit = storage.get(STORAGE_KEY_TARGET_SIZE_UNIT)
+    if (savedUnit === 'KB' || savedUnit === 'MB' || savedUnit === 'GB') {
+      this.targetSizeUnit = savedUnit
     }
   }
 
@@ -109,6 +138,22 @@ class Store extends BaseStore {
   setAudioCompressionMode(mode: AudioCompressionMode) {
     this.audioCompressionMode = mode
     storage.set(STORAGE_KEY_AUDIO_MODE, mode)
+  }
+
+  setTargetSize(size: number, unit: TargetSizeUnit) {
+    this.targetSize = size
+    this.targetSizeUnit = unit
+    storage.set(STORAGE_KEY_TARGET_SIZE, String(size))
+    storage.set(STORAGE_KEY_TARGET_SIZE_UNIT, unit)
+  }
+
+  get targetSizeBytes(): number {
+    const multipliers: Record<TargetSizeUnit, number> = {
+      KB: 1024,
+      MB: 1024 * 1024,
+      GB: 1024 * 1024 * 1024,
+    }
+    return this.targetSize * multipliers[this.targetSizeUnit]
   }
 
   setQuality(quality: number) {
@@ -263,6 +308,25 @@ class Store extends BaseStore {
     const item = this.items.find((i) => i.id === id)
     if (!item || item.isCompressing || item.isDone) return
 
+    const isTargetSize =
+      (this.mode === 'video' && this.videoCompressionMode === 'targetsize') ||
+      (this.mode === 'audio' && this.audioCompressionMode === 'targetsize')
+
+    if (
+      isTargetSize &&
+      item.originalSize > 0 &&
+      item.originalSize <= this.targetSizeBytes
+    ) {
+      runInAction(() => {
+        item.outputSize = item.originalSize
+        item.progress = 100
+        item.outputPath = item.filePath
+        item.isDone = true
+        item.isCompressing = false
+      })
+      return
+    }
+
     item.isCompressing = true
     item.progress = 0
 
@@ -274,6 +338,7 @@ class Store extends BaseStore {
         audioMode: this.audioCompressionMode,
         quality: this.quality,
         gpuEncoder,
+        targetSizeBytes: this.targetSizeBytes,
       })
 
       const task = tinker.runFFmpeg(ffmpegArgs, (progress) => {
@@ -383,7 +448,20 @@ class Store extends BaseStore {
   }
 
   get hasUncompressed() {
-    return this.items.some((i) => !i.isDone && !i.isCompressing)
+    const isTargetSize =
+      (this.mode === 'video' && this.videoCompressionMode === 'targetsize') ||
+      (this.mode === 'audio' && this.audioCompressionMode === 'targetsize')
+
+    return this.items.some((i) => {
+      if (i.isDone || i.isCompressing) return false
+      if (
+        isTargetSize &&
+        i.originalSize > 0 &&
+        i.originalSize <= this.targetSizeBytes
+      )
+        return false
+      return true
+    })
   }
 
   get isCompressing() {
