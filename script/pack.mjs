@@ -60,6 +60,8 @@ const config = {
       NSRequiresAquaSystemAppearance: false,
       NSQuitAlwaysKeepsWindows: false,
       NSSupportsAutomaticGraphicsSwitching: true,
+      'com.apple.security.device.audio-input': true,
+      'com.apple.security.device.camera': true,
     },
   },
   publish: {
