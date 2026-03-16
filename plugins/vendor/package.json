@@ -25,6 +25,6 @@
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",
-    "wavesurfer.js": "^7.12.1"
+    "wavesurfer.js": "7.12.2"
   }
 }
