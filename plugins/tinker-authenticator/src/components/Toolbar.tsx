@@ -5,6 +5,7 @@ import {
   ToolbarButton,
   ToolbarSpacer,
   ToolbarSearch,
+  ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { Plus, QrCode, LockOpen, KeyRound } from 'lucide-react'
@@ -72,13 +73,20 @@ export default observer(function ToolbarComponent() {
           { label: t('importUri'), click: () => store.openImportDialog() },
           {
             label: t('openImage'),
-            click: () => setTimeout(() => handleOpenImage(), 100),
+            click: () => handleOpenImage(),
           },
         ]}
         title={t('scanScreen')}
       >
         <QrCode size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+      <ToolbarSeparator />
+      <ToolbarSearch
+        value={store.searchQuery}
+        onChange={(v) => store.setSearchQuery(v)}
+        placeholder={t('search')}
+      />
+      <ToolbarSpacer />
       <ToolbarButton
         onClick={() => store.openPasswordDialog()}
         title={t('passwordProtection')}
@@ -90,12 +98,6 @@ export default observer(function ToolbarComponent() {
           <LockOpen size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       )}
-      <ToolbarSpacer />
-      <ToolbarSearch
-        value={store.searchQuery}
-        onChange={(v) => store.setSearchQuery(v)}
-        placeholder={t('search')}
-      />
     </Toolbar>
   )
 })

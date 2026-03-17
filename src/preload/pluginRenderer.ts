@@ -55,16 +55,19 @@ export function injectApi() {
 
   function showContextMenu(x, y, options) {
     callbacks = {}
-    transOptions(options)
+    const transformedOptions = transOptions(options)
 
-    _tinker.showPluginContextMenu(x, y, options)
+    _tinker.showPluginContextMenu(x, y, transformedOptions)
   }
 
   let callbacks: types.PlainObj<types.AnyFn> = {}
 
   function transOptions(options: MenuItemConstructorOptions[]) {
-    options = Array.isArray(options) ? options : [options]
-    options.forEach((item) => {
+    const normalizedOptions = Array.isArray(options) ? options : [options]
+
+    return normalizedOptions.map((option) => {
+      const item = { ...option }
+
       if (typeof item.click === 'function') {
         const id = uuid()
         callbacks[id] = item.click
@@ -75,8 +78,9 @@ export function injectApi() {
           item.submenu as MenuItemConstructorOptions[]
         )
       }
+
+      return item
     })
-    return options
   }
 
   _tinker.on('clickContextMenu', (id: string) => {
