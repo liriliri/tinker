@@ -1,0 +1,22 @@
+{
+  "name": "tinker-authenticator",
+  "version": "0.1.0",
+  "description": "2FA Authenticator for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Authenticator",
+    "main": "dist/index.html",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "两步验证"
+      }
+    }
+  },
+  "devDependencies": {
+    "@zxing/library": "^0.21.3"
+  }
+}
