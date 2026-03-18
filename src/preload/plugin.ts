@@ -69,6 +69,13 @@ function setTitle(title: string) {
   }
 }
 
+function builtinOnly<T extends (...args: any[]) => any>(fn: T): T {
+  return ((...args: any[]) => {
+    if (!plugin?.builtin) return
+    return fn(...args)
+  }) as T
+}
+
 async function saveData(files: types.PlainObj<string>) {
   return saveDataUtil(files, plugin)
 }
@@ -118,6 +125,8 @@ const tinkerObj = {
   async getApps() {
     return await mainObj.getApps()
   },
+  getSetting: builtinOnly(mainObj.getSettingsStore),
+  setSetting: builtinOnly(mainObj.setSettingsStore),
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)

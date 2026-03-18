@@ -11,6 +11,7 @@ import startWith from 'licia/startWith'
 import os from 'os'
 import isEmpty from 'licia/isEmpty'
 import trim from 'licia/trim'
+import unique from 'licia/unique'
 import { getFileIcon } from '../fileIcon'
 
 const logger = log('macApp')
@@ -34,6 +35,7 @@ export const getApps: IpcGetApps = async (force = false) => {
 
     const installedApps: any[] = (plist.parse(stdout) as any)[0]._items
 
+    const discoveredApps: IApp[] = []
     const appPromises: Promise<void>[] = []
     for (let i = 0, len = installedApps.length; i < len; i++) {
       const { path, _name } = installedApps[i]
@@ -44,7 +46,7 @@ export const getApps: IpcGetApps = async (force = false) => {
 
       appPromises.push(
         extractIcon(path).then((icon) => {
-          apps.push({
+          discoveredApps.push({
             name: _name,
             path,
             icon,
@@ -53,6 +55,7 @@ export const getApps: IpcGetApps = async (force = false) => {
       )
     }
     await Promise.all(appPromises)
+    apps.push(...unique(discoveredApps, (a, b) => a.path === b.path))
   } catch (e) {
     logger.warn('failed to get apps:', e)
   }

@@ -80,25 +80,25 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
     return false
   }
 
-  const win = window.getWin('main')
-
   const pluginView = plugin.online ? getWebPluginView() : getPluginView()
-  pluginViews[id] = {
-    view: pluginView,
-    win,
-  }
   pluginView.webContents.on('page-title-updated', (_e, title) => {
     const { win } = pluginViews[id]
     if (win) {
       win.webContents.send('updatePluginTitle', title)
     }
   })
-  updatePluginTheme(id)
 
-  if (detached) {
-    detachPlugin(id)
+  const mainWin = window.getWin('main')
+  if (detached || !mainWin) {
+    const newWin = pluginWin.showWin(plugin)
+    pluginViews[id] = { view: pluginView, win: newWin }
+    updatePluginTheme(id)
+    newWin.contentView.addChildView(pluginView)
+    layoutPlugin(id)
   } else {
-    win.contentView.addChildView(pluginView)
+    pluginViews[id] = { view: pluginView, win: mainWin }
+    updatePluginTheme(id)
+    mainWin.contentView.addChildView(pluginView)
     layoutPlugin(id)
   }
 

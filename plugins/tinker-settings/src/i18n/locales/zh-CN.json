@@ -1,0 +1,19 @@
+{
+  "appearance": "外观",
+  "theme": "主题",
+  "language": "语言",
+  "sysPreference": "跟随系统",
+  "light": "浅色",
+  "dark": "深色",
+  "useNativeTitlebar": "使用系统原生标题栏",
+
+  "startup": "启动",
+  "openAtLogin": "开机自启动",
+  "silentStart": "静默启动",
+
+  "window": "窗口",
+  "showShortcut": "唤出快捷键",
+  "autoHide": "自动隐藏",
+
+  "restartRequired": "需要重启应用后生效。"
+}

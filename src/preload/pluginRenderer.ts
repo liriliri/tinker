@@ -51,6 +51,8 @@ export function injectApi() {
     showContextMenu,
     getMediaInfo: _tinker.getMediaInfo,
     getApps: _tinker.getApps,
+    getSetting: _tinker.getSetting,
+    setSetting: _tinker.setSetting,
   }
 
   function showContextMenu(x, y, options) {

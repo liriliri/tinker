@@ -165,6 +165,12 @@ declare global {
     /** Get a list of installed applications. */
     getApps(): Promise<AppInfo[]>
 
+    /** Get a setting value by name. Only available to builtin plugins. */
+    getSetting(name: string): Promise<any>
+
+    /** Set a setting value by name. Only available to builtin plugins. */
+    setSetting(name: string, val: any): Promise<void>
+
     /**
      * Show a context menu at the specified position.
      * @example

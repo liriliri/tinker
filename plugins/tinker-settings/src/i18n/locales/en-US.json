@@ -1,0 +1,19 @@
+{
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "language": "Language",
+  "sysPreference": "System Preference",
+  "light": "Light",
+  "dark": "Dark",
+  "useNativeTitlebar": "Use Native Title Bar",
+
+  "startup": "Startup",
+  "openAtLogin": "Open at Login",
+  "silentStart": "Silent Start",
+
+  "window": "Window",
+  "showShortcut": "Show Shortcut",
+  "autoHide": "Auto Hide",
+
+  "restartRequired": "Restart required to apply changes."
+}
