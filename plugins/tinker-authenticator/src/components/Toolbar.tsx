@@ -8,7 +8,7 @@ import {
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { Plus, QrCode, LockOpen, KeyRound } from 'lucide-react'
+import { Plus, LockOpen, KeyRound } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { openImageFile } from 'share/lib/util'
 import { parseOtpAuthUri } from '../lib/totp'
@@ -63,22 +63,14 @@ export default observer(function ToolbarComponent() {
     <Toolbar>
       <ToolbarButton
         onClick={() => store.openAddDialog()}
+        menu={[
+          { label: t('scanScreen'), click: () => handleScan() },
+          { label: t('openImage'), click: () => handleOpenImage() },
+          { label: t('importUri'), click: () => store.openImportDialog() },
+        ]}
         title={t('addAccount')}
       >
         <Plus size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={handleScan}
-        menu={[
-          { label: t('importUri'), click: () => store.openImportDialog() },
-          {
-            label: t('openImage'),
-            click: () => handleOpenImage(),
-          },
-        ]}
-        title={t('scanScreen')}
-      >
-        <QrCode size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSeparator />
       <ToolbarSearch

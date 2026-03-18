@@ -30,18 +30,31 @@ function hexToRgba(hex: string): [number, number, number, number] {
   ]
 }
 
+function correctLevelToZxing(
+  level: 'L' | 'M' | 'Q' | 'H'
+): QRCodeDecoderErrorCorrectionLevel {
+  switch (level) {
+    case 'M':
+      return QRCodeDecoderErrorCorrectionLevel.M
+    case 'Q':
+      return QRCodeDecoderErrorCorrectionLevel.Q
+    case 'H':
+      return QRCodeDecoderErrorCorrectionLevel.H
+    default:
+      return QRCodeDecoderErrorCorrectionLevel.L
+  }
+}
+
 export function renderQRToCanvas(
   canvas: HTMLCanvasElement,
   text: string,
   size: number,
   fgColor: string,
-  bgColor: string
+  bgColor: string,
+  correctLevel: 'L' | 'M' | 'Q' | 'H'
 ) {
   const hints = new Map<EncodeHintType, unknown>()
-  hints.set(
-    EncodeHintType.ERROR_CORRECTION,
-    QRCodeDecoderErrorCorrectionLevel.M
-  )
+  hints.set(EncodeHintType.ERROR_CORRECTION, correctLevelToZxing(correctLevel))
   hints.set(EncodeHintType.MARGIN, 2)
 
   const bitMatrix = qrWriter.encode(

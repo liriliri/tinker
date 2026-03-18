@@ -15,8 +15,5 @@
         "name": "两步验证"
       }
     }
-  },
-  "devDependencies": {
-    "@zxing/library": "^0.21.3"
   }
 }

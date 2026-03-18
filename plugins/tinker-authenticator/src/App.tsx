@@ -11,6 +11,7 @@ import AddDialog from './components/AddDialog'
 import ImportDialog from './components/ImportDialog'
 import LockScreen from './components/LockScreen'
 import PasswordDialog from './components/PasswordDialog'
+import QRDialog from './components/QRDialog'
 
 export default observer(function App() {
   const { t, i18n } = useTranslation()
@@ -49,6 +50,7 @@ export default observer(function App() {
             <AddDialog />
             <ImportDialog />
             <PasswordDialog />
+            <QRDialog />
           </div>
         )}
       </ToasterProvider>

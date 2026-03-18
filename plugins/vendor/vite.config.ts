@@ -22,6 +22,7 @@ const globals = {
   'ag-grid-community': 'AgGridCommunity',
   'ag-grid-react': 'AgGridReact',
   'lucide-react': 'lucideReact',
+  '@zxing/library': 'zxing',
   'html-to-image': 'htmlToImage',
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
@@ -163,6 +164,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'wavesurfer') {
     return createConfig('wavesurfer', 'PluginVendorWavesurfer')
+  }
+
+  if (target === 'zxing') {
+    return createConfig('zxing', 'PluginVendorZxing')
   }
 
   return createConfig('react', 'PluginVendorReact')

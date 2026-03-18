@@ -5,12 +5,17 @@
   "correctLevel": "Error Correction",
   "setIcon": "Set Icon",
   "clearIcon": "Clear Icon",
-  "copy": "Copy to Clipboard",
+  "copy": "Copy",
   "save": "Save",
   "placeholder": "Enter text or URL to generate QR code...",
   "emptyTitle": "Enter text or URL on the left",
   "emptySubtitle": "to generate QR code",
   "custom": "Custom",
   "copiedSuccess": "Copied to clipboard",
-  "copiedFailed": "Copy failed"
+  "copiedFailed": "Copy failed",
+  "scan": "Scan QR Code",
+  "openImage": "Open Image",
+  "noQRFound": "No QR code found",
+  "scanResult": "Scan Result",
+  "close": "Close"
 }

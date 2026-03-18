@@ -25,6 +25,9 @@ class Store extends BaseStore {
   correctLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
   iconDataUrl: string = ''
 
+  scanResult: string = ''
+  isScanResultOpen: boolean = false
+
   canvasRef: RefObject<HTMLCanvasElement | null> | null = null
 
   constructor() {
@@ -111,6 +114,15 @@ class Store extends BaseStore {
 
   setQRCodeDataURL(dataURL: string) {
     this.qrCodeDataURL = dataURL
+  }
+
+  openScanResult(result: string) {
+    this.scanResult = result
+    this.isScanResultOpen = true
+  }
+
+  closeScanResult() {
+    this.isScanResultOpen = false
   }
 
   async copyQRCodeToClipboardWithToast() {

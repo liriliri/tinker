@@ -5,12 +5,17 @@
   "correctLevel": "容错率",
   "setIcon": "设置图标",
   "clearIcon": "清除图标",
-  "copy": "复制到剪贴板",
+  "copy": "复制",
   "save": "保存",
   "placeholder": "输入文本或 URL 生成二维码...",
   "emptyTitle": "在左侧输入文本或 URL",
   "emptySubtitle": "以生成二维码",
   "custom": "自定义",
   "copiedSuccess": "已复制到剪贴板",
-  "copiedFailed": "复制失败"
+  "copiedFailed": "复制失败",
+  "scan": "扫描二维码",
+  "openImage": "打开图片",
+  "noQRFound": "未找到二维码",
+  "scanResult": "扫描结果",
+  "close": "关闭"
 }

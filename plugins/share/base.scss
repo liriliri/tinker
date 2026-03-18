@@ -1,12 +1,18 @@
 @use 'tailwindcss';
 
+button:focus-visible {
+  outline: 1px solid var(--theme-primary);
+}
+
 :root {
+  --theme-primary: #0fc25e;
   --toast-bg: #ffffff;
   --toast-text: #333333;
 }
 
 html.dark {
   color-scheme: dark;
+  --theme-primary: #0fc25e;
   --toast-bg: #333333;
   --toast-text: #ffffff;
 }

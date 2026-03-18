@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Pencil, Trash2 } from 'lucide-react'
+import { Copy, Check, Pencil, Trash2, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
@@ -67,6 +67,13 @@ export default observer(function AccountCard({ account }: AccountCardProps) {
             title={t('copy')}
           >
             {copied ? <Check size={13} /> : <Copy size={13} />}
+          </button>
+          <button
+            onClick={() => store.openQRDialog(account)}
+            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
+            title={t('showQRCode')}
+          >
+            <QrCode size={13} />
           </button>
           <button
             onClick={() => store.openAddDialog(account)}

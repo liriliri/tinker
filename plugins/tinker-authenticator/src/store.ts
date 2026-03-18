@@ -23,6 +23,8 @@ class Store extends BaseStore {
   showAddDialog: boolean = false
   showImportDialog: boolean = false
   showPasswordDialog: boolean = false
+  showQRDialog: boolean = false
+  qrAccount: Account | null = null
   editingAccount: Account | null = null
   prefillData: Omit<Account, 'id'> | null = null
 
@@ -162,6 +164,16 @@ class Store extends BaseStore {
 
   closeImportDialog() {
     this.showImportDialog = false
+  }
+
+  openQRDialog(account: Account) {
+    this.qrAccount = account
+    this.showQRDialog = true
+  }
+
+  closeQRDialog() {
+    this.showQRDialog = false
+    this.qrAccount = null
   }
 
   openPasswordDialog() {

@@ -20,6 +20,8 @@
   "add": "Add",
   "copy": "Copy",
   "copyFailed": "Copy failed",
+  "showQRCode": "Show QR Code",
+  "close": "Close",
   "secretRequired": "Secret key is required",
   "nameRequired": "Issuer or account name is required",
   "accountAdded": "Account added",

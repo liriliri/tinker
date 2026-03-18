@@ -21,6 +21,8 @@
   "add": "添加",
   "copy": "复制",
   "copyFailed": "复制失败",
+  "showQRCode": "显示二维码",
+  "close": "关闭",
   "secretRequired": "密钥不能为空",
   "nameRequired": "服务商或账户名不能为空",
   "accountAdded": "账户已添加",

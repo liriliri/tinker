@@ -142,6 +142,29 @@ export function parseOtpAuthUri(uri: string): Partial<{
   }
 }
 
+export function buildOtpAuthUri(account: {
+  issuer: string
+  account: string
+  secret: string
+  algorithm: OTPAlgorithm
+  period: number
+  digits: number
+}): string {
+  const label = account.issuer
+    ? `${encodeURIComponent(account.issuer)}:${encodeURIComponent(
+        account.account
+      )}`
+    : encodeURIComponent(account.account)
+  const params = new URLSearchParams({
+    secret: account.secret,
+    issuer: account.issuer,
+    algorithm: account.algorithm,
+    digits: String(account.digits),
+    period: String(account.period),
+  })
+  return `otpauth://totp/${label}?${params.toString()}`
+}
+
 export function formatCode(code: string): string {
   if (code.length === 6) return `${code.slice(0, 3)} ${code.slice(3)}`
   if (code.length === 8) return `${code.slice(0, 4)} ${code.slice(4)}`

@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
@@ -10,7 +10,8 @@
     "build:aggrid": "vite build --config vite.config.ts --mode aggrid",
     "build:lucide": "vite build --config vite.config.ts --mode lucide",
     "build:htmltoimage": "vite build --config vite.config.ts --mode htmltoimage",
-    "build:wavesurfer": "vite build --config vite.config.ts --mode wavesurfer"
+    "build:wavesurfer": "vite build --config vite.config.ts --mode wavesurfer",
+    "build:zxing": "vite build --config vite.config.ts --mode zxing"
   },
   "dependencies": {
     "got": "^11.8.6",
@@ -20,6 +21,7 @@
     "@monaco-editor/react": "^4.7.0",
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",
+    "@zxing/library": "^0.21.3",
     "html-to-image": "^1.11.13",
     "idb": "^8.0.3",
     "lucide-react": "^0.556.0",

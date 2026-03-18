@@ -15,8 +15,5 @@
         "name": "二维码"
       }
     }
-  },
-  "devDependencies": {
-    "qrcode": "^1.5.4"
   }
 }

@@ -1,7 +1,10 @@
 import { observer } from 'mobx-react-lite'
-import { Save, Image } from 'lucide-react'
+import { Save, Image, ScanLine } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import openFile from 'licia/openFile'
+import toast from 'react-hot-toast'
+import { openImageFile } from 'share/lib/util'
+import { decodeQRFromUrl } from '../lib/qr'
 import store from '../store'
 import Select from 'share/components/Select'
 import {
@@ -87,9 +90,36 @@ export default observer(function ToolbarComponent() {
     }
   }
 
+  async function decodeAndShow(url: string) {
+    const text = await decodeQRFromUrl(url)
+    store.openScanResult(text)
+  }
+
+  async function handleScan() {
+    const dataUrl = await tinker.captureScreen()
+    if (!dataUrl) return
+    try {
+      await decodeAndShow(dataUrl)
+    } catch {
+      toast.error(t('noQRFound'))
+    }
+  }
+
+  async function handleOpenImage() {
+    const result = await openImageFile({ title: t('openImage') })
+    if (!result) return
+    const url = URL.createObjectURL(result.file)
+    try {
+      await decodeAndShow(url)
+    } catch {
+      toast.error(t('noQRFound'))
+    } finally {
+      URL.revokeObjectURL(url)
+    }
+  }
+
   return (
     <Toolbar>
-      {/* Size Control */}
       <div className="flex items-center gap-1.5 px-1">
         <ToolbarLabel>{`${t('size')}:`}</ToolbarLabel>
         <Select
@@ -110,7 +140,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      {/* Error Correction Level */}
       <div className="flex items-center gap-1.5 px-1">
         <ToolbarLabel>{`${t('correctLevel')}:`}</ToolbarLabel>
         <Select
@@ -124,7 +153,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      {/* Foreground Color */}
       <div className="flex items-center gap-1.5 px-1">
         <ToolbarLabel>{`${t('color')}:`}</ToolbarLabel>
         <ToolbarColor
@@ -133,7 +161,6 @@ export default observer(function ToolbarComponent() {
         />
       </div>
 
-      {/* Background Color */}
       <div className="flex items-center gap-1.5 px-1">
         <ToolbarLabel>{`${t('background')}:`}</ToolbarLabel>
         <ToolbarColor
@@ -144,7 +171,6 @@ export default observer(function ToolbarComponent() {
 
       <ToolbarSeparator />
 
-      {/* Icon */}
       <ToolbarButton
         onClick={handleSetIcon}
         menu={
@@ -165,6 +191,16 @@ export default observer(function ToolbarComponent() {
         title={t('save')}
       >
         <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <ToolbarButton
+        onClick={handleScan}
+        menu={[{ label: t('openImage'), click: () => handleOpenImage() }]}
+        title={t('scan')}
+      >
+        <ScanLine size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
     </Toolbar>
   )
