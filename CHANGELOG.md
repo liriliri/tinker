@@ -1,3 +1,9 @@
+## v1.4.0 (18 Mar 2026)
+
+feat: add authenticator
+feat(qrcode): scan qrcode
+feat: settings ui
+
 ## v1.3.1 (15 Mar 2026)
 
 * fix(todo): date formatting
