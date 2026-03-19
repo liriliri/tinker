@@ -32,6 +32,17 @@ export function injectApi() {
     return extendedPromise
   }
 
+  function callAIStream(option: any, onChunk: any) {
+    const { promise, requestId } = _tinker.callAIStream(option, onChunk)
+
+    const extendedPromise = promise as any
+    extendedPromise.abort = function () {
+      _tinker.abortAI(requestId)
+    }
+
+    return extendedPromise
+  }
+
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -53,6 +64,8 @@ export function injectApi() {
     getApps: _tinker.getApps,
     getSetting: _tinker.getSetting,
     setSetting: _tinker.setSetting,
+    callAI: _tinker.callAI,
+    callAIStream,
   }
 
   function showContextMenu(x, y, options) {

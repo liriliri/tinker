@@ -44,42 +44,38 @@ export default observer(function AppearanceSection() {
 
   return (
     <div>
-      <h2 className={`text-base font-semibold mb-2 ${tw.primary.text}`}>
+      <h2 className={`text-sm font-semibold mb-2 px-1 ${tw.text.secondary}`}>
         {t('appearance')}
       </h2>
-      <section
-        className={`rounded-lg p-3 border ${tw.border} ${tw.bg.secondary}`}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className={`text-xs ${tw.text.secondary}`}>
-              {t('theme')}
-            </label>
-            <Select
-              value={store.theme}
-              onChange={handleThemeChange}
-              options={themeOptions}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className={`text-xs ${tw.text.secondary}`}>
-              {t('language')}
-            </label>
-            <Select
-              value={store.language}
-              onChange={handleLanguageChange}
-              options={languageOptions}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className={`text-xs ${tw.text.secondary}`}>
-              {t('useNativeTitlebar')}
-            </label>
-            <Checkbox
-              checked={store.useNativeTitlebar}
-              onChange={handleNativeTitlebarChange}
-            />
-          </div>
+      <section className={`rounded-lg border ${tw.border} ${tw.bg.secondary}`}>
+        <div className="flex items-center justify-between px-4 py-3">
+          <label className={`text-sm ${tw.text.primary}`}>{t('theme')}</label>
+          <Select
+            value={store.theme}
+            onChange={handleThemeChange}
+            options={themeOptions}
+          />
+        </div>
+        <div className={`h-px ${tw.bg.border}`} />
+        <div className="flex items-center justify-between px-4 py-3">
+          <label className={`text-sm ${tw.text.primary}`}>
+            {t('language')}
+          </label>
+          <Select
+            value={store.language}
+            onChange={handleLanguageChange}
+            options={languageOptions}
+          />
+        </div>
+        <div className={`h-px ${tw.bg.border}`} />
+        <div className="flex items-center justify-between px-4 py-3">
+          <label className={`text-sm ${tw.text.primary}`}>
+            {t('useNativeTitlebar')}
+          </label>
+          <Checkbox
+            checked={store.useNativeTitlebar}
+            onChange={handleNativeTitlebarChange}
+          />
         </div>
       </section>
     </div>

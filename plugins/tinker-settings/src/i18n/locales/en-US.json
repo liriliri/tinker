@@ -1,4 +1,5 @@
 {
+  "general": "General",
   "appearance": "Appearance",
   "theme": "Theme",
   "language": "Language",
@@ -15,5 +16,32 @@
   "showShortcut": "Show Shortcut",
   "autoHide": "Auto Hide",
 
-  "restartRequired": "Restart required to apply changes."
+  "restartRequired": "Restart required to apply changes.",
+
+  "ai": "AI",
+  "aiModels": "AI Models",
+  "aiProvider": "AI Provider",
+  "addProvider": "Add Provider",
+  "editProvider": "Edit Provider",
+  "providerName": "Name",
+  "apiUrl": "API Base URL",
+  "apiUrlHint": "Must be OpenAI-compatible API format",
+  "apiKey": "API Key",
+  "showApiKey": "Show API Key",
+  "hideApiKey": "Hide API Key",
+  "model": "Default Model",
+  "noProviders": "No AI providers configured",
+  "edit": "Edit",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "save": "Save",
+  "deleteProvider": "Delete Provider",
+  "deleteProviderConfirm": "Are you sure you want to delete \"{{name}}\"?",
+  "providerAdded": "Provider added",
+  "providerUpdated": "Provider updated",
+  "providerDeleted": "Provider deleted",
+  "nameRequired": "Name is required",
+  "apiUrlRequired": "API Base URL is required",
+  "apiKeyRequired": "API Key is required",
+  "modelRequired": "Default Model is required"
 }

@@ -7,7 +7,7 @@ import startWith from 'licia/startWith'
 import * as language from 'share/main/lib/language'
 import extend from 'licia/extend'
 import types from 'licia/types'
-import isEmpty from 'licia/isEmpty'
+import keys from 'licia/keys'
 import map from 'licia/map'
 import identity from 'licia/identity'
 import replaceAll from 'licia/replaceAll'
@@ -21,6 +21,10 @@ const logger = log('plugin')
 const DEFAULT_ICON = resolveResources('default-plugin.png')
 
 export const plugins: types.PlainObj<IPlugin> = {}
+;(async function () {
+  const name = 'tinker-settings'
+  plugins[name] = await loadPlugin(name, path.join(getBuiltinPluginDir(), name))
+})()
 
 export function getBuiltinPluginDir() {
   return path.join(__dirname, isDev() ? '../../plugins' : '../plugins')
@@ -83,12 +87,12 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
 }
 
 export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
-  if (!force && !isEmpty(plugins)) {
+  if (!force && keys(plugins).length > 1) {
     return map(plugins, identity)
   }
 
   const pluginDirs: Array<{ dir: string; prefix?: string }> = []
-  if (isEmpty(plugins)) {
+  if (keys(plugins).length <= 1) {
     pluginDirs.push({ dir: getBuiltinPluginDir() })
   }
   try {

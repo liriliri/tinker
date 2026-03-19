@@ -9,31 +9,28 @@ export default observer(function StartupSection() {
 
   return (
     <div>
-      <h2 className={`text-base font-semibold mb-2 ${tw.primary.text}`}>
+      <h2 className={`text-sm font-semibold mb-2 px-1 ${tw.text.secondary}`}>
         {t('startup')}
       </h2>
-      <section
-        className={`rounded-lg p-3 border ${tw.border} ${tw.bg.secondary}`}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className={`text-xs ${tw.text.secondary}`}>
-              {t('openAtLogin')}
-            </label>
-            <Checkbox
-              checked={store.openAtLogin}
-              onChange={(v) => store.setOpenAtLogin(v)}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className={`text-xs ${tw.text.secondary}`}>
-              {t('silentStart')}
-            </label>
-            <Checkbox
-              checked={store.silentStart}
-              onChange={(v) => store.setSilentStart(v)}
-            />
-          </div>
+      <section className={`rounded-lg border ${tw.border} ${tw.bg.secondary}`}>
+        <div className="flex items-center justify-between px-4 py-3">
+          <label className={`text-sm ${tw.text.primary}`}>
+            {t('openAtLogin')}
+          </label>
+          <Checkbox
+            checked={store.openAtLogin}
+            onChange={(v) => store.setOpenAtLogin(v)}
+          />
+        </div>
+        <div className={`h-px ${tw.bg.border}`} />
+        <div className="flex items-center justify-between px-4 py-3">
+          <label className={`text-sm ${tw.text.primary}`}>
+            {t('silentStart')}
+          </label>
+          <Checkbox
+            checked={store.silentStart}
+            onChange={(v) => store.setSilentStart(v)}
+          />
         </div>
       </section>
     </div>

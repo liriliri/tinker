@@ -1,4 +1,5 @@
 {
+  "general": "通用",
   "appearance": "外观",
   "theme": "主题",
   "language": "语言",
@@ -15,5 +16,32 @@
   "showShortcut": "唤出快捷键",
   "autoHide": "自动隐藏",
 
-  "restartRequired": "需要重启应用后生效。"
+  "restartRequired": "需要重启应用后生效。",
+
+  "ai": "AI",
+  "aiModels": "AI 模型",
+  "aiProvider": "AI 提供商",
+  "addProvider": "添加提供商",
+  "editProvider": "编辑提供商",
+  "providerName": "名称",
+  "apiUrl": "API 地址",
+  "apiUrlHint": "必须使用与 OpenAI 兼容的 API 格式",
+  "apiKey": "API 密钥",
+  "showApiKey": "显示 API 密钥",
+  "hideApiKey": "隐藏 API 密钥",
+  "model": "默认模型",
+  "noProviders": "暂无 AI 提供商配置",
+  "edit": "编辑",
+  "delete": "删除",
+  "cancel": "取消",
+  "save": "保存",
+  "deleteProvider": "删除提供商",
+  "deleteProviderConfirm": "确定要删除「{{name}}」吗？",
+  "providerAdded": "提供商已添加",
+  "providerUpdated": "提供商已更新",
+  "providerDeleted": "提供商已删除",
+  "nameRequired": "请填写名称",
+  "apiUrlRequired": "请填写 API 地址",
+  "apiKeyRequired": "请填写 API 密钥",
+  "modelRequired": "请填写默认模型"
 }

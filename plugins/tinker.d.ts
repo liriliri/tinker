@@ -83,6 +83,48 @@ interface AppInfo {
   path: string
 }
 
+interface AiProvider {
+  id: string
+  name: string
+  apiUrl: string
+  apiKey: string
+  model: string
+}
+
+interface AiMessage {
+  role: string
+  content?: string | any[]
+  reasoning_content?: string
+  tool_calls?: any[]
+  tool_call_id?: string
+}
+
+interface AiCallOption {
+  provider?: string
+  messages: AiMessage[]
+  tools?: any[]
+  temperature?: number
+  maxTokens?: number
+}
+
+interface AiResult {
+  success: boolean
+  data?: AiMessage
+  error?: string
+}
+
+interface AiChunk {
+  content?: string
+  reasoning_content?: string
+  tool_calls?: any[]
+  done?: boolean
+  error?: string
+}
+
+interface AiStreamTask extends Promise<void> {
+  abort(): void
+}
+
 declare global {
   const tinker: {
     /** @returns 'light' or 'dark' */
@@ -185,6 +227,36 @@ declare global {
       y: number,
       options: MenuItemConstructorOptions[]
     ) => void
+
+    /**
+     * Call AI with a non-streaming request.
+     * Uses the configured AI provider to send messages and receive a response.
+     * @param option - Call options including messages, provider, tools, etc.
+     * @returns Result with success flag and response message or error
+     */
+    callAI(option: AiCallOption): Promise<AiResult>
+
+    /**
+     * Call AI with a streaming request.
+     * Streams response chunks via callback as they arrive.
+     * @param option - Call options including messages, provider, tools, etc.
+     * @param onChunk - Callback invoked for each chunk; chunk.done signals completion
+     * @returns Task object with abort() method to cancel the stream
+     * @example
+     * const task = tinker.callAIStream(
+     *   { messages: [{ role: 'user', content: 'Hello' }] },
+     *   (chunk) => {
+     *     if (chunk.content) process.stdout.write(chunk.content)
+     *     if (chunk.done) console.log('Done')
+     *   }
+     * )
+     * // To cancel:
+     * task.abort()
+     */
+    callAIStream(
+      option: AiCallOption,
+      onChunk: (chunk: AiChunk) => void
+    ): AiStreamTask
   }
 }
 
