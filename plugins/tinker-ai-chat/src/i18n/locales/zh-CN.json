@@ -1,0 +1,18 @@
+{
+  "newChat": "新对话",
+  "sessions": "对话列表",
+  "clearMessages": "清空消息",
+  "delete": "删除",
+  "you": "你",
+  "assistant": "助手",
+  "retry": "重试",
+  "send": "发送",
+  "stop": "停止",
+  "inputPlaceholder": "输入消息…（Enter 发送，Shift+Enter 换行）",
+  "sendHint": "Enter 发送 · Shift+Enter 换行",
+  "emptyHint": "开始对话吧",
+  "noProviders": "未配置 AI 提供商，请在 Tinker 设置中配置。",
+  "errorPrefix": "错误：",
+  "systemPrompt": "系统提示词",
+  "systemPromptPlaceholder": "可选的系统提示词…"
+}

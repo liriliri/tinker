@@ -1,0 +1,18 @@
+{
+  "newChat": "New Chat",
+  "sessions": "Sessions",
+  "clearMessages": "Clear Messages",
+  "delete": "Delete",
+  "you": "You",
+  "assistant": "Assistant",
+  "retry": "Retry",
+  "send": "Send",
+  "stop": "Stop",
+  "inputPlaceholder": "Type a message... (Enter to send, Shift+Enter for newline)",
+  "sendHint": "Enter to send · Shift+Enter for newline",
+  "emptyHint": "Start a conversation",
+  "noProviders": "No AI providers configured. Please set up a provider in Tinker settings.",
+  "errorPrefix": "Error: ",
+  "systemPrompt": "System Prompt",
+  "systemPromptPlaceholder": "Optional system prompt..."
+}
