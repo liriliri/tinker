@@ -20,9 +20,14 @@ export default observer(function App() {
     <AlertProvider locale={i18n.language}>
       <ConfirmProvider locale={i18n.language}>
         <PromptProvider locale={i18n.language}>
-          <div className={`h-screen flex overflow-hidden ${tw.bg.primary}`}>
-            <Sidebar />
-            <Editor />
+          <div
+            className={`h-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
+          >
+            <div className={`border-t ${tw.border}`} />
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <Editor />
+            </div>
           </div>
         </PromptProvider>
       </ConfirmProvider>

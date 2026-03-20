@@ -53,7 +53,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
     <div className="tree-node">
       <div
         className={`
-          flex items-center py-1 px-2 cursor-pointer
+          flex items-center py-2.5 px-2 cursor-pointer
           transition-colors
           ${isActive ? tw.primary.bg : tw.hover}
         `}

@@ -96,7 +96,7 @@ export default observer(function Sidebar() {
       <div
         key={cfg.id}
         className={className(
-          'flex items-center gap-2 px-3 py-2 cursor-pointer',
+          'flex items-center gap-2 px-3 py-2.5 cursor-pointer',
           tw.hover,
           isSelected && tw.active
         )}

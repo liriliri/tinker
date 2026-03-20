@@ -46,7 +46,7 @@ export default function NavList({
             key={item.id}
             title={item.title}
             className={className(
-              'w-full flex items-center gap-2 py-1 px-2 transition-colors text-sm',
+              'w-full flex items-center gap-2 py-2.5 px-2 transition-colors text-sm',
               tw.hover,
               tw.text.primary,
               isActive && tw.active

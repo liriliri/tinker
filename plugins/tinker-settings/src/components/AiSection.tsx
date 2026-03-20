@@ -2,11 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Plus, Pencil, Trash2 } from 'lucide-react'
-import { tw } from 'share/theme'
-import TextInput from 'share/components/TextInput'
-import Dialog, { DialogButton } from 'share/components/Dialog'
-import { confirm } from 'share/components/Confirm'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
@@ -14,81 +10,50 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import Grid from 'share/components/Grid'
-import { ColDef, RowClickedEvent, GetRowIdParams } from 'ag-grid-community'
+import { confirm } from 'share/components/Confirm'
+import {
+  ColDef,
+  RowClickedEvent,
+  GetRowIdParams,
+  ICellRendererParams,
+} from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import uuid from 'licia/uuid'
-import store, { AiProvider } from '../store'
-
-function emptyProvider(): AiProvider {
-  return { id: '', name: '', apiUrl: '', apiKey: '', model: '' }
-}
-
-function maskApiKey(apiKey: string): string {
-  if (!apiKey) return ''
-  if (apiKey.length <= 8) return '••••••••'
-  return apiKey.substring(0, 4) + '••••' + apiKey.substring(apiKey.length - 4)
-}
+import store from '../store'
+import AddProviderDialog from './AddProviderDialog'
+import EditProviderDialog from './EditProviderDialog'
+import ClaudeIcon from '../assets/claude.svg?react'
+import OpenAIIcon from '../assets/openai.svg?react'
 
 interface RowData {
   id: string
   name: string
   model: string
   apiUrl: string
-  apiKey: string
+  apiType: string
+}
+
+const ProviderNameCell = ({ data }: ICellRendererParams<RowData>) => {
+  if (!data) return null
+  const Icon = data.apiType === 'claude' ? ClaudeIcon : OpenAIIcon
+  return (
+    <div className="flex items-center gap-2">
+      <Icon className="w-4 h-4 flex-shrink-0" />
+      <span className="truncate">{data.name}</span>
+    </div>
+  )
 }
 
 export default observer(function AiSection() {
   const { t } = useTranslation()
   const gridRef = useRef<AgGridReact<RowData>>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState<AiProvider>(emptyProvider())
+  const [addOpen, setAddOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const handleAdd = () => {
-    setForm({ ...emptyProvider(), id: uuid() })
-    setEditingId(null)
-    setDialogOpen(true)
-  }
-
-  const handleEdit = useCallback((provider: AiProvider) => {
-    setForm({ ...provider })
-    setEditingId(provider.id)
-    setDialogOpen(true)
-  }, [])
-
-  const handleClose = () => {
-    setDialogOpen(false)
-    setEditingId(null)
-    setForm(emptyProvider())
-  }
-
-  const handleSave = async () => {
-    if (!form.name.trim()) {
-      toast.error(t('nameRequired'))
-      return
-    }
-    if (!form.apiUrl.trim()) {
-      toast.error(t('apiUrlRequired'))
-      return
-    }
-    if (!form.apiKey.trim()) {
-      toast.error(t('apiKeyRequired'))
-      return
-    }
-    if (!form.model.trim()) {
-      toast.error(t('modelRequired'))
-      return
-    }
-    if (editingId) {
-      await store.updateAiProvider(form)
-      toast.success(t('providerUpdated'))
-    } else {
-      await store.addAiProvider(form)
-      toast.success(t('providerAdded'))
-    }
-    handleClose()
-  }
+  const selectedProvider = useMemo(
+    () => store.aiProviders.find((p) => p.id === selectedId) ?? null,
+    [selectedId, store.aiProviders]
+  )
 
   const handleDelete = useCallback(async () => {
     if (!selectedId) return
@@ -108,13 +73,6 @@ export default observer(function AiSection() {
     toast.success(t('providerDeleted'))
   }, [selectedId, t])
 
-  const handleEditSelected = useCallback(() => {
-    if (!selectedId) return
-    const provider = store.aiProviders.find((p) => p.id === selectedId)
-    if (!provider) return
-    handleEdit(provider)
-  }, [selectedId, handleEdit])
-
   const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
       {
@@ -123,6 +81,7 @@ export default observer(function AiSection() {
         flex: 1,
         minWidth: 120,
         sortable: true,
+        cellRenderer: ProviderNameCell,
       },
       {
         field: 'model',
@@ -138,14 +97,6 @@ export default observer(function AiSection() {
         minWidth: 150,
         sortable: true,
       },
-      {
-        field: 'apiKey',
-        headerName: t('apiKey'),
-        flex: 1,
-        minWidth: 120,
-        sortable: false,
-        valueFormatter: (params) => maskApiKey(params.value as string),
-      },
     ],
     [t]
   )
@@ -157,15 +108,13 @@ export default observer(function AiSection() {
         name: p.name,
         model: p.model,
         apiUrl: p.apiUrl,
-        apiKey: p.apiKey,
+        apiType: p.apiType ?? 'openai',
       })),
     [store.aiProviders]
   )
 
   const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
-    if (event.data) {
-      setSelectedId(event.data.id)
-    }
+    if (event.data) setSelectedId(event.data.id)
   }, [])
 
   const getRowId = useCallback(
@@ -174,12 +123,8 @@ export default observer(function AiSection() {
   )
 
   const getRowClass = useCallback(
-    (params: { data?: RowData }) => {
-      if (params.data && params.data.id === selectedId) {
-        return 'ag-row-selected'
-      }
-      return ''
-    },
+    (params: { data?: RowData }) =>
+      params.data?.id === selectedId ? 'ag-row-selected' : '',
     [selectedId]
   )
 
@@ -191,19 +136,20 @@ export default observer(function AiSection() {
 
   const localeText = useMemo(() => ({ noRowsToShow: t('noProviders') }), [t])
 
-  const dialogTitle = editingId ? t('editProvider') : t('addProvider')
-
   return (
     <div className="h-full flex flex-col">
       <Toolbar>
-        <ToolbarButton onClick={handleAdd} title={t('addProvider')}>
+        <ToolbarButton
+          onClick={() => setAddOpen(true)}
+          title={t('addProvider')}
+        >
           <Plus size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
 
         <ToolbarSeparator />
 
         <ToolbarButton
-          onClick={handleEditSelected}
+          onClick={() => setEditOpen(true)}
           disabled={!selectedId}
           title={t('edit')}
         >
@@ -237,95 +183,13 @@ export default observer(function AiSection() {
         />
       </div>
 
-      <Dialog
-        open={dialogOpen}
-        onClose={handleClose}
-        title={dialogTitle}
-        showClose
-      >
-        <ProviderForm
-          form={form}
-          setForm={setForm}
-          onSave={handleSave}
-          onCancel={handleClose}
-        />
-      </Dialog>
+      <AddProviderDialog open={addOpen} onClose={() => setAddOpen(false)} />
+
+      <EditProviderDialog
+        open={editOpen}
+        provider={selectedProvider}
+        onClose={() => setEditOpen(false)}
+      />
     </div>
   )
 })
-
-interface ProviderFormProps {
-  form: AiProvider
-  setForm: (form: AiProvider) => void
-  onSave: () => void
-  onCancel: () => void
-}
-
-function ProviderForm({ form, setForm, onSave, onCancel }: ProviderFormProps) {
-  const { t } = useTranslation()
-  const [showApiKey, setShowApiKey] = useState(false)
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('providerName')} <span className="text-red-500">*</span>
-        </label>
-        <TextInput
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder={t('providerName')}
-        />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('apiUrl')} <span className="text-red-500">*</span>
-        </label>
-        <TextInput
-          value={form.apiUrl}
-          onChange={(e) => setForm({ ...form, apiUrl: e.target.value })}
-          placeholder="https://api.openai.com/v1"
-        />
-        <p className={`text-xs ${tw.text.tertiary}`}>{t('apiUrlHint')}</p>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('apiKey')} <span className="text-red-500">*</span>
-        </label>
-        <div className="relative">
-          <TextInput
-            type={showApiKey ? 'text' : 'password'}
-            value={form.apiKey}
-            onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
-            placeholder={t('apiKey')}
-            className="pr-8"
-          />
-          <button
-            type="button"
-            onClick={() => setShowApiKey(!showApiKey)}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary} hover:text-gray-600 dark:hover:text-gray-300`}
-            title={showApiKey ? t('hideApiKey') : t('showApiKey')}
-          >
-            {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('model')} <span className="text-red-500">*</span>
-        </label>
-        <TextInput
-          value={form.model}
-          onChange={(e) => setForm({ ...form, model: e.target.value })}
-          placeholder="gpt-4o"
-        />
-      </div>
-      <div className="flex justify-end gap-2 pt-1">
-        <DialogButton variant="text" onClick={onCancel}>
-          {t('cancel')}
-        </DialogButton>
-        <DialogButton onClick={onSave}>{t('save')}</DialogButton>
-      </div>
-    </div>
-  )
-}

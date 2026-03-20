@@ -1,12 +1,15 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 
+type ApiType = 'openai' | 'claude'
+
 interface AiProvider {
   id: string
   name: string
   apiUrl: string
   apiKey: string
   model: string
+  apiType?: ApiType
 }
 
 class Store extends BaseStore {
@@ -116,5 +119,5 @@ class Store extends BaseStore {
   }
 }
 
-export type { AiProvider }
+export type { ApiType, AiProvider }
 export default new Store()
