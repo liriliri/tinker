@@ -1,16 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
-
-type ApiType = 'openai' | 'claude'
-
-interface AiProvider {
-  id: string
-  name: string
-  apiUrl: string
-  apiKey: string
-  model: string
-  apiType?: ApiType
-}
+import type { AiProvider, Section } from './types'
 
 class Store extends BaseStore {
   theme: string = 'system'
@@ -23,15 +13,27 @@ class Store extends BaseStore {
   aiProviders: AiProvider[] = []
 
   isLoading: boolean = true
-  currentSection: string = 'general'
+  currentSection: Section = 'general'
+  selectedProviderId: string | null = null
 
   constructor() {
     super()
     makeAutoObservable(this)
   }
 
-  setCurrentSection(section: string) {
+  setCurrentSection(section: Section) {
     this.currentSection = section
+    this.selectedProviderId = null
+  }
+
+  setSelectedProviderId(id: string | null) {
+    this.selectedProviderId = id
+  }
+
+  get selectedProvider(): AiProvider | null {
+    return (
+      this.aiProviders.find((p) => p.id === this.selectedProviderId) ?? null
+    )
   }
 
   async loadSettings() {
@@ -62,7 +64,13 @@ class Store extends BaseStore {
     this.silentStart = silentStart ?? false
     this.showShortcut = showShortcut ?? 'Alt+Space'
     this.autoHide = autoHide ?? false
-    this.aiProviders = aiProvidersRaw ? JSON.parse(aiProvidersRaw) : []
+    const parsed: AiProvider[] = aiProvidersRaw
+      ? JSON.parse(aiProvidersRaw)
+      : []
+    this.aiProviders = parsed.map((p) => ({
+      ...p,
+      apiType: p.apiType ?? 'openai',
+    }))
     this.isLoading = false
   }
 
@@ -101,23 +109,29 @@ class Store extends BaseStore {
     await tinker.setSetting('autoHide', value)
   }
 
-  async addAiProvider(provider: AiProvider) {
-    this.aiProviders = [...this.aiProviders, provider]
+  private async saveAiProviders() {
     await tinker.setSetting('aiProviders', JSON.stringify(this.aiProviders))
+  }
+
+  async addAiProvider(provider: AiProvider) {
+    this.aiProviders.push(provider)
+    await this.saveAiProviders()
   }
 
   async updateAiProvider(provider: AiProvider) {
-    this.aiProviders = this.aiProviders.map((p) =>
-      p.id === provider.id ? provider : p
-    )
-    await tinker.setSetting('aiProviders', JSON.stringify(this.aiProviders))
+    const idx = this.aiProviders.findIndex((p) => p.id === provider.id)
+    if (idx !== -1) this.aiProviders[idx] = provider
+    await this.saveAiProviders()
   }
 
   async deleteAiProvider(id: string) {
-    this.aiProviders = this.aiProviders.filter((p) => p.id !== id)
-    await tinker.setSetting('aiProviders', JSON.stringify(this.aiProviders))
+    const idx = this.aiProviders.findIndex((p) => p.id === id)
+    if (idx !== -1) this.aiProviders.splice(idx, 1)
+    if (this.selectedProviderId === id) {
+      this.selectedProviderId = null
+    }
+    await this.saveAiProviders()
   }
 }
 
-export type { ApiType, AiProvider }
 export default new Store()

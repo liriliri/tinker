@@ -8,7 +8,7 @@ import Sidebar from './components/Sidebar'
 import AppearanceSection from './components/AppearanceSection'
 import StartupSection from './components/StartupSection'
 import WindowSection from './components/WindowSection'
-import AiSection from './components/AiSection'
+import AiView from './components/AiView'
 
 export default observer(function App() {
   useEffect(() => {
@@ -33,7 +33,7 @@ export default observer(function App() {
             )}
             {!store.isLoading && store.currentSection === 'ai' && (
               <div className="flex-1 overflow-hidden">
-                <AiSection />
+                <AiView />
               </div>
             )}
           </div>

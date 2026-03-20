@@ -24,6 +24,7 @@ const globals = {
   'lucide-react': 'lucideReact',
   '@zxing/library': 'zxing',
   'html-to-image': 'htmlToImage',
+  'react-resizable-panels': 'reactResizablePanels',
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
   'wavesurfer.js/plugins/timeline': 'wavesurferTimelinePlugin',
@@ -168,6 +169,14 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'zxing') {
     return createConfig('zxing', 'PluginVendorZxing')
+  }
+
+  if (target === 'reactresizablepanels') {
+    return createConfig(
+      'reactresizablepanels',
+      'PluginVendorReactResizablePanels',
+      ['react']
+    )
   }
 
   return createConfig('react', 'PluginVendorReact')

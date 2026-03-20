@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:reactresizablepanels",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
@@ -11,7 +11,8 @@
     "build:lucide": "vite build --config vite.config.ts --mode lucide",
     "build:htmltoimage": "vite build --config vite.config.ts --mode htmltoimage",
     "build:wavesurfer": "vite build --config vite.config.ts --mode wavesurfer",
-    "build:zxing": "vite build --config vite.config.ts --mode zxing"
+    "build:zxing": "vite build --config vite.config.ts --mode zxing",
+    "build:reactresizablepanels": "vite build --config vite.config.ts --mode reactresizablepanels"
   },
   "dependencies": {
     "got": "^11.8.6",
@@ -27,6 +28,7 @@
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",
-    "wavesurfer.js": "7.12.2"
+    "wavesurfer.js": "7.12.2",
+    "react-resizable-panels": "^4.3.3"
   }
 }

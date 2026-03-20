@@ -1,16 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useMemo, useCallback, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
-import {
-  Toolbar,
-  ToolbarButton,
-  ToolbarSeparator,
-  TOOLBAR_ICON_SIZE,
-} from 'share/components/Toolbar'
 import Grid from 'share/components/Grid'
-import { confirm } from 'share/components/Confirm'
 import {
   ColDef,
   RowClickedEvent,
@@ -20,7 +11,6 @@ import {
 import { AgGridReact } from 'ag-grid-react'
 import store from '../store'
 import AddProviderDialog from './AddProviderDialog'
-import EditProviderDialog from './EditProviderDialog'
 import ClaudeIcon from '../assets/claude.svg?react'
 import OpenAIIcon from '../assets/openai.svg?react'
 
@@ -43,35 +33,19 @@ const ProviderNameCell = ({ data }: ICellRendererParams<RowData>) => {
   )
 }
 
-export default observer(function AiSection() {
+interface Props {
+  search: string
+  addOpen: boolean
+  onAddClose: () => void
+}
+
+export default observer(function AiSection({
+  search,
+  addOpen,
+  onAddClose,
+}: Props) {
   const { t } = useTranslation()
   const gridRef = useRef<AgGridReact<RowData>>(null)
-  const [addOpen, setAddOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-
-  const selectedProvider = useMemo(
-    () => store.aiProviders.find((p) => p.id === selectedId) ?? null,
-    [selectedId, store.aiProviders]
-  )
-
-  const handleDelete = useCallback(async () => {
-    if (!selectedId) return
-    const provider = store.aiProviders.find((p) => p.id === selectedId)
-    if (!provider) return
-
-    const confirmed = await confirm({
-      title: t('deleteProvider'),
-      message: t('deleteProviderConfirm', { name: provider.name }),
-      confirmText: t('delete'),
-      cancelText: t('cancel'),
-    })
-    if (!confirmed) return
-
-    await store.deleteAiProvider(provider.id)
-    setSelectedId(null)
-    toast.success(t('providerDeleted'))
-  }, [selectedId, t])
 
   const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
@@ -101,20 +75,27 @@ export default observer(function AiSection() {
     [t]
   )
 
-  const rowData = useMemo<RowData[]>(
-    () =>
-      store.aiProviders.map((p) => ({
+  const rowData = useMemo<RowData[]>(() => {
+    const keyword = search.trim().toLowerCase()
+    return store.aiProviders
+      .filter(
+        (p) =>
+          !keyword ||
+          p.name.toLowerCase().includes(keyword) ||
+          p.model.toLowerCase().includes(keyword) ||
+          p.apiUrl.toLowerCase().includes(keyword)
+      )
+      .map((p) => ({
         id: p.id,
         name: p.name,
         model: p.model,
         apiUrl: p.apiUrl,
-        apiType: p.apiType ?? 'openai',
-      })),
-    [store.aiProviders]
-  )
+        apiType: p.apiType,
+      }))
+  }, [store.aiProviders, search])
 
   const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
-    if (event.data) setSelectedId(event.data.id)
+    if (event.data) store.setSelectedProviderId(event.data.id)
   }, [])
 
   const getRowId = useCallback(
@@ -122,74 +103,36 @@ export default observer(function AiSection() {
     []
   )
 
-  const getRowClass = useCallback(
-    (params: { data?: RowData }) =>
-      params.data?.id === selectedId ? 'ag-row-selected' : '',
-    [selectedId]
-  )
+  const getRowClass = (params: { data?: RowData }) =>
+    params.data?.id === store.selectedProviderId ? 'ag-row-selected' : ''
 
   useEffect(() => {
     if (gridRef.current?.api) {
       gridRef.current.api.redrawRows()
     }
-  }, [selectedId])
+  }, [store.selectedProviderId])
 
   const localeText = useMemo(() => ({ noRowsToShow: t('noProviders') }), [t])
 
   return (
-    <div className="h-full flex flex-col">
-      <Toolbar>
-        <ToolbarButton
-          onClick={() => setAddOpen(true)}
-          title={t('addProvider')}
-        >
-          <Plus size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarSeparator />
-
-        <ToolbarButton
-          onClick={() => setEditOpen(true)}
-          disabled={!selectedId}
-          title={t('edit')}
-        >
-          <Pencil size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarButton
-          onClick={handleDelete}
-          disabled={!selectedId}
-          title={t('delete')}
-        >
-          <Trash2 size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      </Toolbar>
-
-      <div className="flex-1 overflow-hidden">
-        <Grid<RowData>
-          isDark={store.isDark}
-          ref={gridRef}
-          columnDefs={columnDefs}
-          rowData={rowData}
-          onRowClicked={onRowClicked}
-          getRowId={getRowId}
-          getRowClass={getRowClass}
-          headerHeight={40}
-          rowHeight={40}
-          animateRows={true}
-          enableCellTextSelection={false}
-          suppressCellFocus={true}
-          localeText={localeText}
-        />
-      </div>
-
-      <AddProviderDialog open={addOpen} onClose={() => setAddOpen(false)} />
-
-      <EditProviderDialog
-        open={editOpen}
-        provider={selectedProvider}
-        onClose={() => setEditOpen(false)}
+    <div className="h-full overflow-hidden">
+      <Grid<RowData>
+        isDark={store.isDark}
+        ref={gridRef}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        onRowClicked={onRowClicked}
+        getRowId={getRowId}
+        getRowClass={getRowClass}
+        headerHeight={40}
+        rowHeight={40}
+        animateRows={true}
+        enableCellTextSelection={false}
+        suppressCellFocus={true}
+        localeText={localeText}
       />
+
+      <AddProviderDialog open={addOpen} onClose={onAddClose} />
     </div>
   )
 })

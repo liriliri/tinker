@@ -37,6 +37,8 @@
   "hideApiKey": "Hide API Key",
   "model": "Default Model",
   "noProviders": "No AI providers configured",
+  "noProviderSelected": "Select a provider to edit",
+  "search": "Search",
   "edit": "Edit",
   "delete": "Delete",
   "cancel": "Cancel",

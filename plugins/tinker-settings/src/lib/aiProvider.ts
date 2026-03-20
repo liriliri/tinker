@@ -1,4 +1,4 @@
-import { ApiType } from '../store'
+import type { ApiType } from '../types'
 
 export const API_TYPE_DEFAULTS: Record<
   ApiType,

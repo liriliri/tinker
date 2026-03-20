@@ -37,6 +37,8 @@
   "hideApiKey": "隐藏 API 密钥",
   "model": "默认模型",
   "noProviders": "暂无 AI 提供商配置",
+  "noProviderSelected": "选择提供商进行编辑",
+  "search": "搜索",
   "edit": "编辑",
   "delete": "删除",
   "cancel": "取消",

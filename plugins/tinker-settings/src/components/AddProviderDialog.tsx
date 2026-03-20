@@ -6,8 +6,9 @@ import TextInput from 'share/components/TextInput'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Select from 'share/components/Select'
 import uuid from 'licia/uuid'
-import store, { ApiType } from '../store'
-import { API_TYPE_DEFAULTS } from './aiProviderDefaults'
+import store from '../store'
+import type { ApiType } from '../types'
+import { API_TYPE_DEFAULTS } from '../lib/aiProvider'
 
 interface Props {
   open: boolean

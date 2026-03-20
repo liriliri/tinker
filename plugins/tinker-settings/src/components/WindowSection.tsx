@@ -8,18 +8,18 @@ import store from '../store'
 
 const MAC_SHORTCUTS = ['Option+Space', 'Ctrl+Ctrl']
 const WIN_SHORTCUTS = ['Alt+Space', 'Ctrl+Ctrl']
+const IS_MAC = navigator.platform.toUpperCase().includes('MAC')
 
 export default observer(function WindowSection() {
   const { t } = useTranslation()
 
-  const isMac = navigator.platform.toUpperCase().includes('MAC')
   const shortcutOptions = useMemo(
     () =>
-      (isMac ? MAC_SHORTCUTS : WIN_SHORTCUTS).map((s) => ({
+      (IS_MAC ? MAC_SHORTCUTS : WIN_SHORTCUTS).map((s) => ({
         label: s,
         value: s,
       })),
-    [isMac]
+    [IS_MAC]
   )
 
   return (

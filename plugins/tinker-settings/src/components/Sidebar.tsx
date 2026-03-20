@@ -4,6 +4,7 @@ import { Settings, Cpu } from 'lucide-react'
 import NavList, { type NavListItem } from 'share/components/NavList'
 import { tw } from 'share/theme'
 import store from '../store'
+import type { Section } from '../types'
 
 export default observer(function Sidebar() {
   const { t } = useTranslation()
@@ -31,7 +32,7 @@ export default observer(function Sidebar() {
         <NavList
           items={items}
           activeId={store.currentSection}
-          onSelect={(id) => store.setCurrentSection(id)}
+          onSelect={(id) => store.setCurrentSection(id as Section)}
         />
       </div>
     </div>

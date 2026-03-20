@@ -41,7 +41,13 @@ Read all target files and check for the following categories of redundancy:
 - Identical JSX subtrees copy-pasted across components
 - Identical event handler logic inline in multiple components
 
-### 6. Unused i18n Keys
+### 6. Unreferenced Files
+
+- Source files (`.ts`, `.tsx`) under `src/` that are never imported by any other file in the plugin
+- A file is unreferenced if no other `.ts`/`.tsx` file in the plugin contains an `import` statement pointing to it
+- Entry points (`main.tsx`, `index.ts`) and type-only files (`types.ts`) are exempt from this check
+
+### 7. Unused i18n Keys
 
 - Keys defined in `src/i18n/locales/*.json` that are never referenced via `t('key')` anywhere in the plugin's `.ts`/`.tsx` files
 - Check both locale files (`en-US.json` and `zh-CN.json`) — a key is unused only if it is absent from **all** `t()` calls across the entire plugin source
@@ -60,6 +66,7 @@ Example:
 [Dead Code] src/lib/ffmpegArgs.ts:22 — case 'gif' in getVideoCodecArgs is unreachable; caller handles gif before invoking this function
 [Duplicate Logic] src/components/MediaList.tsx:50,158 — handleContextMenu is identical in ImageCard and MediaRow; extract to a shared hook
 [Duplicate Type] src/components/MediaList.tsx:43,151 — MediaItemProps and MediaRowProps are identical; remove one
+[Unreferenced] src/components/EditProviderDialog.tsx — file is never imported by any other file in the plugin; delete it
 [i18n] src/i18n/locales/en-US.json:12 — key "outputDir" is defined but never used via t()
 ```
 
@@ -72,8 +79,9 @@ If no issues are found, report: **No redundancies found.**
    - If file paths are given, read those files; also read the i18n locale files for i18n key checks
 2. Read all target files thoroughly.
 3. Cross-reference exports against imports across all files in the plugin to detect unused exports.
-4. For i18n keys: collect every key from both locale JSON files, then grep all `.ts`/`.tsx` files for `t('key')` calls. Any key not found in any call is unused.
-5. Apply each checklist item and collect all findings.
-5. Report all findings grouped by category with file path and line number.
-6. Fix every issue found by editing the relevant files. Do not skip any issue.
-7. After fixing, verify there are no TypeScript errors by checking IDE diagnostics or re-reading the changed files.
+4. Cross-reference every `.ts`/`.tsx` file under `src/` against all `import` statements in the plugin — any file not imported by any other file (excluding entry points and `types.ts`) is unreferenced and should be deleted.
+5. For i18n keys: collect every key from both locale JSON files, then grep all `.ts`/`.tsx` files for `t('key')` calls. Any key not found in any call is unused.
+6. Apply each checklist item and collect all findings.
+7. Report all findings grouped by category with file path and line number.
+8. Fix every issue found by editing or deleting the relevant files. Do not skip any issue.
+9. After fixing, verify there are no TypeScript errors by checking IDE diagnostics or re-reading the changed files.

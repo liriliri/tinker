@@ -28,10 +28,6 @@ export default observer(function AppearanceSection() {
     [t]
   )
 
-  const handleThemeChange = async (value: string) => {
-    await store.setTheme(value)
-  }
-
   const handleLanguageChange = async (value: string) => {
     await store.setLanguage(value)
     toast(t('restartRequired'))
@@ -52,7 +48,7 @@ export default observer(function AppearanceSection() {
           <label className={`text-sm ${tw.text.primary}`}>{t('theme')}</label>
           <Select
             value={store.theme}
-            onChange={handleThemeChange}
+            onChange={store.setTheme}
             options={themeOptions}
           />
         </div>
