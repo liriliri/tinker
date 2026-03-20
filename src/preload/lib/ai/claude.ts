@@ -1,3 +1,6 @@
+import isEmpty from 'licia/isEmpty'
+import rtrim from 'licia/rtrim'
+import trim from 'licia/trim'
 import { AiAdapter } from './adapter'
 import type {
   AiCallOption,
@@ -9,18 +12,37 @@ import type {
 } from './types'
 
 function normalizeApiUrl(apiUrl: string): string {
-  apiUrl = apiUrl.trim()
+  apiUrl = trim(apiUrl)
   if (apiUrl === 'https://api.anthropic.com') {
     apiUrl = `${apiUrl}/v1`
   }
-  if (apiUrl.endsWith('/')) {
-    apiUrl = apiUrl.slice(0, -1)
+  return rtrim(apiUrl, '/')
+}
+
+function getTextContent(content?: AiMessage['content']): string {
+  if (typeof content === 'string') {
+    return content
   }
-  return apiUrl
+
+  return (content ?? [])
+    .filter((part) => part.type === 'text')
+    .map((part) => part.text)
+    .join('')
+}
+
+function getClaudeToolCalls(
+  toolBlocksMap: Record<number, { id: string; name: string; inputJson: string }>
+): AiToolCall[] | undefined {
+  if (isEmpty(toolBlocksMap)) return undefined
+
+  return Object.values(toolBlocksMap).map((toolBlock) => ({
+    id: toolBlock.id,
+    type: 'function',
+    function: { name: toolBlock.name, arguments: toolBlock.inputJson },
+  }))
 }
 
 function convertMessage(message: AiMessage): Record<string, unknown> {
-  // tool result → user message with tool_result block
   if (message.role === 'tool') {
     return {
       role: 'user',
@@ -28,39 +50,26 @@ function convertMessage(message: AiMessage): Record<string, unknown> {
         {
           type: 'tool_result',
           tool_use_id: message.tool_call_id,
-          content:
-            typeof message.content === 'string'
-              ? message.content
-              : (message.content ?? [])
-                  .filter((p) => p.type === 'text')
-                  .map((p) => p.text)
-                  .join(''),
+          content: getTextContent(message.content),
         },
       ],
     }
   }
 
-  // assistant message with tool_calls
   if (
     message.role === 'assistant' &&
     message.tool_calls &&
     message.tool_calls.length > 0
   ) {
     const content: unknown[] = []
-    const text =
-      typeof message.content === 'string'
-        ? message.content
-        : (message.content ?? [])
-            .filter((p) => p.type === 'text')
-            .map((p) => p.text)
-            .join('')
+    const text = getTextContent(message.content)
     if (text) content.push({ type: 'text', text })
     for (const tc of message.tool_calls) {
       let input: unknown = {}
       try {
         input = JSON.parse(tc.function.arguments || '{}')
       } catch {
-        // keep empty object on parse failure
+        // ignore
       }
       content.push({
         type: 'tool_use',
@@ -147,7 +156,7 @@ export class ClaudeAdapter extends AiAdapter {
     const otherMessages = option.messages.filter((m) => m.role !== 'system')
 
     const body: Record<string, unknown> = {
-      model: this.provider.model,
+      model: option.model ?? this.provider.models[0]?.name ?? '',
       max_tokens: option.maxTokens ?? 8096,
       messages: otherMessages.map(convertMessage),
       stream,
@@ -155,14 +164,7 @@ export class ClaudeAdapter extends AiAdapter {
 
     if (systemMessages.length > 0) {
       body.system = systemMessages
-        .map((m) =>
-          typeof m.content === 'string'
-            ? m.content
-            : (m.content ?? [])
-                .filter((p) => p.type === 'text')
-                .map((p) => p.text)
-                .join('')
-        )
+        .map((m) => getTextContent(m.content))
         .join('\n')
     }
 
@@ -213,7 +215,6 @@ export class ClaudeAdapter extends AiAdapter {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
-    // index → partial tool_use block
     const toolBlocksMap: Record<
       number,
       { id: string; name: string; inputJson: string }
@@ -229,15 +230,15 @@ export class ClaudeAdapter extends AiAdapter {
 
       let pendingEvent = ''
       for (const line of lines) {
-        const trimmed = line.trim()
+        const trimmed = trim(line)
 
         if (trimmed.startsWith('event:')) {
-          pendingEvent = trimmed.slice(6).trim()
+          pendingEvent = trim(trimmed.slice(6))
           continue
         }
 
         if (!trimmed.startsWith('data:')) continue
-        const dataStr = trimmed.slice(5).trim()
+        const dataStr = trim(trimmed.slice(5))
         if (!dataStr) continue
 
         try {
@@ -268,32 +269,18 @@ export class ClaudeAdapter extends AiAdapter {
                 toolBlocksMap[idx].inputJson += delta.partial_json
             }
           } else if (eventType === 'message_stop') {
-            const toolCalls =
-              Object.keys(toolBlocksMap).length > 0
-                ? Object.values(toolBlocksMap).map((tb) => ({
-                    id: tb.id,
-                    type: 'function' as const,
-                    function: { name: tb.name, arguments: tb.inputJson },
-                  }))
-                : undefined
-            onChunk({ done: true, tool_calls: toolCalls })
+            onChunk({
+              done: true,
+              tool_calls: getClaudeToolCalls(toolBlocksMap),
+            })
             return
           }
         } catch {
-          // ignore individual SSE parse errors
+          // ignore
         }
       }
     }
 
-    // stream ended without message_stop
-    const toolCalls =
-      Object.keys(toolBlocksMap).length > 0
-        ? Object.values(toolBlocksMap).map((tb) => ({
-            id: tb.id,
-            type: 'function' as const,
-            function: { name: tb.name, arguments: tb.inputJson },
-          }))
-        : undefined
-    onChunk({ done: true, tool_calls: toolCalls })
+    onChunk({ done: true, tool_calls: getClaudeToolCalls(toolBlocksMap) })
   }
 }

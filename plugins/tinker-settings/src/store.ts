@@ -70,6 +70,7 @@ class Store extends BaseStore {
     this.aiProviders = parsed.map((p) => ({
       ...p,
       apiType: p.apiType ?? 'openai',
+      models: p.models ?? [],
     }))
     this.isLoading = false
   }

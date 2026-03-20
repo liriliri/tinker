@@ -95,7 +95,7 @@ async function updateContextMenu() {
       type: 'separator',
     },
     {
-      label: t('settings'),
+      label: `${t('settings')}...`,
       click() {
         openPlugin('tinker-settings', true)
       },

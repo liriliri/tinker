@@ -17,7 +17,7 @@ import OpenAIIcon from '../assets/openai.svg?react'
 interface RowData {
   id: string
   name: string
-  model: string
+  defaultModel: string
   apiUrl: string
   apiType: string
 }
@@ -58,10 +58,10 @@ export default observer(function AiSection({
         cellRenderer: ProviderNameCell,
       },
       {
-        field: 'model',
-        headerName: t('model'),
+        field: 'defaultModel',
+        headerName: t('defaultModel'),
         flex: 1,
-        minWidth: 120,
+        minWidth: 80,
         sortable: true,
       },
       {
@@ -75,24 +75,22 @@ export default observer(function AiSection({
     [t]
   )
 
-  const rowData = useMemo<RowData[]>(() => {
-    const keyword = search.trim().toLowerCase()
-    return store.aiProviders
-      .filter(
-        (p) =>
-          !keyword ||
-          p.name.toLowerCase().includes(keyword) ||
-          p.model.toLowerCase().includes(keyword) ||
-          p.apiUrl.toLowerCase().includes(keyword)
-      )
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        model: p.model,
-        apiUrl: p.apiUrl,
-        apiType: p.apiType,
-      }))
-  }, [store.aiProviders, search])
+  const keyword = search.trim().toLowerCase()
+  const rowData: RowData[] = store.aiProviders
+    .filter(
+      (p) =>
+        !keyword ||
+        p.name.toLowerCase().includes(keyword) ||
+        p.models.some((m) => m.name.toLowerCase().includes(keyword)) ||
+        p.apiUrl.toLowerCase().includes(keyword)
+    )
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      defaultModel: p.models[0]?.name ?? '',
+      apiUrl: p.apiUrl,
+      apiType: p.apiType,
+    }))
 
   const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
     if (event.data) store.setSelectedProviderId(event.data.id)

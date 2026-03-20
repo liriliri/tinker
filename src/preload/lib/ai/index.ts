@@ -11,14 +11,12 @@ export type {
   AiChunk,
   AiContentPart,
   AiMessage,
+  AiModel,
   AiProvider,
   AiResult,
   AiTool,
   AiToolCall,
 } from './types'
-
-// ─── Adapter registry ─────────────────────────────────────────────────────────
-// To add a new format: implement AiAdapter and register it here.
 
 const adapterRegistry: Record<string, new (provider: AiProvider) => AiAdapter> =
   {
@@ -35,11 +33,7 @@ function createAdapter(
   return new AdapterClass(provider)
 }
 
-// ─── Abort controllers ────────────────────────────────────────────────────────
-
 const abortControllers = new Map<string, AbortController>()
-
-// ─── Public API ───────────────────────────────────────────────────────────────
 
 export async function callAI(option: AiCallOption): Promise<AiResult> {
   const provider = await findProvider(option.provider)

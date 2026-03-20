@@ -36,6 +36,11 @@
   "showApiKey": "显示 API 密钥",
   "hideApiKey": "隐藏 API 密钥",
   "model": "默认模型",
+  "defaultModel": "默认模型",
+  "models": "模型列表",
+  "modelsHint": "第一个模型为默认模型，可拖拽调整顺序。",
+  "addModel": "添加模型",
+  "default": "默认",
   "noProviders": "暂无 AI 提供商配置",
   "noProviderSelected": "选择提供商进行编辑",
   "search": "搜索",
@@ -51,5 +56,5 @@
   "nameRequired": "请填写名称",
   "apiUrlRequired": "请填写 API 地址",
   "apiKeyRequired": "请填写 API 密钥",
-  "modelRequired": "请填写默认模型"
+  "modelRequired": "至少需要一个模型"
 }

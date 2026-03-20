@@ -1,11 +1,18 @@
 export type AiApiType = 'openai' | 'claude'
 
+export interface AiModel {
+  name: string
+  capabilities?: string[]
+  contextWindow?: number
+  maxOutput?: number
+}
+
 export interface AiProvider {
   id: string
   name: string
   apiUrl: string
   apiKey: string
-  model: string
+  models: AiModel[]
   apiType?: AiApiType
 }
 
@@ -33,6 +40,7 @@ export interface AiToolCall {
 
 export interface AiCallOption {
   provider?: string
+  model?: string
   messages: AiMessage[]
   tools?: AiTool[]
   temperature?: number

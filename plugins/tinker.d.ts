@@ -83,12 +83,19 @@ interface AppInfo {
   path: string
 }
 
+interface AiModel {
+  name: string
+  capabilities?: string[]
+  contextWindow?: number
+  maxOutput?: number
+}
+
 interface AiProvider {
   id: string
   name: string
   apiUrl: string
   apiKey: string
-  model: string
+  models: AiModel[]
 }
 
 interface AiMessage {
@@ -101,6 +108,7 @@ interface AiMessage {
 
 interface AiCallOption {
   provider?: string
+  model?: string
   messages: AiMessage[]
   tools?: any[]
   temperature?: number

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Plus, Trash2, GripVertical } from 'lucide-react'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
-import type { AiProvider } from '../types'
+import type { AiProvider, AiModel } from '../types'
 
 interface Props {
   value: AiProvider
@@ -13,8 +13,57 @@ interface Props {
 export default function ProviderFields({ value, onChange }: Props) {
   const { t } = useTranslation()
   const [showApiKey, setShowApiKey] = useState(false)
+  const [newModelId, setNewModelId] = useState('')
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   const isClaude = value.apiType === 'claude'
+
+  const handleModelIdChange = (index: number, name: string) => {
+    const models = value.models.map((m, i) =>
+      i === index ? { ...m, name } : m
+    )
+    onChange({ models })
+  }
+
+  const handleAddModel = () => {
+    const name = newModelId.trim()
+    if (!name) return
+    onChange({ models: [...value.models, { name }] })
+    setNewModelId('')
+  }
+
+  const handleDeleteModel = (index: number) => {
+    onChange({ models: value.models.filter((_, i) => i !== index) })
+  }
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    setDragOverIndex(index)
+  }
+
+  const handleDrop = (targetIndex: number) => {
+    if (dragIndex === null || dragIndex === targetIndex) {
+      setDragIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+    const models = [...value.models]
+    const [moved] = models.splice(dragIndex, 1)
+    models.splice(targetIndex, 0, moved)
+    onChange({ models })
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }
+
+  const handleDragEnd = () => {
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }
 
   return (
     <div className="space-y-4">
@@ -29,9 +78,6 @@ export default function ProviderFields({ value, onChange }: Props) {
             isClaude ? 'https://api.anthropic.com' : 'https://api.openai.com/v1'
           }
         />
-        <p className={`text-xs ${tw.text.tertiary}`}>
-          {isClaude ? t('claudeApiUrlHint') : t('apiUrlHint')}
-        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -59,13 +105,69 @@ export default function ProviderFields({ value, onChange }: Props) {
 
       <div className="flex flex-col gap-1.5">
         <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('model')}
+          {t('models')}
         </label>
-        <TextInput
-          value={value.model}
-          onChange={(e) => onChange({ model: e.target.value })}
-          placeholder={isClaude ? 'claude-opus-4-5' : 'gpt-4o'}
-        />
+        <div className="flex gap-2">
+          <TextInput
+            value={newModelId}
+            onChange={(e) => setNewModelId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddModel()
+              }
+            }}
+            placeholder={isClaude ? 'claude-opus-4-5' : 'gpt-4o'}
+            className="flex-1 text-sm"
+          />
+          <button
+            type="button"
+            onClick={handleAddModel}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-medium ${tw.hover} ${tw.text.secondary} border ${tw.border}`}
+          >
+            <Plus size={13} />
+            {t('addModel')}
+          </button>
+        </div>
+        {value.models.length > 0 && (
+          <div className={`rounded border ${tw.border} divide-y ${tw.divide}`}>
+            {value.models.map((model: AiModel, index: number) => (
+              <div
+                key={index}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={() => handleDrop(index)}
+                className={`flex items-center gap-2 px-2 py-1.5 transition-colors ${
+                  dragOverIndex === index && dragIndex !== index
+                    ? tw.bg.secondary
+                    : ''
+                }`}
+              >
+                <span
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragEnd={handleDragEnd}
+                  className="flex-shrink-0 cursor-grab"
+                >
+                  <GripVertical size={14} className={tw.text.tertiary} />
+                </span>
+                <TextInput
+                  value={model.name}
+                  onChange={(e) => handleModelIdChange(index, e.target.value)}
+                  placeholder={isClaude ? 'claude-opus-4-5' : 'gpt-4o'}
+                  className="flex-1 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDeleteModel(index)}
+                  className={`flex-shrink-0 p-1 rounded ${tw.hover} text-red-500 dark:text-red-400`}
+                  title={t('delete')}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

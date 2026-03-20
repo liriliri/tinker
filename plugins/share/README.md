@@ -36,7 +36,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 <div className={`${tw.hover} ${isActive ? tw.active : ''}`} />
 ```
 
-**Key patterns**: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
+**Key patterns**: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
 
 ## BaseStore
 

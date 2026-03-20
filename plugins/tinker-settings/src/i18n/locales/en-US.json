@@ -36,6 +36,11 @@
   "showApiKey": "Show API Key",
   "hideApiKey": "Hide API Key",
   "model": "Default Model",
+  "defaultModel": "Default Model",
+  "models": "Models",
+  "modelsHint": "The first model is used by default. Drag to reorder.",
+  "addModel": "Add Model",
+  "default": "Default",
   "noProviders": "No AI providers configured",
   "noProviderSelected": "Select a provider to edit",
   "search": "Search",
@@ -51,5 +56,5 @@
   "nameRequired": "Name is required",
   "apiUrlRequired": "API Base URL is required",
   "apiKeyRequired": "API Key is required",
-  "modelRequired": "Default Model is required"
+  "modelRequired": "At least one model is required"
 }

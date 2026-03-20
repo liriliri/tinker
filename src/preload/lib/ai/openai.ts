@@ -1,3 +1,5 @@
+import isEmpty from 'licia/isEmpty'
+import trim from 'licia/trim'
 import { AiAdapter } from './adapter'
 import type {
   AiCallOption,
@@ -6,6 +8,12 @@ import type {
   AiProvider,
   AiToolCall,
 } from './types'
+
+function getToolCalls(
+  toolCallsMap: Record<number, AiToolCall>
+): AiToolCall[] | undefined {
+  return isEmpty(toolCallsMap) ? undefined : Object.values(toolCallsMap)
+}
 
 export class OpenAIAdapter extends AiAdapter {
   constructor(provider: AiProvider) {
@@ -28,7 +36,7 @@ export class OpenAIAdapter extends AiAdapter {
     stream: boolean
   ): Record<string, unknown> {
     const body: Record<string, unknown> = {
-      model: this.provider.model,
+      model: option.model ?? this.provider.models[0]?.name ?? '',
       messages: option.messages,
       stream,
     }
@@ -94,16 +102,12 @@ export class OpenAIAdapter extends AiAdapter {
       buffer = lines.pop() ?? ''
 
       for (const line of lines) {
-        const trimmed = line.trim()
+        const trimmed = trim(line)
         if (!trimmed.startsWith('data:')) continue
 
-        const dataStr = trimmed.slice(5).trim()
+        const dataStr = trim(trimmed.slice(5))
         if (dataStr === '[DONE]') {
-          const toolCalls =
-            Object.keys(toolCallsMap).length > 0
-              ? Object.values(toolCallsMap)
-              : undefined
-          onChunk({ done: true, tool_calls: toolCalls })
+          onChunk({ done: true, tool_calls: getToolCalls(toolCallsMap) })
           return
         }
 
@@ -135,17 +139,13 @@ export class OpenAIAdapter extends AiAdapter {
             }
           }
 
-          if (Object.keys(chunk).length > 0) onChunk(chunk)
+          if (!isEmpty(chunk)) onChunk(chunk)
         } catch {
-          // ignore individual SSE parse errors
+          // ignore
         }
       }
     }
 
-    const toolCalls =
-      Object.keys(toolCallsMap).length > 0
-        ? Object.values(toolCallsMap)
-        : undefined
-    onChunk({ done: true, tool_calls: toolCalls })
+    onChunk({ done: true, tool_calls: getToolCalls(toolCallsMap) })
   }
 }

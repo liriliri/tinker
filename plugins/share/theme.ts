@@ -141,6 +141,9 @@ export const tw = {
   // Border color utilities
   border: 'border-[#e0e0e0] dark:border-[#4a4a4a]',
 
+  // Divide color utilities (for divide-y / divide-x)
+  divide: 'divide-[#e0e0e0] dark:divide-[#4a4a4a]',
+
   // Hover state utilities
   hover: 'hover:bg-gray-200 dark:hover:bg-[#3a3a3c]',
 

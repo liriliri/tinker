@@ -56,138 +56,118 @@ export default observer(function EntryDetail() {
   return (
     <div className={`h-full overflow-y-auto ${tw.bg.tertiary}`}>
       <div className="p-4">
-        <div className="max-w-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">{entry.title}</h2>
-            <button
-              onClick={handleDelete}
-              className={`p-2 rounded ${tw.hover} text-red-600 dark:text-red-400`}
-              title={t('deleteEntry')}
-            >
-              <Trash2 size={18} />
-            </button>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-base font-semibold truncate">{entry.title}</h2>
+          <button
+            onClick={handleDelete}
+            className={`p-2 rounded ${tw.hover} text-red-600 dark:text-red-400 flex-shrink-0`}
+            title={t('deleteEntry')}
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label className={`text-xs font-medium ${tw.text.secondary}`}>
+              {t('title')}
+            </label>
+            <TextInput
+              type="text"
+              value={entry.title}
+              onChange={(e) => handleUpdateField('Title', e.target.value)}
+              className={`focus:ring-2 ${tw.primary.focusRing}`}
+            />
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
-              >
-                {t('title')}
-              </label>
+          <div className="flex flex-col gap-1.5">
+            <label className={`text-xs font-medium ${tw.text.secondary}`}>
+              {t('username')}
+            </label>
+            <div className="relative">
               <TextInput
                 type="text"
-                value={entry.title}
-                onChange={(e) => handleUpdateField('Title', e.target.value)}
-                className={`focus:ring-2 ${tw.primary.focusRing}`}
+                value={entry.username}
+                onChange={(e) => handleUpdateField('UserName', e.target.value)}
+                className={`font-mono focus:ring-2 ${tw.primary.focusRing} pr-10`}
+              />
+              <CopyButton
+                text={entry.username}
+                title={t('copyUsername')}
+                variant="icon"
+                iconClassName={tw.text.primary}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
               />
             </div>
+          </div>
 
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
-              >
-                {t('username')}
-              </label>
-              <div className="relative">
-                <TextInput
-                  type="text"
-                  value={entry.username}
-                  onChange={(e) =>
-                    handleUpdateField('UserName', e.target.value)
-                  }
-                  className={`font-mono focus:ring-2 ${tw.primary.focusRing} pr-10`}
-                />
-                <CopyButton
-                  text={entry.username}
-                  title={t('copyUsername')}
-                  variant="icon"
-                  iconClassName={tw.text.primary}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
-              >
-                {t('password')}
-              </label>
-              <div className="relative">
-                <TextInput
-                  type={store.showPassword ? 'text' : 'password'}
-                  value={passwordText}
-                  onChange={(e) =>
-                    handleUpdateField('Password', e.target.value)
-                  }
-                  className={`pr-16 font-mono focus:ring-2 ${tw.primary.focusRing}`}
-                />
-                <CopyButton
-                  text={entry.password.getText()}
-                  title={t('copyPassword')}
-                  variant="icon"
-                  iconClassName={tw.text.primary}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
-                />
-                <button
-                  onClick={handleTogglePassword}
-                  className={`absolute right-10 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover}`}
-                  title={
-                    store.showPassword ? t('hidePassword') : t('showPassword')
-                  }
-                >
-                  {store.showPassword ? (
-                    <Eye size={16} />
-                  ) : (
-                    <EyeOff size={16} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
-              >
-                {t('url')}
-              </label>
+          <div className="flex flex-col gap-1.5">
+            <label className={`text-xs font-medium ${tw.text.secondary}`}>
+              {t('password')}
+            </label>
+            <div className="relative">
               <TextInput
-                type="text"
-                value={entry.url}
-                onChange={(e) => handleUpdateField('URL', e.target.value)}
-                className={`focus:ring-2 ${tw.primary.focusRing}`}
+                type={store.showPassword ? 'text' : 'password'}
+                value={passwordText}
+                onChange={(e) => handleUpdateField('Password', e.target.value)}
+                className={`pr-16 font-mono focus:ring-2 ${tw.primary.focusRing}`}
               />
-            </div>
-
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${tw.text.secondary}`}
+              <CopyButton
+                text={entry.password.getText()}
+                title={t('copyPassword')}
+                variant="icon"
+                iconClassName={tw.text.primary}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded ${tw.hover}`}
+              />
+              <button
+                onClick={handleTogglePassword}
+                className={`absolute right-10 top-1/2 -translate-y-1/2 p-1 rounded ${tw.hover}`}
+                title={
+                  store.showPassword ? t('hidePassword') : t('showPassword')
+                }
               >
-                {t('notes')}
-              </label>
-              <textarea
-                value={entry.notes}
-                onChange={(e) => handleUpdateField('Notes', e.target.value)}
-                rows={6}
-                className={`w-full px-3 py-2 rounded border ${tw.border} ${tw.bg.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
-              />
+                {store.showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
             </div>
+          </div>
 
-            <div className={`pt-4 border-t ${tw.border}`}>
-              <div className={`text-xs ${tw.text.secondary} space-y-1`}>
-                <div>
-                  {t('created')}:{' '}
-                  {new Date(entry.times.creationTime).toLocaleString()}
-                </div>
-                <div>
-                  {t('modified')}:{' '}
-                  {new Date(entry.times.lastModTime).toLocaleString()}
-                </div>
-                <div>
-                  {t('accessed')}:{' '}
-                  {new Date(entry.times.lastAccessTime).toLocaleString()}
-                </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={`text-xs font-medium ${tw.text.secondary}`}>
+              {t('url')}
+            </label>
+            <TextInput
+              type="text"
+              value={entry.url}
+              onChange={(e) => handleUpdateField('URL', e.target.value)}
+              className={`focus:ring-2 ${tw.primary.focusRing}`}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={`text-xs font-medium ${tw.text.secondary}`}>
+              {t('notes')}
+            </label>
+            <textarea
+              value={entry.notes}
+              onChange={(e) => handleUpdateField('Notes', e.target.value)}
+              rows={6}
+              className={`w-full px-3 py-2 rounded border ${tw.border} ${tw.bg.input} resize-none focus:outline-none focus:ring-2 ${tw.primary.focusRing}`}
+            />
+          </div>
+
+          <div className={`pt-4 border-t ${tw.border}`}>
+            <div className={`text-xs ${tw.text.secondary} space-y-1`}>
+              <div>
+                {t('created')}:{' '}
+                {new Date(entry.times.creationTime).toLocaleString()}
+              </div>
+              <div>
+                {t('modified')}:{' '}
+                {new Date(entry.times.lastModTime).toLocaleString()}
+              </div>
+              <div>
+                {t('accessed')}:{' '}
+                {new Date(entry.times.lastAccessTime).toLocaleString()}
               </div>
             </div>
           </div>
