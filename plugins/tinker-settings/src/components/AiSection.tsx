@@ -1,12 +1,21 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Plus, Pencil, Trash2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import { confirm } from 'share/components/Confirm'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
+import Grid from 'share/components/Grid'
+import { ColDef, RowClickedEvent, GetRowIdParams } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
 import uuid from 'licia/uuid'
 import store, { AiProvider } from '../store'
 
@@ -20,11 +29,21 @@ function maskApiKey(apiKey: string): string {
   return apiKey.substring(0, 4) + '••••' + apiKey.substring(apiKey.length - 4)
 }
 
+interface RowData {
+  id: string
+  name: string
+  model: string
+  apiUrl: string
+  apiKey: string
+}
+
 export default observer(function AiSection() {
   const { t } = useTranslation()
+  const gridRef = useRef<AgGridReact<RowData>>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<AiProvider>(emptyProvider())
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const handleAdd = () => {
     setForm({ ...emptyProvider(), id: uuid() })
@@ -32,11 +51,11 @@ export default observer(function AiSection() {
     setDialogOpen(true)
   }
 
-  const handleEdit = (provider: AiProvider) => {
+  const handleEdit = useCallback((provider: AiProvider) => {
     setForm({ ...provider })
     setEditingId(provider.id)
     setDialogOpen(true)
-  }
+  }, [])
 
   const handleClose = () => {
     setDialogOpen(false)
@@ -71,7 +90,11 @@ export default observer(function AiSection() {
     handleClose()
   }
 
-  const handleDelete = async (provider: AiProvider) => {
+  const handleDelete = useCallback(async () => {
+    if (!selectedId) return
+    const provider = store.aiProviders.find((p) => p.id === selectedId)
+    if (!provider) return
+
     const confirmed = await confirm({
       title: t('deleteProvider'),
       message: t('deleteProviderConfirm', { name: provider.name }),
@@ -81,83 +104,138 @@ export default observer(function AiSection() {
     if (!confirmed) return
 
     await store.deleteAiProvider(provider.id)
+    setSelectedId(null)
     toast.success(t('providerDeleted'))
-  }
+  }, [selectedId, t])
+
+  const handleEditSelected = useCallback(() => {
+    if (!selectedId) return
+    const provider = store.aiProviders.find((p) => p.id === selectedId)
+    if (!provider) return
+    handleEdit(provider)
+  }, [selectedId, handleEdit])
+
+  const columnDefs: ColDef<RowData>[] = useMemo(
+    () => [
+      {
+        field: 'name',
+        headerName: t('providerName'),
+        flex: 1,
+        minWidth: 120,
+        sortable: true,
+      },
+      {
+        field: 'model',
+        headerName: t('model'),
+        flex: 1,
+        minWidth: 120,
+        sortable: true,
+      },
+      {
+        field: 'apiUrl',
+        headerName: t('apiUrl'),
+        flex: 2,
+        minWidth: 150,
+        sortable: true,
+      },
+      {
+        field: 'apiKey',
+        headerName: t('apiKey'),
+        flex: 1,
+        minWidth: 120,
+        sortable: false,
+        valueFormatter: (params) => maskApiKey(params.value as string),
+      },
+    ],
+    [t]
+  )
+
+  const rowData = useMemo<RowData[]>(
+    () =>
+      store.aiProviders.map((p) => ({
+        id: p.id,
+        name: p.name,
+        model: p.model,
+        apiUrl: p.apiUrl,
+        apiKey: p.apiKey,
+      })),
+    [store.aiProviders]
+  )
+
+  const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
+    if (event.data) {
+      setSelectedId(event.data.id)
+    }
+  }, [])
+
+  const getRowId = useCallback(
+    (params: GetRowIdParams<RowData>) => params.data.id,
+    []
+  )
+
+  const getRowClass = useCallback(
+    (params: { data?: RowData }) => {
+      if (params.data && params.data.id === selectedId) {
+        return 'ag-row-selected'
+      }
+      return ''
+    },
+    [selectedId]
+  )
+
+  useEffect(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.redrawRows()
+    }
+  }, [selectedId])
+
+  const localeText = useMemo(() => ({ noRowsToShow: t('noProviders') }), [t])
 
   const dialogTitle = editingId ? t('editProvider') : t('addProvider')
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2 px-1">
-        <h2 className={`text-sm font-semibold ${tw.text.secondary}`}>
-          {t('aiModels')}
-        </h2>
-        <button
-          onClick={handleAdd}
-          className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white`}
+    <div className="h-full flex flex-col">
+      <Toolbar>
+        <ToolbarButton onClick={handleAdd} title={t('addProvider')}>
+          <Plus size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <ToolbarButton
+          onClick={handleEditSelected}
+          disabled={!selectedId}
+          title={t('edit')}
         >
-          <Plus size={12} />
-          {t('addProvider')}
-        </button>
+          <Pencil size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={handleDelete}
+          disabled={!selectedId}
+          title={t('delete')}
+        >
+          <Trash2 size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </Toolbar>
+
+      <div className="flex-1 overflow-hidden">
+        <Grid<RowData>
+          isDark={store.isDark}
+          ref={gridRef}
+          columnDefs={columnDefs}
+          rowData={rowData}
+          onRowClicked={onRowClicked}
+          getRowId={getRowId}
+          getRowClass={getRowClass}
+          headerHeight={40}
+          rowHeight={40}
+          animateRows={true}
+          enableCellTextSelection={false}
+          suppressCellFocus={true}
+          localeText={localeText}
+        />
       </div>
-      <section className={`rounded-lg border ${tw.border} ${tw.bg.secondary}`}>
-        {store.aiProviders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2">
-            <Sparkles size={28} className={`${tw.text.tertiary} opacity-50`} />
-            <p className={`text-xs ${tw.text.tertiary}`}>{t('noProviders')}</p>
-          </div>
-        ) : (
-          <ul>
-            {store.aiProviders.map((provider, index) => (
-              <li key={provider.id}>
-                {index > 0 && <div className={`h-px ${tw.bg.border}`} />}
-                <div className="px-4 py-3 flex items-center gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`text-sm font-medium ${tw.text.primary}`}
-                      >
-                        {provider.name}
-                      </span>
-                      <span
-                        className={`text-xs ${tw.primary.text} ${tw.primary.bgFocused} px-1.5 py-0.5 rounded font-medium`}
-                      >
-                        {provider.model}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs ${tw.text.tertiary} truncate`}>
-                        {provider.apiUrl}
-                      </span>
-                      <span
-                        className={`text-xs ${tw.text.tertiary} font-mono shrink-0`}
-                      >
-                        {maskApiKey(provider.apiKey)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => handleEdit(provider)}
-                      className={`p-1.5 rounded ${tw.text.secondary} ${tw.hover} transition-colors`}
-                      title={t('edit')}
-                    >
-                      <Pencil size={13} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(provider)}
-                      className="p-1.5 rounded text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title={t('delete')}
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
 
       <Dialog
         open={dialogOpen}

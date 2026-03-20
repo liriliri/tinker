@@ -18,20 +18,25 @@ export default observer(function App() {
   return (
     <ToasterProvider>
       <ConfirmProvider>
-        <div className={`h-screen flex transition-colors ${tw.bg.primary}`}>
-          <Sidebar />
-          {!store.isLoading && (
-            <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6 space-y-6">
-              {store.currentSection === 'general' && (
-                <>
-                  <AppearanceSection />
-                  <StartupSection />
-                  <WindowSection />
-                </>
-              )}
-              {store.currentSection === 'ai' && <AiSection />}
-            </div>
-          )}
+        <div
+          className={`h-screen flex flex-col transition-colors ${tw.bg.primary}`}
+        >
+          <div className={`border-t ${tw.border}`} />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            {!store.isLoading && store.currentSection === 'general' && (
+              <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6 space-y-6">
+                <AppearanceSection />
+                <StartupSection />
+                <WindowSection />
+              </div>
+            )}
+            {!store.isLoading && store.currentSection === 'ai' && (
+              <div className="flex-1 overflow-hidden">
+                <AiSection />
+              </div>
+            )}
+          </div>
         </div>
       </ConfirmProvider>
     </ToasterProvider>

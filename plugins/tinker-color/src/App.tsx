@@ -11,6 +11,7 @@ export default observer(function App() {
       <div
         className={`h-screen w-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
       >
+        <div className={`border-t ${tw.border}`} />
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden transition-colors">
           {/* Left side - Color Picker */}
