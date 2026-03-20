@@ -10,7 +10,6 @@ interface AiModel {
 }
 
 interface AiProvider {
-  id: string
   name: string
   apiUrl: string
   apiKey: string

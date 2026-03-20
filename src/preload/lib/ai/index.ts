@@ -2,7 +2,7 @@ import uuid from 'licia/uuid'
 import type { AiAdapter } from './adapter'
 import { ClaudeAdapter } from './claude'
 import { OpenAIAdapter } from './openai'
-import { findProvider } from './provider'
+import { findProvider, getProviderList } from './provider'
 import type { AiCallOption, AiChunk, AiProvider, AiResult } from './types'
 
 export type {
@@ -17,6 +17,8 @@ export type {
   AiTool,
   AiToolCall,
 } from './types'
+export type { AiProviderInfo } from './provider'
+export { getProviderList }
 
 const adapterRegistry: Record<string, new (provider: AiProvider) => AiAdapter> =
   {

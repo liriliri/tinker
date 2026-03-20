@@ -54,6 +54,7 @@
   "providerUpdated": "Provider updated",
   "providerDeleted": "Provider deleted",
   "nameRequired": "Name is required",
+  "providerNameExists": "A provider with this name already exists",
   "apiUrlRequired": "API Base URL is required",
   "apiKeyRequired": "API Key is required",
   "modelRequired": "At least one model is required"

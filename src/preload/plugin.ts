@@ -16,7 +16,7 @@ import isStrBlank from 'licia/isStrBlank'
 import { injectRendererScript, domReady } from './lib/util'
 import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
-import { callAI, callAIStream, abortAI } from './lib/ai/index'
+import { callAI, callAIStream, abortAI, getProviderList } from './lib/ai/index'
 import types from 'licia/types'
 import { i18n } from 'common/util'
 import fs from 'node:fs'
@@ -131,6 +131,7 @@ const tinkerObj = {
   callAI,
   callAIStream,
   abortAI,
+  getProviderList,
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)

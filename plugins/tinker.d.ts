@@ -90,8 +90,12 @@ interface AiModel {
   maxOutput?: number
 }
 
+interface AiProviderInfo {
+  name: string
+  models: AiModel[]
+}
+
 interface AiProvider {
-  id: string
   name: string
   apiUrl: string
   apiKey: string
@@ -265,6 +269,9 @@ declare global {
       option: AiCallOption,
       onChunk: (chunk: AiChunk) => void
     ): AiStreamTask
+
+    /** Get the list of configured AI providers (name and models only). */
+    getAIProviders(): Promise<AiProviderInfo[]>
   }
 }
 

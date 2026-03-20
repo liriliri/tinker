@@ -1,5 +1,10 @@
 import mainObj from 'share/preload/main'
-import type { AiProvider } from './types'
+import type { AiModel, AiProvider } from './types'
+
+export interface AiProviderInfo {
+  name: string
+  models: AiModel[]
+}
 
 export async function getProviders(): Promise<AiProvider[]> {
   const raw = await mainObj.getSettingsStore('aiProviders')
@@ -11,13 +16,18 @@ export async function getProviders(): Promise<AiProvider[]> {
   }
 }
 
+export async function getProviderList(): Promise<AiProviderInfo[]> {
+  const providers = await getProviders()
+  return providers.map((p) => ({ name: p.name, models: p.models ?? [] }))
+}
+
 export async function findProvider(
-  providerId?: string
+  providerName?: string
 ): Promise<AiProvider | null> {
   const providers = await getProviders()
   if (!providers.length) return null
-  if (providerId) {
-    return providers.find((p) => p.id === providerId) ?? providers[0]
+  if (providerName) {
+    return providers.find((p) => p.name === providerName) ?? providers[0]
   }
   return providers[0]
 }

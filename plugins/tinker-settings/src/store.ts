@@ -14,7 +14,7 @@ class Store extends BaseStore {
 
   isLoading: boolean = true
   currentSection: Section = 'general'
-  selectedProviderId: string | null = null
+  selectedProviderName: string | null = null
 
   constructor() {
     super()
@@ -23,16 +23,16 @@ class Store extends BaseStore {
 
   setCurrentSection(section: Section) {
     this.currentSection = section
-    this.selectedProviderId = null
+    this.selectedProviderName = null
   }
 
-  setSelectedProviderId(id: string | null) {
-    this.selectedProviderId = id
+  setSelectedProviderName(name: string | null) {
+    this.selectedProviderName = name
   }
 
   get selectedProvider(): AiProvider | null {
     return (
-      this.aiProviders.find((p) => p.id === this.selectedProviderId) ?? null
+      this.aiProviders.find((p) => p.name === this.selectedProviderName) ?? null
     )
   }
 
@@ -120,16 +120,16 @@ class Store extends BaseStore {
   }
 
   async updateAiProvider(provider: AiProvider) {
-    const idx = this.aiProviders.findIndex((p) => p.id === provider.id)
+    const idx = this.aiProviders.findIndex((p) => p.name === provider.name)
     if (idx !== -1) this.aiProviders[idx] = provider
     await this.saveAiProviders()
   }
 
-  async deleteAiProvider(id: string) {
-    const idx = this.aiProviders.findIndex((p) => p.id === id)
+  async deleteAiProvider(name: string) {
+    const idx = this.aiProviders.findIndex((p) => p.name === name)
     if (idx !== -1) this.aiProviders.splice(idx, 1)
-    if (this.selectedProviderId === id) {
-      this.selectedProviderId = null
+    if (this.selectedProviderName === name) {
+      this.selectedProviderName = null
     }
     await this.saveAiProviders()
   }

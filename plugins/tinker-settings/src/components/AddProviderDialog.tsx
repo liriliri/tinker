@@ -5,7 +5,6 @@ import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Select from 'share/components/Select'
-import uuid from 'licia/uuid'
 import store from '../store'
 import type { ApiType } from '../types'
 import { API_TYPE_DEFAULTS } from '../lib/aiProvider'
@@ -39,9 +38,13 @@ export default function AddProviderDialog({ open, onClose }: Props) {
       toast.error(t('nameRequired'))
       return
     }
+    const trimmedName = name.trim()
+    if (store.aiProviders.some((p) => p.name === trimmedName)) {
+      toast.error(t('providerNameExists'))
+      return
+    }
     await store.addAiProvider({
-      id: uuid(),
-      name: name.trim(),
+      name: trimmedName,
       apiType,
       apiKey: '',
       ...API_TYPE_DEFAULTS[apiType],

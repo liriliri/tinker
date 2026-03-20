@@ -66,6 +66,7 @@ export function injectApi() {
     setSetting: _tinker.setSetting,
     callAI: _tinker.callAI,
     callAIStream,
+    getAIProviders: _tinker.getProviderList,
   }
 
   function showContextMenu(x, y, options) {

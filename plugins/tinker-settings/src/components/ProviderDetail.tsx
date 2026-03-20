@@ -17,7 +17,7 @@ export default observer(function ProviderDetail() {
 
   useEffect(() => {
     setForm(provider ? { ...provider } : null)
-  }, [provider?.id])
+  }, [provider?.name])
 
   if (!provider || !form) {
     return (
@@ -45,7 +45,7 @@ export default observer(function ProviderDetail() {
       cancelText: t('cancel'),
     })
     if (!confirmed) return
-    await store.deleteAiProvider(provider.id)
+    await store.deleteAiProvider(provider.name)
     toast.success(t('providerDeleted'))
   }
 

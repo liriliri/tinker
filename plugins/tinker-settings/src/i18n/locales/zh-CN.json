@@ -54,6 +54,7 @@
   "providerUpdated": "提供商已更新",
   "providerDeleted": "提供商已删除",
   "nameRequired": "请填写名称",
+  "providerNameExists": "已存在同名提供商",
   "apiUrlRequired": "请填写 API 地址",
   "apiKeyRequired": "请填写 API 密钥",
   "modelRequired": "至少需要一个模型"

@@ -8,7 +8,6 @@ export interface AiModel {
 }
 
 export interface AiProvider {
-  id: string
   name: string
   apiUrl: string
   apiKey: string

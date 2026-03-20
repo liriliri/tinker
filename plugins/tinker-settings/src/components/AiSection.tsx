@@ -15,7 +15,6 @@ import ClaudeIcon from '../assets/claude.svg?react'
 import OpenAIIcon from '../assets/openai.svg?react'
 
 interface RowData {
-  id: string
   name: string
   defaultModel: string
   apiUrl: string
@@ -85,7 +84,6 @@ export default observer(function AiSection({
         p.apiUrl.toLowerCase().includes(keyword)
     )
     .map((p) => ({
-      id: p.id,
       name: p.name,
       defaultModel: p.models[0]?.name ?? '',
       apiUrl: p.apiUrl,
@@ -93,22 +91,22 @@ export default observer(function AiSection({
     }))
 
   const onRowClicked = useCallback((event: RowClickedEvent<RowData>) => {
-    if (event.data) store.setSelectedProviderId(event.data.id)
+    if (event.data) store.setSelectedProviderName(event.data.name)
   }, [])
 
   const getRowId = useCallback(
-    (params: GetRowIdParams<RowData>) => params.data.id,
+    (params: GetRowIdParams<RowData>) => params.data.name,
     []
   )
 
   const getRowClass = (params: { data?: RowData }) =>
-    params.data?.id === store.selectedProviderId ? 'ag-row-selected' : ''
+    params.data?.name === store.selectedProviderName ? 'ag-row-selected' : ''
 
   useEffect(() => {
     if (gridRef.current?.api) {
       gridRef.current.api.redrawRows()
     }
-  }, [store.selectedProviderId])
+  }, [store.selectedProviderName])
 
   const localeText = useMemo(() => ({ noRowsToShow: t('noProviders') }), [t])
 
