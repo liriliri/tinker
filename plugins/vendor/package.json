@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:reactresizablepanels",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
@@ -12,7 +12,9 @@
     "build:htmltoimage": "vite build --config vite.config.ts --mode htmltoimage",
     "build:wavesurfer": "vite build --config vite.config.ts --mode wavesurfer",
     "build:zxing": "vite build --config vite.config.ts --mode zxing",
-    "build:reactresizablepanels": "vite build --config vite.config.ts --mode reactresizablepanels"
+    "build:resizablepanels": "vite build --config vite.config.ts --mode resizablepanels",
+    "build:syntaxhighlighter": "vite build --config vite.config.ts --mode syntaxhighlighter",
+    "build:markdown": "vite build --config vite.config.ts --mode markdown"
   },
   "dependencies": {
     "systeminformation": "^5.30.7"
@@ -28,6 +30,10 @@
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",
     "wavesurfer.js": "7.12.2",
-    "react-resizable-panels": "^4.3.3"
+    "react-resizable-panels": "^4.3.3",
+    "react-syntax-highlighter": "^16.1.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "remark-breaks": "^4.0.0"
   }
 }

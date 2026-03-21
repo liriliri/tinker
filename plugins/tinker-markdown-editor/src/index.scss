@@ -1,11 +1,2 @@
 @use '../../share/base.scss';
 @config "../tailwind.config.js";
-
-/* Override vditor styles for dark mode */
-.vditor-reset--dark {
-  color: #e0e0e0;
-
-  :is(.dark *) & {
-    background-color: transparent;
-  }
-}

@@ -24,6 +24,12 @@ const globals = {
   'lucide-react': 'lucideReact',
   '@zxing/library': 'zxing',
   'html-to-image': 'htmlToImage',
+  'react-syntax-highlighter': 'reactSyntaxHighlighter',
+  'react-syntax-highlighter/dist/esm/styles/prism':
+    'reactSyntaxHighlighterPrismStyles',
+  'react-markdown': 'reactMarkdown',
+  'remark-gfm': 'remarkGfm',
+  'remark-breaks': 'remarkBreaks',
   'react-resizable-panels': 'reactResizablePanels',
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
@@ -171,12 +177,20 @@ export default defineConfig(({ mode }) => {
     return createConfig('zxing', 'PluginVendorZxing')
   }
 
-  if (target === 'reactresizablepanels') {
-    return createConfig(
-      'reactresizablepanels',
-      'PluginVendorReactResizablePanels',
-      ['react']
-    )
+  if (target === 'resizablepanels') {
+    return createConfig('resizablepanels', 'PluginVendorResizablePanels', [
+      'react',
+    ])
+  }
+
+  if (target === 'syntaxhighlighter') {
+    return createConfig('syntaxhighlighter', 'PluginVendorSyntaxHighlighter', [
+      'react',
+    ])
+  }
+
+  if (target === 'markdown') {
+    return createConfig('markdown', 'PluginVendorMarkdown', ['react'])
   }
 
   return createConfig('react', 'PluginVendorReact')
