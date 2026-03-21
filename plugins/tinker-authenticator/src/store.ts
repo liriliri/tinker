@@ -2,7 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
-import uniqId from 'licia/uniqId'
+import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import type { Account } from './types'
 import { generateTOTP } from './lib/totp'
@@ -48,8 +48,8 @@ class Store extends BaseStore {
       this.isLocked = !!passwordHash
     })
     if (!passwordHash) {
-      this.loadAccounts()
-      this.refreshCodes()
+      await this.loadAccounts()
+      await this.refreshCodes()
     }
     this.startTimer()
   }
@@ -203,7 +203,7 @@ class Store extends BaseStore {
   }
 
   addAccount(data: Omit<Account, 'id'>) {
-    const account: Account = { ...data, id: uniqId('account_') }
+    const account: Account = { ...data, id: uuid() }
     this.accounts.unshift(account)
     this.saveAccounts()
     this.refreshCode(account)
