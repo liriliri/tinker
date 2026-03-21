@@ -10,13 +10,13 @@ const storage = new LocalStore('tinker-ai-chat')
 const ACTIVE_SESSION_KEY = 'activeSessionId'
 const PROVIDER_KEY = 'provider'
 const MODEL_KEY = 'model'
-const SYSTEM_PROMPT_KEY = 'systemPrompt'
 
 function createSession(): Session {
   return {
     id: uuid(),
     title: '',
     messages: [],
+    systemPrompt: '',
     createdAt: Date.now(),
   }
 }
@@ -28,7 +28,6 @@ class Store extends BaseStore {
   providers: tinker.AiProviderInfo[] = []
   selectedProvider: string = ''
   selectedModel: string = ''
-  systemPrompt: string = ''
 
   input: string = ''
   isGenerating: boolean = false
@@ -44,7 +43,6 @@ class Store extends BaseStore {
   private async init() {
     this.selectedProvider = storage.get(PROVIDER_KEY) || ''
     this.selectedModel = storage.get(MODEL_KEY) || ''
-    this.systemPrompt = storage.get(SYSTEM_PROMPT_KEY) || ''
 
     const savedActiveId: string = storage.get(ACTIVE_SESSION_KEY) || ''
     const [savedSessions] = await Promise.all([
@@ -100,6 +98,10 @@ class Store extends BaseStore {
     return this.sessions.find((s) => s.id === this.activeSessionId)
   }
 
+  get systemPrompt(): string {
+    return this.activeSession?.systemPrompt || ''
+  }
+
   get currentModels(): tinker.AiModel[] {
     const provider = this.providers.find(
       (p) => p.name === this.selectedProvider
@@ -143,8 +145,10 @@ class Store extends BaseStore {
   }
 
   setSystemPrompt(val: string) {
-    this.systemPrompt = val
-    storage.set(SYSTEM_PROMPT_KEY, val)
+    const session = this.activeSession
+    if (!session) return
+    session.systemPrompt = val
+    this.saveActiveSession()
   }
 
   selectSession(id: string) {
