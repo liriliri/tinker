@@ -15,7 +15,6 @@
     "build:reactresizablepanels": "vite build --config vite.config.ts --mode reactresizablepanels"
   },
   "dependencies": {
-    "got": "^11.8.6",
     "systeminformation": "^5.30.7"
   },
   "devDependencies": {

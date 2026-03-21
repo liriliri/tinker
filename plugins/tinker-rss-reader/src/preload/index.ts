@@ -1,7 +1,6 @@
 import { contextBridge, shell } from 'electron'
 import Parser from 'rss-parser'
 import MercuryParser from '@postlight/parser'
-import got from 'got'
 import type { ParsedItem } from '../common/types'
 
 const rssParser = new Parser({
@@ -75,7 +74,7 @@ const rssReaderObj = {
     url: string
   ): Promise<{ content?: string; error?: string }> {
     try {
-      const html = await got(url).text()
+      const html = await fetch(url).then((r) => r.text())
       const result = await MercuryParser.parse(url, { html })
       return { content: result.content || '' }
     } catch (err) {
