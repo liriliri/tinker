@@ -20,7 +20,7 @@ export default observer(function App() {
             <div className={`border-t ${tw.border}`} />
             <div className="flex-1 flex overflow-hidden">
               {/* Sidebar */}
-              <div className="w-48 shrink-0 flex flex-col overflow-hidden">
+              <div className={`w-48 shrink-0 flex flex-col overflow-hidden ${tw.bg.tertiary}`}>
                 <SessionList />
               </div>
 
