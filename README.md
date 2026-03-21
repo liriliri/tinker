@@ -207,6 +207,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/config_editor.png"/></th>
       <th><img src="https://tinker.liriliri.io/audio_editor.png"/></th>
     </tr>
+    <tr>
+      <th>Authenticator</th>
+      <th>AI Chat</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/authenticator.png"/></th>
+      <th><img src="https://tinker.liriliri.io/ai_chat.png"/></th>
+    </tr>
   </tbody>
 </table>
 
