@@ -1,5 +1,5 @@
+import { useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import * as prismStyles from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -13,41 +13,11 @@ function omitNode<T extends { node?: unknown }>({ node, ...rest }: T) {
   return rest
 }
 
-export default observer(function MarkdownPreview() {
-  const containerRef = useRef<HTMLDivElement>(null)
+interface Props {
+  children: string
+}
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const maxScroll = scrollHeight - clientHeight
-      const scrollPercent = maxScroll > 0 ? scrollTop / maxScroll : 0
-
-      if (Math.abs(store.scrollPercent - scrollPercent) > 0.001) {
-        store.setScrollPercent(scrollPercent)
-      }
-    }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const { scrollHeight, clientHeight } = container
-    const maxScroll = scrollHeight - clientHeight
-    if (maxScroll <= 0) return
-
-    const currentPercent = container.scrollTop / maxScroll
-    if (Math.abs(currentPercent - store.scrollPercent) > 0.001) {
-      container.scrollTop = maxScroll * store.scrollPercent
-    }
-  }, [store.scrollPercent])
-
+export default observer(function MarkdownContent({ children }: Props) {
   const components = useMemo<Components>(
     () => ({
       h1: (props) => (
@@ -88,7 +58,7 @@ export default observer(function MarkdownPreview() {
       ),
       p: (props) => (
         <p
-          className={`mb-3 leading-7 ${tw.text.primary}`}
+          className={`mb-3 last:mb-0 leading-7 ${tw.text.primary}`}
           {...omitNode(props)}
         />
       ),
@@ -147,7 +117,7 @@ export default observer(function MarkdownPreview() {
           {...omitNode(props)}
         />
       ),
-      a: ({ children, href, ...props }) => (
+      a: ({ children: linkChildren, href, ...props }) => (
         <a
           href={href}
           target="_blank"
@@ -155,7 +125,7 @@ export default observer(function MarkdownPreview() {
           className="text-blue-500 hover:text-blue-600 underline"
           {...omitNode(props)}
         >
-          {children}
+          {linkChildren}
         </a>
       ),
       code: ({ className, children, ...props }) => {
@@ -191,16 +161,11 @@ export default observer(function MarkdownPreview() {
   )
 
   return (
-    <div
-      ref={containerRef}
-      className={`h-full w-full overflow-auto p-6 text-sm ${tw.bg.primary}`}
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkBreaks]}
+      components={components}
     >
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
-        components={components}
-      >
-        {store.markdownInput}
-      </ReactMarkdown>
-    </div>
+      {children}
+    </ReactMarkdown>
   )
 })

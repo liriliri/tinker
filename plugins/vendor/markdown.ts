@@ -1,11 +1,11 @@
-import * as reactMarkdown from 'react-markdown'
-import * as remarkGfm from 'remark-gfm'
-import * as remarkBreaks from 'remark-breaks'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 
 const g = globalThis as Record<string, unknown>
 
-g.reactMarkdown = reactMarkdown
+g.ReactMarkdown = ReactMarkdown
 g.remarkGfm = remarkGfm
 g.remarkBreaks = remarkBreaks
 
-export { reactMarkdown, remarkGfm, remarkBreaks }
+export { ReactMarkdown, remarkGfm, remarkBreaks }

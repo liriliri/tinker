@@ -27,7 +27,7 @@ const globals = {
   'react-syntax-highlighter': 'reactSyntaxHighlighter',
   'react-syntax-highlighter/dist/esm/styles/prism':
     'reactSyntaxHighlighterPrismStyles',
-  'react-markdown': 'reactMarkdown',
+  'react-markdown': 'ReactMarkdown',
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
   'react-resizable-panels': 'reactResizablePanels',

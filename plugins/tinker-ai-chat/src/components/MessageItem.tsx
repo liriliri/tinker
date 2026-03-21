@@ -5,6 +5,7 @@ import { tw } from 'share/theme'
 import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import type { ChatMessage } from '../types'
+import MarkdownContent from './MarkdownContent'
 
 interface Props {
   msg: ChatMessage
@@ -40,15 +41,17 @@ const MessageItem = observer(function MessageItem({ msg }: Props) {
           </div>
         ) : (
           <div
-            className={`text-sm whitespace-pre-wrap break-words ${
-              tw.text.primary
-            } ${
+            className={`text-sm break-words ${tw.text.primary} ${
               isUser
-                ? `inline-block rounded-2xl ${tw.bg.secondary} px-3 py-2`
+                ? `inline-block rounded-2xl ${tw.bg.secondary} px-3 py-2 whitespace-pre-wrap`
                 : ''
             }`}
           >
-            {msg.content}
+            {isUser ? (
+              msg.content
+            ) : (
+              <MarkdownContent>{msg.content}</MarkdownContent>
+            )}
             {msg.generating && (
               <span
                 className={`inline-block w-2 h-4 ml-0.5 align-text-bottom animate-pulse ${tw.primary.bg}`}
