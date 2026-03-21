@@ -1,3 +1,8 @@
+## v1.5.0 (21 Mar 2026)
+
+* feat: ai support
+* feat: add ai chat
+
 ## v1.4.0 (18 Mar 2026)
 
 feat: add authenticator

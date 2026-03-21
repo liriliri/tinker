@@ -21,7 +21,7 @@ jobs:
         python-version: '3.10'
     - uses: actions/setup-node@v4
       with:
-        node-version: '22.x'
+        node-version: '24.x'
     - run: |
         npm i
         npm run init
