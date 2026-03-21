@@ -2,14 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import uniqId from 'licia/uniqId'
 import BaseStore from 'share/BaseStore'
-import type {
-  ChatMessage,
-  Session,
-  AiModel,
-  AiProviderInfo,
-  AiMessage,
-  AiStreamTask,
-} from './types'
+import type { ChatMessage, Session } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
 
@@ -32,7 +25,7 @@ class Store extends BaseStore {
   sessions: Session[] = []
   activeSessionId: string = ''
 
-  providers: AiProviderInfo[] = []
+  providers: tinker.AiProviderInfo[] = []
   selectedProvider: string = ''
   selectedModel: string = ''
   systemPrompt: string = ''
@@ -40,7 +33,7 @@ class Store extends BaseStore {
   input: string = ''
   isGenerating: boolean = false
 
-  private streamTask: AiStreamTask | null = null
+  private streamTask: tinker.AiStreamTask | null = null
 
   constructor() {
     super()
@@ -104,7 +97,7 @@ class Store extends BaseStore {
     return this.sessions.find((s) => s.id === this.activeSessionId)
   }
 
-  get currentModels(): AiModel[] {
+  get currentModels(): tinker.AiModel[] {
     const provider = this.providers.find(
       (p) => p.name === this.selectedProvider
     )
@@ -229,7 +222,7 @@ class Store extends BaseStore {
     this.isGenerating = true
 
     const session = this.activeSession!
-    const history: AiMessage[] = []
+    const history: tinker.AiMessage[] = []
     if (this.systemPrompt.trim()) {
       history.push({ role: 'system', content: this.systemPrompt.trim() })
     }

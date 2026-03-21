@@ -18,9 +18,9 @@ export interface AiProvider {
 export interface AiMessage {
   role: string
   content?: string | AiContentPart[]
-  reasoning_content?: string
-  tool_calls?: AiToolCall[]
-  tool_call_id?: string
+  reasoningContent?: string
+  toolCalls?: AiToolCall[]
+  toolCallId?: string
 }
 
 export interface AiContentPart {
@@ -63,8 +63,8 @@ export interface AiResult {
 
 export interface AiChunk {
   content?: string
-  reasoning_content?: string
-  tool_calls?: AiToolCall[]
+  reasoningContent?: string
+  toolCalls?: AiToolCall[]
   done?: boolean
   error?: string
 }
