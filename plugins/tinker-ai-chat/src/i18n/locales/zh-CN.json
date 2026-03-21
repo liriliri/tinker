@@ -14,5 +14,9 @@
   "noProviders": "未配置 AI 提供商，请在 Tinker 设置中配置。",
   "errorPrefix": "错误：",
   "systemPrompt": "系统提示词",
-  "systemPromptPlaceholder": "可选的系统提示词…"
+  "systemPromptPlaceholder": "可选的系统提示词…",
+  "settings": "设置",
+  "save": "保存",
+  "cancel": "取消",
+  "deleteSessionConfirm": "删除这个对话？"
 }

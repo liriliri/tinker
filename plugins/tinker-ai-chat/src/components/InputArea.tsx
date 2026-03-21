@@ -1,22 +1,16 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Square } from 'lucide-react'
+import { ArrowRight, Settings, Square } from 'lucide-react'
 import Select from 'share/components/Select'
+import Dialog, { DialogButton } from 'share/components/Dialog'
 import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function InputArea() {
   const { t } = useTranslation()
-
-  const providerOptions = store.providers.map((p) => ({
-    value: p.name,
-    label: p.name,
-  }))
-
-  const modelOptions = store.currentModels.map((m) => ({
-    value: m.name,
-    label: m.name,
-  }))
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [draftPrompt, setDraftPrompt] = useState('')
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -25,65 +19,110 @@ export default observer(function InputArea() {
     }
   }
 
+  function openSettings() {
+    setDraftPrompt(store.systemPrompt)
+    setSettingsOpen(true)
+  }
+
+  function saveSettings() {
+    store.setSystemPrompt(draftPrompt)
+    setSettingsOpen(false)
+  }
+
   return (
-    <div className={`border-t ${tw.border} px-3 py-2 flex flex-col gap-2`}>
-      {/* Provider / Model selectors */}
-      {store.providers.length > 0 && (
-        <div className="flex gap-2">
-          <div className="flex-1 min-w-0">
-            <Select
-              value={store.selectedProvider}
-              onChange={(val) => store.setSelectedProvider(val as string)}
-              options={providerOptions}
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <Select
-              value={store.selectedModel}
-              onChange={(val) => store.setSelectedModel(val as string)}
-              options={modelOptions}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* No providers configured */}
-      {store.providers.length === 0 && (
-        <p className={`text-xs ${tw.text.tertiary}`}>{t('noProviders')}</p>
-      )}
-
-      {/* Textarea + Send */}
-      <div className="flex gap-2 items-end">
+    <div className="px-3 pb-3">
+      <div
+        className={`flex flex-col rounded-lg border ${tw.border} ${tw.bg.input}`}
+      >
+        {/* Textarea */}
         <textarea
           value={store.input}
           onChange={(e) => store.setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('inputPlaceholder')}
           rows={3}
-          className={`flex-1 resize-none rounded border px-3 py-2 text-sm outline-none focus:ring-1 ${tw.bg.input} ${tw.border} ${tw.text.primary} focus:ring-blue-500`}
+          className={`w-full resize-none bg-transparent px-3 pt-3 pb-1 text-sm outline-none ${tw.text.primary}`}
           disabled={store.isGenerating}
         />
-        {store.isGenerating ? (
+
+        {/* Bottom action bar */}
+        <div className="flex items-center gap-2 px-2 py-1.5">
+          {store.providers.length === 0 ? (
+            <p className={`flex-1 text-xs ${tw.text.tertiary}`}>
+              {t('noProviders')}
+            </p>
+          ) : (
+            <>
+              <Select
+                value={store.selectedProvider}
+                onChange={(val) => store.setSelectedProvider(val as string)}
+                options={store.providerOptions}
+                className="max-w-28"
+              />
+              <Select
+                value={store.selectedModel}
+                onChange={(val) => store.setSelectedModel(val as string)}
+                options={store.modelOptions}
+                className="max-w-36"
+              />
+            </>
+          )}
+
           <button
-            onClick={() => store.abortGeneration()}
-            title={t('stop')}
-            className={`shrink-0 w-8 h-8 rounded flex items-center justify-center bg-red-500 hover:bg-red-600 text-white`}
+            onClick={openSettings}
+            title={t('settings')}
+            className={`shrink-0 w-6 h-6 rounded flex items-center justify-center ${
+              tw.hover
+            } ${store.systemPrompt ? tw.primary.text : tw.text.tertiary}`}
           >
-            <Square size={14} fill="currentColor" />
+            <Settings size={12} />
           </button>
-        ) : (
-          <button
-            onClick={() => store.sendMessage()}
-            title={t('send')}
-            disabled={!store.canSend}
-            className={`shrink-0 w-8 h-8 rounded flex items-center justify-center text-white disabled:opacity-40 disabled:cursor-not-allowed ${tw.primary.bg} ${tw.primary.bgHover}`}
-          >
-            <ArrowRight size={14} />
-          </button>
-        )}
+
+          <div className="flex-1" />
+
+          {store.isGenerating ? (
+            <button
+              onClick={() => store.abortGeneration()}
+              title={t('stop')}
+              className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center ${tw.hover} ${tw.text.secondary}`}
+            >
+              <Square size={12} fill="currentColor" />
+            </button>
+          ) : (
+            <button
+              onClick={() => store.sendMessage()}
+              title={`${t('send')} (Enter)`}
+              disabled={!store.canSend}
+              className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed ${tw.primary.bg} ${tw.primary.bgHover}`}
+            >
+              <ArrowRight size={12} />
+            </button>
+          )}
+        </div>
       </div>
 
-      <p className={`text-xs ${tw.text.tertiary}`}>{t('sendHint')}</p>
+      <Dialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        title={t('systemPrompt')}
+        showClose
+      >
+        <div className="flex flex-col gap-4">
+          <textarea
+            value={draftPrompt}
+            onChange={(e) => setDraftPrompt(e.target.value)}
+            placeholder={t('systemPromptPlaceholder')}
+            rows={6}
+            className={`w-full resize-none rounded border px-3 py-2 text-sm outline-none focus:ring-1 ${tw.bg.input} ${tw.border} ${tw.text.primary} ${tw.primary.focusRing}`}
+          />
+          <div className="flex justify-end gap-2">
+            <DialogButton variant="text" onClick={() => setSettingsOpen(false)}>
+              {t('cancel')}
+            </DialogButton>
+            <DialogButton onClick={saveSettings}>{t('save')}</DialogButton>
+          </div>
+        </div>
+      </Dialog>
     </div>
   )
 })

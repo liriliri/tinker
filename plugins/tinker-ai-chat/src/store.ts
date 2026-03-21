@@ -1,20 +1,20 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import uniqId from 'licia/uniqId'
+import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
+import * as db from './lib/db'
 import type { ChatMessage, Session } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
 
-const SESSIONS_KEY = 'sessions'
 const ACTIVE_SESSION_KEY = 'activeSessionId'
 const PROVIDER_KEY = 'provider'
 const MODEL_KEY = 'model'
 const SYSTEM_PROMPT_KEY = 'systemPrompt'
 
-function newSession(): Session {
+function createSession(): Session {
   return {
-    id: uniqId('session-'),
+    id: uuid(),
     title: '',
     messages: [],
     createdAt: Date.now(),
@@ -41,26 +41,29 @@ class Store extends BaseStore {
     this.init()
   }
 
-  private init() {
-    const savedSessions: Session[] = storage.get(SESSIONS_KEY) || []
-    const savedActiveId: string = storage.get(ACTIVE_SESSION_KEY) || ''
-
-    if (savedSessions.length > 0) {
-      this.sessions = savedSessions
-      this.activeSessionId =
-        savedSessions.find((s) => s.id === savedActiveId)?.id ||
-        savedSessions[0].id
-    } else {
-      const session = newSession()
-      this.sessions = [session]
-      this.activeSessionId = session.id
-    }
-
+  private async init() {
     this.selectedProvider = storage.get(PROVIDER_KEY) || ''
     this.selectedModel = storage.get(MODEL_KEY) || ''
     this.systemPrompt = storage.get(SYSTEM_PROMPT_KEY) || ''
 
-    this.loadProviders()
+    const savedActiveId: string = storage.get(ACTIVE_SESSION_KEY) || ''
+    const [savedSessions] = await Promise.all([
+      db.getAllSessions(),
+      this.loadProviders(),
+    ])
+
+    runInAction(() => {
+      if (savedSessions.length > 0) {
+        this.sessions = savedSessions.sort((a, b) => b.createdAt - a.createdAt)
+        this.activeSessionId =
+          savedSessions.find((s) => s.id === savedActiveId)?.id ||
+          savedSessions[0].id
+      } else {
+        const session = createSession()
+        this.sessions = [session]
+        this.activeSessionId = session.id
+      }
+    })
   }
 
   private async loadProviders() {
@@ -104,6 +107,14 @@ class Store extends BaseStore {
     return provider?.models || []
   }
 
+  get providerOptions(): Array<{ value: string; label: string }> {
+    return this.providers.map((p) => ({ value: p.name, label: p.name }))
+  }
+
+  get modelOptions(): Array<{ value: string; label: string }> {
+    return this.currentModels.map((m) => ({ value: m.name, label: m.name }))
+  }
+
   get canSend(): boolean {
     return (
       this.input.trim().length > 0 &&
@@ -142,26 +153,33 @@ class Store extends BaseStore {
   }
 
   newSession() {
-    const session = newSession()
+    const latest = this.sessions[0]
+    if (latest && latest.messages.length === 0) {
+      this.selectSession(latest.id)
+      return
+    }
+    const session = createSession()
     this.sessions.unshift(session)
     this.activeSessionId = session.id
-    this.saveSessions()
     storage.set(ACTIVE_SESSION_KEY, session.id)
   }
 
   deleteSession(id: string) {
+    const session = this.sessions.find((s) => s.id === id)
     this.sessions = this.sessions.filter((s) => s.id !== id)
+    if (session && session.messages.length > 0) {
+      db.removeSession(id)
+    }
     if (this.activeSessionId === id) {
       if (this.sessions.length === 0) {
-        const session = newSession()
-        this.sessions = [session]
-        this.activeSessionId = session.id
+        const newSession = createSession()
+        this.sessions = [newSession]
+        this.activeSessionId = newSession.id
       } else {
         this.activeSessionId = this.sessions[0].id
       }
       storage.set(ACTIVE_SESSION_KEY, this.activeSessionId)
     }
-    this.saveSessions()
   }
 
   clearMessages() {
@@ -169,11 +187,17 @@ class Store extends BaseStore {
     if (!session) return
     session.messages = []
     session.title = ''
-    this.saveSessions()
+    this.saveActiveSession()
   }
 
-  private saveSessions() {
-    storage.set(SESSIONS_KEY, this.sessions)
+  private saveActiveSession() {
+    const session = this.activeSession
+    if (!session) return
+    if (session.messages.length > 0) {
+      db.putSession(session)
+    } else {
+      db.removeSession(session.id)
+    }
   }
 
   private addMessage(msg: ChatMessage) {
@@ -183,7 +207,7 @@ class Store extends BaseStore {
     if (session.messages.length === 1 && msg.role === 'user') {
       session.title = msg.content.slice(0, 40)
     }
-    this.saveSessions()
+    this.saveActiveSession()
   }
 
   private updateLastAssistantMessage(patch: Partial<ChatMessage>) {
@@ -196,24 +220,26 @@ class Store extends BaseStore {
         break
       }
     }
-    this.saveSessions()
+    this.saveActiveSession()
   }
 
   async sendMessage() {
     if (!this.canSend) return
-
     const userText = this.input.trim()
     this.input = ''
+    await this.sendContent(userText)
+  }
 
+  private async sendContent(userText: string) {
     const userMsg: ChatMessage = {
-      id: uniqId('msg-'),
+      id: uuid(),
       role: 'user',
       content: userText,
     }
     this.addMessage(userMsg)
 
     const assistantMsg: ChatMessage = {
-      id: uniqId('msg-'),
+      id: uuid(),
       role: 'assistant',
       content: '',
       generating: true,
@@ -231,7 +257,6 @@ class Store extends BaseStore {
       if (m.id === assistantMsg.id) continue
       history.push({ role: m.role, content: m.content })
     }
-    history.push({ role: 'user', content: userText })
 
     let fullContent = ''
 
@@ -291,16 +316,15 @@ class Store extends BaseStore {
 
     const userContent = messages[lastUserIdx].content
     session.messages = messages.slice(0, lastUserIdx)
-    this.saveSessions()
-    this.input = userContent
-    this.sendMessage()
+    this.saveActiveSession()
+    this.sendContent(userContent)
   }
 
   deleteMessage(id: string) {
     const session = this.activeSession
     if (!session) return
     session.messages = session.messages.filter((m) => m.id !== id)
-    this.saveSessions()
+    this.saveActiveSession()
   }
 }
 

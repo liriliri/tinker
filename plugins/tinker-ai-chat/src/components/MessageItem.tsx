@@ -1,27 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Copy, RefreshCw, Trash2 } from 'lucide-react'
+import { RefreshCw, Trash2, User } from 'lucide-react'
 import { tw } from 'share/theme'
-import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import type { ChatMessage } from '../types'
 
 interface Props {
   msg: ChatMessage
-}
-
-function CopyBtn({ text }: { text: string }) {
-  const { copied, copyToClipboard } = useCopyToClipboard()
-  return (
-    <button
-      onClick={() => copyToClipboard(text)}
-      className={`p-1 rounded ${tw.hover} ${
-        copied ? tw.primary.text : tw.text.tertiary
-      }`}
-    >
-      <Copy size={13} />
-    </button>
-  )
 }
 
 const MessageItem = observer(function MessageItem({ msg }: Props) {
@@ -30,24 +16,23 @@ const MessageItem = observer(function MessageItem({ msg }: Props) {
 
   return (
     <div
-      className={`group flex gap-3 px-4 py-3 ${
-        isUser ? '' : `${tw.bg.secondary}`
+      className={`group flex gap-2 px-4 py-2 ${
+        isUser ? 'flex-row-reverse' : ''
       }`}
     >
       {/* Avatar */}
       <div
-        className={`shrink-0 mt-0.5 w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold
-        ${isUser ? 'bg-blue-500' : 'bg-emerald-500'}`}
+        className={`shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+          isUser ? 'bg-blue-500' : 'bg-emerald-500'
+        }`}
       >
-        {isUser ? 'U' : 'AI'}
+        {isUser ? <User size={16} /> : 'AI'}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className={`text-xs font-medium mb-1 ${tw.text.tertiary}`}>
-          {isUser ? t('you') : t('assistant')}
-        </div>
-
+      <div
+        className={`flex-1 min-w-0 ${isUser ? 'flex flex-col items-end' : ''}`}
+      >
         {msg.error ? (
           <div className="text-red-500 dark:text-red-400 text-sm whitespace-pre-wrap break-words">
             {t('errorPrefix')}
@@ -55,7 +40,13 @@ const MessageItem = observer(function MessageItem({ msg }: Props) {
           </div>
         ) : (
           <div
-            className={`text-sm whitespace-pre-wrap break-words ${tw.text.primary}`}
+            className={`text-sm whitespace-pre-wrap break-words ${
+              tw.text.primary
+            } ${
+              isUser
+                ? `inline-block rounded-2xl ${tw.bg.secondary} px-3 py-2`
+                : ''
+            }`}
           >
             {msg.content}
             {msg.generating && (
@@ -67,18 +58,21 @@ const MessageItem = observer(function MessageItem({ msg }: Props) {
         )}
 
         {/* Actions */}
-        {!msg.generating && (
+        {!msg.generating && !isUser && (
           <div className="flex gap-0.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <CopyBtn text={msg.content} />
-            {!isUser && (
-              <button
-                onClick={() => store.retryLastMessage()}
-                title={t('retry')}
-                className={`p-1 rounded ${tw.hover} ${tw.text.tertiary}`}
-              >
-                <RefreshCw size={13} />
-              </button>
-            )}
+            <CopyButton
+              text={msg.content}
+              variant="toolbar"
+              size={13}
+              className={tw.text.tertiary}
+            />
+            <button
+              onClick={() => store.retryLastMessage()}
+              title={t('retry')}
+              className={`p-1 rounded ${tw.hover} ${tw.text.tertiary}`}
+            >
+              <RefreshCw size={13} />
+            </button>
             <button
               onClick={() => store.deleteMessage(msg.id)}
               title={t('delete')}

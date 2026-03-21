@@ -13,7 +13,7 @@ export default observer(function MessageList() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [session?.messages.length, session?.messages[session.messages.length - 1]?.content])
+  }, [session?.messages.length])
 
   if (!session || session.messages.length === 0) {
     return (

@@ -14,5 +14,9 @@
   "noProviders": "No AI providers configured. Please set up a provider in Tinker settings.",
   "errorPrefix": "Error: ",
   "systemPrompt": "System Prompt",
-  "systemPromptPlaceholder": "Optional system prompt..."
+  "systemPromptPlaceholder": "Optional system prompt...",
+  "settings": "Settings",
+  "save": "Save",
+  "cancel": "Cancel",
+  "deleteSessionConfirm": "Delete this conversation?"
 }

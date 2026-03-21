@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2 } from 'lucide-react'
+import { Eraser } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
@@ -21,15 +21,12 @@ export default observer(function SessionToolbar() {
         {store.activeSession?.title || t('newChat')}
       </span>
       <ToolbarSpacer />
-      <ToolbarButton title={t('newChat')} onClick={() => store.newSession()}>
-        <Plus size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
       <ToolbarButton
         title={t('clearMessages')}
         onClick={() => store.clearMessages()}
         disabled={!store.activeSession?.messages.length}
       >
-        <Trash2 size={TOOLBAR_ICON_SIZE} />
+        <Eraser size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
     </Toolbar>
   )
