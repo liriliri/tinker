@@ -43,11 +43,11 @@ function importData() {
 let plugin: IPlugin | null = null
 
 async function preparePlugin(p: IPlugin) {
+  plugin = p
   if (p.preload) {
     pluginRenderer.injectApi()
     await import(pathToFileURL(p.preload).href)
   }
-  plugin = p
 }
 
 async function updateTheme() {
