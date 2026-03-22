@@ -11,7 +11,12 @@ import PQueue from 'p-queue'
 import toNum from 'licia/toNum'
 import toStr from 'licia/toStr'
 import mime from 'mime'
-import { getPlugins, plugins, getBuiltinPluginDir } from './loader'
+import {
+  getPlugins,
+  plugins,
+  getBuiltinPluginDir,
+  loadSettingsPlugin,
+} from './loader'
 import {
   PLUGIN_PARTITION,
   pluginViews,
@@ -83,6 +88,8 @@ export function init() {
       }
     }
   })
+
+  loadSettingsPlugin()
 
   const pluginSession = session.fromPartition(PLUGIN_PARTITION)
   pluginSession.protocol.handle('plugin', async (request) => {
