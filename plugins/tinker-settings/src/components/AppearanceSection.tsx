@@ -48,7 +48,7 @@ export default observer(function AppearanceSection() {
           <label className={`text-sm ${tw.text.primary}`}>{t('theme')}</label>
           <Select
             value={store.theme}
-            onChange={store.setTheme}
+            onChange={(value) => store.setTheme(value)}
             options={themeOptions}
           />
         </div>
