@@ -109,12 +109,18 @@ class Store extends BaseStore {
     return provider?.models || []
   }
 
-  get providerOptions(): Array<{ value: string; label: string }> {
-    return this.providers.map((p) => ({ value: p.name, label: p.name }))
+  get combinedOptions(): Array<{ value: string; label: string }> {
+    return this.providers.flatMap((p) =>
+      p.models.map((m) => ({
+        value: `${p.name}:${m.name}`,
+        label: `${p.name}:${m.name}`,
+      }))
+    )
   }
 
-  get modelOptions(): Array<{ value: string; label: string }> {
-    return this.currentModels.map((m) => ({ value: m.name, label: m.name }))
+  get selectedCombined(): string {
+    if (!this.selectedProvider || !this.selectedModel) return ''
+    return `${this.selectedProvider}:${this.selectedModel}`
   }
 
   get canSend(): boolean {
@@ -142,6 +148,17 @@ class Store extends BaseStore {
   setSelectedModel(name: string) {
     this.selectedModel = name
     storage.set(MODEL_KEY, name)
+  }
+
+  setSelectedCombined(val: string) {
+    const idx = val.indexOf(':')
+    if (idx === -1) return
+    const provider = val.slice(0, idx)
+    const model = val.slice(idx + 1)
+    this.selectedProvider = provider
+    storage.set(PROVIDER_KEY, provider)
+    this.selectedModel = model
+    storage.set(MODEL_KEY, model)
   }
 
   setSystemPrompt(val: string) {

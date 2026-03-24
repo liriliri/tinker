@@ -54,16 +54,10 @@ export default observer(function InputArea() {
           ) : (
             <>
               <Select
-                value={store.selectedProvider}
-                onChange={(val) => store.setSelectedProvider(val as string)}
-                options={store.providerOptions}
-                className="max-w-28"
-              />
-              <Select
-                value={store.selectedModel}
-                onChange={(val) => store.setSelectedModel(val as string)}
-                options={store.modelOptions}
-                className="max-w-36"
+                value={store.selectedCombined}
+                onChange={(val) => store.setSelectedCombined(val as string)}
+                options={store.combinedOptions}
+                className="max-w-48"
               />
             </>
           )}

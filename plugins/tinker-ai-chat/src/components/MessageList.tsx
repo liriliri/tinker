@@ -11,9 +11,26 @@ export default observer(function MessageList() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const session = store.activeSession
 
+  const prevSessionId = useRef<string | undefined>(undefined)
+
+  // Access generating message content during render so MobX tracks it,
+  // causing re-renders (and scroll) on every streaming chunk.
+  const lastMsg = session?.messages[session.messages.length - 1]
+  const streamingContent = lastMsg?.generating ? lastMsg.content : null
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [session?.messages.length])
+    const isNewSession = prevSessionId.current !== session?.id
+    prevSessionId.current = session?.id
+    bottomRef.current?.scrollIntoView({
+      behavior: isNewSession ? 'instant' : 'smooth',
+    })
+  }, [session?.id, session?.messages.length])
+
+  useEffect(() => {
+    if (streamingContent !== null) {
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+    }
+  }, [streamingContent])
 
   if (!session || session.messages.length === 0) {
     return (

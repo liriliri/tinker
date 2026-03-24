@@ -47,12 +47,27 @@ const MessageItem = observer(function MessageItem({ msg }: Props) {
                 : ''
             }`}
           >
-            {isUser ? (
+            {msg.generating && !msg.content ? (
+              <span className="flex items-end gap-1 h-5 pb-0.5">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full animate-bounce ${tw.primary.bg}`}
+                  style={{ animationDelay: '0ms' }}
+                />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full animate-bounce ${tw.primary.bg}`}
+                  style={{ animationDelay: '150ms' }}
+                />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full animate-bounce ${tw.primary.bg}`}
+                  style={{ animationDelay: '300ms' }}
+                />
+              </span>
+            ) : isUser ? (
               msg.content
             ) : (
               <MarkdownContent>{msg.content}</MarkdownContent>
             )}
-            {msg.generating && (
+            {msg.generating && msg.content && (
               <span
                 className={`inline-block w-2 h-4 ml-0.5 align-text-bottom animate-pulse ${tw.primary.bg}`}
               />
