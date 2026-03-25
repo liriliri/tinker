@@ -28,6 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
   mainObj.on('changeTheme', updateTheme)
   mainObj.on('exportData', exportData)
   mainObj.on('importData', importData)
+  mainObj.on('clearData', clearData)
 })
 
 function exportData() {
@@ -38,6 +39,10 @@ function exportData() {
 
 function importData() {
   injectRendererScript(`(${pluginRenderer.importData.toString()})()`)
+}
+
+function clearData() {
+  injectRendererScript(`(${pluginRenderer.clearData.toString()})()`)
 }
 
 let plugin: IPlugin | null = null
@@ -132,6 +137,9 @@ const tinkerObj = {
   callAIStream,
   abortAI,
   getProviderList,
+  t(key: string) {
+    return i18n.t(key)
+  },
 }
 
 contextBridge.exposeInMainWorld('_tinker', tinkerObj)

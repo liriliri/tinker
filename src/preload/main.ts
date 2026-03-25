@@ -6,6 +6,7 @@ import {
   IpcGetApps,
   IpcGetPlugins,
   IpcImportPluginData,
+  IpcClearPluginData,
   IpcOpenApp,
   IpcOpenPlugin,
   IpcReopenPlugin,
@@ -26,5 +27,6 @@ export default Object.assign(mainObj, {
   openApp: invoke<IpcOpenApp>('openApp'),
   exportPluginData: invoke<IpcExportPluginData>('exportPluginData'),
   importPluginData: invoke<IpcImportPluginData>('importPluginData'),
+  clearPluginData: invoke<IpcClearPluginData>('clearPluginData'),
   preparePluginView: invoke('preparePluginView'),
 })

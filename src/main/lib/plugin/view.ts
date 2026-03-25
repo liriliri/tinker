@@ -1,6 +1,7 @@
 import {
   IpcClosePlugin,
   IpcDetachPlugin,
+  IpcClearPluginData,
   IpcExportPluginData,
   IpcImportPluginData,
   IpcOpenPlugin,
@@ -253,6 +254,15 @@ export const importPluginData: IpcImportPluginData = function (id) {
   }
 
   view.webContents.send('importData')
+}
+
+export const clearPluginData: IpcClearPluginData = function (id) {
+  const { view } = pluginViews[id]
+  if (!view) {
+    return
+  }
+
+  view.webContents.send('clearData')
 }
 
 export function preparePluginView() {

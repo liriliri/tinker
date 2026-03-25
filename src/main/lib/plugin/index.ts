@@ -28,6 +28,7 @@ import {
   showPluginContextMenu,
   exportPluginData,
   importPluginData,
+  clearPluginData,
   preparePluginView,
 } from './view'
 
@@ -78,6 +79,7 @@ export function init() {
   handleEvent('getClipboardFilePaths', getClipboardFilePaths)
   handleEvent('exportPluginData', exportPluginData)
   handleEvent('importPluginData', importPluginData)
+  handleEvent('clearPluginData', clearPluginData)
   handleEvent('preparePluginView', preparePluginView)
   handleEvent('captureScreen', captureScreen)
   handleEvent('pluginGetFileIcon', getFileIcon)

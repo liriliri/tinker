@@ -32,10 +32,6 @@ export async function loadData(
     filters: [{ name: 'Zip Files', extensions: ['zip'] }],
   })
   if (filePaths && filePaths.length > 0) {
-    const result = confirm(t('importDataConfirm'))
-    if (!result) {
-      return
-    }
     const filePath = filePaths[0]
     const buf = await fs.readFile(filePath)
     const files = unzipFiles(buf)

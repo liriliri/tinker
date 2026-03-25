@@ -91,6 +91,12 @@ export default observer(function Titlebar() {
             },
           },
           {
+            label: t('clearData'),
+            click() {
+              main.clearPluginData(store.plugin!.id)
+            },
+          },
+          {
             type: 'separator',
           }
         )

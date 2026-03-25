@@ -55,6 +55,7 @@ export type IpcGetApps = (force?: boolean) => Promise<IApp[]>
 export type IpcOpenApp = (path: string) => void
 export type IpcGetClipboardFilePaths = () => string[]
 export type IpcExportPluginData = (id: string) => void
-export type IpcImportPluginData = (id: string) => void
+export type IpcImportPluginData = IpcExportPluginData
+export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>

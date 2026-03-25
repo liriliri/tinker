@@ -118,6 +118,10 @@ export function injectApi() {
 }
 
 export async function importData() {
+  const result = confirm(_tinker.t('importDataConfirm'))
+  if (!result) {
+    return
+  }
   const files = await _tinker.loadData()
   if (!files) return
 
@@ -195,6 +199,29 @@ export async function importData() {
     }
 
     db.close()
+  }
+
+  location.reload()
+}
+
+export async function clearData() {
+  const result = confirm(_tinker.t('clearDataConfirm'))
+  if (!result) {
+    return
+  }
+
+  // localStorage
+  localStorage.clear()
+
+  // IndexedDB
+  const databases = await indexedDB.databases()
+  for (const dbInfo of databases) {
+    if (!dbInfo.name) continue
+    await new Promise<void>((resolve, reject) => {
+      const req = indexedDB.deleteDatabase(dbInfo.name!)
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+    })
   }
 
   location.reload()

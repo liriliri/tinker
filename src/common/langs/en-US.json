@@ -14,6 +14,8 @@
   "openDir": "Open Directory",
   "exportData": "Export Data",
   "importData": "Import Data",
+  "clearData": "Clear Data",
   "importDataConfirm": "Importing data will overwrite your current data. Are you sure you want to continue?",
+  "clearDataConfirm": "This will permanently delete all local data. Are you sure you want to continue?",
   "importDataMismatchErr": "Plugin ID mismatch: expected \"{{expected}}\", got \"{{got}}\""
 }
