@@ -16,5 +16,13 @@
   "page": "第 {{pageNum}} 页",
   "rendering": "渲染中...",
   "thumbnails": "缩略图",
-  "outline": "大纲"
+  "outline": "大纲",
+  "exportImages": "导出为图片",
+  "exportDialogTitle": "导出为图片",
+  "scale": "缩放倍数",
+  "export": "导出",
+  "cancel": "取消",
+  "exporting": "{{current}}/{{total}}",
+  "exportSuccess": "成功导出 {{total}} 张图片",
+  "errorExport": "导出图片失败"
 }

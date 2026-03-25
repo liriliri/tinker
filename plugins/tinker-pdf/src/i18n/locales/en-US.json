@@ -16,5 +16,13 @@
   "page": "Page {{pageNum}}",
   "rendering": "Rendering...",
   "thumbnails": "Thumbnails",
-  "outline": "Outline"
+  "outline": "Outline",
+  "exportImages": "Export as Images",
+  "exportDialogTitle": "Export as Images",
+  "scale": "Scale",
+  "export": "Export",
+  "cancel": "Cancel",
+  "exporting": "{{current}}/{{total}}",
+  "exportSuccess": "Exported {{total}} images successfully",
+  "errorExport": "Failed to export images"
 }

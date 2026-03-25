@@ -388,6 +388,7 @@ export default observer(function PdfViewer() {
       <FileOpen
         onOpenFile={(file) => store.openFileFromFile(file)}
         openTitle={t('openTitle')}
+        accept=".pdf"
         fileName={store.fileName}
       />
     )

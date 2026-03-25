@@ -4,6 +4,8 @@ import toast from 'react-hot-toast'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { pdfjsLib } from './lib/pdfjs'
 import LocalStore from 'licia/LocalStore'
+import dataUrl from 'licia/dataUrl'
+import convertBin from 'licia/convertBin'
 import i18n from './i18n'
 
 const storage = new LocalStore('tinker-pdf')
@@ -31,6 +33,8 @@ class Store extends BaseStore {
 
   sidebarOpen: boolean = true
   sidebarView: SidebarView = 'thumbnails'
+
+  exportProgress: { current: number; total: number } | null = null
 
   constructor() {
     super()
@@ -196,6 +200,56 @@ class Store extends BaseStore {
       await this.loadPdfFile(filePath)
     } catch (error) {
       console.error('Error opening file:', error)
+    }
+  }
+
+  async exportImages(scale: number) {
+    if (!this.pdfDoc) return
+
+    try {
+      const result = await tinker.showOpenDialog({
+        properties: ['openDirectory'],
+      })
+
+      if (result.canceled || !result.filePaths.length) return
+
+      const outputDir = result.filePaths[0]
+      const baseName = this.fileName.replace(/\.[^.]+$/, '')
+      const total = this.numPages
+
+      this.exportProgress = { current: 0, total }
+
+      for (let pageNum = 1; pageNum <= total; pageNum++) {
+        const page = await this.pdfDoc.getPage(pageNum)
+        const viewport = page.getViewport({ scale })
+
+        const canvas = document.createElement('canvas')
+        const dpr = window.devicePixelRatio || 1
+        canvas.width = Math.floor(viewport.width * dpr)
+        canvas.height = Math.floor(viewport.height * dpr)
+        canvas.style.width = `${Math.floor(viewport.width)}px`
+        canvas.style.height = `${Math.floor(viewport.height)}px`
+
+        const ctx = canvas.getContext('2d')!
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+        await page.render({ canvas, canvasContext: ctx, viewport }).promise
+
+        const parsed = dataUrl.parse(canvas.toDataURL('image/png'))!
+        const buffer = convertBin(parsed.data, 'Uint8Array')
+
+        const outputPath = `${outputDir}/${baseName}-${pageNum}.png`
+        await tinker.writeFile(outputPath, buffer)
+
+        this.exportProgress = { current: pageNum, total }
+      }
+
+      toast.success(i18n.t('exportSuccess', { total }))
+    } catch (error) {
+      console.error('Error exporting images:', error)
+      this.showError('errorExport')
+    } finally {
+      this.exportProgress = null
     }
   }
 }

@@ -415,7 +415,11 @@ const AudioEditor = observer(
           <LoadingCircle />
         </div>
       ) : (
-        <FileOpen onOpenFile={onOpenFile} openTitle={t('noFile')} />
+        <FileOpen
+          onOpenFile={onOpenFile}
+          openTitle={t('noFile')}
+          accept=".mp3,.wav,.ogg,.flac,.m4a,.aac,.webm"
+        />
       )
     ) : (
       <div className="flex-1 flex flex-col overflow-hidden">

@@ -6,6 +6,7 @@ import { tw } from 'share/theme'
 interface FileOpenProps {
   onOpenFile: (file: File) => Promise<void>
   openTitle: string
+  accept?: string
   supportedFormats?: string
   fileName?: string
 }
@@ -13,6 +14,7 @@ interface FileOpenProps {
 const FileOpen: React.FC<FileOpenProps> = ({
   onOpenFile,
   openTitle,
+  accept,
   supportedFormats,
   fileName,
 }) => {
@@ -28,7 +30,7 @@ const FileOpen: React.FC<FileOpenProps> = ({
 
   const handleClick = async () => {
     try {
-      const files = await openFile()
+      const files = await openFile({ accept })
       if (files && files.length > 0) {
         await handleFileOpen(files[0])
       }
@@ -62,7 +64,23 @@ const FileOpen: React.FC<FileOpenProps> = ({
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    await handleFileOpen(files[0])
+    const file = files[0]
+
+    if (accept) {
+      const extensions = accept
+        .split(',')
+        .map((s) => s.trim().toLowerCase())
+        .filter((s) => s.startsWith('.'))
+      const name = file.name.toLowerCase()
+      if (
+        extensions.length > 0 &&
+        !extensions.some((ext) => name.endsWith(ext))
+      ) {
+        return
+      }
+    }
+
+    await handleFileOpen(file)
   }
 
   return (

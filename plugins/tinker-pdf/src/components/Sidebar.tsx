@@ -20,9 +20,17 @@ export default observer(function Sidebar() {
   const [thumbnailDimensions, setThumbnailDimensions] = useState<
     Map<number, ThumbnailDimensions>
   >(new Map())
+  const [pdfDocVersion, setPdfDocVersion] = useState(0)
+  const prevPdfDocRef = useRef(store.pdfDoc)
 
   // Pre-calculate thumbnail dimensions when document loads
   useEffect(() => {
+    if (store.pdfDoc !== prevPdfDocRef.current) {
+      prevPdfDocRef.current = store.pdfDoc
+      setPdfDocVersion((v) => v + 1)
+      thumbnailRefs.current.clear()
+    }
+
     if (!store.pdfDoc) {
       setThumbnailDimensions(new Map())
       return
@@ -129,7 +137,7 @@ export default observer(function Sidebar() {
             const dims = thumbnailDimensions.get(pageNum)
             return (
               <div
-                key={pageNum}
+                key={`${pdfDocVersion}-${pageNum}`}
                 ref={(el) => {
                   if (el) {
                     thumbnailRefs.current.set(pageNum, el)
