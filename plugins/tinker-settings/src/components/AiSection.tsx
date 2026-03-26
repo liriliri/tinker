@@ -7,6 +7,8 @@ import {
   RowClickedEvent,
   GetRowIdParams,
   ICellRendererParams,
+  RowDragEndEvent,
+  IRowDragItem,
 } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import store from '../store'
@@ -53,7 +55,6 @@ export default observer(function AiSection({
         headerName: t('providerName'),
         flex: 1,
         minWidth: 120,
-        sortable: true,
         cellRenderer: ProviderNameCell,
       },
       {
@@ -61,14 +62,12 @@ export default observer(function AiSection({
         headerName: t('defaultModel'),
         flex: 1,
         minWidth: 80,
-        sortable: true,
       },
       {
         field: 'apiUrl',
         headerName: t('apiUrl'),
         flex: 2,
         minWidth: 150,
-        sortable: true,
       },
     ],
     [t]
@@ -102,6 +101,17 @@ export default observer(function AiSection({
   const getRowClass = (params: { data?: RowData }) =>
     params.data?.name === store.selectedProviderName ? 'ag-row-selected' : ''
 
+  const onRowDragEnd = useCallback((event: RowDragEndEvent<RowData>) => {
+    const { node, overIndex } = event
+    if (overIndex < 0 || node.rowIndex === overIndex) return
+    const fromName = node.data?.name
+    if (!fromName) return
+    const fromIndex = store.aiProviders.findIndex((p) => p.name === fromName)
+    if (fromIndex !== -1) {
+      store.reorderAiProviders(fromIndex, overIndex)
+    }
+  }, [])
+
   useEffect(() => {
     if (gridRef.current?.api) {
       gridRef.current.api.redrawRows()
@@ -117,14 +127,19 @@ export default observer(function AiSection({
         ref={gridRef}
         columnDefs={columnDefs}
         rowData={rowData}
+        defaultColDef={{ sortable: false }}
         onRowClicked={onRowClicked}
         getRowId={getRowId}
         getRowClass={getRowClass}
         headerHeight={40}
         rowHeight={40}
-        animateRows={true}
+        animateRows={false}
         enableCellTextSelection={false}
         suppressCellFocus={true}
+        rowDragManaged={true}
+        rowDragEntireRow={true}
+        rowDragText={(params: IRowDragItem) => params.rowNode?.data?.name ?? ''}
+        onRowDragEnd={onRowDragEnd}
         localeText={localeText}
       />
 

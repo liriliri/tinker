@@ -133,6 +133,12 @@ class Store extends BaseStore {
     }
     await this.saveAiProviders()
   }
+
+  async reorderAiProviders(fromIndex: number, toIndex: number) {
+    const [item] = this.aiProviders.splice(fromIndex, 1)
+    this.aiProviders.splice(toIndex, 0, item)
+    await this.saveAiProviders()
+  }
 }
 
 export default new Store()
