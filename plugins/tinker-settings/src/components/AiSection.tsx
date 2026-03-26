@@ -102,13 +102,15 @@ export default observer(function AiSection({
     params.data?.name === store.selectedProviderName ? 'ag-row-selected' : ''
 
   const onRowDragEnd = useCallback((event: RowDragEndEvent<RowData>) => {
-    const { node, overIndex } = event
-    if (overIndex < 0 || node.rowIndex === overIndex) return
+    const { node, overNode } = event
+    if (!overNode || node.id === overNode.id) return
     const fromName = node.data?.name
-    if (!fromName) return
+    const toName = overNode.data?.name
+    if (!fromName || !toName) return
     const fromIndex = store.aiProviders.findIndex((p) => p.name === fromName)
-    if (fromIndex !== -1) {
-      store.reorderAiProviders(fromIndex, overIndex)
+    const toIndex = store.aiProviders.findIndex((p) => p.name === toName)
+    if (fromIndex !== -1 && toIndex !== -1) {
+      store.reorderAiProviders(fromIndex, toIndex)
     }
   }, [])
 
@@ -136,7 +138,6 @@ export default observer(function AiSection({
         animateRows={false}
         enableCellTextSelection={false}
         suppressCellFocus={true}
-        rowDragManaged={true}
         rowDragEntireRow={true}
         rowDragText={(params: IRowDragItem) => params.rowNode?.data?.name ?? ''}
         onRowDragEnd={onRowDragEnd}
