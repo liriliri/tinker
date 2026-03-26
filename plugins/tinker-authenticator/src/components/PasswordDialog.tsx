@@ -79,7 +79,7 @@ export default observer(function PasswordDialog() {
   const title = hasPassword ? t('managePassword') : t('setPassword')
 
   return (
-    <Dialog open={open} onClose={handleClose} title={title} showClose>
+    <Dialog open={open} onClose={handleClose} title={title}>
       {!hasPassword && (
         <form onSubmit={handleSet} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">

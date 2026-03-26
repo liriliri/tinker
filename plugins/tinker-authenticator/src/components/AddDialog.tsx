@@ -103,7 +103,6 @@ export default observer(function AddDialog() {
       open={store.showAddDialog}
       onClose={() => store.closeAddDialog()}
       title={editing ? t('editAccount') : t('addAccount')}
-      showClose
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">

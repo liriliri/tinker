@@ -99,7 +99,6 @@ export default observer(function InputArea() {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         title={t('systemPrompt')}
-        showClose
       >
         <div className="flex flex-col gap-4">
           <textarea

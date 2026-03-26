@@ -41,7 +41,6 @@ export default observer(function ImportDialog() {
       open={store.showImportDialog}
       onClose={handleClose}
       title={t('importUri')}
-      showClose
     >
       <div className="flex flex-col gap-3">
         <textarea
