@@ -47,9 +47,23 @@ export default observer(function MessageList() {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {session.messages.map((msg) => (
-        <MessageItem key={msg.id} msg={msg} />
-      ))}
+      {session.messages.map((msg, index) => {
+        if (msg.role === 'tool') return null
+
+        let toolMessages: typeof session.messages = []
+        if (msg.role === 'assistant') {
+          toolMessages = []
+          for (let i = index + 1; i < session.messages.length; i++) {
+            const nextMsg = session.messages[i]
+            if (nextMsg.role !== 'tool') break
+            toolMessages.push(nextMsg)
+          }
+        }
+
+        return (
+          <MessageItem key={msg.id} msg={msg} toolMessages={toolMessages} />
+        )
+      })}
       <div ref={bottomRef} />
     </div>
   )

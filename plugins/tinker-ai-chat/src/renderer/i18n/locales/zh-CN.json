@@ -8,7 +8,7 @@
   "retry": "重试",
   "send": "发送",
   "stop": "停止",
-  "inputPlaceholder": "输入消息…（Enter 发送，Shift+Enter 换行）",
+  "inputPlaceholder": "输入消息…",
   "sendHint": "Enter 发送 · Shift+Enter 换行",
   "emptyHint": "开始对话吧",
   "noProviders": "未配置 AI 提供商，请在 Tinker 设置中配置。",
@@ -18,5 +18,9 @@
   "settings": "设置",
   "save": "保存",
   "cancel": "取消",
-  "deleteSessionConfirm": "删除这个对话？"
+  "deleteSessionConfirm": "删除这个对话？",
+  "searching": "正在搜索",
+  "searchedFor": "已搜索",
+  "searchResults": "条结果",
+  "searchFailed": "搜索失败"
 }

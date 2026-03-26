@@ -34,7 +34,6 @@ export default observer(function InputArea() {
       <div
         className={`flex flex-col rounded-lg border ${tw.border} ${tw.bg.input}`}
       >
-        {/* Textarea */}
         <textarea
           value={store.input}
           onChange={(e) => store.setInput(e.target.value)}
@@ -45,21 +44,18 @@ export default observer(function InputArea() {
           disabled={store.isGenerating}
         />
 
-        {/* Bottom action bar */}
         <div className="flex items-center gap-2 px-2 py-1.5">
           {store.providers.length === 0 ? (
             <p className={`flex-1 text-xs ${tw.text.tertiary}`}>
               {t('noProviders')}
             </p>
           ) : (
-            <>
-              <Select
-                value={store.selectedCombined}
-                onChange={(val) => store.setSelectedCombined(val as string)}
-                options={store.combinedOptions}
-                className="max-w-48"
-              />
-            </>
+            <Select
+              value={store.selectedCombined}
+              onChange={(val) => store.setSelectedCombined(val as string)}
+              options={store.combinedOptions}
+              className="max-w-48"
+            />
           )}
 
           <button

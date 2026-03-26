@@ -21,6 +21,7 @@ export interface AiMessage {
   reasoningContent?: string
   toolCalls?: AiToolCall[]
   toolCallId?: string
+  toolName?: string
 }
 
 export interface AiContentPart {

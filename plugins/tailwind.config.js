@@ -2,6 +2,7 @@ export default {
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
+    '!./references/**/*',
     '../share/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: 'class',

@@ -57,7 +57,7 @@ export function convertMessages(
     const toolResult: LanguageModelV3ToolResultPart = {
       type: 'tool-result',
       toolCallId: msg.toolCallId ?? '',
-      toolName: '',
+      toolName: msg.toolName ?? '',
       output: { type: 'text', value: getTextContent(msg.content) },
     }
     return { role: 'tool', content: [toolResult] }

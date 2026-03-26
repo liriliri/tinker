@@ -110,6 +110,7 @@ declare global {
       reasoningContent?: string
       toolCalls?: any[]
       toolCallId?: string
+      toolName?: string
     }
 
     interface AiCallOption {

@@ -8,7 +8,7 @@
   "retry": "Retry",
   "send": "Send",
   "stop": "Stop",
-  "inputPlaceholder": "Type a message... (Enter to send, Shift+Enter for newline)",
+  "inputPlaceholder": "Type a message...",
   "sendHint": "Enter to send · Shift+Enter for newline",
   "emptyHint": "Start a conversation",
   "noProviders": "No AI providers configured. Please set up a provider in Tinker settings.",
@@ -18,5 +18,9 @@
   "settings": "Settings",
   "save": "Save",
   "cancel": "Cancel",
-  "deleteSessionConfirm": "Delete this conversation?"
+  "deleteSessionConfirm": "Delete this conversation?",
+  "searching": "Searching",
+  "searchedFor": "Searched",
+  "searchResults": "results",
+  "searchFailed": "Search failed"
 }
