@@ -178,6 +178,7 @@ class Store extends BaseStore {
     return (
       this.input.trim().length > 0 &&
       !this.isGenerating &&
+      this.providers.length > 0 &&
       !!this.selectedProvider &&
       !!this.selectedModel
     )

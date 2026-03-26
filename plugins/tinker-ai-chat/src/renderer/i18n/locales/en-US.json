@@ -11,7 +11,7 @@
   "inputPlaceholder": "Type a message...",
   "sendHint": "Enter to send · Shift+Enter for newline",
   "emptyHint": "Start a conversation",
-  "noProviders": "No AI providers configured. Please set up a provider in Tinker settings.",
+  "noProviders": "No AI providers configured",
   "errorPrefix": "Error: ",
   "systemPrompt": "System Prompt",
   "systemPromptPlaceholder": "Optional system prompt...",

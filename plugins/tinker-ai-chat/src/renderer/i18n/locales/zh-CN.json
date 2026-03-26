@@ -11,7 +11,7 @@
   "inputPlaceholder": "输入消息…",
   "sendHint": "Enter 发送 · Shift+Enter 换行",
   "emptyHint": "开始对话吧",
-  "noProviders": "未配置 AI 提供商，请在 Tinker 设置中配置。",
+  "noProviders": "未配置 AI 提供商",
   "errorPrefix": "错误：",
   "systemPrompt": "系统提示词",
   "systemPromptPlaceholder": "可选的系统提示词…",

@@ -46,9 +46,13 @@ export default observer(function InputArea() {
 
         <div className="flex items-center gap-2 px-2 py-1.5">
           {store.providers.length === 0 ? (
-            <p className={`flex-1 text-xs ${tw.text.tertiary}`}>
-              {t('noProviders')}
-            </p>
+            <Select
+              value=""
+              onChange={() => {}}
+              options={[{ value: '', label: t('noProviders') }]}
+              className="max-w-48"
+              disabled={true}
+            />
           ) : (
             <Select
               value={store.selectedCombined}
