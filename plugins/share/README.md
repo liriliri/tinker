@@ -223,6 +223,121 @@ import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 const { copied, copyToClipboard } = useCopyToClipboard()
 ```
 
+## Agent
+
+AI Agent class that handles streaming, tool-call loops, and message management. Decoupled from MobX via callbacks.
+
+```typescript
+import { Agent, formatSearchResults } from 'share/lib/Agent'
+import type { AgentMessage, AgentTool, ToolCall, ToolStatus, SearchResult } from 'share/lib/Agent'
+import { WEB_SEARCH_TOOL } from 'share/tools/web'
+
+const agent = new Agent({
+  provider: 'openai',
+  model: 'gpt-4o',
+  systemPrompt: 'You are a helpful assistant.',
+  maxIterations: 10,           // default 20
+  tools: [
+    {
+      definition: WEB_SEARCH_TOOL,     // function schema passed to the AI
+      initMessage: (args) => ({        // optional: extra fields on the initial tool message
+        isSearching: true,
+        searchQuery: args.query as string,
+      }),
+      execute: async (args) => {
+        // return a string, or { content: string, ...partial AgentMessage fields }
+        const results = await search(args.query as string, lang)
+        return {
+          content: formatSearchResults(results),
+          isSearching: false,
+          searchResults: results,
+        }
+      },
+    },
+  ],
+  onMessage: (msg) => runInAction(() => messages.push(msg)),
+  onMessageUpdate: (id, patch) =>
+    runInAction(() => {
+      const msg = messages.find((m) => m.id === id)
+      if (msg) Object.assign(msg, patch)
+    }),
+  getMessages: () => messages,
+})
+
+// Update config at any time
+agent.setProvider('anthropic')
+agent.setModel('claude-opus-4-5')
+agent.setSystemPrompt('New system prompt')
+agent.setTools([...])
+
+// Send a message (auto-adds user/assistant messages and runs the tool loop)
+await agent.send('Hello!')
+
+// Abort generation
+agent.abort()
+
+// Read-only state
+agent.isGenerating  // boolean
+```
+
+**AgentMessage type** (used as `ChatMessage` in both AI plugins):
+```typescript
+interface AgentMessage {
+  id: string
+  role: 'user' | 'assistant' | 'tool'
+  content: string
+  generating?: boolean
+  error?: string
+  toolCalls?: ToolCall[]
+  toolCallId?: string
+  toolName?: string
+  toolArgs?: Record<string, unknown>
+  toolStatus?: 'running' | 'done' | 'error'
+  isSearching?: boolean
+  searchQuery?: string
+  searchResults?: SearchResult[]       // { title, url, content }[]
+}
+```
+
+## Shared Tools
+
+Reusable AI tool definitions for use with `Agent`.
+
+### `share/tools/web`
+
+```typescript
+import { WEB_SEARCH_TOOL, WEB_FETCH_TOOL } from 'share/tools/web'
+```
+
+| Export | Tool name | Description |
+|---|---|---|
+| `WEB_SEARCH_TOOL` | `web_search` | Search the web via Google / Baidu |
+| `WEB_FETCH_TOOL` | `web_fetch` | Fetch readable text from a URL |
+
+### `share/tools/fileSystem`
+
+```typescript
+import {
+  EXEC_TOOL,
+  READ_FILE_TOOL,
+  WRITE_FILE_TOOL,
+  EDIT_FILE_TOOL,
+  LIST_DIR_TOOL,
+  getToolLabel,
+} from 'share/tools/fileSystem'
+import type { ToolName } from 'share/tools/fileSystem'
+```
+
+| Export | Tool name | Description |
+|---|---|---|
+| `EXEC_TOOL` | `exec` | Run a shell command |
+| `READ_FILE_TOOL` | `read_file` | Read a file with line numbers |
+| `WRITE_FILE_TOOL` | `write_file` | Write content to a file |
+| `EDIT_FILE_TOOL` | `edit_file` | Replace text within a file |
+| `LIST_DIR_TOOL` | `list_dir` | List directory contents |
+
+`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'exec'` → `'Shell'`).
+
 ## Shared Utilities
 
 ```typescript

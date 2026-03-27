@@ -1,13 +1,13 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import uuid from 'licia/uuid'
-import jsonClone from 'licia/jsonClone'
 import BaseStore from 'share/BaseStore'
+import { Agent } from 'share/lib/Agent'
+import type { AgentMessage, AgentTool } from 'share/lib/Agent'
 import * as db from './lib/db'
-import { TOOLS } from './lib/tools'
 import { formatResults } from './lib/search'
+import { TOOLS } from './lib/tools'
 import i18n from './i18n'
-import type { ChatMessage, Session, ToolCall } from './types'
+import type { Session } from './types'
 import type { SearchResult } from '../common/types'
 
 const storage = new LocalStore('tinker-ai-assistant')
@@ -16,42 +16,101 @@ const PROVIDER_KEY = 'provider'
 const MODEL_KEY = 'model'
 const WORKING_DIR_KEY = 'workingDir'
 
-const MAX_TOOL_ITERATIONS = 20
+function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
+  return TOOLS.map((toolDef) => {
+    const name = (toolDef as { function: { name: string } }).function.name
+    const tool: AgentTool = {
+      definition: toolDef,
+      execute: async (args) => {
+        const workingDir = getWorkingDir()
+        switch (name) {
+          case 'exec': {
+            const command = typeof args.command === 'string' ? args.command : ''
+            const timeout =
+              typeof args.timeout === 'number' ? args.timeout : undefined
+            return aiAssistant.exec(command, workingDir, timeout)
+          }
+          case 'read_file': {
+            const filePath = typeof args.path === 'string' ? args.path : ''
+            const offset =
+              typeof args.offset === 'number' ? args.offset : undefined
+            const limit =
+              typeof args.limit === 'number' ? args.limit : undefined
+            return aiAssistant.readFile(filePath, workingDir, offset, limit)
+          }
+          case 'write_file': {
+            const filePath = typeof args.path === 'string' ? args.path : ''
+            const content = typeof args.content === 'string' ? args.content : ''
+            return aiAssistant.writeFile(filePath, content, workingDir)
+          }
+          case 'edit_file': {
+            const filePath = typeof args.path === 'string' ? args.path : ''
+            const oldText =
+              typeof args.old_text === 'string' ? args.old_text : ''
+            const newText =
+              typeof args.new_text === 'string' ? args.new_text : ''
+            const replaceAll =
+              typeof args.replace_all === 'boolean' ? args.replace_all : false
+            return aiAssistant.editFile(
+              filePath,
+              oldText,
+              newText,
+              workingDir,
+              replaceAll
+            )
+          }
+          case 'list_dir': {
+            const dirPath = typeof args.path === 'string' ? args.path : '.'
+            const recursive =
+              typeof args.recursive === 'boolean' ? args.recursive : false
+            const maxEntries =
+              typeof args.max_entries === 'number'
+                ? args.max_entries
+                : undefined
+            return aiAssistant.listDir(
+              dirPath,
+              workingDir,
+              recursive,
+              maxEntries
+            )
+          }
+          case 'web_search': {
+            const query = typeof args.query === 'string' ? args.query : ''
+            const lang = i18n.language
+            const results: SearchResult[] = await aiAssistant.webSearch(
+              query,
+              lang
+            )
+            return {
+              content: formatResults(results),
+              isSearching: false,
+              searchResults: results,
+            }
+          }
+          case 'web_fetch': {
+            const url = typeof args.url === 'string' ? args.url : ''
+            return aiAssistant.webFetch(url)
+          }
+          default:
+            return `Error: Unknown tool "${name}"`
+        }
+      },
+    }
+    if (name === 'web_search') {
+      tool.initMessage = (args) => ({
+        isSearching: true,
+        searchQuery: typeof args.query === 'string' ? args.query : '',
+      })
+    }
+    return tool
+  })
+}
 
 function createSession(workingDir: string): Session {
   return {
     messages: [],
     workingDir,
   }
-}
-
-function accumulateToolCalls(
-  existing: ToolCall[],
-  chunkToolCalls: Record<string, unknown>[]
-): ToolCall[] {
-  const result: ToolCall[] = existing.map((tc) => ({
-    ...tc,
-    function: { ...tc.function },
-  }))
-
-  for (const chunk of chunkToolCalls) {
-    const idx = typeof chunk.index === 'number' ? chunk.index : 0
-    if (!result[idx]) {
-      result[idx] = {
-        id:
-          typeof chunk.id === 'string' ? chunk.id : `call_${idx}_${Date.now()}`,
-        type: 'function',
-        function: { name: '', arguments: '' },
-      }
-    }
-    if (typeof chunk.id === 'string') result[idx].id = chunk.id
-    const fn = chunk.function as Record<string, unknown> | undefined
-    if (typeof fn?.name === 'string') result[idx].function.name += fn.name
-    if (typeof fn?.arguments === 'string')
-      result[idx].function.arguments += fn.arguments
-  }
-
-  return result.filter(Boolean)
 }
 
 class Store extends BaseStore {
@@ -64,14 +123,31 @@ class Store extends BaseStore {
   workingDir: string = ''
 
   input: string = ''
-  isGenerating: boolean = false
 
-  private streamTask: tinker.AiStreamTask | null = null
-  private aborted: boolean = false
+  private agent: Agent
 
   constructor() {
     super()
     makeAutoObservable(this)
+    this.agent = new Agent({
+      tools: buildAgentTools(
+        () =>
+          this.session.workingDir || this.workingDir || aiAssistant.getHomeDir()
+      ),
+      onMessage: (msg) => {
+        this.session.messages.push(msg)
+        this.saveSession()
+      },
+      onMessageUpdate: (id, patch) => {
+        const msg = this.session.messages.find((m) => m.id === id)
+        if (!msg) return
+        Object.assign(msg, patch)
+        if (patch.content !== undefined || patch.searchResults !== undefined) {
+          this.saveSession()
+        }
+      },
+      getMessages: () => this.session.messages,
+    })
     this.init()
   }
 
@@ -94,6 +170,7 @@ class Store extends BaseStore {
       } else {
         this.session = createSession(savedWorkingDir)
       }
+      this.agent.setSystemPrompt(this.buildSystemPrompt())
     })
   }
 
@@ -122,8 +199,31 @@ class Store extends BaseStore {
     })
   }
 
-  get messages(): ChatMessage[] {
+  private buildSystemPrompt(): string {
+    const now = new Date()
+    const dateStr = now.toLocaleString(i18n.language, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const { platform } = aiAssistant.getSystemInfo()
+    return [
+      "You are a helpful AI assistant. You have access to tools to complete tasks on the user's computer.",
+      `Current date/time: ${dateStr}`,
+      `Platform: ${platform}`,
+      `Working directory: ${this.session.workingDir || this.workingDir}`,
+    ].join('\n')
+  }
+
+  get messages(): AgentMessage[] {
     return this.session.messages
+  }
+
+  get isGenerating(): boolean {
+    return this.agent.isGenerating
   }
 
   get currentModels(): tinker.AiModel[] {
@@ -168,11 +268,14 @@ class Store extends BaseStore {
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
     storage.set(MODEL_KEY, firstModel)
+    this.agent.setProvider(name)
+    this.agent.setModel(firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
     storage.set(MODEL_KEY, name)
+    this.agent.setModel(name)
   }
 
   setSelectedCombined(val: string) {
@@ -184,6 +287,8 @@ class Store extends BaseStore {
     storage.set(PROVIDER_KEY, provider)
     this.selectedModel = model
     storage.set(MODEL_KEY, model)
+    this.agent.setProvider(provider)
+    this.agent.setModel(model)
   }
 
   setWorkingDir(dir: string) {
@@ -207,361 +312,18 @@ class Store extends BaseStore {
     }
   }
 
-  private addMessage(msg: ChatMessage) {
-    this.session.messages.push(msg)
-    this.saveSession()
-  }
-
-  private buildHistory(excludeMsgId: string): tinker.AiMessage[] {
-    const history: tinker.AiMessage[] = []
-
-    const now = new Date()
-    const dateStr = now.toLocaleString(i18n.language, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    const { platform } = aiAssistant.getSystemInfo()
-
-    const systemParts = [
-      "You are a helpful AI assistant. You have access to tools to complete tasks on the user's computer.",
-      `Current date/time: ${dateStr}`,
-      `Platform: ${platform}`,
-      `Working directory: ${this.session.workingDir || this.workingDir}`,
-    ]
-    history.push({ role: 'system', content: systemParts.join('\n') })
-
-    for (const m of this.session.messages) {
-      if (m.id === excludeMsgId) continue
-      if (m.generating) continue
-
-      if (m.role === 'user') {
-        history.push({ role: 'user', content: m.content })
-      } else if (m.role === 'assistant') {
-        if (m.toolCalls && m.toolCalls.length > 0) {
-          history.push({
-            role: 'assistant',
-            content: m.content || undefined,
-            toolCalls: m.toolCalls,
-          })
-        } else if (m.content) {
-          history.push({ role: 'assistant', content: m.content })
-        }
-      } else if (m.role === 'tool' && m.toolCallId) {
-        history.push({
-          role: 'tool',
-          toolCallId: m.toolCallId,
-          toolName: m.toolName,
-          content: m.content,
-        })
-      }
-    }
-
-    return history
-  }
-
   async sendMessage() {
     if (!this.canSend) return
     const userText = this.input.trim()
     this.input = ''
-    await this.sendContent(userText)
-  }
-
-  private async sendContent(userText: string) {
-    const userMsg: ChatMessage = {
-      id: uuid(),
-      role: 'user',
-      content: userText,
-    }
-    this.addMessage(userMsg)
-
-    const assistantMsg: ChatMessage = {
-      id: uuid(),
-      role: 'assistant',
-      content: '',
-      generating: true,
-    }
-    this.addMessage(assistantMsg)
-    this.isGenerating = true
-    this.aborted = false
-
-    await this.runAILoop(assistantMsg.id, 0)
-  }
-
-  private async runAILoop(
-    assistantMsgId: string,
-    iteration: number
-  ): Promise<void> {
-    if (this.aborted || iteration >= MAX_TOOL_ITERATIONS) {
-      runInAction(() => {
-        const msg = this.session.messages.find((m) => m.id === assistantMsgId)
-        if (msg) msg.generating = false
-        this.isGenerating = false
-      })
-      return
-    }
-
-    const history = this.buildHistory(assistantMsgId)
-    let fullContent = ''
-    let accToolCalls: ToolCall[] = []
-    let done = false
-
-    const assistantMsg = this.session.messages.find(
-      (m) => m.id === assistantMsgId
-    )
-
-    await new Promise<void>((resolve) => {
-      this.streamTask = tinker.callAIStream(
-        jsonClone({
-          provider: this.selectedProvider,
-          model: this.selectedModel,
-          messages: history,
-          tools: [...TOOLS],
-        }),
-        (chunk) => {
-          runInAction(() => {
-            if (this.aborted) {
-              resolve()
-              return
-            }
-
-            const msg = assistantMsg
-            if (!msg) return
-
-            if (chunk.error) {
-              msg.generating = false
-              msg.error = chunk.error
-              this.isGenerating = false
-              this.streamTask = null
-              resolve()
-              return
-            }
-
-            if (chunk.content) {
-              fullContent += chunk.content
-              msg.content = fullContent
-            }
-
-            if (chunk.toolCalls && chunk.toolCalls.length > 0) {
-              accToolCalls = accumulateToolCalls(accToolCalls, chunk.toolCalls)
-            }
-
-            if (chunk.done) {
-              done = true
-              msg.generating = false
-              this.streamTask = null
-              resolve()
-            }
-          })
-        }
-      )
-    })
-
-    if (!done || this.aborted) {
-      runInAction(() => {
-        this.isGenerating = false
-      })
-      return
-    }
-
-    if (accToolCalls.length === 0) {
-      runInAction(() => {
-        this.isGenerating = false
-        this.saveSession()
-      })
-      return
-    }
-
-    runInAction(() => {
-      const msg = this.session.messages.find((m) => m.id === assistantMsgId)
-      if (msg) msg.toolCalls = accToolCalls
-    })
-
-    for (const toolCall of accToolCalls) {
-      if (this.aborted) break
-      await this.executeToolCall(toolCall)
-    }
-
-    if (this.aborted) {
-      runInAction(() => {
-        this.isGenerating = false
-      })
-      return
-    }
-
-    const nextAssistantMsg: ChatMessage = {
-      id: uuid(),
-      role: 'assistant',
-      content: '',
-      generating: true,
-    }
-    runInAction(() => this.addMessage(nextAssistantMsg))
-
-    await this.runAILoop(nextAssistantMsg.id, iteration + 1)
-  }
-
-  private async executeToolCall(toolCall: ToolCall): Promise<void> {
-    const toolName = toolCall.function.name
-    let args: Record<string, unknown> = {}
-    try {
-      args = JSON.parse(toolCall.function.arguments)
-    } catch {
-      // ignore parse error
-    }
-
-    const workingDir =
-      this.session.workingDir || this.workingDir || aiAssistant.getHomeDir()
-
-    const toolMsg: ChatMessage = {
-      id: uuid(),
-      role: 'tool',
-      content: '',
-      toolCallId: toolCall.id,
-      toolName,
-      toolArgs: args,
-      toolStatus: 'running',
-      generating: true,
-    }
-
-    if (toolName === 'web_search') {
-      toolMsg.isSearching = true
-      toolMsg.searchQuery = typeof args.query === 'string' ? args.query : ''
-    }
-
-    runInAction(() => this.addMessage(toolMsg))
-
-    let resultContent = ''
-
-    try {
-      switch (toolName) {
-        case 'exec': {
-          const command = typeof args.command === 'string' ? args.command : ''
-          const timeout =
-            typeof args.timeout === 'number' ? args.timeout : undefined
-          resultContent = await aiAssistant.exec(command, workingDir, timeout)
-          break
-        }
-        case 'read_file': {
-          const filePath = typeof args.path === 'string' ? args.path : ''
-          const offset =
-            typeof args.offset === 'number' ? args.offset : undefined
-          const limit = typeof args.limit === 'number' ? args.limit : undefined
-          resultContent = aiAssistant.readFile(
-            filePath,
-            workingDir,
-            offset,
-            limit
-          )
-          break
-        }
-        case 'write_file': {
-          const filePath = typeof args.path === 'string' ? args.path : ''
-          const content = typeof args.content === 'string' ? args.content : ''
-          resultContent = aiAssistant.writeFile(filePath, content, workingDir)
-          break
-        }
-        case 'edit_file': {
-          const filePath = typeof args.path === 'string' ? args.path : ''
-          const oldText = typeof args.old_text === 'string' ? args.old_text : ''
-          const newText = typeof args.new_text === 'string' ? args.new_text : ''
-          const replaceAll =
-            typeof args.replace_all === 'boolean' ? args.replace_all : false
-          resultContent = aiAssistant.editFile(
-            filePath,
-            oldText,
-            newText,
-            workingDir,
-            replaceAll
-          )
-          break
-        }
-        case 'list_dir': {
-          const dirPath = typeof args.path === 'string' ? args.path : '.'
-          const recursive =
-            typeof args.recursive === 'boolean' ? args.recursive : false
-          const maxEntries =
-            typeof args.max_entries === 'number' ? args.max_entries : undefined
-          resultContent = aiAssistant.listDir(
-            dirPath,
-            workingDir,
-            recursive,
-            maxEntries
-          )
-          break
-        }
-        case 'web_search': {
-          const query = typeof args.query === 'string' ? args.query : ''
-          const lang = i18n.language
-          let searchResults: SearchResult[] = []
-          try {
-            searchResults = await aiAssistant.webSearch(query, lang)
-          } catch (e) {
-            const errMsg = e instanceof Error ? e.message : 'Search failed'
-            runInAction(() => {
-              const tm = this.session.messages.find((m) => m.id === toolMsg.id)
-              if (!tm) return
-              tm.isSearching = false
-              tm.generating = false
-              tm.toolStatus = 'error'
-              tm.error = errMsg
-              tm.content = `Search failed: ${errMsg}`
-              this.saveSession()
-            })
-            return
-          }
-          runInAction(() => {
-            const tm = this.session.messages.find((m) => m.id === toolMsg.id)
-            if (!tm) return
-            tm.isSearching = false
-            tm.searchResults = searchResults
-            tm.content = formatResults(searchResults)
-            tm.generating = false
-            tm.toolStatus = 'done'
-            this.saveSession()
-          })
-          return
-        }
-        case 'web_fetch': {
-          const url = typeof args.url === 'string' ? args.url : ''
-          resultContent = await aiAssistant.webFetch(url)
-          break
-        }
-        default:
-          resultContent = `Error: Unknown tool "${toolName}"`
-      }
-    } catch (e) {
-      resultContent = `Error: ${e instanceof Error ? e.message : String(e)}`
-    }
-
-    runInAction(() => {
-      const tm = this.session.messages.find((m) => m.id === toolMsg.id)
-      if (!tm) return
-      tm.content = resultContent
-      tm.generating = false
-      tm.toolStatus = resultContent.startsWith('Error') ? 'error' : 'done'
-      this.saveSession()
-    })
+    this.agent.setProvider(this.selectedProvider)
+    this.agent.setModel(this.selectedModel)
+    this.agent.setSystemPrompt(this.buildSystemPrompt())
+    await this.agent.send(userText)
   }
 
   abortGeneration() {
-    this.aborted = true
-    if (this.streamTask) {
-      this.streamTask.abort()
-      this.streamTask = null
-    }
-    runInAction(() => {
-      for (const m of this.session.messages) {
-        if (m.generating) {
-          m.generating = false
-          if (m.isSearching) m.isSearching = false
-          if (m.toolStatus === 'running') m.toolStatus = 'error'
-        }
-      }
-      this.isGenerating = false
-    })
+    this.agent.abort()
   }
 
   async retryLastMessage() {
@@ -580,7 +342,10 @@ class Store extends BaseStore {
     const userContent = messages[lastUserIdx].content
     this.session.messages = messages.slice(0, lastUserIdx)
     this.saveSession()
-    await this.sendContent(userContent)
+    this.agent.setProvider(this.selectedProvider)
+    this.agent.setModel(this.selectedModel)
+    this.agent.setSystemPrompt(this.buildSystemPrompt())
+    await this.agent.send(userContent)
   }
 
   deleteMessage(id: string) {

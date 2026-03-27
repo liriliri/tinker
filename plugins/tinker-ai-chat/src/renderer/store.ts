@@ -1,13 +1,13 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
-import jsonClone from 'licia/jsonClone'
 import BaseStore from 'share/BaseStore'
+import { Agent } from 'share/lib/Agent'
+import type { AgentTool } from 'share/lib/Agent'
 import * as db from './lib/db'
 import { search, formatResults } from './lib/search'
 import i18n from './i18n'
-import type { ChatMessage, Session, ToolCall } from './types'
-import type { SearchResult } from '../common/types'
+import type { Session } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
 
@@ -15,25 +15,38 @@ const ACTIVE_SESSION_KEY = 'activeSessionId'
 const PROVIDER_KEY = 'provider'
 const MODEL_KEY = 'model'
 
-const MAX_TOOL_ITERATIONS = 3
-const WEB_SEARCH_TOOL_NAME = 'web_search'
-
-const WEB_SEARCH_TOOL = {
-  type: 'function',
-  function: {
-    name: WEB_SEARCH_TOOL_NAME,
-    description:
-      'Search the web for up-to-date information, recent news, or real-time data. Use this when the user asks about current events, facts that may have changed, or anything requiring fresh information.',
-    parameters: {
-      type: 'object',
-      properties: {
-        query: {
-          type: 'string',
-          description: 'The optimized search query string',
+const WEB_SEARCH_TOOL: AgentTool = {
+  definition: {
+    type: 'function',
+    function: {
+      name: 'web_search',
+      description:
+        'Search the web for up-to-date information, recent news, or real-time data. Use this when the user asks about current events, facts that may have changed, or anything requiring fresh information.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'The optimized search query string',
+          },
         },
+        required: ['query'],
       },
-      required: ['query'],
     },
+  },
+  initMessage: (args) => ({
+    isSearching: true,
+    searchQuery: typeof args.query === 'string' ? args.query : '',
+  }),
+  execute: async (args) => {
+    const query = typeof args.query === 'string' ? args.query : ''
+    const lang = i18n.language
+    const results = await search(query, lang)
+    return {
+      content: formatResults(results),
+      isSearching: false,
+      searchResults: results,
+    }
   },
 }
 
@@ -47,35 +60,6 @@ function createSession(): Session {
   }
 }
 
-function accumulateToolCalls(
-  existing: ToolCall[],
-  chunkToolCalls: Record<string, unknown>[]
-): ToolCall[] {
-  const result: ToolCall[] = existing.map((tc) => ({
-    ...tc,
-    function: { ...tc.function },
-  }))
-
-  for (const chunk of chunkToolCalls) {
-    const idx = typeof chunk.index === 'number' ? chunk.index : 0
-    if (!result[idx]) {
-      result[idx] = {
-        id:
-          typeof chunk.id === 'string' ? chunk.id : `call_${idx}_${Date.now()}`,
-        type: 'function',
-        function: { name: '', arguments: '' },
-      }
-    }
-    if (typeof chunk.id === 'string') result[idx].id = chunk.id
-    const fn = chunk.function as Record<string, unknown> | undefined
-    if (typeof fn?.name === 'string') result[idx].function.name += fn.name
-    if (typeof fn?.arguments === 'string')
-      result[idx].function.arguments += fn.arguments
-  }
-
-  return result.filter(Boolean)
-}
-
 class Store extends BaseStore {
   sessions: Session[] = []
   activeSessionId: string = ''
@@ -85,14 +69,42 @@ class Store extends BaseStore {
   selectedModel: string = ''
 
   input: string = ''
-  isGenerating: boolean = false
 
-  private streamTask: tinker.AiStreamTask | null = null
-  private aborted: boolean = false
+  private agent: Agent
 
   constructor() {
     super()
     makeAutoObservable(this)
+    this.agent = new Agent({
+      maxIterations: 3,
+      tools: [WEB_SEARCH_TOOL],
+      onMessage: (msg) => {
+        const session = this.activeSession
+        if (!session) return
+        session.messages.push(msg)
+        if (msg.role === 'user') {
+          let userCount = 0
+          for (const m of session.messages) {
+            if (m.role === 'user' && ++userCount > 1) break
+          }
+          if (userCount === 1) {
+            session.title = msg.content.slice(0, 40)
+          }
+        }
+        this.saveActiveSession()
+      },
+      onMessageUpdate: (id, patch) => {
+        const session = this.activeSession
+        if (!session) return
+        const msg = session.messages.find((m) => m.id === id)
+        if (!msg) return
+        Object.assign(msg, patch)
+        if (patch.content !== undefined || patch.searchResults !== undefined) {
+          this.saveActiveSession()
+        }
+      },
+      getMessages: () => this.activeSession?.messages ?? [],
+    })
     this.init()
   }
 
@@ -153,6 +165,10 @@ class Store extends BaseStore {
     return this.activeSession?.systemPrompt || ''
   }
 
+  get isGenerating(): boolean {
+    return this.agent.isGenerating
+  }
+
   get currentModels(): tinker.AiModel[] {
     const provider = this.providers.find(
       (p) => p.name === this.selectedProvider
@@ -195,11 +211,14 @@ class Store extends BaseStore {
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
     storage.set(MODEL_KEY, firstModel)
+    this.agent.setProvider(name)
+    this.agent.setModel(firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
     storage.set(MODEL_KEY, name)
+    this.agent.setModel(name)
   }
 
   setSelectedCombined(val: string) {
@@ -211,18 +230,23 @@ class Store extends BaseStore {
     storage.set(PROVIDER_KEY, provider)
     this.selectedModel = model
     storage.set(MODEL_KEY, model)
+    this.agent.setProvider(provider)
+    this.agent.setModel(model)
   }
 
   setSystemPrompt(val: string) {
     const session = this.activeSession
     if (!session) return
     session.systemPrompt = val
+    this.agent.setSystemPrompt(val)
     this.saveActiveSession()
   }
 
   selectSession(id: string) {
     this.activeSessionId = id
     storage.set(ACTIVE_SESSION_KEY, id)
+    const session = this.sessions.find((s) => s.id === id)
+    this.agent.setSystemPrompt(session?.systemPrompt ?? '')
   }
 
   newSession() {
@@ -235,6 +259,7 @@ class Store extends BaseStore {
     this.sessions.unshift(session)
     this.activeSessionId = session.id
     storage.set(ACTIVE_SESSION_KEY, session.id)
+    this.agent.setSystemPrompt('')
   }
 
   deleteSession(id: string) {
@@ -252,6 +277,8 @@ class Store extends BaseStore {
         this.activeSessionId = this.sessions[0].id
       }
       storage.set(ACTIVE_SESSION_KEY, this.activeSessionId)
+      const active = this.sessions.find((s) => s.id === this.activeSessionId)
+      this.agent.setSystemPrompt(active?.systemPrompt ?? '')
     }
   }
 
@@ -276,270 +303,18 @@ class Store extends BaseStore {
     }
   }
 
-  private addMessage(msg: ChatMessage) {
-    const session = this.activeSession
-    if (!session) return
-    session.messages.push(msg)
-    if (msg.role === 'user') {
-      let userCount = 0
-      for (const m of session.messages) {
-        if (m.role === 'user' && ++userCount > 1) break
-      }
-      if (userCount === 1) {
-        session.title = msg.content.slice(0, 40)
-      }
-    }
-    this.saveActiveSession()
-  }
-
-  private buildHistory(excludeMsgId: string): tinker.AiMessage[] {
-    const session = this.activeSession
-    if (!session) return []
-
-    const history: tinker.AiMessage[] = []
-    if (this.systemPrompt.trim()) {
-      history.push({ role: 'system', content: this.systemPrompt.trim() })
-    }
-
-    for (const m of session.messages) {
-      if (m.id === excludeMsgId) continue
-      if (m.generating) continue
-
-      if (m.role === 'user') {
-        history.push({ role: 'user', content: m.content })
-      } else if (m.role === 'assistant') {
-        if (m.toolCalls && m.toolCalls.length > 0) {
-          history.push({
-            role: 'assistant',
-            content: m.content || undefined,
-            toolCalls: m.toolCalls,
-          })
-        } else if (m.content) {
-          history.push({ role: 'assistant', content: m.content })
-        }
-      } else if (m.role === 'tool' && m.toolCallId) {
-        history.push({
-          role: 'tool',
-          toolCallId: m.toolCallId,
-          toolName: m.toolName,
-          content: m.content,
-        })
-      }
-    }
-
-    return history
-  }
-
   async sendMessage() {
     if (!this.canSend) return
     const userText = this.input.trim()
     this.input = ''
-    await this.sendContent(userText)
-  }
-
-  private async sendContent(userText: string) {
-    const userMsg: ChatMessage = {
-      id: uuid(),
-      role: 'user',
-      content: userText,
-    }
-    this.addMessage(userMsg)
-
-    const assistantMsg: ChatMessage = {
-      id: uuid(),
-      role: 'assistant',
-      content: '',
-      generating: true,
-    }
-    this.addMessage(assistantMsg)
-    this.isGenerating = true
-    this.aborted = false
-
-    await this.runAILoop(assistantMsg.id, 0)
-  }
-
-  private async runAILoop(
-    assistantMsgId: string,
-    iteration: number
-  ): Promise<void> {
-    if (this.aborted || iteration >= MAX_TOOL_ITERATIONS) {
-      runInAction(() => {
-        const session = this.activeSession
-        if (!session) return
-        const msg = session.messages.find((m) => m.id === assistantMsgId)
-        if (msg) msg.generating = false
-        this.isGenerating = false
-      })
-      return
-    }
-
-    const history = this.buildHistory(assistantMsgId)
-    let fullContent = ''
-    let accToolCalls: ToolCall[] = []
-    let done = false
-
-    const assistantMsg = this.activeSession?.messages.find(
-      (m) => m.id === assistantMsgId
-    )
-
-    await new Promise<void>((resolve) => {
-      this.streamTask = tinker.callAIStream(
-        jsonClone({
-          provider: this.selectedProvider,
-          model: this.selectedModel,
-          messages: history,
-          tools: [WEB_SEARCH_TOOL],
-        }),
-        (chunk) => {
-          runInAction(() => {
-            if (this.aborted) {
-              resolve()
-              return
-            }
-
-            const msg = assistantMsg
-            if (!msg) return
-
-            if (chunk.error) {
-              msg.generating = false
-              msg.error = chunk.error
-              this.isGenerating = false
-              this.streamTask = null
-              resolve()
-              return
-            }
-
-            if (chunk.content) {
-              fullContent += chunk.content
-              msg.content = fullContent
-            }
-
-            if (chunk.toolCalls && chunk.toolCalls.length > 0) {
-              accToolCalls = accumulateToolCalls(accToolCalls, chunk.toolCalls)
-            }
-
-            if (chunk.done) {
-              done = true
-              msg.generating = false
-              this.streamTask = null
-              resolve()
-            }
-          })
-        }
-      )
-    })
-
-    if (!done || this.aborted) {
-      runInAction(() => {
-        this.isGenerating = false
-      })
-      return
-    }
-
-    if (accToolCalls.length === 0) {
-      runInAction(() => {
-        this.isGenerating = false
-        this.saveActiveSession()
-      })
-      return
-    }
-
-    runInAction(() => {
-      const session = this.activeSession
-      if (!session) return
-      const msg = session.messages.find((m) => m.id === assistantMsgId)
-      if (msg) msg.toolCalls = accToolCalls
-    })
-
-    for (const toolCall of accToolCalls) {
-      if (toolCall.function.name !== WEB_SEARCH_TOOL_NAME) continue
-      if (this.aborted) break
-
-      let query = ''
-      try {
-        const args = JSON.parse(toolCall.function.arguments)
-        query = args.query || ''
-      } catch {
-        continue
-      }
-      if (!query) continue
-
-      const toolMsg: ChatMessage = {
-        id: uuid(),
-        role: 'tool',
-        content: '',
-        toolCallId: toolCall.id,
-        toolName: WEB_SEARCH_TOOL_NAME,
-        isSearching: true,
-        searchQuery: query,
-        generating: true,
-      }
-      runInAction(() => this.addMessage(toolMsg))
-
-      let searchResult: { results?: SearchResult[]; error?: string } = {}
-      try {
-        const lang = i18n.language
-        searchResult = { results: await search(query, lang) }
-      } catch (e: unknown) {
-        searchResult = {
-          error: e instanceof Error ? e.message : 'Search failed',
-        }
-      }
-
-      runInAction(() => {
-        const session = this.activeSession
-        if (!session) return
-        const tm = session.messages.find((m) => m.id === toolMsg.id)
-        if (!tm) return
-        tm.isSearching = false
-        tm.generating = false
-        if (searchResult.results) {
-          tm.searchResults = searchResult.results
-          tm.content = formatResults(searchResult.results)
-        } else {
-          tm.error = searchResult.error
-          tm.content = `Search failed: ${searchResult.error}`
-        }
-        this.saveActiveSession()
-      })
-    }
-
-    if (this.aborted) {
-      runInAction(() => {
-        this.isGenerating = false
-      })
-      return
-    }
-
-    const nextAssistantMsg: ChatMessage = {
-      id: uuid(),
-      role: 'assistant',
-      content: '',
-      generating: true,
-    }
-    runInAction(() => this.addMessage(nextAssistantMsg))
-
-    await this.runAILoop(nextAssistantMsg.id, iteration + 1)
+    this.agent.setProvider(this.selectedProvider)
+    this.agent.setModel(this.selectedModel)
+    this.agent.setSystemPrompt(this.systemPrompt)
+    await this.agent.send(userText)
   }
 
   abortGeneration() {
-    this.aborted = true
-    if (this.streamTask) {
-      this.streamTask.abort()
-      this.streamTask = null
-    }
-    runInAction(() => {
-      const session = this.activeSession
-      if (session) {
-        for (const m of session.messages) {
-          if (m.generating) {
-            m.generating = false
-            if (m.isSearching) m.isSearching = false
-          }
-        }
-      }
-      this.isGenerating = false
-    })
+    this.agent.abort()
   }
 
   async retryLastMessage() {
@@ -559,7 +334,10 @@ class Store extends BaseStore {
     const userContent = messages[lastUserIdx].content
     session.messages = messages.slice(0, lastUserIdx)
     this.saveActiveSession()
-    await this.sendContent(userContent)
+    this.agent.setProvider(this.selectedProvider)
+    this.agent.setModel(this.selectedModel)
+    this.agent.setSystemPrompt(this.systemPrompt)
+    await this.agent.send(userContent)
   }
 
   deleteMessage(id: string) {
