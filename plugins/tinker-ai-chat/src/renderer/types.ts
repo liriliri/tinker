@@ -1,3 +1,4 @@
+import type { ChatMessage as BaseChatMessage } from 'share/components/AiChat'
 import type { SearchResult } from '../common/types'
 
 export interface ToolCall {
@@ -9,12 +10,8 @@ export interface ToolCall {
   }
 }
 
-export interface ChatMessage {
-  id: string
+export interface ChatMessage extends Omit<BaseChatMessage, 'role'> {
   role: 'user' | 'assistant' | 'tool'
-  content: string
-  generating?: boolean
-  error?: string
   // Tool call fields (assistant messages)
   toolCalls?: ToolCall[]
   // Tool result fields (tool messages)

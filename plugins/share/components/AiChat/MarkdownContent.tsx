@@ -1,23 +1,25 @@
 import { useMemo } from 'react'
-import { observer } from 'mobx-react-lite'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import * as prismStyles from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
-import { tw } from 'share/theme'
-import store from '../store'
+import { tw } from '../../theme'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function omitNode<T extends { node?: unknown }>({ node, ...rest }: T) {
   return rest
 }
 
-interface Props {
+export interface MarkdownContentProps {
   children: string
+  isDark?: boolean
 }
 
-export default observer(function MarkdownContent({ children }: Props) {
+export default function MarkdownContent({
+  children,
+  isDark = false,
+}: MarkdownContentProps) {
   const components = useMemo<Components>(
     () => ({
       h1: (props) => (
@@ -77,7 +79,7 @@ export default observer(function MarkdownContent({ children }: Props) {
       li: (props) => <li className="leading-7" {...omitNode(props)} />,
       blockquote: (props) => (
         <blockquote
-          className={`border-l-4 border-l-gray-300 dark:border-l-gray-600 pl-4 my-4 ${tw.text.secondary}`}
+          className={`border-l-4 ${tw.border} pl-4 my-4 ${tw.text.secondary}`}
           {...omitNode(props)}
         />
       ),
@@ -122,7 +124,7 @@ export default observer(function MarkdownContent({ children }: Props) {
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="text-blue-500 hover:text-blue-600 underline"
+          className={`${tw.primary.text} underline hover:underline`}
           {...omitNode(props)}
         >
           {linkChildren}
@@ -143,7 +145,7 @@ export default observer(function MarkdownContent({ children }: Props) {
         }
         return (
           <SyntaxHighlighter
-            style={store.isDark ? prismStyles.oneDark : prismStyles.oneLight}
+            style={isDark ? prismStyles.oneDark : prismStyles.oneLight}
             language={match?.[1] || 'text'}
             PreTag="div"
             customStyle={{
@@ -157,7 +159,7 @@ export default observer(function MarkdownContent({ children }: Props) {
         )
       },
     }),
-    [store.isDark]
+    [isDark]
   )
 
   return (
@@ -168,4 +170,4 @@ export default observer(function MarkdownContent({ children }: Props) {
       {children}
     </ReactMarkdown>
   )
-})
+}

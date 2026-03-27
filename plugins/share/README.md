@@ -16,31 +16,26 @@ Import `share/base.scss` in `index.scss`:
 @config "../../tailwind.config.js";
 ```
 
-## Theme Configuration
+## Theme
 
-Use unified theme from `share/theme.ts`:
+Use unified theme from `share/theme.ts`. Never hardcode colors.
 
 ```typescript
 import { tw, THEME_COLORS } from 'share/theme'
 
-// Primary colors
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`} />
 <Copy className={copied ? tw.primary.text : ''} />
 <span className={`${tw.text.primary} ${tw.primary.textHover}`}>Hover me</span>
-
-// Backgrounds & Borders
 <div className={tw.bg.secondary}>Content</div>
 <input className={`${tw.bg.input} border ${tw.border}`} />
-
-// States
 <div className={`${tw.hover} ${isActive ? tw.active : ''}`} />
 ```
 
-**Key patterns**: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
+Patterns: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
 
 ## BaseStore
 
-All plugin stores must extend `BaseStore`:
+All plugin stores must extend `BaseStore`. Call `super()` first, then `makeAutoObservable(this)`. Access theme via `store.isDark`.
 
 ```typescript
 import { makeAutoObservable } from 'mobx'
@@ -54,37 +49,11 @@ class Store extends BaseStore {
     makeAutoObservable(this)
   }
 
-  get isEmpty() {
-    return this.input.length === 0
-  }
-
-  setInput(value: string) {
-    this.input = value
-  }
+  get isEmpty() { return this.input.length === 0 }
+  setInput(value: string) { this.input = value }
 }
 
 export default new Store()
-```
-
-**Key**: Call `super()` first, then `makeAutoObservable(this)`. Access theme via `store.isDark`.
-
-## Component Patterns
-
-Use `observer` for components accessing store:
-
-```typescript
-import { observer } from 'mobx-react-lite'
-
-const Counter = observer(() => <div>{store.count}</div>)
-
-interface ButtonProps {
-  onClick: () => void
-  disabled?: boolean
-}
-
-const Button = ({ onClick, disabled = false }: ButtonProps) => (
-  <button onClick={onClick} disabled={disabled}>Click</button>
-)
 ```
 
 ## Shared Components
@@ -93,64 +62,32 @@ const Button = ({ onClick, disabled = false }: ButtonProps) => (
 
 ```typescript
 import { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer, ToolbarSearch, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
-import { Copy } from 'lucide-react'
 
 <Toolbar>
-  <ToolbarButton onClick={handleCopy}>
-    <Copy size={TOOLBAR_ICON_SIZE} />
-  </ToolbarButton>
+  <ToolbarButton onClick={handleCopy}><Copy size={TOOLBAR_ICON_SIZE} /></ToolbarButton>
   <ToolbarSeparator />
-  <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggle()}>
-    Toggle
-  </ToolbarButton>
-  <ToolbarSearch
-    value={store.searchQuery}
-    onChange={(value) => store.setSearchQuery(value)}
-    placeholder="Search..."
-  />
+  <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggle()}>Toggle</ToolbarButton>
+  <ToolbarSearch value={store.searchQuery} onChange={(v) => store.setSearchQuery(v)} placeholder="Search..." />
   <ToolbarSpacer />
-  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>
-    Menu
-  </ToolbarButton>
+  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>Menu</ToolbarButton>
 </Toolbar>
 ```
 
-**ToolbarButton Props**: `variant` ('action' | 'toggle'), `active`, `menu`, `longPressDuration`
-
-**ToolbarSearch Props**: `value`, `onChange`, `placeholder`, `className`
+`ToolbarButton` props: `variant` ('action' | 'toggle'), `active`, `menu`, `longPressDuration`
 
 ### Dialog Components
 
 ```typescript
-import { alert } from 'share/components/Alert'
-import { confirm } from 'share/components/Confirm'
-import { prompt } from 'share/components/Prompt'
+import { alert, AlertProvider } from 'share/components/Alert'
+import { confirm, ConfirmProvider } from 'share/components/Confirm'
+import { prompt, PromptProvider } from 'share/components/Prompt'
 
 await alert({ title: 'Error', message: 'Failed!' })
 const ok = await confirm({ title: 'Delete', message: 'Sure?' })
 const value = await prompt({ title: 'Name', defaultValue: 'Untitled' })
 ```
 
-Setup in `App.tsx`:
-
-```typescript
-import { AlertProvider } from 'share/components/Alert'
-import { ConfirmProvider } from 'share/components/Confirm'
-import { PromptProvider } from 'share/components/Prompt'
-
-export default observer(function App() {
-  const { i18n } = useTranslation()
-  return (
-    <AlertProvider locale={i18n.language}>
-      <ConfirmProvider locale={i18n.language}>
-        <PromptProvider locale={i18n.language}>
-          {/* content */}
-        </PromptProvider>
-      </ConfirmProvider>
-    </AlertProvider>
-  )
-})
-```
+Setup in `App.tsx`: wrap with `<AlertProvider>`, `<ConfirmProvider>`, `<PromptProvider>` passing `locale={i18n.language}`.
 
 ### Toaster
 
@@ -158,10 +95,7 @@ export default observer(function App() {
 import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
 
-export default function App() {
-  return <ToasterProvider>{/* content */}</ToasterProvider>
-}
-
+// Wrap app with <ToasterProvider>
 toast.success('Saved')
 toast.error('Failed')
 ```
@@ -169,7 +103,7 @@ toast.error('Failed')
 ### Form Components
 
 ```typescript
-import Select, { SelectOption } from 'share/components/Select'
+import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import Slider from 'share/components/Slider'
 
@@ -178,38 +112,76 @@ import Slider from 'share/components/Slider'
 <Slider min={0} max={100} value={store.size} onChange={store.setSize} disabled={!store.enabled} />
 ```
 
+### AiChat
+
+Display-only AI chat UI components. Data and callbacks are handled by the caller.
+
+```typescript
+import { MessageList, ChatInput, MarkdownContent, type ChatMessage } from 'share/components/AiChat'
+
+<MessageList
+  messages={store.messages}
+  sessionId={store.sessionId}      // used to detect session switches (instant scroll)
+  isDark={store.isDark}
+  emptyHint={t('emptyHint')}
+  retryLabel={t('retry')}
+  deleteLabel={t('delete')}
+  errorPrefix={t('errorPrefix')}
+  searchResultsLabel={t('searchResults')}
+  searchingLabel={t('searching')}
+  searchFailedLabel={t('searchFailed')}
+  onRetryLast={() => store.retryLastMessage()}
+  onDelete={(id) => store.deleteMessage(id)}
+  onOpenUrl={(url) => openExternal(url)}
+/>
+
+<ChatInput
+  value={store.input}
+  onChange={(v) => store.setInput(v)}
+  onSend={() => store.sendMessage()}
+  onStop={() => store.abortGeneration()}
+  isGenerating={store.isGenerating}
+  canSend={store.canSend}
+  placeholder={t('inputPlaceholder')}
+  sendLabel={`${t('send')} (Enter)`}
+  stopLabel={t('stop')}
+  extra={<MyModelSelector />}      // optional slot on the left of the send button
+/>
+
+<MarkdownContent isDark={store.isDark}>{markdownString}</MarkdownContent>
+```
+
+**ChatMessage type**:
+```typescript
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant' | 'tool'
+  content: string
+  generating?: boolean
+  error?: string
+  // tool role fields (web search)
+  isSearching?: boolean
+  searchQuery?: string
+  searchResults?: { title: string; url: string; content: string }[]
+}
+```
+
 ### Grid
 
-Data grid component wrapping AG Grid with Tinker theme integration.
+Data grid wrapping AG Grid with Tinker theme integration.
 
 ```typescript
 import Grid from 'share/components/Grid'
 import { ColDef } from 'ag-grid-community'
-import { useRef } from 'react'
-import { AgGridReact } from 'ag-grid-react'
-
-interface RowData {
-  id: string
-  name: string
-}
 
 const columnDefs: ColDef<RowData>[] = [
   { field: 'name', headerName: 'Name', flex: 1, sortable: true },
 ]
 
-const gridRef = useRef<AgGridReact<RowData>>(null)
-
-<Grid<RowData>
-  isDark={store.isDark}
-  ref={gridRef}
-  columnDefs={columnDefs}
-  rowData={rowData}
-  headerHeight={40}
-  rowHeight={40}
-/>
+<Grid<RowData> isDark={store.isDark} ref={gridRef} columnDefs={columnDefs} rowData={rowData} rowHeight={40} />
 ```
 
-**Props**: All `AgGridReactProps` plus `isDark: boolean` for theme switching. Supports `ref` forwarding to access the AG Grid API.
+Props: all `AgGridReactProps` plus `isDark: boolean`. Supports `ref` forwarding to access the AG Grid API.
 
 ### Other Components
 
@@ -218,141 +190,50 @@ import CopyButton from 'share/components/CopyButton'
 import FileOpen from 'share/components/FileOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import Tooltip from 'share/components/Tooltip'
+import NavList, { NavListItem } from 'share/components/NavList'
 import Tree, { TreeNodeData } from 'share/components/Tree'
 
-// Copy button variants
 <CopyButton text="copy me" title="Copy" />
 <CopyButton variant="toolbar" text={store.text} disabled={store.isEmpty} />
-<CopyButton variant="icon" text={data} size={20} className="custom-style" />
+<CopyButton variant="icon" text={data} size={20} />
 
-// File open
-<FileOpen
-  onOpenFile={(file) => store.handleFile(file)}
-  openTitle={t('openFile')}
-  supportedFormats="PNG, JPG"
-  fileName={store.fileName}
-/>
+<FileOpen onOpenFile={(file) => store.handleFile(file)} openTitle={t('openFile')} supportedFormats="PNG, JPG" fileName={store.fileName} />
 
-// Image drop zone
-<ImageOpen
-  onOpenImage={() => store.openImage()}
-  openTitle="Drop image or click"
-  supportedFormats="PNG, JPG, WebP"
-/>
+<ImageOpen onOpenImage={() => store.openImage()} openTitle="Drop image or click" supportedFormats="PNG, JPG, WebP" />
 
-// Tooltip
 <Tooltip visible={show} x={x} y={y} content="Hint" />
 
-// NavList - Vertical navigation list with icon, label, count and active state
-import NavList, { NavListItem } from 'share/components/NavList'
-import { List } from 'lucide-react'
+// NavList - vertical navigation with icon, label, count and active state
+const items: NavListItem[] = [{ id: 'all', icon: List, label: t('all'), count: store.total }]
+<NavList items={items} activeId={store.currentId} onSelect={(id) => store.setCurrentId(id)} />
 
-const items: NavListItem[] = [
-  { id: 'all', icon: List, label: t('all'), count: store.total },
-]
-
-<NavList
-  items={items}
-  activeId={store.currentId}
-  onSelect={(id) => store.setCurrentId(id)}
-/>
-
-// Tree - Generic tree view with expand/collapse and highlighting
-interface MyNode extends TreeNodeData {
-  customField: string
-}
-
-<Tree<MyNode>
-  data={treeData}
-  onNodeClick={(node) => handleClick(node)}
-  activeNodeId={activeId}
-  emptyText="No data"
-/>
+// Tree - generic tree view with expand/collapse and highlighting
+<Tree<MyNode> data={treeData} onNodeClick={(node) => handleClick(node)} activeNodeId={activeId} emptyText="No data" />
 ```
 
 ## Shared Hooks
 
 ### useCopyToClipboard
 
+Auto-resets `copied` after 2 seconds.
+
 ```typescript
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 
 const { copied, copyToClipboard } = useCopyToClipboard()
-
-<button onClick={() => copyToClipboard('text')} className={copied ? tw.primary.text : ''}>
-  {copied ? <Check /> : <Copy />}
-</button>
 ```
-
-Auto-resets `copied` after 2 seconds.
 
 ## Shared Utilities
 
-### openImageFile
-
 ```typescript
-import { openImageFile } from 'share/lib/util'
+import { openImageFile, fileExists, resolveSavePath } from 'share/lib/util'
 
+// Opens native file dialog; returns { file: File, filePath: string } | null
 const result = await openImageFile({ title: 'Open Image' })
-if (result) {
-  store.loadImage(result.file, result.filePath)
-}
-```
 
-Opens native file dialog for images. Returns `{ file: File, filePath: string } | null`.
-
-### fileExists
-
-```typescript
-import { fileExists } from 'share/lib/util'
-
+// Returns boolean
 const exists = await fileExists('/path/to/file')
-```
 
-Checks whether a file or directory exists at the given path. Returns `boolean`.
-
-### resolveSavePath
-
-```typescript
-import { resolveSavePath } from 'share/lib/util'
-
+// Returns unique save path; appends -yyyymmddHH (or -yyyymmddHHMM) if path exists
 const savePath = await resolveSavePath('/path/to/recording.mp3')
-// Returns '/path/to/recording.mp3' if it doesn't exist
-// Returns '/path/to/recording-2026022822.mp3' if base path exists
-// Returns '/path/to/recording-202602281030.mp3' if hour path also exists
 ```
-
-Resolves a unique save path. If the given path already exists, appends a `-yyyymmddHH` timestamp suffix; if that also exists, appends `-yyyymmddHHMM`.
-
-## Best Practices
-
-**Performance**: Use computed properties for cached calculations.
-
-```typescript
-class Store extends BaseStore {
-  items: Item[] = []
-  get activeItems() {
-    return this.items.filter(x => x.active) // Cached
-  }
-}
-```
-
-**Error Handling**: Use try-catch with dialogs.
-
-```typescript
-try {
-  await store.save()
-} catch (error) {
-  await alert({ title: 'Failed', message: 'Could not save.' })
-}
-```
-
-**Type Safety**: Avoid `any`, use union types, define prop interfaces.
-
-## Quick Reference
-
-- **Import**: Use `share/` prefix (e.g., `import { tw } from 'share/theme'`)
-- **Theme**: Always use `tw` or `THEME_COLORS` - never hardcode colors
-- **BaseStore**: All stores must extend `BaseStore` and call `super()` first
-- **Observer**: Only wrap components that access store state
-- **Examples**: See `tinker-hash`, `tinker-hex-editor` for reference

@@ -1,70 +1,59 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles } from 'lucide-react'
-import { tw } from 'share/theme'
+import { MessageList as BaseMessageList } from 'share/components/AiChat'
+import type { ChatMessage as BaseChatMessage } from 'share/components/AiChat'
 import store from '../store'
+import type { ChatMessage } from '../types'
 import MessageItem from './MessageItem'
 
 export default observer(function MessageList() {
   const { t } = useTranslation()
-  const bottomRef = useRef<HTMLDivElement>(null)
   const session = store.activeSession
+  const messages = session?.messages ?? []
 
-  const prevSessionId = useRef<string | undefined>(undefined)
+  // Access streaming content during render so MobX tracks it,
+  // causing re-renders on every streaming chunk.
+  const lastMsg = messages[messages.length - 1]
+  void (lastMsg?.generating && lastMsg.content)
 
-  // Access generating message content during render so MobX tracks it,
-  // causing re-renders (and scroll) on every streaming chunk.
-  const lastMsg = session?.messages[session.messages.length - 1]
-  const streamingContent = lastMsg?.generating ? lastMsg.content : null
+  // Filter out tool messages — they are rendered as footers inside MessageItem
+  const visibleMessages = messages.filter(
+    (msg) => msg.role !== 'tool'
+  ) as BaseChatMessage[]
 
-  useEffect(() => {
-    const isNewSession = prevSessionId.current !== session?.id
-    prevSessionId.current = session?.id
-    bottomRef.current?.scrollIntoView({
-      behavior: isNewSession ? 'instant' : 'smooth',
-    })
-  }, [session?.id, session?.messages.length])
-
-  useEffect(() => {
-    if (streamingContent !== null) {
-      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+  function getToolMessages(msg: ChatMessage, index: number): ChatMessage[] {
+    if (msg.role !== 'assistant') return []
+    const toolMessages: ChatMessage[] = []
+    for (let i = index + 1; i < messages.length; i++) {
+      const next = messages[i]
+      if (next.role !== 'tool') break
+      toolMessages.push(next)
     }
-  }, [streamingContent])
-
-  if (!session || session.messages.length === 0) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 select-none">
-        <div
-          className={`w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-900`}
-        >
-          <Sparkles size={24} className="text-emerald-500" />
-        </div>
-        <p className={`text-sm ${tw.text.tertiary}`}>{t('emptyHint')}</p>
-      </div>
-    )
+    return toolMessages
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      {session.messages.map((msg, index) => {
-        if (msg.role === 'tool') return null
-
-        let toolMessages: typeof session.messages = []
-        if (msg.role === 'assistant') {
-          toolMessages = []
-          for (let i = index + 1; i < session.messages.length; i++) {
-            const nextMsg = session.messages[i]
-            if (nextMsg.role !== 'tool') break
-            toolMessages.push(nextMsg)
-          }
-        }
+    <BaseMessageList
+      messages={visibleMessages}
+      sessionId={session?.id}
+      isDark={store.isDark}
+      emptyHint={t('emptyHint')}
+      retryLabel={t('retry')}
+      deleteLabel={t('delete')}
+      errorPrefix={t('errorPrefix')}
+      onRetryLast={() => store.retryLastMessage()}
+      onDelete={(id) => store.deleteMessage(id)}
+    >
+      {(baseMsg) => {
+        // Map back to original index for tool message lookup
+        const originalIndex = messages.findIndex((m) => m.id === baseMsg.id)
+        const msg = messages[originalIndex]
+        const toolMessages = getToolMessages(msg, originalIndex)
 
         return (
           <MessageItem key={msg.id} msg={msg} toolMessages={toolMessages} />
         )
-      })}
-      <div ref={bottomRef} />
-    </div>
+      }}
+    </BaseMessageList>
   )
 })
