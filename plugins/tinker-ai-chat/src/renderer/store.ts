@@ -62,6 +62,14 @@ function serializeSession(session: Session): SessionData {
   }
 }
 
+function hasSessionContent(session: SessionData): boolean {
+  return session.messages.some(
+    (message) =>
+      (message.role === 'user' || message.role === 'assistant') &&
+      message.content.trim().length > 0
+  )
+}
+
 class Store extends BaseStore {
   sessions: Session[] = []
   activeSessionId: string = ''
@@ -230,11 +238,8 @@ class Store extends BaseStore {
   }
 
   deleteSession(id: string) {
-    const session = this.sessions.find((s) => s.id === id)
     this.sessions = this.sessions.filter((s) => s.id !== id)
-    if (session && session.agent.getMessages().length > 0) {
-      db.removeSession(id)
-    }
+    db.removeSession(id)
     if (this.activeSessionId === id) {
       if (this.sessions.length === 0) {
         const newSession = createSession()
@@ -259,14 +264,11 @@ class Store extends BaseStore {
     const session = this.activeSession
     if (!session) return
     const data = serializeSession(session)
-    const hasContent = data.messages.some(
-      (m) => (m.role === 'user' || m.role === 'assistant') && m.content
-    )
-    if (hasContent) {
+    if (hasSessionContent(data)) {
       db.putSession(data)
-    } else {
-      db.removeSession(session.id)
+      return
     }
+    db.removeSession(session.id)
   }
 
   private getActiveAgent(): Agent | undefined {
