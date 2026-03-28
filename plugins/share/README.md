@@ -73,7 +73,6 @@ import {
   ToolbarSearch,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-
 ;<Toolbar>
   <ToolbarButton onClick={handleCopy}>
     <Copy size={TOOLBAR_ICON_SIZE} />
@@ -341,29 +340,52 @@ import { webFetch, webSearch } from 'share/tools/webImpl'
 | `webFetch(url)`                      | Implementation  | Node-side web fetch implementation for preload                                         |
 | `webSearch(query)`                   | Implementation  | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
 
+### `share/tools/shell`
+
+```typescript
+import { EXEC_TOOL, getToolLabel } from 'share/tools/shell'
+import { exec } from 'share/tools/shellImpl'
+import type { ToolName } from 'share/tools/shell'
+```
+
+| Export      | Type            | Description                                                |
+| ----------- | --------------- | ---------------------------------------------------------- |
+| `EXEC_TOOL` | Tool definition | `exec` function schema for renderer/agent                  |
+| `exec(...)` | Implementation  | Node-side shell execution with safety guard and output cap |
+
+`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'exec'` → `'Shell'`).
+
 ### `share/tools/fileSystem`
 
 ```typescript
 import {
-  EXEC_TOOL,
   READ_FILE_TOOL,
   WRITE_FILE_TOOL,
   EDIT_FILE_TOOL,
   LIST_DIR_TOOL,
   getToolLabel,
 } from 'share/tools/fileSystem'
+import {
+  editFile,
+  listDir,
+  readFile,
+  writeFile,
+} from 'share/tools/fileSystemImpl'
 import type { ToolName } from 'share/tools/fileSystem'
 ```
 
-| Export            | Tool name    | Description                   |
-| ----------------- | ------------ | ----------------------------- |
-| `EXEC_TOOL`       | `exec`       | Run a shell command           |
-| `READ_FILE_TOOL`  | `read_file`  | Read a file with line numbers |
-| `WRITE_FILE_TOOL` | `write_file` | Write content to a file       |
-| `EDIT_FILE_TOOL`  | `edit_file`  | Replace text within a file    |
-| `LIST_DIR_TOOL`   | `list_dir`   | List directory contents       |
+| Export            | Type            | Description                                                   |
+| ----------------- | --------------- | ------------------------------------------------------------- |
+| `READ_FILE_TOOL`  | Tool definition | `read_file` function schema for renderer/agent                |
+| `WRITE_FILE_TOOL` | Tool definition | `write_file` function schema for renderer/agent               |
+| `EDIT_FILE_TOOL`  | Tool definition | `edit_file` function schema for renderer/agent                |
+| `LIST_DIR_TOOL`   | Tool definition | `list_dir` function schema for renderer/agent                 |
+| `readFile(...)`   | Implementation  | Node-side file reader with line numbers and pagination        |
+| `writeFile(...)`  | Implementation  | Node-side file writer that creates parent directories         |
+| `editFile(...)`   | Implementation  | Node-side targeted file edit with duplicate-match protection  |
+| `listDir(...)`    | Implementation  | Node-side directory listing with recursive mode and filtering |
 
-`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'exec'` → `'Shell'`).
+`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'read_file'` → `'Read File'`).
 
 ## Shared Utilities
 
