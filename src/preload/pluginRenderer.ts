@@ -257,12 +257,37 @@ export async function clearData() {
 
   // IndexedDB
   const databases = await indexedDB.databases()
+  const dbNames: string[] = []
   for (const dbInfo of databases) {
     if (!dbInfo.name) continue
-    await new Promise<void>((resolve, reject) => {
-      const req = indexedDB.deleteDatabase(dbInfo.name!)
-      req.onsuccess = () => resolve()
+    dbNames.push(dbInfo.name)
+    // Clear all store data first
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbInfo.name!)
+      req.onsuccess = () => resolve(req.result)
       req.onerror = () => reject(req.error)
+    })
+    const storeNames = Array.from(db.objectStoreNames)
+    if (storeNames.length > 0) {
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(storeNames, 'readwrite')
+        for (const storeName of storeNames) {
+          tx.objectStore(storeName).clear()
+        }
+        tx.oncomplete = () => resolve()
+        tx.onerror = tx.onabort = () => reject(tx.error)
+      })
+    }
+    db.close()
+  }
+
+  // Try to delete databases, skip if blocked by active connections
+  for (const name of dbNames) {
+    await new Promise<void>((resolve) => {
+      const req = indexedDB.deleteDatabase(name)
+      req.onsuccess = () => resolve()
+      req.onerror = () => resolve()
+      req.onblocked = () => resolve()
     })
   }
 
