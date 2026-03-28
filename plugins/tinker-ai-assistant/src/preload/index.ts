@@ -1,19 +1,11 @@
 import { contextBridge, shell } from 'electron'
-import https from 'node:https'
-import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFile } from 'node:child_process'
 import os from 'node:os'
-import { webSearch } from '../../../share/tools/webImpl'
-import type { WebSearchResult } from '../../../share/tools/web'
+import { webFetch, webSearch } from '../../../share/tools/webImpl'
 
-const USER_AGENT =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-
-const MAX_REDIRECTS = 5
 const EXEC_TIMEOUT_MS = 60_000
-const FETCH_TIMEOUT_MS = 15_000
 const MAX_OUTPUT_CHARS = 10_000
 const MAX_FILE_CHARS = 128_000
 const DEFAULT_LINE_LIMIT = 2000
@@ -43,94 +35,6 @@ const DENY_PATTERNS = [
   /\b(shutdown|reboot|poweroff)\b/i,
   /:\(\)\s*\{.*\};\s*:/,
 ]
-
-// ---------------------------------------------------------------------------
-// HTTP helpers
-// ---------------------------------------------------------------------------
-
-function fetchHtml(url: string, redirectCount = 0): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (redirectCount >= MAX_REDIRECTS) {
-      reject(new Error('Too many redirects'))
-      return
-    }
-    let parsed: URL
-    try {
-      parsed = new URL(url)
-    } catch {
-      reject(new Error(`Invalid URL: ${url}`))
-      return
-    }
-    const client = parsed.protocol === 'https:' ? https : http
-    const req = client.get(
-      {
-        hostname: parsed.hostname,
-        path: parsed.pathname + parsed.search,
-        headers: {
-          'User-Agent': USER_AGENT,
-          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-          Accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        },
-      },
-      (res) => {
-        if (
-          res.statusCode &&
-          res.statusCode >= 300 &&
-          res.statusCode < 400 &&
-          res.headers.location
-        ) {
-          const redirectUrl = res.headers.location.startsWith('http')
-            ? res.headers.location
-            : `${parsed.protocol}//${parsed.host}${res.headers.location}`
-          fetchHtml(redirectUrl, redirectCount + 1)
-            .then(resolve)
-            .catch(reject)
-          res.resume()
-          return
-        }
-        const chunks: Buffer[] = []
-        res.on('data', (c: Buffer) => chunks.push(c))
-        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')))
-        res.on('error', reject)
-      }
-    )
-    req.setTimeout(FETCH_TIMEOUT_MS, () => {
-      req.destroy()
-      reject(new Error('Request timeout'))
-    })
-    req.on('error', reject)
-  })
-}
-
-function decodeHtml(html: string): string {
-  return html
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-}
-
-function stripTags(html: string): string {
-  return decodeHtml(html.replace(/<[^>]+>/g, ' '))
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-const MAX_HTML_CHARS = 200_000
-
-function htmlToText(html: string): string {
-  const truncated =
-    html.length > MAX_HTML_CHARS ? html.slice(0, MAX_HTML_CHARS) : html
-  return stripTags(
-    truncated
-      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-      .replace(/<(nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
-  ).slice(0, 2000)
-}
 
 // ---------------------------------------------------------------------------
 // exec
@@ -339,23 +243,6 @@ function listDir(
 }
 
 // ---------------------------------------------------------------------------
-// web fetch
-// ---------------------------------------------------------------------------
-
-async function webFetch(url: string): Promise<string> {
-  try {
-    const html = await fetchHtml(url)
-    const text = htmlToText(html)
-    if (!text) return `Error: Could not extract content from ${url}`
-    return `[Content from ${url}]\n\n${text}`
-  } catch (e) {
-    return `Error fetching ${url}: ${
-      e instanceof Error ? e.message : String(e)
-    }`
-  }
-}
-
-// ---------------------------------------------------------------------------
 // contextBridge
 // ---------------------------------------------------------------------------
 
@@ -407,9 +294,7 @@ const aiAssistantObj = {
   ): string {
     return listDir(dirPath, workingDir, recursive, maxEntries)
   },
-  webSearch(query: string): Promise<WebSearchResult[]> {
-    return webSearch(query)
-  },
+  webSearch,
   webFetch(url: string): Promise<string> {
     return webFetch(url)
   },

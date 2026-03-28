@@ -4,11 +4,6 @@ export interface WebSearchResult {
   content: string
 }
 
-export interface WebSearchToolResult {
-  content: string
-  data: WebSearchResult[]
-}
-
 export const WEB_SEARCH_TOOL = {
   type: 'function',
   function: {
@@ -28,17 +23,37 @@ export const WEB_SEARCH_TOOL = {
   },
 } as const
 
+export const WEB_FETCH_TOOL = {
+  type: 'function',
+  function: {
+    name: 'web_fetch',
+    description: 'Fetch and extract readable text content from a URL.',
+    parameters: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'The URL to fetch content from',
+        },
+      },
+      required: ['url'],
+    },
+  },
+} as const
+
 function formatWebSearchResults(results: WebSearchResult[]): string {
   return results
     .map((r, i) => `[${i + 1}] ${r.title}\nURL: ${r.url}\n${r.content}`)
     .join('\n\n')
 }
 
-export function createWebSearchToolResult(
-  results: WebSearchResult[]
-): WebSearchToolResult {
+export function createWebSearchToolResult(results: WebSearchResult[]) {
   return {
     content: formatWebSearchResults(results),
     data: results,
   }
+}
+
+export function createWebFetchToolResult(content: string) {
+  return { content }
 }

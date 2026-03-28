@@ -49,8 +49,12 @@ class Store extends BaseStore {
     makeAutoObservable(this)
   }
 
-  get isEmpty() { return this.input.length === 0 }
-  setInput(value: string) { this.input = value }
+  get isEmpty() {
+    return this.input.length === 0
+  }
+  setInput(value: string) {
+    this.input = value
+  }
 }
 
 export default new Store()
@@ -61,15 +65,36 @@ export default new Store()
 ### Toolbar
 
 ```typescript
-import { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer, ToolbarSearch, TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+  ToolbarSpacer,
+  ToolbarSearch,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 
-<Toolbar>
-  <ToolbarButton onClick={handleCopy}><Copy size={TOOLBAR_ICON_SIZE} /></ToolbarButton>
+;<Toolbar>
+  <ToolbarButton onClick={handleCopy}>
+    <Copy size={TOOLBAR_ICON_SIZE} />
+  </ToolbarButton>
   <ToolbarSeparator />
-  <ToolbarButton variant="toggle" active={store.isActive} onClick={() => store.toggle()}>Toggle</ToolbarButton>
-  <ToolbarSearch value={store.searchQuery} onChange={(v) => store.setSearchQuery(v)} placeholder="Search..." />
+  <ToolbarButton
+    variant="toggle"
+    active={store.isActive}
+    onClick={() => store.toggle()}
+  >
+    Toggle
+  </ToolbarButton>
+  <ToolbarSearch
+    value={store.searchQuery}
+    onChange={(v) => store.setSearchQuery(v)}
+    placeholder="Search..."
+  />
   <ToolbarSpacer />
-  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>Menu</ToolbarButton>
+  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>
+    Menu
+  </ToolbarButton>
 </Toolbar>
 ```
 
@@ -152,6 +177,7 @@ import { MessageList, ChatInput, MarkdownContent, type ChatMessage } from 'share
 ```
 
 **ChatMessage type**:
+
 ```typescript
 interface ChatMessage {
   id: string
@@ -273,6 +299,7 @@ agent.isGenerating  // boolean
 ```
 
 **AgentMessage type** (used as `ChatMessage` in both AI plugins):
+
 ```typescript
 interface AgentMessage {
   id: string
@@ -297,17 +324,22 @@ Reusable AI tool definitions for use with `Agent`.
 
 ```typescript
 import {
+  WEB_FETCH_TOOL,
   WEB_SEARCH_TOOL,
+  createWebFetchToolResult,
   createWebSearchToolResult,
 } from 'share/tools/web'
-import { webSearch } from 'share/tools/webImpl'
+import { webFetch, webSearch } from 'share/tools/webImpl'
 ```
 
-| Export | Type | Description |
-|---|---|---|
-| `WEB_SEARCH_TOOL` | Tool definition | `web_search` function schema for renderer/agent |
-| `createWebSearchToolResult(results)` | Helper | Build `{ content, data }` for `web_search` tool execution |
-| `webSearch(query)` | Implementation | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
+| Export                               | Type            | Description                                                                            |
+| ------------------------------------ | --------------- | -------------------------------------------------------------------------------------- |
+| `WEB_FETCH_TOOL`                     | Tool definition | `web_fetch` function schema for renderer/agent                                         |
+| `WEB_SEARCH_TOOL`                    | Tool definition | `web_search` function schema for renderer/agent                                        |
+| `createWebFetchToolResult(content)`  | Helper          | Build `{ content }` for `web_fetch` tool execution                                     |
+| `createWebSearchToolResult(results)` | Helper          | Build `{ content, data }` for `web_search` tool execution                              |
+| `webFetch(url)`                      | Implementation  | Node-side web fetch implementation for preload                                         |
+| `webSearch(query)`                   | Implementation  | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
 
 ### `share/tools/fileSystem`
 
@@ -323,13 +355,13 @@ import {
 import type { ToolName } from 'share/tools/fileSystem'
 ```
 
-| Export | Tool name | Description |
-|---|---|---|
-| `EXEC_TOOL` | `exec` | Run a shell command |
-| `READ_FILE_TOOL` | `read_file` | Read a file with line numbers |
-| `WRITE_FILE_TOOL` | `write_file` | Write content to a file |
-| `EDIT_FILE_TOOL` | `edit_file` | Replace text within a file |
-| `LIST_DIR_TOOL` | `list_dir` | List directory contents |
+| Export            | Tool name    | Description                   |
+| ----------------- | ------------ | ----------------------------- |
+| `EXEC_TOOL`       | `exec`       | Run a shell command           |
+| `READ_FILE_TOOL`  | `read_file`  | Read a file with line numbers |
+| `WRITE_FILE_TOOL` | `write_file` | Write content to a file       |
+| `EDIT_FILE_TOOL`  | `edit_file`  | Replace text within a file    |
+| `LIST_DIR_TOOL`   | `list_dir`   | List directory contents       |
 
 `getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'exec'` → `'Shell'`).
 

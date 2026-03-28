@@ -132,6 +132,23 @@ async function fetchContent(url: string): Promise<string> {
   }
 }
 
+export async function webFetch(url: string): Promise<string> {
+  try {
+    const html = await fetchHtml(url)
+    const text = htmlToText(html)
+
+    if (!text) {
+      return `Error: Could not extract content from ${url}`
+    }
+
+    return `[Content from ${url}]\n\n${text}`
+  } catch (e) {
+    return `Error fetching ${url}: ${
+      e instanceof Error ? e.message : String(e)
+    }`
+  }
+}
+
 export async function webSearch(query: string): Promise<WebSearchResult[]> {
   const lang = await tinker.getLanguage()
   const isZh = lang.startsWith('zh')
