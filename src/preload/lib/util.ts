@@ -19,19 +19,27 @@ export function domReady(callback: () => void) {
   observer.observe(document, { childList: true })
 }
 
-export function zipFiles(files: types.PlainObj<string>): Buffer {
+export function zipFiles(files: types.PlainObj<string | Uint8Array>): Buffer {
   const zip = new AdmZip()
   each(files, (content, name) => {
-    zip.addFile(name, Buffer.from(content, 'utf-8'))
+    if (typeof content === 'string') {
+      zip.addFile(name, Buffer.from(content, 'utf-8'))
+    } else {
+      zip.addFile(name, Buffer.from(content))
+    }
   })
   return zip.toBuffer()
 }
 
-export function unzipFiles(buf: Buffer): types.PlainObj<string> {
-  const files: types.PlainObj<string> = {}
+export function unzipFiles(buf: Buffer): types.PlainObj<string | Uint8Array> {
+  const files: types.PlainObj<string | Uint8Array> = {}
   const zip = new AdmZip(buf)
   zip.getEntries().forEach((entry) => {
-    files[entry.entryName] = entry.getData().toString('utf-8')
+    if (entry.entryName.endsWith('.bin')) {
+      files[entry.entryName] = new Uint8Array(entry.getData())
+    } else {
+      files[entry.entryName] = entry.getData().toString('utf-8')
+    }
   })
   return files
 }

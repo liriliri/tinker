@@ -7,7 +7,7 @@ import { zipFiles, unzipFiles } from './util'
 import mainObj from '../main'
 
 export async function saveData(
-  files: types.PlainObj<string>,
+  files: types.PlainObj<string | Uint8Array>,
   plugin?: IPlugin | null
 ) {
   const buf = zipFiles(files)
@@ -25,7 +25,7 @@ export async function saveData(
 
 export async function loadData(
   plugin?: IPlugin | null
-): Promise<types.PlainObj<string> | undefined> {
+): Promise<types.PlainObj<string | Uint8Array> | undefined> {
   const { filePaths } = await mainObj.showOpenDialog({
     title: t('importData'),
     properties: ['openFile'],
@@ -37,7 +37,7 @@ export async function loadData(
     const files = unzipFiles(buf)
     const pluginData = files['plugin.json']
     if (pluginData) {
-      const meta = JSON.parse(pluginData)
+      const meta = JSON.parse(pluginData as string)
       if (plugin && meta.id !== plugin.id) {
         alert(
           t('importDataMismatchErr', {

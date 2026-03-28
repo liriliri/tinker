@@ -118,6 +118,7 @@ export function injectApi() {
 }
 
 export async function importData() {
+  const BINARY_TAG = '__tinker_bin__'
   const result = confirm(_tinker.t('importDataConfirm'))
   if (!result) {
     return
@@ -129,7 +130,7 @@ export async function importData() {
   const localStr = files['localStorage.json']
   if (localStr) {
     localStorage.clear()
-    const data = JSON.parse(localStr)
+    const data = JSON.parse(localStr as string)
     for (const key in data) {
       localStorage.setItem(key, data[key])
     }
@@ -147,7 +148,7 @@ export async function importData() {
   for (const dbName of dbNames) {
     const metaStr = files[`indexedDB/${dbName}/meta.json`]
     if (!metaStr) continue
-    const meta = JSON.parse(metaStr)
+    const meta = JSON.parse(metaStr as string)
     const stores = meta.stores || {}
 
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -184,14 +185,21 @@ export async function importData() {
     for (const storeName in stores) {
       const dataStr = files[`indexedDB/${dbName}/${storeName}.json`]
       if (!dataStr) continue
-      const items = JSON.parse(dataStr)
+      const items = JSON.parse(dataStr as string).map((item: any) => ({
+        key: restoreBin(item.key),
+        value: restoreBin(item.value),
+      }))
       if (items.length === 0) continue
 
       await new Promise<void>((resolve, reject) => {
         const tx = db.transaction([storeName], 'readwrite')
         const store = tx.objectStore(storeName)
         for (const item of items) {
-          store.put(item)
+          if (store.keyPath) {
+            store.put(item.value)
+          } else {
+            store.put(item.value, item.key)
+          }
         }
         tx.oncomplete = () => resolve()
         tx.onerror = tx.onabort = () => reject(tx.error)
@@ -202,6 +210,40 @@ export async function importData() {
   }
 
   location.reload()
+
+  function restoreBin(value: any): any {
+    if (value === null || value === undefined) return value
+    if (Array.isArray(value)) {
+      return value.map((item) => restoreBin(item))
+    }
+    if (typeof value === 'object') {
+      if (value[BINARY_TAG]) {
+        const bytes = files![value.path] as Uint8Array
+        if (!bytes) return null
+
+        const type = value[BINARY_TAG]
+        if (type === 'ArrayBuffer') return bytes.buffer
+        const TypedArrayMap: any = {
+          Uint8Array,
+          Int8Array,
+          Uint16Array,
+          Int16Array,
+          Uint32Array,
+          Int32Array,
+          Float32Array,
+          Float64Array,
+        }
+        const Ctor = TypedArrayMap[type]
+        return Ctor ? new Ctor(bytes.buffer) : bytes.buffer
+      }
+      const result: any = {}
+      for (const key of Object.keys(value)) {
+        result[key] = restoreBin(value[key])
+      }
+      return result
+    }
+    return value
+  }
 }
 
 export async function clearData() {
@@ -228,12 +270,13 @@ export async function clearData() {
 }
 
 export async function exportData(id: string) {
-  const files: types.PlainObj<string> = {
+  const BINARY_TAG = '__tinker_bin__'
+  const files: Record<string, string | Uint8Array> = {
     'plugin.json': JSON.stringify({ id, date: Date.now() }),
   }
 
   // localStorage
-  const localStorageData: types.PlainObj<string> = {}
+  const localStorageData: Record<string, string> = {}
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)!
     localStorageData[key] = localStorage.getItem(key)!
@@ -241,6 +284,7 @@ export async function exportData(id: string) {
   files['localStorage.json'] = JSON.stringify(localStorageData)
 
   // IndexedDB
+  let binIdx = 0
   const databases = await indexedDB.databases()
   for (const dbInfo of databases) {
     if (!dbInfo.name) continue
@@ -254,7 +298,7 @@ export async function exportData(id: string) {
 
     const meta = {
       version: db.version,
-      stores: {} as types.PlainObj<any>,
+      stores: {} as Record<string, any>,
     }
 
     const storeNames = Array.from(db.objectStoreNames)
@@ -270,21 +314,65 @@ export async function exportData(id: string) {
           autoIncrement: store.autoIncrement,
         }
 
-        const storeData = await new Promise<any[]>((resolve, reject) => {
-          const req = store.getAll()
-          req.onsuccess = () => resolve(req.result)
-          req.onerror = () => reject(req.error)
-        })
+        const storeData = await new Promise<{ key: any; value: any }[]>(
+          (resolve, reject) => {
+            const items: { key: any; value: any }[] = []
+            const req = store.openCursor()
+            req.onsuccess = () => {
+              const cursor = req.result
+              if (cursor) {
+                items.push({ key: cursor.key, value: cursor.value })
+                cursor.continue()
+              } else {
+                resolve(items)
+              }
+            }
+            req.onerror = () => reject(req.error)
+          }
+        )
+
+        const serialized = storeData.map((record) => ({
+          key: extractBin(record.key),
+          value: extractBin(record.value),
+        }))
 
         files[`indexedDB/${dbName}/${storeName}.json`] =
-          JSON.stringify(storeData)
+          JSON.stringify(serialized)
       }
     }
 
     files[`indexedDB/${dbName}/meta.json`] = JSON.stringify(meta)
-
     db.close()
   }
 
   _tinker.saveData(files)
+
+  function extractBin(value: any): any {
+    if (value === null || value === undefined) return value
+    if (value instanceof ArrayBuffer) {
+      const binPath = `bin/${binIdx++}.bin`
+      files[binPath] = new Uint8Array(value)
+      return { [BINARY_TAG]: 'ArrayBuffer', path: binPath }
+    }
+    if (ArrayBuffer.isView(value)) {
+      const binPath = `bin/${binIdx++}.bin`
+      files[binPath] = new Uint8Array(
+        value.buffer,
+        value.byteOffset,
+        value.byteLength
+      )
+      return { [BINARY_TAG]: value.constructor.name, path: binPath }
+    }
+    if (Array.isArray(value)) {
+      return value.map((item: any) => extractBin(item))
+    }
+    if (typeof value === 'object') {
+      const result: any = {}
+      for (const key of Object.keys(value)) {
+        result[key] = extractBin(value[key])
+      }
+      return result
+    }
+    return value
+  }
 }

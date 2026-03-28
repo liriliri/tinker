@@ -82,11 +82,13 @@ function builtinOnly<T extends (...args: any[]) => any>(fn: T): T {
   }) as T
 }
 
-async function saveData(files: types.PlainObj<string>) {
+async function saveData(files: types.PlainObj<string | Uint8Array>) {
   return saveDataUtil(files, plugin)
 }
 
-async function loadData(): Promise<types.PlainObj<string> | undefined> {
+async function loadData(): Promise<
+  types.PlainObj<string | Uint8Array> | undefined
+> {
   return loadDataUtil(plugin)
 }
 
