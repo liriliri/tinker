@@ -1,3 +1,9 @@
+## v1.6.0 (28 Mar 2026)
+
+* feat: add ai assistant
+* feat: clear plugin data
+* feat(pdf): export as images
+
 ## v1.5.0 (21 Mar 2026)
 
 * feat: ai support
