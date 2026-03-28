@@ -30,9 +30,17 @@ export default function MessageList({
   useEffect(() => {
     const isNewSession = prevSessionId.current !== sessionId
     prevSessionId.current = sessionId
-    bottomRef.current?.scrollIntoView({
-      behavior: isNewSession ? 'instant' : 'smooth',
-    })
+    // setTimeout gives the browser enough time to finish layout after
+    // React commits a potentially large message list to the DOM.
+    // rAF-based approaches are unreliable because flex/overflow
+    // calculations may still be pending after one or two frames.
+    const id = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: isNewSession ? 'instant' : 'smooth',
+      })
+    }, 50)
+
+    return () => clearTimeout(id)
   }, [sessionId, messages.length])
 
   // Observe inner content height changes (driven by typewriter character reveals)
