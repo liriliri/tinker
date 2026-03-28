@@ -95,6 +95,18 @@ function cloneMessages(messages: AgentMessage[]): AgentMessage[] {
   return jsonClone(messages) as AgentMessage[]
 }
 
+function formatUnknownToolError(
+  toolName: string,
+  toolMap: Map<string, AgentTool>
+): string {
+  const availableTools = Array.from(toolMap.keys()).filter(Boolean)
+  const availableText = availableTools.length
+    ? availableTools.join(', ')
+    : '(none)'
+
+  return `Error: Tool '${toolName}' not found. Available: ${availableText}\n\n[Analyze the error above and try a different approach.]`
+}
+
 export class Agent {
   provider: string
   model: string
@@ -353,7 +365,7 @@ export class Agent {
 
     if (!tool) {
       this.updateMessage(toolMsg.id, {
-        content: `Error: Unknown tool "${toolName}"`,
+        content: formatUnknownToolError(toolName, this.toolMap),
         generating: false,
         toolStatus: 'error',
       })

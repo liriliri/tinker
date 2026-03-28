@@ -8,11 +8,20 @@ import {
   getSearchCardProps,
 } from 'share/components/AiChat'
 import store from '../store'
+import { isSupportedToolName } from '../store'
 import type { ChatMessage } from '../types'
 
 interface Props {
   msg: ChatMessage
   toolMessages?: ChatMessage[]
+}
+
+function isVisibleToolMessage(msg: ChatMessage): boolean {
+  return (
+    msg.role === 'tool' &&
+    isSupportedToolName(msg.toolName) &&
+    msg.toolName === 'web_search'
+  )
 }
 
 export default observer(function MessageItem({
@@ -26,6 +35,10 @@ export default observer(function MessageItem({
   }
 
   if (msg.role === 'tool') {
+    if (!isVisibleToolMessage(msg)) {
+      return null
+    }
+
     const searchCardProps = getSearchCardProps(msg)
 
     return (
@@ -38,7 +51,7 @@ export default observer(function MessageItem({
   const footer =
     msg.role === 'assistant' && toolMessages.length > 0 ? (
       <>
-        {toolMessages.map((toolMsg) => {
+        {toolMessages.filter(isVisibleToolMessage).map((toolMsg) => {
           const searchCardProps = getSearchCardProps(toolMsg)
 
           return (

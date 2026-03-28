@@ -23,6 +23,12 @@ const WEB_SEARCH_AGENT_TOOL: AgentTool = {
   },
 }
 
+const SUPPORTED_TOOL_NAMES = new Set(['web_search'])
+
+export function isSupportedToolName(name: string | undefined): boolean {
+  return !!name && SUPPORTED_TOOL_NAMES.has(name)
+}
+
 function createSession(): Session {
   const id = uuid()
   return {

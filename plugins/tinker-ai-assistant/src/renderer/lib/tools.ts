@@ -27,6 +27,21 @@ export const TOOLS = [
 
 type ToolName = ShellToolName | FileSystemToolName | 'web_search' | 'web_fetch'
 
+function getToolName(tool: (typeof TOOLS)[number]): string {
+  const definition = tool as {
+    function?: { name?: string }
+    name?: string
+  }
+
+  return definition.function?.name ?? definition.name ?? ''
+}
+
+const SUPPORTED_TOOL_NAMES = new Set(TOOLS.map(getToolName).filter(Boolean))
+
+export function isSupportedToolName(name: string | undefined): boolean {
+  return !!name && SUPPORTED_TOOL_NAMES.has(name)
+}
+
 export function getToolLabel(name: string): string {
   const labels: Partial<Record<ToolName, string>> = {
     web_search: 'Web Search',

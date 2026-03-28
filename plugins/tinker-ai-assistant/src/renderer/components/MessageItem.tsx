@@ -9,11 +9,16 @@ import {
 } from 'share/components/AiChat'
 import store from '../store'
 import type { ChatMessage } from '../types'
+import { isSupportedToolName } from '../lib/tools'
 import ToolCard from './ToolCard'
 
 interface Props {
   msg: ChatMessage
   toolMessages?: ChatMessage[]
+}
+
+function shouldHideToolMessage(msg: ChatMessage): boolean {
+  return msg.role === 'tool' && !isSupportedToolName(msg.toolName)
 }
 
 export default observer(function MessageItem({
@@ -27,6 +32,10 @@ export default observer(function MessageItem({
   }
 
   if (msg.role === 'tool') {
+    if (shouldHideToolMessage(msg)) {
+      return null
+    }
+
     if (msg.toolName === 'web_search') {
       const searchCardProps = getSearchCardProps(msg)
 
@@ -47,21 +56,23 @@ export default observer(function MessageItem({
   const footer =
     msg.role === 'assistant' && toolMessages.length > 0 ? (
       <>
-        {toolMessages.map((toolMsg) => {
-          if (toolMsg.toolName === 'web_search') {
-            const searchCardProps = getSearchCardProps(toolMsg)
+        {toolMessages
+          .filter((toolMsg) => !shouldHideToolMessage(toolMsg))
+          .map((toolMsg) => {
+            if (toolMsg.toolName === 'web_search') {
+              const searchCardProps = getSearchCardProps(toolMsg)
 
-            return (
-              <SearchCard
-                key={toolMsg.id}
-                {...searchCardProps}
-                onOpenResult={openSearchResult}
-              />
-            )
-          }
+              return (
+                <SearchCard
+                  key={toolMsg.id}
+                  {...searchCardProps}
+                  onOpenResult={openSearchResult}
+                />
+              )
+            }
 
-          return <ToolCard key={toolMsg.id} msg={toolMsg} />
-        })}
+            return <ToolCard key={toolMsg.id} msg={toolMsg} />
+          })}
       </>
     ) : undefined
 
