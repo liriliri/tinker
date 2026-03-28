@@ -162,7 +162,7 @@ interface ChatMessage {
   // tool role fields (web search)
   toolStatus?: 'running' | 'done' | 'error'
   toolArgs?: Record<string, unknown>
-  searchResults?: { title: string; url: string; content: string }[]
+  data?: unknown
 }
 ```
 
@@ -228,9 +228,9 @@ const { copied, copyToClipboard } = useCopyToClipboard()
 AI Agent class that handles streaming, tool-call loops, and message management. Decoupled from MobX via callbacks.
 
 ```typescript
-import { Agent, formatSearchResults } from 'share/lib/Agent'
+import { Agent } from 'share/lib/Agent'
 import type { AgentMessage, AgentTool, ToolCall, ToolStatus, SearchResult } from 'share/lib/Agent'
-import { WEB_SEARCH_TOOL } from 'share/tools/web'
+import { WEB_SEARCH_TOOL, createWebSearchToolResult } from 'share/tools/web'
 
 const agent = new Agent({
   provider: 'openai',
@@ -241,12 +241,9 @@ const agent = new Agent({
     {
       definition: WEB_SEARCH_TOOL,     // function schema passed to the AI
       execute: async (args) => {
-        // return a string, or { content: string, ...partial AgentMessage fields }
+        // return a string, or { content: string, data?: unknown }
         const results = await webSearch(args.query as string)
-        return {
-          content: formatSearchResults(results),
-          searchResults: results,
-        }
+        return createWebSearchToolResult(results)
       },
     },
   ],
@@ -288,7 +285,7 @@ interface AgentMessage {
   toolName?: string
   toolArgs?: Record<string, unknown>
   toolStatus?: 'running' | 'done' | 'error'
-  searchResults?: SearchResult[]       // { title, url, content }[]
+  data?: unknown
 }
 ```
 
@@ -301,7 +298,7 @@ Reusable AI tool definitions for use with `Agent`.
 ```typescript
 import {
   WEB_SEARCH_TOOL,
-  formatWebSearchResults,
+  createWebSearchToolResult,
 } from 'share/tools/web'
 import { webSearch } from 'share/tools/webImpl'
 ```
@@ -309,7 +306,7 @@ import { webSearch } from 'share/tools/webImpl'
 | Export | Type | Description |
 |---|---|---|
 | `WEB_SEARCH_TOOL` | Tool definition | `web_search` function schema for renderer/agent |
-| `formatWebSearchResults(results)` | Helper | Format search results to plain text for model context |
+| `createWebSearchToolResult(results)` | Helper | Build `{ content, data }` for `web_search` tool execution |
 | `webSearch(query)` | Implementation | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
 
 ### `share/tools/fileSystem`

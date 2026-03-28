@@ -4,6 +4,11 @@ export interface WebSearchResult {
   content: string
 }
 
+export interface WebSearchToolResult {
+  content: string
+  data: WebSearchResult[]
+}
+
 export const WEB_SEARCH_TOOL = {
   type: 'function',
   function: {
@@ -23,8 +28,17 @@ export const WEB_SEARCH_TOOL = {
   },
 } as const
 
-export function formatWebSearchResults(results: WebSearchResult[]): string {
+function formatWebSearchResults(results: WebSearchResult[]): string {
   return results
     .map((r, i) => `[${i + 1}] ${r.title}\nURL: ${r.url}\n${r.content}`)
     .join('\n\n')
+}
+
+export function createWebSearchToolResult(
+  results: WebSearchResult[]
+): WebSearchToolResult {
+  return {
+    content: formatWebSearchResults(results),
+    data: results,
+  }
 }

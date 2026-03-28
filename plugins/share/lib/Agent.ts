@@ -1,6 +1,5 @@
 import uuid from 'licia/uuid'
 import jsonClone from 'licia/jsonClone'
-import type { WebSearchResult } from '../tools/web'
 
 export interface ToolCall {
   id: string
@@ -24,12 +23,15 @@ export interface AgentMessage {
   toolName?: string
   toolArgs?: Record<string, unknown>
   toolStatus?: ToolStatus
-  searchResults?: WebSearchResult[]
+  data?: unknown
 }
 
 export type AgentToolResult =
   | string
-  | ({ content: string } & Partial<AgentMessage>)
+  | {
+      content: string
+      data?: unknown
+    }
 
 export interface AgentTool {
   definition: object

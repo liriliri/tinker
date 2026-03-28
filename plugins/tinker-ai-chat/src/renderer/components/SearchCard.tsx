@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, Search } from 'lucide-react'
 import { tw } from 'share/theme'
+import type { WebSearchResult } from 'share/tools/web'
 import type { ChatMessage } from '../types'
 
 interface Props {
@@ -12,10 +13,14 @@ interface Props {
 export default observer(function SearchCard({ msg }: Props) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
+  const results = Array.isArray(msg.data) ? (msg.data as WebSearchResult[]) : []
   const query =
     typeof msg.toolArgs?.query === 'string' ? msg.toolArgs.query : ''
 
-  if (msg.toolStatus === 'running' || (msg.generating && !msg.searchResults)) {
+  if (
+    msg.toolStatus === 'running' ||
+    (msg.generating && results.length === 0)
+  ) {
     return (
       <div
         className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[11px] ${tw.border} ${tw.bg.secondary} ${tw.text.secondary}`}
@@ -41,7 +46,7 @@ export default observer(function SearchCard({ msg }: Props) {
     )
   }
 
-  const count = msg.searchResults?.length ?? 0
+  const count = results.length
 
   return (
     <div
@@ -78,11 +83,11 @@ export default observer(function SearchCard({ msg }: Props) {
         </div>
       </button>
 
-      {expanded && msg.searchResults && msg.searchResults.length > 0 && (
+      {expanded && results.length > 0 && (
         <div
           className={`flex flex-col gap-1.5 border-t px-2.5 py-2 ${tw.border}`}
         >
-          {msg.searchResults.map((r, i) => (
+          {results.map((r, i) => (
             <button
               key={i}
               type="button"

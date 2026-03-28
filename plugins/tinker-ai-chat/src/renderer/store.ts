@@ -4,7 +4,7 @@ import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import { Agent } from 'share/lib/Agent'
 import type { AgentTool } from 'share/lib/Agent'
-import { WEB_SEARCH_TOOL, formatWebSearchResults } from 'share/tools/web'
+import { WEB_SEARCH_TOOL, createWebSearchToolResult } from 'share/tools/web'
 import * as db from './lib/db'
 import type { Session } from './types'
 
@@ -19,10 +19,7 @@ const WEB_SEARCH_AGENT_TOOL: AgentTool = {
   execute: async (args) => {
     const query = typeof args.query === 'string' ? args.query : ''
     const results = await aiChat.webSearch(query)
-    return {
-      content: formatWebSearchResults(results),
-      searchResults: results,
-    }
+    return createWebSearchToolResult(results)
   },
 }
 
@@ -75,7 +72,7 @@ class Store extends BaseStore {
         const msg = session.messages.find((m) => m.id === id)
         if (!msg) return
         Object.assign(msg, patch)
-        if (patch.content !== undefined || patch.searchResults !== undefined) {
+        if (patch.content !== undefined || patch.data !== undefined) {
           this.saveActiveSession()
         }
       },

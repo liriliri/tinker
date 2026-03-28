@@ -3,12 +3,11 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Agent } from 'share/lib/Agent'
 import type { AgentMessage, AgentTool } from 'share/lib/Agent'
-import { formatWebSearchResults } from 'share/tools/web'
+import { createWebSearchToolResult } from 'share/tools/web'
 import * as db from './lib/db'
 import { TOOLS } from './lib/tools'
 import i18n from './i18n'
 import type { Session } from './types'
-import type { WebSearchResult } from 'share/tools/web'
 
 const storage = new LocalStore('tinker-ai-assistant')
 
@@ -76,13 +75,8 @@ function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
           }
           case 'web_search': {
             const query = typeof args.query === 'string' ? args.query : ''
-            const results: WebSearchResult[] = await aiAssistant.webSearch(
-              query
-            )
-            return {
-              content: formatWebSearchResults(results),
-              searchResults: results,
-            }
+            const results = await aiAssistant.webSearch(query)
+            return createWebSearchToolResult(results)
           }
           case 'web_fetch': {
             const url = typeof args.url === 'string' ? args.url : ''
@@ -133,7 +127,7 @@ class Store extends BaseStore {
         const msg = this.session.messages.find((m) => m.id === id)
         if (!msg) return
         Object.assign(msg, patch)
-        if (patch.content !== undefined || patch.searchResults !== undefined) {
+        if (patch.content !== undefined || patch.data !== undefined) {
           this.saveSession()
         }
       },
