@@ -52,6 +52,15 @@ export function showWin() {
     }
   })
 
+  win.webContents.on('did-start-navigation', () => {
+    if (win) {
+      const plugin = getAttachedPlugin(win)
+      if (plugin) {
+        closePlugin(plugin.id)
+      }
+    }
+  })
+
   win.webContents.on('before-input-event', (event, input) => {
     if (input.type !== 'keyDown') {
       return
