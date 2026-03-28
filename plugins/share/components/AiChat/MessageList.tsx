@@ -23,11 +23,9 @@ export default function MessageList({
   ...itemProps
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const prevSessionId = useRef<string | undefined>(undefined)
-
-  // Track streaming content for scroll tracking (caller should pass reactive messages)
-  const lastMsg = messages[messages.length - 1]
-  const streamingContent = lastMsg?.generating ? lastMsg.content : null
+  const isGenerating = messages[messages.length - 1]?.generating ?? false
 
   useEffect(() => {
     const isNewSession = prevSessionId.current !== sessionId
@@ -37,11 +35,20 @@ export default function MessageList({
     })
   }, [sessionId, messages.length])
 
+  // Observe inner content height changes (driven by typewriter character reveals)
+  // and keep the bottom anchor in view throughout generation
   useEffect(() => {
-    if (streamingContent !== null) {
+    if (!isGenerating) return
+    const inner = innerRef.current
+    if (!inner) return
+
+    const observer = new ResizeObserver(() => {
       bottomRef.current?.scrollIntoView({ behavior: 'instant' })
-    }
-  }, [streamingContent])
+    })
+    observer.observe(inner)
+
+    return () => observer.disconnect()
+  }, [isGenerating])
 
   if (messages.length === 0) {
     return (
@@ -58,21 +65,23 @@ export default function MessageList({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {messages.map((msg, index) => {
-        if (children) {
-          return children(msg, index)
-        }
+      <div ref={innerRef}>
+        {messages.map((msg, index) => {
+          if (children) {
+            return children(msg, index)
+          }
 
-        return (
-          <MessageItem
-            key={msg.id}
-            msg={msg}
-            onRetry={onRetryLast}
-            {...itemProps}
-          />
-        )
-      })}
-      <div ref={bottomRef} />
+          return (
+            <MessageItem
+              key={msg.id}
+              msg={msg}
+              onRetry={onRetryLast}
+              {...itemProps}
+            />
+          )
+        })}
+        <div ref={bottomRef} />
+      </div>
     </div>
   )
 }

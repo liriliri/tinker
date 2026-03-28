@@ -1,8 +1,45 @@
+import { useEffect, useRef, useState } from 'react'
 import { RefreshCw, Trash2 } from 'lucide-react'
 import { tw } from '../../theme'
 import CopyButton from '../CopyButton'
 import MarkdownContent from './MarkdownContent'
 import type { ChatMessage } from './types'
+
+/** Typewriter hook: reveals content character-by-character with adaptive speed.
+ *  `streaming` should be true while the server is actively sending chunks.
+ *  Once started, the animation continues until fully caught up even after streaming ends. */
+function useTypewriter(content: string, streaming: boolean): string {
+  const everStarted = useRef(false)
+  const [displayedLen, setDisplayedLen] = useState(0)
+
+  // Start typewriter on first chunk during streaming
+  if (streaming && content.length > 0 && !everStarted.current) {
+    everStarted.current = true
+  }
+
+  const shouldAnimate = everStarted.current
+
+  useEffect(() => {
+    if (!shouldAnimate) {
+      setDisplayedLen(content.length)
+      return
+    }
+
+    if (displayedLen >= content.length) return
+
+    const lag = content.length - displayedLen
+    const charsToAdd = lag > 50 ? 8 : lag > 20 ? 4 : 1
+    const delay = lag > 50 ? 10 : lag > 20 ? 20 : 35
+
+    const timer = setTimeout(() => {
+      setDisplayedLen((prev) => Math.min(prev + charsToAdd, content.length))
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [content, shouldAnimate, displayedLen])
+
+  return content.slice(0, displayedLen)
+}
 
 export interface MessageItemProps {
   msg: ChatMessage
@@ -35,10 +72,19 @@ export default function MessageItem({
   const isUser = msg.role === 'user'
   const hasTextContent = Boolean(msg.content || msg.error || msg.generating)
 
+  const displayedContent = useTypewriter(
+    msg.content,
+    !isUser && Boolean(msg.generating)
+  )
+  const showCursor =
+    !isUser &&
+    (Boolean(msg.generating) || displayedContent.length < msg.content.length) &&
+    Boolean(displayedContent)
+
   const defaultContent = isUser ? (
     msg.content
   ) : (
-    <MarkdownContent isDark={isDark}>{msg.content}</MarkdownContent>
+    <MarkdownContent isDark={isDark}>{displayedContent}</MarkdownContent>
   )
 
   return (
@@ -82,7 +128,7 @@ export default function MessageItem({
               ) : (
                 children ?? defaultContent
               )}
-              {msg.generating && msg.content && (
+              {showCursor && (
                 <span
                   className={`inline-block w-2 h-4 ml-0.5 align-text-bottom animate-pulse ${tw.primary.bg}`}
                 />
