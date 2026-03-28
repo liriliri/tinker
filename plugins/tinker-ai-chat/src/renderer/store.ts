@@ -6,7 +6,7 @@ import { Agent } from 'share/lib/Agent'
 import type { AgentTool } from 'share/lib/Agent'
 import { WEB_SEARCH_TOOL, createWebSearchToolResult } from 'share/tools/web'
 import * as db from './lib/db'
-import type { Session } from './types'
+import type { Session, SessionData } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
 
@@ -24,12 +24,41 @@ const WEB_SEARCH_AGENT_TOOL: AgentTool = {
 }
 
 function createSession(): Session {
+  const id = uuid()
   return {
-    id: uuid(),
+    id,
     title: '',
-    messages: [],
     systemPrompt: '',
     createdAt: Date.now(),
+    agent: createAgent(),
+  }
+}
+
+function createAgent(initialMessages: SessionData['messages'] = []) {
+  return new Agent({
+    maxIterations: 3,
+    tools: [WEB_SEARCH_AGENT_TOOL],
+    initialMessages,
+  })
+}
+
+function createSessionFromData(session: SessionData): Session {
+  return {
+    id: session.id,
+    title: session.title,
+    systemPrompt: session.systemPrompt,
+    createdAt: session.createdAt,
+    agent: createAgent(session.messages),
+  }
+}
+
+function serializeSession(session: Session): SessionData {
+  return {
+    id: session.id,
+    title: session.title,
+    messages: session.agent.getMessages(),
+    systemPrompt: session.systemPrompt,
+    createdAt: session.createdAt,
   }
 }
 
@@ -43,41 +72,9 @@ class Store extends BaseStore {
 
   input: string = ''
 
-  private agent: Agent
-
   constructor() {
     super()
     makeAutoObservable(this)
-    this.agent = new Agent({
-      maxIterations: 3,
-      tools: [WEB_SEARCH_AGENT_TOOL],
-      onMessage: (msg) => {
-        const session = this.activeSession
-        if (!session) return
-        session.messages.push(msg)
-        if (msg.role === 'user') {
-          let userCount = 0
-          for (const m of session.messages) {
-            if (m.role === 'user' && ++userCount > 1) break
-          }
-          if (userCount === 1) {
-            session.title = msg.content.slice(0, 40)
-          }
-        }
-        this.saveActiveSession()
-      },
-      onMessageUpdate: (id, patch) => {
-        const session = this.activeSession
-        if (!session) return
-        const msg = session.messages.find((m) => m.id === id)
-        if (!msg) return
-        Object.assign(msg, patch)
-        if (patch.content !== undefined || patch.data !== undefined) {
-          this.saveActiveSession()
-        }
-      },
-      getMessages: () => this.activeSession?.messages ?? [],
-    })
     this.init()
   }
 
@@ -93,7 +90,9 @@ class Store extends BaseStore {
 
     runInAction(() => {
       if (savedSessions.length > 0) {
-        this.sessions = savedSessions.sort((a, b) => b.createdAt - a.createdAt)
+        this.sessions = savedSessions
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .map(createSessionFromData)
         this.activeSessionId =
           savedSessions.find((s) => s.id === savedActiveId)?.id ||
           savedSessions[0].id
@@ -139,7 +138,11 @@ class Store extends BaseStore {
   }
 
   get isGenerating(): boolean {
-    return this.agent.isGenerating
+    return this.activeSession?.agent.isGenerating ?? false
+  }
+
+  get messages() {
+    return this.activeSession?.agent.getMessages() ?? []
   }
 
   get currentModels(): tinker.AiModel[] {
@@ -184,14 +187,11 @@ class Store extends BaseStore {
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
     storage.set(MODEL_KEY, firstModel)
-    this.agent.setProvider(name)
-    this.agent.setModel(firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
     storage.set(MODEL_KEY, name)
-    this.agent.setModel(name)
   }
 
   setSelectedCombined(val: string) {
@@ -203,28 +203,23 @@ class Store extends BaseStore {
     storage.set(PROVIDER_KEY, provider)
     this.selectedModel = model
     storage.set(MODEL_KEY, model)
-    this.agent.setProvider(provider)
-    this.agent.setModel(model)
   }
 
   setSystemPrompt(val: string) {
     const session = this.activeSession
     if (!session) return
     session.systemPrompt = val
-    this.agent.setSystemPrompt(val)
     this.saveActiveSession()
   }
 
   selectSession(id: string) {
     this.activeSessionId = id
     storage.set(ACTIVE_SESSION_KEY, id)
-    const session = this.sessions.find((s) => s.id === id)
-    this.agent.setSystemPrompt(session?.systemPrompt ?? '')
   }
 
   newSession() {
     const latest = this.sessions[0]
-    if (latest && latest.messages.length === 0) {
+    if (latest && latest.agent.getMessages().length === 0) {
       this.selectSession(latest.id)
       return
     }
@@ -232,13 +227,12 @@ class Store extends BaseStore {
     this.sessions.unshift(session)
     this.activeSessionId = session.id
     storage.set(ACTIVE_SESSION_KEY, session.id)
-    this.agent.setSystemPrompt('')
   }
 
   deleteSession(id: string) {
     const session = this.sessions.find((s) => s.id === id)
     this.sessions = this.sessions.filter((s) => s.id !== id)
-    if (session && session.messages.length > 0) {
+    if (session && session.agent.getMessages().length > 0) {
       db.removeSession(id)
     }
     if (this.activeSessionId === id) {
@@ -250,15 +244,13 @@ class Store extends BaseStore {
         this.activeSessionId = this.sessions[0].id
       }
       storage.set(ACTIVE_SESSION_KEY, this.activeSessionId)
-      const active = this.sessions.find((s) => s.id === this.activeSessionId)
-      this.agent.setSystemPrompt(active?.systemPrompt ?? '')
     }
   }
 
   clearMessages() {
     const session = this.activeSession
     if (!session) return
-    session.messages = []
+    session.agent.clearMessages()
     session.title = ''
     this.saveActiveSession()
   }
@@ -266,35 +258,54 @@ class Store extends BaseStore {
   private saveActiveSession() {
     const session = this.activeSession
     if (!session) return
-    const hasContent = session.messages.some(
+    const data = serializeSession(session)
+    const hasContent = data.messages.some(
       (m) => (m.role === 'user' || m.role === 'assistant') && m.content
     )
     if (hasContent) {
-      db.putSession(session)
+      db.putSession(data)
     } else {
       db.removeSession(session.id)
     }
+  }
+
+  private getActiveAgent(): Agent | undefined {
+    return this.activeSession?.agent
+  }
+
+  private updateActiveSessionTitle() {
+    const session = this.activeSession
+    if (!session) return
+    const messages = session.agent.getMessages()
+    const firstUserMessage = messages.find((msg) => msg.role === 'user')
+    session.title = firstUserMessage?.content.slice(0, 40) ?? ''
   }
 
   async sendMessage() {
     if (!this.canSend) return
     const userText = this.input.trim()
     this.input = ''
-    this.agent.setProvider(this.selectedProvider)
-    this.agent.setModel(this.selectedModel)
-    this.agent.setSystemPrompt(this.systemPrompt)
-    await this.agent.send(userText)
+    const agent = this.getActiveAgent()
+    if (!agent) return
+    agent.setProvider(this.selectedProvider)
+    agent.setModel(this.selectedModel)
+    agent.setSystemPrompt(this.systemPrompt)
+    await agent.send(userText)
+    this.updateActiveSessionTitle()
+    this.saveActiveSession()
   }
 
   abortGeneration() {
-    this.agent.abort()
+    this.getActiveAgent()?.abort()
+    this.saveActiveSession()
   }
 
   async retryLastMessage() {
     const session = this.activeSession
     if (!session || this.isGenerating) return
 
-    const messages = session.messages
+    const agent = session.agent
+    const messages = agent.getMessages()
     let lastUserIdx = -1
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role === 'user') {
@@ -305,18 +316,22 @@ class Store extends BaseStore {
     if (lastUserIdx === -1) return
 
     const userContent = messages[lastUserIdx].content
-    session.messages = messages.slice(0, lastUserIdx)
+    agent.setMessages(messages.slice(0, lastUserIdx))
+    this.updateActiveSessionTitle()
     this.saveActiveSession()
-    this.agent.setProvider(this.selectedProvider)
-    this.agent.setModel(this.selectedModel)
-    this.agent.setSystemPrompt(this.systemPrompt)
-    await this.agent.send(userContent)
+    agent.setProvider(this.selectedProvider)
+    agent.setModel(this.selectedModel)
+    agent.setSystemPrompt(this.systemPrompt)
+    await agent.send(userContent)
+    this.updateActiveSessionTitle()
+    this.saveActiveSession()
   }
 
   deleteMessage(id: string) {
     const session = this.activeSession
     if (!session) return
-    session.messages = session.messages.filter((m) => m.id !== id)
+    session.agent.deleteMessage(id)
+    this.updateActiveSessionTitle()
     this.saveActiveSession()
   }
 }

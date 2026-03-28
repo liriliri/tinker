@@ -9,7 +9,7 @@ import MessageItem from './MessageItem'
 export default observer(function MessageList() {
   const { t } = useTranslation()
   const session = store.activeSession
-  const messages = session?.messages ?? []
+  const messages = store.messages
 
   // Access streaming content during render so MobX tracks it,
   // causing re-renders on every streaming chunk.

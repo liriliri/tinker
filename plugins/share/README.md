@@ -1,70 +1,65 @@
 # Shared Components and Utilities
 
-Shared components, utility classes, and hooks for the Tinker plugin system.
+Tinker plugins should reuse the shared layer instead of rebuilding common UI, store, and AI logic.
+
+## Quick Rules
+
+- Import `share/base.scss` in plugin `index.scss`.
+- Use `tw` utilities from `share/theme.ts`; do not hardcode colors.
+- Plugin stores should extend `BaseStore`, call `super()` first, then `makeAutoObservable(this)`.
+- `share/components/AiChat` is display-only. State and actions stay in the caller.
+- `share/lib/Agent` owns AI message state, tool-call loops, and streaming.
 
 ## Base Styles
 
-Import `share/base.scss` in `index.scss`:
-
 ```scss
-// Basic: src/index.scss
+// src/index.scss
 @use '../../share/base.scss';
 @config "../tailwind.config.js";
 
-// Advanced: src/renderer/index.scss
+// src/renderer/index.scss
 @use '../../../share/base.scss';
 @config "../../tailwind.config.js";
 ```
 
 ## Theme
 
-Use unified theme from `share/theme.ts`. Never hardcode colors.
-
-```typescript
+```ts
 import { tw, THEME_COLORS } from 'share/theme'
 
+<div className={tw.bg.secondary} />
+<span className={tw.text.primary} />
 <button className={`${tw.primary.bg} ${tw.primary.bgHover}`} />
-<Copy className={copied ? tw.primary.text : ''} />
-<span className={`${tw.text.primary} ${tw.primary.textHover}`}>Hover me</span>
-<div className={tw.bg.secondary}>Content</div>
 <input className={`${tw.bg.input} border ${tw.border}`} />
-<div className={`${tw.hover} ${isActive ? tw.active : ''}`} />
 ```
 
-Patterns: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.{primary|secondary|tertiary}`, `tw.hover`, `tw.active`.
+Common tokens: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.*`, `tw.hover`, `tw.active`.
 
 ## BaseStore
 
-All plugin stores must extend `BaseStore`. Call `super()` first, then `makeAutoObservable(this)`. Access theme via `store.isDark`.
-
-```typescript
+```ts
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 
 class Store extends BaseStore {
-  input: string = ''
+  input = ''
 
   constructor() {
     super()
     makeAutoObservable(this)
-  }
-
-  get isEmpty() {
-    return this.input.length === 0
-  }
-  setInput(value: string) {
-    this.input = value
   }
 }
 
 export default new Store()
 ```
 
+Use `store.isDark` for theme-aware rendering.
+
 ## Shared Components
 
 ### Toolbar
 
-```typescript
+```ts
 import {
   Toolbar,
   ToolbarButton,
@@ -73,331 +68,140 @@ import {
   ToolbarSearch,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-;<Toolbar>
-  <ToolbarButton onClick={handleCopy}>
-    <Copy size={TOOLBAR_ICON_SIZE} />
-  </ToolbarButton>
-  <ToolbarSeparator />
-  <ToolbarButton
-    variant="toggle"
-    active={store.isActive}
-    onClick={() => store.toggle()}
-  >
-    Toggle
-  </ToolbarButton>
-  <ToolbarSearch
-    value={store.searchQuery}
-    onChange={(v) => store.setSearchQuery(v)}
-    placeholder="Search..."
-  />
-  <ToolbarSpacer />
-  <ToolbarButton menu={[{ label: 'Action', click: handleAction }]}>
-    Menu
-  </ToolbarButton>
-</Toolbar>
 ```
 
-`ToolbarButton` props: `variant` ('action' | 'toggle'), `active`, `menu`, `longPressDuration`
+### Dialogs
 
-### Dialog Components
-
-```typescript
+```ts
 import { alert, AlertProvider } from 'share/components/Alert'
 import { confirm, ConfirmProvider } from 'share/components/Confirm'
 import { prompt, PromptProvider } from 'share/components/Prompt'
-
-await alert({ title: 'Error', message: 'Failed!' })
-const ok = await confirm({ title: 'Delete', message: 'Sure?' })
-const value = await prompt({ title: 'Name', defaultValue: 'Untitled' })
 ```
 
-Setup in `App.tsx`: wrap with `<AlertProvider>`, `<ConfirmProvider>`, `<PromptProvider>` passing `locale={i18n.language}`.
+Wrap `App.tsx` with the matching providers.
 
 ### Toaster
 
-```typescript
+```ts
 import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
-
-// Wrap app with <ToasterProvider>
-toast.success('Saved')
-toast.error('Failed')
 ```
 
 ### Form Components
 
-```typescript
+```ts
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import Slider from 'share/components/Slider'
-
-<Select value={store.value} onChange={store.setValue} options={options} />
-<Checkbox checked={store.enabled} onChange={store.setEnabled} label="Enable" />
-<Slider min={0} max={100} value={store.size} onChange={store.setSize} disabled={!store.enabled} />
 ```
 
 ### AiChat
 
-Display-only AI chat UI components. Data and callbacks are handled by the caller.
-
-```typescript
-import { MessageList, ChatInput, MarkdownContent, type ChatMessage } from 'share/components/AiChat'
-
-<MessageList
-  messages={store.messages}
-  sessionId={store.sessionId}      // used to detect session switches (instant scroll)
-  isDark={store.isDark}
-  emptyHint={t('emptyHint')}
-  retryLabel={t('retry')}
-  deleteLabel={t('delete')}
-  errorPrefix={t('errorPrefix')}
-  searchResultsLabel={t('searchResults')}
-  searchingLabel={t('searching')}
-  searchFailedLabel={t('searchFailed')}
-  onRetryLast={() => store.retryLastMessage()}
-  onDelete={(id) => store.deleteMessage(id)}
-  onOpenUrl={(url) => openExternal(url)}
-/>
-
-<ChatInput
-  value={store.input}
-  onChange={(v) => store.setInput(v)}
-  onSend={() => store.sendMessage()}
-  onStop={() => store.abortGeneration()}
-  isGenerating={store.isGenerating}
-  canSend={store.canSend}
-  placeholder={t('inputPlaceholder')}
-  sendLabel={`${t('send')} (Enter)`}
-  stopLabel={t('stop')}
-  extra={<MyModelSelector />}      // optional slot on the left of the send button
-/>
-
-<MarkdownContent isDark={store.isDark}>{markdownString}</MarkdownContent>
+```ts
+import {
+  MessageList,
+  ChatInput,
+  MarkdownContent,
+  type ChatMessage,
+} from 'share/components/AiChat'
 ```
 
-**ChatMessage type**:
+Use `MessageList` and `ChatInput` for rendering only; provide your own `messages`, `send`, `retry`, `delete`, and session switching logic.
 
-```typescript
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant' | 'tool'
-  content: string
-  generating?: boolean
-  error?: string
-  // tool role fields (web search)
-  toolStatus?: 'running' | 'done' | 'error'
-  toolArgs?: Record<string, unknown>
-  data?: unknown
-}
-```
+### Other Common Components
 
-### Grid
-
-Data grid wrapping AG Grid with Tinker theme integration.
-
-```typescript
-import Grid from 'share/components/Grid'
-import { ColDef } from 'ag-grid-community'
-
-const columnDefs: ColDef<RowData>[] = [
-  { field: 'name', headerName: 'Name', flex: 1, sortable: true },
-]
-
-<Grid<RowData> isDark={store.isDark} ref={gridRef} columnDefs={columnDefs} rowData={rowData} rowHeight={40} />
-```
-
-Props: all `AgGridReactProps` plus `isDark: boolean`. Supports `ref` forwarding to access the AG Grid API.
-
-### Other Components
-
-```typescript
+```ts
 import CopyButton from 'share/components/CopyButton'
 import FileOpen from 'share/components/FileOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import Tooltip from 'share/components/Tooltip'
-import NavList, { NavListItem } from 'share/components/NavList'
-import Tree, { TreeNodeData } from 'share/components/Tree'
-
-<CopyButton text="copy me" title="Copy" />
-<CopyButton variant="toolbar" text={store.text} disabled={store.isEmpty} />
-<CopyButton variant="icon" text={data} size={20} />
-
-<FileOpen onOpenFile={(file) => store.handleFile(file)} openTitle={t('openFile')} supportedFormats="PNG, JPG" fileName={store.fileName} />
-
-<ImageOpen onOpenImage={() => store.openImage()} openTitle="Drop image or click" supportedFormats="PNG, JPG, WebP" />
-
-<Tooltip visible={show} x={x} y={y} content="Hint" />
-
-// NavList - vertical navigation with icon, label, count and active state
-const items: NavListItem[] = [{ id: 'all', icon: List, label: t('all'), count: store.total }]
-<NavList items={items} activeId={store.currentId} onSelect={(id) => store.setCurrentId(id)} />
-
-// Tree - generic tree view with expand/collapse and highlighting
-<Tree<MyNode> data={treeData} onNodeClick={(node) => handleClick(node)} activeNodeId={activeId} emptyText="No data" />
+import NavList from 'share/components/NavList'
+import Tree from 'share/components/Tree'
+import Grid from 'share/components/Grid'
 ```
 
-## Shared Hooks
+## Hooks
 
-### useCopyToClipboard
-
-Auto-resets `copied` after 2 seconds.
-
-```typescript
+```ts
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
-
-const { copied, copyToClipboard } = useCopyToClipboard()
 ```
 
 ## Agent
 
-AI Agent class that handles streaming, tool-call loops, and message management. Decoupled from MobX via callbacks.
+`share/lib/Agent` manages:
 
-```typescript
+- internal `messages`
+- AI streaming
+- tool-call loops
+- abort state
+
+```ts
 import { Agent } from 'share/lib/Agent'
-import type { AgentMessage, AgentTool, ToolCall, ToolStatus, SearchResult } from 'share/lib/Agent'
+import type { AgentTool } from 'share/lib/Agent'
 import { WEB_SEARCH_TOOL, createWebSearchToolResult } from 'share/tools/web'
+
+const tools: AgentTool[] = [
+  {
+    definition: WEB_SEARCH_TOOL,
+    execute: async (args) => {
+      const results = await webSearch(args.query as string)
+      return createWebSearchToolResult(results)
+    },
+  },
+]
 
 const agent = new Agent({
   provider: 'openai',
   model: 'gpt-4o',
   systemPrompt: 'You are a helpful assistant.',
-  maxIterations: 10,           // default 20
-  tools: [
-    {
-      definition: WEB_SEARCH_TOOL,     // function schema passed to the AI
-      execute: async (args) => {
-        // return a string, or { content: string, data?: unknown }
-        const results = await webSearch(args.query as string)
-        return createWebSearchToolResult(results)
-      },
-    },
-  ],
-  onMessage: (msg) => runInAction(() => messages.push(msg)),
-  onMessageUpdate: (id, patch) =>
-    runInAction(() => {
-      const msg = messages.find((m) => m.id === id)
-      if (msg) Object.assign(msg, patch)
-    }),
-  getMessages: () => messages,
+  maxIterations: 10,
+  tools,
+  initialMessages: [],
 })
 
-// Update config at any time
 agent.setProvider('anthropic')
 agent.setModel('claude-opus-4-5')
-agent.setSystemPrompt('New system prompt')
-agent.setTools([...])
+agent.setSystemPrompt('New prompt')
+agent.setMessages(savedMessages)
 
-// Send a message (auto-adds user/assistant messages and runs the tool loop)
-await agent.send('Hello!')
-
-// Abort generation
+await agent.send('Hello')
 agent.abort()
 
-// Read-only state
-agent.isGenerating  // boolean
-```
-
-**AgentMessage type** (used as `ChatMessage` in both AI plugins):
-
-```typescript
-interface AgentMessage {
-  id: string
-  role: 'user' | 'assistant' | 'tool'
-  content: string
-  generating?: boolean
-  error?: string
-  toolCalls?: ToolCall[]
-  toolCallId?: string
-  toolName?: string
-  toolArgs?: Record<string, unknown>
-  toolStatus?: 'running' | 'done' | 'error'
-  data?: unknown
-}
+agent.getMessages()
+agent.isGenerating
 ```
 
 ## Shared Tools
 
-Reusable AI tool definitions for use with `Agent`.
+### Web
 
-### `share/tools/web`
-
-```typescript
+```ts
 import {
   WEB_FETCH_TOOL,
   WEB_SEARCH_TOOL,
   createWebFetchToolResult,
   createWebSearchToolResult,
 } from 'share/tools/web'
-import { webFetch, webSearch } from 'share/tools/webImpl'
 ```
 
-| Export                               | Type            | Description                                                                            |
-| ------------------------------------ | --------------- | -------------------------------------------------------------------------------------- |
-| `WEB_FETCH_TOOL`                     | Tool definition | `web_fetch` function schema for renderer/agent                                         |
-| `WEB_SEARCH_TOOL`                    | Tool definition | `web_search` function schema for renderer/agent                                        |
-| `createWebFetchToolResult(content)`  | Helper          | Build `{ content }` for `web_fetch` tool execution                                     |
-| `createWebSearchToolResult(results)` | Helper          | Build `{ content, data }` for `web_search` tool execution                              |
-| `webFetch(url)`                      | Implementation  | Node-side web fetch implementation for preload                                         |
-| `webSearch(query)`                   | Implementation  | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
+### Shell
 
-### `share/tools/shell`
-
-```typescript
+```ts
 import { EXEC_TOOL, getToolLabel } from 'share/tools/shell'
 import { exec } from 'share/tools/shellImpl'
-import type { ToolName } from 'share/tools/shell'
 ```
 
-| Export      | Type            | Description                                                |
-| ----------- | --------------- | ---------------------------------------------------------- |
-| `EXEC_TOOL` | Tool definition | `exec` function schema for renderer/agent                  |
-| `exec(...)` | Implementation  | Node-side shell execution with safety guard and output cap |
+### File System
 
-`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'exec'` → `'Shell'`).
-
-### `share/tools/fileSystem`
-
-```typescript
+```ts
 import {
   READ_FILE_TOOL,
   WRITE_FILE_TOOL,
   EDIT_FILE_TOOL,
   LIST_DIR_TOOL,
-  getToolLabel,
 } from 'share/tools/fileSystem'
-import {
-  editFile,
-  listDir,
-  readFile,
-  writeFile,
-} from 'share/tools/fileSystemImpl'
-import type { ToolName } from 'share/tools/fileSystem'
 ```
 
-| Export            | Type            | Description                                                   |
-| ----------------- | --------------- | ------------------------------------------------------------- |
-| `READ_FILE_TOOL`  | Tool definition | `read_file` function schema for renderer/agent                |
-| `WRITE_FILE_TOOL` | Tool definition | `write_file` function schema for renderer/agent               |
-| `EDIT_FILE_TOOL`  | Tool definition | `edit_file` function schema for renderer/agent                |
-| `LIST_DIR_TOOL`   | Tool definition | `list_dir` function schema for renderer/agent                 |
-| `readFile(...)`   | Implementation  | Node-side file reader with line numbers and pagination        |
-| `writeFile(...)`  | Implementation  | Node-side file writer that creates parent directories         |
-| `editFile(...)`   | Implementation  | Node-side targeted file edit with duplicate-match protection  |
-| `listDir(...)`    | Implementation  | Node-side directory listing with recursive mode and filtering |
+## When To Update This File
 
-`getToolLabel(name)` returns a human-readable label for a tool name (e.g. `'read_file'` → `'Read File'`).
-
-## Shared Utilities
-
-```typescript
-import { openImageFile, fileExists, resolveSavePath } from 'share/lib/util'
-
-// Opens native file dialog; returns { file: File, filePath: string } | null
-const result = await openImageFile({ title: 'Open Image' })
-
-// Returns boolean
-const exists = await fileExists('/path/to/file')
-
-// Returns unique save path; appends -yyyymmddHH (or -yyyymmddHHMM) if path exists
-const savePath = await resolveSavePath('/path/to/recording.mp3')
-```
+Update this README when you change shared APIs, conventions, or recommended usage in `share/`.

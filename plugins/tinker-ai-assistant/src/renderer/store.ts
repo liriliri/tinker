@@ -7,7 +7,7 @@ import { createWebSearchToolResult } from 'share/tools/web'
 import * as db from './lib/db'
 import { TOOLS } from './lib/tools'
 import i18n from './i18n'
-import type { Session } from './types'
+import type { Session, SessionData } from './types'
 
 const storage = new LocalStore('tinker-ai-assistant')
 
@@ -93,8 +93,33 @@ function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
 
 function createSession(workingDir: string): Session {
   return {
-    messages: [],
     workingDir,
+    agent: createAgent(workingDir),
+  }
+}
+
+function createAgent(
+  workingDir: string,
+  initialMessages: SessionData['messages'] = []
+) {
+  return new Agent({
+    maxIterations: 3,
+    tools: buildAgentTools(() => workingDir || aiAssistant.getHomeDir()),
+    initialMessages,
+  })
+}
+
+function createSessionFromData(session: SessionData): Session {
+  return {
+    workingDir: session.workingDir,
+    agent: createAgent(session.workingDir, session.messages),
+  }
+}
+
+function serializeSession(session: Session): SessionData {
+  return {
+    workingDir: session.workingDir,
+    messages: session.agent.getMessages(),
   }
 }
 
@@ -109,30 +134,9 @@ class Store extends BaseStore {
 
   input: string = ''
 
-  private agent: Agent
-
   constructor() {
     super()
     makeAutoObservable(this)
-    this.agent = new Agent({
-      tools: buildAgentTools(
-        () =>
-          this.session.workingDir || this.workingDir || aiAssistant.getHomeDir()
-      ),
-      onMessage: (msg) => {
-        this.session.messages.push(msg)
-        this.saveSession()
-      },
-      onMessageUpdate: (id, patch) => {
-        const msg = this.session.messages.find((m) => m.id === id)
-        if (!msg) return
-        Object.assign(msg, patch)
-        if (patch.content !== undefined || patch.data !== undefined) {
-          this.saveSession()
-        }
-      },
-      getMessages: () => this.session.messages,
-    })
     this.init()
   }
 
@@ -151,11 +155,10 @@ class Store extends BaseStore {
     runInAction(() => {
       this.workingDir = savedWorkingDir
       if (savedSession) {
-        this.session = savedSession
+        this.session = createSessionFromData(savedSession)
       } else {
         this.session = createSession(savedWorkingDir)
       }
-      this.agent.setSystemPrompt(this.buildSystemPrompt())
     })
   }
 
@@ -204,11 +207,11 @@ class Store extends BaseStore {
   }
 
   get messages(): AgentMessage[] {
-    return this.session.messages
+    return this.session.agent.getMessages()
   }
 
   get isGenerating(): boolean {
-    return this.agent.isGenerating
+    return this.session.agent.isGenerating
   }
 
   get currentModels(): tinker.AiModel[] {
@@ -253,14 +256,11 @@ class Store extends BaseStore {
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
     storage.set(MODEL_KEY, firstModel)
-    this.agent.setProvider(name)
-    this.agent.setModel(firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
     storage.set(MODEL_KEY, name)
-    this.agent.setModel(name)
   }
 
   setSelectedCombined(val: string) {
@@ -272,28 +272,32 @@ class Store extends BaseStore {
     storage.set(PROVIDER_KEY, provider)
     this.selectedModel = model
     storage.set(MODEL_KEY, model)
-    this.agent.setProvider(provider)
-    this.agent.setModel(model)
   }
 
   setWorkingDir(dir: string) {
     this.workingDir = dir
     storage.set(WORKING_DIR_KEY, dir)
-    this.session.workingDir = dir
+    this.session = {
+      workingDir: dir,
+      agent: createAgent(dir, this.session.agent.getMessages()),
+    }
     this.saveSession()
   }
 
   clearMessages() {
-    this.session.messages = []
+    this.session.agent.clearMessages()
     this.saveSession()
   }
 
   private saveSession() {
-    const hasContent = this.session.messages.some(
+    const data = serializeSession(this.session)
+    const hasContent = data.messages.some(
       (m) => (m.role === 'user' || m.role === 'assistant') && m.content
     )
     if (hasContent) {
-      db.saveSession(this.session)
+      db.saveSession(data)
+    } else {
+      db.saveSession(data)
     }
   }
 
@@ -301,20 +305,24 @@ class Store extends BaseStore {
     if (!this.canSend) return
     const userText = this.input.trim()
     this.input = ''
-    this.agent.setProvider(this.selectedProvider)
-    this.agent.setModel(this.selectedModel)
-    this.agent.setSystemPrompt(this.buildSystemPrompt())
-    await this.agent.send(userText)
+    const agent = this.session.agent
+    agent.setProvider(this.selectedProvider)
+    agent.setModel(this.selectedModel)
+    agent.setSystemPrompt(this.buildSystemPrompt())
+    await agent.send(userText)
+    this.saveSession()
   }
 
   abortGeneration() {
-    this.agent.abort()
+    this.session.agent.abort()
+    this.saveSession()
   }
 
   async retryLastMessage() {
     if (this.isGenerating) return
 
-    const messages = this.session.messages
+    const agent = this.session.agent
+    const messages = agent.getMessages()
     let lastUserIdx = -1
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role === 'user') {
@@ -325,16 +333,17 @@ class Store extends BaseStore {
     if (lastUserIdx === -1) return
 
     const userContent = messages[lastUserIdx].content
-    this.session.messages = messages.slice(0, lastUserIdx)
+    agent.setMessages(messages.slice(0, lastUserIdx))
     this.saveSession()
-    this.agent.setProvider(this.selectedProvider)
-    this.agent.setModel(this.selectedModel)
-    this.agent.setSystemPrompt(this.buildSystemPrompt())
-    await this.agent.send(userContent)
+    agent.setProvider(this.selectedProvider)
+    agent.setModel(this.selectedModel)
+    agent.setSystemPrompt(this.buildSystemPrompt())
+    await agent.send(userContent)
+    this.saveSession()
   }
 
   deleteMessage(id: string) {
-    this.session.messages = this.session.messages.filter((m) => m.id !== id)
+    this.session.agent.deleteMessage(id)
     this.saveSession()
   }
 }

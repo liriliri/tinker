@@ -1,3 +1,4 @@
+import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
 import jsonClone from 'licia/jsonClone'
 
@@ -46,9 +47,7 @@ export interface AgentOptions {
   systemPrompt?: string
   tools?: AgentTool[]
   maxIterations?: number
-  onMessage: (msg: AgentMessage) => void
-  onMessageUpdate: (id: string, patch: Partial<AgentMessage>) => void
-  getMessages: () => AgentMessage[]
+  initialMessages?: AgentMessage[]
 }
 
 function getToolName(tool: AgentTool): string {
@@ -92,17 +91,19 @@ function accumulateToolCalls(
   return result.filter(Boolean)
 }
 
-export class Agent {
-  private provider: string
-  private model: string
-  private systemPrompt: string
-  private tools: AgentTool[]
-  private toolMap: Map<string, AgentTool>
-  private maxIterations: number
-  private onMessage: (msg: AgentMessage) => void
-  private onMessageUpdate: (id: string, patch: Partial<AgentMessage>) => void
-  private getMessages: () => AgentMessage[]
+function cloneMessages(messages: AgentMessage[]): AgentMessage[] {
+  return jsonClone(messages) as AgentMessage[]
+}
 
+export class Agent {
+  provider: string
+  model: string
+  systemPrompt: string
+  tools: AgentTool[]
+  maxIterations: number
+  messages: AgentMessage[] = []
+
+  private toolMap: Map<string, AgentTool>
   private streamTask: tinker.AiStreamTask | null = null
   private aborted: boolean = false
   isGenerating: boolean = false
@@ -114,9 +115,9 @@ export class Agent {
     this.tools = options.tools ?? []
     this.toolMap = buildToolMap(this.tools)
     this.maxIterations = options.maxIterations ?? 20
-    this.onMessage = options.onMessage
-    this.onMessageUpdate = options.onMessageUpdate
-    this.getMessages = options.getMessages
+    this.messages = cloneMessages(options.initialMessages ?? [])
+
+    makeAutoObservable(this)
   }
 
   setProvider(provider: string) {
@@ -136,13 +137,29 @@ export class Agent {
     this.toolMap = buildToolMap(tools)
   }
 
+  setMessages(messages: AgentMessage[]) {
+    this.messages = cloneMessages(messages)
+  }
+
+  getMessages(): AgentMessage[] {
+    return this.messages
+  }
+
+  clearMessages() {
+    this.messages = []
+  }
+
+  deleteMessage(id: string) {
+    this.messages = this.messages.filter((msg) => msg.id !== id)
+  }
+
   async send(userText: string): Promise<void> {
     const userMsg: AgentMessage = {
       id: uuid(),
       role: 'user',
       content: userText,
     }
-    this.onMessage(userMsg)
+    this.addMessage(userMsg)
 
     const assistantMsg: AgentMessage = {
       id: uuid(),
@@ -150,7 +167,7 @@ export class Agent {
       content: '',
       generating: true,
     }
-    this.onMessage(assistantMsg)
+    this.addMessage(assistantMsg)
     this.isGenerating = true
     this.aborted = false
 
@@ -163,15 +180,25 @@ export class Agent {
       this.streamTask.abort()
       this.streamTask = null
     }
-    const messages = this.getMessages()
-    for (const m of messages) {
+
+    for (const m of this.messages) {
       if (m.generating) {
         const patch: Partial<AgentMessage> = { generating: false }
         if (m.toolStatus === 'running') patch.toolStatus = 'error'
-        this.onMessageUpdate(m.id, patch)
+        this.updateMessage(m.id, patch)
       }
     }
     this.isGenerating = false
+  }
+
+  private addMessage(msg: AgentMessage) {
+    this.messages.push(msg)
+  }
+
+  private updateMessage(id: string, patch: Partial<AgentMessage>) {
+    const msg = this.messages.find((item) => item.id === id)
+    if (!msg) return
+    Object.assign(msg, patch)
   }
 
   private buildHistory(excludeMsgId: string): tinker.AiMessage[] {
@@ -181,7 +208,7 @@ export class Agent {
       history.push({ role: 'system', content: this.systemPrompt.trim() })
     }
 
-    for (const m of this.getMessages()) {
+    for (const m of this.messages) {
       if (m.id === excludeMsgId) continue
       if (m.generating) continue
 
@@ -215,7 +242,7 @@ export class Agent {
 
     for (let iteration = 0; iteration < this.maxIterations; iteration++) {
       if (this.aborted) {
-        this.onMessageUpdate(assistantMsgId, { generating: false })
+        this.updateMessage(assistantMsgId, { generating: false })
         break
       }
 
@@ -239,7 +266,7 @@ export class Agent {
             }
 
             if (chunk.error) {
-              this.onMessageUpdate(assistantMsgId, {
+              this.updateMessage(assistantMsgId, {
                 generating: false,
                 error: chunk.error,
               })
@@ -251,7 +278,7 @@ export class Agent {
 
             if (chunk.content) {
               fullContent += chunk.content
-              this.onMessageUpdate(assistantMsgId, { content: fullContent })
+              this.updateMessage(assistantMsgId, { content: fullContent })
             }
 
             if (chunk.toolCalls && chunk.toolCalls.length > 0) {
@@ -263,7 +290,7 @@ export class Agent {
 
             if (chunk.done) {
               done = true
-              this.onMessageUpdate(assistantMsgId, { generating: false })
+              this.updateMessage(assistantMsgId, { generating: false })
               this.streamTask = null
               resolve()
             }
@@ -279,7 +306,7 @@ export class Agent {
         break
       }
 
-      this.onMessageUpdate(assistantMsgId, { toolCalls: accToolCalls })
+      this.updateMessage(assistantMsgId, { toolCalls: accToolCalls })
 
       for (const toolCall of accToolCalls) {
         if (this.aborted) break
@@ -294,7 +321,7 @@ export class Agent {
         content: '',
         generating: true,
       }
-      this.onMessage(nextAssistantMsg)
+      this.addMessage(nextAssistantMsg)
       assistantMsgId = nextAssistantMsg.id
     }
 
@@ -322,10 +349,10 @@ export class Agent {
       toolStatus: 'running',
       generating: true,
     }
-    this.onMessage(toolMsg)
+    this.addMessage(toolMsg)
 
     if (!tool) {
-      this.onMessageUpdate(toolMsg.id, {
+      this.updateMessage(toolMsg.id, {
         content: `Error: Unknown tool "${toolName}"`,
         generating: false,
         toolStatus: 'error',
@@ -344,7 +371,7 @@ export class Agent {
 
     const content = typeof result === 'string' ? result : result.content
     const extraPatch = typeof result === 'string' ? {} : result
-    this.onMessageUpdate(toolMsg.id, {
+    this.updateMessage(toolMsg.id, {
       ...extraPatch,
       content,
       generating: false,

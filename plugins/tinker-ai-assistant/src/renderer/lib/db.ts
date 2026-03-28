@@ -1,11 +1,11 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import { toJS } from 'mobx'
-import type { Session } from '../types'
+import type { SessionData } from '../types'
 
 interface AiAssistantDB extends DBSchema {
   session: {
     key: string
-    value: Session
+    value: SessionData
   }
 }
 
@@ -29,12 +29,12 @@ function getDB(): Promise<IDBPDatabase<AiAssistantDB>> {
   return dbPromise
 }
 
-export async function loadSession(): Promise<Session | undefined> {
+export async function loadSession(): Promise<SessionData | undefined> {
   const db = await getDB()
   return db.get(STORE_NAME, SESSION_KEY)
 }
 
-export async function saveSession(session: Session): Promise<void> {
+export async function saveSession(session: SessionData): Promise<void> {
   const db = await getDB()
   await db.put(STORE_NAME, toJS(session), SESSION_KEY)
 }

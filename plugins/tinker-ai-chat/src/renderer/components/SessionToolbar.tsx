@@ -24,7 +24,7 @@ export default observer(function SessionToolbar() {
       <ToolbarButton
         title={t('clearMessages')}
         onClick={() => store.clearMessages()}
-        disabled={!store.activeSession?.messages.length}
+        disabled={!store.messages.length}
       >
         <Eraser size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>

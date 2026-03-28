@@ -1,11 +1,11 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import { toJS } from 'mobx'
-import type { Session } from '../types'
+import type { SessionData } from '../types'
 
 interface AiChatDB extends DBSchema {
   sessions: {
     key: string
-    value: Session
+    value: SessionData
   }
 }
 
@@ -28,12 +28,12 @@ function getDB(): Promise<IDBPDatabase<AiChatDB>> {
   return dbPromise
 }
 
-export async function getAllSessions(): Promise<Session[]> {
+export async function getAllSessions(): Promise<SessionData[]> {
   const db = await getDB()
   return db.getAll(STORE_NAME)
 }
 
-export async function putSession(session: Session): Promise<void> {
+export async function putSession(session: SessionData): Promise<void> {
   const db = await getDB()
   await db.put(STORE_NAME, toJS(session))
 }
