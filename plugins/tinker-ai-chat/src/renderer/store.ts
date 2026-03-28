@@ -4,9 +4,8 @@ import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
 import { Agent } from 'share/lib/Agent'
 import type { AgentTool } from 'share/lib/Agent'
+import { WEB_SEARCH_TOOL, formatWebSearchResults } from 'share/tools/web'
 import * as db from './lib/db'
-import { search, formatResults } from './lib/search'
-import i18n from './i18n'
 import type { Session } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
@@ -15,36 +14,13 @@ const ACTIVE_SESSION_KEY = 'activeSessionId'
 const PROVIDER_KEY = 'provider'
 const MODEL_KEY = 'model'
 
-const WEB_SEARCH_TOOL: AgentTool = {
-  definition: {
-    type: 'function',
-    function: {
-      name: 'web_search',
-      description:
-        'Search the web for up-to-date information, recent news, or real-time data. Use this when the user asks about current events, facts that may have changed, or anything requiring fresh information.',
-      parameters: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'The optimized search query string',
-          },
-        },
-        required: ['query'],
-      },
-    },
-  },
-  initMessage: (args) => ({
-    isSearching: true,
-    searchQuery: typeof args.query === 'string' ? args.query : '',
-  }),
+const WEB_SEARCH_AGENT_TOOL: AgentTool = {
+  definition: WEB_SEARCH_TOOL,
   execute: async (args) => {
     const query = typeof args.query === 'string' ? args.query : ''
-    const lang = i18n.language
-    const results = await search(query, lang)
+    const results = await aiChat.webSearch(query)
     return {
-      content: formatResults(results),
-      isSearching: false,
+      content: formatWebSearchResults(results),
       searchResults: results,
     }
   },
@@ -77,7 +53,7 @@ class Store extends BaseStore {
     makeAutoObservable(this)
     this.agent = new Agent({
       maxIterations: 3,
-      tools: [WEB_SEARCH_TOOL],
+      tools: [WEB_SEARCH_AGENT_TOOL],
       onMessage: (msg) => {
         const session = this.activeSession
         if (!session) return

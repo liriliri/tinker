@@ -1,5 +1,25 @@
 // Tool definitions for the AI assistant agent loop
 
+import { WEB_SEARCH_TOOL } from 'share/tools/web'
+
+const WEB_FETCH_TOOL = {
+  type: 'function',
+  function: {
+    name: 'web_fetch',
+    description: 'Fetch and extract readable text content from a URL.',
+    parameters: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'The URL to fetch content from',
+        },
+      },
+      required: ['url'],
+    },
+  },
+} as const
+
 export const TOOLS = [
   {
     type: 'function',
@@ -138,41 +158,8 @@ export const TOOLS = [
       },
     },
   },
-  {
-    type: 'function',
-    function: {
-      name: 'web_search',
-      description:
-        'Search the web for up-to-date information, recent news, or real-time data.',
-      parameters: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'The optimized search query string',
-          },
-        },
-        required: ['query'],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'web_fetch',
-      description: 'Fetch and extract readable text content from a URL.',
-      parameters: {
-        type: 'object',
-        properties: {
-          url: {
-            type: 'string',
-            description: 'The URL to fetch content from',
-          },
-        },
-        required: ['url'],
-      },
-    },
-  },
+  WEB_SEARCH_TOOL,
+  WEB_FETCH_TOOL,
 ] as const
 
 export type ToolName =

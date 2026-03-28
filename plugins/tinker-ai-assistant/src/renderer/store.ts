@@ -3,12 +3,12 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { Agent } from 'share/lib/Agent'
 import type { AgentMessage, AgentTool } from 'share/lib/Agent'
+import { formatWebSearchResults } from 'share/tools/web'
 import * as db from './lib/db'
-import { formatResults } from './lib/search'
 import { TOOLS } from './lib/tools'
 import i18n from './i18n'
 import type { Session } from './types'
-import type { SearchResult } from '../common/types'
+import type { WebSearchResult } from 'share/tools/web'
 
 const storage = new LocalStore('tinker-ai-assistant')
 
@@ -76,14 +76,11 @@ function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
           }
           case 'web_search': {
             const query = typeof args.query === 'string' ? args.query : ''
-            const lang = i18n.language
-            const results: SearchResult[] = await aiAssistant.webSearch(
-              query,
-              lang
+            const results: WebSearchResult[] = await aiAssistant.webSearch(
+              query
             )
             return {
-              content: formatResults(results),
-              isSearching: false,
+              content: formatWebSearchResults(results),
               searchResults: results,
             }
           }
@@ -95,12 +92,6 @@ function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
             return `Error: Unknown tool "${name}"`
         }
       },
-    }
-    if (name === 'web_search') {
-      tool.initMessage = (args) => ({
-        isSearching: true,
-        searchQuery: typeof args.query === 'string' ? args.query : '',
-      })
     }
     return tool
   })

@@ -12,16 +12,17 @@ interface Props {
 export default observer(function SearchCard({ msg }: Props) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
+  const query =
+    typeof msg.toolArgs?.query === 'string' ? msg.toolArgs.query : ''
 
-  if (msg.isSearching || (msg.generating && !msg.searchResults)) {
+  if (msg.toolStatus === 'running' || (msg.generating && !msg.searchResults)) {
     return (
       <div
         className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[11px] ${tw.border} ${tw.bg.secondary} ${tw.text.secondary}`}
       >
         <Search size={11} className="animate-pulse shrink-0" />
         <span>
-          {t('searching')}：
-          <span className={tw.text.primary}>{msg.searchQuery}</span>
+          {t('searching')}：<span className={tw.text.primary}>{query}</span>
         </span>
       </div>
     )
@@ -34,7 +35,7 @@ export default observer(function SearchCard({ msg }: Props) {
       >
         <Search size={11} className="shrink-0" />
         <span>
-          {t('searchFailed')}：{msg.searchQuery}
+          {t('searchFailed')}：{query}
         </span>
       </div>
     )
@@ -61,7 +62,7 @@ export default observer(function SearchCard({ msg }: Props) {
               <div
                 className={`min-w-0 flex-1 truncate text-[11px] font-medium leading-4 ${tw.text.primary}`}
               >
-                {msg.searchQuery}
+                {query}
               </div>
               <span className={`shrink-0 leading-none ${tw.text.tertiary}`}>
                 {count} {t('searchResults')}

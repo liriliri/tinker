@@ -5,12 +5,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFile } from 'node:child_process'
 import os from 'node:os'
-import type { SearchResult } from '../common/types'
+import { webSearch } from '../../../share/tools/webImpl'
+import type { WebSearchResult } from '../../../share/tools/web'
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 
-const MAX_SEARCH_RESULTS = 5
 const MAX_REDIRECTS = 5
 const EXEC_TIMEOUT_MS = 60_000
 const FETCH_TIMEOUT_MS = 15_000
@@ -106,11 +106,11 @@ function fetchHtml(url: string, redirectCount = 0): Promise<string> {
 function decodeHtml(html: string): string {
   return html
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
 }
 
 function stripTags(html: string): string {
@@ -119,9 +119,13 @@ function stripTags(html: string): string {
     .trim()
 }
 
+const MAX_HTML_CHARS = 200_000
+
 function htmlToText(html: string): string {
+  const truncated =
+    html.length > MAX_HTML_CHARS ? html.slice(0, MAX_HTML_CHARS) : html
   return stripTags(
-    html
+    truncated
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<(nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, ' ')
@@ -335,76 +339,6 @@ function listDir(
 }
 
 // ---------------------------------------------------------------------------
-// web search
-// ---------------------------------------------------------------------------
-
-interface SearchItem {
-  title: string
-  url: string
-}
-
-function parseResults(html: string, regex: RegExp): SearchItem[] {
-  const results: SearchItem[] = []
-  for (const match of html.matchAll(regex)) {
-    const url = match[1]
-    const title = stripTags(match[2])
-    if (!url || !title) continue
-    results.push({ title, url })
-    if (results.length >= MAX_SEARCH_RESULTS) break
-  }
-  return results
-}
-
-function parseGoogleResults(html: string): SearchItem[] {
-  return parseResults(
-    html,
-    /<a[^>]+href="(https?:\/\/[^"]+)"[^>]*>[\s\S]*?<h3[^>]*>([\s\S]*?)<\/h3>[\s\S]*?<\/a>/gi
-  )
-}
-
-function parseBaiduResults(html: string): SearchItem[] {
-  return parseResults(
-    html,
-    /<h3[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/h3>/gi
-  )
-}
-
-async function fetchContent(url: string): Promise<string> {
-  try {
-    const html = await fetchHtml(url)
-    return htmlToText(html)
-  } catch {
-    return ''
-  }
-}
-
-async function webSearch(query: string, lang: string): Promise<SearchResult[]> {
-  const isZh = lang.startsWith('zh')
-  const searchUrl = isZh
-    ? `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`
-    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
-  const parse = isZh ? parseBaiduResults : parseGoogleResults
-
-  const html = await fetchHtml(searchUrl)
-  const items = parse(html).filter((item) => item.url.startsWith('http'))
-
-  const settled = await Promise.allSettled(
-    items.map(async (item) => ({
-      title: item.title,
-      url: item.url,
-      content: await fetchContent(item.url),
-    }))
-  )
-
-  return settled
-    .filter(
-      (r): r is PromiseFulfilledResult<SearchResult> => r.status === 'fulfilled'
-    )
-    .map((r) => r.value)
-    .filter((r) => r.content.length > 0)
-}
-
-// ---------------------------------------------------------------------------
 // web fetch
 // ---------------------------------------------------------------------------
 
@@ -473,8 +407,8 @@ const aiAssistantObj = {
   ): string {
     return listDir(dirPath, workingDir, recursive, maxEntries)
   },
-  webSearch(query: string, lang: string): Promise<SearchResult[]> {
-    return webSearch(query, lang)
+  webSearch(query: string): Promise<WebSearchResult[]> {
+    return webSearch(query)
   },
   webFetch(url: string): Promise<string> {
     return webFetch(url)

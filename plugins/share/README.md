@@ -160,8 +160,8 @@ interface ChatMessage {
   generating?: boolean
   error?: string
   // tool role fields (web search)
-  isSearching?: boolean
-  searchQuery?: string
+  toolStatus?: 'running' | 'done' | 'error'
+  toolArgs?: Record<string, unknown>
   searchResults?: { title: string; url: string; content: string }[]
 }
 ```
@@ -240,16 +240,11 @@ const agent = new Agent({
   tools: [
     {
       definition: WEB_SEARCH_TOOL,     // function schema passed to the AI
-      initMessage: (args) => ({        // optional: extra fields on the initial tool message
-        isSearching: true,
-        searchQuery: args.query as string,
-      }),
       execute: async (args) => {
         // return a string, or { content: string, ...partial AgentMessage fields }
-        const results = await search(args.query as string, lang)
+        const results = await webSearch(args.query as string)
         return {
           content: formatSearchResults(results),
-          isSearching: false,
           searchResults: results,
         }
       },
@@ -293,8 +288,6 @@ interface AgentMessage {
   toolName?: string
   toolArgs?: Record<string, unknown>
   toolStatus?: 'running' | 'done' | 'error'
-  isSearching?: boolean
-  searchQuery?: string
   searchResults?: SearchResult[]       // { title, url, content }[]
 }
 ```
@@ -306,13 +299,18 @@ Reusable AI tool definitions for use with `Agent`.
 ### `share/tools/web`
 
 ```typescript
-import { WEB_SEARCH_TOOL, WEB_FETCH_TOOL } from 'share/tools/web'
+import {
+  WEB_SEARCH_TOOL,
+  formatWebSearchResults,
+} from 'share/tools/web'
+import { webSearch } from 'share/tools/webImpl'
 ```
 
-| Export | Tool name | Description |
+| Export | Type | Description |
 |---|---|---|
-| `WEB_SEARCH_TOOL` | `web_search` | Search the web via Google / Baidu |
-| `WEB_FETCH_TOOL` | `web_fetch` | Fetch readable text from a URL |
+| `WEB_SEARCH_TOOL` | Tool definition | `web_search` function schema for renderer/agent |
+| `formatWebSearchResults(results)` | Helper | Format search results to plain text for model context |
+| `webSearch(query)` | Implementation | Node-side web search implementation for preload (language from `tinker.getLanguage()`) |
 
 ### `share/tools/fileSystem`
 

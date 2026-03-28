@@ -1,5 +1,6 @@
 import uuid from 'licia/uuid'
 import jsonClone from 'licia/jsonClone'
+import type { WebSearchResult } from '../tools/web'
 
 export interface ToolCall {
   id: string
@@ -12,12 +13,6 @@ export interface ToolCall {
 
 export type ToolStatus = 'running' | 'done' | 'error'
 
-export interface SearchResult {
-  title: string
-  url: string
-  content: string
-}
-
 export interface AgentMessage {
   id: string
   role: 'user' | 'assistant' | 'tool'
@@ -29,9 +24,7 @@ export interface AgentMessage {
   toolName?: string
   toolArgs?: Record<string, unknown>
   toolStatus?: ToolStatus
-  isSearching?: boolean
-  searchQuery?: string
-  searchResults?: SearchResult[]
+  searchResults?: WebSearchResult[]
 }
 
 export type AgentToolResult =
@@ -40,8 +33,6 @@ export type AgentToolResult =
 
 export interface AgentTool {
   definition: object
-  /** Optional: enrich the initial tool message before it's emitted (e.g. set isSearching, searchQuery) */
-  initMessage?: (args: Record<string, unknown>) => Partial<AgentMessage>
   execute: (
     args: Record<string, unknown>
   ) => Promise<AgentToolResult> | AgentToolResult
@@ -97,12 +88,6 @@ function accumulateToolCalls(
   }
 
   return result.filter(Boolean)
-}
-
-export function formatSearchResults(results: SearchResult[]): string {
-  return results
-    .map((r, i) => `[${i + 1}] ${r.title}\nURL: ${r.url}\n${r.content}`)
-    .join('\n\n')
 }
 
 export class Agent {
@@ -180,7 +165,6 @@ export class Agent {
     for (const m of messages) {
       if (m.generating) {
         const patch: Partial<AgentMessage> = { generating: false }
-        if (m.isSearching) patch.isSearching = false
         if (m.toolStatus === 'running') patch.toolStatus = 'error'
         this.onMessageUpdate(m.id, patch)
       }
@@ -326,7 +310,6 @@ export class Agent {
 
     const tool = this.toolMap.get(toolName)
 
-    const initPatch = tool?.initMessage ? tool.initMessage(args) : {}
     const toolMsg: AgentMessage = {
       id: uuid(),
       role: 'tool',
@@ -336,7 +319,6 @@ export class Agent {
       toolArgs: args,
       toolStatus: 'running',
       generating: true,
-      ...initPatch,
     }
     this.onMessage(toolMsg)
 

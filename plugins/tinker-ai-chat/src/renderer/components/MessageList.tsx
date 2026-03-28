@@ -21,6 +21,9 @@ export default observer(function MessageList() {
     (msg) => msg.role !== 'tool'
   ) as BaseChatMessage[]
 
+  // Build an index map for O(1) lookups from id → original position
+  const indexById = new Map(messages.map((m, i) => [m.id, i]))
+
   function getToolMessages(msg: ChatMessage, index: number): ChatMessage[] {
     if (msg.role !== 'assistant') return []
     const toolMessages: ChatMessage[] = []
@@ -45,8 +48,7 @@ export default observer(function MessageList() {
       onDelete={(id) => store.deleteMessage(id)}
     >
       {(baseMsg) => {
-        // Map back to original index for tool message lookup
-        const originalIndex = messages.findIndex((m) => m.id === baseMsg.id)
+        const originalIndex = indexById.get(baseMsg.id) ?? -1
         const msg = messages[originalIndex]
         const toolMessages = getToolMessages(msg, originalIndex)
 
