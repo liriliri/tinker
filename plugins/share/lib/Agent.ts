@@ -58,6 +58,18 @@ export interface AgentOptions {
   getMessages: () => AgentMessage[]
 }
 
+function getToolName(tool: AgentTool): string {
+  const def = tool.definition as {
+    function?: { name?: string }
+    name?: string
+  }
+  return def.function?.name ?? def.name ?? ''
+}
+
+function buildToolMap(tools: AgentTool[]): Map<string, AgentTool> {
+  return new Map(tools.map((t) => [getToolName(t), t]))
+}
+
 function accumulateToolCalls(
   existing: ToolCall[],
   chunkToolCalls: Record<string, unknown>[]
@@ -98,6 +110,7 @@ export class Agent {
   private model: string
   private systemPrompt: string
   private tools: AgentTool[]
+  private toolMap: Map<string, AgentTool>
   private maxIterations: number
   private onMessage: (msg: AgentMessage) => void
   private onMessageUpdate: (id: string, patch: Partial<AgentMessage>) => void
@@ -112,6 +125,7 @@ export class Agent {
     this.model = options.model ?? ''
     this.systemPrompt = options.systemPrompt ?? ''
     this.tools = options.tools ?? []
+    this.toolMap = buildToolMap(this.tools)
     this.maxIterations = options.maxIterations ?? 20
     this.onMessage = options.onMessage
     this.onMessageUpdate = options.onMessageUpdate
@@ -132,6 +146,7 @@ export class Agent {
 
   setTools(tools: AgentTool[]) {
     this.tools = tools
+    this.toolMap = buildToolMap(tools)
   }
 
   async send(userText: string): Promise<void> {
@@ -152,7 +167,7 @@ export class Agent {
     this.isGenerating = true
     this.aborted = false
 
-    await this.runAILoop(assistantMsg.id, 0)
+    await this.runAILoop(assistantMsg.id)
   }
 
   abort() {
@@ -209,99 +224,95 @@ export class Agent {
     return history
   }
 
-  private async runAILoop(
-    assistantMsgId: string,
-    iteration: number
-  ): Promise<void> {
-    if (this.aborted || iteration >= this.maxIterations) {
-      this.onMessageUpdate(assistantMsgId, { generating: false })
-      this.isGenerating = false
-      return
-    }
+  private async runAILoop(initialAssistantMsgId: string): Promise<void> {
+    let assistantMsgId = initialAssistantMsgId
 
-    const history = this.buildHistory(assistantMsgId)
-    let fullContent = ''
-    let accToolCalls: ToolCall[] = []
-    let done = false
+    for (let iteration = 0; iteration < this.maxIterations; iteration++) {
+      if (this.aborted) {
+        this.onMessageUpdate(assistantMsgId, { generating: false })
+        break
+      }
 
-    await new Promise<void>((resolve) => {
-      this.streamTask = tinker.callAIStream(
-        jsonClone({
-          provider: this.provider,
-          model: this.model,
-          messages: history,
-          tools: this.tools.map((t) => t.definition),
-        }),
-        (chunk) => {
-          if (this.aborted) {
-            resolve()
-            return
+      const history = this.buildHistory(assistantMsgId)
+      let fullContent = ''
+      let accToolCalls: ToolCall[] = []
+      let done = false
+
+      await new Promise<void>((resolve) => {
+        this.streamTask = tinker.callAIStream(
+          jsonClone({
+            provider: this.provider,
+            model: this.model,
+            messages: history,
+            tools: this.tools.map((t) => t.definition),
+          }),
+          (chunk) => {
+            if (this.aborted) {
+              resolve()
+              return
+            }
+
+            if (chunk.error) {
+              this.onMessageUpdate(assistantMsgId, {
+                generating: false,
+                error: chunk.error,
+              })
+              this.isGenerating = false
+              this.streamTask = null
+              resolve()
+              return
+            }
+
+            if (chunk.content) {
+              fullContent += chunk.content
+              this.onMessageUpdate(assistantMsgId, { content: fullContent })
+            }
+
+            if (chunk.toolCalls && chunk.toolCalls.length > 0) {
+              accToolCalls = accumulateToolCalls(
+                accToolCalls,
+                chunk.toolCalls as Record<string, unknown>[]
+              )
+            }
+
+            if (chunk.done) {
+              done = true
+              this.onMessageUpdate(assistantMsgId, { generating: false })
+              this.streamTask = null
+              resolve()
+            }
           }
+        )
+      })
 
-          if (chunk.error) {
-            this.onMessageUpdate(assistantMsgId, {
-              generating: false,
-              error: chunk.error,
-            })
-            this.isGenerating = false
-            this.streamTask = null
-            resolve()
-            return
-          }
+      if (!done || this.aborted) {
+        break
+      }
 
-          if (chunk.content) {
-            fullContent += chunk.content
-            this.onMessageUpdate(assistantMsgId, { content: fullContent })
-          }
+      if (accToolCalls.length === 0) {
+        break
+      }
 
-          if (chunk.toolCalls && chunk.toolCalls.length > 0) {
-            accToolCalls = accumulateToolCalls(
-              accToolCalls,
-              chunk.toolCalls as Record<string, unknown>[]
-            )
-          }
+      this.onMessageUpdate(assistantMsgId, { toolCalls: accToolCalls })
 
-          if (chunk.done) {
-            done = true
-            this.onMessageUpdate(assistantMsgId, { generating: false })
-            this.streamTask = null
-            resolve()
-          }
-        }
-      )
-    })
+      for (const toolCall of accToolCalls) {
+        if (this.aborted) break
+        await this.executeToolCall(toolCall)
+      }
 
-    if (!done || this.aborted) {
-      this.isGenerating = false
-      return
-    }
-
-    if (accToolCalls.length === 0) {
-      this.isGenerating = false
-      return
-    }
-
-    this.onMessageUpdate(assistantMsgId, { toolCalls: accToolCalls })
-
-    for (const toolCall of accToolCalls) {
       if (this.aborted) break
-      await this.executeToolCall(toolCall)
+
+      const nextAssistantMsg: AgentMessage = {
+        id: uuid(),
+        role: 'assistant',
+        content: '',
+        generating: true,
+      }
+      this.onMessage(nextAssistantMsg)
+      assistantMsgId = nextAssistantMsg.id
     }
 
-    if (this.aborted) {
-      this.isGenerating = false
-      return
-    }
-
-    const nextAssistantMsg: AgentMessage = {
-      id: uuid(),
-      role: 'assistant',
-      content: '',
-      generating: true,
-    }
-    this.onMessage(nextAssistantMsg)
-
-    await this.runAILoop(nextAssistantMsg.id, iteration + 1)
+    this.isGenerating = false
   }
 
   private async executeToolCall(toolCall: ToolCall): Promise<void> {
@@ -313,13 +324,7 @@ export class Agent {
       // ignore parse error
     }
 
-    const tool = this.tools.find((t) => {
-      const def = t.definition as {
-        function?: { name?: string }
-        name?: string
-      }
-      return (def.function?.name ?? def.name) === toolName
-    })
+    const tool = this.toolMap.get(toolName)
 
     const initPatch = tool?.initMessage ? tool.initMessage(args) : {}
     const toolMsg: AgentMessage = {
@@ -344,11 +349,13 @@ export class Agent {
       return
     }
 
+    let isError = false
     let result: AgentToolResult = ''
     try {
       result = await tool.execute(args)
     } catch (e) {
       result = `Error: ${e instanceof Error ? e.message : String(e)}`
+      isError = true
     }
 
     const content = typeof result === 'string' ? result : result.content
@@ -357,7 +364,7 @@ export class Agent {
       ...extraPatch,
       content,
       generating: false,
-      toolStatus: content.startsWith('Error') ? 'error' : 'done',
+      toolStatus: isError ? 'error' : 'done',
     })
   }
 }
