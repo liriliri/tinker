@@ -36,7 +36,6 @@ export const getApps: IpcGetApps = async (force = false) => {
     const installedApps: any[] = (plist.parse(stdout) as any)[0]._items
 
     const discoveredApps: IApp[] = []
-    const appPromises: Promise<void>[] = []
     for (let i = 0, len = installedApps.length; i < len; i++) {
       const { path, _name } = installedApps[i]
 
@@ -44,17 +43,13 @@ export const getApps: IpcGetApps = async (force = false) => {
         continue
       }
 
-      appPromises.push(
-        extractIcon(path).then((icon) => {
-          discoveredApps.push({
-            name: _name,
-            path,
-            icon,
-          })
-        })
-      )
+      const icon = await extractIcon(path)
+      discoveredApps.push({
+        name: _name,
+        path,
+        icon,
+      })
     }
-    await Promise.all(appPromises)
     apps.push(...unique(discoveredApps, (a, b) => a.path === b.path))
   } catch (e) {
     logger.warn('failed to get apps:', e)
