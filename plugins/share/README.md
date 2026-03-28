@@ -102,11 +102,14 @@ import {
   MessageList,
   ChatInput,
   MarkdownContent,
+  SearchCard,
   type ChatMessage,
 } from 'share/components/AiChat'
 ```
 
 Use `MessageList` and `ChatInput` for rendering only; provide your own `messages`, `send`, `retry`, `delete`, and session switching logic.
+Use `SearchCard` for `web_search` tool results and pass plain UI data like `query`, `results`, `isRunning`, and `error` from the plugin host.
+Use `getSearchCardProps(toolMsg)` to extract `SearchCardProps` from an `AgentMessage` — it handles safe data extraction and `isRunning` detection.
 
 ### Other Common Components
 

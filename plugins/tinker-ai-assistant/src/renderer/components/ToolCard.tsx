@@ -13,7 +13,6 @@ import {
 import { tw } from 'share/theme'
 import { getToolLabel } from '../lib/tools'
 import type { ChatMessage } from '../types'
-import SearchCard from './SearchCard'
 
 interface Props {
   msg: ChatMessage
@@ -62,11 +61,6 @@ function getArgSummary(name: string, args: Record<string, unknown>): string {
 export default observer(function ToolCard({ msg }: Props) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
-
-  // Delegate web_search to SearchCard
-  if (msg.toolName === 'web_search') {
-    return <SearchCard msg={msg} />
-  }
 
   const toolName = msg.toolName ?? ''
   const args = msg.toolArgs ?? {}

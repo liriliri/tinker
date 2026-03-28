@@ -4,6 +4,8 @@ import {
   MessageItem as BaseMessageItem,
   type MessageItemProps as BaseProps,
   type ChatMessage as BaseChatMessage,
+  SearchCard,
+  getSearchCardProps,
 } from 'share/components/AiChat'
 import store from '../store'
 import type { ChatMessage } from '../types'
@@ -20,7 +22,21 @@ export default observer(function MessageItem({
 }: Props) {
   const { t } = useTranslation()
 
+  function openSearchResult(url: string) {
+    aiAssistant.openExternal(url)
+  }
+
   if (msg.role === 'tool') {
+    if (msg.toolName === 'web_search') {
+      const searchCardProps = getSearchCardProps(msg)
+
+      return (
+        <div className="px-4 py-1">
+          <SearchCard {...searchCardProps} onOpenResult={openSearchResult} />
+        </div>
+      )
+    }
+
     return (
       <div className="px-4 py-1">
         <ToolCard msg={msg} />
@@ -31,9 +47,21 @@ export default observer(function MessageItem({
   const footer =
     msg.role === 'assistant' && toolMessages.length > 0 ? (
       <>
-        {toolMessages.map((toolMsg) => (
-          <ToolCard key={toolMsg.id} msg={toolMsg} />
-        ))}
+        {toolMessages.map((toolMsg) => {
+          if (toolMsg.toolName === 'web_search') {
+            const searchCardProps = getSearchCardProps(toolMsg)
+
+            return (
+              <SearchCard
+                key={toolMsg.id}
+                {...searchCardProps}
+                onOpenResult={openSearchResult}
+              />
+            )
+          }
+
+          return <ToolCard key={toolMsg.id} msg={toolMsg} />
+        })}
       </>
     ) : undefined
 

@@ -290,15 +290,7 @@ class Store extends BaseStore {
   }
 
   private saveSession() {
-    const data = serializeSession(this.session)
-    const hasContent = data.messages.some(
-      (m) => (m.role === 'user' || m.role === 'assistant') && m.content
-    )
-    if (hasContent) {
-      db.saveSession(data)
-    } else {
-      db.saveSession(data)
-    }
+    db.saveSession(serializeSession(this.session))
   }
 
   async sendMessage() {
