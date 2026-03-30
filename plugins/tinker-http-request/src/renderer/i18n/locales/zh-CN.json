@@ -13,9 +13,7 @@
   "headerKey": "请求头名",
   "headerValue": "请求头值",
   "bodyNone": "无",
-  "noBody": "此请求没有请求体",
-  "jsonPlaceholder": "{ \"key\": \"value\" }",
-  "rawPlaceholder": "原始请求体内容...",
+  "noBody": "未设置任何请求体",
   "authNone": "无",
   "username": "用户名",
   "password": "密码",
@@ -40,5 +38,7 @@
   "enabled": "启用",
   "key": "键",
   "value": "值",
+  "formKey": "字段名",
+  "formValue": "字段值",
   "actions": "操作"
 }

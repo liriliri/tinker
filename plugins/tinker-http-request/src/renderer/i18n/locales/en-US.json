@@ -13,9 +13,7 @@
   "headerKey": "Header name",
   "headerValue": "Header value",
   "bodyNone": "None",
-  "noBody": "This request does not have a body",
-  "jsonPlaceholder": "{ \"key\": \"value\" }",
-  "rawPlaceholder": "Raw body content...",
+  "noBody": "No request body configured",
   "authNone": "None",
   "username": "Username",
   "password": "Password",
@@ -40,5 +38,7 @@
   "enabled": "Enabled",
   "key": "Key",
   "value": "Value",
+  "formKey": "Field name",
+  "formValue": "Field value",
   "actions": "Actions"
 }

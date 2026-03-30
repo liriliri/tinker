@@ -13,7 +13,7 @@ export interface KeyValuePair {
   enabled: boolean
 }
 
-export type BodyType = 'none' | 'json' | 'form-urlencoded' | 'form-data' | 'raw'
+export type BodyType = 'none' | 'json' | 'form-urlencoded' | 'text'
 export type AuthType = 'none' | 'basic' | 'bearer'
 
 export interface RequestConfig {

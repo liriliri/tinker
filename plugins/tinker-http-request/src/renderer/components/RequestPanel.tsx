@@ -1,43 +1,41 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { Editor } from '@monaco-editor/react'
 import Select from 'share/components/Select'
-import { tw, THEME_COLORS } from 'share/theme'
+import { tw } from 'share/theme'
 import store from '../store'
+import TabBar from './TabBar'
 import KeyValueEditor from './KeyValueEditor'
 import type { BodyType } from '../../common/types'
 
 const TABS = ['params', 'headers', 'body'] as const
 
+const BASE_EDITOR_OPTIONS = {
+  minimap: { enabled: false },
+  fontSize: 12,
+  lineNumbers: 'on' as const,
+  scrollBeyondLastLine: false,
+  automaticLayout: true,
+  tabSize: 2,
+  wordWrap: 'on' as const,
+}
+
+const JSON_EDITOR_OPTIONS = {
+  ...BASE_EDITOR_OPTIONS,
+  formatOnPaste: true,
+  formatOnType: true,
+}
+
+const TEXT_EDITOR_OPTIONS = BASE_EDITOR_OPTIONS
+
 export default observer(function RequestPanel() {
   const { t } = useTranslation()
-  const tabsRef = useRef<HTMLDivElement>(null)
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
-
-  const updateIndicator = useCallback(() => {
-    const activeEl = tabRefs.current[store.activeRequestTab]
-    const container = tabsRef.current
-    if (activeEl && container) {
-      const containerRect = container.getBoundingClientRect()
-      const tabRect = activeEl.getBoundingClientRect()
-      setIndicatorStyle({
-        left: tabRect.left - containerRect.left,
-        width: tabRect.width,
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    updateIndicator()
-  }, [store.activeRequestTab, updateIndicator])
 
   const bodyTypeOptions: { label: string; value: BodyType }[] = [
     { label: t('bodyNone'), value: 'none' },
     { label: 'JSON', value: 'json' },
-    { label: 'Form URL Encoded', value: 'form-urlencoded' },
-    { label: 'Form Data', value: 'form-data' },
-    { label: 'Raw', value: 'raw' },
+    { label: 'URL Encoded', value: 'form-urlencoded' },
+    { label: 'Text', value: 'text' },
   ]
 
   const tabLabels: Record<string, string> = {
@@ -48,33 +46,24 @@ export default observer(function RequestPanel() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 px-3">
-      <div ref={tabsRef} className={`relative flex border-b ${tw.border}`}>
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            ref={(el) => {
-              tabRefs.current[tab] = el
-            }}
-            onClick={() => store.setActiveRequestTab(tab)}
-            className={`px-3 py-1.5 text-xs transition-colors ${
-              store.activeRequestTab === tab
-                ? tw.primary.text
-                : `${tw.text.secondary} ${tw.hover}`
-            }`}
-          >
-            {tabLabels[tab]}
-          </button>
-        ))}
-        <div
-          className="absolute bottom-0 h-0.5"
-          style={{
-            left: indicatorStyle.left,
-            width: indicatorStyle.width,
-            backgroundColor: THEME_COLORS.primary,
-            transition: 'left 0.25s ease, width 0.25s ease',
-          }}
-        />
-      </div>
+      <TabBar
+        tabs={TABS}
+        activeTab={store.activeRequestTab}
+        labels={tabLabels}
+        onTabChange={(tab) =>
+          store.setActiveRequestTab(tab as (typeof TABS)[number])
+        }
+        right={
+          store.activeRequestTab === 'body' ? (
+            <Select
+              value={store.bodyType}
+              onChange={(val) => store.setBodyType(val as BodyType)}
+              options={bodyTypeOptions}
+              className="w-28 h-7"
+            />
+          ) : undefined
+        }
+      />
 
       <div className="flex-1 flex flex-col min-h-0 py-3">
         {store.activeRequestTab === 'params' && (
@@ -100,38 +89,41 @@ export default observer(function RequestPanel() {
         )}
 
         {store.activeRequestTab === 'body' && (
-          <div className="flex flex-col gap-3 flex-1 min-h-0">
-            <Select
-              value={store.bodyType}
-              onChange={(val) => store.setBodyType(val as BodyType)}
-              options={bodyTypeOptions}
-              className="w-44 h-7"
-            />
-
+          <div className="flex flex-col flex-1 min-h-0">
             {store.bodyType === 'none' && (
-              <div className={`text-xs ${tw.text.tertiary}`}>{t('noBody')}</div>
+              <div
+                className={`flex-1 flex items-center justify-center text-xs ${tw.text.tertiary}`}
+              >
+                {t('noBody')}
+              </div>
             )}
 
-            {(store.bodyType === 'json' || store.bodyType === 'raw') && (
-              <textarea
-                value={store.body}
-                onChange={(e) => store.setBody(e.target.value)}
-                placeholder={
-                  store.bodyType === 'json'
-                    ? t('jsonPlaceholder')
-                    : t('rawPlaceholder')
-                }
-                className={`w-full h-40 px-3 py-2 text-xs font-mono border ${tw.border} rounded ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing} resize-y`}
-              />
+            {(store.bodyType === 'json' || store.bodyType === 'text') && (
+              <div
+                className={`flex-1 min-h-0 border ${tw.border} rounded overflow-hidden`}
+              >
+                <Editor
+                  value={store.body}
+                  language={store.bodyType === 'json' ? 'json' : 'plaintext'}
+                  onChange={(value) => store.setBody(value || '')}
+                  options={
+                    store.bodyType === 'json'
+                      ? JSON_EDITOR_OPTIONS
+                      : TEXT_EDITOR_OPTIONS
+                  }
+                  theme={store.isDark ? 'vs-dark' : 'vs'}
+                />
+              </div>
             )}
 
-            {(store.bodyType === 'form-urlencoded' ||
-              store.bodyType === 'form-data') && (
+            {store.bodyType === 'form-urlencoded' && (
               <KeyValueEditor
                 items={store.formData}
                 onUpdate={(i, f, v) => store.updatePair('formData', i, f, v)}
                 onAdd={() => store.addPair('formData')}
                 onRemove={(i) => store.removePair('formData', i)}
+                keyPlaceholder={t('formKey')}
+                valuePlaceholder={t('formValue')}
               />
             )}
           </div>

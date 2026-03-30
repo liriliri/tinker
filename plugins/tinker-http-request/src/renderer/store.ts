@@ -124,7 +124,23 @@ class Store extends BaseStore {
 
   get isDirty(): boolean {
     if (this.isTemporary) return false
-    return JSON.stringify(this.getRequestConfig()) !== this.savedSnapshot
+    return this.requestSnapshot !== this.savedSnapshot
+  }
+
+  private get requestSnapshot(): string {
+    return JSON.stringify({
+      method: this.method,
+      url: this.url,
+      headers: this.headers,
+      params: this.params,
+      bodyType: this.bodyType,
+      body: this.body,
+      formData: this.formData,
+      authType: this.authType,
+      authBasicUser: this.authBasicUser,
+      authBasicPass: this.authBasicPass,
+      authBearerToken: this.authBearerToken,
+    })
   }
 
   private async loadCollections() {

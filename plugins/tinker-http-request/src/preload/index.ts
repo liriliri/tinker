@@ -3,7 +3,6 @@ import * as http from 'http'
 import * as https from 'https'
 import * as querystring from 'querystring'
 import filter from 'licia/filter'
-import map from 'licia/map'
 import each from 'licia/each'
 import type { RequestConfig, HttpResponse, KeyValuePair } from '../common/types'
 
@@ -84,18 +83,7 @@ const httpRequestObj = {
               formObj[p.key] = p.value
             })
             bodyData = querystring.stringify(formObj)
-          } else if (config.bodyType === 'form-data') {
-            const boundary =
-              '----TinkerFormBoundary' + Math.random().toString(36).slice(2)
-            headers[
-              'Content-Type'
-            ] = `multipart/form-data; boundary=${boundary}`
-            const enabledFormData = getEnabledPairs(config.formData)
-            const parts = map(enabledFormData, (p: KeyValuePair) => {
-              return `--${boundary}\r\nContent-Disposition: form-data; name="${p.key}"\r\n\r\n${p.value}`
-            })
-            bodyData = parts.join('\r\n') + `\r\n--${boundary}--\r\n`
-          } else if (config.bodyType === 'raw') {
+          } else if (config.bodyType === 'text') {
             bodyData = config.body
           }
         }

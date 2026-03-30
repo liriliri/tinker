@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
@@ -113,9 +114,12 @@ export default observer(function KeyValueEditor({
   onUpdate,
   onAdd,
   onRemove,
-  keyPlaceholder = 'Key',
-  valuePlaceholder = 'Value',
+  keyPlaceholder,
+  valuePlaceholder,
 }: KeyValueEditorProps) {
+  const { t } = useTranslation()
+  const resolvedKeyPlaceholder = keyPlaceholder || t('key')
+  const resolvedValuePlaceholder = valuePlaceholder || t('value')
   const gridRef = useRef<AgGridReact<RowData>>(null)
 
   const rowData: RowData[] = useMemo(() => {
@@ -155,7 +159,7 @@ export default observer(function KeyValueEditor({
         suppressMovable: true,
       },
       {
-        headerName: keyPlaceholder,
+        headerName: resolvedKeyPlaceholder,
         field: 'key',
         flex: 1,
         minWidth: 120,
@@ -163,7 +167,7 @@ export default observer(function KeyValueEditor({
         suppressMovable: true,
         cellRenderer: InputRenderer,
         cellRendererParams: {
-          placeholder: keyPlaceholder,
+          placeholder: resolvedKeyPlaceholder,
           field: 'key',
           onUpdate,
           onAdd,
@@ -171,7 +175,7 @@ export default observer(function KeyValueEditor({
         },
       },
       {
-        headerName: valuePlaceholder,
+        headerName: resolvedValuePlaceholder,
         field: 'value',
         flex: 1,
         minWidth: 120,
@@ -179,7 +183,7 @@ export default observer(function KeyValueEditor({
         suppressMovable: true,
         cellRenderer: InputRenderer,
         cellRendererParams: {
-          placeholder: valuePlaceholder,
+          placeholder: resolvedValuePlaceholder,
           field: 'value',
           onUpdate,
           onAdd,
@@ -198,7 +202,14 @@ export default observer(function KeyValueEditor({
         suppressMovable: true,
       },
     ],
-    [keyPlaceholder, valuePlaceholder, onUpdate, onRemove, onAdd, items.length]
+    [
+      resolvedKeyPlaceholder,
+      resolvedValuePlaceholder,
+      onUpdate,
+      onRemove,
+      onAdd,
+      items.length,
+    ]
   )
 
   const getRowId = useCallback(
