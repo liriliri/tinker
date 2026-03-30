@@ -1,6 +1,7 @@
 {
   "urlPlaceholder": "输入 URL...",
   "send": "发送",
+  "save": "保存",
   "cancel": "取消",
   "params": "参数",
   "headers": "请求头",

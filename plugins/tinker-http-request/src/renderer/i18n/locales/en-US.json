@@ -1,6 +1,7 @@
 {
   "urlPlaceholder": "Enter URL...",
   "send": "Send",
+  "save": "Save",
   "cancel": "Cancel",
   "params": "Params",
   "headers": "Headers",

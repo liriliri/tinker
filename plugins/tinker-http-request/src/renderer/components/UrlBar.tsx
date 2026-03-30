@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Send, X } from 'lucide-react'
+import { Save, Send, X } from 'lucide-react'
 import { tw } from 'share/theme'
 import store from '../store'
 import { METHOD_COLORS } from '../../lib/util'
@@ -60,6 +60,16 @@ export default observer(function UrlBar() {
           placeholder={t('urlPlaceholder')}
           className={`flex-1 bg-transparent px-2 py-2 text-xs ${tw.text.primary} focus:outline-none placeholder:text-gray-400`}
         />
+        {!store.isTemporary && (
+          <button
+            onClick={() => store.saveCurrentRequest()}
+            disabled={!store.isDirty}
+            title={t('save')}
+            className={`flex items-center px-2 py-2 text-xs ${tw.text.secondary} hover:${tw.primary.text} disabled:opacity-30 disabled:cursor-not-allowed`}
+          >
+            <Save size={14} />
+          </button>
+        )}
         {store.loading ? (
           <button
             onClick={() => store.abort()}

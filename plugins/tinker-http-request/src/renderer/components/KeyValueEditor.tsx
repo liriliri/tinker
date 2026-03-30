@@ -202,7 +202,8 @@ export default observer(function KeyValueEditor({
   )
 
   const getRowId = useCallback(
-    (params: { data: RowData }) => String(params.data.index),
+    (params: { data: RowData }) =>
+      `${params.data.index}-${params.data.isLastEmpty}`,
     []
   )
 

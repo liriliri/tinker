@@ -1,8 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import jsonClone from 'licia/jsonClone'
 import uuid from 'licia/uuid'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import * as db from '../lib/db'
 import type {
   HttpMethod,
   KeyValuePair,
@@ -16,9 +16,6 @@ import type {
 
 type RequestTab = 'params' | 'headers' | 'body' | 'auth'
 type ResponseTab = 'body' | 'headers'
-
-const storage = new LocalStore('tinker-http-request')
-const COLLECTIONS_KEY = 'collections'
 
 function getDefaultRequestConfig(): RequestConfig {
   return {
@@ -113,6 +110,7 @@ class Store extends BaseStore {
   selectedItemId: string | null = null
 
   private syncing = false
+  private savedSnapshot: string = ''
 
   constructor() {
     super()
@@ -124,15 +122,24 @@ class Store extends BaseStore {
     return this.selectedItemId === null
   }
 
-  private loadCollections() {
-    const saved = storage.get(COLLECTIONS_KEY)
-    if (saved) {
-      this.collections = saved
+  get isDirty(): boolean {
+    if (this.isTemporary) return false
+    return JSON.stringify(this.getRequestConfig()) !== this.savedSnapshot
+  }
+
+  private async loadCollections() {
+    try {
+      const collections = await db.getAllCollections()
+      runInAction(() => {
+        this.collections = collections
+      })
+    } catch (error) {
+      console.error('Failed to load collections:', error)
     }
   }
 
   private saveCollections() {
-    storage.set(COLLECTIONS_KEY, jsonClone(this.collections))
+    db.saveAllCollections(jsonClone(this.collections))
   }
 
   private loadRequestConfig(config: RequestConfig) {
@@ -147,6 +154,7 @@ class Store extends BaseStore {
     this.authBasicUser = config.authBasicUser
     this.authBasicPass = config.authBasicPass
     this.authBearerToken = config.authBearerToken
+    this.savedSnapshot = JSON.stringify(config)
   }
 
   private saveCurrentToSelected() {
@@ -181,6 +189,7 @@ class Store extends BaseStore {
 
   saveCurrentRequest() {
     this.saveCurrentToSelected()
+    this.savedSnapshot = JSON.stringify(this.getRequestConfig())
   }
 
   // Collection CRUD
@@ -264,6 +273,7 @@ class Store extends BaseStore {
       request: getDefaultRequestConfig(),
     }
     this.addItemToParent(parentId, request)
+    this.selectItem(request.id)
   }
 
   renameRequest(requestId: string, name: string) {

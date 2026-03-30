@@ -107,17 +107,12 @@ export default observer(function GroupTree() {
           <span
             className={className(
               'text-sm flex-1 truncate',
-              isActive ? 'text-white font-medium' : tw.text.primary
+              isActive ? 'font-medium' : tw.text.primary
             )}
           >
             {node.label}
           </span>
-          <span
-            className={className(
-              'text-xs ml-2',
-              isActive ? 'text-white opacity-90' : tw.text.secondary
-            )}
-          >
+          <span className={className('text-xs ml-2', tw.text.secondary)}>
             {node.entryCount}
           </span>
         </>

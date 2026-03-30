@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Folder, Plus } from 'lucide-react'
+import { Folder, GalleryVerticalEnd, Plus } from 'lucide-react'
 import { tw } from 'share/theme'
 import {
   Toolbar,
@@ -65,7 +65,7 @@ export default observer(function CollectionTree() {
   const handleNewCollection = async () => {
     const name = await prompt({
       title: t('newCollection'),
-      defaultValue: t('newCollection'),
+      defaultValue: '',
     })
     if (name) {
       store.createCollection(name)
@@ -79,23 +79,11 @@ export default observer(function CollectionTree() {
 
     if (node.nodeType === 'collection') {
       items.push({
-        label: t('newFolder'),
-        click: async () => {
-          const name = await prompt({
-            title: t('newFolder'),
-            defaultValue: t('newFolder'),
-          })
-          if (name) {
-            store.createFolder(node.id, name)
-          }
-        },
-      })
-      items.push({
         label: t('newRequest'),
         click: async () => {
           const name = await prompt({
             title: t('newRequest'),
-            defaultValue: t('newRequest'),
+            defaultValue: '',
           })
           if (name) {
             store.createRequest(node.id, name)
@@ -145,7 +133,7 @@ export default observer(function CollectionTree() {
         click: async () => {
           const name = await prompt({
             title: t('newRequest'),
-            defaultValue: t('newRequest'),
+            defaultValue: '',
           })
           if (name) {
             store.createRequest(node.id, name)
@@ -210,6 +198,10 @@ export default observer(function CollectionTree() {
   return (
     <div className="h-full flex flex-col">
       <Toolbar>
+        <GalleryVerticalEnd
+          size={TOOLBAR_ICON_SIZE}
+          className={tw.text.secondary}
+        />
         <ToolbarLabel>{t('collections')}</ToolbarLabel>
         <ToolbarSpacer />
         <ToolbarButton onClick={handleNewCollection} title={t('newCollection')}>
@@ -228,16 +220,16 @@ export default observer(function CollectionTree() {
               <>
                 <span
                   className={className(
-                    'text-[10px] font-bold mr-1.5 flex-shrink-0 w-8',
-                    isActive ? 'text-white' : colorClass
+                    'text-[10px] font-bold mr-1.5 flex-shrink-0',
+                    colorClass
                   )}
                 >
-                  {method.length > 3 ? method.slice(0, 3) : method}
+                  {method}
                 </span>
                 <span
                   className={className(
                     'text-sm truncate',
-                    isActive ? 'text-white font-medium' : tw.text.primary
+                    isActive ? 'font-medium' : tw.text.primary
                   )}
                   title={node.label}
                 >
@@ -253,7 +245,7 @@ export default observer(function CollectionTree() {
               <span
                 className={className(
                   'text-sm truncate',
-                  isActive ? 'text-white font-medium' : tw.text.primary
+                  isActive ? 'font-medium' : tw.text.primary
                 )}
                 title={node.label}
               >
