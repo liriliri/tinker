@@ -17,6 +17,7 @@ import * as about from 'share/main/window/about'
 import { isDev } from 'share/common/util'
 import * as updater from 'share/main/lib/updater'
 import { openPlugin } from './plugin/view'
+import * as window from 'share/main/lib/window'
 
 const logger = log('tray')
 let tray: Tray | null = null
@@ -127,6 +128,7 @@ async function updateContextMenu() {
     {
       label: `${t('checkUpdate')}...`,
       click() {
+        window.sendTo('main', 'closePlugin')
         main.showWin()
         updater.checkUpdate()
       },

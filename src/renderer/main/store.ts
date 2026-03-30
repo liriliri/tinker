@@ -133,6 +133,9 @@ class Store extends BaseStore {
         runInAction(() => (this.filter = title))
       }
     })
+    main.on('closePlugin', () => {
+      this.closePlugin()
+    })
   }
   private loadCache() {
     const plugins = storage.get(STORAGE_KEY_PLUGINS)
