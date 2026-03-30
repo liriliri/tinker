@@ -98,14 +98,16 @@ export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
   }
   try {
     const npmGlobalDir = await getNpmGlobalDir()
-    pluginDirs.push({ dir: npmGlobalDir })
-    const files = await fs.readdir(npmGlobalDir, { withFileTypes: true })
-    for (const file of files) {
-      if (startWith(file.name, '@') && file.isDirectory()) {
-        pluginDirs.push({
-          dir: path.join(npmGlobalDir, file.name),
-          prefix: file.name + '/',
-        })
+    if (await fs.pathExists(npmGlobalDir)) {
+      pluginDirs.push({ dir: npmGlobalDir })
+      const files = await fs.readdir(npmGlobalDir, { withFileTypes: true })
+      for (const file of files) {
+        if (startWith(file.name, '@') && file.isDirectory()) {
+          pluginDirs.push({
+            dir: path.join(npmGlobalDir, file.name),
+            prefix: file.name + '/',
+          })
+        }
       }
     }
   } catch (e) {
