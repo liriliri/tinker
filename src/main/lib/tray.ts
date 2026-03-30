@@ -30,14 +30,11 @@ export function init() {
   tray = new Tray(icon)
   tray.setToolTip(`${PRODUCT_NAME} ${VERSION}`)
   tray.on('click', () => {
-    updateContextMenu()
-    if (!isMac) {
-      main.showWin()
-    }
+    main.showWin()
   })
-  tray.on('right-click', updateContextMenu)
-
-  updateContextMenu()
+  tray.on('right-click', () => {
+    updateContextMenu()
+  })
 }
 
 async function updateContextMenu() {
@@ -151,5 +148,5 @@ async function updateContextMenu() {
       },
     },
   ])
-  tray.setContextMenu(contextMenu)
+  tray.popUpContextMenu(contextMenu)
 }
