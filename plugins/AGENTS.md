@@ -29,6 +29,15 @@ Guidelines that AI coding assistants must follow when developing code for the Ti
 * i18next (Internationalization)
 * **Licia** (Utility library - preferred)
 
+## Vendor Libraries
+
+Third-party libraries are pre-built as global scripts in the `vendor/` directory and must be loaded via `<script>` tags in the plugin's `index.html`. They are **not** installed as npm dependencies.
+
+- To use a vendor library, add `<script src="/vendor/<name>.js"></script>` to the plugin's `index.html` `<head>` section
+- The Vite build treats these as externals — `import { X } from 'react-resizable-panels'` works after adding the corresponding vendor script
+- See `vendor/README.md` for the full list of available vendor scripts and their import module names
+- **Adding new icons**: If a `lucide-react` icon is not in `vendor/lucide.ts`, add it to the import, the object, and the export in that file, then rebuild with `cd vendor && npm run build:lucide`
+
 ## Shared Resources
 
 See `share/README.md` for Store patterns, component conventions, and full API documentation.

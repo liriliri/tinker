@@ -1,5 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import jsonClone from 'licia/jsonClone'
+import uuid from 'licia/uuid'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type {
   HttpMethod,
@@ -8,10 +10,86 @@ import type {
   AuthType,
   HttpResponse,
   RequestConfig,
+  Collection,
+  CollectionItem,
 } from '../common/types'
 
 type RequestTab = 'params' | 'headers' | 'body' | 'auth'
 type ResponseTab = 'body' | 'headers'
+
+const storage = new LocalStore('tinker-http-request')
+const COLLECTIONS_KEY = 'collections'
+
+function getDefaultRequestConfig(): RequestConfig {
+  return {
+    method: 'GET',
+    url: '',
+    headers: [{ key: '', value: '', enabled: true }],
+    params: [{ key: '', value: '', enabled: true }],
+    bodyType: 'none',
+    body: '',
+    formData: [{ key: '', value: '', enabled: true }],
+    authType: 'none',
+    authBasicUser: '',
+    authBasicPass: '',
+    authBearerToken: '',
+  }
+}
+
+function findItemInCollections(
+  collections: Collection[],
+  itemId: string
+): CollectionItem | null {
+  for (const collection of collections) {
+    const found = findItemInItems(collection.items, itemId)
+    if (found) return found
+  }
+  return null
+}
+
+function findItemInItems(
+  items: CollectionItem[],
+  itemId: string
+): CollectionItem | null {
+  for (const item of items) {
+    if (item.id === itemId) return item
+    if (item.children) {
+      const found = findItemInItems(item.children, itemId)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+function findParentItems(
+  collections: Collection[],
+  itemId: string
+): CollectionItem[] | null {
+  for (const collection of collections) {
+    if (collection.items.some((item) => item.id === itemId)) {
+      return collection.items
+    }
+    const found = findParentInItems(collection.items, itemId)
+    if (found) return found
+  }
+  return null
+}
+
+function findParentInItems(
+  items: CollectionItem[],
+  itemId: string
+): CollectionItem[] | null {
+  for (const item of items) {
+    if (item.children) {
+      if (item.children.some((child) => child.id === itemId)) {
+        return item.children
+      }
+      const found = findParentInItems(item.children, itemId)
+      if (found) return found
+    }
+  }
+  return null
+}
 
 class Store extends BaseStore {
   method: HttpMethod = 'GET'
@@ -31,17 +109,273 @@ class Store extends BaseStore {
   activeRequestTab: RequestTab = 'params'
   activeResponseTab: ResponseTab = 'body'
 
+  collections: Collection[] = []
+  selectedItemId: string | null = null
+
+  private syncing = false
+
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadCollections()
   }
 
+  get isTemporary(): boolean {
+    return this.selectedItemId === null
+  }
+
+  private loadCollections() {
+    const saved = storage.get(COLLECTIONS_KEY)
+    if (saved) {
+      this.collections = saved
+    }
+  }
+
+  private saveCollections() {
+    storage.set(COLLECTIONS_KEY, jsonClone(this.collections))
+  }
+
+  private loadRequestConfig(config: RequestConfig) {
+    this.method = config.method
+    this.url = config.url
+    this.headers = jsonClone(config.headers)
+    this.params = jsonClone(config.params)
+    this.bodyType = config.bodyType
+    this.body = config.body
+    this.formData = jsonClone(config.formData)
+    this.authType = config.authType
+    this.authBasicUser = config.authBasicUser
+    this.authBasicPass = config.authBasicPass
+    this.authBearerToken = config.authBearerToken
+  }
+
+  private saveCurrentToSelected() {
+    if (!this.selectedItemId) return
+    const item = findItemInCollections(this.collections, this.selectedItemId)
+    if (item && item.type === 'request') {
+      item.request = this.getRequestConfig()
+      this.saveCollections()
+    }
+  }
+
+  selectItem(id: string | null) {
+    // Auto-save current request before switching
+    if (this.selectedItemId && this.selectedItemId !== id) {
+      this.saveCurrentToSelected()
+    }
+
+    this.selectedItemId = id
+    this.response = null
+
+    if (id) {
+      const item = findItemInCollections(this.collections, id)
+      if (item && item.type === 'request' && item.request) {
+        this.loadRequestConfig(item.request)
+      }
+    } else {
+      // Switch to temporary mode with defaults
+      const config = getDefaultRequestConfig()
+      this.loadRequestConfig(config)
+    }
+  }
+
+  saveCurrentRequest() {
+    this.saveCurrentToSelected()
+  }
+
+  // Collection CRUD
+  createCollection(name: string) {
+    const collection: Collection = {
+      id: uuid(),
+      name,
+      items: [],
+    }
+    this.collections.push(collection)
+    this.saveCollections()
+  }
+
+  renameCollection(collectionId: string, name: string) {
+    const collection = this.collections.find((c) => c.id === collectionId)
+    if (collection) {
+      collection.name = name
+      this.saveCollections()
+    }
+  }
+
+  deleteCollection(collectionId: string) {
+    const index = this.collections.findIndex((c) => c.id === collectionId)
+    if (index !== -1) {
+      // Deselect if selected item is in this collection
+      if (this.selectedItemId) {
+        const item = findItemInItems(
+          this.collections[index].items,
+          this.selectedItemId
+        )
+        if (item) {
+          this.selectedItemId = null
+        }
+      }
+      this.collections.splice(index, 1)
+      this.saveCollections()
+    }
+  }
+
+  // Folder CRUD
+  createFolder(parentId: string, name: string) {
+    const folder: CollectionItem = {
+      id: uuid(),
+      type: 'folder',
+      name,
+      children: [],
+    }
+    this.addItemToParent(parentId, folder)
+  }
+
+  renameFolder(folderId: string, name: string) {
+    const item = findItemInCollections(this.collections, folderId)
+    if (item) {
+      item.name = name
+      this.saveCollections()
+    }
+  }
+
+  deleteFolder(folderId: string) {
+    if (this.selectedItemId) {
+      const item = findItemInCollections(this.collections, folderId)
+      if (item && item.children) {
+        const selectedInFolder = findItemInItems(
+          item.children,
+          this.selectedItemId
+        )
+        if (selectedInFolder || this.selectedItemId === folderId) {
+          this.selectedItemId = null
+        }
+      }
+    }
+    this.removeItem(folderId)
+  }
+
+  // Request CRUD
+  createRequest(parentId: string, name: string) {
+    const request: CollectionItem = {
+      id: uuid(),
+      type: 'request',
+      name,
+      request: getDefaultRequestConfig(),
+    }
+    this.addItemToParent(parentId, request)
+  }
+
+  renameRequest(requestId: string, name: string) {
+    const item = findItemInCollections(this.collections, requestId)
+    if (item) {
+      item.name = name
+      this.saveCollections()
+    }
+  }
+
+  deleteRequest(requestId: string) {
+    if (this.selectedItemId === requestId) {
+      this.selectedItemId = null
+    }
+    this.removeItem(requestId)
+  }
+
+  private addItemToParent(parentId: string, newItem: CollectionItem) {
+    // Check if parentId is a collection
+    const collection = this.collections.find((c) => c.id === parentId)
+    if (collection) {
+      collection.items.push(newItem)
+      this.saveCollections()
+      return
+    }
+
+    // Check if parentId is a folder
+    const folder = findItemInCollections(this.collections, parentId)
+    if (folder && folder.type === 'folder' && folder.children) {
+      folder.children.push(newItem)
+      this.saveCollections()
+    }
+  }
+
+  private removeItem(itemId: string) {
+    const parentItems = findParentItems(this.collections, itemId)
+    if (parentItems) {
+      const index = parentItems.findIndex((item) => item.id === itemId)
+      if (index !== -1) {
+        parentItems.splice(index, 1)
+        this.saveCollections()
+      }
+    }
+  }
+
+  // Existing methods
   setMethod(method: HttpMethod) {
     this.method = method
   }
 
   setUrl(url: string) {
     this.url = url
+    if (!this.syncing) {
+      this.syncUrlToParams()
+    }
+  }
+
+  private syncUrlToParams() {
+    this.syncing = true
+    try {
+      const questionIdx = this.url.indexOf('?')
+      if (questionIdx === -1) {
+        // No query string — keep only disabled params
+        const disabled = this.params.filter((p) => !p.enabled && p.key !== '')
+        this.params = disabled
+        return
+      }
+
+      const queryString = this.url.slice(questionIdx + 1)
+      const newParams: KeyValuePair[] = []
+
+      if (queryString) {
+        const pairs = queryString.split('&')
+        for (const pair of pairs) {
+          const eqIdx = pair.indexOf('=')
+          const key = decodeURIComponent(
+            eqIdx === -1 ? pair : pair.slice(0, eqIdx)
+          )
+          const value =
+            eqIdx === -1 ? '' : decodeURIComponent(pair.slice(eqIdx + 1))
+          newParams.push({ key, value, enabled: true })
+        }
+      }
+
+      // Preserve disabled params
+      const disabled = this.params.filter((p) => !p.enabled && p.key !== '')
+      this.params = [...newParams, ...disabled]
+    } finally {
+      this.syncing = false
+    }
+  }
+
+  private syncParamsToUrl() {
+    this.syncing = true
+    try {
+      const baseUrl = this.url.split('?')[0]
+      const enabledParams = this.params.filter((p) => p.enabled && p.key !== '')
+
+      if (enabledParams.length === 0) {
+        this.url = baseUrl
+        return
+      }
+
+      const queryString = enabledParams
+        .map(
+          (p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`
+        )
+        .join('&')
+      this.url = `${baseUrl}?${queryString}`
+    } finally {
+      this.syncing = false
+    }
   }
 
   setBodyType(bodyType: BodyType) {
@@ -88,6 +422,9 @@ class Store extends BaseStore {
     } else {
       item[field] = value as string
     }
+    if (list === 'params' && !this.syncing) {
+      this.syncParamsToUrl()
+    }
   }
 
   addPair(list: 'headers' | 'params' | 'formData') {
@@ -98,6 +435,9 @@ class Store extends BaseStore {
     this[list].splice(index, 1)
     if (this[list].length === 0) {
       this[list].push({ key: '', value: '', enabled: true })
+    }
+    if (list === 'params' && !this.syncing) {
+      this.syncParamsToUrl()
     }
   }
 

@@ -30,6 +30,20 @@ export interface RequestConfig {
   authBearerToken: string
 }
 
+export interface CollectionItem {
+  id: string
+  type: 'folder' | 'request'
+  name: string
+  request?: RequestConfig
+  children?: CollectionItem[]
+}
+
+export interface Collection {
+  id: string
+  name: string
+  items: CollectionItem[]
+}
+
 export interface HttpResponse {
   status: number
   statusText: string

@@ -1,9 +1,21 @@
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
-import { Plus, X } from 'lucide-react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { X } from 'lucide-react'
+import { AgGridReact } from 'ag-grid-react'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import Grid from 'share/components/Grid'
 import Checkbox from 'share/components/Checkbox'
 import { tw } from 'share/theme'
+import store from '../store'
 import type { KeyValuePair } from '../../common/types'
+
+interface RowData {
+  index: number
+  key: string
+  value: string
+  enabled: boolean
+  isLastEmpty: boolean
+}
 
 interface KeyValueEditorProps {
   items: KeyValuePair[]
@@ -18,6 +30,84 @@ interface KeyValueEditorProps {
   valuePlaceholder?: string
 }
 
+interface InputRendererParams {
+  placeholder: string
+  field: 'key' | 'value'
+  onUpdate: KeyValueEditorProps['onUpdate']
+  onAdd: KeyValueEditorProps['onAdd']
+  itemsLength: number
+}
+
+function InputRenderer(
+  params: ICellRendererParams<RowData> & InputRendererParams
+) {
+  const [value, setValue] = useState(params.value as string)
+  const data = params.data!
+
+  useEffect(() => {
+    setValue(params.value as string)
+  }, [params.value])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setValue(newValue)
+    params.onUpdate(data.index, params.field, newValue)
+
+    // Auto-add empty row when typing in the last empty row
+    if (data.isLastEmpty && newValue !== '') {
+      params.onAdd()
+    }
+  }
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={handleChange}
+      placeholder={params.placeholder}
+      className={`w-full h-full bg-transparent text-xs outline-none ${tw.text.primary} placeholder:${tw.text.tertiary}`}
+    />
+  )
+}
+
+function CheckboxRenderer(
+  params: ICellRendererParams<RowData> & {
+    onUpdate: KeyValueEditorProps['onUpdate']
+  }
+) {
+  if (!params.data || params.data.isLastEmpty) return null
+
+  return (
+    <div className="flex items-center justify-center" style={{ height: 36 }}>
+      <Checkbox
+        checked={params.data.enabled}
+        onChange={(checked) =>
+          params.onUpdate(params.data!.index, 'enabled', checked)
+        }
+      />
+    </div>
+  )
+}
+
+function DeleteRenderer(
+  params: ICellRendererParams<RowData> & {
+    onRemove: KeyValueEditorProps['onRemove']
+  }
+) {
+  if (!params.data || params.data.isLastEmpty) return null
+
+  return (
+    <div className="flex items-center justify-center" style={{ height: 36 }}>
+      <button
+        onClick={() => params.onRemove(params.data!.index)}
+        className={`p-1 rounded ${tw.hover} ${tw.text.tertiary} ${tw.primary.textHover}`}
+      >
+        <X size={14} />
+      </button>
+    </div>
+  )
+}
+
 export default observer(function KeyValueEditor({
   items,
   onUpdate,
@@ -26,46 +116,112 @@ export default observer(function KeyValueEditor({
   keyPlaceholder = 'Key',
   valuePlaceholder = 'Value',
 }: KeyValueEditorProps) {
-  const { t } = useTranslation()
-  const inputClass = `flex-1 px-2 py-1 text-xs border ${tw.border} rounded ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
+  const gridRef = useRef<AgGridReact<RowData>>(null)
+
+  const rowData: RowData[] = useMemo(() => {
+    const lastIndex = items.length - 1
+    return items.map((item, index) => ({
+      index,
+      key: item.key,
+      value: item.value,
+      enabled: item.enabled,
+      isLastEmpty: index === lastIndex && item.key === '' && item.value === '',
+    }))
+  }, [items.length, ...items.map((i) => `${i.key}|${i.value}|${i.enabled}`)])
+
+  const hasEmptyLastRow =
+    items.length > 0 &&
+    items[items.length - 1].key === '' &&
+    items[items.length - 1].value === ''
+
+  // Ensure there's always an empty last row
+  useEffect(() => {
+    if (!hasEmptyLastRow) {
+      onAdd()
+    }
+  }, [hasEmptyLastRow, onAdd])
+
+  const columnDefs: ColDef<RowData>[] = useMemo(
+    () => [
+      {
+        headerName: '',
+        field: 'enabled',
+        width: 50,
+        minWidth: 50,
+        maxWidth: 50,
+        sortable: false,
+        cellRenderer: CheckboxRenderer,
+        cellRendererParams: { onUpdate },
+        suppressMovable: true,
+      },
+      {
+        headerName: keyPlaceholder,
+        field: 'key',
+        flex: 1,
+        minWidth: 120,
+        sortable: false,
+        suppressMovable: true,
+        cellRenderer: InputRenderer,
+        cellRendererParams: {
+          placeholder: keyPlaceholder,
+          field: 'key',
+          onUpdate,
+          onAdd,
+          itemsLength: items.length,
+        },
+      },
+      {
+        headerName: valuePlaceholder,
+        field: 'value',
+        flex: 1,
+        minWidth: 120,
+        sortable: false,
+        suppressMovable: true,
+        cellRenderer: InputRenderer,
+        cellRendererParams: {
+          placeholder: valuePlaceholder,
+          field: 'value',
+          onUpdate,
+          onAdd,
+          itemsLength: items.length,
+        },
+      },
+      {
+        headerName: '',
+        field: 'index',
+        width: 40,
+        minWidth: 40,
+        maxWidth: 40,
+        sortable: false,
+        cellRenderer: DeleteRenderer,
+        cellRendererParams: { onRemove },
+        suppressMovable: true,
+      },
+    ],
+    [keyPlaceholder, valuePlaceholder, onUpdate, onRemove, onAdd, items.length]
+  )
+
+  const getRowId = useCallback(
+    (params: { data: RowData }) => String(params.data.index),
+    []
+  )
 
   return (
-    <div className="flex flex-col gap-1.5">
-      {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <Checkbox
-            checked={item.enabled}
-            onChange={(checked) => onUpdate(index, 'enabled', checked)}
-          />
-          <input
-            type="text"
-            value={item.key}
-            onChange={(e) => onUpdate(index, 'key', e.target.value)}
-            placeholder={keyPlaceholder}
-            className={inputClass}
-          />
-          <input
-            type="text"
-            value={item.value}
-            onChange={(e) => onUpdate(index, 'value', e.target.value)}
-            placeholder={valuePlaceholder}
-            className={inputClass}
-          />
-          <button
-            onClick={() => onRemove(index)}
-            className={`p-1 rounded ${tw.hover} ${tw.text.tertiary}`}
-          >
-            <X size={14} />
-          </button>
-        </div>
-      ))}
-      <button
-        onClick={onAdd}
-        className={`flex items-center gap-1 text-xs px-2 py-1 rounded ${tw.hover} ${tw.text.secondary} self-start`}
-      >
-        <Plus size={12} />
-        {t('add')}
-      </button>
+    <div className="flex-1 min-h-0">
+      <div className={`h-full border ${tw.border} rounded overflow-hidden`}>
+        <Grid<RowData>
+          ref={gridRef}
+          isDark={store.isDark}
+          columnDefs={columnDefs}
+          rowData={rowData}
+          getRowId={getRowId}
+          headerHeight={32}
+          rowHeight={36}
+          animateRows={false}
+          enableCellTextSelection={true}
+          suppressCellFocus={true}
+        />
+      </div>
     </div>
   )
 })

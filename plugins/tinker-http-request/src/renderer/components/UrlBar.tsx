@@ -1,20 +1,19 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import Select from 'share/components/Select'
+import { Send, X } from 'lucide-react'
 import { tw } from 'share/theme'
-import { ToolbarTextButton } from 'share/components/Toolbar'
-import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
+import { METHOD_COLORS } from '../../lib/util'
 import type { HttpMethod } from '../../common/types'
 
-const METHOD_OPTIONS: { label: string; value: HttpMethod }[] = [
-  { label: 'GET', value: 'GET' },
-  { label: 'POST', value: 'POST' },
-  { label: 'PUT', value: 'PUT' },
-  { label: 'PATCH', value: 'PATCH' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'HEAD', value: 'HEAD' },
-  { label: 'OPTIONS', value: 'OPTIONS' },
+const METHODS: HttpMethod[] = [
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'HEAD',
+  'OPTIONS',
 ]
 
 export default observer(function UrlBar() {
@@ -30,42 +29,54 @@ export default observer(function UrlBar() {
     }
   }
 
+  const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    store.setMethod(e.target.value as HttpMethod)
+  }
+
   return (
-    <div
-      className={`flex items-center gap-2 p-2 border-b ${tw.border} ${tw.bg.secondary}`}
-    >
-      <Select
-        value={store.method}
-        onChange={(val) => store.setMethod(val as HttpMethod)}
-        options={METHOD_OPTIONS}
-        className="w-24 h-8"
-      />
-      <input
-        type="text"
-        value={store.url}
-        onChange={(e) => store.setUrl(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={t('urlPlaceholder')}
-        className={`flex-1 px-3 py-1.5 text-xs border ${tw.border} ${tw.primary.focusBorder} rounded ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`}
-      />
-      {store.loading ? (
-        <ToolbarTextButton
-          variant="secondary"
-          onClick={() => store.abort()}
-          className="flex items-center gap-1.5 h-8"
+    <div className="px-3 py-2">
+      <div
+        className={`flex items-center border ${tw.border} rounded-lg ${tw.bg.input} focus-within:ring-1 focus-within:ring-[var(--theme-primary)] focus-within:border-[var(--theme-primary)]`}
+      >
+        <select
+          value={store.method}
+          onChange={handleMethodChange}
+          className={`appearance-none bg-transparent text-xs font-bold pl-3 pr-1 py-2 cursor-pointer focus:outline-none ${
+            METHOD_COLORS[store.method] || tw.text.primary
+          }`}
         >
-          <LoadingCircle className="!w-3.5 !h-3.5 text-white" />
-          {t('cancel')}
-        </ToolbarTextButton>
-      ) : (
-        <ToolbarTextButton
-          onClick={() => store.send()}
-          disabled={!store.url.trim()}
-          className="h-8"
-        >
-          {t('send')}
-        </ToolbarTextButton>
-      )}
+          {METHODS.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+        <div className={`w-px h-4 mx-1 ${tw.bg.border}`} />
+        <input
+          type="text"
+          value={store.url}
+          onChange={(e) => store.setUrl(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={t('urlPlaceholder')}
+          className={`flex-1 bg-transparent px-2 py-2 text-xs ${tw.text.primary} focus:outline-none placeholder:text-gray-400`}
+        />
+        {store.loading ? (
+          <button
+            onClick={() => store.abort()}
+            className="flex items-center gap-1 px-3 py-2 text-xs text-red-500 hover:text-red-600"
+          >
+            <X size={14} />
+          </button>
+        ) : (
+          <button
+            onClick={() => store.send()}
+            disabled={!store.url.trim()}
+            className={`flex items-center gap-1 px-3 py-2 text-xs ${tw.primary.text} disabled:opacity-30 disabled:cursor-not-allowed`}
+          >
+            <Send size={14} />
+          </button>
+        )}
+      </div>
     </div>
   )
 })

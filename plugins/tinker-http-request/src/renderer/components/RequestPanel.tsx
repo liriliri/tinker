@@ -1,15 +1,36 @@
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 import store from '../store'
 import KeyValueEditor from './KeyValueEditor'
-import type { BodyType, AuthType } from '../../common/types'
+import type { BodyType } from '../../common/types'
 
-const TABS = ['params', 'headers', 'body', 'auth'] as const
+const TABS = ['params', 'headers', 'body'] as const
 
 export default observer(function RequestPanel() {
   const { t } = useTranslation()
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
+  const updateIndicator = useCallback(() => {
+    const activeEl = tabRefs.current[store.activeRequestTab]
+    const container = tabsRef.current
+    if (activeEl && container) {
+      const containerRect = container.getBoundingClientRect()
+      const tabRect = activeEl.getBoundingClientRect()
+      setIndicatorStyle({
+        left: tabRect.left - containerRect.left,
+        width: tabRect.width,
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    updateIndicator()
+  }, [store.activeRequestTab, updateIndicator])
 
   const bodyTypeOptions: { label: string; value: BodyType }[] = [
     { label: t('bodyNone'), value: 'none' },
@@ -19,40 +40,43 @@ export default observer(function RequestPanel() {
     { label: 'Raw', value: 'raw' },
   ]
 
-  const authTypeOptions: { label: string; value: AuthType }[] = [
-    { label: t('authNone'), value: 'none' },
-    { label: 'Basic', value: 'basic' },
-    { label: 'Bearer', value: 'bearer' },
-  ]
-
   const tabLabels: Record<string, string> = {
     params: t('params'),
     headers: t('headers'),
     body: t('body'),
-    auth: t('auth'),
   }
 
-  const inputClass = `w-full px-2 py-1 text-xs border ${tw.border} rounded ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
-
   return (
-    <div className="flex flex-col flex-1 min-h-0">
-      <div className={`flex border-b ${tw.border}`}>
+    <div className="flex flex-col flex-1 min-h-0 px-3">
+      <div ref={tabsRef} className={`relative flex border-b ${tw.border}`}>
         {TABS.map((tab) => (
           <button
             key={tab}
+            ref={(el) => {
+              tabRefs.current[tab] = el
+            }}
             onClick={() => store.setActiveRequestTab(tab)}
             className={`px-3 py-1.5 text-xs transition-colors ${
               store.activeRequestTab === tab
-                ? `${tw.primary.text} border-b-2 ${tw.primary.border}`
+                ? tw.primary.text
                 : `${tw.text.secondary} ${tw.hover}`
             }`}
           >
             {tabLabels[tab]}
           </button>
         ))}
+        <div
+          className="absolute bottom-0 h-0.5"
+          style={{
+            left: indicatorStyle.left,
+            width: indicatorStyle.width,
+            backgroundColor: THEME_COLORS.primary,
+            transition: 'left 0.25s ease, width 0.25s ease',
+          }}
+        />
       </div>
 
-      <div className="flex-1 overflow-auto p-3">
+      <div className="flex-1 flex flex-col min-h-0 py-3">
         {store.activeRequestTab === 'params' && (
           <KeyValueEditor
             items={store.params}
@@ -76,7 +100,7 @@ export default observer(function RequestPanel() {
         )}
 
         {store.activeRequestTab === 'body' && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 flex-1 min-h-0">
             <Select
               value={store.bodyType}
               onChange={(val) => store.setBodyType(val as BodyType)}
@@ -109,50 +133,6 @@ export default observer(function RequestPanel() {
                 onAdd={() => store.addPair('formData')}
                 onRemove={(i) => store.removePair('formData', i)}
               />
-            )}
-          </div>
-        )}
-
-        {store.activeRequestTab === 'auth' && (
-          <div className="flex flex-col gap-3">
-            <Select
-              value={store.authType}
-              onChange={(val) => store.setAuthType(val as AuthType)}
-              options={authTypeOptions}
-              className="w-32 h-7"
-            />
-
-            {store.authType === 'basic' && (
-              <div className="flex flex-col gap-2">
-                <input
-                  type="text"
-                  value={store.authBasicUser}
-                  onChange={(e) => store.setAuthBasicUser(e.target.value)}
-                  placeholder={t('username')}
-                  className={inputClass}
-                />
-                <input
-                  type="password"
-                  value={store.authBasicPass}
-                  onChange={(e) => store.setAuthBasicPass(e.target.value)}
-                  placeholder={t('password')}
-                  className={inputClass}
-                />
-              </div>
-            )}
-
-            {store.authType === 'bearer' && (
-              <input
-                type="text"
-                value={store.authBearerToken}
-                onChange={(e) => store.setAuthBearerToken(e.target.value)}
-                placeholder={t('token')}
-                className={inputClass}
-              />
-            )}
-
-            {store.authType === 'none' && (
-              <div className={`text-xs ${tw.text.tertiary}`}>{t('noAuth')}</div>
             )}
           </div>
         )}
