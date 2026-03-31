@@ -34,6 +34,7 @@ const globals = {
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
   '@headlessui/react': 'headlessui',
+  'react-hot-toast': 'hottoast',
   'react-resizable-panels': 'reactResizablePanels',
   'react-hex-editor': 'hexEditor',
   'styled-components': 'styledComponents',
@@ -204,7 +205,17 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'headlessui') {
-    return createConfig('headlessui', 'PluginVendorHeadlessui', ['react'])
+    return createConfig('headlessui', 'PluginVendorHeadlessui', [
+      'react',
+      'react-dom',
+    ])
+  }
+
+  if (target === 'hottoast') {
+    return createConfig('hottoast', 'PluginVendorHottoast', [
+      'react',
+      'react-dom',
+    ])
   }
 
   return createConfig('react', 'PluginVendorReact')
