@@ -1,9 +1,9 @@
-import hexEditor from 'react-hex-editor'
+import HexEditor from 'react-hex-editor'
 import * as styledComponents from 'styled-components'
 
 const g = globalThis as Record<string, unknown>
 
-g.hexEditor = hexEditor
+g.ReactHexEditor = HexEditor
 g.styledComponents = styledComponents
 
-export default hexEditor
+export default HexEditor

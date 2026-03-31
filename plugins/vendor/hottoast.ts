@@ -1,7 +1,9 @@
-import * as hottoast from 'react-hot-toast'
+import toast from 'react-hot-toast'
+import * as all from 'react-hot-toast'
 
 const g = globalThis as Record<string, unknown>
 
-g.hottoast = hottoast
+Object.assign(toast, all)
+g.reactHotToast = toast
 
-export { hottoast }
+export default toast
