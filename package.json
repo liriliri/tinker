@@ -48,7 +48,6 @@
   "devDependencies": {
     "@ai-sdk/anthropic": "^3.0.63",
     "@ai-sdk/openai": "^3.0.47",
-    "@headlessui/react": "^2.2.9",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/fs-extra": "^11.0.4",
     "@types/koa": "^3.0.1",

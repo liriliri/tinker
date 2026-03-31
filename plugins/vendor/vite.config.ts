@@ -33,6 +33,7 @@ const globals = {
   'react-markdown': 'ReactMarkdown',
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
+  '@headlessui/react': 'headlessui',
   'react-resizable-panels': 'reactResizablePanels',
   'react-hex-editor': 'hexEditor',
   'styled-components': 'styledComponents',
@@ -200,6 +201,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'markdown') {
     return createConfig('markdown', 'PluginVendorMarkdown', ['react'])
+  }
+
+  if (target === 'headlessui') {
+    return createConfig('headlessui', 'PluginVendorHeadlessui', ['react'])
   }
 
   return createConfig('react', 'PluginVendorReact')
