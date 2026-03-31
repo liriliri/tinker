@@ -1,14 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { FileText, Binary } from 'lucide-react'
 import { LoadingCircle } from 'share/components/Loading'
+import {
+  ToolbarButton,
+  ToolbarButtonGroup,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import { tw } from 'share/theme'
 import store from '../store'
 import TabBar from './TabBar'
 import ResponseViewer from './ResponseViewer'
 import fileSize from 'licia/fileSize'
 import { getStatusColor } from '../../lib/util'
-
-const TABS = ['body', 'headers'] as const
 
 export default observer(function ResponsePanel() {
   const { t } = useTranslation()
@@ -50,7 +54,7 @@ export default observer(function ResponsePanel() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="px-3">
+      <div className="px-3 pt-2">
         <TabBar
           tabs={TABS}
           activeTab={store.activeResponseTab}
@@ -60,6 +64,7 @@ export default observer(function ResponsePanel() {
           }
           right={
             <div className="flex items-center gap-3 text-xs">
+              {store.activeResponseTab === 'body' && <BodyModeToggle />}
               <span
                 className={`font-medium ${getStatusColor(response.status)}`}
               >
@@ -75,9 +80,7 @@ export default observer(function ResponsePanel() {
       </div>
 
       <div className="flex-1 overflow-auto min-h-0">
-        {store.activeResponseTab === 'body' && (
-          <ResponseViewer body={response.body} />
-        )}
+        {store.activeResponseTab === 'body' && <ResponseViewer />}
 
         {store.activeResponseTab === 'headers' && (
           <div className="p-3">
@@ -103,5 +106,40 @@ export default observer(function ResponsePanel() {
         )}
       </div>
     </div>
+  )
+})
+
+const TABS = ['body', 'headers'] as const
+
+const BodyModeToggle = observer(function BodyModeToggle() {
+  const { t } = useTranslation()
+  const mode = store.effectiveBodyMode
+  const isAuto = store.responseBodyMode === 'auto'
+
+  return (
+    <ToolbarButtonGroup>
+      <ToolbarButton
+        className={`rounded-none rounded-l border-r ${tw.border}`}
+        variant="toggle"
+        active={mode === 'text'}
+        onClick={() =>
+          store.setResponseBodyMode(isAuto && mode === 'text' ? 'auto' : 'text')
+        }
+        title={t('textMode')}
+      >
+        <FileText size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        className="rounded-none rounded-r"
+        variant="toggle"
+        active={mode === 'hex'}
+        onClick={() =>
+          store.setResponseBodyMode(isAuto && mode === 'hex' ? 'auto' : 'hex')
+        }
+        title={t('hexMode')}
+      >
+        <Binary size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+    </ToolbarButtonGroup>
   )
 })

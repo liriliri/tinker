@@ -20,6 +20,7 @@ function createErrorResponse(startTime: number, message: string): HttpResponse {
     statusText: '',
     headers: {},
     body: '',
+    bodyBytes: [],
     duration: Date.now() - startTime,
     size: 0,
     error: message,
@@ -120,6 +121,7 @@ const httpRequestObj = {
             currentRequest = null
             const buffer = Buffer.concat(chunks)
             const body = buffer.toString('utf-8')
+            const bodyBytes = Array.from(buffer)
             const duration = Date.now() - startTime
 
             const responseHeaders: Record<string, string> = {}
@@ -136,6 +138,7 @@ const httpRequestObj = {
               statusText: res.statusMessage || '',
               headers: responseHeaders,
               body,
+              bodyBytes,
               duration,
               size: buffer.length,
             })

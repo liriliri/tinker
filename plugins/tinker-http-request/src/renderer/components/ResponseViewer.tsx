@@ -1,45 +1,99 @@
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
-import CopyButton from 'share/components/CopyButton'
+import { Editor } from '@monaco-editor/react'
+import HexEditor from 'share/components/HexEditor'
 import { tw } from 'share/theme'
+import store from '../store'
 
-interface ResponseViewerProps {
-  body: string
-}
+export default observer(function ResponseViewer() {
+  const { response } = store
 
-export default observer(function ResponseViewer({ body }: ResponseViewerProps) {
-  const { t } = useTranslation()
+  if (!response) return null
 
-  const { displayBody, isJson } = useMemo(() => {
-    let displayBody = body
-    let isJson = false
-    try {
-      const parsed = JSON.parse(body)
-      displayBody = JSON.stringify(parsed, null, 2)
-      isJson = true
-    } catch {
-      // not JSON, display as-is
+  if (store.effectiveBodyMode === 'hex') {
+    return <HexResponseViewer />
+  }
+
+  return <TextResponseViewer />
+})
+
+const TextResponseViewer = observer(function TextResponseViewer() {
+  const { response } = store
+
+  if (!response) return null
+
+  const { displayBody, language } = useMemo(() => {
+    let displayBody = response.body
+    let language = 'plaintext'
+    const contentType = response.headers['content-type'] || ''
+
+    if (
+      contentType.includes('application/json') ||
+      contentType.includes('+json')
+    ) {
+      language = 'json'
+      try {
+        const parsed = JSON.parse(response.body)
+        displayBody = JSON.stringify(parsed, null, 2)
+      } catch {
+        // not valid JSON, display as-is
+      }
+    } else if (contentType.includes('xml') || contentType.includes('+xml')) {
+      language = 'xml'
+    } else if (contentType.includes('html')) {
+      language = 'html'
+    } else if (contentType.includes('javascript')) {
+      language = 'javascript'
+    } else if (contentType.includes('css')) {
+      language = 'css'
     }
-    return { displayBody, isJson }
-  }, [body])
+
+    return { displayBody, language }
+  }, [response.body, response.headers])
 
   return (
-    <div className="relative flex-1 min-h-0">
-      <div className="absolute top-1 right-1 z-10">
-        <CopyButton
-          text={displayBody}
-          variant="toolbar"
-          title={t('copyBody')}
+    <div className={`w-full h-full p-3`}>
+      <div
+        className={`w-full h-full border ${tw.border} rounded overflow-hidden`}
+      >
+        <Editor
+          value={displayBody}
+          language={language}
+          theme={store.isDark ? 'vs-dark' : 'vs'}
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontSize: 12,
+            lineNumbers: 'off',
+            folding: true,
+            wordWrap: 'on',
+            automaticLayout: true,
+          }}
         />
       </div>
-      <pre
-        className={`w-full h-full overflow-auto p-3 text-xs font-mono ${
-          tw.text.primary
-        } ${isJson ? 'whitespace-pre' : 'whitespace-pre-wrap'}`}
-      >
-        {displayBody}
-      </pre>
     </div>
+  )
+})
+
+const HexResponseViewer = observer(function HexResponseViewer() {
+  const { response } = store
+
+  const { data, nonce } = useMemo(() => {
+    if (!response) return { data: new Uint8Array(0), nonce: 0 }
+    return { data: new Uint8Array(response.bodyBytes), nonce: 1 }
+  }, [response])
+
+  const handleSetValue = useCallback(() => {
+    // read-only, no-op
+  }, [])
+
+  return (
+    <HexEditor
+      data={data}
+      nonce={nonce}
+      isDark={store.isDark}
+      onSetValue={handleSetValue}
+    />
   )
 })

@@ -49,6 +49,7 @@ export interface HttpResponse {
   statusText: string
   headers: Record<string, string>
   body: string
+  bodyBytes: number[]
   duration: number
   size: number
   error?: string

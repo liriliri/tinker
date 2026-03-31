@@ -111,6 +111,26 @@ Use `MessageList` and `ChatInput` for rendering only; provide your own `messages
 Use `SearchCard` for `web_search` tool results and pass plain UI data like `query`, `results`, `isRunning`, and `error` from the plugin host.
 Use `getSearchCardProps(toolMsg)` to extract `SearchCardProps` from an `AgentMessage` — it handles safe data extraction and `isRunning` detection.
 
+### HexEditor
+
+```ts
+import HexEditor from 'share/components/HexEditor'
+
+<HexEditor
+  data={store.data}       // Uint8Array
+  nonce={store.nonce}     // number – bump to force re-render
+  isDark={store.isDark}   // boolean – switches light/dark theme
+  onSetValue={handleSetValue} // (offset: number, value: number) => void
+  columns={0x10}          // optional, default 0x10
+  showAscii={true}        // optional, default true
+  showColumnLabels={true} // optional, default true
+  showRowLabels={true}    // optional, default true
+  className=""            // optional
+/>
+```
+
+Requires `react-hex-editor` and `styled-components` vendor scripts in the plugin's `index.html`.
+
 ### Other Common Components
 
 ```ts

@@ -1,8 +1,5 @@
-import { observer } from 'mobx-react-lite'
-import { useCallback } from 'react'
-import HexEditor from 'react-hex-editor'
+import HexEditorLib from 'react-hex-editor'
 import { ThemeProvider } from 'styled-components'
-import store from '../store'
 
 const LIGHT_THEME = {
   hexEditor: {
@@ -109,28 +106,48 @@ const DARK_THEME = {
   },
 }
 
-export default observer(function HexEditorView() {
-  const handleSetValue = useCallback((offset: number, value: number) => {
-    store.setValue(offset, value)
-  }, [])
+interface HexEditorProps {
+  data: Uint8Array
+  nonce: number
+  isDark: boolean
+  onSetValue: (offset: number, value: number) => void
+  columns?: number
+  showAscii?: boolean
+  showColumnLabels?: boolean
+  showRowLabels?: boolean
+  className?: string
+}
 
-  const theme = store.isDark ? DARK_THEME : LIGHT_THEME
+export default function HexEditor({
+  data,
+  nonce,
+  isDark,
+  onSetValue,
+  columns = 0x10,
+  showAscii = true,
+  showColumnLabels = true,
+  showRowLabels = true,
+  className,
+}: HexEditorProps) {
+  const theme = isDark ? DARK_THEME : LIGHT_THEME
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="w-full h-full p-4 flex justify-center">
+      <div
+        className={`w-full h-full p-4 flex justify-center ${className || ''}`}
+      >
         <div className="max-w-full">
-          <HexEditor
-            columns={0x10}
-            data={store.data}
-            nonce={store.nonce}
-            onSetValue={handleSetValue}
-            showAscii={true}
-            showColumnLabels={true}
-            showRowLabels={true}
+          <HexEditorLib
+            columns={columns}
+            data={data}
+            nonce={nonce}
+            onSetValue={onSetValue}
+            showAscii={showAscii}
+            showColumnLabels={showColumnLabels}
+            showRowLabels={showRowLabels}
           />
         </div>
       </div>
     </ThemeProvider>
   )
-})
+}

@@ -24,6 +24,8 @@
   "sendPrompt": "Send a request to see the response",
   "error": "Error",
   "copyBody": "Copy response body",
+  "textMode": "Text",
+  "hexMode": "Hex",
   "collections": "Collections",
   "newCollection": "New Collection",
   "newFolder": "New Folder",

@@ -1,10 +1,12 @@
 import { observer } from 'mobx-react-lite'
+import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
+import HexEditor from 'share/components/HexEditor'
 import FileOpen from 'share/components/FileOpen'
+import { LoadingCircle } from 'share/components/Loading'
 import store from './store'
 import Toolbar from './components/Toolbar'
-import HexEditorView from './components/HexEditorView'
 import { tw } from 'share/theme'
 
 export default observer(function App() {
@@ -29,6 +31,10 @@ export default observer(function App() {
     }
   }
 
+  const handleSetValue = useCallback((offset: number, value: number) => {
+    store.setValue(offset, value)
+  }, [])
+
   return (
     <AlertProvider locale={i18n.language}>
       <div
@@ -38,7 +44,11 @@ export default observer(function App() {
       >
         <Toolbar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          {!store.hasData ? (
+          {store.loading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <LoadingCircle />
+            </div>
+          ) : !store.hasData ? (
             <div className={'flex-1 flex flex-col'}>
               <FileOpen
                 onOpenFile={(file) => store.openFileFromFile(file)}
@@ -48,7 +58,12 @@ export default observer(function App() {
             </div>
           ) : (
             <div className={'flex-1'}>
-              <HexEditorView />
+              <HexEditor
+                data={store.data}
+                nonce={store.nonce}
+                isDark={store.isDark}
+                onSetValue={handleSetValue}
+              />
             </div>
           )}
         </div>

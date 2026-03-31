@@ -14,6 +14,9 @@ const globals = {
   'react-dom/client': 'ReactDOMClient',
   'react/jsx-runtime': 'ReactJSXRuntime',
   'use-sync-external-store/shim': 'UseSyncExternalStoreShim',
+  'use-sync-external-store/shim/with-selector':
+    'UseSyncExternalStoreShimWithSelector',
+  'use-sync-external-store/with-selector': 'UseSyncExternalStoreWithSelector',
   mobx: 'mobx',
   'mobx-react-lite': 'mobxReactLite',
   mathjs: 'mathjs',

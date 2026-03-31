@@ -7,6 +7,7 @@ class Store extends BaseStore {
   nonce: number = 0
   currentFilePath: string | null = null
   savedData: Uint8Array = new Uint8Array(0)
+  loading = false
 
   constructor() {
     super()
@@ -55,30 +56,37 @@ class Store extends BaseStore {
 
       if (result && result.filePaths && result.filePaths.length > 0) {
         const filePath = result.filePaths[0]
+        this.loading = true
         const buffer = await tinker.readFile(filePath)
         const data = new Uint8Array(buffer)
         this.currentFilePath = filePath
         this.data = data
         this.savedData = new Uint8Array(data)
         this.nonce += 1
+        this.loading = false
       }
     } catch (error) {
+      this.loading = false
       console.error('Open file failed:', error)
     }
   }
 
   async openFileFromFile(file: File) {
     try {
+      this.loading = true
       const filePath = (file as File & { path?: string }).path
       if (filePath) {
         const buffer = await tinker.readFile(filePath)
         this.importData(buffer, filePath)
+        this.loading = false
         return
       }
 
       const arrayBuffer = await file.arrayBuffer()
       this.importData(new Uint8Array(arrayBuffer))
+      this.loading = false
     } catch (error) {
+      this.loading = false
       console.error('Open file failed:', error)
     }
   }

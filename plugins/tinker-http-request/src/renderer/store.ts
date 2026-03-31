@@ -16,6 +16,7 @@ import type {
 
 type RequestTab = 'params' | 'headers' | 'body' | 'auth'
 type ResponseTab = 'body' | 'headers'
+type ResponseBodyMode = 'auto' | 'text' | 'hex'
 
 function getDefaultRequestConfig(): RequestConfig {
   return {
@@ -105,6 +106,7 @@ class Store extends BaseStore {
   loading: boolean = false
   activeRequestTab: RequestTab = 'params'
   activeResponseTab: ResponseTab = 'body'
+  responseBodyMode: ResponseBodyMode = 'auto'
 
   collections: Collection[] = []
   selectedItemId: string | null = null
@@ -436,6 +438,28 @@ class Store extends BaseStore {
     this.activeResponseTab = tab
   }
 
+  setResponseBodyMode(mode: ResponseBodyMode) {
+    this.responseBodyMode = mode
+  }
+
+  get isTextResponse(): boolean {
+    if (!this.response) return true
+    const contentType = this.response.headers['content-type'] || ''
+    return (
+      contentType.includes('text/') ||
+      contentType.includes('application/json') ||
+      contentType.includes('application/xml') ||
+      contentType.includes('application/javascript') ||
+      contentType.includes('+xml') ||
+      contentType.includes('+json')
+    )
+  }
+
+  get effectiveBodyMode(): 'text' | 'hex' {
+    if (this.responseBodyMode !== 'auto') return this.responseBodyMode
+    return this.isTextResponse ? 'text' : 'hex'
+  }
+
   updatePair(
     list: 'headers' | 'params' | 'formData',
     index: number,
@@ -492,6 +516,7 @@ class Store extends BaseStore {
       const result = await httpRequest.send(this.getRequestConfig())
       runInAction(() => {
         this.response = result
+        this.responseBodyMode = 'auto'
         this.loading = false
       })
     } catch (err) {
@@ -501,6 +526,7 @@ class Store extends BaseStore {
           statusText: '',
           headers: {},
           body: '',
+          bodyBytes: [],
           duration: 0,
           size: 0,
           error: err instanceof Error ? err.message : String(err),

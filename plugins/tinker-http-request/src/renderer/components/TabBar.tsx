@@ -46,7 +46,7 @@ export default function TabBar({
             tabRefs.current[tab] = el
           }}
           onClick={() => onTabChange(tab)}
-          className={`px-3 py-1.5 text-xs transition-colors ${
+          className={`px-3 pt-1 pb-3 text-xs transition-colors ${
             activeTab === tab
               ? tw.primary.text
               : `${tw.text.secondary} ${tw.hover}`
