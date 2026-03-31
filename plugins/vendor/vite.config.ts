@@ -31,6 +31,8 @@ const globals = {
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
   'react-resizable-panels': 'reactResizablePanels',
+  'react-hex-editor': 'hexEditor',
+  'styled-components': 'styledComponents',
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
   'wavesurfer.js/plugins/timeline': 'wavesurferTimelinePlugin',
@@ -167,6 +169,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'htmltoimage') {
     return createConfig('htmltoimage', 'PluginVendorHtmlToImage')
+  }
+
+  if (target === 'hexeditor') {
+    return createConfig('hexeditor', 'PluginVendorHexEditor', ['react'])
   }
 
   if (target === 'wavesurfer') {

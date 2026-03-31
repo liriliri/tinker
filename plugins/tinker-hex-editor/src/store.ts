@@ -3,10 +3,10 @@ import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 
 class Store extends BaseStore {
-  data: number[] = []
+  data: Uint8Array = new Uint8Array(0)
   nonce: number = 0
   currentFilePath: string | null = null
-  savedData: number[] = []
+  savedData: Uint8Array = new Uint8Array(0)
 
   constructor() {
     super()
@@ -43,7 +43,7 @@ class Store extends BaseStore {
   }
 
   clearData() {
-    this.data = []
+    this.data = new Uint8Array(0)
     this.nonce += 1
   }
 
@@ -56,10 +56,10 @@ class Store extends BaseStore {
       if (result && result.filePaths && result.filePaths.length > 0) {
         const filePath = result.filePaths[0]
         const buffer = await tinker.readFile(filePath)
-        const data = Array.from(buffer)
+        const data = new Uint8Array(buffer)
         this.currentFilePath = filePath
         this.data = data
-        this.savedData = [...data]
+        this.savedData = new Uint8Array(data)
         this.nonce += 1
       }
     } catch (error) {
@@ -88,7 +88,7 @@ class Store extends BaseStore {
       if (this.currentFilePath) {
         const data = new Uint8Array(this.data)
         await tinker.writeFile(this.currentFilePath, data)
-        this.savedData = [...this.data]
+        this.savedData = new Uint8Array(this.data)
       } else {
         await this.saveFileAs()
       }
@@ -107,16 +107,16 @@ class Store extends BaseStore {
         const data = new Uint8Array(this.data)
         await tinker.writeFile(result.filePath, data)
         this.currentFilePath = result.filePath
-        this.savedData = [...this.data]
+        this.savedData = new Uint8Array(this.data)
       }
     } catch (error) {
       console.error('Save file as failed:', error)
     }
   }
 
-  importData(newData: number[] | Uint8Array, filePath?: string) {
-    this.data = Array.from(newData)
-    this.savedData = [...this.data]
+  importData(newData: Uint8Array, filePath?: string) {
+    this.data = new Uint8Array(newData)
+    this.savedData = new Uint8Array(newData)
     this.nonce += 1
     this.currentFilePath = filePath || null
   }

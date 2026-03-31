@@ -15,9 +15,5 @@
         "name": "HEX 编辑"
       }
     }
-  },
-  "devDependencies": {
-    "styled-components": "^4.4.1",
-    "react-hex-editor": "0.3.0"
   }
 }
