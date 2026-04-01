@@ -88,7 +88,11 @@ export function ToolbarButton({
       return
     }
     isLongPressRef.current = false
-    onClick?.(event)
+    if (onClick) {
+      onClick(event)
+    } else if (menu) {
+      showContextMenu(event)
+    }
   }
 
   const handleContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
