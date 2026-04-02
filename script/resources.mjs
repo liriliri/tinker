@@ -25,3 +25,6 @@ if (isWindows) {
 }
 const pduUrl = `https://github.com/KSXGitHub/parallel-disk-usage/releases/download/${pduVersion}/${pduFile}`
 await $`curl -Lk ${pduUrl} > ${dir}/${pduOutput}`
+if (!isWindows) {
+  await $`chmod +x ${dir}/${pduOutput}`
+}
