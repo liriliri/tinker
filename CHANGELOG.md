@@ -1,3 +1,9 @@
+## v1.7.0 (2 Apr 2026)
+
+* feat: add http request
+* feat: add renamer
+* feat: add disk usage
+
 ## v1.6.0 (28 Mar 2026)
 
 * feat: add ai assistant
