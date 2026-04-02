@@ -17,8 +17,8 @@ export interface DiskUsageOptions {
 }
 
 export interface DiskUsageProgress {
-  items: number
-  total: number
+  count: number
+  size: number
   errors: number
 }
 
@@ -80,8 +80,8 @@ class PduTask {
           const match = stderrData.match(regProgress)
           if (match) {
             onProgress({
-              items: toNum(match[1]),
-              total: toNum(match[2]),
+              count: toNum(match[1]),
+              size: toNum(match[2]),
               errors: match[3] ? toNum(match[3]) : 0,
             })
           }

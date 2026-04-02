@@ -60,8 +60,8 @@ declare global {
     }
 
     interface DiskUsageProgress {
-      items: number
-      total: number
+      count: number
+      size: number
       errors: number
     }
 

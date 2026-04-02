@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Loader2 } from 'lucide-react'
+import { LoadingCircle } from 'share/components/Loading'
+import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
 import store from '../store'
 
@@ -8,33 +9,38 @@ export default observer(function ScanningView() {
   const { t } = useTranslation()
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4">
-      <Loader2
-        className={`w-8 h-8 animate-spin ${tw.primary.text}`}
-        strokeWidth={1.5}
-      />
+    <div className="flex-1 flex flex-col items-center justify-center gap-5">
+      <LoadingCircle className="w-8 h-8" />
       <div className="text-center">
         <p className={`text-sm ${tw.text.primary}`}>{t('scanning')}</p>
         <p
-          className={`text-xs mt-1 ${tw.text.secondary} max-w-xs break-all`}
+          className={`text-xs mt-1 ${tw.text.secondary} truncate max-w-sm`}
           title={store.scanPath}
         >
           {store.scanPath}
         </p>
-        {store.scanProgress && (
-          <p className={`text-xs mt-2 ${tw.text.tertiary}`}>
-            {t('items')}: {store.scanProgress.items.toLocaleString()}
-            {store.scanProgress.errors > 0 && (
-              <span className="ml-3 text-red-500">
-                {t('errors')}: {store.scanProgress.errors}
-              </span>
-            )}
-          </p>
-        )}
+        <div
+          className={`text-xs mt-3 tabular-nums ${tw.text.tertiary} h-10 flex flex-col justify-center`}
+        >
+          {store.scanProgress && (
+            <p>
+              {store.scanProgress.count.toLocaleString()}
+              {store.scanProgress.size > 0 && (
+                <> · {fileSize(store.scanProgress.size)}</>
+              )}
+              {store.scanProgress.errors > 0 && (
+                <span className="text-red-500">
+                  {' '}
+                  · {t('errors')}: {store.scanProgress.errors}
+                </span>
+              )}
+            </p>
+          )}
+        </div>
       </div>
       <button
         onClick={() => store.cancelScan()}
-        className={`flex items-center px-3 py-1 text-xs rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+        className={`flex items-center px-4 py-1.5 text-xs rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
       >
         {t('cancel')}
       </button>

@@ -19,7 +19,7 @@ const DEFAULT_MAX_DEPTH = 3
 class Store extends BaseStore {
   view: ViewState = 'open'
   scanPath: string = ''
-  scanProgress: { items: number; total: number; errors: number } | null = null
+  scanProgress: { count: number; size: number; errors: number } | null = null
   diskData: DiskItem | null = null
   navigatePath: string = ''
   navigationHistory: string[] = []
@@ -56,18 +56,14 @@ class Store extends BaseStore {
   async openDirectory(dirPath: string) {
     this.view = 'scanning'
     this.scanPath = dirPath
-    this.scanProgress = { items: 0, total: 0, errors: 0 }
+    this.scanProgress = { count: 0, size: 0, errors: 0 }
 
     try {
       const task = tinker.getDiskUsage(
         { paths: [dirPath], maxDepth: DEFAULT_MAX_DEPTH },
         (progress) => {
           runInAction(() => {
-            this.scanProgress = {
-              items: progress.items,
-              total: progress.total,
-              errors: progress.errors,
-            }
+            this.scanProgress = { ...progress }
           })
         }
       )
