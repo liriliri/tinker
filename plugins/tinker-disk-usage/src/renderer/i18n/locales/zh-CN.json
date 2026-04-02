@@ -3,7 +3,7 @@
   "dropFolderHere": "拖拽文件夹到此处或点击选择",
   "scanning": "扫描中...",
   "cancel": "取消",
-  "items": "项目",
+  "files": "个文件",
   "errors": "错误",
   "back": "返回",
   "forward": "前进",
@@ -11,9 +11,5 @@
   "showInFileManager": "在文件管理器中显示",
   "delete": "删除",
   "deleteConfirmTitle": "删除",
-  "deleteConfirmMessage": "确定要删除「{{name}}」吗？",
-  "smallerItems": "{{count}} 个较小项目",
-  "totalSize": "总大小",
-  "files": "个文件",
-  "folders": "个文件夹"
+  "deleteConfirmMessage": "确定要删除「{{name}}」吗？"
 }

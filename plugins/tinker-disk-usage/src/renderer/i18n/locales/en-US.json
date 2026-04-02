@@ -3,7 +3,7 @@
   "dropFolderHere": "Drop a folder here or click to select",
   "scanning": "Scanning...",
   "cancel": "Cancel",
-  "items": "Items",
+  "files": "files",
   "errors": "Errors",
   "back": "Back",
   "forward": "Forward",
@@ -11,9 +11,5 @@
   "showInFileManager": "Show in File Manager",
   "delete": "Delete",
   "deleteConfirmTitle": "Delete",
-  "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?",
-  "smallerItems": "{{count}} smaller items",
-  "totalSize": "Total Size",
-  "files": "files",
-  "folders": "folders"
+  "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?"
 }

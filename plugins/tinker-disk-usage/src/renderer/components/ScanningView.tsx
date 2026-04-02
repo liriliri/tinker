@@ -23,18 +23,19 @@ export default observer(function ScanningView() {
           className={`text-xs mt-3 tabular-nums ${tw.text.tertiary} h-10 flex flex-col justify-center`}
         >
           {store.scanProgress && (
-            <p>
-              {store.scanProgress.count.toLocaleString()}
+            <>
+              <p>
+                {store.scanProgress.count.toLocaleString()} {t('files')}
+              </p>
               {store.scanProgress.size > 0 && (
-                <> · {fileSize(store.scanProgress.size)}</>
+                <p>{fileSize(store.scanProgress.size)}</p>
               )}
               {store.scanProgress.errors > 0 && (
-                <span className="text-red-500">
-                  {' '}
-                  · {t('errors')}: {store.scanProgress.errors}
-                </span>
+                <p className="text-red-500">
+                  {t('errors')}: {store.scanProgress.errors}
+                </p>
               )}
-            </p>
+            </>
           )}
         </div>
       </div>

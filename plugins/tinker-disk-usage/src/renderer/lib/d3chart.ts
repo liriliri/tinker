@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import fileSize from 'licia/fileSize'
+import splitPath from 'licia/splitPath'
 import type { DiskItem } from '../../common/types'
 import { THEME_COLORS } from 'share/theme'
 
@@ -30,9 +31,7 @@ function getBoxColor(
     return isDark ? '#3a2816' : '#fcebd4'
   }
 
-  const ext = d.data.name.includes('.')
-    ? d.data.name.slice(d.data.name.lastIndexOf('.')).toLowerCase()
-    : ''
+  const ext = splitPath(d.data.name).ext.toLowerCase()
 
   if (isDark) {
     switch (ext) {

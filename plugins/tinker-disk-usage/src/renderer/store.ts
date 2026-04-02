@@ -53,6 +53,20 @@ class Store extends BaseStore {
     return this.view === 'chart' && !!this.navigatePath
   }
 
+  async openDirectoryPicker(reset = false) {
+    const result = await tinker.showOpenDialog({
+      properties: ['openDirectory'],
+    })
+    const [dirPath] = result.filePaths
+    if (result.canceled || !dirPath) return
+
+    if (reset) {
+      this.reset()
+    }
+
+    await this.openDirectory(dirPath)
+  }
+
   async openDirectory(dirPath: string) {
     this.view = 'scanning'
     this.scanPath = dirPath
@@ -135,14 +149,10 @@ class Store extends BaseStore {
   async navigateUp() {
     if (!this.navigatePath || !this.diskData) return
     const current = findBranch(this.navigatePath, this.diskData)
-    let parentPath: string
-    if (!current || current.id === this.diskData.id) {
-      parentPath = ''
-    } else {
-      const lastSlash = this.navigatePath.lastIndexOf('/')
-      parentPath =
-        lastSlash > 0 ? this.navigatePath.substring(0, lastSlash) : ''
-    }
+    const parentPath =
+      !current || current.id === this.diskData.id
+        ? ''
+        : this.navigatePath.split('/').slice(0, -1).join('/')
     await this.navigateTo(parentPath)
   }
 

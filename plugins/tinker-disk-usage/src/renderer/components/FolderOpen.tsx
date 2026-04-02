@@ -9,12 +9,7 @@ export default function FolderOpen() {
   const [isDragging, setIsDragging] = useState(false)
 
   const handleClick = async () => {
-    const result = await tinker.showOpenDialog({
-      properties: ['openDirectory'],
-    })
-    if (!result.canceled && result.filePaths.length > 0) {
-      store.openDirectory(result.filePaths[0])
-    }
+    await store.openDirectoryPicker()
   }
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -43,15 +38,15 @@ export default function FolderOpen() {
     if (!files || files.length === 0) return
 
     const file = files[0] as File & { path?: string }
-    if (file.path) {
-      try {
-        const stats = await tinker.fstat(file.path)
-        if (stats.isDirectory) {
-          store.openDirectory(file.path)
-        }
-      } catch {
+    if (!file?.path) return
+
+    try {
+      const stats = await tinker.fstat(file.path)
+      if (stats.isDirectory) {
         store.openDirectory(file.path)
       }
+    } catch {
+      store.openDirectory(file.path)
     }
   }
 

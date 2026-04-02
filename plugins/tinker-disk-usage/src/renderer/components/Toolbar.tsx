@@ -17,13 +17,7 @@ export default observer(function Toolbar() {
   const currentData = store.currentData
 
   const handleOpenDirectory = async () => {
-    const result = await tinker.showOpenDialog({
-      properties: ['openDirectory'],
-    })
-    if (!result.canceled && result.filePaths.length > 0) {
-      store.reset()
-      store.openDirectory(result.filePaths[0])
-    }
+    await store.openDirectoryPicker(true)
   }
 
   return (

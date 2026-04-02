@@ -1,8 +1,5 @@
 import { contextBridge } from 'electron'
 import * as fs from 'fs/promises'
-import { homedir, platform } from 'os'
-import * as path from 'path'
-
 const diskUsageObj = {
   async checkDirectories(paths: string[]): Promise<Record<string, boolean>> {
     const result: Record<string, boolean> = {}
@@ -21,18 +18,6 @@ const diskUsageObj = {
 
   async remove(filePath: string): Promise<void> {
     await fs.rm(filePath, { recursive: true, force: true })
-  },
-
-  homedir(): string {
-    return homedir()
-  },
-
-  platform(): string {
-    return platform()
-  },
-
-  pathSep(): string {
-    return path.sep
   },
 }
 
