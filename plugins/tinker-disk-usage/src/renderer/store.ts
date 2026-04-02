@@ -50,7 +50,11 @@ class Store extends BaseStore {
   }
 
   get canGoUp(): boolean {
-    return this.view === 'chart' && !!this.navigatePath
+    return (
+      this.view === 'chart' &&
+      !!this.navigatePath &&
+      this.navigatePath !== this.diskData?.id
+    )
   }
 
   async openDirectoryPicker(reset = false) {
@@ -147,12 +151,15 @@ class Store extends BaseStore {
   }
 
   async navigateUp() {
-    if (!this.navigatePath || !this.diskData) return
+    if (!this.canGoUp || !this.diskData) return
     const current = findBranch(this.navigatePath, this.diskData)
-    const parentPath =
+    let parentPath =
       !current || current.id === this.diskData.id
         ? ''
         : this.navigatePath.split('/').slice(0, -1).join('/')
+    if (parentPath === this.diskData.id) {
+      parentPath = ''
+    }
     await this.navigateTo(parentPath)
   }
 

@@ -233,7 +233,13 @@ export function createTreemapChart(
               event.stopPropagation()
               callbacks.onContextMenuNode(event, d.data)
             })
-            .attr('title', (d) => `${d.data.name}\n${fileSize(d.value || 0)}`)
+            .attr(
+              'title',
+              (d) =>
+                `${d.depth === 0 ? d.data.id : d.data.name}\n${fileSize(
+                  d.value || 0
+                )}`
+            )
 
           const label = entered.append('div').attr('class', 'label')
 
@@ -241,7 +247,7 @@ export function createTreemapChart(
             .append('span')
             .attr('class', 'label-name')
             .style('color', fontColor)
-            .text((d) => d.data.name)
+            .text((d) => (d.depth === 0 ? d.data.id : d.data.name))
 
           label
             .append('span')
@@ -264,12 +270,18 @@ export function createTreemapChart(
               const h = d.y1 - d.y0
               return !shouldShow(w, h)
             })
-            .attr('title', (d) => `${d.data.name}\n${fileSize(d.value || 0)}`)
+            .attr(
+              'title',
+              (d) =>
+                `${d.depth === 0 ? d.data.id : d.data.name}\n${fileSize(
+                  d.value || 0
+                )}`
+            )
             .each(function (this: HTMLElement, d) {
               const nameEl = this.querySelector('.label-name') as HTMLElement
               const sizeEl = this.querySelector('.label-size') as HTMLElement
               if (nameEl) {
-                nameEl.textContent = d.data.name
+                nameEl.textContent = d.depth === 0 ? d.data.id : d.data.name
                 nameEl.style.color = fontColor
               }
               if (sizeEl) {
