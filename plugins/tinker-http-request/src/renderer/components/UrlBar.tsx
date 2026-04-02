@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Save, Send, X } from 'lucide-react'
+import { Save, Send, Square } from 'lucide-react'
 import { tw } from 'share/theme'
 import store from '../store'
 import { METHOD_COLORS } from '../../lib/util'
@@ -73,9 +73,9 @@ export default observer(function UrlBar() {
         {store.loading ? (
           <button
             onClick={() => store.abort()}
-            className="flex items-center gap-1 px-3 py-2 text-xs text-red-500 hover:text-red-600"
+            className={`flex items-center gap-1 px-3 py-2 text-xs ${tw.text.secondary} hover:${tw.text.primary}`}
           >
-            <X size={14} />
+            <Square size={10} fill="currentColor" />
           </button>
         ) : (
           <button
