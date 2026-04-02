@@ -1,0 +1,19 @@
+{
+  "openFolder": "Open a Folder",
+  "dropFolderHere": "Drop a folder here or click to select",
+  "scanning": "Scanning...",
+  "cancel": "Cancel",
+  "items": "Items",
+  "errors": "Errors",
+  "back": "Back",
+  "forward": "Forward",
+  "up": "Up",
+  "showInFileManager": "Show in File Manager",
+  "delete": "Delete",
+  "deleteConfirmTitle": "Delete",
+  "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?",
+  "smallerItems": "{{count}} smaller items",
+  "totalSize": "Total Size",
+  "files": "files",
+  "folders": "folders"
+}

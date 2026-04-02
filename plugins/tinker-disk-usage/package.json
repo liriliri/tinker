@@ -1,0 +1,27 @@
+{
+  "name": "tinker-disk-usage",
+  "version": "0.1.0",
+  "description": "Disk usage analyzer for TINKER",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
+    "dev:renderer": "vite --config ../vite.config.ts",
+    "dev:preload": "vite --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
+  },
+  "tinker": {
+    "name": "Disk Usage",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "磁盘用量"
+      }
+    }
+  },
+  "devDependencies": {
+    "d3": "^7.9.0"
+  }
+}

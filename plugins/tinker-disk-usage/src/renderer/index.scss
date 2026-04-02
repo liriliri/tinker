@@ -1,0 +1,82 @@
+@use '../../../share/base.scss';
+@config "../../tailwind.config.js";
+
+$anim-duration: 400ms;
+
+.treemap {
+  position: relative;
+  overflow: hidden;
+
+  .box {
+    position: absolute;
+    overflow: hidden;
+    cursor: default;
+
+    &:hover {
+      border-color: #0fc25e !important; // primary theme color highlight
+    }
+  }
+
+  .hide-box {
+    opacity: 0 !important;
+    border-color: transparent !important;
+  }
+
+  &.box-transition-position {
+    .box {
+      transition: top $anim-duration, left $anim-duration, width $anim-duration,
+        height $anim-duration, background-color 250ms;
+    }
+  }
+
+  .animate-in-box {
+    opacity: 0;
+    animation: fadeIn $anim-duration forwards;
+    animation-delay: 500ms;
+  }
+
+  .animate-out-box {
+    animation: fadeOut 0.3s forwards;
+  }
+
+  .label {
+    padding: 0.15rem 0.35rem;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    font-size: 11px;
+    line-height: 1.6;
+    pointer-events: none;
+
+    .label-name {
+      flex: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .label-size {
+      flex: none;
+      margin-left: 6px;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

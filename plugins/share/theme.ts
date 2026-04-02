@@ -32,7 +32,7 @@ export const THEME_COLORS = {
 
   // Border colors
   border: {
-    light: '#e0e0e0',
+    light: '#c0c0c0',
     dark: '#4a4a4a',
   },
 
