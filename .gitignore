@@ -5,4 +5,5 @@ release/
 references/
 tests/
 resources/ScreenCapture.exe
+resources/pdu
 package-lock.json

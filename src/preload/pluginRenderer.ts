@@ -9,6 +9,11 @@ export function injectApi() {
     quit: () => void
   }> = {}
 
+  const diskUsageTasks: types.PlainObj<{
+    kill: () => void
+    quit: () => void
+  }> = {}
+
   function runFFmpeg(args: string[], onProgress?: any) {
     const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
 
@@ -27,6 +32,29 @@ export function injectApi() {
     }
     extendedPromise.quit = function () {
       ffmpegTasks[taskId]?.quit()
+    }
+
+    return extendedPromise
+  }
+
+  function getDiskUsage(options: any, onProgress?: any) {
+    const { promise, taskId } = _tinker.getDiskUsage(options, onProgress)
+
+    diskUsageTasks[taskId] = {
+      kill: () => _tinker.killDiskUsage(taskId),
+      quit: () => _tinker.quitDiskUsage(taskId),
+    }
+
+    promise.finally(() => {
+      delete diskUsageTasks[taskId]
+    })
+
+    const extendedPromise = promise as any
+    extendedPromise.kill = function () {
+      diskUsageTasks[taskId]?.kill()
+    }
+    extendedPromise.quit = function () {
+      diskUsageTasks[taskId]?.quit()
     }
 
     return extendedPromise
@@ -59,6 +87,7 @@ export function injectApi() {
     getFileIcon: _tinker.getFileIcon,
     on: _tinker.on,
     runFFmpeg,
+    getDiskUsage,
     showContextMenu,
     getMediaInfo: _tinker.getMediaInfo,
     getApps: _tinker.getApps,

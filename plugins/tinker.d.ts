@@ -49,6 +49,33 @@ declare global {
       quit(): void
     }
 
+    interface DiskUsageOptions {
+      paths: string[]
+      maxDepth?: number
+      quantity?: 'apparent-size' | 'block-size' | 'block-count'
+      minRatio?: number
+      silentErrors?: boolean
+      threads?: number
+      deduplicateHardlinks?: boolean
+    }
+
+    interface DiskUsageProgress {
+      items: number
+      total: number
+      errors: number
+    }
+
+    interface DiskUsageResult {
+      name: string
+      size: number
+      children: DiskUsageResult[]
+    }
+
+    interface DiskUsageTask extends Promise<DiskUsageResult> {
+      kill(): void
+      quit(): void
+    }
+
     interface VideoStream {
       codec: string
       width: number
@@ -218,6 +245,21 @@ declare global {
      * Throws if the file is not a valid media file.
      */
     getMediaInfo(filePath: string): Promise<tinker.MediaInfo>
+
+    /**
+     * Analyze disk usage of directories.
+     * @example
+     * const task = tinker.getDiskUsage(
+     *   { paths: ['/Users/xxx/Documents'], maxDepth: 5 },
+     *   (progress) => console.log(`scanned ${progress.items} items`)
+     * )
+     * task.kill() // cancel
+     * const data = await task
+     */
+    getDiskUsage(
+      options: tinker.DiskUsageOptions,
+      onProgress?: (progress: tinker.DiskUsageProgress) => void
+    ): tinker.DiskUsageTask
 
     /** Get a list of installed applications. */
     getApps(): Promise<tinker.AppInfo[]>

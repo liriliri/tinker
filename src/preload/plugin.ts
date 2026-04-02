@@ -15,6 +15,7 @@ import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
 import { injectRendererScript, domReady } from './lib/util'
 import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
+import { getDiskUsage, killDiskUsage, quitDiskUsage } from './lib/pdu'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import { callAI, callAIStream, abortAI, getProviderList } from './lib/ai/index'
 import types from 'licia/types'
@@ -130,6 +131,9 @@ const tinkerObj = {
   killFFmpeg,
   quitFFmpeg,
   getMediaInfo,
+  getDiskUsage,
+  killDiskUsage,
+  quitDiskUsage,
   async getApps() {
     return await mainObj.getApps()
   },
