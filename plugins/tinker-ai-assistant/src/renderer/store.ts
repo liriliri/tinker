@@ -125,6 +125,7 @@ function serializeSession(session: Session): SessionData {
 
 class Store extends BaseStore {
   session: Session = createSession('')
+  sessionLoaded = false
 
   providers: tinker.AiProviderInfo[] = []
   selectedProvider: string = ''
@@ -159,6 +160,7 @@ class Store extends BaseStore {
       } else {
         this.session = createSession(savedWorkingDir)
       }
+      this.sessionLoaded = true
     })
   }
 

@@ -37,6 +37,7 @@ export default observer(function MessageList() {
   return (
     <BaseMessageList
       messages={visibleMessages}
+      sessionId={store.sessionLoaded ? 'loaded' : undefined}
       isDark={store.isDark}
       emptyHint={t('emptyHint')}
       retryLabel={t('retry')}
