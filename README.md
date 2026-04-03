@@ -215,6 +215,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/authenticator.png"/></th>
       <th><img src="https://tinker.liriliri.io/ai_chat.png"/></th>
     </tr>
+    <tr>
+      <th>AI Assistant</th>
+      <th>Disk Usage</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/ai_assistant.png"/></th>
+      <th><img src="https://tinker.liriliri.io/disk_usage.png"/></th>
+    </tr>
+    <tr>
+      <th>Renamer</th>
+      <th>HTTP Request</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/renamer.png"/></th>
+      <th><img src="https://tinker.liriliri.io/http_request.png"/></th>
+    </tr>
   </tbody>
 </table>
 
