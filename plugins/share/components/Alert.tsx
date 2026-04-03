@@ -59,9 +59,7 @@ export function AlertProvider({
       {alertState && (
         <Dialog open={true} onClose={handleClose} title={alertState.title}>
           {alertState.message && (
-            <p
-              className={`text-sm ${tw.text.secondary} ${tw.text.secondary} mb-6`}
-            >
+            <p className={`text-sm ${tw.text.secondary} mb-6`}>
               {alertState.message}
             </p>
           )}

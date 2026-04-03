@@ -72,9 +72,7 @@ export function ConfirmProvider({
       {confirmState && (
         <Dialog open={true} onClose={handleCancel} title={confirmState.title}>
           {confirmState.message && (
-            <p
-              className={`text-sm ${tw.text.secondary} ${tw.text.secondary} mb-6`}
-            >
+            <p className={`text-sm ${tw.text.secondary} mb-6`}>
               {confirmState.message}
             </p>
           )}

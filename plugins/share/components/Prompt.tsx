@@ -88,9 +88,7 @@ export function PromptProvider({
       {promptState && (
         <Dialog open={true} onClose={handleCancel} title={promptState.title}>
           {promptState.message && (
-            <p
-              className={`text-sm ${tw.text.secondary} ${tw.text.secondary} mb-3`}
-            >
+            <p className={`text-sm ${tw.text.secondary} mb-3`}>
               {promptState.message}
             </p>
           )}

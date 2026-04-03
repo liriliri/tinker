@@ -15,7 +15,7 @@ export const THEME_COLORS = {
     light: {
       primary: '#ffffff',
       secondary: '#f0f1f2',
-      tertiary: '#f3e5f5',
+      tertiary: '#f6f7f8',
       input: '#ffffff',
       select: '#ffffff',
       code: '#252526',
@@ -32,33 +32,33 @@ export const THEME_COLORS = {
 
   // Border colors
   border: {
-    light: '#c0c0c0',
+    light: '#e0e0e0',
     dark: '#4a4a4a',
   },
 
   // Hover state background colors
   hover: {
-    light: '#e5e5e5',
+    light: '#e5e7eb',
     dark: '#3a3a3c',
   },
 
   // Active state background colors
   active: {
-    light: '#d5d5d5',
+    light: '#d1d5db',
     dark: '#4a4a4a',
   },
 
   // Text colors
   text: {
     light: {
-      primary: '#000000',
-      secondary: '#6b7280',
-      tertiary: '#9ca3af',
+      primary: '#1f2937',
+      secondary: '#4b5563',
+      tertiary: '#6b7280',
     },
     dark: {
-      primary: '#d4d4d4',
-      secondary: '#9ca3af',
-      tertiary: '#6b7280',
+      primary: '#e5e7eb',
+      secondary: '#d1d5db',
+      tertiary: '#9ca3af',
     },
   },
 

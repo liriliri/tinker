@@ -16,7 +16,6 @@ export default observer(function App() {
       <ConfirmProvider locale={i18n.language}>
         <ToasterProvider>
           <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
-            <div className={`border-t ${tw.border}`} />
             <Toolbar />
             <MessageList />
             <InputArea />

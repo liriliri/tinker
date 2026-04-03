@@ -31,6 +31,44 @@ export default function Dialog({
   className = '',
   showClose = false,
 }: DialogProps) {
+  const titleClassName =
+    'text-lg font-semibold text-gray-800 dark:text-gray-200'
+  const closeButtonClassName =
+    'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors'
+
+  const renderCloseButton = () => (
+    <button onClick={onClose} className={closeButtonClassName}>
+      <X className="w-5 h-5" />
+    </button>
+  )
+
+  const renderHeader = () => {
+    if (!title && !showClose) {
+      return null
+    }
+
+    if (title && showClose) {
+      return (
+        <div className="flex items-center justify-between">
+          <DialogTitle as="h3" className={titleClassName}>
+            {title}
+          </DialogTitle>
+          {renderCloseButton()}
+        </div>
+      )
+    }
+
+    if (title) {
+      return (
+        <DialogTitle as="h3" className={titleClassName}>
+          {title}
+        </DialogTitle>
+      )
+    }
+
+    return <div className="flex justify-end mb-2">{renderCloseButton()}</div>
+  }
+
   return (
     <Transition appear show={open} as={Fragment}>
       <HeadlessDialog as="div" className="relative z-50" onClose={onClose}>
@@ -62,42 +100,7 @@ export default function Dialog({
                   tw.bg.secondary
                 } shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
-                <div className="p-6 pb-2 flex-shrink-0">
-                  {title && !showClose && (
-                    <DialogTitle
-                      as="h3"
-                      className="text-lg font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      {title}
-                    </DialogTitle>
-                  )}
-                  {title && showClose && (
-                    <div className="flex items-center justify-between">
-                      <DialogTitle
-                        as="h3"
-                        className="text-lg font-semibold text-gray-800 dark:text-gray-200"
-                      >
-                        {title}
-                      </DialogTitle>
-                      <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  )}
-                  {!title && showClose && (
-                    <div className="flex justify-end mb-2">
-                      <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <div className="p-6 pb-2 flex-shrink-0">{renderHeader()}</div>
                 <div className="p-6 pt-4 overflow-y-auto flex-1 min-h-0">
                   {children}
                 </div>
