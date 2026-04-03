@@ -42,6 +42,10 @@ export const WEB_FETCH_TOOL = {
 } as const
 
 function formatWebSearchResults(results: WebSearchResult[]): string {
+  if (results.length === 0) {
+    return 'No search results found for the given query.'
+  }
+
   return results
     .map((r, i) => `[${i + 1}] ${r.title}\nURL: ${r.url}\n${r.content}`)
     .join('\n\n')

@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
-import { toJS } from 'mobx'
+import jsonClone from 'licia/jsonClone'
 import type { SessionData } from '../types'
 
 interface AiAssistantDB extends DBSchema {
@@ -36,5 +36,5 @@ export async function loadSession(): Promise<SessionData | undefined> {
 
 export async function saveSession(session: SessionData): Promise<void> {
   const db = await getDB()
-  await db.put(STORE_NAME, toJS(session), SESSION_KEY)
+  await db.put(STORE_NAME, jsonClone(session), SESSION_KEY)
 }

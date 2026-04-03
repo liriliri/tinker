@@ -17,7 +17,7 @@
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "磁盘用量"
+        "name": "磁盘空间分析"
       }
     }
   },

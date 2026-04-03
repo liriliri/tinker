@@ -1,5 +1,8 @@
 import https from 'node:https'
 import http from 'node:http'
+import queryString from 'licia/query'
+import stripHtmlTag from 'licia/stripHtmlTag'
+import unescape from 'licia/unescape'
 import type { WebSearchResult } from './web'
 
 const USER_AGENT =
@@ -13,7 +16,17 @@ interface SearchItem {
   url: string
 }
 
-function fetchHtml(url: string, redirectCount = 0): Promise<string> {
+interface FetchHtmlOptions {
+  body?: string
+  headers?: Record<string, string>
+  method?: 'GET' | 'POST'
+  redirectCount?: number
+}
+
+function fetchHtml(
+  url: string,
+  { body, headers, method = 'GET', redirectCount = 0 }: FetchHtmlOptions = {}
+): Promise<string> {
   return new Promise((resolve, reject) => {
     if (redirectCount >= MAX_REDIRECTS) {
       reject(new Error('Too many redirects'))
@@ -27,15 +40,21 @@ function fetchHtml(url: string, redirectCount = 0): Promise<string> {
       return
     }
     const client = parsed.protocol === 'https:' ? https : http
-    const req = client.get(
+    const req = client.request(
       {
         hostname: parsed.hostname,
+        method,
         path: parsed.pathname + parsed.search,
+        port: parsed.port || undefined,
+        servername: parsed.hostname,
         headers: {
           'User-Agent': USER_AGENT,
           'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
           Accept:
             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Origin: `${parsed.protocol}//${parsed.host}`,
+          Referer: `${parsed.protocol}//${parsed.host}/`,
+          ...headers,
         },
       },
       (res) => {
@@ -48,7 +67,12 @@ function fetchHtml(url: string, redirectCount = 0): Promise<string> {
           const redirectUrl = res.headers.location.startsWith('http')
             ? res.headers.location
             : `${parsed.protocol}//${parsed.host}${res.headers.location}`
-          fetchHtml(redirectUrl, redirectCount + 1)
+          fetchHtml(redirectUrl, {
+            body,
+            headers,
+            method,
+            redirectCount: redirectCount + 1,
+          })
             .then(resolve)
             .catch(reject)
           res.resume()
@@ -65,21 +89,16 @@ function fetchHtml(url: string, redirectCount = 0): Promise<string> {
       reject(new Error('Request timeout'))
     })
     req.on('error', reject)
+    if (body) {
+      req.write(body)
+    }
+    req.end()
   })
 }
 
-function decodeHtml(html: string): string {
-  return html
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-}
-
 function stripTags(html: string): string {
-  return decodeHtml(html.replace(/<[^>]+>/g, ' '))
+  return unescape(stripHtmlTag(html))
+    .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -98,9 +117,9 @@ function parseResults(html: string, regex: RegExp): SearchItem[] {
   return results
 }
 
-function parseGoogleResults(html: string): SearchItem[] {
+function parseDuckDuckGoResults(html: string): SearchItem[] {
   const regex =
-    /<a[^>]+href="(https?:\/\/[^"]+)"[^>]*>[\s\S]*?<h3[^>]*>([\s\S]*?)<\/h3>[\s\S]*?<\/a>/gi
+    /<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
   return parseResults(html, regex)
 }
 
@@ -123,19 +142,17 @@ function htmlToText(html: string): string {
   ).slice(0, 2000)
 }
 
-async function fetchContent(url: string): Promise<string> {
-  try {
-    const html = await fetchHtml(url)
-    return htmlToText(html)
-  } catch {
-    return ''
-  }
+async function fetchTextContent(
+  url: string,
+  options?: FetchHtmlOptions
+): Promise<string> {
+  const html = await fetchHtml(url, options)
+  return htmlToText(html)
 }
 
 export async function webFetch(url: string): Promise<string> {
   try {
-    const html = await fetchHtml(url)
-    const text = htmlToText(html)
+    const text = await fetchTextContent(url)
 
     if (!text) {
       return `Error: Could not extract content from ${url}`
@@ -154,17 +171,28 @@ export async function webSearch(query: string): Promise<WebSearchResult[]> {
   const isZh = lang.startsWith('zh')
   const searchUrl = isZh
     ? `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`
-    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
-  const parse = isZh ? parseBaiduResults : parseGoogleResults
+    : 'https://html.duckduckgo.com/html/'
+  const parse = isZh ? parseBaiduResults : parseDuckDuckGoResults
 
-  const html = await fetchHtml(searchUrl)
+  const html = await fetchHtml(
+    searchUrl,
+    isZh
+      ? undefined
+      : {
+          method: 'POST',
+          body: queryString.stringify({ q: query }),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+  )
   const items = parse(html).filter((item) => item.url.startsWith('http'))
 
   const settled = await Promise.allSettled(
     items.map(async (item) => ({
       title: item.title,
       url: item.url,
-      content: await fetchContent(item.url),
+      content: await fetchTextContent(item.url).catch(() => ''),
     }))
   )
 
