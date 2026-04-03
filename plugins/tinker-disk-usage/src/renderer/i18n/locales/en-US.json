@@ -11,5 +11,7 @@
   "showInFileManager": "Show in File Manager",
   "delete": "Delete",
   "deleteConfirmTitle": "Delete",
-  "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?"
+  "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?",
+  "rescan": "Rescan",
+  "rescan": "Rescan"
 }

@@ -14,7 +14,7 @@ import type { ChartControls } from './lib/d3chart'
 
 export type ViewState = 'open' | 'scanning' | 'chart'
 
-const DEFAULT_MAX_DEPTH = 3
+const DEFAULT_MAX_DEPTH = 5
 
 class Store extends BaseStore {
   view: ViewState = 'open'
@@ -230,6 +230,13 @@ class Store extends BaseStore {
     if (this.chartControls && this.currentData) {
       this.chartControls.render(this.currentData)
     }
+  }
+
+  async rescan() {
+    if (!this.scanPath) return
+    const dirPath = this.scanPath
+    this.reset()
+    await this.openDirectory(dirPath)
   }
 
   reset() {

@@ -7,7 +7,11 @@ import { THEME_COLORS } from 'share/theme'
 export interface ChartCallbacks {
   onClickNode: (node: DiskItem) => void
   onExpandNode: (node: DiskItem) => void
-  onContextMenuNode: (event: MouseEvent, node: DiskItem) => void
+  onContextMenuNode: (
+    event: MouseEvent,
+    node: DiskItem,
+    isRoot: boolean
+  ) => void
 }
 
 export interface ChartControls {
@@ -207,12 +211,10 @@ export function createTreemapChart(
             .style('border', (d) =>
               d.depth === 0 ? 'none' : `1px solid ${borderColor}`
             )
-            .style('cursor', (d) =>
-              d.data.isDirectory ? 'pointer' : 'default'
-            )
+            .style('cursor', 'default')
             .on('click', (event, d) => {
               event.stopPropagation()
-              if (d.data.isDirectory) {
+              if (d.data.isDirectory && d.depth > 0) {
                 if (clickTimer) clearTimeout(clickTimer)
                 clickTimer = setTimeout(() => {
                   clickTimer = null
@@ -226,12 +228,13 @@ export function createTreemapChart(
                 clearTimeout(clickTimer)
                 clickTimer = null
               }
+              if (d.depth === 0) return
               callbacks.onClickNode(d.data)
             })
             .on('contextmenu', (event, d) => {
               event.preventDefault()
               event.stopPropagation()
-              callbacks.onContextMenuNode(event, d.data)
+              callbacks.onContextMenuNode(event, d.data, d.depth === 0)
             })
             .attr(
               'title',

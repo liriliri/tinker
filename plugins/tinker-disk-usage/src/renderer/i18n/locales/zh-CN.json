@@ -11,5 +11,6 @@
   "showInFileManager": "在文件管理器中显示",
   "delete": "删除",
   "deleteConfirmTitle": "删除",
-  "deleteConfirmMessage": "确定要删除「{{name}}」吗？"
+  "deleteConfirmMessage": "确定要删除「{{name}}」吗？",
+  "rescan": "重新扫描"
 }

@@ -31,31 +31,38 @@ export default observer(function ChartView() {
         onExpandNode: async (node) => {
           await store.expandNode(node.id)
         },
-        onContextMenuNode: (event, node) => {
-          tinker.showContextMenu(event.clientX, event.clientY, [
+        onContextMenuNode: (event, node, isRoot) => {
+          const menuItems: Parameters<typeof tinker.showContextMenu>[2] = [
             {
               label: t('showInFileManager'),
               click: () => tinker.showItemInPath(node.id),
             },
-            { type: 'separator' },
-            {
-              label: t('delete'),
-              click: async () => {
-                const confirmed = await confirm({
-                  title: t('deleteConfirmTitle'),
-                  message: t('deleteConfirmMessage', { name: node.name }),
-                })
-                if (confirmed) {
-                  try {
-                    await diskUsage.remove(node.id)
-                    store.deleteItem(node.id)
-                  } catch (err) {
-                    console.error('Delete failed:', err)
+          ]
+
+          if (!isRoot) {
+            menuItems.push(
+              { type: 'separator' },
+              {
+                label: t('delete'),
+                click: async () => {
+                  const confirmed = await confirm({
+                    title: t('deleteConfirmTitle'),
+                    message: t('deleteConfirmMessage', { name: node.name }),
+                  })
+                  if (confirmed) {
+                    try {
+                      await diskUsage.remove(node.id)
+                      store.deleteItem(node.id)
+                    } catch (err) {
+                      console.error('Delete failed:', err)
+                    }
                   }
-                }
-              },
-            },
-          ])
+                },
+              }
+            )
+          }
+
+          tinker.showContextMenu(event.clientX, event.clientY, menuItems)
         },
       },
       store.isDark
