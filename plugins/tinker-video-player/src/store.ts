@@ -1,16 +1,9 @@
 import { makeAutoObservable } from 'mobx'
 import fileUrl from 'licia/fileUrl'
 import splitPath from 'licia/splitPath'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-
-interface HistoryItem {
-  filePath: string
-  name: string
-}
-
-const HISTORY_KEY = 'history'
-const storage = new LocalStore('tinker-video-player')
+import * as db from './lib/db'
+import { HistoryItem } from './types'
 
 class Store extends BaseStore {
   videoSrc = ''
@@ -26,18 +19,16 @@ class Store extends BaseStore {
     this.loadHistory()
   }
 
-  private loadHistory() {
-    const history = storage.get(HISTORY_KEY)
-    if (Array.isArray(history)) {
+  private async loadHistory() {
+    try {
+      const history = await db.getAllHistory()
       this.playHistory = history
+    } catch (error) {
+      console.error('Failed to load history:', error)
     }
   }
 
-  private saveHistory() {
-    storage.set(HISTORY_KEY, this.playHistory.slice())
-  }
-
-  setVideo(filePath: string) {
+  async setVideo(filePath: string) {
     this.filePath = filePath
     this.videoSrc = fileUrl(filePath)
 
@@ -45,20 +36,61 @@ class Store extends BaseStore {
     const displayName = name.replace(ext, '')
     tinker.setTitle(displayName)
 
-    this.addToHistory({ filePath, name: displayName })
+    await this.addToHistory(filePath, displayName)
   }
 
-  private addToHistory(item: HistoryItem) {
+  private async addToHistory(filePath: string, name: string) {
+    const existing = this.playHistory.find((h) => h.filePath === filePath)
+
+    const item: HistoryItem = {
+      filePath,
+      name,
+      thumbnail: existing?.thumbnail,
+      duration: existing?.duration,
+      currentTime: existing?.currentTime,
+      lastPlayed: Date.now(),
+    }
+
     this.playHistory = [
       item,
-      ...this.playHistory.filter((h) => h.filePath !== item.filePath),
+      ...this.playHistory.filter((h) => h.filePath !== filePath),
     ]
-    this.saveHistory()
+    db.putHistory(item)
+
+    // Fetch thumbnail in background if not cached
+    if (!item.thumbnail) {
+      this.fetchThumbnail(filePath)
+    }
   }
 
-  removeFromHistory(filePath: string) {
+  private async fetchThumbnail(filePath: string) {
+    try {
+      const info = await tinker.getMediaInfo(filePath)
+      const idx = this.playHistory.findIndex((h) => h.filePath === filePath)
+      if (idx === -1) return
+
+      const updated: HistoryItem = {
+        ...this.playHistory[idx],
+        thumbnail: info.videoStream?.thumbnail,
+        duration: info.duration,
+      }
+      this.playHistory = this.playHistory.map((h) =>
+        h.filePath === filePath ? updated : h
+      )
+      db.putHistory(updated)
+    } catch {
+      // ignore - file may not be accessible
+    }
+  }
+
+  async removeFromHistory(filePath: string) {
     this.playHistory = this.playHistory.filter((h) => h.filePath !== filePath)
-    this.saveHistory()
+    await db.removeHistory(filePath)
+  }
+
+  async clearHistory() {
+    this.playHistory = []
+    await db.clearHistory()
   }
 
   setVideoSrc(src: string) {
@@ -71,6 +103,31 @@ class Store extends BaseStore {
 
   togglePlaylist() {
     this.showPlaylist = !this.showPlaylist
+  }
+
+  closePlaylist() {
+    this.showPlaylist = false
+  }
+
+  saveProgress(currentTime: number) {
+    const item = this.playHistory.find((h) => h.filePath === this.filePath)
+    if (!item) return
+    if (
+      item.currentTime !== undefined &&
+      Math.abs(currentTime - item.currentTime) < 1
+    )
+      return
+
+    const updated: HistoryItem = { ...item, currentTime }
+    this.playHistory = this.playHistory.map((h) =>
+      h.filePath === this.filePath ? updated : h
+    )
+    db.putHistory(updated)
+  }
+
+  getSavedProgress(filePath: string): number {
+    const item = this.playHistory.find((h) => h.filePath === filePath)
+    return item?.currentTime ?? 0
   }
 
   async openFile() {

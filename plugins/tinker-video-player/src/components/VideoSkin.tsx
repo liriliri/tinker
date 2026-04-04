@@ -1,5 +1,6 @@
 import { forwardRef, PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
+import { observer } from 'mobx-react-lite'
 import {
   Container,
   usePlayer,
@@ -108,9 +109,11 @@ function VolumePopover() {
   )
 }
 
-export default function VideoSkin(props: VideoSkinProps) {
+export default observer(function VideoSkin(props: VideoSkinProps) {
   const { children, className, poster, ...rest } = props
   const { t } = useTranslation()
+
+  const disabledClass = !store.hasVideo ? 'opacity-30 pointer-events-none' : ''
 
   const playLabel: PlayButtonProps['label'] = (state) => {
     if (state.ended) return t('replay')
@@ -154,7 +157,7 @@ export default function VideoSkin(props: VideoSkinProps) {
       </ErrorDialog.Root>
       <Controls.Root className="media-surface media-controls">
         <Tooltip.Provider>
-          <div className="media-button-group">
+          <div className={`media-button-group ${disabledClass}`}>
             <Tooltip.Root side="top">
               <Tooltip.Trigger
                 render={
@@ -221,7 +224,7 @@ export default function VideoSkin(props: VideoSkinProps) {
               </Tooltip.Popup>
             </Tooltip.Root>
           </div>
-          <div className="media-time-controls">
+          <div className={`media-time-controls ${disabledClass}`}>
             <Time.Value type="current" className="media-time" />
             <TimeSlider.Root className="media-slider">
               <Slider.Track className="media-slider__track">
@@ -346,4 +349,4 @@ export default function VideoSkin(props: VideoSkinProps) {
       <div className="media-overlay" />
     </Container>
   )
-}
+})

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { createPlayer } from '@videojs/react'
 import { Video, videoFeatures } from '@videojs/react/video'
@@ -6,6 +6,8 @@ import '@videojs/react/video/skin.css'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen } from 'lucide-react'
 import { tw } from 'share/theme'
+import { ConfirmProvider } from 'share/components/Confirm'
+import i18n from './i18n'
 import store from './store'
 import VideoSkin from './components/VideoSkin'
 import MediaInfoDialog from './components/MediaInfoDialog'
@@ -30,6 +32,8 @@ export default observer(function App() {
     e.preventDefault()
   }
 
+  const saveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
   const handleVideoClick = useCallback(
     (e: React.MouseEvent<HTMLVideoElement>) => {
       const video = e.currentTarget
@@ -41,6 +45,40 @@ export default observer(function App() {
     },
     []
   )
+
+  const handleLoadedMetadata = useCallback(
+    (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      const video = e.currentTarget
+      const saved = store.getSavedProgress(store.filePath)
+      if (saved > 0 && saved < video.duration - 1) {
+        video.currentTime = saved
+      }
+    },
+    []
+  )
+
+  const startSaveTimer = useCallback((video: HTMLVideoElement) => {
+    if (saveTimerRef.current) return
+    saveTimerRef.current = setInterval(() => {
+      store.saveProgress(video.currentTime)
+    }, 3000)
+  }, [])
+
+  const stopSaveTimer = useCallback((video: HTMLVideoElement) => {
+    if (saveTimerRef.current) {
+      clearInterval(saveTimerRef.current)
+      saveTimerRef.current = null
+    }
+    store.saveProgress(video.currentTime)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearInterval(saveTimerRef.current)
+      }
+    }
+  }, [])
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
@@ -56,39 +94,51 @@ export default observer(function App() {
   )
 
   return (
-    <div
-      className="relative h-screen"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onContextMenu={handleContextMenu}
-    >
-      <Provider>
-        <Container className="h-full">
-          <VideoSkin>
-            <Video
-              src={store.videoSrc || undefined}
-              autoPlay={store.hasVideo}
-              onClick={handleVideoClick}
+    <ConfirmProvider locale={i18n.language}>
+      <div
+        className="relative h-screen"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onContextMenu={handleContextMenu}
+      >
+        <Provider>
+          <Container className="h-full">
+            <VideoSkin>
+              <Video
+                src={store.videoSrc || undefined}
+                autoPlay={store.hasVideo}
+                onClick={handleVideoClick}
+                onLoadedMetadata={handleLoadedMetadata}
+                onPlay={(e: React.SyntheticEvent<HTMLVideoElement>) =>
+                  startSaveTimer(e.currentTarget)
+                }
+                onPause={(e: React.SyntheticEvent<HTMLVideoElement>) =>
+                  stopSaveTimer(e.currentTarget)
+                }
+                onEnded={(e: React.SyntheticEvent<HTMLVideoElement>) =>
+                  stopSaveTimer(e.currentTarget)
+                }
+              />
+            </VideoSkin>
+          </Container>
+        </Provider>
+        {!store.hasVideo && (
+          <button
+            className="absolute inset-0 bottom-12 flex flex-col items-center justify-center cursor-pointer z-10"
+            onClick={() => store.openFile()}
+          >
+            <FolderOpen
+              className={`${tw.text.primary} opacity-50 hover:opacity-80 transition-opacity`}
+              size={48}
             />
-          </VideoSkin>
-        </Container>
-      </Provider>
-      {!store.hasVideo && (
-        <button
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer z-10"
-          onClick={() => store.openFile()}
-        >
-          <FolderOpen
-            className={`${tw.text.primary} opacity-50 hover:opacity-80 transition-opacity`}
-            size={48}
-          />
-          <span className={`mt-3 text-sm ${tw.text.secondary} opacity-50`}>
-            {t('dropOrOpen')}
-          </span>
-        </button>
-      )}
-      <MediaInfoDialog />
-      <PlaylistPanel />
-    </div>
+            <span className={`mt-3 text-sm ${tw.text.secondary} opacity-50`}>
+              {t('dropOrOpen')}
+            </span>
+          </button>
+        )}
+        <MediaInfoDialog />
+        <PlaylistPanel />
+      </div>
+    </ConfirmProvider>
   )
 })

@@ -30,5 +30,8 @@
   "bitrate": "码率",
   "sampleRate": "采样率",
   "playlist": "播放列表",
-  "noHistory": "暂无播放记录"
+  "noHistory": "暂无播放记录",
+  "remove": "移除",
+  "clearAll": "清空全部",
+  "confirmClear": "确定要清空所有播放记录吗？"
 }

@@ -30,5 +30,8 @@
   "bitrate": "Bitrate",
   "sampleRate": "Sample Rate",
   "playlist": "Playlist",
-  "noHistory": "No play history"
+  "noHistory": "No play history",
+  "remove": "Remove",
+  "clearAll": "Clear All",
+  "confirmClear": "Are you sure you want to clear all play history?"
 }
