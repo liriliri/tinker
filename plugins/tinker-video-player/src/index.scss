@@ -1,0 +1,34 @@
+@use '../../share/base.scss';
+@config "../tailwind.config.js";
+
+#app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+// Override @videojs/react skin to match Tinker theme
+.media-default-skin {
+  border-radius: 0;
+
+  // Light mode
+  --media-color-primary: #1f2937;
+  --media-surface-background-color: rgba(240, 241, 242, 0.85);
+  --media-surface-inner-border-color: rgba(224, 224, 224, 0.5);
+  --media-surface-outer-border-color: rgba(224, 224, 224, 0.3);
+  --media-surface-shadow-color: rgba(0, 0, 0, 0.08);
+  --media-border-color: rgba(224, 224, 224, 0.5);
+
+  .media-slider__fill {
+    color: #0fc25e;
+  }
+}
+
+// Dark mode
+.dark .media-default-skin {
+  --media-color-primary: #e5e7eb;
+  --media-surface-background-color: rgba(48, 49, 51, 0.85);
+  --media-surface-inner-border-color: rgba(74, 74, 74, 0.5);
+  --media-surface-outer-border-color: rgba(74, 74, 74, 0.3);
+  --media-surface-shadow-color: rgba(0, 0, 0, 0.3);
+  --media-border-color: rgba(74, 74, 74, 0.5);
+}

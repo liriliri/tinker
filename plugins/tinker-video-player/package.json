@@ -1,22 +1,22 @@
 {
-  "name": "tinker-password-manager",
+  "name": "tinker-video-player",
   "version": "0.1.0",
-  "description": "Password Manager Plugin for TINKER",
+  "description": "Video Player for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
-    "name": "Password Manager",
+    "name": "Video Player",
+    "main": "dist/index.html",
     "icon": "icon.png",
-    "main": "dist/renderer/index.html",
     "locales": {
       "zh-CN": {
-        "name": "密码管理"
+        "name": "视频播放"
       }
     }
   },
   "devDependencies": {
-    "kdbxweb": "^2.1.1"
+    "@videojs/react": "^10.0.0-beta.15"
   }
 }

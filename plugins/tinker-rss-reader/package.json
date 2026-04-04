@@ -17,7 +17,7 @@
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "RSS 阅读器"
+        "name": "RSS 阅读"
       }
     }
   },

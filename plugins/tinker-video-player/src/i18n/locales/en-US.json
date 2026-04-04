@@ -1,0 +1,21 @@
+{
+  "openVideo": "Open Video",
+  "dropOrOpen": "Drop a video file here, or click to open",
+  "supportedFormats": "Supports MP4, WebM, OGG, and more",
+  "play": "Play",
+  "pause": "Pause",
+  "replay": "Replay",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "seekBackward": "Seek backward {{seconds}} seconds",
+  "seekForward": "Seek forward {{seconds}} seconds",
+  "togglePlaybackRate": "Toggle playback rate",
+  "enableCaptions": "Enable captions",
+  "disableCaptions": "Disable captions",
+  "enterPip": "Enter picture-in-picture",
+  "exitPip": "Exit picture-in-picture",
+  "enterFullscreen": "Enter fullscreen",
+  "exitFullscreen": "Exit fullscreen",
+  "errorTitle": "Something went wrong.",
+  "ok": "OK"
+}
