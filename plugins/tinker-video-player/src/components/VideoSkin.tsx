@@ -37,7 +37,9 @@ import {
   Subtitles,
   PictureInPicture2,
   Loader2,
+  ListVideo,
 } from 'lucide-react'
+import store from '../store'
 
 const SEEK_TIME = 10
 const ICON_SIZE = 18
@@ -239,6 +241,18 @@ export default function VideoSkin(props: VideoSkinProps) {
             <Time.Value type="duration" className="media-time" />
           </div>
           <div className="media-button-group">
+            <Tooltip.Root side="top">
+              <Tooltip.Trigger
+                render={
+                  <Button onClick={() => store.togglePlaylist()}>
+                    <ListVideo className="media-icon" size={ICON_SIZE} />
+                  </Button>
+                }
+              />
+              <Tooltip.Popup className="media-surface media-tooltip">
+                {t('playlist')}
+              </Tooltip.Popup>
+            </Tooltip.Root>
             <Tooltip.Root side="top">
               <Tooltip.Trigger
                 render={

@@ -28,5 +28,7 @@
   "resolution": "分辨率",
   "fps": "帧率",
   "bitrate": "码率",
-  "sampleRate": "采样率"
+  "sampleRate": "采样率",
+  "playlist": "播放列表",
+  "noHistory": "暂无播放记录"
 }

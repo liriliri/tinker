@@ -9,6 +9,7 @@ import { tw } from 'share/theme'
 import store from './store'
 import VideoSkin from './components/VideoSkin'
 import MediaInfoDialog from './components/MediaInfoDialog'
+import PlaylistPanel from './components/PlaylistPanel'
 
 const { Provider, Container } = createPlayer({
   features: videoFeatures,
@@ -87,6 +88,7 @@ export default observer(function App() {
         </button>
       )}
       <MediaInfoDialog />
+      <PlaylistPanel />
     </div>
   )
 })

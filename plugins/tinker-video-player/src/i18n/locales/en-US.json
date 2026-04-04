@@ -28,5 +28,7 @@
   "resolution": "Resolution",
   "fps": "FPS",
   "bitrate": "Bitrate",
-  "sampleRate": "Sample Rate"
+  "sampleRate": "Sample Rate",
+  "playlist": "Playlist",
+  "noHistory": "No play history"
 }
