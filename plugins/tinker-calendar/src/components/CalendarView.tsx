@@ -18,6 +18,7 @@ import type {
 import { useTranslation } from 'react-i18next'
 import EventDialog, { type EventFormData } from './EventDialog'
 import store from '../store'
+import { getDatePart, getTimePart, normalizeDateKey } from '../lib/date'
 import { getLunarDate } from '../lib/lunar'
 
 interface CalendarViewProps {
@@ -67,7 +68,7 @@ const CalendarView = observer(
       []
     )
 
-    const handleDateClick = async (info: DateClickArg) => {
+    const handleDateClick = (info: DateClickArg) => {
       lastClickInfoRef.current = info
 
       if (clickTimerRef.current) {
@@ -98,7 +99,7 @@ const CalendarView = observer(
       }
       const eventDate = info.event.start ?? new Date()
       store.setSelectedDate(eventDate)
-      store.openEventDialog(info.event.startStr.slice(0, 10), info.event.id)
+      store.openEventDialog(getDatePart(info.event.startStr), info.event.id)
     }
 
     const handleDialogSave = (data: EventFormData) => {
@@ -138,12 +139,7 @@ const CalendarView = observer(
       setCurrentView(arg.view.type)
 
       if (arg.view.type === 'timeGridDay') {
-        const viewDate = arg.view.currentStart
-        const year = viewDate.getFullYear()
-        const month = String(viewDate.getMonth() + 1).padStart(2, '0')
-        const day = String(viewDate.getDate()).padStart(2, '0')
-        const dateStr = `${year}-${month}-${day}`
-        store.setSelectedDate(dateStr)
+        store.setSelectedDate(normalizeDateKey(arg.view.currentStart))
       }
     }
 
@@ -152,11 +148,7 @@ const CalendarView = observer(
       : null
 
     const dayCellClassNames = (arg: { date: Date }) => {
-      const year = arg.date.getFullYear()
-      const month = String(arg.date.getMonth() + 1).padStart(2, '0')
-      const day = String(arg.date.getDate()).padStart(2, '0')
-      const dateStr = `${year}-${month}-${day}`
-      if (dateStr === store.selectedDate) {
+      if (normalizeDateKey(arg.date) === store.selectedDate) {
         return ['fc-day-selected']
       }
       return []
@@ -231,9 +223,15 @@ const CalendarView = observer(
           onSave={handleDialogSave}
           initialDate={store.eventDialogDate}
           initialTitle={editingEvent?.title}
-          initialStartTime={editingEvent?.start.slice(11, 16)}
-          initialEndTime={editingEvent?.end?.slice(11, 16)}
-          initialEndDate={editingEvent?.end?.slice(0, 10)}
+          initialStartTime={
+            editingEvent ? getTimePart(editingEvent.start) : undefined
+          }
+          initialEndTime={
+            editingEvent?.end ? getTimePart(editingEvent.end) : undefined
+          }
+          initialEndDate={
+            editingEvent?.end ? getDatePart(editingEvent.end) : undefined
+          }
         />
       </>
     )

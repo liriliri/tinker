@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Pencil, Trash2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import { tw } from 'share/theme'
+import { getDatePart, getTimePart } from '../lib/date'
 import store, { type CalendarEvent } from '../store'
 
 function formatDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
@@ -13,10 +14,10 @@ function formatDateLabel(dateKey: string, formatter: Intl.DateTimeFormat) {
 function formatEventTime(event: CalendarEvent, selectedDate: string): string {
   if (event.allDay) return ''
 
-  const startTime = event.start.slice(11, 16)
-  const startDate = event.start.slice(0, 10)
-  const endDate = event.end?.slice(0, 10)
-  const endTime = event.end?.slice(11, 16)
+  const startTime = getTimePart(event.start)
+  const startDate = getDatePart(event.start)
+  const endDate = event.end ? getDatePart(event.end) : undefined
+  const endTime = event.end ? getTimePart(event.end) : undefined
 
   // If event spans multiple days
   if (endDate && endDate !== startDate) {
@@ -53,7 +54,7 @@ const Sidebar = observer(() => {
   const eventsForSelectedDate = store.eventsForSelectedDate
 
   const handleEditEvent = (event: CalendarEvent) => {
-    store.openEventDialog(event.start.slice(0, 10), event.id)
+    store.openEventDialog(getDatePart(event.start), event.id)
   }
 
   const handleDeleteEvent = async (event: CalendarEvent) => {

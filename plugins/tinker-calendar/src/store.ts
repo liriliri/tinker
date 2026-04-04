@@ -1,11 +1,18 @@
 import { makeAutoObservable } from 'mobx'
 import filter from 'licia/filter'
 import find from 'licia/find'
+import findIdx from 'licia/findIdx'
 import LocalStore from 'licia/LocalStore'
 import sortBy from 'licia/sortBy'
 import trim from 'licia/trim'
 import uuid from 'licia/uuid'
 import BaseStore from 'share/BaseStore'
+import {
+  createDateTime,
+  getDatePart,
+  getTimePart,
+  normalizeDateKey,
+} from './lib/date'
 import { getHolidaysForYearRange } from './lib/holidays'
 import * as db from './lib/db'
 import i18n from './i18n'
@@ -37,21 +44,11 @@ class Store extends BaseStore {
   }
 
   private getTodayKey() {
-    return this.normalizeDateKey(new Date())
-  }
-
-  private normalizeDateKey(value: string | Date) {
-    if (value instanceof Date) {
-      const year = value.getFullYear()
-      const month = String(value.getMonth() + 1).padStart(2, '0')
-      const day = String(value.getDate()).padStart(2, '0')
-      return `${year}-${month}-${day}`
-    }
-    return value.slice(0, 10)
+    return normalizeDateKey(new Date())
   }
 
   private extractTime(dateTimeStr: string): string {
-    return dateTimeStr.slice(11, 16)
+    return getTimePart(dateTimeStr)
   }
 
   private async loadStorage() {
@@ -73,7 +70,7 @@ class Store extends BaseStore {
   }
 
   setSelectedDate(value: string | Date) {
-    this.selectedDate = this.normalizeDateKey(value)
+    this.selectedDate = normalizeDateKey(value)
   }
 
   setToday() {
@@ -104,20 +101,18 @@ class Store extends BaseStore {
     endTime = '10:00',
     endDate?: string
   ) {
-    const startDateKey = this.normalizeDateKey(startDate)
-    const endDateKey = endDate ? this.normalizeDateKey(endDate) : startDateKey
+    const startDateKey = normalizeDateKey(startDate)
+    const endDateKey = endDate ? normalizeDateKey(endDate) : startDateKey
     const newEvent: CalendarEvent = {
       id: uuid(),
       title: trim(title),
-      start: isAllDay
-        ? `${startDateKey}T00:00`
-        : `${startDateKey}T${startTime}`,
+      start: createDateTime(startDateKey, isAllDay ? '00:00' : startTime),
       end: isAllDay
         ? endDateKey !== startDateKey
-          ? `${endDateKey}T00:00`
+          ? createDateTime(endDateKey, '00:00')
           : undefined
         : endTime
-        ? `${endDateKey}T${endTime}`
+        ? createDateTime(endDateKey, endTime)
         : undefined,
       allDay: isAllDay,
     }
@@ -140,51 +135,48 @@ class Store extends BaseStore {
 
     const startDateKey = startDate
     const endDateKey = endDate || startDate
+    const eventIdx = findIdx(this.events, (event) => event.id === id)
+    if (eventIdx === -1) return
 
-    this.events = this.events.map((event) => {
-      if (event.id !== id) return event
-
-      return {
-        ...event,
-        title: trimmed,
-        start: isAllDay
-          ? `${startDateKey}T00:00`
-          : `${startDateKey}T${startTime}`,
-        end: isAllDay
-          ? endDateKey !== startDateKey
-            ? `${endDateKey}T00:00`
-            : undefined
-          : endTime
-          ? `${endDateKey}T${endTime}`
-          : undefined,
-        allDay: isAllDay,
-      }
-    })
-    const updatedEvent = find(this.events, (e) => e.id === id)
-    if (updatedEvent) {
-      db.updateEvent(updatedEvent)
+    const updatedEvent = {
+      ...this.events[eventIdx],
+      title: trimmed,
+      start: createDateTime(startDateKey, isAllDay ? '00:00' : startTime),
+      end: isAllDay
+        ? endDateKey !== startDateKey
+          ? createDateTime(endDateKey, '00:00')
+          : undefined
+        : endTime
+        ? createDateTime(endDateKey, endTime)
+        : undefined,
+      allDay: isAllDay,
     }
+
+    this.events = this.events.map((event, idx) =>
+      idx === eventIdx ? updatedEvent : event
+    )
+    db.updateEvent(updatedEvent)
   }
 
   updateEventDate(id: string, newDate: Date) {
-    const dateKey = this.normalizeDateKey(newDate)
-    this.events = this.events.map((event) => {
-      if (event.id !== id) return event
+    const dateKey = normalizeDateKey(newDate)
+    const eventIdx = findIdx(this.events, (event) => event.id === id)
+    if (eventIdx === -1) return
 
-      const startTime = event.allDay ? '00:00' : this.extractTime(event.start)
-      const endTime =
-        event.end && !event.allDay ? this.extractTime(event.end) : undefined
-
-      return {
-        ...event,
-        start: `${dateKey}T${startTime}`,
-        end: endTime ? `${dateKey}T${endTime}` : undefined,
-      }
-    })
-    const updatedEvent = find(this.events, (e) => e.id === id)
-    if (updatedEvent) {
-      db.updateEvent(updatedEvent)
+    const event = this.events[eventIdx]
+    const startTime = event.allDay ? '00:00' : this.extractTime(event.start)
+    const endTime =
+      event.end && !event.allDay ? this.extractTime(event.end) : undefined
+    const updatedEvent = {
+      ...event,
+      start: createDateTime(dateKey, startTime),
+      end: endTime ? createDateTime(dateKey, endTime) : undefined,
     }
+
+    this.events = this.events.map((event, idx) =>
+      idx === eventIdx ? updatedEvent : event
+    )
+    db.updateEvent(updatedEvent)
   }
 
   removeEvent(id: string) {
@@ -198,14 +190,14 @@ class Store extends BaseStore {
   }
 
   clearEventsForDate(date: string | Date) {
-    const dateKey = this.normalizeDateKey(date)
+    const dateKey = normalizeDateKey(date)
     const toRemove = filter(
       this.events,
-      (event) => event.start.slice(0, 10) === dateKey
+      (event) => getDatePart(event.start) === dateKey
     )
     this.events = filter(
       this.events,
-      (event) => event.start.slice(0, 10) !== dateKey
+      (event) => getDatePart(event.start) !== dateKey
     )
     toRemove.forEach((event) => db.removeEvent(event.id))
   }
@@ -221,7 +213,7 @@ class Store extends BaseStore {
     return holidays.map((holiday) => ({
       id: holiday.id,
       title: holiday.nameKey,
-      start: `${holiday.date}T00:00`,
+      start: createDateTime(holiday.date, '00:00'),
       allDay: true,
       classNames: ['holiday-event'],
       backgroundColor: HOLIDAY_COLOR,
@@ -247,8 +239,8 @@ class Store extends BaseStore {
   get eventsForSelectedDate() {
     return sortBy(
       filter(this.events, (event) => {
-        const startDate = event.start.slice(0, 10)
-        const endDate = event.end?.slice(0, 10)
+        const startDate = getDatePart(event.start)
+        const endDate = event.end ? getDatePart(event.end) : undefined
 
         if (!endDate || endDate === startDate) {
           return startDate === this.selectedDate

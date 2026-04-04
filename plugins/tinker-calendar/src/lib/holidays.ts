@@ -1,4 +1,5 @@
 import calendar from 'js-calendar-converter'
+import dateFormat from 'licia/dateFormat'
 import filter from 'licia/filter'
 
 export type Holiday = {
@@ -159,6 +160,10 @@ function lunarToSolar(year: number, lunarMonth: number, lunarDay: number) {
   }
 }
 
+function formatHolidayDate(date: Date): string {
+  return dateFormat(date, 'yyyy-mm-dd')
+}
+
 /**
  * Calculate the date for a floating holiday (e.g., 2nd Sunday of May)
  */
@@ -233,26 +238,19 @@ export function getHolidaysForYearRange(
         continue
       }
 
-      const dateStr = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-
       result.push({
         id: `${holiday.id}-${year}`,
-        date: dateStr,
+        date: formatHolidayDate(date),
         nameKey: holiday.nameKey,
       })
     }
 
     if (locale === 'zh-CN') {
       const qingmingDate = getQingmingDate(year)
-      const dateStr = `${qingmingDate.getFullYear()}-${String(
-        qingmingDate.getMonth() + 1
-      ).padStart(2, '0')}-${String(qingmingDate.getDate()).padStart(2, '0')}`
 
       result.push({
         id: `qingming-festival-${year}`,
-        date: dateStr,
+        date: formatHolidayDate(qingmingDate),
         nameKey: 'qingmingFestival',
       })
     }
@@ -269,13 +267,9 @@ export function getHolidaysForYearRange(
         )
         if (!solarDate) continue
 
-        const dateStr = `${solarDate.getFullYear()}-${String(
-          solarDate.getMonth() + 1
-        ).padStart(2, '0')}-${String(solarDate.getDate()).padStart(2, '0')}`
-
         result.push({
           id: `${holiday.id}-${year}`,
-          date: dateStr,
+          date: formatHolidayDate(solarDate),
           nameKey: holiday.nameKey,
         })
       }
