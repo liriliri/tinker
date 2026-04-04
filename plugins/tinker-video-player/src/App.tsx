@@ -6,9 +6,9 @@ import '@videojs/react/video/skin.css'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen } from 'lucide-react'
 import { tw } from 'share/theme'
-import fileUrl from 'licia/fileUrl'
 import store from './store'
 import VideoSkin from './components/VideoSkin'
+import MediaInfoDialog from './components/MediaInfoDialog'
 
 const { Provider, Container } = createPlayer({
   features: videoFeatures,
@@ -21,7 +21,7 @@ export default observer(function App() {
     e.preventDefault()
     const file = e.dataTransfer.files[0]
     if (file?.path) {
-      store.setVideoSrc(fileUrl(file.path))
+      store.setVideo(file.path)
     }
   }
 
@@ -41,11 +41,25 @@ export default observer(function App() {
     []
   )
 
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      if (!store.hasVideo) return
+      e.preventDefault()
+      tinker.showContextMenu(e.clientX, e.clientY, [
+        { label: t('open'), click: () => store.openFile() },
+        { type: 'separator' },
+        { label: t('fileInfo'), click: () => store.fetchMediaInfo() },
+      ])
+    },
+    [t]
+  )
+
   return (
     <div
       className="relative h-screen"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
+      onContextMenu={handleContextMenu}
     >
       <Provider>
         <Container className="h-full">
@@ -72,6 +86,7 @@ export default observer(function App() {
           </span>
         </button>
       )}
+      <MediaInfoDialog />
     </div>
   )
 })

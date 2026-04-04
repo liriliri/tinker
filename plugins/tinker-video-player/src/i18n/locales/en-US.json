@@ -17,5 +17,16 @@
   "enterFullscreen": "Enter fullscreen",
   "exitFullscreen": "Exit fullscreen",
   "errorTitle": "Something went wrong.",
-  "ok": "OK"
+  "ok": "OK",
+  "open": "Open",
+  "fileInfo": "File Info",
+  "size": "Size",
+  "duration": "Duration",
+  "video": "Video",
+  "audio": "Audio",
+  "codec": "Codec",
+  "resolution": "Resolution",
+  "fps": "FPS",
+  "bitrate": "Bitrate",
+  "sampleRate": "Sample Rate"
 }

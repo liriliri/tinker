@@ -4,10 +4,18 @@ import BaseStore from 'share/BaseStore'
 
 class Store extends BaseStore {
   videoSrc = ''
+  filePath = ''
+  mediaInfo: tinker.MediaInfo | null = null
+  showMediaInfo = false
 
   constructor() {
     super()
     makeAutoObservable(this)
+  }
+
+  setVideo(filePath: string) {
+    this.filePath = filePath
+    this.videoSrc = fileUrl(filePath)
   }
 
   setVideoSrc(src: string) {
@@ -29,8 +37,18 @@ class Store extends BaseStore {
       ],
     })
     if (!result.canceled && result.filePaths.length > 0) {
-      this.setVideoSrc(fileUrl(result.filePaths[0]))
+      this.setVideo(result.filePaths[0])
     }
+  }
+
+  async fetchMediaInfo() {
+    if (!this.filePath) return
+    this.mediaInfo = await tinker.getMediaInfo(this.filePath)
+    this.showMediaInfo = true
+  }
+
+  closeMediaInfo() {
+    this.showMediaInfo = false
   }
 }
 
