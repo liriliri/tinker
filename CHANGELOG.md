@@ -1,3 +1,7 @@
+## v1.7.1 (4 Apr 2026)
+
+* fix(ai-assistant): web search not working
+
 ## v1.7.0 (2 Apr 2026)
 
 * feat: add http request
