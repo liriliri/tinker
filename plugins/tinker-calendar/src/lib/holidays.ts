@@ -180,6 +180,20 @@ function getFloatingHolidayDate(
   return new Date(year, month - 1, 1 + daysToAdd)
 }
 
+function getQingmingDate(year: number): Date {
+  const centuryCoefficient = year >= 2000 ? 5.59 : 4.81
+  const yearOfCentury = year % 100
+  let day =
+    Math.floor(yearOfCentury * 0.2422 + centuryCoefficient) -
+    Math.floor(yearOfCentury / 4)
+
+  if (year === 1902 || year === 2008) {
+    day += 1
+  }
+
+  return new Date(year, 3, day)
+}
+
 /**
  * Get all holidays for a given year range
  */
@@ -227,6 +241,19 @@ export function getHolidaysForYearRange(
         id: `${holiday.id}-${year}`,
         date: dateStr,
         nameKey: holiday.nameKey,
+      })
+    }
+
+    if (locale === 'zh-CN') {
+      const qingmingDate = getQingmingDate(year)
+      const dateStr = `${qingmingDate.getFullYear()}-${String(
+        qingmingDate.getMonth() + 1
+      ).padStart(2, '0')}-${String(qingmingDate.getDate()).padStart(2, '0')}`
+
+      result.push({
+        id: `qingming-festival-${year}`,
+        date: dateStr,
+        nameKey: 'qingmingFestival',
       })
     }
 
