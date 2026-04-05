@@ -73,6 +73,10 @@ Available in renderer process and preload scripts. See `tinker.d.ts` for details
 
 **Note**: BaseStore automatically handles theme management.
 
+## Communication Style
+
+- **Do not summarize or generate documentation unless explicitly asked.** After completing a task, briefly state what was done — do not produce lengthy summaries, tables, or reports.
+
 ## Coding Standards
 
 **MANDATORY**: After every code change to a plugin, you MUST immediately run `/lint <changed-file-path>` on the modified files before considering the task complete. This is not optional — do not skip this step, do not wait to be asked. If lint reports errors, fix them and re-run lint until it passes.

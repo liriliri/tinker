@@ -1,19 +1,27 @@
 import type { DiskItem } from '../../common/types'
+import { isDiskNodeDirectory } from 'share/lib/util'
 
-export function buildDiskData(raw: tinker.DiskUsageResult): DiskItem {
-  function convert(node: tinker.DiskUsageResult, parentId: string): DiskItem {
+export async function buildDiskData(
+  raw: tinker.DiskUsageResult
+): Promise<DiskItem> {
+  async function convert(
+    node: tinker.DiskUsageResult,
+    parentId: string
+  ): Promise<DiskItem> {
     const id = parentId ? `${parentId}/${node.name}` : node.name
-    const isDirectory = node.children && node.children.length > 0
+    const isDirectory = await isDiskNodeDirectory(node, id)
 
     const item: DiskItem = {
       id,
       name: node.name,
       size: node.size,
-      isDirectory: !!isDirectory,
+      isDirectory,
     }
 
-    if (isDirectory) {
-      item.children = node.children.map((child) => convert(child, id))
+    if (isDirectory && node.children && node.children.length > 0) {
+      item.children = await Promise.all(
+        node.children.map((child) => convert(child, id))
+      )
       item.loaded = true
     }
 
@@ -21,43 +29,6 @@ export function buildDiskData(raw: tinker.DiskUsageResult): DiskItem {
   }
 
   return convert(raw, '')
-}
-
-export function collectLeafPaths(data: DiskItem): string[] {
-  const paths: string[] = []
-
-  function walk(node: DiskItem) {
-    if (!node.children || node.children.length === 0) {
-      if (!node.loaded && node.size > 0) {
-        paths.push(node.id)
-      }
-      return
-    }
-    for (const child of node.children) {
-      walk(child)
-    }
-  }
-
-  walk(data)
-  return paths
-}
-
-export function applyDirectoryFlags(
-  data: DiskItem,
-  dirMap: Record<string, boolean>
-): void {
-  function walk(node: DiskItem) {
-    if (!node.loaded && node.id in dirMap) {
-      node.isDirectory = dirMap[node.id]
-    }
-    if (node.children) {
-      for (const child of node.children) {
-        walk(child)
-      }
-    }
-  }
-
-  walk(data)
 }
 
 export function findBranch(id: string, data: DiskItem): DiskItem | undefined {

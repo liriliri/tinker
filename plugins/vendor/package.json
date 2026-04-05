@@ -23,24 +23,24 @@
     "systeminformation": "^5.30.7"
   },
   "devDependencies": {
+    "@headlessui/react": "^2.2.9",
     "@monaco-editor/react": "^4.7.0",
+    "@zxing/library": "^0.21.3",
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",
-    "@zxing/library": "^0.21.3",
     "html-to-image": "^1.11.13",
     "idb": "^8.0.3",
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",
-    "wavesurfer.js": "7.12.2",
+    "react-hex-editor": "0.3.0",
+    "react-hot-toast": "^2.6.0",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^4.3.3",
     "react-syntax-highlighter": "^16.1.1",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
     "remark-breaks": "^4.0.0",
-    "react-hex-editor": "0.3.0",
+    "remark-gfm": "^4.0.1",
     "styled-components": "^4.4.1",
-    "@headlessui/react": "^2.2.9",
-    "react-hot-toast": "^2.6.0"
+    "wavesurfer.js": "7.12.2"
   }
 }

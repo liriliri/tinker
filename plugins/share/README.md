@@ -136,6 +136,7 @@ Requires `react-hex-editor` and `styled-components` vendor scripts in the plugin
 ```ts
 import CopyButton from 'share/components/CopyButton'
 import FileOpen from 'share/components/FileOpen'
+import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import Tooltip from 'share/components/Tooltip'
 import NavList from 'share/components/NavList'

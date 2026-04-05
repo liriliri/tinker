@@ -1,0 +1,14 @@
+{
+  "openFolder": "打开文件夹",
+  "dropFolderHere": "拖拽文件夹到此处或点击选择",
+  "scanning": "扫描中...",
+  "cancel": "取消",
+  "files": "个文件",
+  "fileName": "文件名",
+  "filePath": "路径",
+  "fileSize": "大小",
+  "group": "分组",
+  "duplicateGroups": "发现 {{count}} 组重复文件",
+  "openFolder2": "打开文件夹",
+  "showInFolder": "在文件夹中显示"
+}

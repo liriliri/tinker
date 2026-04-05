@@ -1,0 +1,14 @@
+{
+  "openFolder": "Open a Folder",
+  "dropFolderHere": "Drop a folder here or click to select",
+  "scanning": "Scanning...",
+  "cancel": "Cancel",
+  "files": "files",
+  "fileName": "File Name",
+  "filePath": "Path",
+  "fileSize": "Size",
+  "group": "Group",
+  "duplicateGroups": "{{count}} duplicate groups found",
+  "openFolder2": "Open Folder",
+  "showInFolder": "Show in Folder"
+}

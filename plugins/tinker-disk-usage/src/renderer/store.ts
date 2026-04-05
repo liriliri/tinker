@@ -2,9 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import type { DiskItem } from '../common/types'
 import {
-  applyDirectoryFlags,
   buildDiskData,
-  collectLeafPaths,
   collectUnloadedLeafDirs,
   findBranch,
   mergeBranch,
@@ -89,8 +87,7 @@ class Store extends BaseStore {
       this.scanTask = task
 
       const result = await task
-      const data = buildDiskData(result)
-      await this.resolveLeafTypes(data)
+      const data = await buildDiskData(result)
 
       runInAction(() => {
         this.diskData = data
@@ -128,8 +125,7 @@ class Store extends BaseStore {
             paths: [id],
             maxDepth: DEFAULT_MAX_DEPTH,
           })
-          const newData = buildDiskData(result)
-          await this.resolveLeafTypes(newData)
+          const newData = await buildDiskData(result)
           runInAction(() => {
             mergeBranch(this.diskData!, id, newData)
           })
@@ -195,8 +191,7 @@ class Store extends BaseStore {
             paths: [leaf.id],
             maxDepth: 2,
           })
-          const newData = buildDiskData(result)
-          await this.resolveLeafTypes(newData)
+          const newData = await buildDiskData(result)
           return { id: leaf.id, data: newData }
         } catch {
           return null
@@ -215,13 +210,6 @@ class Store extends BaseStore {
     if (this.chartControls && this.currentData) {
       this.chartControls.render(this.currentData)
     }
-  }
-
-  private async resolveLeafTypes(data: DiskItem) {
-    const leafPaths = collectLeafPaths(data)
-    if (leafPaths.length === 0) return
-    const dirMap = await diskUsage.checkDirectories(leafPaths)
-    applyDirectoryFlags(data, dirMap)
   }
 
   deleteItem(id: string) {
