@@ -76,7 +76,7 @@ class Store extends BaseStore {
 
     try {
       const task = tinker.getDiskUsage(
-        { paths: [dirPath], maxDepth: DEFAULT_MAX_DEPTH },
+        { paths: [dirPath], maxDepth: DEFAULT_MAX_DEPTH, minRatio: 0.001 },
         (progress) => {
           runInAction(() => {
             this.scanProgress = { ...progress }
@@ -124,6 +124,7 @@ class Store extends BaseStore {
           const result = await tinker.getDiskUsage({
             paths: [id],
             maxDepth: DEFAULT_MAX_DEPTH,
+            minRatio: 0.001,
           })
           const newData = await buildDiskData(result)
           runInAction(() => {
@@ -190,6 +191,7 @@ class Store extends BaseStore {
           const result = await tinker.getDiskUsage({
             paths: [leaf.id],
             maxDepth: 2,
+            minRatio: 0.001,
           })
           const newData = await buildDiskData(result)
           return { id: leaf.id, data: newData }

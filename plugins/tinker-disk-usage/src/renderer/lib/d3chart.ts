@@ -154,18 +154,22 @@ export function createTreemapChart(
       el.classList.add('box-transition-position')
     }
 
+    const hierarchy = d3
+      .hierarchy(currentData)
+      .sum((d) => (d.children && d.children.length > 0 ? 0 : d.size))
+      .sort((a, b) => (b.value || 0) - (a.value || 0))
+
+    hierarchy.each((d) => {
+      d.value = d.data.size
+    })
+
     const root = d3
       .treemap<DiskItem>()
       .size([width, height])
       .paddingOuter(6)
       .paddingTop(22)
       .paddingInner(3)
-      .round(false)(
-      d3
-        .hierarchy(currentData)
-        .sum((d) => (d.children && d.children.length > 0 ? 0 : d.size))
-        .sort((a, b) => (b.value || 0) - (a.value || 0))
-    )
+      .round(false)(hierarchy)
 
     filterSmallChildren(root)
     const allowedIds = new Set(root.descendants().map((n) => n.data.id))

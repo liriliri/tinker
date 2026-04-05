@@ -50,24 +50,51 @@ declare global {
     }
 
     interface DiskUsageOptions {
+      /** Absolute or relative paths to analyze. */
       paths: string[]
+      /**
+       * Maximum depth of descendants to include in the returned tree.
+       * Sizes beyond this depth still count toward ancestor totals.
+       * Example: `0` keeps only the root node, `1` keeps root + direct children.
+       */
       maxDepth?: number
+      /**
+       * How disk usage is measured.
+       * - `apparent-size`: logical file size in bytes.
+       * - `block-size`: allocated size in bytes.
+       * - `block-count`: allocated block count.
+       */
       quantity?: 'apparent-size' | 'block-size' | 'block-count'
+      /**
+       * Minimum size ratio required for a node to appear in the returned tree.
+       * The ratio is relative to the root total size.
+       * Example: `0.01` means only nodes at least 1% of the root are kept.
+       * Use `0` to disable filtering and keep all nodes.
+       * If omitted, the default implementation value is used.
+       */
       minRatio?: number
+      /** Suppress filesystem errors from stderr output. */
       silentErrors?: boolean
+      /** Number of worker threads used during scanning. */
       threads?: number
+      /** Deduplicate hardlinks when calculating sizes. */
       deduplicateHardlinks?: boolean
     }
 
     interface DiskUsageProgress {
+      /** Number of scanned filesystem items. */
       count: number
+      /** Total scanned size. */
       size: number
+      /** Number of filesystem errors encountered during scanning. */
       errors: number
     }
 
     interface DiskUsageResult {
       name: string
+      /** Measured size of this node. */
       size: number
+      /** Child nodes included in the returned tree. */
       children: DiskUsageResult[]
     }
 
@@ -247,11 +274,22 @@ declare global {
     getMediaInfo(filePath: string): Promise<tinker.MediaInfo>
 
     /**
-     * Analyze disk usage of directories.
+     * Analyze disk usage for one or more paths.
+     *
+     * The returned value is a promise-like task that resolves to a tree of
+     * `{ name, size, children }`.
+     *
+     * Notes:
+     * - `maxDepth` only limits how deep the returned tree goes; deeper sizes still
+     *   contribute to ancestor totals.
+     * - `minRatio` filters small nodes from the returned tree relative to the root.
+     *   Use `minRatio: 0` if you need every file node.
+     * - Progress `count` means scanned item count, not returned node count.
+     *
      * @example
      * const task = tinker.getDiskUsage(
-     *   { paths: ['/Users/xxx/Documents'], maxDepth: 5 },
-     *   (progress) => console.log(`scanned ${progress.items} items`)
+     *   { paths: ['/Users/xxx/Documents'], maxDepth: 5, minRatio: 0 },
+     *   (progress) => console.log(`scanned ${progress.count} items`)
      * )
      * task.kill() // cancel
      * const data = await task
