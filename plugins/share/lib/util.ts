@@ -58,20 +58,6 @@ export async function resolveSavePath(filePath: string): Promise<string> {
   return `${base}-${dateFormat('yyyymmddHHMM')}${ext}`
 }
 
-export async function isDiskNodeDirectory(
-  node: tinker.DiskUsageResult,
-  fullPath: string
-): Promise<boolean> {
-  if (node.children && node.children.length > 0) return true
-
-  try {
-    const stat = await tinker.fstat(fullPath)
-    return stat.isDirectory
-  } catch {
-    return false
-  }
-}
-
 export function mediaDurationFormat(seconds: number) {
   if (seconds > 3600) {
     return durationFormat(Math.round(seconds * 1000), 'hh:mm:ss')

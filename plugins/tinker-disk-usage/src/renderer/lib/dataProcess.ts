@@ -1,5 +1,18 @@
 import type { DiskItem } from '../../common/types'
-import { isDiskNodeDirectory } from 'share/lib/util'
+
+async function isDiskNodeDirectory(
+  node: tinker.DiskUsageResult,
+  fullPath: string
+): Promise<boolean> {
+  if (node.children && node.children.length > 0) return true
+
+  try {
+    const stat = await tinker.fstat(fullPath)
+    return stat.isDirectory
+  } catch {
+    return false
+  }
+}
 
 export async function buildDiskData(
   raw: tinker.DiskUsageResult
