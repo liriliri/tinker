@@ -1,3 +1,10 @@
+## v1.8.0 (6 Apr 2026)
+
+* feat: add video player
+* feat: add duplicate cleaner
+* feat(calendar): add Qingming Festival
+* fix(disk-usage): wrong display size
+
 ## v1.7.1 (4 Apr 2026)
 
 * fix(ai-assistant): web search not working
