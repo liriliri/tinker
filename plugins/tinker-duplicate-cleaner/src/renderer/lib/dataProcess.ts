@@ -1,6 +1,7 @@
 import type { FileEntry, DuplicateGroup } from '../../common/types'
+import fileSize from 'licia/fileSize'
 
-const MIN_SIZE = 200 * 1024
+const MIN_SIZE = fileSize('1M')
 
 function collectFiles(
   node: tinker.DiskUsageResult,
@@ -73,7 +74,7 @@ export async function findDuplicates(
 
   const groups = allVerified.flat()
 
-  groups.sort((a, b) => b.size - a.size)
+  groups.sort((a, b) => b.size * b.files.length - a.size * a.files.length)
 
   return groups
 }

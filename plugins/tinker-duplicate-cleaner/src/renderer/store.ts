@@ -1,7 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import type { DuplicateGroup } from '../common/types'
+import type { FilterTab } from './types'
 import { findDuplicates } from './lib/dataProcess'
+import { getFileCategory } from './lib/util'
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
@@ -11,10 +13,22 @@ class Store extends BaseStore {
   scanProgress: { count: number; size: number } | null = null
   duplicateGroups: DuplicateGroup[] = []
   scanTask: tinker.DiskUsageTask | null = null
+  filterTab: FilterTab = 'all'
 
   constructor() {
     super()
     makeAutoObservable(this)
+  }
+
+  get filteredGroups(): DuplicateGroup[] {
+    if (this.filterTab === 'all') return this.duplicateGroups
+    return this.duplicateGroups.filter(
+      (group) => getFileCategory(group.files[0].name) === this.filterTab
+    )
+  }
+
+  setFilterTab(tab: FilterTab) {
+    this.filterTab = tab
   }
 
   async openDirectory(dirPath: string) {

@@ -10,5 +10,11 @@
   "group": "Group",
   "duplicateGroups": "{{count}} duplicate groups found",
   "openFolder2": "Open Folder",
-  "showInFolder": "Show in Folder"
+  "showInFolder": "Show in Folder",
+  "all": "All",
+  "audio": "Audio",
+  "video": "Video",
+  "document": "Document",
+  "image": "Image",
+  "other": "Other"
 }

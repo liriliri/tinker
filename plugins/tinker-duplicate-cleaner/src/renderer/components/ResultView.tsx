@@ -18,6 +18,7 @@ interface GroupRow {
   groupIndex: number
   size: number
   count: number
+  firstName: string
 }
 
 interface FileRow {
@@ -37,13 +38,14 @@ function isGroupRow(row: RowData): row is GroupRow {
 
 function buildRows(expandedGroups: Set<number>): RowData[] {
   const rows: RowData[] = []
-  store.duplicateGroups.forEach((group, i) => {
+  store.filteredGroups.forEach((group, i) => {
     rows.push({
       type: 'group',
       id: `group-${i}`,
       groupIndex: i,
       size: group.size,
       count: group.files.length,
+      firstName: group.files[0]?.name ?? '',
     })
     if (expandedGroups.has(i)) {
       for (const file of group.files) {
@@ -87,12 +89,14 @@ interface GroupCellProps {
 
 function GroupCellRenderer({ data, expanded }: GroupCellProps) {
   const Icon = expanded ? ChevronDown : ChevronRight
+  const totalSize = data.size * data.count
   return (
     <div className="flex items-center gap-2 px-3 h-full cursor-pointer select-none">
       <Icon size={14} className="flex-shrink-0" />
       <span className="font-medium">
-        {fileSize(data.size)} ({data.count})
+        {data.firstName} ({data.count})
       </span>
+      <span className="ml-auto text-sm opacity-70">{fileSize(totalSize)}</span>
     </div>
   )
 }
@@ -105,7 +109,7 @@ export default observer(function ResultView() {
 
   const rowData = useMemo(
     () => buildRows(expandedGroups),
-    [store.duplicateGroups, expandedGroups]
+    [store.filteredGroups, expandedGroups]
   )
 
   const columnDefs: ColDef<RowData>[] = useMemo(
@@ -130,6 +134,7 @@ export default observer(function ResultView() {
         headerName: t('fileSize'),
         width: 120,
         sortable: false,
+        cellStyle: { textAlign: 'right' },
         valueFormatter: (params) =>
           params.data && !isGroupRow(params.data) ? fileSize(params.value) : '',
       },

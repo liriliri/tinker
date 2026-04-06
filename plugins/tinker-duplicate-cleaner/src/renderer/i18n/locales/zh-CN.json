@@ -10,5 +10,11 @@
   "group": "分组",
   "duplicateGroups": "发现 {{count}} 组重复文件",
   "openFolder2": "打开文件夹",
-  "showInFolder": "在文件夹中显示"
+  "showInFolder": "在文件夹中显示",
+  "all": "全部",
+  "audio": "音频",
+  "video": "视频",
+  "document": "文档",
+  "image": "图片",
+  "other": "其他"
 }
