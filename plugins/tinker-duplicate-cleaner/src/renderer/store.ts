@@ -14,10 +14,55 @@ class Store extends BaseStore {
   duplicateGroups: DuplicateGroup[] = []
   scanTask: tinker.DiskUsageTask | null = null
   filterTab: FilterTab = 'all'
+  selectedFiles: Set<string> = new Set()
 
   constructor() {
     super()
     makeAutoObservable(this)
+  }
+
+  get selectedSize(): number {
+    let size = 0
+    for (const group of this.duplicateGroups) {
+      for (const file of group.files) {
+        if (this.selectedFiles.has(file.path)) {
+          size += file.size
+        }
+      }
+    }
+    return size
+  }
+
+  get selectedCount(): number {
+    return this.selectedFiles.size
+  }
+
+  toggleFile(path: string) {
+    const next = new Set(this.selectedFiles)
+    if (next.has(path)) {
+      next.delete(path)
+    } else {
+      next.add(path)
+    }
+    this.selectedFiles = next
+  }
+
+  clearSelection() {
+    this.selectedFiles = new Set()
+  }
+
+  async deleteSelected(): Promise<{
+    deleted: number
+    errors: string[]
+  } | null> {
+    const paths = Array.from(this.selectedFiles)
+    if (paths.length === 0) return null
+    try {
+      const result = await duplicateCleaner.deleteFiles(paths)
+      return result
+    } catch {
+      return null
+    }
   }
 
   get filteredGroups(): DuplicateGroup[] {
@@ -83,6 +128,7 @@ class Store extends BaseStore {
     this.scanPath = ''
     this.scanProgress = null
     this.duplicateGroups = []
+    this.selectedFiles = new Set()
   }
 }
 

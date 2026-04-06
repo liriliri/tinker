@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import { fork } from 'child_process'
+import { promises as fs } from 'fs'
 
 let child: ReturnType<typeof fork> | null = null
 let nextId = 0
@@ -58,6 +59,21 @@ const duplicateCleanerObj = {
       pending.set(id, { resolve, reject })
       getChild().send({ id, filePath, fileSize })
     })
+  },
+  async deleteFiles(
+    filePaths: string[]
+  ): Promise<{ deleted: number; errors: string[] }> {
+    let deleted = 0
+    const errors: string[] = []
+    for (const filePath of filePaths) {
+      try {
+        await fs.unlink(filePath)
+        deleted++
+      } catch {
+        errors.push(filePath)
+      }
+    }
+    return { deleted, errors }
   },
 }
 

@@ -16,5 +16,12 @@
   "video": "视频",
   "document": "文档",
   "image": "图片",
-  "other": "其他"
+  "other": "其他",
+  "selectedInfo": "已选 {{count}} 个文件 ({{size}})",
+  "clean": "清理",
+  "confirmClean": "确认清理",
+  "confirmCleanMessage": "确定要删除 {{count}} 个文件 ({{size}}) 吗？",
+  "cleanSuccess": "成功删除 {{count}} 个文件",
+  "cleanErrors": "{{count}} 个文件删除失败",
+  "noRows": "未发现重复文件"
 }

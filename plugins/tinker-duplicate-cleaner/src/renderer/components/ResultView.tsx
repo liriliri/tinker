@@ -10,6 +10,7 @@ import type {
 import fileSize from 'licia/fileSize'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import Grid from 'share/components/Grid'
+import Checkbox from 'share/components/Checkbox'
 import store from '../store'
 
 interface GroupRow {
@@ -63,6 +64,21 @@ function buildRows(expandedGroups: Set<number>): RowData[] {
   return rows
 }
 
+const CheckboxCell = observer(function CheckboxCell({
+  data,
+}: ICellRendererParams<RowData>) {
+  if (!data || isGroupRow(data)) return null
+
+  return (
+    <div className="flex items-center justify-center" style={{ height: 36 }}>
+      <Checkbox
+        checked={store.selectedFiles.has(data.path)}
+        onChange={() => store.toggleFile(data.path)}
+      />
+    </div>
+  )
+})
+
 const PathCell = ({ data }: ICellRendererParams<RowData>) => {
   if (!data || isGroupRow(data)) return null
 
@@ -114,6 +130,13 @@ export default observer(function ResultView() {
 
   const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
+      {
+        headerName: '',
+        width: 50,
+        sortable: false,
+        cellRenderer: CheckboxCell,
+        suppressMovable: true,
+      },
       {
         field: 'name' as const,
         headerName: t('fileName'),
@@ -194,6 +217,7 @@ export default observer(function ResultView() {
         onRowClicked={onRowClicked}
         enableCellTextSelection={true}
         suppressCellFocus={true}
+        overlayNoRowsTemplate={`<span>${t('noRows')}</span>`}
       />
     </div>
   )

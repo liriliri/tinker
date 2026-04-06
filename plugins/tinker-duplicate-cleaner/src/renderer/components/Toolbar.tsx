@@ -14,8 +14,12 @@ import {
   ToolbarButton,
   ToolbarSpacer,
   ToolbarSeparator,
+  ToolbarTextButton,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import { confirm } from 'share/components/Confirm'
+import toast from 'react-hot-toast'
+import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
 import store from '../store'
 import type { FilterTab } from '../types'
@@ -41,6 +45,28 @@ export default observer(function ToolbarComponent() {
 
     store.reset()
     store.openDirectory(dirPath)
+  }
+
+  const handleClean = async () => {
+    if (store.selectedCount === 0) return
+    const ok = await confirm({
+      title: t('confirmClean'),
+      message: t('confirmCleanMessage', {
+        count: store.selectedCount,
+        size: fileSize(store.selectedSize),
+      }),
+    })
+    if (!ok) return
+
+    const result = await store.deleteSelected()
+    if (!result) return
+    if (result.deleted > 0) {
+      toast.success(t('cleanSuccess', { count: result.deleted }))
+    }
+    if (result.errors.length > 0) {
+      toast.error(t('cleanErrors', { count: result.errors.length }))
+    }
+    store.reset()
   }
 
   return (
@@ -74,9 +100,20 @@ export default observer(function ToolbarComponent() {
       <ToolbarSpacer />
       {store.view === 'result' && (
         <span className={`text-xs ${tw.text.secondary} mr-2`}>
-          {t('duplicateGroups', { count: store.filteredGroups.length })}
+          {store.selectedCount > 0
+            ? t('selectedInfo', {
+                count: store.selectedCount,
+                size: fileSize(store.selectedSize),
+              })
+            : t('duplicateGroups', { count: store.filteredGroups.length })}
         </span>
       )}
+      <ToolbarTextButton
+        onClick={handleClean}
+        disabled={store.selectedCount === 0}
+      >
+        {t('clean')}
+      </ToolbarTextButton>
     </ToolbarBase>
   )
 })

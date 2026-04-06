@@ -16,5 +16,12 @@
   "video": "Video",
   "document": "Document",
   "image": "Image",
-  "other": "Other"
+  "other": "Other",
+  "selectedInfo": "{{count}} files selected ({{size}})",
+  "clean": "Clean",
+  "confirmClean": "Confirm Clean",
+  "confirmCleanMessage": "Are you sure you want to delete {{count}} files ({{size}})?",
+  "cleanSuccess": "{{count}} files deleted successfully",
+  "cleanErrors": "{{count}} files failed to delete",
+  "noRows": "No duplicate files found"
 }
