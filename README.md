@@ -231,6 +231,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/renamer.png"/></th>
       <th><img src="https://tinker.liriliri.io/http_request.png"/></th>
     </tr>
+    <tr>
+      <th>Video Player</th>
+      <th>Duplicate Cleaner</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/video_player.png"/></th>
+      <th><img src="https://tinker.liriliri.io/duplicate_cleaner.png"/></th>
+    </tr>
   </tbody>
 </table>
 
