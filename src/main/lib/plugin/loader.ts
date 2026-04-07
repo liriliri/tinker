@@ -138,12 +138,19 @@ export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
         }
         if (isDir) {
           try {
+            const pluginDir = path.join(dir, file.name)
+            const pkgPath = path.join(pluginDir, 'package.json')
+            if (await fs.pathExists(pkgPath)) {
+              const pkg = await fs.readJson(pkgPath)
+              if (!pkg.tinker) {
+                continue
+              }
+            } else {
+              continue
+            }
             const pluginId = normalizePluginId(prefix + file.name)
             if (!plugins[pluginId]) {
-              plugins[pluginId] = await loadPlugin(
-                pluginId,
-                path.join(dir, file.name)
-              )
+              plugins[pluginId] = await loadPlugin(pluginId, pluginDir)
             } else {
               logger.warn(`plugin conflict: ${pluginId}`)
             }
