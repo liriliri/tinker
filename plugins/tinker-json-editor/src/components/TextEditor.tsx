@@ -34,6 +34,17 @@ export default observer(function TextEditor() {
     store.updateUndoRedoState()
   }, [store.fileVersion])
 
+  // Sync store changes (format/minify) back to editor
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+
+    const model = editor.getModel()
+    if (model && model.getValue() !== store.jsonInput) {
+      model.setValue(store.jsonInput)
+    }
+  }, [store.jsonInput])
+
   return (
     <div className="h-full w-full">
       <Editor
