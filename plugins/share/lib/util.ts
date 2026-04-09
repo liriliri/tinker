@@ -46,6 +46,20 @@ export async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
+export async function isDiskNodeDirectory(
+  node: tinker.DiskUsageResult,
+  fullPath: string
+): Promise<boolean> {
+  if (node.children && node.children.length > 0) return true
+
+  try {
+    const stat = await tinker.fstat(fullPath)
+    return stat.isDirectory
+  } catch {
+    return false
+  }
+}
+
 export async function resolveSavePath(filePath: string): Promise<string> {
   if (!(await fileExists(filePath))) return filePath
 

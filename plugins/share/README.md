@@ -226,6 +226,15 @@ import {
 } from 'share/tools/fileSystem'
 ```
 
+## Utilities
+
+```ts
+import { isDiskNodeDirectory, mediaDurationFormat, openImageFile, fileExists, resolveSavePath } from 'share/lib/util'
+
+// Check if a DiskUsageResult node is a directory
+isDiskNodeDirectory(node, fullPath) // uses children or fstat fallback
+```
+
 ## When To Update This File
 
 Update this README when you change shared APIs, conventions, or recommended usage in `share/`.
