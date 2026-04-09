@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 import type { ColDef, ICellRendererParams } from 'ag-grid-community'
 import fileSize from 'licia/fileSize'
 import Grid from 'share/components/Grid'
 import Checkbox from 'share/components/Checkbox'
-import type { FileEntry } from '../../common/types'
+import type { FileEntry } from '../types'
 import store from '../store'
 
 const ROW_HEIGHT = 36
@@ -15,19 +15,18 @@ const CheckboxCell = observer(function CheckboxCell({
 }: ICellRendererParams<FileEntry>) {
   if (!data) return null
   return (
-    <div
-      className="flex items-center justify-center"
-      style={{ height: ROW_HEIGHT }}
-    >
+    <div className="flex items-center justify-center h-full">
       <Checkbox
-        checked={store.selectedFiles.has(data.path)}
+        checked={store.isSelected(data.path)}
         onChange={() => store.toggleFile(data.path)}
       />
     </div>
   )
 })
 
-const PathCell = ({ data }: ICellRendererParams<FileEntry>) => {
+const PathCell = memo(function PathCell({
+  data,
+}: ICellRendererParams<FileEntry>) {
   if (!data) return null
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -42,7 +41,7 @@ const PathCell = ({ data }: ICellRendererParams<FileEntry>) => {
       {data.path}
     </span>
   )
-}
+})
 
 export default observer(function ResultView() {
   const { t } = useTranslation()

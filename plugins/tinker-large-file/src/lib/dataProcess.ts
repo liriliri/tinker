@@ -1,5 +1,5 @@
 import fileSize from 'licia/fileSize'
-import type { FileEntry } from '../../common/types'
+import type { FileEntry } from '../types'
 import { isDiskNodeDirectory } from 'share/lib/util'
 
 const MIN_SIZE = fileSize('10M')
@@ -13,9 +13,9 @@ async function collectFiles(
 
   if (await isDiskNodeDirectory(node, path)) {
     if (node.children) {
-      for (const child of node.children) {
-        await collectFiles(child, path, result)
-      }
+      await Promise.all(
+        node.children.map((child) => collectFiles(child, path, result))
+      )
     }
   } else if (node.size >= MIN_SIZE) {
     result.push({ name: node.name, path, size: node.size })

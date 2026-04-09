@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import type { FileEntry } from '../common/types'
-import type { FilterTab } from './types'
+import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
 import { getFileCategory } from './lib/util'
 
@@ -35,14 +34,16 @@ class Store extends BaseStore {
     return this.selectedFiles.size
   }
 
+  isSelected(path: string): boolean {
+    return this.selectedFiles.has(path)
+  }
+
   toggleFile(path: string) {
-    const next = new Set(this.selectedFiles)
-    if (next.has(path)) {
-      next.delete(path)
+    if (this.selectedFiles.has(path)) {
+      this.selectedFiles.delete(path)
     } else {
-      next.add(path)
+      this.selectedFiles.add(path)
     }
-    this.selectedFiles = next
   }
 
   clearSelection() {
@@ -55,23 +56,19 @@ class Store extends BaseStore {
   } | null> {
     const paths = Array.from(this.selectedFiles)
     if (paths.length === 0) return null
-    let deleted = 0
+
+    const results = await Promise.allSettled(paths.map((p) => tinker.rm(p)))
     const errors: string[] = []
-    for (const filePath of paths) {
-      try {
-        await tinker.rm(filePath)
-        deleted++
-      } catch {
-        errors.push(filePath)
-      }
-    }
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') errors.push(paths[i])
+    })
+
     runInAction(() => {
-      const errSet = new Set(errors)
-      const deletedSet = new Set(paths.filter((p) => !errSet.has(p)))
-      this.largeFiles = this.largeFiles.filter((f) => !deletedSet.has(f.path))
+      const failSet = new Set(errors)
+      this.largeFiles = this.largeFiles.filter((f) => failSet.has(f.path))
       this.selectedFiles = new Set()
     })
-    return { deleted, errors }
+    return { deleted: paths.length - errors.length, errors }
   }
 
   get filteredFiles(): FileEntry[] {
@@ -124,12 +121,14 @@ class Store extends BaseStore {
   }
 
   cancelScan() {
-    if (this.scanTask) {
-      this.scanTask.kill()
-      this.scanTask = null
-    }
-    this.view = 'open'
-    this.scanProgress = null
+    runInAction(() => {
+      if (this.scanTask) {
+        this.scanTask.kill()
+        this.scanTask = null
+      }
+      this.view = 'open'
+      this.scanProgress = null
+    })
   }
 
   reset() {

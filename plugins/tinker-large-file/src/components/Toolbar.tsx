@@ -24,13 +24,13 @@ import { tw } from 'share/theme'
 import store from '../store'
 import type { FilterTab } from '../types'
 
-const tabs: { id: FilterTab; icon: typeof AlignJustify; label: string }[] = [
-  { id: 'all', icon: AlignJustify, label: 'all' },
-  { id: 'audio', icon: Music, label: 'audio' },
-  { id: 'video', icon: Video, label: 'video' },
-  { id: 'document', icon: FileText, label: 'document' },
-  { id: 'image', icon: Image, label: 'image' },
-  { id: 'other', icon: File, label: 'other' },
+const tabs: { id: FilterTab; icon: typeof AlignJustify }[] = [
+  { id: 'all', icon: AlignJustify },
+  { id: 'audio', icon: Music },
+  { id: 'video', icon: Video },
+  { id: 'document', icon: FileText },
+  { id: 'image', icon: Image },
+  { id: 'other', icon: File },
 ]
 
 export default observer(function ToolbarComponent() {
@@ -48,7 +48,6 @@ export default observer(function ToolbarComponent() {
   }
 
   const handleClean = async () => {
-    if (store.selectedCount === 0) return
     const ok = await confirm({
       title: t('confirmClean'),
       message: t('confirmCleanMessage', {
@@ -90,7 +89,7 @@ export default observer(function ToolbarComponent() {
               >
                 <div className="flex items-center gap-1.5">
                   <Icon size={TOOLBAR_ICON_SIZE} />
-                  {t(tab.label)}
+                  {t(tab.id)}
                 </div>
               </ToolbarButton>
             )
