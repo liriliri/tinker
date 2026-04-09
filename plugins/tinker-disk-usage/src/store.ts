@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import type { DiskItem } from '../common/types'
+import type { DiskItem } from './types'
 import {
   buildDiskData,
   collectUnloadedLeafDirs,

@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import fileSize from 'licia/fileSize'
 import splitPath from 'licia/splitPath'
-import type { DiskItem } from '../../common/types'
+import type { DiskItem } from '../types'
 import { THEME_COLORS } from 'share/theme'
 
 export interface ChartCallbacks {

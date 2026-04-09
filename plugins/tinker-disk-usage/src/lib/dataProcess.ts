@@ -1,4 +1,4 @@
-import type { DiskItem } from '../../common/types'
+import type { DiskItem } from '../types'
 
 async function isDiskNodeDirectory(
   node: tinker.DiskUsageResult,

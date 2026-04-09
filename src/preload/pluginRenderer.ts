@@ -82,6 +82,7 @@ export function injectApi() {
     setTitle: _tinker.setTitle,
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,
+    rm: _tinker.rm,
     fstat: _tinker.fstat,
     getPath: _tinker.getPath,
     getFileIcon: _tinker.getFileIcon,

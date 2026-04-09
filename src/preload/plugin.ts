@@ -113,6 +113,7 @@ const tinkerObj = {
   loadData,
   readFile: nodeObj.readFile,
   writeFile: nodeObj.writeFile,
+  rm: fs.promises.rm,
   fstat: async (file: string) => {
     const stats = await fs.promises.stat(file)
     return {

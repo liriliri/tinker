@@ -51,7 +51,7 @@ export default observer(function ChartView() {
                   })
                   if (confirmed) {
                     try {
-                      await diskUsage.remove(node.id)
+                      await tinker.rm(node.id, { recursive: true, force: true })
                       store.deleteItem(node.id)
                     } catch (err) {
                       console.error('Delete failed:', err)

@@ -9,6 +9,8 @@ import type {
 
 type ReadFile = typeof import('node:fs/promises').readFile
 type WriteFile = typeof import('node:fs/promises').writeFile
+type Rm = typeof import('node:fs/promises').rm
+
 
 declare global {
   namespace tinker {
@@ -235,6 +237,9 @@ declare global {
 
     /** Wraps Node's fs.promises.writeFile */
     writeFile: WriteFile
+
+    /** Wraps Node's fs.promises.rm */
+    rm: Rm
 
     /** Get file stats (size, timestamps, type flags). */
     fstat(path: string): Promise<tinker.FileStats>
