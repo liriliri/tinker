@@ -59,3 +59,4 @@ export type IpcImportPluginData = IpcExportPluginData
 export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
+export type IpcShowPluginNotification = (body: string) => void

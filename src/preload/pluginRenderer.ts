@@ -86,6 +86,7 @@ export function injectApi() {
     fstat: _tinker.fstat,
     getPath: _tinker.getPath,
     getFileIcon: _tinker.getFileIcon,
+    showNotification: _tinker.showNotification,
     on: _tinker.on,
     runFFmpeg,
     getDiskUsage,

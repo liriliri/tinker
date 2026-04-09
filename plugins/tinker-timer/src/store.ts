@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { formatMs, pad } from './lib/util'
+import i18n from './i18n'
 
 const storage = new LocalStore('tinker-timer')
 
@@ -222,6 +223,7 @@ class Store extends BaseStore {
           this.cdCompleted = true
           this.cdRafId = null
           this.playBeep()
+          tinker.showNotification(i18n.t('countdownComplete'))
         } else {
           this.cdElapsed = elapsed
         }

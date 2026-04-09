@@ -232,6 +232,13 @@ declare global {
      */
     getFileIcon(filePath: string): Promise<string>
 
+    /**
+     * Show a system notification.
+     * The notification title and icon are automatically set to the current plugin's name and icon.
+     * @param body - The notification body text
+     */
+    showNotification(body: string): void
+
     /** Wraps Node's fs.promises.readFile */
     readFile: ReadFile
 

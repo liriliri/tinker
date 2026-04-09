@@ -13,5 +13,6 @@
   "totalLabel": "Total",
   "hours": "Hours",
   "minutes": "Minutes",
-  "seconds": "Seconds"
+  "seconds": "Seconds",
+  "countdownComplete": "Countdown complete!"
 }

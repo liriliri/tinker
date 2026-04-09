@@ -3,7 +3,7 @@ import { handleEvent } from 'share/main/lib/util'
 import path from 'path'
 import fs from 'fs-extra'
 import startWith from 'licia/startWith'
-import { ipcMain, session } from 'electron'
+import { ipcMain, Notification, session } from 'electron'
 import { getClipboardFilePaths } from '../clipboard'
 import { captureScreen } from '../screen'
 import { getFileIcon as getFileIconBuffer } from '../fileIcon'
@@ -83,6 +83,32 @@ export function init() {
   handleEvent('preparePluginView', preparePluginView)
   handleEvent('captureScreen', captureScreen)
   handleEvent('pluginGetFileIcon', getFileIcon)
+  ipcMain.handle('showPluginNotification', (event, body: string) => {
+    if (!Notification.isSupported()) {
+      return
+    }
+
+    const options: Electron.NotificationConstructorOptions = {
+      title: 'TINKER',
+      body,
+    }
+
+    for (const id in pluginViews) {
+      if (pluginViews[id].view.webContents === event.sender) {
+        const plugin = plugins[id]
+        if (plugin) {
+          options.title = plugin.name
+          if (plugin.icon) {
+            options.icon = plugin.icon
+          }
+        }
+        break
+      }
+    }
+
+    new Notification(options).show()
+  })
+
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

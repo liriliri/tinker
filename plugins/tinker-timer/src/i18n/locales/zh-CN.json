@@ -13,5 +13,6 @@
   "totalLabel": "累计",
   "hours": "小时",
   "minutes": "分钟",
-  "seconds": "秒"
+  "seconds": "秒",
+  "countdownComplete": "倒计时结束！"
 }

@@ -6,6 +6,7 @@ import {
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
   IpcGetFileIcon,
+  IpcShowPluginNotification,
   IpcShowPluginContextMenu,
   IPlugin,
 } from 'common/types'
@@ -106,6 +107,7 @@ const tinkerObj = {
   ),
   captureScreen: invoke<IpcCaptureScreen>('captureScreen'),
   getFileIcon: invoke<IpcGetFileIcon>('pluginGetFileIcon'),
+  showNotification: invoke<IpcShowPluginNotification>('showPluginNotification'),
   setTitle,
   showItemInPath: mainObj.showItemInFolder,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
