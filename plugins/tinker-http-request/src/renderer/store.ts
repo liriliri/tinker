@@ -16,7 +16,7 @@ import type {
 
 type RequestTab = 'params' | 'headers' | 'body' | 'auth'
 type ResponseTab = 'body' | 'headers'
-type ResponseBodyMode = 'auto' | 'text' | 'hex'
+type ResponseBodyMode = 'auto' | 'preview' | 'hex'
 
 function getDefaultRequestConfig(): RequestConfig {
   return {
@@ -455,9 +455,15 @@ class Store extends BaseStore {
     )
   }
 
-  get effectiveBodyMode(): 'text' | 'hex' {
+  get isImageResponse(): boolean {
+    if (!this.response) return false
+    const contentType = this.response.headers['content-type'] || ''
+    return contentType.startsWith('image/')
+  }
+
+  get effectiveBodyMode(): 'preview' | 'hex' {
     if (this.responseBodyMode !== 'auto') return this.responseBodyMode
-    return this.isTextResponse ? 'text' : 'hex'
+    return this.isTextResponse || this.isImageResponse ? 'preview' : 'hex'
   }
 
   updatePair(

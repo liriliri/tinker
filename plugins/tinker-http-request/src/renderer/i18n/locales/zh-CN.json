@@ -26,6 +26,7 @@
   "copyBody": "复制响应体",
   "textMode": "文本",
   "hexMode": "十六进制",
+  "preview": "预览",
   "collections": "集合",
   "newCollection": "新建集合",
   "newFolder": "新建文件夹",

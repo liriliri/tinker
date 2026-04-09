@@ -26,6 +26,8 @@
   "copyBody": "Copy response body",
   "textMode": "Text",
   "hexMode": "Hex",
+  "preview": "Preview",
+  "preview": "Preview",
   "collections": "Collections",
   "newCollection": "New Collection",
   "newFolder": "New Folder",

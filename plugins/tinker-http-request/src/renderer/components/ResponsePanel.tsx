@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { FileText, Binary } from 'lucide-react'
+import { Eye, Binary, Image } from 'lucide-react'
 import { LoadingCircle } from 'share/components/Loading'
 import {
   ToolbarButton,
@@ -115,19 +115,24 @@ const BodyModeToggle = observer(function BodyModeToggle() {
   const { t } = useTranslation()
   const mode = store.effectiveBodyMode
   const isAuto = store.responseBodyMode === 'auto'
+  const isImage = store.isImageResponse
+
+  const PreviewIcon = isImage ? Image : Eye
 
   return (
     <ToolbarButtonGroup>
       <ToolbarButton
         className={`rounded-none rounded-l border-r ${tw.border}`}
         variant="toggle"
-        active={mode === 'text'}
+        active={mode === 'preview'}
         onClick={() =>
-          store.setResponseBodyMode(isAuto && mode === 'text' ? 'auto' : 'text')
+          store.setResponseBodyMode(
+            isAuto && mode === 'preview' ? 'auto' : 'preview'
+          )
         }
-        title={t('textMode')}
+        title={t('preview')}
       >
-        <FileText size={TOOLBAR_ICON_SIZE} />
+        <PreviewIcon size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
         className="rounded-none rounded-r"

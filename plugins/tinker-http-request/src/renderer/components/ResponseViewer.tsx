@@ -10,8 +10,14 @@ export default observer(function ResponseViewer() {
 
   if (!response) return null
 
-  if (store.effectiveBodyMode === 'hex') {
+  const mode = store.effectiveBodyMode
+
+  if (mode === 'hex') {
     return <HexResponseViewer />
+  }
+
+  if (store.isImageResponse) {
+    return <ImageResponseViewer />
   }
 
   return <TextResponseViewer />
@@ -72,6 +78,32 @@ const TextResponseViewer = observer(function TextResponseViewer() {
           }}
         />
       </div>
+    </div>
+  )
+})
+
+const ImageResponseViewer = observer(function ImageResponseViewer() {
+  const { response } = store
+
+  const url = useMemo(() => {
+    if (!response) return ''
+    const contentType = response.headers['content-type'] || ''
+    const blob = new Blob([new Uint8Array(response.bodyBytes)], {
+      type: contentType.split(';')[0],
+    })
+    return URL.createObjectURL(blob)
+  }, [response])
+
+  if (!url) return null
+
+  return (
+    <div className="w-full h-full p-3 flex items-center justify-center">
+      <img
+        src={url}
+        className="max-w-full max-h-full object-contain"
+        onLoad={() => URL.revokeObjectURL(url)}
+        alt="Response"
+      />
     </div>
   )
 })
