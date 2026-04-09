@@ -149,7 +149,14 @@ class FFmpegTask {
         if (code === 0) {
           resolve()
         } else {
-          reject(new Error(`FFmpeg process exited with code ${code}`))
+          const detail = stderrData.trim()
+          reject(
+            new Error(
+              `FFmpeg process exited with code ${code}${
+                detail ? `\n${detail}` : ''
+              }`
+            )
+          )
         }
       })
 
@@ -323,6 +330,11 @@ function generateThumbnail(
     ])
 
     const chunks: Buffer[] = []
+    let stderrData = ''
+
+    ffmpegProcess.stderr?.on('data', (data: Buffer) => {
+      stderrData += data.toString()
+    })
 
     ffmpegProcess.stdout?.on('data', (data: Buffer) => {
       chunks.push(data)
@@ -330,7 +342,12 @@ function generateThumbnail(
 
     ffmpegProcess.on('close', () => {
       if (chunks.length === 0) {
-        reject(new Error('Failed to generate thumbnail'))
+        const detail = stderrData.trim()
+        reject(
+          new Error(
+            `Failed to generate thumbnail${detail ? `\n${detail}` : ''}`
+          )
+        )
         return
       }
       const buffer = Buffer.concat(chunks)
