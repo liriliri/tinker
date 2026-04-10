@@ -15,7 +15,7 @@ const CheckboxCell = observer(function CheckboxCell({
 }: ICellRendererParams<FileEntry>) {
   if (!data) return null
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center" style={{ height: ROW_HEIGHT }}>
       <Checkbox
         checked={store.isSelected(data.path)}
         onChange={() => store.toggleFile(data.path)}
