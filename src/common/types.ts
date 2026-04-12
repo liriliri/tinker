@@ -3,6 +3,7 @@ import types from 'licia/types'
 
 export interface IRawPlugin {
   name: string
+  description?: string
   main: string
   icon?: string
   preload?: string
@@ -17,6 +18,7 @@ export interface IRawPlugin {
 export interface IPlugin {
   id: string
   name: string
+  description: string
   dir: string
   root: string
   historyApiFallback: boolean

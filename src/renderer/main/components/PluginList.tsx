@@ -17,6 +17,7 @@ export default observer(function PluginList() {
     plugin,
     src: fileUrl(plugin.icon),
     name: plugin.name,
+    title: plugin.description,
     style: {
       borderRadius: borderRadius + 'px',
     },

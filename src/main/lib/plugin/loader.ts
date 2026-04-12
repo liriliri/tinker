@@ -61,6 +61,7 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     dir,
     root: path.join(dir, path.dirname(rawPlugin.main)),
     name: rawPlugin.name,
+    description: rawPlugin.description || pkg.description || '',
     icon: rawPlugin.icon || '',
     main: rawPlugin.main,
     historyApiFallback: rawPlugin.historyApiFallback || false,
