@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Text Diff",
+    "description": "Text comparison with side-by-side diff and syntax highlighting",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "文本对比"
+        "name": "文本对比",
+        "description": "文本对比，支持并排差异查看和语法高亮"
       }
     }
   }

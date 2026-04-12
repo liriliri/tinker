@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Text Encoder",
+    "description": "Text encoding tool for URL, Morse code, and Unicode",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "文本编码"
+        "name": "文本编码",
+        "description": "文本编码工具，支持 URL、Morse 电码和 Unicode"
       }
     }
   },

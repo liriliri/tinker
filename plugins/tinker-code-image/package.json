@@ -1,18 +1,20 @@
 {
   "name": "tinker-code-image",
   "version": "0.1.0",
-  "description": "Generate shareable images from code snippets",
+  "description": "Code Image Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Code Image",
+    "description": "Generate beautiful images from code snippets",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "代码图片"
+        "name": "代码图片",
+        "description": "将代码片段生成为美观的可分享图片"
       }
     }
   },

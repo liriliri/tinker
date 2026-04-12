@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Hex Editor",
+    "description": "Hex editor for viewing and editing binary files",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "HEX 编辑"
+        "name": "HEX 编辑",
+        "description": "字节级查看和编辑二进制文件"
       }
     }
   }

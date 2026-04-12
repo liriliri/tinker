@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Photo Collage",
+    "description": "Photo collage with various grid layouts",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "照片拼接"
+        "name": "照片拼接",
+        "description": "照片拼接，支持多种网格布局"
       }
     }
   },

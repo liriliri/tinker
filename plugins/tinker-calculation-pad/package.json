@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Calculation Pad",
+    "description": "Notepad-style calculator for evaluating expressions line by line",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "计算稿纸"
+        "name": "计算稿纸",
+        "description": "记事本风格计算器，逐行计算数学表达式"
       }
     }
   }

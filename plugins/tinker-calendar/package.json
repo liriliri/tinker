@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Calendar",
+    "description": "Calendar with event management, multiple views, and lunar calendar",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "日历"
+        "name": "日历",
+        "description": "日历，支持事件管理、多种视图和农历显示"
       }
     }
   },

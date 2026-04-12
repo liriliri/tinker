@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Pomodoro",
+    "description": "Pomodoro timer for focused work and break intervals",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "番茄钟"
+        "name": "番茄钟",
+        "description": "番茄钟，定时工作和休息间隔"
       }
     }
   }

@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Timer",
+    "description": "Stopwatch and countdown timer with flip clock display",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "计时器"
+        "name": "计时器",
+        "description": "秒表和倒计时，翻页时钟风格显示"
       }
     }
   },

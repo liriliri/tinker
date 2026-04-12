@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Hash",
+    "description": "Hash calculator supporting MD5, SHA1, SHA256, and SHA512",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "哈希计算"
+        "name": "哈希计算",
+        "description": "哈希计算，支持 MD5、SHA1、SHA256 和 SHA512"
       }
     }
   },

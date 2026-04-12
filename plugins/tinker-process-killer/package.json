@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "Process Killer",
+    "description": "Process manager for viewing, searching, and killing processes",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "进程清理"
+        "name": "进程清理",
+        "description": "进程管理，支持查看、搜索和终止进程"
       }
     }
   }

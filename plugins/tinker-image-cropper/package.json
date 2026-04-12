@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Image Cropper",
+    "description": "Image cropper with rotation, flipping, and aspect ratio controls",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "图片裁剪"
+        "name": "图片裁剪",
+        "description": "图片裁剪，支持旋转、翻转和宽高比控制"
       }
     }
   },

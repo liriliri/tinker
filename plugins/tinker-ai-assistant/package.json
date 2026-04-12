@@ -1,7 +1,7 @@
 {
   "name": "tinker-ai-assistant",
   "version": "0.1.0",
-  "description": "AI Assistant that completes tasks through chat",
+  "description": "AI Assistant Plugin for TINKER",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",
@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "AI Assistant",
+    "description": "AI assistant with tools for file operations, shell commands, and web search",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "AI 助手"
+        "name": "AI 助手",
+        "description": "AI 助手，支持文件操作、Shell 命令和网页搜索等工具"
       }
     }
   }

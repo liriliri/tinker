@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Voice Recorder",
+    "description": "Voice recorder with waveform visualization and playback",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "录音机"
+        "name": "录音机",
+        "description": "录音机，支持波形可视化和回放预览"
       }
     }
   },

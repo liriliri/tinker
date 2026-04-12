@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Media Compressor",
+    "description": "Batch video and audio compression powered by FFmpeg",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "音视频压缩"
+        "name": "音视频压缩",
+        "description": "基于 FFmpeg 的批量音视频压缩"
       }
     }
   }

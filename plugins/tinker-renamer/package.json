@@ -1,7 +1,7 @@
 {
   "name": "tinker-renamer",
   "version": "0.1.0",
-  "description": "Batch File Renamer for TINKER",
+  "description": "Batch File Renamer Plugin for TINKER",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",
@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "Renamer",
+    "description": "Batch file renaming with multiple rules and live preview",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "批量重命名"
+        "name": "批量重命名",
+        "description": "批量文件重命名，支持多种规则和实时预览"
       }
     }
   }

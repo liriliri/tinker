@@ -1,18 +1,20 @@
 {
   "name": "tinker-disk-usage",
   "version": "0.1.0",
-  "description": "Disk usage analyzer for TINKER",
+  "description": "Disk Usage Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Disk Usage",
+    "description": "Disk usage analyzer with interactive treemap visualization",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "磁盘空间分析"
+        "name": "磁盘空间分析",
+        "description": "磁盘空间分析，交互式树状图可视化"
       }
     }
   },

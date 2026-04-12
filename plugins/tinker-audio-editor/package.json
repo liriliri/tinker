@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Audio Editor",
+    "description": "Multi-format audio editor with waveform visualization",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "音频编辑"
+        "name": "音频编辑",
+        "description": "多格式音频编辑，支持波形可视化"
       }
     }
   }

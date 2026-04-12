@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "PDF",
+    "description": "PDF viewer powered by PDF.js",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "PDF"
+        "name": "PDF",
+        "description": "基于 PDF.js 的 PDF 查看器"
       }
     }
   },

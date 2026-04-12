@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Whiteboard",
+    "description": "Whiteboard for freeform drawing powered by tldraw",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "白板"
+        "name": "白板",
+        "description": "基于 tldraw 的白板绘图工具"
       }
     }
   },

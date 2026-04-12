@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "QR Code",
+    "description": "QR code generator and scanner",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "二维码"
+        "name": "二维码",
+        "description": "二维码生成与扫描"
       }
     }
   }

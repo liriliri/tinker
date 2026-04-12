@@ -1,18 +1,20 @@
 {
   "name": "tinker-base64",
   "version": "0.1.0",
-  "description": "Base64 encoder/decoder for TINKER",
+  "description": "Base64 Encoder/Decoder Plugin for TINKER",
   "scripts": {
     "dev": "vite --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Base64",
+    "description": "Base64 encoder/decoder for text and files",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "Base64"
+        "name": "Base64",
+        "description": "Base64 编解码，支持文本和文件"
       }
     }
   }

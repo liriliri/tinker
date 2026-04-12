@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Media Converter",
+    "description": "Batch media format conversion powered by FFmpeg",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "媒体格式转换"
+        "name": "媒体格式转换",
+        "description": "基于 FFmpeg 的批量媒体格式转换"
       }
     }
   }

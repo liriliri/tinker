@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Notepad",
+    "description": "Lightweight text editor with syntax highlighting",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "记事本"
+        "name": "记事本",
+        "description": "轻量级文本编辑器，支持语法高亮"
       }
     }
   }

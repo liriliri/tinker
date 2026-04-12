@@ -1,7 +1,7 @@
 {
   "name": "tinker-duplicate-cleaner",
   "version": "0.1.0",
-  "description": "Find and clean duplicate files",
+  "description": "Duplicate Cleaner Plugin for TINKER",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite --config ../vite.config.ts",
@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "Duplicate Cleaner",
+    "description": "Duplicate file scanner and cleaner",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "重复文件清理"
+        "name": "重复文件清理",
+        "description": "重复文件扫描与清理"
       }
     }
   }

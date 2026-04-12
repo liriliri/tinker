@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Unit Converter",
+    "description": "Unit converter across seven measurement categories",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "单位换算"
+        "name": "单位换算",
+        "description": "单位换算，支持七大测量类别"
       }
     }
   }

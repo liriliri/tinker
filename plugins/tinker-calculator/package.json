@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Calculator",
+    "description": "Scientific calculator with basic arithmetic and advanced functions",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "计算器"
+        "name": "计算器",
+        "description": "科学计算器，支持基础算术和高级科学计算"
       }
     }
   }

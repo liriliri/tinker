@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Password Manager",
+    "description": "Password manager using KeePass (KDBX) format",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "locales": {
       "zh-CN": {
-        "name": "密码管理"
+        "name": "密码管理",
+        "description": "基于 KeePass（KDBX）格式的密码管理"
       }
     }
   },

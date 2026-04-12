@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Config Editor",
+    "description": "Visual editor for system and application config files",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "配置编辑"
+        "name": "配置编辑",
+        "description": "系统和应用程序配置文件可视化编辑器"
       }
     }
   }

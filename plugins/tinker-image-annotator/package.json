@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Image Annotator",
+    "description": "Image annotation with drawing, shape, and text tools",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "图片标注"
+        "name": "图片标注",
+        "description": "图片标注，支持绘图、形状和文本工具"
       }
     }
   },

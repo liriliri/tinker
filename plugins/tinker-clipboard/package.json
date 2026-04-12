@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "Clipboard",
+    "description": "Clipboard history manager for text, images, and files",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "剪贴板"
+        "name": "剪贴板",
+        "description": "剪贴板历史管理，支持文本、图片和文件"
       }
     }
   }

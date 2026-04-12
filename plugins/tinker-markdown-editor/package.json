@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Markdown Editor",
+    "description": "Markdown editor with live preview and split view",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "Markdown 编辑"
+        "name": "Markdown 编辑",
+        "description": "Markdown 编辑器，支持实时预览和分栏视图"
       }
     }
   }

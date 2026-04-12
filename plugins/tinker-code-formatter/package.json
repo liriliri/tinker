@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Code Formatter",
+    "description": "Code formatter supporting multiple languages",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "代码格式化"
+        "name": "代码格式化",
+        "description": "代码格式化，支持多种编程语言"
       }
     }
   },

@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Timestamp Converter",
+    "description": "Timestamp and date converter with timezone support",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "时间戳转换"
+        "name": "时间戳转换",
+        "description": "时间戳与日期双向转换，支持多时区"
       }
     }
   }

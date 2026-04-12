@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "RSS Reader",
+    "description": "RSS/Atom feed reader for subscribing and reading articles",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "RSS 阅读"
+        "name": "RSS 阅读",
+        "description": "RSS/Atom 订阅阅读器，支持源管理和文章阅读"
       }
     }
   },

@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Clock",
+    "description": "Clock with flip, analog, and digital styles and timezone support",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "时钟"
+        "name": "时钟",
+        "description": "时钟，支持翻页、模拟和数字三种风格及时区切换"
       }
     }
   },

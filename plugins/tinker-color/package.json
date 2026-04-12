@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Color",
+    "description": "Color picker with format conversion and harmony schemes",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "颜色"
+        "name": "颜色",
+        "description": "颜色选择器，支持格式转换和配色方案"
       }
     }
   },

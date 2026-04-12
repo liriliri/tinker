@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "Switch Hosts",
+    "description": "Hosts file manager for switching between configurations",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "Hosts 切换"
+        "name": "Hosts 切换",
+        "description": "Hosts 文件管理，快速切换多个配置"
       }
     }
   }

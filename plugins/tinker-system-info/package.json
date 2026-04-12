@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "System Info",
+    "description": "System information viewer for hardware and software details",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "系统信息"
+        "name": "系统信息",
+        "description": "系统信息查看，显示硬件和软件详情"
       }
     }
   }

@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Todo",
+    "description": "Todo list using todo.txt format",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "待办清单"
+        "name": "待办清单",
+        "description": "待办清单，使用 todo.txt 格式"
       }
     }
   },

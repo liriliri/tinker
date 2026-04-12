@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Camera",
+    "description": "Camera preview and photo capture",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "相机"
+        "name": "相机",
+        "description": "摄像头预览和拍照"
       }
     }
   }

@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "HTTP Request",
+    "description": "HTTP request testing tool similar to Postman",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
-        "name": "HTTP 请求"
+        "name": "HTTP 请求",
+        "description": "HTTP 请求测试工具，类似 Postman"
       }
     }
   }

@@ -12,12 +12,14 @@
   },
   "tinker": {
     "name": "AI Chat",
+    "description": "Multi-session AI chat with various providers and web search",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "AI 聊天"
+        "name": "AI 聊天",
+        "description": "多会话 AI 聊天，支持多种提供商和网页搜索"
       }
     }
   }

@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Mind Map",
+    "description": "Mind map editor with multiple layout options",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "思维导图"
+        "name": "思维导图",
+        "description": "思维导图编辑器，支持多种布局方式"
       }
     }
   },
