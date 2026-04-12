@@ -1,3 +1,10 @@
+## v1.9.0 (12 Apr 2026)
+
+* feat: add large file
+* feat: show notification api
+* feat(http-request): image preview
+* fix(json-editor): format json
+
 ## v1.8.0 (6 Apr 2026)
 
 * feat: add video player
