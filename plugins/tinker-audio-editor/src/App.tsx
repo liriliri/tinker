@@ -27,6 +27,7 @@ import {
   fadeOutBuffer,
   insertSilenceBuffer,
   exportAudio,
+  SUPPORTED_EXTENSIONS,
 } from './lib/audioUtils'
 
 export default observer(function App() {
@@ -51,17 +52,8 @@ export default observer(function App() {
       properties: ['openFile'],
       filters: [
         {
-          name: 'Audio',
-          extensions: [
-            'mp3',
-            'wav',
-            'ogg',
-            'flac',
-            'm4a',
-            'aac',
-            'opus',
-            'webm',
-          ],
+          name: 'Audio/Video',
+          extensions: SUPPORTED_EXTENSIONS,
         },
       ],
     })

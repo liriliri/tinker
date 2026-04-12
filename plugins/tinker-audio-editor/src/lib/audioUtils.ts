@@ -1,5 +1,26 @@
 import lpad from 'licia/lpad'
 
+export const SUPPORTED_EXTENSIONS = [
+  'mp3',
+  'wav',
+  'ogg',
+  'flac',
+  'm4a',
+  'aac',
+  'opus',
+  'webm',
+  'mp4',
+  'mkv',
+  'avi',
+  'mov',
+  'wmv',
+  'flv',
+]
+
+export const SUPPORTED_ACCEPT = SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(
+  ','
+)
+
 let _audioCtx: AudioContext | null = null
 
 function getAudioCtx(): AudioContext {

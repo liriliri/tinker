@@ -16,6 +16,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 import FileOpen from 'share/components/FileOpen'
 import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
+import { SUPPORTED_ACCEPT } from '../lib/audioUtils'
 import ChannelLabels from './ChannelLabels'
 import { useWaveScrollbar, WaveScrollbarView } from './WaveScrollbar'
 import VuMeter from './VuMeter'
@@ -418,7 +419,7 @@ const AudioEditor = observer(
         <FileOpen
           onOpenFile={onOpenFile}
           openTitle={t('noFile')}
-          accept=".mp3,.wav,.ogg,.flac,.m4a,.aac,.webm"
+          accept={SUPPORTED_ACCEPT}
         />
       )
     ) : (
