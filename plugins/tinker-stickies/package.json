@@ -1,0 +1,19 @@
+{
+  "name": "tinker-stickies",
+  "version": "0.1.0",
+  "description": "Sticky Notes Plugin for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Stickies",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "便签"
+      }
+    }
+  }
+}
