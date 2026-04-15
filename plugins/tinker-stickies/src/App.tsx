@@ -24,18 +24,18 @@ export default observer(function App() {
       <ToasterProvider>
         <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
           <Toolbar>
+            <ToolbarSearch
+              value={store.searchQuery}
+              onChange={(v) => store.setSearchQuery(v)}
+              placeholder={t('searchPlaceholder')}
+            />
+            <ToolbarSpacer />
             <ToolbarButton
               onClick={() => store.addSticky()}
               title={t('addSticky')}
             >
               <Plus size={TOOLBAR_ICON_SIZE} />
             </ToolbarButton>
-            <ToolbarSpacer />
-            <ToolbarSearch
-              value={store.searchQuery}
-              onChange={(v) => store.setSearchQuery(v)}
-              placeholder={t('searchPlaceholder')}
-            />
           </Toolbar>
 
           <div className="flex-1 overflow-y-auto p-4">

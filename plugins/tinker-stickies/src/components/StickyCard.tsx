@@ -87,28 +87,43 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
         className="px-3 py-2 flex items-center gap-1"
         onClick={(e) => e.stopPropagation()}
       >
-        {STICKY_COLORS.map((color) => (
-          <button
-            key={color}
-            className={`w-4 h-4 rounded-full border transition-transform ${
-              sticky.color === color ? 'scale-125 ring-1 ring-offset-1' : ''
-            }`}
-            style={{
-              backgroundColor: color,
-              borderColor: color,
-            }}
-            onClick={() => store.updateStickyColor(sticky.id, color)}
-          />
-        ))}
-
-        <div className="flex-1" />
-
         <span
-          className="text-[10px] opacity-50 mr-1"
+          className="text-[10px] opacity-50"
           style={{ color: store.isDark ? '#e5e7eb' : '#1f2937' }}
         >
           {formatTime(sticky.updatedAt, i18n.language)}
         </span>
+
+        <div className="flex-1" />
+
+        <div className="group/color relative">
+          <div
+            className={`w-4 h-4 rounded-full border cursor-pointer ${tw.border}`}
+            style={{ backgroundColor: sticky.color }}
+          />
+          <div
+            className={`absolute bottom-full right-0 pb-2 opacity-0 scale-95 pointer-events-none transition-all duration-150 group-hover/color:opacity-100 group-hover/color:scale-100 group-hover/color:pointer-events-auto`}
+          >
+            <div
+              className={`flex gap-1 p-1.5 rounded shadow-lg border ${tw.border} ${tw.bg.secondary}`}
+            >
+              {STICKY_COLORS.map((color) => (
+                <button
+                  key={color}
+                  className={`w-5 h-5 rounded-full border transition-transform ${
+                    tw.border
+                  } ${
+                    sticky.color === color
+                      ? 'scale-110 ring-1 ring-offset-1'
+                      : ''
+                  }`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => store.updateStickyColor(sticky.id, color)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
 
         <button
           className={`p-1 rounded opacity-40 hover:opacity-100 transition-opacity ${tw.hover}`}
