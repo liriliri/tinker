@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
+import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
 import { getFileCategory } from './lib/util'
@@ -14,10 +15,22 @@ class Store extends BaseStore {
   scanTask: tinker.DiskUsageTask | null = null
   filterTab: FilterTab = 'all'
   selectedFiles: Set<string> = new Set()
+  iconCache: Map<string, string> = new Map()
 
   constructor() {
     super()
     makeAutoObservable(this)
+  }
+
+  async loadFileIcon(filePath: string) {
+    if (this.iconCache.has(filePath)) return
+
+    const icon = await getFileIcon(filePath)
+    if (icon) {
+      runInAction(() => {
+        this.iconCache.set(filePath, icon)
+      })
+    }
   }
 
   get selectedSize(): number {
@@ -137,6 +150,7 @@ class Store extends BaseStore {
     this.scanProgress = null
     this.largeFiles = []
     this.selectedFiles = new Set()
+    this.iconCache.clear()
   }
 }
 

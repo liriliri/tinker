@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { useMemo, useCallback, memo } from 'react'
+import { useMemo, useCallback, memo, useEffect } from 'react'
 import type { ColDef, ICellRendererParams } from 'ag-grid-community'
 import fileSize from 'licia/fileSize'
 import Grid from 'share/components/Grid'
@@ -46,6 +46,31 @@ const PathCell = memo(function PathCell({
   )
 })
 
+const NameCell = observer(function NameCell({
+  data,
+}: ICellRendererParams<FileEntry>) {
+  if (!data) return null
+
+  useEffect(() => {
+    if (!store.iconCache.has(data.path)) {
+      store.loadFileIcon(data.path)
+    }
+  }, [data.path])
+
+  const icon = store.iconCache.get(data.path)
+
+  return (
+    <div className="flex items-center gap-2">
+      {icon ? (
+        <img src={icon} alt="" className="w-4 h-4 flex-shrink-0" />
+      ) : (
+        <span className="w-4 h-4 flex-shrink-0" />
+      )}
+      <span className="truncate">{data.name}</span>
+    </div>
+  )
+})
+
 export default observer(function ResultView() {
   const { t } = useTranslation()
 
@@ -57,6 +82,7 @@ export default observer(function ResultView() {
         sortable: false,
         cellRenderer: CheckboxCell,
         suppressMovable: true,
+        cellStyle: { paddingRight: 0 },
       },
       {
         field: 'name',
@@ -64,6 +90,8 @@ export default observer(function ResultView() {
         flex: 2,
         minWidth: 150,
         sortable: false,
+        cellRenderer: NameCell,
+        cellStyle: { paddingLeft: 0 },
       },
       {
         field: 'path',

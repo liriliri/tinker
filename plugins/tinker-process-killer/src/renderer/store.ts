@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import { confirm } from 'share/components/Confirm'
+import { getFileIcon } from 'share/lib/util'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
@@ -30,8 +31,6 @@ class Store extends BaseStore {
   refreshInterval: number = 5000
 
   private refreshTimer: NodeJS.Timeout | null = null
-  private iconCache: Map<string, string> = new Map()
-  private loadingIcons: Set<string> = new Set()
 
   constructor() {
     super()
@@ -230,39 +229,15 @@ class Store extends BaseStore {
       }
     }
 
-    const cacheKey = filePath
-    if (this.iconCache.has(cacheKey)) {
-      process.icon = this.iconCache.get(cacheKey)
-      return
-    }
-
-    if (this.loadingIcons.has(cacheKey)) {
-      return
-    }
-
-    this.loadingIcons.add(cacheKey)
-    try {
-      let icon = await tinker.getFileIcon(filePath)
-      if (!icon) {
-        icon = defaultAppIcon
-      }
-      this.iconCache.set(cacheKey, icon)
-
-      const currentProcess = find(this.processes, (p) => p.pid === pid)
-      if (currentProcess) {
-        currentProcess.icon = icon
-      }
-    } catch {
-      this.iconCache.set(cacheKey, defaultAppIcon)
-    } finally {
-      this.loadingIcons.delete(cacheKey)
+    const icon = await getFileIcon(filePath)
+    const currentProcess = find(this.processes, (p) => p.pid === pid)
+    if (currentProcess) {
+      currentProcess.icon = icon || defaultAppIcon
     }
   }
 
   destroy() {
     this.stopAutoRefresh()
-    this.iconCache.clear()
-    this.loadingIcons.clear()
   }
 }
 

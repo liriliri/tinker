@@ -1,6 +1,7 @@
 import durationFormat from 'licia/durationFormat'
 import dateFormat from 'licia/dateFormat'
 import splitPath from 'licia/splitPath'
+import contain from 'licia/contain'
 
 /**
  * Open an image file using native dialog and return File with path
@@ -70,6 +71,35 @@ export async function resolveSavePath(filePath: string): Promise<string> {
   if (!(await fileExists(hourPath))) return hourPath
 
   return `${base}-${dateFormat('yyyymmddHHMM')}${ext}`
+}
+
+const fileIconCache = new Map<string, Promise<string | undefined>>()
+
+const EXECUTABLE_EXTS = ['.app', '.exe', '.msi', '.dmg', '.appimage']
+
+function getFileIconCacheKey(filePath: string): string {
+  const { ext } = splitPath(filePath)
+  const lowerExt = ext.toLowerCase()
+
+  if (!lowerExt || contain(EXECUTABLE_EXTS, lowerExt)) {
+    return filePath
+  }
+
+  return `ext:${lowerExt}`
+}
+
+export function getFileIcon(filePath: string): Promise<string | undefined> {
+  const cacheKey = getFileIconCacheKey(filePath)
+
+  if (fileIconCache.has(cacheKey)) return fileIconCache.get(cacheKey)!
+
+  const promise = tinker
+    .getFileIcon(filePath)
+    .then((icon) => icon || undefined)
+    .catch(() => undefined)
+
+  fileIconCache.set(cacheKey, promise)
+  return promise
 }
 
 export function mediaDurationFormat(seconds: number) {

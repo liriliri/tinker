@@ -229,10 +229,13 @@ import {
 ## Utilities
 
 ```ts
-import { isDiskNodeDirectory, mediaDurationFormat, openImageFile, fileExists, resolveSavePath } from 'share/lib/util'
+import { isDiskNodeDirectory, mediaDurationFormat, openImageFile, fileExists, resolveSavePath, getFileIcon } from 'share/lib/util'
 
 // Check if a DiskUsageResult node is a directory
 isDiskNodeDirectory(node, fullPath) // uses children or fstat fallback
+
+// Get file icon with built-in cache (returns data URL or undefined)
+const icon = await getFileIcon('/path/to/file')
 ```
 
 ## When To Update This File

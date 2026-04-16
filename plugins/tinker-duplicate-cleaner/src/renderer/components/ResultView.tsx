@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import type {
   ColDef,
   ICellRendererParams,
@@ -98,6 +98,31 @@ const PathCell = ({ data }: ICellRendererParams<RowData>) => {
   )
 }
 
+const NameCell = observer(function NameCell({
+  data,
+}: ICellRendererParams<RowData>) {
+  if (!data || isGroupRow(data)) return null
+
+  useEffect(() => {
+    if (!store.iconCache.has(data.path)) {
+      store.loadFileIcon(data.path)
+    }
+  }, [data.path])
+
+  const icon = store.iconCache.get(data.path)
+
+  return (
+    <div className="flex items-center gap-2">
+      {icon ? (
+        <img src={icon} alt="" className="w-4 h-4 flex-shrink-0" />
+      ) : (
+        <span className="w-4 h-4 flex-shrink-0" />
+      )}
+      <span className="truncate">{data.name}</span>
+    </div>
+  )
+})
+
 interface GroupCellProps {
   data: GroupRow
   expanded: boolean
@@ -136,6 +161,7 @@ export default observer(function ResultView() {
         sortable: false,
         cellRenderer: CheckboxCell,
         suppressMovable: true,
+        cellStyle: { paddingRight: 0 },
       },
       {
         field: 'name' as const,
@@ -143,6 +169,8 @@ export default observer(function ResultView() {
         flex: 2,
         minWidth: 150,
         sortable: false,
+        cellRenderer: NameCell,
+        cellStyle: { paddingLeft: 0 },
       },
       {
         field: 'path' as const,
