@@ -12,5 +12,7 @@
   "delete": "删除",
   "deleteConfirmTitle": "删除",
   "deleteConfirmMessage": "确定要删除「{{name}}」吗？",
+  "moveToTrash": "移到回收站",
+  "confirm": "确定",
   "rescan": "重新扫描"
 }

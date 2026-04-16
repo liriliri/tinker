@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   FolderOpen,
@@ -17,7 +18,8 @@ import {
   ToolbarTextButton,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { confirm } from 'share/components/Confirm'
+import Dialog, { DialogButton } from 'share/components/Dialog'
+import Checkbox from 'share/components/Checkbox'
 import toast from 'react-hot-toast'
 import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
@@ -35,6 +37,7 @@ const tabs: { id: FilterTab; icon: typeof AlignJustify; label: string }[] = [
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleOpenFolder = async () => {
     const result = await tinker.showOpenDialog({
@@ -47,17 +50,13 @@ export default observer(function ToolbarComponent() {
     store.openDirectory(dirPath)
   }
 
-  const handleClean = async () => {
+  const handleClean = () => {
     if (store.selectedCount === 0) return
-    const ok = await confirm({
-      title: t('confirmClean'),
-      message: t('confirmCleanMessage', {
-        count: store.selectedCount,
-        size: fileSize(store.selectedSize),
-      }),
-    })
-    if (!ok) return
+    setShowConfirm(true)
+  }
 
+  const handleConfirm = async () => {
+    setShowConfirm(false)
     const result = await store.deleteSelected()
     if (!result) return
     if (result.deleted > 0) {
@@ -114,6 +113,31 @@ export default observer(function ToolbarComponent() {
       >
         {t('clean')}
       </ToolbarTextButton>
+      <Dialog
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        title={t('confirmClean')}
+      >
+        <p className={`text-sm ${tw.text.secondary} mb-4`}>
+          {t('confirmCleanMessage', {
+            count: store.selectedCount,
+            size: fileSize(store.selectedSize),
+          })}
+        </p>
+        <Checkbox
+          checked={store.moveToTrash}
+          onChange={(checked) => store.setMoveToTrash(checked)}
+          className="mb-6"
+        >
+          {t('moveToTrash')}
+        </Checkbox>
+        <div className="flex gap-2 justify-end">
+          <DialogButton variant="text" onClick={() => setShowConfirm(false)}>
+            {t('cancel')}
+          </DialogButton>
+          <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
+        </div>
+      </Dialog>
     </ToolbarBase>
   )
 })

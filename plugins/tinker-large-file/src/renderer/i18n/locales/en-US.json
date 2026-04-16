@@ -22,5 +22,7 @@
   "confirmCleanMessage": "Are you sure you want to delete {{count}} files ({{size}})?",
   "cleanSuccess": "{{count}} files deleted successfully",
   "cleanErrors": "{{count}} files failed to delete",
+  "moveToTrash": "Move to Trash",
+  "confirm": "Confirm",
   "noRows": "No large files found"
 }

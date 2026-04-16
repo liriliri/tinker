@@ -1,10 +1,13 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { getFileIcon } from 'share/lib/util'
 import type { DuplicateGroup } from '../common/types'
 import type { FilterTab } from './types'
 import { findDuplicates } from './lib/dataProcess'
 import { getFileCategory } from './lib/util'
+
+const localStore = new LocalStore('tinker-duplicate-cleaner')
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
@@ -17,6 +20,7 @@ class Store extends BaseStore {
   filterTab: FilterTab = 'all'
   selectedFiles: Set<string> = new Set()
   iconCache: Map<string, string> = new Map()
+  moveToTrash: boolean = localStore.get('moveToTrash') !== false
 
   constructor() {
     super()
@@ -64,6 +68,11 @@ class Store extends BaseStore {
     this.selectedFiles = new Set()
   }
 
+  setMoveToTrash(value: boolean) {
+    this.moveToTrash = value
+    localStore.set('moveToTrash', value)
+  }
+
   async deleteSelected(): Promise<{
     deleted: number
     errors: string[]
@@ -71,7 +80,7 @@ class Store extends BaseStore {
     const paths = Array.from(this.selectedFiles)
     if (paths.length === 0) return null
     try {
-      const result = await duplicateCleaner.deleteFiles(paths)
+      const result = await duplicateCleaner.deleteFiles(paths, this.moveToTrash)
       return result
     } catch {
       return null

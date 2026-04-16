@@ -1,16 +1,13 @@
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
-import FolderOpen from 'share/components/FolderOpen'
 import store from './store'
-import Toolbar from './components/Toolbar'
+import FolderOpen from './components/FolderOpen'
 import ScanningView from './components/ScanningView'
-import ResultView from './components/ResultView'
+import ChartView from './components/ChartView'
+import Toolbar from './components/Toolbar'
 
 export default observer(function App() {
-  const { t } = useTranslation()
-
   return (
     <ToasterProvider>
       <div
@@ -18,15 +15,9 @@ export default observer(function App() {
       >
         <Toolbar />
 
-        {store.view === 'open' && (
-          <FolderOpen
-            onOpenFolder={(path) => store.openDirectory(path)}
-            openTitle={t('openFolder')}
-            dropTitle={t('dropFolderHere')}
-          />
-        )}
+        {store.view === 'open' && <FolderOpen />}
         {store.view === 'scanning' && <ScanningView />}
-        {store.view === 'result' && <ResultView />}
+        {store.view === 'chart' && <ChartView />}
       </div>
     </ToasterProvider>
   )

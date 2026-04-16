@@ -22,5 +22,7 @@
   "confirmCleanMessage": "确定要删除 {{count}} 个文件 ({{size}}) 吗？",
   "cleanSuccess": "成功删除 {{count}} 个文件",
   "cleanErrors": "{{count}} 个文件删除失败",
+  "moveToTrash": "移到回收站",
+  "confirm": "确定",
   "noRows": "未发现大文件"
 }

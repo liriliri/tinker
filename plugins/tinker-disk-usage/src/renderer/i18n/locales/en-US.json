@@ -12,6 +12,7 @@
   "delete": "Delete",
   "deleteConfirmTitle": "Delete",
   "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"?",
-  "rescan": "Rescan",
+  "moveToTrash": "Move to Trash",
+  "confirm": "Confirm",
   "rescan": "Rescan"
 }

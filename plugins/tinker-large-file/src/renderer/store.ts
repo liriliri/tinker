@@ -1,9 +1,12 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
 import { getFileCategory } from './lib/util'
+
+const localStore = new LocalStore('tinker-large-file')
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
@@ -16,6 +19,7 @@ class Store extends BaseStore {
   filterTab: FilterTab = 'all'
   selectedFiles: Set<string> = new Set()
   iconCache: Map<string, string> = new Map()
+  moveToTrash: boolean = localStore.get('moveToTrash') !== false
 
   constructor() {
     super()
@@ -63,6 +67,11 @@ class Store extends BaseStore {
     this.selectedFiles = new Set()
   }
 
+  setMoveToTrash(value: boolean) {
+    this.moveToTrash = value
+    localStore.set('moveToTrash', value)
+  }
+
   async deleteSelected(): Promise<{
     deleted: number
     errors: string[]
@@ -70,18 +79,14 @@ class Store extends BaseStore {
     const paths = Array.from(this.selectedFiles)
     if (paths.length === 0) return null
 
-    const results = await Promise.allSettled(paths.map((p) => tinker.rm(p)))
-    const errors: string[] = []
-    results.forEach((r, i) => {
-      if (r.status === 'rejected') errors.push(paths[i])
-    })
+    const result = await largeFile.deleteFiles(paths, this.moveToTrash)
 
     runInAction(() => {
-      const failSet = new Set(errors)
+      const failSet = new Set(result.errors)
       this.largeFiles = this.largeFiles.filter((f) => failSet.has(f.path))
       this.selectedFiles = new Set()
     })
-    return { deleted: paths.length - errors.length, errors }
+    return result
   }
 
   get filteredFiles(): FileEntry[] {

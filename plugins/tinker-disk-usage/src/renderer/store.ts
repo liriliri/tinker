@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { DiskItem } from './types'
 import {
@@ -9,6 +10,8 @@ import {
   removeNodes,
 } from './lib/dataProcess'
 import type { ChartControls } from './lib/d3chart'
+
+const localStore = new LocalStore('tinker-disk-usage')
 
 export type ViewState = 'open' | 'scanning' | 'chart'
 
@@ -24,6 +27,7 @@ class Store extends BaseStore {
   navigationIndex: number = -1
   chartControls: ChartControls | null = null
   scanTask: tinker.DiskUsageTask | null = null
+  moveToTrash: boolean = localStore.get('moveToTrash') !== false
 
   constructor() {
     super()
@@ -214,12 +218,25 @@ class Store extends BaseStore {
     }
   }
 
-  deleteItem(id: string) {
-    if (!this.diskData) return
+  setMoveToTrash(value: boolean) {
+    this.moveToTrash = value
+    localStore.set('moveToTrash', value)
+  }
+
+  async deleteItem(id: string): Promise<boolean> {
+    try {
+      const result = await diskUsage.deleteItem(id, this.moveToTrash)
+      if (!result.success) return false
+    } catch {
+      return false
+    }
+
+    if (!this.diskData) return true
     removeNodes(this.diskData, new Set([id]))
     if (this.chartControls && this.currentData) {
       this.chartControls.render(this.currentData)
     }
+    return true
   }
 
   async rescan() {
