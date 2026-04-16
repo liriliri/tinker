@@ -14,6 +14,9 @@ import path from 'path'
 import startWith from 'licia/startWith'
 import types from 'licia/types'
 import each from 'licia/each'
+import contain from 'licia/contain'
+import trim from 'licia/trim'
+import toNum from 'licia/toNum'
 import { BrowserWindow, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
@@ -36,6 +39,53 @@ export const pluginViews: types.PlainObj<{
 
 let preloadPluginView: WebContentsView | null = null
 
+const allowedWindowOptions = [
+  'minWidth',
+  'minHeight',
+  'alwaysOnTop',
+  'resizable',
+]
+
+function parseOpenWindowFeatures(features: string) {
+  const opts: Record<string, any> = {}
+  if (!features) return opts
+
+  each(features.split(','), (part: string) => {
+    const [key, val] = part.split('=').map((s) => trim(s))
+    if (!contain(allowedWindowOptions, key) || val === undefined) return
+
+    if (val === 'true' || val === 'yes') {
+      opts[key] = true
+    } else if (val === 'false' || val === 'no') {
+      opts[key] = false
+    } else {
+      const num = toNum(val)
+      if (!isNaN(num)) {
+        opts[key] = num
+      }
+    }
+  })
+
+  return opts
+}
+
+function setupWindowOpenHandler(view: WebContentsView) {
+  view.webContents.setWindowOpenHandler(({ features }) => {
+    const opts = parseOpenWindowFeatures(features)
+
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: opts,
+    }
+  })
+
+  view.webContents.on('did-create-window', (childWin) => {
+    childWin.on('close', () => {
+      childWin.hide()
+    })
+  })
+}
+
 function createPluginView() {
   const view = new WebContentsView({
     webPreferences: {
@@ -46,6 +96,7 @@ function createPluginView() {
       webviewTag: true,
     },
   })
+  setupWindowOpenHandler(view)
   view.webContents.loadURL('about:blank')
   return view
 }
@@ -61,11 +112,13 @@ function getPluginView() {
 }
 
 function getWebPluginView() {
-  return new WebContentsView({
+  const view = new WebContentsView({
     webPreferences: {
       partition: PLUGIN_PARTITION,
     },
   })
+  setupWindowOpenHandler(view)
+  return view
 }
 
 export const openPlugin: IpcOpenPlugin = function (id, detached) {

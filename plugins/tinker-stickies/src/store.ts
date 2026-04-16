@@ -1,11 +1,11 @@
-import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
+import { makeAutoObservable, runInAction } from 'mobx'
 import uuid from 'licia/uuid'
 import filter from 'licia/filter'
 import lowerCase from 'licia/lowerCase'
 import isStrBlank from 'licia/isStrBlank'
 import stripHtmlTag from 'licia/stripHtmlTag'
 import BaseStore from 'share/BaseStore'
+import { getAllStickies, putSticky, removeSticky } from './lib/db'
 
 export interface Sticky {
   id: string
@@ -24,12 +24,10 @@ export const STICKY_COLORS = [
   '#fed7aa', // orange
 ]
 
-const storage = new LocalStore('tinker-stickies')
-const STORAGE_KEY_STICKIES = 'stickies'
-
 class Store extends BaseStore {
   stickies: Sticky[] = []
   searchQuery: string = ''
+  editingId: string = ''
 
   constructor() {
     super()
@@ -37,15 +35,11 @@ class Store extends BaseStore {
     this.loadStickies()
   }
 
-  private loadStickies() {
-    const saved = storage.get(STORAGE_KEY_STICKIES)
-    if (saved) {
-      this.stickies = saved as Sticky[]
-    }
-  }
-
-  private saveStickies() {
-    storage.set(STORAGE_KEY_STICKIES, this.stickies)
+  private async loadStickies() {
+    const stickies = await getAllStickies()
+    runInAction(() => {
+      this.stickies = stickies.sort((a, b) => b.createdAt - a.createdAt)
+    })
   }
 
   addSticky() {
@@ -57,14 +51,15 @@ class Store extends BaseStore {
       updatedAt: Date.now(),
     }
     this.stickies.unshift(sticky)
-    this.saveStickies()
+    this.editingId = sticky.id
+    putSticky(sticky)
 
     return sticky.id
   }
 
   deleteSticky(id: string) {
     this.stickies = filter(this.stickies, (s) => s.id !== id)
-    this.saveStickies()
+    removeSticky(id)
   }
 
   updateSticky(id: string, content: string) {
@@ -72,7 +67,7 @@ class Store extends BaseStore {
     if (!sticky) return
     sticky.content = content
     sticky.updatedAt = Date.now()
-    this.saveStickies()
+    putSticky(sticky)
   }
 
   updateStickyColor(id: string, color: string) {
@@ -80,7 +75,7 @@ class Store extends BaseStore {
     if (!sticky) return
     sticky.color = color
     sticky.updatedAt = Date.now()
-    this.saveStickies()
+    putSticky(sticky)
   }
 
   setSearchQuery(query: string) {

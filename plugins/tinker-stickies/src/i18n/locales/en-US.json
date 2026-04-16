@@ -3,7 +3,7 @@
   "deleteSticky": "Delete",
   "deleteConfirmTitle": "Delete Sticky",
   "deleteConfirmMessage": "Are you sure you want to delete this sticky?",
-  "noStickies": "No stickies yet. Click + to create one.",
+  "noStickies": "No stickies yet",
   "noSearchResults": "No stickies match your search.",
   "searchPlaceholder": "Search stickies...",
   "updatedAt": "Updated",
@@ -11,5 +11,12 @@
   "italic": "Italic",
   "underline": "Underline",
   "strikethrough": "Strikethrough",
-  "highlight": "Highlight"
+  "highlight": "Highlight",
+  "highlightGreen": "Green",
+  "highlightBlue": "Blue",
+  "highlightPink": "Pink",
+  "highlightPurple": "Purple",
+  "highlightOrange": "Orange",
+  "removeHighlight": "Remove",
+  "openWindow": "Open in New Window"
 }
