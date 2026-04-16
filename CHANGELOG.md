@@ -1,3 +1,8 @@
+## v1.10.0 (16 Apr 2026)
+
+* feat: add stickies
+* fix: older macOS version empty app list
+
 ## v1.9.0 (12 Apr 2026)
 
 * feat: add large file
