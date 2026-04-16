@@ -8,11 +8,13 @@
   },
   "tinker": {
     "name": "Stickies",
+    "description": "Colorful sticky notes for quick thoughts and reminders",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "便签"
+        "name": "便签",
+        "description": "彩色便签，随手记录想法和提醒"
       }
     }
   }
