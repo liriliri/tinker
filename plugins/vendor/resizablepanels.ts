@@ -1,7 +1,6 @@
 import * as reactResizablePanels from 'react-resizable-panels'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.reactResizablePanels = reactResizablePanels
+expose('reactResizablePanels', reactResizablePanels)
 
 export { reactResizablePanels }

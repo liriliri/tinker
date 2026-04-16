@@ -1,7 +1,6 @@
 import * as mathjs from 'mathjs'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.mathjs = mathjs
+expose('mathjs', mathjs)
 
 export { mathjs }

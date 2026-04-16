@@ -1,6 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Highlight from '@tiptap/extension-highlight'
 import { Trash2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
@@ -24,15 +28,74 @@ interface StickyCardProps {
 export default observer(function StickyCard({ sticky }: StickyCardProps) {
   const { t, i18n } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        codeBlock: false,
+        blockquote: false,
+        horizontalRule: false,
+      }),
+      Underline,
+      Highlight,
+    ],
+    content: sticky.content,
+    editable: false,
+    onUpdate: ({ editor }) => {
+      store.updateSticky(sticky.id, editor.getHTML())
+    },
+  })
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus()
-      const len = textareaRef.current.value.length
-      textareaRef.current.setSelectionRange(len, len)
+    if (!editor) return
+    if (isEditing) {
+      editor.setEditable(true)
+      editor.commands.focus('end')
+    } else {
+      editor.setEditable(false)
     }
-  }, [isEditing])
+  }, [isEditing, editor])
+
+  useEffect(() => {
+    if (!editor || isEditing) return
+    const currentHTML = editor.getHTML()
+    if (currentHTML !== sticky.content) {
+      editor.commands.setContent(sticky.content)
+    }
+  }, [sticky.content, editor, isEditing])
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      if (!editor || editor.state.selection.empty) return
+
+      e.preventDefault()
+      tinker.showContextMenu(e.clientX, e.clientY, [
+        {
+          label: t('bold'),
+          click: () => editor.chain().focus().toggleBold().run(),
+        },
+        {
+          label: t('italic'),
+          click: () => editor.chain().focus().toggleItalic().run(),
+        },
+        {
+          label: t('underline'),
+          click: () => editor.chain().focus().toggleUnderline().run(),
+        },
+        {
+          label: t('strikethrough'),
+          click: () => editor.chain().focus().toggleStrike().run(),
+        },
+        { type: 'separator' as const },
+        {
+          label: t('highlight'),
+          click: () => editor.chain().focus().toggleHighlight().run(),
+        },
+      ])
+    },
+    [editor, t]
+  )
 
   async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation()
@@ -45,12 +108,9 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
     }
   }
 
-  function handleContentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    store.updateSticky(sticky.id, e.target.value)
-  }
-
   const cardBg = store.isDark ? `${sticky.color}30` : `${sticky.color}90`
   const borderColor = store.isDark ? `${sticky.color}50` : `${sticky.color}`
+  const textColor = store.isDark ? '#e5e7eb' : '#1f2937'
 
   return (
     <div
@@ -61,36 +121,26 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
       }}
       onClick={() => !isEditing && setIsEditing(true)}
     >
-      <div className="flex-1 p-3 overflow-hidden">
-        {isEditing ? (
-          <textarea
-            ref={textareaRef}
-            value={sticky.content}
-            onChange={handleContentChange}
-            onBlur={() => setIsEditing(false)}
-            className="w-full h-full bg-transparent resize-none outline-none text-sm"
-            style={{ color: store.isDark ? '#e5e7eb' : '#1f2937' }}
-          />
-        ) : (
-          <p
-            className="text-sm whitespace-pre-wrap break-words line-clamp-6"
-            style={{ color: store.isDark ? '#e5e7eb' : '#1f2937' }}
-          >
-            {sticky.content || (
-              <span className="opacity-40 italic">{t('addSticky')}...</span>
-            )}
-          </p>
-        )}
+      <div
+        className="flex-1 p-3 overflow-hidden"
+        onContextMenu={handleContextMenu}
+      >
+        <div
+          className={`sticky-editor text-sm h-full ${
+            isEditing ? 'is-editing' : ''
+          }`}
+          style={{ color: textColor }}
+          onBlur={() => setIsEditing(false)}
+        >
+          <EditorContent editor={editor} />
+        </div>
       </div>
 
       <div
         className="px-3 py-2 flex items-center gap-1"
         onClick={(e) => e.stopPropagation()}
       >
-        <span
-          className="text-[10px] opacity-50"
-          style={{ color: store.isDark ? '#e5e7eb' : '#1f2937' }}
-        >
+        <span className="text-[10px] opacity-50" style={{ color: textColor }}>
           {formatTime(sticky.updatedAt, i18n.language)}
         </span>
 

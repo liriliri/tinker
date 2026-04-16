@@ -1,7 +1,6 @@
 import * as htmlToImage from 'html-to-image'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.htmlToImage = htmlToImage
+expose('htmlToImage', htmlToImage)
 
 export { htmlToImage }

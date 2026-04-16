@@ -1,11 +1,8 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.ReactMarkdown = ReactMarkdown
-g.remarkGfm = remarkGfm
-g.remarkBreaks = remarkBreaks
+expose({ ReactMarkdown, remarkGfm, remarkBreaks })
 
 export { ReactMarkdown, remarkGfm, remarkBreaks }

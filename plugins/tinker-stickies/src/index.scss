@@ -1,2 +1,27 @@
 @use '../../share/base.scss';
 @config "../tailwind.config.js";
+
+.sticky-editor {
+  .tiptap {
+    outline: none;
+    height: 100%;
+    overflow-y: auto;
+
+    p {
+      margin: 0;
+    }
+
+    mark {
+      background-color: #fef08a;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+  }
+
+  &:not(.is-editing) .tiptap {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+  }
+}

@@ -1,9 +1,10 @@
 import * as reactSyntaxHighlighter from 'react-syntax-highlighter'
 import * as prismStyles from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.reactSyntaxHighlighter = reactSyntaxHighlighter
-g.reactSyntaxHighlighterPrismStyles = prismStyles
+expose({
+  reactSyntaxHighlighter,
+  reactSyntaxHighlighterPrismStyles: prismStyles,
+})
 
 export { reactSyntaxHighlighter, prismStyles }

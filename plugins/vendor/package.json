@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast",
+    "build": "npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
     "build:mathjs": "vite build --config vite.config.ts --mode mathjs",
@@ -17,7 +17,8 @@
     "build:markdown": "vite build --config vite.config.ts --mode markdown",
     "build:hexeditor": "vite build --config vite.config.ts --mode hexeditor",
     "build:headlessui": "vite build --config vite.config.ts --mode headlessui",
-    "build:hottoast": "vite build --config vite.config.ts --mode hottoast"
+    "build:hottoast": "vite build --config vite.config.ts --mode hottoast",
+    "build:tiptap": "vite build --config vite.config.ts --mode tiptap"
   },
   "dependencies": {
     "systeminformation": "^5.30.7"
@@ -41,6 +42,12 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "styled-components": "^4.4.1",
-    "wavesurfer.js": "7.12.2"
+    "wavesurfer.js": "7.12.2",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/pm": "^2.11.5",
+    "@tiptap/core": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "@tiptap/extension-underline": "^2.11.5",
+    "@tiptap/extension-highlight": "^2.11.5"
   }
 }

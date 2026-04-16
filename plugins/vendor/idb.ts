@@ -1,7 +1,6 @@
 import * as idb from 'idb'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.idb = idb
+expose('idb', idb)
 
 export { idb }

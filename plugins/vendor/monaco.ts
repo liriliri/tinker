@@ -6,6 +6,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker&ur
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker&url'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker&url'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker&url'
+import { expose } from './util'
 
 loader.config({ monaco })
 
@@ -28,8 +29,6 @@ self.MonacoEnvironment = {
   },
 }
 
-const g = globalThis as Record<string, unknown>
-
-g.MonacoEditorReact = MonacoEditorReact
+expose('MonacoEditorReact', MonacoEditorReact)
 
 export { MonacoEditorReact }

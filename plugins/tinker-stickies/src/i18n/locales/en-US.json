@@ -6,5 +6,10 @@
   "noStickies": "No stickies yet. Click + to create one.",
   "noSearchResults": "No stickies match your search.",
   "searchPlaceholder": "Search stickies...",
-  "updatedAt": "Updated"
+  "updatedAt": "Updated",
+  "bold": "Bold",
+  "italic": "Italic",
+  "underline": "Underline",
+  "strikethrough": "Strikethrough",
+  "highlight": "Highlight"
 }

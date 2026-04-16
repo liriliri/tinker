@@ -1,9 +1,7 @@
 import * as mobx from 'mobx'
 import * as mobxReactLite from 'mobx-react-lite'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.mobx = mobx
-g.mobxReactLite = mobxReactLite
+expose({ mobx, mobxReactLite })
 
 export { mobx, mobxReactLite }

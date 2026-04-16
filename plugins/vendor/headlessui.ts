@@ -1,7 +1,6 @@
 import * as headlessui from '@headlessui/react'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.headlessui = headlessui
+expose('headlessui', headlessui)
 
 export { headlessui }

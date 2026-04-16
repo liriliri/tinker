@@ -1,7 +1,6 @@
 import * as zxing from '@zxing/library'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.zxing = zxing
+expose('zxing', zxing)
 
 export { zxing }

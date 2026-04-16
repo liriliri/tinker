@@ -1,10 +1,8 @@
 import * as AgGridCommunity from 'ag-grid-community'
 import * as AgGridReactModule from 'ag-grid-react'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.AgGridCommunity = AgGridCommunity
-g.AgGridReact = AgGridReactModule
+expose({ AgGridCommunity, AgGridReact: AgGridReactModule })
 
 export { AgGridCommunity }
 export const AgGridReact = AgGridReactModule.AgGridReact

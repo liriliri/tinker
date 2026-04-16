@@ -6,5 +6,10 @@
   "noStickies": "还没有便签，点击 + 创建一个吧。",
   "noSearchResults": "没有匹配的便签。",
   "searchPlaceholder": "搜索便签...",
-  "updatedAt": "更新于"
+  "updatedAt": "更新于",
+  "bold": "粗体",
+  "italic": "斜体",
+  "underline": "下划线",
+  "strikethrough": "删除线",
+  "highlight": "高亮"
 }

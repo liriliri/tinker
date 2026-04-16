@@ -4,6 +4,7 @@ import uuid from 'licia/uuid'
 import filter from 'licia/filter'
 import lowerCase from 'licia/lowerCase'
 import isStrBlank from 'licia/isStrBlank'
+import stripHtmlTag from 'licia/stripHtmlTag'
 import BaseStore from 'share/BaseStore'
 
 export interface Sticky {
@@ -91,7 +92,9 @@ class Store extends BaseStore {
       return this.stickies
     }
     const query = lowerCase(this.searchQuery)
-    return filter(this.stickies, (s) => lowerCase(s.content).includes(query))
+    return filter(this.stickies, (s) =>
+      lowerCase(stripHtmlTag(s.content)).includes(query)
+    )
   }
 }
 

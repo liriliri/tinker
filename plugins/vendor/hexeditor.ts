@@ -1,9 +1,7 @@
 import HexEditor from 'react-hex-editor'
 import * as styledComponents from 'styled-components'
+import { expose } from './util'
 
-const g = globalThis as Record<string, unknown>
-
-g.ReactHexEditor = HexEditor
-g.styledComponents = styledComponents
+expose({ ReactHexEditor: HexEditor, styledComponents })
 
 export default HexEditor

@@ -41,6 +41,10 @@ const globals = {
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
   'wavesurfer.js/plugins/timeline': 'wavesurferTimelinePlugin',
+  '@tiptap/react': 'tiptapReact',
+  '@tiptap/starter-kit': 'tiptapStarterKit',
+  '@tiptap/extension-underline': 'tiptapExtensionUnderline',
+  '@tiptap/extension-highlight': 'tiptapExtensionHighlight',
 }
 
 export const shareExternal = ['systeminformation']
@@ -216,6 +220,10 @@ export default defineConfig(({ mode }) => {
       'react',
       'react-dom',
     ])
+  }
+
+  if (target === 'tiptap') {
+    return createConfig('tiptap', 'PluginVendorTiptap', ['react', 'react-dom'])
   }
 
   return createConfig('react', 'PluginVendorReact')
