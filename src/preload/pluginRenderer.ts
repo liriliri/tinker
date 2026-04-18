@@ -14,6 +14,13 @@ export function injectApi() {
     quit: () => void
   }> = {}
 
+  const downloadTasks: types.PlainObj<{
+    pause: () => void
+    resume: () => void
+    cancel: () => void
+    delete: () => void
+  }> = {}
+
   function runFFmpeg(args: string[], onProgress?: any) {
     const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
 
@@ -71,6 +78,59 @@ export function injectApi() {
     return extendedPromise
   }
 
+  function download(options: any) {
+    const listeners = new Set<() => void>()
+    const ref: { task: any } = { task: null }
+
+    const { promise, downloadId } = _tinker.startDownload(
+      options,
+      (progress: any) => {
+        Object.assign(ref.task, progress)
+        listeners.forEach((cb) => cb())
+      }
+    )
+
+    downloadTasks[downloadId] = {
+      pause: () => _tinker.pauseDownload(downloadId),
+      resume: () => _tinker.resumeDownload(downloadId),
+      cancel: () => _tinker.cancelDownload(downloadId),
+      delete: () => _tinker.deleteDownload(downloadId),
+    }
+
+    promise.finally(() => {
+      delete downloadTasks[downloadId]
+    })
+
+    const task = promise as any
+    ref.task = task
+    task.id = downloadId
+    task.url = options.url
+    task.state = 'progressing'
+    task.speed = 0
+    task.totalBytes = 0
+    task.receivedBytes = 0
+    task.paused = false
+    task.savePath = options.savePath
+    task.pause = function () {
+      downloadTasks[downloadId]?.pause()
+    }
+    task.resume = function () {
+      downloadTasks[downloadId]?.resume()
+    }
+    task.cancel = function () {
+      downloadTasks[downloadId]?.cancel()
+    }
+    task.delete = function () {
+      downloadTasks[downloadId]?.delete()
+    }
+    task.onProgress = function (cb: () => void) {
+      listeners.add(cb)
+      return () => listeners.delete(cb)
+    }
+
+    return task
+  }
+
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -98,6 +158,91 @@ export function injectApi() {
     callAI: _tinker.callAI,
     callAIStream,
     getAIProviders: _tinker.getProviderList,
+    download,
+    getDownloads,
+  }
+
+  async function getDownloads() {
+    const list = await _tinker.getDownloads()
+    return list.map((dl: any) => {
+      if (dl.state === 'completed' || dl.state === 'cancelled') {
+        return wrapCompletedDownload(dl)
+      }
+      return attachDownload(dl)
+    })
+  }
+
+  function wrapCompletedDownload(dl: any) {
+    const resolved =
+      dl.state === 'completed'
+        ? Promise.resolve()
+        : Promise.reject(new Error(`Download ${dl.state}: ${dl.url}`))
+    // Silence unhandled rejection for cancelled tasks
+    resolved.catch(() => {})
+
+    const task = Object.assign(dl, {
+      then: resolved.then.bind(resolved),
+      catch: resolved.catch.bind(resolved),
+      finally: resolved.finally.bind(resolved),
+      pause() {},
+      resume() {},
+      cancel() {},
+      delete() {
+        _tinker.deleteDownload(dl.id)
+      },
+      onProgress() {
+        return () => {}
+      },
+    })
+
+    return task
+  }
+
+  function attachDownload(dl: any) {
+    const listeners = new Set<() => void>()
+
+    const { promise, downloadId } = _tinker.attachDownload(
+      dl.id,
+      (progress: any) => {
+        Object.assign(dl, progress)
+        listeners.forEach((cb) => cb())
+      }
+    )
+
+    downloadTasks[downloadId] = {
+      pause: () => _tinker.pauseDownload(downloadId),
+      resume: () => _tinker.resumeDownload(downloadId),
+      cancel: () => _tinker.cancelDownload(downloadId),
+      delete: () => _tinker.deleteDownload(downloadId),
+    }
+
+    promise.finally(() => {
+      delete downloadTasks[downloadId]
+    })
+
+    const task = Object.assign(dl, {
+      then: promise.then.bind(promise),
+      catch: promise.catch.bind(promise),
+      finally: promise.finally.bind(promise),
+      pause() {
+        downloadTasks[downloadId]?.pause()
+      },
+      resume() {
+        downloadTasks[downloadId]?.resume()
+      },
+      cancel() {
+        downloadTasks[downloadId]?.cancel()
+      },
+      delete() {
+        downloadTasks[downloadId]?.delete()
+      },
+      onProgress(cb: () => void) {
+        listeners.add(cb)
+        return () => listeners.delete(cb)
+      },
+    })
+
+    return task
   }
 
   function showContextMenu(x, y, options) {

@@ -1,0 +1,18 @@
+{
+  "downloading": "Downloading",
+  "completed": "Completed",
+  "addDownloadTask": "New Task",
+  "downloadUrl": "Download URL",
+  "fileName": "Filename",
+  "saveDir": "Save directory",
+  "download": "Download",
+  "noDownloads": "No downloads yet",
+  "copyDownloadUrl": "Copy Download URL",
+  "cancelDownloadConfirm": "Cancel downloading \"{{name}}\"?",
+  "clearCompleted": "Clear Completed",
+  "pause": "Pause",
+  "resume": "Resume",
+  "open": "Open",
+  "delete": "Delete",
+  "copySuccess": "Copied"
+}

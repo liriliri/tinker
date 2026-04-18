@@ -62,3 +62,25 @@ export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
+
+export interface IDownloadOptions {
+  url: string
+  savePath: string
+}
+
+export interface IDownloadProgress {
+  state: string
+  speed: number
+  totalBytes: number
+  receivedBytes: number
+  paused: boolean
+}
+
+export type IpcStartPluginDownload = (
+  downloadId: string,
+  options: IDownloadOptions
+) => Promise<void>
+export type IpcPausePluginDownload = (downloadId: string) => void
+export type IpcResumePluginDownload = (downloadId: string) => void
+export type IpcCancelPluginDownload = (downloadId: string) => void
+export type IpcGetPluginDownloads = () => Promise<IDownloadProgress[]>

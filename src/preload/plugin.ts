@@ -19,6 +19,15 @@ import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
 import { getDiskUsage, killDiskUsage, quitDiskUsage } from './lib/pdu'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import { callAI, callAIStream, abortAI, getProviderList } from './lib/ai/index'
+import {
+  startDownload,
+  pauseDownload,
+  resumeDownload,
+  cancelDownload,
+  deleteDownload,
+  getDownloads,
+  attachDownload,
+} from './lib/download'
 import types from 'licia/types'
 import { i18n } from 'common/util'
 import fs from 'node:fs'
@@ -137,6 +146,13 @@ const tinkerObj = {
   getDiskUsage,
   killDiskUsage,
   quitDiskUsage,
+  startDownload,
+  pauseDownload,
+  resumeDownload,
+  cancelDownload,
+  deleteDownload,
+  getDownloads,
+  attachDownload,
   async getApps() {
     return await mainObj.getApps()
   },

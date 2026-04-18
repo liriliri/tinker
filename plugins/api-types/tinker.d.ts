@@ -11,7 +11,6 @@ type ReadFile = typeof import('node:fs/promises').readFile
 type WriteFile = typeof import('node:fs/promises').writeFile
 type Rm = typeof import('node:fs/promises').rm
 
-
 declare global {
   namespace tinker {
     interface FileStats {
@@ -195,6 +194,44 @@ declare global {
     interface AiStreamTask extends Promise<void> {
       abort(): void
     }
+
+    interface DownloadOptions {
+      /** Download URL */
+      url: string
+      /** Full save path (required) */
+      savePath: string
+    }
+
+    interface DownloadProgress {
+      /** 'progressing' | 'interrupted' | 'completed' | 'cancelled' */
+      state: string
+      /** bytes/sec */
+      speed: number
+      totalBytes: number
+      receivedBytes: number
+      paused: boolean
+    }
+
+    interface DownloadTask extends Promise<void>, DownloadProgress {
+      /** Unique identifier for this download */
+      id: string
+      url: string
+      savePath: string
+      pause(): void
+      resume(): void
+      cancel(): void
+      /**
+       * Delete this download record.
+       * If the download is in progress, it will be cancelled first.
+       * The record is permanently removed and will not appear in getDownloads().
+       */
+      delete(): void
+      /**
+       * Register a progress listener. Called whenever download progress updates.
+       * @returns Unsubscribe function
+       */
+      onProgress(callback: () => void): () => void
+    }
   }
 
   const tinker: {
@@ -367,6 +404,30 @@ declare global {
 
     /** Get the list of configured AI providers (name and models only). */
     getAIProviders(): Promise<tinker.AiProviderInfo[]>
+
+    /**
+     * Start a file download.
+     * The download runs in the background and persists even if the plugin is closed.
+     * Progress is tracked on the returned task object. Use task.onProgress() to listen for updates.
+     * @param options - Download URL and optional save path/filename
+     * @returns Task object with pause()/resume()/cancel()/delete()/onProgress() methods
+     * @example
+     * const task = tinker.download({ url: 'https://example.com/file.zip' })
+     * task.onProgress(() => console.log(`${task.receivedBytes}/${task.totalBytes}`))
+     * task.pause()
+     * task.resume()
+     * task.cancel()
+     * await task
+     */
+    download(options: tinker.DownloadOptions): tinker.DownloadTask
+
+    /**
+     * Get all downloads belonging to this plugin.
+     * Returns downloads of all states (including completed/cancelled) as DownloadTask objects.
+     * Active downloads have working pause()/resume()/cancel() controls.
+     * Completed/cancelled downloads have no-op control methods and are already resolved/rejected.
+     */
+    getDownloads(): Promise<tinker.DownloadTask[]>
   }
 }
 

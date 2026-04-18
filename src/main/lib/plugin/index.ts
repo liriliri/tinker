@@ -17,6 +17,7 @@ import {
   getBuiltinPluginDir,
   loadSettingsPlugin,
 } from './loader'
+import * as pluginDownload from './download'
 import {
   PLUGIN_PARTITION,
   pluginViews,
@@ -69,6 +70,7 @@ function nodeStreamToWeb(
 }
 
 export function init() {
+  pluginDownload.init()
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
   handleEvent('reopenPlugin', reopenPlugin)

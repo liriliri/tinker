@@ -1,0 +1,21 @@
+{
+  "name": "tinker-downloader",
+  "version": "0.1.0",
+  "description": "Download Manager for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Downloader",
+    "description": "Download manager with pause, resume, and progress tracking",
+    "main": "dist/index.html",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "下载器",
+        "description": "下载管理器，支持暂停、续传和进度跟踪"
+      }
+    }
+  }
+}
