@@ -27,7 +27,7 @@ declare global {
       isSymbolicLink: boolean
     }
 
-    interface RunProgress {
+    interface FFmpegProgress {
       /** e.g., "1024kbits/s" */
       bitrate: string
       fps: number
@@ -313,7 +313,7 @@ declare global {
      */
     runFFmpeg(
       args: string[],
-      onProgress?: (progress: tinker.RunProgress) => void
+      onProgress?: (progress: tinker.FFmpegProgress) => void
     ): tinker.FFmpegTask
 
     /**

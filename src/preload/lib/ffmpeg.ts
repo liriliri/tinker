@@ -28,7 +28,7 @@ export interface MediaInfo {
   audioStream?: AudioStream
 }
 
-export interface RunProgress {
+export interface FFmpegProgress {
   bitrate: string
   fps: number
   frame: number
@@ -39,7 +39,7 @@ export interface RunProgress {
   time: string
 }
 
-type ProgressCallback = (progress: RunProgress) => void
+type ProgressCallback = (progress: FFmpegProgress) => void
 
 function parseSizeToBytes(size: string): number {
   const match = size.match(/^(\d+)(\w+)$/)
@@ -126,7 +126,7 @@ class FFmpegTask {
           }
 
           const qValue = toNum(q)
-          const progress: RunProgress = {
+          const progress: FFmpegProgress = {
             percent: Math.round(percent * 100) / 100,
             frame: toNum(frame),
             fps: toNum(fps),

@@ -78,6 +78,46 @@ export function injectApi() {
     return extendedPromise
   }
 
+  function wrapDownloadTask(
+    dl: any,
+    promise: Promise<void>,
+    downloadId: string,
+    listeners: Set<() => void>
+  ) {
+    downloadTasks[downloadId] = {
+      pause: () => _tinker.pauseDownload(downloadId),
+      resume: () => _tinker.resumeDownload(downloadId),
+      cancel: () => _tinker.cancelDownload(downloadId),
+      delete: () => _tinker.deleteDownload(downloadId),
+    }
+
+    promise.finally(() => {
+      delete downloadTasks[downloadId]
+    })
+
+    return Object.assign(dl, {
+      then: promise.then.bind(promise),
+      catch: promise.catch.bind(promise),
+      finally: promise.finally.bind(promise),
+      pause() {
+        downloadTasks[downloadId]?.pause()
+      },
+      resume() {
+        downloadTasks[downloadId]?.resume()
+      },
+      cancel() {
+        downloadTasks[downloadId]?.cancel()
+      },
+      delete() {
+        downloadTasks[downloadId]?.delete()
+      },
+      onProgress(cb: () => void) {
+        listeners.add(cb)
+        return () => listeners.delete(cb)
+      },
+    })
+  }
+
   function download(options: any) {
     const listeners = new Set<() => void>()
     const ref: { task: any } = { task: null }
@@ -90,43 +130,22 @@ export function injectApi() {
       }
     )
 
-    downloadTasks[downloadId] = {
-      pause: () => _tinker.pauseDownload(downloadId),
-      resume: () => _tinker.resumeDownload(downloadId),
-      cancel: () => _tinker.cancelDownload(downloadId),
-      delete: () => _tinker.deleteDownload(downloadId),
-    }
-
-    promise.finally(() => {
-      delete downloadTasks[downloadId]
-    })
-
-    const task = promise as any
+    const task = wrapDownloadTask(
+      {
+        id: downloadId,
+        url: options.url,
+        state: 'progressing',
+        speed: 0,
+        totalBytes: 0,
+        receivedBytes: 0,
+        paused: false,
+        savePath: options.savePath,
+      },
+      promise,
+      downloadId,
+      listeners
+    )
     ref.task = task
-    task.id = downloadId
-    task.url = options.url
-    task.state = 'progressing'
-    task.speed = 0
-    task.totalBytes = 0
-    task.receivedBytes = 0
-    task.paused = false
-    task.savePath = options.savePath
-    task.pause = function () {
-      downloadTasks[downloadId]?.pause()
-    }
-    task.resume = function () {
-      downloadTasks[downloadId]?.resume()
-    }
-    task.cancel = function () {
-      downloadTasks[downloadId]?.cancel()
-    }
-    task.delete = function () {
-      downloadTasks[downloadId]?.delete()
-    }
-    task.onProgress = function (cb: () => void) {
-      listeners.add(cb)
-      return () => listeners.delete(cb)
-    }
 
     return task
   }
@@ -209,40 +228,7 @@ export function injectApi() {
       }
     )
 
-    downloadTasks[downloadId] = {
-      pause: () => _tinker.pauseDownload(downloadId),
-      resume: () => _tinker.resumeDownload(downloadId),
-      cancel: () => _tinker.cancelDownload(downloadId),
-      delete: () => _tinker.deleteDownload(downloadId),
-    }
-
-    promise.finally(() => {
-      delete downloadTasks[downloadId]
-    })
-
-    const task = Object.assign(dl, {
-      then: promise.then.bind(promise),
-      catch: promise.catch.bind(promise),
-      finally: promise.finally.bind(promise),
-      pause() {
-        downloadTasks[downloadId]?.pause()
-      },
-      resume() {
-        downloadTasks[downloadId]?.resume()
-      },
-      cancel() {
-        downloadTasks[downloadId]?.cancel()
-      },
-      delete() {
-        downloadTasks[downloadId]?.delete()
-      },
-      onProgress(cb: () => void) {
-        listeners.add(cb)
-        return () => listeners.delete(cb)
-      },
-    })
-
-    return task
+    return wrapDownloadTask(dl, promise, downloadId, listeners)
   }
 
   function showContextMenu(x, y, options) {
