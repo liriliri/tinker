@@ -3,16 +3,11 @@ import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { ITab } from '../common/types'
+import type { ISite } from './types'
 import { getAllFavicons, saveFavicon, removeFavicon } from './lib/db'
 
 const NEW_TAB_URL = ''
 const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
-
-export interface ISite {
-  id: string
-  name: string
-  url: string
-}
 
 const storage = new LocalStore('tinker-browser')
 

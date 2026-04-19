@@ -4,7 +4,8 @@ import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import Dialog, { DialogButton } from 'share/components/Dialog'
-import store, { ISite } from '../store'
+import type { ISite } from '../types'
+import store from '../store'
 
 const SiteCard = observer(function SiteCard({ site }: { site: ISite }) {
   const { t } = useTranslation()

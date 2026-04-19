@@ -31,12 +31,6 @@ function getDB(): Promise<IDBPDatabase<BrowserDB>> {
   return dbPromise
 }
 
-export async function getFavicon(id: string): Promise<string> {
-  const db = await getDB()
-  const entry = await db.get(STORE_NAME, id)
-  return entry?.data || ''
-}
-
 export async function getAllFavicons(): Promise<Map<string, string>> {
   const db = await getDB()
   const entries = await db.getAll(STORE_NAME)
