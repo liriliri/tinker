@@ -1,4 +1,7 @@
 {
   "newTab": "新标签页",
-  "searchOrUrl": "搜索或输入网址"
+  "searchOrUrl": "搜索或输入网址",
+  "back": "后退",
+  "forward": "前进",
+  "reload": "刷新"
 }

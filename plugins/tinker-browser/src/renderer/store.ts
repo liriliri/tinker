@@ -69,6 +69,20 @@ class Store extends BaseStore {
     }
   }
 
+  moveTab(fromIndex: number, toIndex: number) {
+    if (
+      fromIndex === toIndex ||
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.tabs.length ||
+      toIndex >= this.tabs.length
+    ) {
+      return
+    }
+    const [tab] = this.tabs.splice(fromIndex, 1)
+    this.tabs.splice(toIndex, 0, tab)
+  }
+
   setAddressBarValue(value: string) {
     this.addressBarValue = value
   }

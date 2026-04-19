@@ -2,11 +2,15 @@ import { observer } from 'mobx-react-lite'
 import { ArrowLeft, ArrowRight, RefreshCw, X, Search } from 'lucide-react'
 import { tw } from 'share/theme'
 import { useTranslation } from 'react-i18next'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarTextInput,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import store from '../store'
 
-const NAV_ICON_SIZE = 14
-
-export default observer(function NavigationBar() {
+export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const tab = store.activeTab
 
@@ -31,41 +35,35 @@ export default observer(function NavigationBar() {
   }
 
   return (
-    <div
-      className={`flex items-center gap-1 px-1.5 h-10 ${tw.bg.secondary} border-b ${tw.border}`}
-    >
-      <button
-        className={`p-1.5 rounded ${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed`}
+    <Toolbar>
+      <ToolbarButton
         disabled={!tab?.canGoBack}
         onClick={() => store.goBack()}
+        title={t('back')}
       >
-        <ArrowLeft size={NAV_ICON_SIZE} className={tw.text.primary} />
-      </button>
-      <button
-        className={`p-1.5 rounded ${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed`}
+        <ArrowLeft size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
         disabled={!tab?.canGoForward}
         onClick={() => store.goForward()}
+        title={t('forward')}
       >
-        <ArrowRight size={NAV_ICON_SIZE} className={tw.text.primary} />
-      </button>
-      <button
-        className={`p-1.5 rounded ${tw.hover}`}
-        onClick={() => store.reload()}
-      >
+        <ArrowRight size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton onClick={() => store.reload()} title={t('reload')}>
         {tab?.isLoading ? (
-          <X size={NAV_ICON_SIZE} className={tw.text.primary} />
+          <X size={TOOLBAR_ICON_SIZE} />
         ) : (
-          <RefreshCw size={NAV_ICON_SIZE} className={tw.text.primary} />
+          <RefreshCw size={TOOLBAR_ICON_SIZE} />
         )}
-      </button>
+      </ToolbarButton>
       <div className="flex-1 relative">
         <Search
           size={12}
           className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
         />
-        <input
-          type="text"
-          className={`w-full pl-7 pr-3 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`}
+        <ToolbarTextInput
+          className={`w-full pl-7 pr-3 ${tw.primary.focusBorder}`}
           value={store.addressBarValue}
           onChange={(e) => store.setAddressBarValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -74,6 +72,6 @@ export default observer(function NavigationBar() {
           placeholder={t('searchOrUrl')}
         />
       </div>
-    </div>
+    </Toolbar>
   )
 })

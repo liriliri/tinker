@@ -1,4 +1,7 @@
 {
   "newTab": "New Tab",
-  "searchOrUrl": "Search or enter URL"
+  "searchOrUrl": "Search or enter URL",
+  "back": "Back",
+  "forward": "Forward",
+  "reload": "Reload"
 }
