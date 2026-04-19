@@ -1,3 +1,8 @@
+## v1.11.0 (19 Apr 2026)
+
+* feat: add downloader
+* feat: add browser
+
 ## v1.10.0 (16 Apr 2026)
 
 * feat: add stickies

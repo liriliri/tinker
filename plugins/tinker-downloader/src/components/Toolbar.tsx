@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Download, CheckCircle2, ListX } from 'lucide-react'
+import { Download, CheckCircle2, ListX, Plus } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
@@ -51,7 +51,11 @@ export default observer(function ToolbarComponent() {
         <ListX size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSpacer />
-      <ToolbarTextButton onClick={() => store.setAddModalVisible(true)}>
+      <ToolbarTextButton
+        onClick={() => store.setAddModalVisible(true)}
+        className="flex items-center gap-1"
+      >
+        <Plus size={TOOLBAR_ICON_SIZE} />
         {t('addDownloadTask')}
       </ToolbarTextButton>
     </Toolbar>
