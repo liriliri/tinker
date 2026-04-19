@@ -9,7 +9,7 @@ export default observer(function TabBar() {
     <div
       className={`relative flex items-center ${tw.bg.secondary} h-[38px] min-h-[38px]`}
     >
-      <div className="flex-1 flex items-end overflow-x-hidden min-w-0 h-full pt-[4px]">
+      <div className="flex items-end overflow-x-hidden min-w-0 h-full pt-[4px]">
         {store.tabs.map((tab, i) => {
           const nextTab = store.tabs[i + 1]
           const isActive = tab.id === store.activeTabId

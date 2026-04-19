@@ -1,15 +1,31 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
+import uuid from 'licia/uuid'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { ITab } from '../common/types'
+import { getAllFavicons, saveFavicon, removeFavicon } from './lib/db'
 
 const NEW_TAB_URL = ''
 const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
+
+export interface ISite {
+  id: string
+  name: string
+  url: string
+}
+
+const storage = new LocalStore('tinker-browser')
 
 class Store extends BaseStore {
   tabs: ITab[] = []
   activeTabId = ''
   addressBarValue = ''
   addressBarFocused = false
+
+  sites: ISite[] = []
+  favicons: Map<string, string> = new Map()
+  showSiteDialog = false
+  editingSite: ISite | null = null
 
   webviewRefs: Map<string, Electron.WebviewTag> = new Map()
 
@@ -21,6 +37,77 @@ class Store extends BaseStore {
       webviewRefs: false,
     })
     this.addTab()
+    this.loadSites()
+  }
+
+  private loadSites() {
+    const saved = storage.get('sites')
+    if (Array.isArray(saved)) {
+      this.sites = saved
+    }
+    getAllFavicons().then((map) => {
+      runInAction(() => {
+        this.favicons = map
+      })
+    })
+  }
+
+  private saveSites() {
+    storage.set('sites', this.sites)
+  }
+
+  openSiteDialog(site?: ISite) {
+    this.editingSite = site || null
+    this.showSiteDialog = true
+  }
+
+  closeSiteDialog() {
+    this.showSiteDialog = false
+    this.editingSite = null
+  }
+
+  addSite(name: string, url: string) {
+    const id = uuid()
+    this.sites.push({ id, name, url })
+    this.saveSites()
+    this.closeSiteDialog()
+    this.fetchAndCacheFavicon(id, url)
+  }
+
+  updateSite(id: string, name: string, url: string) {
+    const site = this.sites.find((s) => s.id === id)
+    if (!site) return
+
+    const urlChanged = site.url !== url
+    site.name = name
+    site.url = url
+    this.saveSites()
+    this.closeSiteDialog()
+
+    if (urlChanged) {
+      this.fetchAndCacheFavicon(id, url)
+    }
+  }
+
+  removeSite(id: string) {
+    this.sites = this.sites.filter((s) => s.id !== id)
+    this.saveSites()
+    this.favicons.delete(id)
+    removeFavicon(id)
+  }
+
+  private async fetchAndCacheFavicon(id: string, url: string) {
+    let fullUrl = url
+    if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+      fullUrl = 'https://' + fullUrl
+    }
+    const data = await browser.fetchFavicon(fullUrl)
+    if (data) {
+      runInAction(() => {
+        this.favicons.set(id, data)
+      })
+      saveFavicon(id, data)
+    }
   }
 
   get activeTab(): ITab | undefined {

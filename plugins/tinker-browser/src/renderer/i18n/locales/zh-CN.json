@@ -3,5 +3,13 @@
   "searchOrUrl": "搜索或输入网址",
   "back": "后退",
   "forward": "前进",
-  "reload": "刷新"
+  "reload": "刷新",
+  "addSite": "添加网址",
+  "editSite": "编辑网址",
+  "siteName": "名称",
+  "siteUrl": "网址",
+  "save": "保存",
+  "cancel": "取消",
+  "edit": "编辑",
+  "delete": "删除"
 }

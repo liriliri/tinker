@@ -3,5 +3,13 @@
   "searchOrUrl": "Search or enter URL",
   "back": "Back",
   "forward": "Forward",
-  "reload": "Reload"
+  "reload": "Reload",
+  "addSite": "Add Site",
+  "editSite": "Edit Site",
+  "siteName": "Name",
+  "siteUrl": "URL",
+  "save": "Save",
+  "cancel": "Cancel",
+  "edit": "Edit",
+  "delete": "Delete"
 }
