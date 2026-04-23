@@ -90,7 +90,7 @@
     "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",
     "p-queue": "^9.1.0",
-    "pinyin-match": "^1.2.10",
+    "pinyin": "^4.0.0",
     "plist": "^3.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

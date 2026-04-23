@@ -2,13 +2,11 @@ import { IApp, IPlugin } from 'common/types'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
 import find from 'licia/find'
-import lowerCase from 'licia/lowerCase'
 import trim from 'licia/trim'
-import PinyinMatch from 'pinyin-match'
-import toBool from 'licia/toBool'
 import isArr from 'licia/isArr'
 import LocalStore from 'licia/LocalStore'
 import pkg from '../../../package.json'
+import { sortByName, pinyinMatch } from './lib/util'
 
 const storage = new LocalStore('main')
 const STORAGE_KEY_PLUGINS = 'plugins'
@@ -97,12 +95,12 @@ class Store extends BaseStore {
   async refresh(force = false) {
     const plugins = await main.getPlugins(force)
     runInAction(() => {
-      this.plugins = plugins
+      this.plugins = sortByName(plugins)
       this.applyFilter()
     })
     const apps = await main.getApps(force)
     runInAction(() => {
-      this.apps = apps
+      this.apps = sortByName(apps)
       this.applyFilter()
     })
     this.saveCache()
@@ -111,21 +109,17 @@ class Store extends BaseStore {
     return find(this.plugins, (plugin) => plugin.id === id)
   }
   private applyFilter() {
-    const filter = lowerCase(trim(this.filter))
+    const filter = trim(this.filter)
     if (!filter) {
       this.visiblePlugins = this.plugins
       this.visibleApps = this.apps
       return
     }
 
-    this.visiblePlugins = this.plugins.filter((plugin) => {
-      const name = lowerCase(plugin.name)
-      return toBool(PinyinMatch.match(name, filter))
-    })
-    this.visibleApps = this.apps.filter((app) => {
-      const name = lowerCase(app.name)
-      return toBool(PinyinMatch.match(name, filter))
-    })
+    this.visiblePlugins = this.plugins.filter((plugin) =>
+      pinyinMatch(plugin.name, filter)
+    )
+    this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
   }
   private bindEvent() {
     main.on('updatePluginTitle', (title: string) => {
@@ -144,8 +138,8 @@ class Store extends BaseStore {
       return
     }
     runInAction(() => {
-      this.plugins = plugins
-      this.apps = apps
+      this.plugins = sortByName(plugins)
+      this.apps = sortByName(apps)
       this.applyFilter()
     })
   }
