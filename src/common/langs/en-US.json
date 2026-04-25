@@ -21,5 +21,7 @@
   "hideConfirm": "Are you sure you want to hide this plugin?",
   "unhide": "Unhide",
   "pin": "Pin to Top",
-  "unpin": "Unpin"
+  "unpin": "Unpin",
+  "autoDetach": "Auto Detach Window",
+  "runInBackground": "Run in Background"
 }

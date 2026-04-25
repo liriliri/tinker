@@ -33,25 +33,36 @@ export default observer(function PluginList() {
   }))
   const icons = concat(pluginIcons, appIcons)
 
-  function onContextMenu(e: PointerEvent, data: any) {
+  async function onContextMenu(e: PointerEvent, data: any) {
     const template: any[] = []
 
     if (data.plugin) {
       const plugin: IPlugin = data.plugin
-      template.push(
-        {
-          label: t('open'),
-          click() {
-            store.openPlugin(plugin.id)
-          },
+      const autoDetach = store.isPluginAutoDetach(plugin.id)
+      const runInBackground = store.isPluginRunInBackground(plugin.id)
+      const running = await main.isPluginRunning(plugin.id)
+      template.push({
+        label: t('open'),
+        click() {
+          store.openPlugin(plugin.id, autoDetach)
         },
-        {
+      })
+      if (!autoDetach) {
+        template.push({
           label: t('openInNewWin'),
           click() {
             store.openPlugin(plugin.id, true)
           },
-        }
-      )
+        })
+      }
+      if (running) {
+        template.push({
+          label: t('close'),
+          click() {
+            main.closePlugin(plugin.id, true)
+          },
+        })
+      }
       if (!plugin.builtin) {
         template.push({
           label: t('openDir'),
@@ -94,6 +105,31 @@ export default observer(function PluginList() {
           },
         })
       }
+      template.push({ type: 'separator' })
+      template.push({
+        label: t('autoDetach'),
+        type: 'checkbox',
+        checked: autoDetach,
+        click() {
+          if (autoDetach) {
+            store.unsetPluginAutoDetach(plugin.id)
+          } else {
+            store.setPluginAutoDetach(plugin.id)
+          }
+        },
+      })
+      template.push({
+        label: t('runInBackground'),
+        type: 'checkbox',
+        checked: runInBackground,
+        click() {
+          if (runInBackground) {
+            store.unsetPluginRunInBackground(plugin.id)
+          } else {
+            store.setPluginRunInBackground(plugin.id)
+          }
+        },
+      })
     } else {
       template.push({
         label: t('open'),
@@ -116,7 +152,10 @@ export default observer(function PluginList() {
           onClick={(e: any, icon) => {
             const data = icon.data as any
             if (data.plugin) {
-              store.openPlugin(data.plugin.id)
+              store.openPlugin(
+                data.plugin.id,
+                store.isPluginAutoDetach(data.plugin.id)
+              )
             } else {
               store.openApp(data.app.path)
             }

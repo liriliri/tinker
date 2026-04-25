@@ -38,6 +38,8 @@ export interface IApp {
 export interface IPluginState {
   hidden?: boolean
   pinned?: boolean
+  autoDetach?: boolean
+  runInBackground?: boolean
 }
 
 export type IPluginStates = Record<string, IPluginState>
@@ -50,10 +52,14 @@ export type IpcDragMain = (
 ) => void
 export type IpcGetPlugins = (force?: boolean) => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
-export type IpcClosePlugin = (id: string) => void
-export type IpcDetachPlugin = IpcClosePlugin
-export type IpcReopenPlugin = IpcClosePlugin
-export type IpcTogglePluginDevtools = IpcClosePlugin
+export type IpcClosePlugin = (id: string, destroy?: boolean) => void
+export type IpcDetachPlugin = (id: string) => void
+export type IpcIsPluginRunning = (
+  id: string,
+  backgroundOnly?: boolean
+) => boolean
+export type IpcReopenPlugin = IpcDetachPlugin
+export type IpcTogglePluginDevtools = IpcDetachPlugin
 export type IpcShowPluginContextMenu = (
   x: number,
   y: number,

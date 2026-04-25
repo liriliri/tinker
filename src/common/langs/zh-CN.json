@@ -21,5 +21,7 @@
   "hideConfirm": "确定要隐藏此插件吗？",
   "unhide": "取消隐藏",
   "pin": "置顶",
-  "unpin": "取消置顶"
+  "unpin": "取消置顶",
+  "autoDetach": "自动分离窗口",
+  "runInBackground": "允许后台运行"
 }

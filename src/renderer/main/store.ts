@@ -35,6 +35,10 @@ class Store extends BaseStore {
       unhidePlugin: action,
       pinPlugin: action,
       unpinPlugin: action,
+      setPluginAutoDetach: action,
+      unsetPluginAutoDetach: action,
+      setPluginRunInBackground: action,
+      unsetPluginRunInBackground: action,
     })
 
     this.loadCache()
@@ -135,6 +139,42 @@ class Store extends BaseStore {
   }
   isPluginPinned(id: string) {
     return !!this.pluginStates[id]?.pinned
+  }
+  setPluginAutoDetach(id: string) {
+    this.pluginStates = {
+      ...this.pluginStates,
+      [id]: { ...this.pluginStates[id], autoDetach: true },
+    }
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  unsetPluginAutoDetach(id: string) {
+    const state = { ...this.pluginStates[id] }
+    delete state.autoDetach
+    this.pluginStates = { ...this.pluginStates, [id]: state }
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  isPluginAutoDetach(id: string) {
+    return !!this.pluginStates[id]?.autoDetach
+  }
+  setPluginRunInBackground(id: string) {
+    this.pluginStates = {
+      ...this.pluginStates,
+      [id]: { ...this.pluginStates[id], runInBackground: true },
+    }
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  async unsetPluginRunInBackground(id: string) {
+    const state = { ...this.pluginStates[id] }
+    delete state.runInBackground
+    this.pluginStates = { ...this.pluginStates, [id]: state }
+    setMainStore('pluginStates', this.pluginStates)
+    const running = await main.isPluginRunning(id, true)
+    if (running) {
+      main.closePlugin(id, true)
+    }
+  }
+  isPluginRunInBackground(id: string) {
+    return !!this.pluginStates[id]?.runInBackground
   }
   async refresh(force = false) {
     const searchLocalApps = await main.getSettingsStore('searchLocalApps')

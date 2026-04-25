@@ -25,7 +25,7 @@ import * as pluginWin from '../../window/plugin'
 import isMac from 'licia/isMac'
 import contextMenu from '../contextMenu'
 import { plugins } from './loader'
-import { getSettingsStore } from '../store'
+import { getSettingsStore, getMainStore } from '../store'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -34,7 +34,7 @@ export const PLUGIN_PARTITION = 'persist:plugin'
 
 export const pluginViews: types.PlainObj<{
   view: WebContentsView
-  win: BrowserWindow
+  win: BrowserWindow | null
 }> = {}
 
 let preloadPluginView: WebContentsView | null = null
@@ -128,7 +128,24 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
   }
 
   if (pluginViews[id]) {
-    const { win } = pluginViews[id]
+    const { view, win } = pluginViews[id]
+    // Backgrounded plugin: reattach the existing view
+    if (!win) {
+      const mainWin = window.getWin('main')
+      if (detached || !mainWin) {
+        const newWin = pluginWin.showWin(plugin)
+        pluginViews[id].win = newWin
+        updatePluginTheme(id)
+        newWin.contentView.addChildView(view)
+        layoutPlugin(id)
+      } else {
+        pluginViews[id].win = mainWin
+        updatePluginTheme(id)
+        mainWin.contentView.addChildView(view)
+        layoutPlugin(id)
+      }
+      return true
+    }
     win.show()
     win.focus()
     return false
@@ -196,20 +213,45 @@ export function updatePluginTheme(id: string) {
   )
 }
 
-export const closePlugin: IpcClosePlugin = async function (id) {
+export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   const { view, win } = pluginViews[id]
   if (!view) {
     return
   }
 
-  win.contentView.removeChildView(view)
+  if (win) {
+    win.contentView.removeChildView(view)
+  }
+
+  if (!destroy) {
+    const mainStore = getMainStore()
+    const pluginStates = mainStore.get('pluginStates') || {}
+    if (pluginStates[id]?.runInBackground) {
+      pluginViews[id].win = null
+      return
+    }
+  }
+
   view.webContents.close()
   delete pluginViews[id]
+
+  // Close the detached window if it's not the main window
+  if (win && win !== window.getWin('main')) {
+    win.close()
+  }
+}
+
+export function isPluginRunning(id: string, backgroundOnly?: boolean) {
+  const entry = pluginViews[id]
+  if (!entry) {
+    return false
+  }
+  return backgroundOnly ? !entry.win : true
 }
 
 export const detachPlugin: IpcDetachPlugin = async function (id) {
   const { view, win } = pluginViews[id]
-  if (!view) {
+  if (!view || !win) {
     return
   }
 
@@ -230,7 +272,7 @@ export const detachPlugin: IpcDetachPlugin = async function (id) {
 
 export function getAttachedPlugin(win: BrowserWindow): IPlugin | undefined {
   for (const id in pluginViews) {
-    if (pluginViews[id].win === win) {
+    if (pluginViews[id].win && pluginViews[id].win === win) {
       return plugins[id]
     }
   }
@@ -238,6 +280,9 @@ export function getAttachedPlugin(win: BrowserWindow): IPlugin | undefined {
 
 export function layoutPlugin(id: string) {
   const { view, win } = pluginViews[id]
+  if (!win) {
+    return
+  }
 
   let titleBarHeight = 50
   if (win !== window.getWin('main')) {
