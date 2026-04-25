@@ -1,3 +1,10 @@
+## v1.12.0 (25 Apr 2026)
+
+* feat: search local apps setting
+* feat: pin plugin
+* feat: hide plugin
+* feat: allow plugin background running
+
 ## v1.11.0 (19 Apr 2026)
 
 * feat: add downloader
