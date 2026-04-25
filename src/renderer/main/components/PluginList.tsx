@@ -61,6 +61,21 @@ export default observer(function PluginList() {
         })
       }
       template.push({ type: 'separator' })
+      if (store.isPluginPinned(plugin.id)) {
+        template.push({
+          label: t('unpin'),
+          click() {
+            store.unpinPlugin(plugin.id)
+          },
+        })
+      } else {
+        template.push({
+          label: t('pin'),
+          click() {
+            store.pinPlugin(plugin.id)
+          },
+        })
+      }
       if (store.isPluginHidden(plugin.id)) {
         template.push({
           label: t('unhide'),

@@ -33,6 +33,8 @@ class Store extends BaseStore {
       setFilter: action,
       hidePlugin: action,
       unhidePlugin: action,
+      pinPlugin: action,
+      unpinPlugin: action,
     })
 
     this.loadCache()
@@ -116,6 +118,24 @@ class Store extends BaseStore {
   isPluginHidden(id: string) {
     return !!this.pluginStates[id]?.hidden
   }
+  pinPlugin(id: string) {
+    this.pluginStates = {
+      ...this.pluginStates,
+      [id]: { ...this.pluginStates[id], pinned: true },
+    }
+    this.applyFilter()
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  unpinPlugin(id: string) {
+    const state = { ...this.pluginStates[id] }
+    delete state.pinned
+    this.pluginStates = { ...this.pluginStates, [id]: state }
+    this.applyFilter()
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  isPluginPinned(id: string) {
+    return !!this.pluginStates[id]?.pinned
+  }
   async refresh(force = false) {
     const plugins = await main.getPlugins(force)
     runInAction(() => {
@@ -135,16 +155,30 @@ class Store extends BaseStore {
   private applyFilter() {
     const filter = trim(this.filter)
     if (!filter) {
-      this.visiblePlugins = this.plugins.filter(
+      const filtered = this.plugins.filter(
         (plugin) => !this.pluginStates[plugin.id]?.hidden
       )
+      const pinned = filtered.filter(
+        (plugin) => this.pluginStates[plugin.id]?.pinned
+      )
+      const unpinned = filtered.filter(
+        (plugin) => !this.pluginStates[plugin.id]?.pinned
+      )
+      this.visiblePlugins = [...pinned, ...unpinned]
       this.visibleApps = this.apps
       return
     }
 
-    this.visiblePlugins = this.plugins.filter((plugin) =>
+    const matched = this.plugins.filter((plugin) =>
       pinyinMatch(plugin.name, filter)
     )
+    const pinned = matched.filter(
+      (plugin) => this.pluginStates[plugin.id]?.pinned
+    )
+    const unpinned = matched.filter(
+      (plugin) => !this.pluginStates[plugin.id]?.pinned
+    )
+    this.visiblePlugins = [...pinned, ...unpinned]
     this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
   }
   private async loadPluginStates() {

@@ -37,6 +37,7 @@ export interface IApp {
 
 export interface IPluginState {
   hidden?: boolean
+  pinned?: boolean
 }
 
 export type IPluginStates = Record<string, IPluginState>
