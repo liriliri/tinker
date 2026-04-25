@@ -19,6 +19,7 @@ export const getSettingsStore = memoize(function () {
     silentStart: false,
     showShortcut: isMac ? 'Option+Space' : 'Alt+Space',
     autoHide: true,
+    searchLocalApps: true,
   })
 })
 

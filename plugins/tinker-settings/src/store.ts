@@ -10,6 +10,7 @@ class Store extends BaseStore {
   silentStart: boolean = false
   showShortcut: string = 'Alt+Space'
   autoHide: boolean = false
+  searchLocalApps: boolean = true
   aiProviders: AiProvider[] = []
 
   isLoading: boolean = true
@@ -45,6 +46,7 @@ class Store extends BaseStore {
       silentStart,
       showShortcut,
       autoHide,
+      searchLocalApps,
       aiProvidersRaw,
     ] = await Promise.all([
       tinker.getSetting('theme'),
@@ -54,6 +56,7 @@ class Store extends BaseStore {
       tinker.getSetting('silentStart'),
       tinker.getSetting('showShortcut'),
       tinker.getSetting('autoHide'),
+      tinker.getSetting('searchLocalApps'),
       tinker.getSetting('aiProviders'),
     ])
 
@@ -64,6 +67,7 @@ class Store extends BaseStore {
     this.silentStart = silentStart ?? false
     this.showShortcut = showShortcut ?? 'Alt+Space'
     this.autoHide = autoHide ?? false
+    this.searchLocalApps = searchLocalApps ?? true
     const parsed: AiProvider[] = aiProvidersRaw
       ? JSON.parse(aiProvidersRaw)
       : []
@@ -108,6 +112,11 @@ class Store extends BaseStore {
   async setAutoHide(value: boolean) {
     this.autoHide = value
     await tinker.setSetting('autoHide', value)
+  }
+
+  async setSearchLocalApps(value: boolean) {
+    this.searchLocalApps = value
+    await tinker.setSetting('searchLocalApps', value)
   }
 
   private async saveAiProviders() {

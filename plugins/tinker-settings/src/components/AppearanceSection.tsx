@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
-import { tw } from 'share/theme'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import store from '../store'
+import Section, { SettingItem } from './Section'
 
 export default observer(function AppearanceSection() {
   const { t } = useTranslation()
@@ -39,41 +39,27 @@ export default observer(function AppearanceSection() {
   }
 
   return (
-    <div>
-      <h2 className={`text-sm font-semibold mb-2 px-1 ${tw.text.secondary}`}>
-        {t('appearance')}
-      </h2>
-      <section className={`rounded-lg border ${tw.border} ${tw.bg.secondary}`}>
-        <div className="flex items-center justify-between px-4 py-3">
-          <label className={`text-sm ${tw.text.primary}`}>{t('theme')}</label>
-          <Select
-            value={store.theme}
-            onChange={(value) => store.setTheme(value)}
-            options={themeOptions}
-          />
-        </div>
-        <div className={`h-px ${tw.bg.border}`} />
-        <div className="flex items-center justify-between px-4 py-3">
-          <label className={`text-sm ${tw.text.primary}`}>
-            {t('language')}
-          </label>
-          <Select
-            value={store.language}
-            onChange={handleLanguageChange}
-            options={languageOptions}
-          />
-        </div>
-        <div className={`h-px ${tw.bg.border}`} />
-        <div className="flex items-center justify-between px-4 py-3">
-          <label className={`text-sm ${tw.text.primary}`}>
-            {t('useNativeTitlebar')}
-          </label>
-          <Checkbox
-            checked={store.useNativeTitlebar}
-            onChange={handleNativeTitlebarChange}
-          />
-        </div>
-      </section>
-    </div>
+    <Section title={t('appearance')}>
+      <SettingItem label={t('theme')}>
+        <Select
+          value={store.theme}
+          onChange={(value) => store.setTheme(value)}
+          options={themeOptions}
+        />
+      </SettingItem>
+      <SettingItem label={t('language')}>
+        <Select
+          value={store.language}
+          onChange={handleLanguageChange}
+          options={languageOptions}
+        />
+      </SettingItem>
+      <SettingItem label={t('useNativeTitlebar')}>
+        <Checkbox
+          checked={store.useNativeTitlebar}
+          onChange={handleNativeTitlebarChange}
+        />
+      </SettingItem>
+    </Section>
   )
 })

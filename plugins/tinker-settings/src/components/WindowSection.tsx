@@ -1,10 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
+import toast from 'react-hot-toast'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import store from '../store'
+import Section, { SettingItem } from './Section'
 
 const MAC_SHORTCUTS = ['Option+Space', 'Ctrl+Ctrl']
 const WIN_SHORTCUTS = ['Alt+Space', 'Ctrl+Ctrl']
@@ -23,32 +24,29 @@ export default observer(function WindowSection() {
   )
 
   return (
-    <div>
-      <h2 className={`text-sm font-semibold mb-2 px-1 ${tw.text.secondary}`}>
-        {t('window')}
-      </h2>
-      <section className={`rounded-lg border ${tw.border} ${tw.bg.secondary}`}>
-        <div className="flex items-center justify-between px-4 py-3">
-          <label className={`text-sm ${tw.text.primary}`}>
-            {t('showShortcut')}
-          </label>
-          <Select
-            value={store.showShortcut}
-            onChange={(v) => store.setShowShortcut(v)}
-            options={shortcutOptions}
-          />
-        </div>
-        <div className={`h-px ${tw.bg.border}`} />
-        <div className="flex items-center justify-between px-4 py-3">
-          <label className={`text-sm ${tw.text.primary}`}>
-            {t('autoHide')}
-          </label>
-          <Checkbox
-            checked={store.autoHide}
-            onChange={(v) => store.setAutoHide(v)}
-          />
-        </div>
-      </section>
-    </div>
+    <Section title={t('window')}>
+      <SettingItem label={t('showShortcut')}>
+        <Select
+          value={store.showShortcut}
+          onChange={(v) => store.setShowShortcut(v)}
+          options={shortcutOptions}
+        />
+      </SettingItem>
+      <SettingItem label={t('autoHide')}>
+        <Checkbox
+          checked={store.autoHide}
+          onChange={(v) => store.setAutoHide(v)}
+        />
+      </SettingItem>
+      <SettingItem label={t('searchLocalApps')}>
+        <Checkbox
+          checked={store.searchLocalApps}
+          onChange={async (v) => {
+            await store.setSearchLocalApps(v)
+            toast(t('restartRequired'))
+          }}
+        />
+      </SettingItem>
+    </Section>
   )
 })

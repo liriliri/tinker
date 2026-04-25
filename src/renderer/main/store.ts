@@ -137,13 +137,13 @@ class Store extends BaseStore {
     return !!this.pluginStates[id]?.pinned
   }
   async refresh(force = false) {
-    const plugins = await main.getPlugins(force)
+    const searchLocalApps = await main.getSettingsStore('searchLocalApps')
+    const [plugins, apps] = await Promise.all([
+      main.getPlugins(force),
+      searchLocalApps !== false ? main.getApps(force) : [],
+    ])
     runInAction(() => {
       this.plugins = sortByName(plugins)
-      this.applyFilter()
-    })
-    const apps = await main.getApps(force)
-    runInAction(() => {
       this.apps = sortByName(apps)
       this.applyFilter()
     })
