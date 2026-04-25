@@ -35,6 +35,12 @@ export interface IApp {
   path: string
 }
 
+export interface IPluginState {
+  hidden?: boolean
+}
+
+export type IPluginStates = Record<string, IPluginState>
+
 export type IpcDragMain = (
   x: number,
   y: number,

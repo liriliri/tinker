@@ -3,6 +3,7 @@ import lowerCase from 'licia/lowerCase'
 import contain from 'licia/contain'
 import each from 'licia/each'
 import pinyin from 'pinyin'
+import { isObservable, toJS } from 'mobx'
 
 const chineseRe = /[\u4e00-\u9fa5]/
 
@@ -43,4 +44,8 @@ export function sortByName<T extends { name: string }>(arr: T[]): T[] {
   return arr.sort((a, b) =>
     naturalSort.comparator(nameMap.get(a)!, nameMap.get(b)!)
   )
+}
+
+export async function setMainStore(name: string, val: any) {
+  await main.setMainStore(name, isObservable(val) ? toJS(val) : val)
 }

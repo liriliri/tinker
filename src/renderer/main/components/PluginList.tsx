@@ -7,6 +7,7 @@ import fileUrl from 'licia/fileUrl'
 import Style from './PluginList.module.scss'
 import { borderRadius } from 'common/theme'
 import contextMenu from 'share/renderer/lib/contextMenu'
+import LunaModal from 'luna-modal'
 import { t } from 'common/util'
 import concat from 'licia/concat'
 import isEmpty from 'licia/isEmpty'
@@ -56,6 +57,25 @@ export default observer(function PluginList() {
           label: t('openDir'),
           click() {
             main.openPath(plugin.dir)
+          },
+        })
+      }
+      template.push({ type: 'separator' })
+      if (store.isPluginHidden(plugin.id)) {
+        template.push({
+          label: t('unhide'),
+          click() {
+            store.unhidePlugin(plugin.id)
+          },
+        })
+      } else {
+        template.push({
+          label: t('hide'),
+          async click() {
+            const result = await LunaModal.confirm(t('hideConfirm'))
+            if (result) {
+              store.hidePlugin(plugin.id)
+            }
           },
         })
       }

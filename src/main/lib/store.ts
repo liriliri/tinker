@@ -25,5 +25,6 @@ export const getSettingsStore = memoize(function () {
 export const getMainStore = memoize(function () {
   return new FileStore(getUserDataPath('data/main.json'), {
     uIOhookCalled: false,
+    pluginStates: {},
   })
 })

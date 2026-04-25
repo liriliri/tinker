@@ -1,13 +1,15 @@
 import { IpcDragMain } from 'common/types'
+import { IpcGetStore, IpcSetStore } from 'share/common/types'
 import { BrowserWindow, screen } from 'electron'
 import once from 'licia/once'
 import { handleEvent } from 'share/main/lib/util'
 import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 import * as dock from '../lib/dock'
-import { getSettingsStore } from '../lib/store'
+import { getSettingsStore, getMainStore } from '../lib/store'
 
 const settingsStore = getSettingsStore()
+const mainStore = getMainStore()
 
 let win: BrowserWindow | null = null
 
@@ -88,6 +90,10 @@ function onToggleFullscreen() {
 }
 
 const initIpc = once(() => {
+  handleEvent('setMainStore', <IpcSetStore>((name, val) => {
+    mainStore.set(name, val)
+  }))
+  handleEvent('getMainStore', <IpcGetStore>((name) => mainStore.get(name)))
   handleEvent('dragMain', <IpcDragMain>((x, y, width, height) => {
     if (!win) {
       return

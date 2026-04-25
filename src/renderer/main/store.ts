@@ -1,12 +1,13 @@
-import { IApp, IPlugin } from 'common/types'
+import { IApp, IPlugin, IPluginStates } from 'common/types'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
 import find from 'licia/find'
 import trim from 'licia/trim'
 import isArr from 'licia/isArr'
+import isObj from 'licia/isObj'
 import LocalStore from 'licia/LocalStore'
 import pkg from '../../../package.json'
-import { sortByName, pinyinMatch } from './lib/util'
+import { sortByName, pinyinMatch, setMainStore } from './lib/util'
 
 const storage = new LocalStore('main')
 const STORAGE_KEY_PLUGINS = 'plugins'
@@ -19,6 +20,7 @@ class Store extends BaseStore {
   visibleApps: IApp[] = []
   plugin: IPlugin | null = null
   filter = ''
+  pluginStates: IPluginStates = {}
   constructor() {
     super()
 
@@ -27,10 +29,14 @@ class Store extends BaseStore {
       visibleApps: observable,
       filter: observable,
       plugin: observable,
+      pluginStates: observable,
       setFilter: action,
+      hidePlugin: action,
+      unhidePlugin: action,
     })
 
     this.loadCache()
+    this.loadPluginStates()
     main.preparePluginView()
     this.refresh()
     this.bindEvent()
@@ -92,6 +98,24 @@ class Store extends BaseStore {
     }
     main.togglePluginDevtools(this.plugin.id)
   }
+  hidePlugin(id: string) {
+    this.pluginStates = {
+      ...this.pluginStates,
+      [id]: { ...this.pluginStates[id], hidden: true },
+    }
+    this.applyFilter()
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  unhidePlugin(id: string) {
+    const state = { ...this.pluginStates[id] }
+    delete state.hidden
+    this.pluginStates = { ...this.pluginStates, [id]: state }
+    this.applyFilter()
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  isPluginHidden(id: string) {
+    return !!this.pluginStates[id]?.hidden
+  }
   async refresh(force = false) {
     const plugins = await main.getPlugins(force)
     runInAction(() => {
@@ -111,7 +135,9 @@ class Store extends BaseStore {
   private applyFilter() {
     const filter = trim(this.filter)
     if (!filter) {
-      this.visiblePlugins = this.plugins
+      this.visiblePlugins = this.plugins.filter(
+        (plugin) => !this.pluginStates[plugin.id]?.hidden
+      )
       this.visibleApps = this.apps
       return
     }
@@ -120,6 +146,15 @@ class Store extends BaseStore {
       pinyinMatch(plugin.name, filter)
     )
     this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
+  }
+  private async loadPluginStates() {
+    const plugins = await main.getMainStore('pluginStates')
+    if (isObj(plugins)) {
+      runInAction(() => {
+        this.pluginStates = plugins
+        this.applyFilter()
+      })
+    }
   }
   private bindEvent() {
     main.on('updatePluginTitle', (title: string) => {

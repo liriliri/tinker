@@ -12,6 +12,7 @@ import {
   IpcReopenPlugin,
   IpcTogglePluginDevtools,
 } from 'common/types'
+import { IpcGetStore, IpcSetStore } from 'share/common/types'
 import mainObj from 'share/preload/main'
 import { invoke } from 'share/preload/util'
 
@@ -29,4 +30,6 @@ export default Object.assign(mainObj, {
   importPluginData: invoke<IpcImportPluginData>('importPluginData'),
   clearPluginData: invoke<IpcClearPluginData>('clearPluginData'),
   preparePluginView: invoke('preparePluginView'),
+  getMainStore: invoke<IpcGetStore>('getMainStore'),
+  setMainStore: invoke<IpcSetStore>('setMainStore'),
 })
