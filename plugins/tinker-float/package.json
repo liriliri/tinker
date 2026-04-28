@@ -1,0 +1,19 @@
+{
+  "name": "tinker-float",
+  "version": "0.1.0",
+  "description": "Float window for displaying webpages, images, videos and text",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Float",
+    "main": "dist/index.html",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "悬浮"
+      }
+    }
+  }
+}

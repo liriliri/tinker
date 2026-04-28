@@ -1,0 +1,15 @@
+{
+  "inputPlaceholder": "Enter text or image URL...",
+  "captureScreen": "Capture Screen",
+  "openImage": "Open Image",
+  "width": "W",
+  "height": "H",
+  "alwaysOnTop": "Top",
+  "float": "Float",
+  "floatTip": "Press Esc to close float window",
+  "noContent": "Enter text or open an image to preview",
+  "close": "Close",
+  "floatSettings": "Float Settings",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
+}

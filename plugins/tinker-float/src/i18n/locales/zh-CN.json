@@ -1,0 +1,15 @@
+{
+  "inputPlaceholder": "输入文本或图片 URL...",
+  "captureScreen": "截图",
+  "openImage": "打开图片",
+  "width": "宽",
+  "height": "高",
+  "alwaysOnTop": "置顶",
+  "float": "浮窗",
+  "floatTip": "按 Esc 键关闭浮窗",
+  "noContent": "输入文本或打开图片以预览",
+  "close": "关闭",
+  "floatSettings": "浮窗设置",
+  "cancel": "取消",
+  "confirm": "确认"
+}
