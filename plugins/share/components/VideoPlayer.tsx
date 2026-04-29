@@ -1,6 +1,4 @@
 import { forwardRef, PropsWithChildren } from 'react'
-import { useTranslation } from 'react-i18next'
-import { observer } from 'mobx-react-lite'
 import {
   Container,
   usePlayer,
@@ -40,14 +38,103 @@ import {
   Loader2,
   ListVideo,
 } from 'lucide-react'
-import store from '../store'
+
+const BUILT_IN_TRANSLATIONS: Record<string, Record<string, string>> = {
+  'en-US': {
+    play: 'Play',
+    pause: 'Pause',
+    replay: 'Replay',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    seekBackward: 'Seek backward {{seconds}} seconds',
+    seekForward: 'Seek forward {{seconds}} seconds',
+    togglePlaybackRate: 'Toggle playback rate',
+    enableCaptions: 'Enable captions',
+    disableCaptions: 'Disable captions',
+    enterPip: 'Enter picture-in-picture',
+    exitPip: 'Exit picture-in-picture',
+    enterFullscreen: 'Enter fullscreen',
+    exitFullscreen: 'Exit fullscreen',
+    errorTitle: 'Something went wrong.',
+    ok: 'OK',
+    playlist: 'Playlist',
+  },
+  'zh-CN': {
+    play: '播放',
+    pause: '暂停',
+    replay: '重播',
+    mute: '静音',
+    unmute: '取消静音',
+    seekBackward: '后退 {{seconds}} 秒',
+    seekForward: '前进 {{seconds}} 秒',
+    togglePlaybackRate: '切换播放速度',
+    enableCaptions: '开启字幕',
+    disableCaptions: '关闭字幕',
+    enterPip: '进入画中画',
+    exitPip: '退出画中画',
+    enterFullscreen: '进入全屏',
+    exitFullscreen: '退出全屏',
+    errorTitle: '出了点问题。',
+    ok: '确定',
+    playlist: '播放列表',
+  },
+}
+
+function createT(locale: string) {
+  const translations =
+    BUILT_IN_TRANSLATIONS[locale] || BUILT_IN_TRANSLATIONS['en-US']
+  return (key: string, params?: Record<string, string | number>) => {
+    let text = translations[key] || key
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        text = text.replace(`{{${k}}}`, String(v))
+      }
+    }
+    return text
+  }
+}
 
 const SEEK_TIME = 10
 const ICON_SIZE = 18
 
-interface VideoSkinProps extends PropsWithChildren {
+const THEME_STYLES = `
+.media-default-skin {
+  border-radius: 0;
+  --media-color-primary: #1f2937;
+  --media-surface-background-color: rgba(240, 241, 242, 0.85);
+  --media-surface-inner-border-color: rgba(224, 224, 224, 0.5);
+  --media-surface-outer-border-color: rgba(224, 224, 224, 0.3);
+  --media-surface-shadow-color: rgba(0, 0, 0, 0.08);
+  --media-border-color: rgba(224, 224, 224, 0.5);
+}
+.media-default-skin .media-slider__fill {
+  color: #0fc25e;
+}
+.dark .media-default-skin {
+  --media-color-primary: #e5e7eb;
+  --media-surface-background-color: rgba(48, 49, 51, 0.85);
+  --media-surface-inner-border-color: rgba(74, 74, 74, 0.5);
+  --media-surface-outer-border-color: rgba(74, 74, 74, 0.3);
+  --media-surface-shadow-color: rgba(0, 0, 0, 0.3);
+  --media-border-color: rgba(74, 74, 74, 0.5);
+}
+`
+
+let styleInjected = false
+function injectStyles() {
+  if (styleInjected) return
+  styleInjected = true
+  const style = document.createElement('style')
+  style.textContent = THEME_STYLES
+  document.head.appendChild(style)
+}
+
+export interface VideoPlayerProps extends PropsWithChildren {
   className?: string
   poster?: string
+  locale?: string
+  disabled?: boolean
+  onTogglePlaylist?: () => void
 }
 
 const Button = forwardRef<
@@ -66,8 +153,7 @@ const Button = forwardRef<
   )
 })
 
-function VolumePopover() {
-  const { t } = useTranslation()
+function VolumePopover({ t }: { t: (key: string) => string }) {
   const volumeUnsupported = usePlayer(
     (s) => s.volumeAvailability === 'unsupported'
   )
@@ -109,11 +195,21 @@ function VolumePopover() {
   )
 }
 
-export default observer(function VideoSkin(props: VideoSkinProps) {
-  const { children, className, poster, ...rest } = props
-  const { t } = useTranslation()
+export default function VideoPlayer(props: VideoPlayerProps) {
+  const {
+    children,
+    className,
+    poster,
+    locale = 'en-US',
+    disabled = false,
+    onTogglePlaylist,
+    ...rest
+  } = props
 
-  const disabledClass = !store.hasVideo ? 'opacity-30 pointer-events-none' : ''
+  injectStyles()
+
+  const t = createT(locale)
+  const disabledClass = disabled ? 'opacity-30 pointer-events-none' : ''
 
   const playLabel: PlayButtonProps['label'] = (state) => {
     if (state.ended) return t('replay')
@@ -244,18 +340,20 @@ export default observer(function VideoSkin(props: VideoSkinProps) {
             <Time.Value type="duration" className="media-time" />
           </div>
           <div className="media-button-group">
-            <Tooltip.Root side="top">
-              <Tooltip.Trigger
-                render={
-                  <Button onClick={() => store.togglePlaylist()}>
-                    <ListVideo className="media-icon" size={ICON_SIZE} />
-                  </Button>
-                }
-              />
-              <Tooltip.Popup className="media-surface media-tooltip">
-                {t('playlist')}
-              </Tooltip.Popup>
-            </Tooltip.Root>
+            {onTogglePlaylist && (
+              <Tooltip.Root side="top">
+                <Tooltip.Trigger
+                  render={
+                    <Button onClick={onTogglePlaylist}>
+                      <ListVideo className="media-icon" size={ICON_SIZE} />
+                    </Button>
+                  }
+                />
+                <Tooltip.Popup className="media-surface media-tooltip">
+                  {t('playlist')}
+                </Tooltip.Popup>
+              </Tooltip.Root>
+            )}
             <Tooltip.Root side="top">
               <Tooltip.Trigger
                 render={
@@ -269,7 +367,7 @@ export default observer(function VideoSkin(props: VideoSkinProps) {
                 {t('togglePlaybackRate')}
               </Tooltip.Popup>
             </Tooltip.Root>
-            <VolumePopover />
+            <VolumePopover t={t} />
             <Tooltip.Root side="top">
               <Tooltip.Trigger
                 render={
@@ -349,4 +447,4 @@ export default observer(function VideoSkin(props: VideoSkinProps) {
       <div className="media-overlay" />
     </Container>
   )
-})
+}

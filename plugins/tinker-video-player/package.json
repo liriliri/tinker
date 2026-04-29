@@ -17,8 +17,5 @@
         "description": "视频播放器，支持播放控制和播放列表"
       }
     }
-  },
-  "devDependencies": {
-    "@videojs/react": "^10.0.0-beta.15"
   }
 }

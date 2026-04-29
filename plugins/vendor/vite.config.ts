@@ -41,6 +41,8 @@ const globals = {
   'wavesurfer.js': 'wavesurfer',
   'wavesurfer.js/plugins/regions': 'wavesurferRegionsPlugin',
   'wavesurfer.js/plugins/timeline': 'wavesurferTimelinePlugin',
+  '@videojs/react': 'videojsReact',
+  '@videojs/react/video': 'videojsReactVideo',
   '@tiptap/react': 'tiptapReact',
   '@tiptap/starter-kit': 'tiptapStarterKit',
   '@tiptap/extension-underline': 'tiptapExtensionUnderline',
@@ -224,6 +226,15 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'tiptap') {
     return createConfig('tiptap', 'PluginVendorTiptap', ['react', 'react-dom'])
+  }
+
+  if (target === 'videojs') {
+    return createConfig(
+      'videojs',
+      'PluginVendorVideojs',
+      ['react', 'react-dom'],
+      'dist/videojs'
+    )
   }
 
   return createConfig('react', 'PluginVendorReact')

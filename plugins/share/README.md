@@ -131,6 +131,24 @@ import HexEditor from 'share/components/HexEditor'
 
 Requires `react-hex-editor` and `styled-components` vendor scripts in the plugin's `index.html`.
 
+### VideoPlayer
+
+```ts
+import VideoPlayer from 'share/components/VideoPlayer'
+import { createPlayer } from '@videojs/react'
+import { Video, videoFeatures } from '@videojs/react/video'
+
+<VideoPlayer
+  locale="en-US"           // optional, default 'en-US', built-in: 'en-US' | 'zh-CN'
+  disabled={false}         // optional, dims controls when true
+  onTogglePlaylist={fn}    // optional, shows playlist button when provided
+>
+  <Video src={src} autoPlay />
+</VideoPlayer>
+```
+
+Wrap `VideoPlayer` inside the player's `Provider` and `Container` from `createPlayer`. Requires `videojs` vendor scripts (`videojs/videojs.js` + `videojs/style.css`) in the plugin's `index.html`.
+
 ### Other Common Components
 
 ```ts

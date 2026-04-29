@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import { createPlayer } from '@videojs/react'
 import { Video, videoFeatures } from '@videojs/react/video'
-import '@videojs/react/video/skin.css'
-import { useTranslation } from 'react-i18next'
 import { FolderOpen } from 'lucide-react'
 import { tw } from 'share/theme'
 import { ConfirmProvider } from 'share/components/Confirm'
+import VideoPlayer from 'share/components/VideoPlayer'
 import i18n from './i18n'
 import store from './store'
-import VideoSkin from './components/VideoSkin'
 import MediaInfoDialog from './components/MediaInfoDialog'
 import PlaylistPanel from './components/PlaylistPanel'
 
@@ -103,7 +102,11 @@ export default observer(function App() {
       >
         <Provider>
           <Container className="h-full">
-            <VideoSkin>
+            <VideoPlayer
+              locale={i18n.language}
+              disabled={!store.hasVideo}
+              onTogglePlaylist={() => store.togglePlaylist()}
+            >
               <Video
                 src={store.videoSrc || undefined}
                 autoPlay={store.hasVideo}
@@ -119,7 +122,7 @@ export default observer(function App() {
                   stopSaveTimer(e.currentTarget)
                 }
               />
-            </VideoSkin>
+            </VideoPlayer>
           </Container>
         </Provider>
         {!store.hasVideo && (

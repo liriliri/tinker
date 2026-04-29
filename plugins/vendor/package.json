@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
@@ -19,7 +19,8 @@
     "build:hexeditor": "vite build --config vite.config.ts --mode hexeditor",
     "build:headlessui": "vite build --config vite.config.ts --mode headlessui",
     "build:hottoast": "vite build --config vite.config.ts --mode hottoast",
-    "build:tiptap": "vite build --config vite.config.ts --mode tiptap"
+    "build:tiptap": "vite build --config vite.config.ts --mode tiptap",
+    "build:videojs": "vite build --config vite.config.ts --mode videojs"
   },
   "dependencies": {
     "systeminformation": "^5.30.7"
@@ -49,6 +50,7 @@
     "@tiptap/core": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
     "@tiptap/extension-underline": "^2.11.5",
-    "@tiptap/extension-highlight": "^2.11.5"
+    "@tiptap/extension-highlight": "^2.11.5",
+    "@videojs/react": "^10.0.0-beta.15"
   }
 }
