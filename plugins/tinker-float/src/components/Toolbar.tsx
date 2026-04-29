@@ -34,7 +34,7 @@ export default observer(function Toolbar() {
         <Camera size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <ToolbarButton title={t('openImage')} onClick={() => store.openImage()}>
+      <ToolbarButton title={t('openFile')} onClick={() => store.openFile()}>
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
@@ -44,7 +44,11 @@ export default observer(function Toolbar() {
         className="flex-1 min-w-0"
         placeholder={t('inputPlaceholder')}
         value={
-          store.contentType === 'text' ? store.textContent : store.imageDataUrl
+          store.contentType === 'text'
+            ? store.textContent
+            : store.contentType === 'image'
+            ? store.imageDataUrl
+            : store.videoSrc
         }
         onChange={(e) => store.setTextContent(e.target.value)}
       />

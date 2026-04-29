@@ -1,7 +1,7 @@
 {
   "inputPlaceholder": "输入文本或图片 URL...",
   "captureScreen": "截图",
-  "openImage": "打开图片",
+  "openFile": "打开文件",
   "width": "宽",
   "height": "高",
   "alwaysOnTop": "置顶",

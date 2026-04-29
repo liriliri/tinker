@@ -11,7 +11,7 @@ export function launchFloatWindow() {
   const popup = window.open(
     '',
     '_blank',
-    `width=${width},height=${height},alwaysOnTop=${alwaysOnTop},frame=no`
+    `width=${width},height=${height},minWidth=320,minHeight=240,alwaysOnTop=${alwaysOnTop},frame=no`
   )
   if (!popup) return
 
@@ -32,6 +32,7 @@ export function launchFloatWindow() {
       contentType={store.contentType}
       imageDataUrl={store.imageDataUrl}
       textContent={store.textContent}
+      videoSrc={store.videoSrc}
     />
   )
 

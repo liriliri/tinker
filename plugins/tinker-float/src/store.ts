@@ -1,13 +1,20 @@
 import { makeAutoObservable } from 'mobx'
 import fileUrl from 'licia/fileUrl'
 import BaseStore from 'share/BaseStore'
-import { openImageFile } from 'share/lib/util'
-import { isImageUrl } from './lib/util'
+import {
+  isImageUrl,
+  isImageExtension,
+  isVideoExtension,
+  IMAGE_EXTENSIONS,
+  TEXT_EXTENSIONS,
+  VIDEO_EXTENSIONS,
+} from './lib/util'
 
 class Store extends BaseStore {
-  contentType: 'image' | 'text' = 'text'
+  contentType: 'image' | 'text' | 'video' = 'text'
   textContent: string = ''
   imageDataUrl: string = ''
+  videoSrc: string = ''
   imageNaturalWidth: number = 0
   imageNaturalHeight: number = 0
 
@@ -22,6 +29,7 @@ class Store extends BaseStore {
 
   get hasContent(): boolean {
     if (this.contentType === 'image') return this.imageDataUrl !== ''
+    if (this.contentType === 'video') return this.videoSrc !== ''
     return this.textContent !== ''
   }
 
@@ -50,20 +58,62 @@ class Store extends BaseStore {
       this.imageNaturalWidth = 0
       this.imageNaturalHeight = 0
     }
+    this.videoSrc = ''
   }
 
   setImageSrc(src: string) {
     this.contentType = 'image'
     this.imageDataUrl = src
     this.textContent = ''
+    this.videoSrc = ''
     this.imageNaturalWidth = 0
     this.imageNaturalHeight = 0
   }
 
-  async openImage() {
-    const result = await openImageFile()
-    if (!result) return
-    this.setImageSrc(fileUrl(result.filePath))
+  setVideoSrc(src: string) {
+    this.contentType = 'video'
+    this.videoSrc = src
+    this.textContent = ''
+    this.imageDataUrl = ''
+    this.imageNaturalWidth = 0
+    this.imageNaturalHeight = 0
+  }
+
+  async openFile() {
+    const result = await tinker.showOpenDialog({
+      title: 'Open File',
+      filters: [
+        {
+          name: 'All Supported',
+          extensions: [
+            ...IMAGE_EXTENSIONS,
+            ...TEXT_EXTENSIONS,
+            ...VIDEO_EXTENSIONS,
+          ],
+        },
+        { name: 'Images', extensions: IMAGE_EXTENSIONS },
+        { name: 'Video', extensions: VIDEO_EXTENSIONS },
+        { name: 'Text', extensions: TEXT_EXTENSIONS },
+      ],
+      properties: ['openFile'],
+    })
+
+    if (result.canceled || !result.filePaths[0]) return
+
+    const filePath = result.filePaths[0]
+    if (isImageExtension(filePath)) {
+      this.setImageSrc(fileUrl(filePath))
+    } else if (isVideoExtension(filePath)) {
+      this.setVideoSrc(fileUrl(filePath))
+    } else {
+      try {
+        const buffer = await tinker.readFile(filePath)
+        const text = new TextDecoder().decode(buffer)
+        this.setTextContent(text)
+      } catch (error) {
+        console.error('Failed to read text file:', error)
+      }
+    }
   }
 
   async captureScreen() {
@@ -93,6 +143,7 @@ class Store extends BaseStore {
     this.contentType = 'text'
     this.textContent = ''
     this.imageDataUrl = ''
+    this.videoSrc = ''
     this.imageNaturalWidth = 0
     this.imageNaturalHeight = 0
   }

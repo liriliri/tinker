@@ -1,7 +1,7 @@
 {
   "inputPlaceholder": "Enter text or image URL...",
   "captureScreen": "Capture Screen",
-  "openImage": "Open Image",
+  "openFile": "Open File",
   "width": "W",
   "height": "H",
   "alwaysOnTop": "Top",
