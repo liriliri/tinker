@@ -19,10 +19,17 @@ import SizeDialog from './SizeDialog'
 export default observer(function Toolbar() {
   const { t } = useTranslation()
   const [showSizeDialog, setShowSizeDialog] = useState(false)
+  const [urlInput, setUrlInput] = useState('')
 
   const handleSizeConfirm = (width: number, height: number) => {
     store.setWindowWidth(width)
     store.setWindowHeight(height)
+  }
+
+  const handleUrlKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && urlInput.trim()) {
+      store.setUrlSrc(urlInput.trim())
+    }
   }
 
   return (
@@ -43,14 +50,9 @@ export default observer(function Toolbar() {
       <ToolbarTextInput
         className="flex-1 min-w-0"
         placeholder={t('inputPlaceholder')}
-        value={
-          store.contentType === 'text'
-            ? store.textContent
-            : store.contentType === 'image'
-            ? store.imageDataUrl
-            : store.videoSrc
-        }
-        onChange={(e) => store.setTextContent(e.target.value)}
+        value={urlInput}
+        onChange={(e) => setUrlInput(e.target.value)}
+        onKeyDown={handleUrlKeyDown}
       />
 
       <button
@@ -76,8 +78,11 @@ export default observer(function Toolbar() {
       <ToolbarSeparator />
 
       <ToolbarTextButton
-        disabled={!store.hasContent}
-        onClick={launchFloatWindow}
+        disabled={!store.canFloat}
+        onClick={() => {
+          launchFloatWindow()
+          setUrlInput('')
+        }}
         className="flex items-center gap-1"
         title={t('floatTip')}
       >

@@ -46,13 +46,26 @@ const allowedWindowOptions = [
   'resizable',
 ]
 
+const allowedWebPreferences = ['webviewTag']
+
 function parseOpenWindowFeatures(features: string) {
   const opts: Record<string, any> = {}
   if (!features) return opts
 
+  const webPreferences: Record<string, any> = {}
+
   each(features.split(','), (part: string) => {
     const [key, val] = part.split('=').map((s) => trim(s))
-    if (!contain(allowedWindowOptions, key) || val === undefined) return
+    if (val === undefined) return
+
+    if (contain(allowedWebPreferences, key)) {
+      if (val === 'true' || val === 'yes') {
+        webPreferences[key] = true
+      }
+      return
+    }
+
+    if (!contain(allowedWindowOptions, key)) return
 
     if (val === 'true' || val === 'yes') {
       opts[key] = true
@@ -65,6 +78,10 @@ function parseOpenWindowFeatures(features: string) {
       }
     }
   })
+
+  if (Object.keys(webPreferences).length > 0) {
+    opts.webPreferences = webPreferences
+  }
 
   return opts
 }

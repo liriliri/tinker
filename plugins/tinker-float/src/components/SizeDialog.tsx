@@ -4,6 +4,7 @@ import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import isStrBlank from 'licia/isStrBlank'
+import store from '../store'
 
 interface SizeDialogProps {
   open: boolean
@@ -74,7 +75,7 @@ export default function SizeDialog({
             value={width}
             onChange={(e) => setWidth(e.target.value)}
             onKeyDown={handleKeyDown}
-            min="100"
+            min={String(store.minWindowWidth)}
             autoFocus
           />
         </div>
@@ -89,7 +90,7 @@ export default function SizeDialog({
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             onKeyDown={handleKeyDown}
-            min="100"
+            min={String(store.minWindowHeight)}
             disabled={heightDisabled}
           />
         </div>

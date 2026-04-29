@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import fileUrl from 'licia/fileUrl'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import {
   isImageUrl,
@@ -10,11 +11,22 @@ import {
   VIDEO_EXTENSIONS,
 } from './lib/util'
 
+const MIN_WINDOW_SIZE = {
+  image: { width: 100, height: 100 },
+  text: { width: 200, height: 100 },
+  video: { width: 320, height: 240 },
+  url: { width: 320, height: 240 },
+}
+
+const storage = new LocalStore('tinker-float')
+
 class Store extends BaseStore {
-  contentType: 'image' | 'text' | 'video' = 'text'
+  contentType: 'image' | 'text' | 'video' | 'url' = 'text'
   textContent: string = ''
   imageDataUrl: string = ''
   videoSrc: string = ''
+  urlSrc: string = ''
+  urlLoading: boolean = false
   imageNaturalWidth: number = 0
   imageNaturalHeight: number = 0
 
@@ -25,12 +37,36 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadStorage()
+  }
+
+  private loadStorage() {
+    const width = storage.get('windowWidth') as number | undefined
+    const height = storage.get('windowHeight') as number | undefined
+    const alwaysOnTop = storage.get('alwaysOnTop') as boolean | undefined
+    if (width != null) this.windowWidth = width
+    if (height != null) this.windowHeight = height
+    if (alwaysOnTop != null) this.alwaysOnTop = alwaysOnTop
   }
 
   get hasContent(): boolean {
     if (this.contentType === 'image') return this.imageDataUrl !== ''
     if (this.contentType === 'video') return this.videoSrc !== ''
+    if (this.contentType === 'url') return this.urlSrc !== ''
     return this.textContent !== ''
+  }
+
+  get canFloat(): boolean {
+    if (this.contentType === 'url') return this.hasContent && !this.urlLoading
+    return this.hasContent
+  }
+
+  get minWindowWidth(): number {
+    return MIN_WINDOW_SIZE[this.contentType].width
+  }
+
+  get minWindowHeight(): number {
+    return MIN_WINDOW_SIZE[this.contentType].height
   }
 
   get effectiveHeight(): number {
@@ -39,44 +75,58 @@ class Store extends BaseStore {
       this.imageNaturalWidth > 0 &&
       this.imageNaturalHeight > 0
     ) {
-      return Math.round(
-        this.windowWidth * (this.imageNaturalHeight / this.imageNaturalWidth)
+      return Math.max(
+        this.minWindowHeight,
+        Math.round(
+          this.windowWidth * (this.imageNaturalHeight / this.imageNaturalWidth)
+        )
       )
     }
     return this.windowHeight
   }
 
+  private resetContent() {
+    this.textContent = ''
+    this.imageDataUrl = ''
+    this.videoSrc = ''
+    this.urlSrc = ''
+    this.urlLoading = false
+    this.imageNaturalWidth = 0
+    this.imageNaturalHeight = 0
+  }
+
   setTextContent(text: string) {
+    this.resetContent()
     if (isImageUrl(text)) {
       this.contentType = 'image'
       this.imageDataUrl = text
-      this.textContent = ''
     } else {
       this.contentType = 'text'
       this.textContent = text
-      this.imageDataUrl = ''
-      this.imageNaturalWidth = 0
-      this.imageNaturalHeight = 0
     }
-    this.videoSrc = ''
   }
 
   setImageSrc(src: string) {
+    this.resetContent()
     this.contentType = 'image'
     this.imageDataUrl = src
-    this.textContent = ''
-    this.videoSrc = ''
-    this.imageNaturalWidth = 0
-    this.imageNaturalHeight = 0
   }
 
   setVideoSrc(src: string) {
+    this.resetContent()
     this.contentType = 'video'
     this.videoSrc = src
-    this.textContent = ''
-    this.imageDataUrl = ''
-    this.imageNaturalWidth = 0
-    this.imageNaturalHeight = 0
+  }
+
+  setUrlSrc(url: string) {
+    this.resetContent()
+    this.contentType = 'url'
+    this.urlSrc = url
+    this.urlLoading = true
+  }
+
+  setUrlLoading(v: boolean) {
+    this.urlLoading = v
   }
 
   async openFile() {
@@ -123,15 +173,18 @@ class Store extends BaseStore {
   }
 
   setWindowWidth(w: number) {
-    this.windowWidth = Math.max(100, w)
+    this.windowWidth = Math.max(this.minWindowWidth, w)
+    storage.set('windowWidth', this.windowWidth)
   }
 
   setWindowHeight(h: number) {
-    this.windowHeight = Math.max(100, h)
+    this.windowHeight = Math.max(this.minWindowHeight, h)
+    storage.set('windowHeight', this.windowHeight)
   }
 
   setAlwaysOnTop(v: boolean) {
     this.alwaysOnTop = v
+    storage.set('alwaysOnTop', v)
   }
 
   setImageNaturalSize(w: number, h: number) {
@@ -140,12 +193,8 @@ class Store extends BaseStore {
   }
 
   clearContent() {
+    this.resetContent()
     this.contentType = 'text'
-    this.textContent = ''
-    this.imageDataUrl = ''
-    this.videoSrc = ''
-    this.imageNaturalWidth = 0
-    this.imageNaturalHeight = 0
   }
 }
 

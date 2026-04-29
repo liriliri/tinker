@@ -1,5 +1,5 @@
 {
-  "inputPlaceholder": "输入文本或图片 URL...",
+  "inputPlaceholder": "输入 URL...",
   "captureScreen": "截图",
   "openFile": "打开文件",
   "width": "宽",
@@ -7,9 +7,10 @@
   "alwaysOnTop": "置顶",
   "float": "浮窗",
   "floatTip": "按 Esc 键关闭浮窗",
-  "noContent": "输入文本或打开图片以预览",
-  "close": "关闭",
+  "noContent": "输入 URL 或打开文件以预览",
   "floatSettings": "浮窗设置",
   "cancel": "取消",
-  "confirm": "确认"
+  "confirm": "确认",
+  "loading": "加载中...",
+  "loadFailed": "无法加载页面"
 }
