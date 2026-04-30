@@ -1,4 +1,5 @@
 import { IpcGetPlugins, IPlugin, IRawPlugin } from 'common/types'
+import { marketplacePlugins } from './marketplace'
 import singleton from 'licia/singleton'
 import { isDev } from 'share/common/util'
 import path from 'path'
@@ -14,7 +15,7 @@ import replaceAll from 'licia/replaceAll'
 import each from 'licia/each'
 import { exec } from 'child_process'
 import log from 'share/common/log'
-import { resolveResources } from 'share/main/lib/util'
+import { resolveResources, getUserDataPath } from 'share/main/lib/util'
 
 const logger = log('plugin')
 
@@ -51,6 +52,8 @@ async function getNpmGlobalDir(): Promise<string> {
   })
 }
 
+const userPluginDir = getUserDataPath('plugins')
+
 async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
   const builtinDir = getBuiltinPluginDir()
   const pkgPath = path.join(dir, 'package.json')
@@ -68,6 +71,7 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     preload: rawPlugin.preload,
     online: startWith(rawPlugin.main, 'https://'),
     builtin: startWith(dir, builtinDir),
+    userInstalled: startWith(dir, userPluginDir),
   }
   if (plugin.icon) {
     plugin.icon = path.join(dir, plugin.icon)
@@ -88,31 +92,75 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
   return plugin
 }
 
+function loadMarketplacePlugins(): IPlugin[] {
+  const lang = language.get()
+  const result: IPlugin[] = []
+
+  for (const mp of marketplacePlugins) {
+    if (plugins[mp.id]) continue
+
+    let name = mp.name
+    let description = mp.description
+    if (mp.locales) {
+      const locale = mp.locales[lang]
+      if (locale) {
+        if (locale.name) name = locale.name
+        if (locale.description) description = locale.description
+      }
+    }
+
+    result.push({
+      id: mp.id,
+      name,
+      description,
+      icon: resolveResources(`marketplace/${mp.icon}`),
+      dir: '',
+      root: '',
+      main: '',
+      online: false,
+      builtin: false,
+      historyApiFallback: false,
+      marketplace: true,
+    })
+  }
+
+  return result
+}
+
 export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
   if (!force && keys(plugins).length > 1) {
-    return map(plugins, identity)
+    return [...map(plugins, identity), ...loadMarketplacePlugins()]
   }
 
   const pluginDirs: Array<{ dir: string; prefix?: string }> = []
   if (keys(plugins).length <= 1) {
     pluginDirs.push({ dir: getBuiltinPluginDir() })
   }
-  try {
-    const npmGlobalDir = await getNpmGlobalDir()
-    if (await fs.pathExists(npmGlobalDir)) {
-      pluginDirs.push({ dir: npmGlobalDir })
-      const files = await fs.readdir(npmGlobalDir, { withFileTypes: true })
+  async function addNodeModulesDir(dir: string) {
+    if (await fs.pathExists(dir)) {
+      pluginDirs.push({ dir })
+      const files = await fs.readdir(dir, { withFileTypes: true })
       for (const file of files) {
         if (startWith(file.name, '@') && file.isDirectory()) {
           pluginDirs.push({
-            dir: path.join(npmGlobalDir, file.name),
+            dir: path.join(dir, file.name),
             prefix: file.name + '/',
           })
         }
       }
     }
+  }
+
+  try {
+    await addNodeModulesDir(await getNpmGlobalDir())
   } catch (e) {
     logger.warn('failed to get npm global directory:', e)
+  }
+
+  try {
+    await addNodeModulesDir(getUserDataPath('plugins/node_modules'))
+  } catch (e) {
+    logger.warn('failed to read user plugin directory:', e)
   }
 
   each(plugins, (plugin) => {
@@ -163,5 +211,5 @@ export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
     }
   }
 
-  return map(plugins, identity)
+  return [...map(plugins, identity), ...loadMarketplacePlugins()]
 })

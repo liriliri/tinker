@@ -17,10 +17,13 @@ export default observer(function PluginList() {
   const pluginIcons = map(store.visiblePlugins, (plugin) => ({
     plugin,
     src: fileUrl(plugin.icon),
-    name: plugin.name,
+    name: store.installingPlugins.has(plugin.id)
+      ? t('installingPlugin')
+      : plugin.name,
     title: plugin.description,
     style: {
       borderRadius: borderRadius + 'px',
+      ...(plugin.marketplace ? { opacity: 0.6 } : {}),
     },
   }))
   const appIcons = map(store.visibleApps, (app) => ({
@@ -38,6 +41,18 @@ export default observer(function PluginList() {
 
     if (data.plugin) {
       const plugin: IPlugin = data.plugin
+
+      if (plugin.marketplace) {
+        template.push({
+          label: t('installPlugin'),
+          click() {
+            store.openPlugin(plugin.id)
+          },
+        })
+        contextMenu(e, template)
+        return
+      }
+
       const autoDetach = store.isPluginAutoDetach(plugin.id)
       const runInBackground = store.isPluginRunInBackground(plugin.id)
       const running = await main.isPluginRunning(plugin.id)
@@ -130,6 +145,15 @@ export default observer(function PluginList() {
           }
         },
       })
+      if (plugin.userInstalled) {
+        template.push({ type: 'separator' })
+        template.push({
+          label: t('uninstallPlugin'),
+          click() {
+            store.uninstallUserPlugin(plugin)
+          },
+        })
+      }
     } else {
       template.push({
         label: t('open'),

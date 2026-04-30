@@ -27,6 +27,8 @@ export interface IPlugin {
   main: string
   online: boolean
   builtin: boolean
+  marketplace?: boolean
+  userInstalled?: boolean
 }
 
 export interface IApp {
@@ -75,6 +77,8 @@ export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
+export type IpcInstallPlugin = (name: string) => Promise<void>
+export type IpcUninstallPlugin = (name: string) => Promise<void>
 
 export interface IDownloadOptions {
   url: string

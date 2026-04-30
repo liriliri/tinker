@@ -4,3 +4,6 @@
 [submodule "src/renderer/icon"]
 	path = src/renderer/icon
 	url = https://github.com/liriliri/icon-share.git
+[submodule "tinker-plugins"]
+	path = tinker-plugins
+	url = https://github.com/liriliri/tinker-plugins.git

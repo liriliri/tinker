@@ -23,5 +23,12 @@
   "pin": "Pin to Top",
   "unpin": "Unpin",
   "autoDetach": "Auto Detach Window",
-  "runInBackground": "Run in Background"
+  "runInBackground": "Run in Background",
+  "installPlugin": "Install",
+  "installPluginConfirm": "Do you want to install \"{{name}}\"?",
+  "installingPlugin": "Installing...",
+  "installPluginErr": "Failed to install plugin",
+  "uninstallPlugin": "Uninstall",
+  "uninstallPluginConfirm": "Are you sure you want to uninstall \"{{name}}\"?",
+  "uninstallPluginErr": "Failed to uninstall plugin"
 }

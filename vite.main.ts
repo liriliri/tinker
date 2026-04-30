@@ -12,6 +12,7 @@ external.push(
   'node-mac-permissions',
   'registry-js',
   'file-icon',
+  'npm',
   ...external.map((m) => `node:${m}`)
 )
 

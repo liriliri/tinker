@@ -6,8 +6,10 @@ import trim from 'licia/trim'
 import isArr from 'licia/isArr'
 import isObj from 'licia/isObj'
 import LocalStore from 'licia/LocalStore'
+import LunaModal from 'luna-modal'
 import pkg from '../../../package.json'
 import { sortByName, pinyinMatch, setMainStore } from './lib/util'
+import { t } from 'common/util'
 
 const storage = new LocalStore('main')
 const STORAGE_KEY_PLUGINS = 'plugins'
@@ -21,6 +23,7 @@ class Store extends BaseStore {
   plugin: IPlugin | null = null
   filter = ''
   pluginStates: IPluginStates = {}
+  installingPlugins: Set<string> = new Set()
   constructor() {
     super()
 
@@ -30,6 +33,7 @@ class Store extends BaseStore {
       filter: observable,
       plugin: observable,
       pluginStates: observable,
+      installingPlugins: observable,
       setFilter: action,
       hidePlugin: action,
       unhidePlugin: action,
@@ -57,6 +61,11 @@ class Store extends BaseStore {
       return
     }
 
+    if (plugin.marketplace) {
+      this.installAndOpenPlugin(plugin, detached)
+      return
+    }
+
     main.openPlugin(id, detached).then((opened) => {
       if (opened) {
         if (!detached) {
@@ -68,6 +77,58 @@ class Store extends BaseStore {
         }
       }
     })
+  }
+  async installAndOpenPlugin(plugin: IPlugin, detached = false) {
+    if (this.installingPlugins.has(plugin.id)) return
+
+    const confirmed = await LunaModal.confirm(
+      t('installPluginConfirm', { name: plugin.name })
+    )
+    if (!confirmed) return
+
+    runInAction(() => {
+      this.installingPlugins = new Set([...this.installingPlugins, plugin.id])
+    })
+
+    try {
+      await main.installPlugin(plugin.id)
+      await this.refresh(true)
+      runInAction(() => {
+        const next = new Set(this.installingPlugins)
+        next.delete(plugin.id)
+        this.installingPlugins = next
+      })
+      if (!detached && this.plugin) return
+      this.openPlugin(plugin.id, detached)
+    } catch {
+      runInAction(() => {
+        const next = new Set(this.installingPlugins)
+        next.delete(plugin.id)
+        this.installingPlugins = next
+      })
+      await LunaModal.alert(t('installPluginErr'))
+    }
+  }
+  async uninstallUserPlugin(plugin: IPlugin) {
+    const confirmed = await LunaModal.confirm(
+      t('uninstallPluginConfirm', { name: plugin.name })
+    )
+    if (!confirmed) return
+
+    const running = await main.isPluginRunning(plugin.id)
+    if (running) {
+      main.closePlugin(plugin.id, true)
+    }
+    if (this.plugin?.id === plugin.id) {
+      this.closePlugin()
+    }
+
+    try {
+      await main.uninstallPlugin(plugin.id)
+      await this.refresh(true)
+    } catch {
+      await LunaModal.alert(t('uninstallPluginErr'))
+    }
   }
   openApp(path: string) {
     main.openApp(path)
@@ -198,13 +259,15 @@ class Store extends BaseStore {
       const filtered = this.plugins.filter(
         (plugin) => !this.pluginStates[plugin.id]?.hidden
       )
-      const pinned = filtered.filter(
+      const installed = filtered.filter((plugin) => !plugin.marketplace)
+      const marketplace = filtered.filter((plugin) => plugin.marketplace)
+      const pinned = installed.filter(
         (plugin) => this.pluginStates[plugin.id]?.pinned
       )
-      const unpinned = filtered.filter(
+      const unpinned = installed.filter(
         (plugin) => !this.pluginStates[plugin.id]?.pinned
       )
-      this.visiblePlugins = [...pinned, ...unpinned]
+      this.visiblePlugins = [...pinned, ...unpinned, ...marketplace]
       this.visibleApps = this.apps
       return
     }
@@ -212,13 +275,15 @@ class Store extends BaseStore {
     const matched = this.plugins.filter((plugin) =>
       pinyinMatch(plugin.name, filter)
     )
-    const pinned = matched.filter(
+    const installed = matched.filter((plugin) => !plugin.marketplace)
+    const marketplace = matched.filter((plugin) => plugin.marketplace)
+    const pinned = installed.filter(
       (plugin) => this.pluginStates[plugin.id]?.pinned
     )
-    const unpinned = matched.filter(
+    const unpinned = installed.filter(
       (plugin) => !this.pluginStates[plugin.id]?.pinned
     )
-    this.visiblePlugins = [...pinned, ...unpinned]
+    this.visiblePlugins = [...pinned, ...unpinned, ...marketplace]
     this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
   }
   private async loadPluginStates() {
