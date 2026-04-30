@@ -12,5 +12,6 @@
   "cancel": "Cancel",
   "confirm": "Confirm",
   "loading": "Loading...",
-  "loadFailed": "Unable to load page"
+  "loadFailed": "Unable to load page",
+  "invalidUrl": "Please enter a valid URL"
 }

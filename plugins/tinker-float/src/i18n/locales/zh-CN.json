@@ -12,5 +12,6 @@
   "cancel": "取消",
   "confirm": "确认",
   "loading": "加载中...",
-  "loadFailed": "无法加载页面"
+  "loadFailed": "无法加载页面",
+  "invalidUrl": "请输入有效的 URL"
 }

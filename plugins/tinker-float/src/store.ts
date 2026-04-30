@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import fileUrl from 'licia/fileUrl'
+import isUrl from 'licia/isUrl'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import {
@@ -118,11 +119,13 @@ class Store extends BaseStore {
     this.videoSrc = src
   }
 
-  setUrlSrc(url: string) {
+  setUrlSrc(url: string): boolean {
+    if (!isUrl(url)) return false
     this.resetContent()
     this.contentType = 'url'
     this.urlSrc = url
     this.urlLoading = true
+    return true
   }
 
   setUrlLoading(v: boolean) {

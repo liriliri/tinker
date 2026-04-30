@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { Camera, FolderOpen, PictureInPicture2 } from 'lucide-react'
 import {
@@ -28,7 +29,9 @@ export default observer(function Toolbar() {
 
   const handleUrlKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && urlInput.trim()) {
-      store.setUrlSrc(urlInput.trim())
+      if (!store.setUrlSrc(urlInput.trim())) {
+        toast.error(t('invalidUrl'))
+      }
     }
   }
 
