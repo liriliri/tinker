@@ -1,7 +1,9 @@
 import { spawn } from 'child_process'
+import type { SpawnOptions } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
 import { getUserDataPath } from 'share/main/lib/util'
+import { plugins } from './loader'
 
 const pluginInstallDir = getUserDataPath('plugins')
 
@@ -10,35 +12,26 @@ function getNpmCliPath() {
   return path.join(npmDir, 'bin/npm-cli.js')
 }
 
-export async function installPlugin(name: string): Promise<void> {
-  await fs.mkdirs(pluginInstallDir)
-
+function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
   return new Promise((resolve, reject) => {
-    const args = [
-      getNpmCliPath(),
-      'install',
-      name,
-      '--prefix',
-      pluginInstallDir,
-      '--registry=https://registry.npmmirror.com',
-    ]
-    const child = spawn(process.execPath, args, {
-      cwd: pluginInstallDir,
-    })
+    const child = spawn(process.execPath, [getNpmCliPath(), ...args], options)
 
-    let output = ''
+    let stdout = ''
+    let stderr = ''
     child.stdout?.on('data', (data) => {
-      output += data
+      stdout += data
     })
     child.stderr?.on('data', (data) => {
-      output += data
+      stderr += data
     })
 
     child.on('close', (code) => {
       if (code === 0) {
-        resolve()
+        resolve(stdout)
       } else {
-        reject(new Error(`npm install failed (code ${code}): ${output}`))
+        reject(
+          new Error(`npm ${args[0]} failed (code ${code}): ${stderr || stdout}`)
+        )
       }
     })
 
@@ -46,35 +39,42 @@ export async function installPlugin(name: string): Promise<void> {
   })
 }
 
-export async function uninstallPlugin(name: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const args = [
-      getNpmCliPath(),
-      'uninstall',
+export async function installPlugin(name: string): Promise<void> {
+  await fs.mkdirs(pluginInstallDir)
+  await runNpm(
+    [
+      'install',
       name,
       '--prefix',
       pluginInstallDir,
-    ]
-    const child = spawn(process.execPath, args, {
-      cwd: pluginInstallDir,
-    })
+      '--registry=https://registry.npmmirror.com',
+    ],
+    { cwd: pluginInstallDir }
+  )
+}
 
-    let output = ''
-    child.stdout?.on('data', (data) => {
-      output += data
-    })
-    child.stderr?.on('data', (data) => {
-      output += data
-    })
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve()
-      } else {
-        reject(new Error(`npm uninstall failed (code ${code}): ${output}`))
-      }
-    })
-
-    child.on('error', (err) => reject(err))
+export async function uninstallPlugin(name: string): Promise<void> {
+  await runNpm(['uninstall', name, '--prefix', pluginInstallDir], {
+    cwd: pluginInstallDir,
   })
+}
+
+export async function checkPluginUpdate(id: string): Promise<string | null> {
+  const plugin = plugins[id]
+  if (!plugin || !plugin.userInstalled || !plugin.version) {
+    return null
+  }
+
+  const output = await runNpm([
+    'view',
+    id,
+    'version',
+    '--registry=https://registry.npmmirror.com',
+  ])
+  const latestVersion = output.trim()
+  if (latestVersion && latestVersion !== plugin.version) {
+    return latestVersion
+  }
+
+  return null
 }

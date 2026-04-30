@@ -9,6 +9,7 @@ import LocalStore from 'licia/LocalStore'
 import LunaModal from 'luna-modal'
 import pkg from '../../../package.json'
 import { sortByName, pinyinMatch, setMainStore } from './lib/util'
+import { notify } from 'share/renderer/lib/util'
 import { t } from 'common/util'
 
 const storage = new LocalStore('main')
@@ -128,6 +129,28 @@ class Store extends BaseStore {
       await this.refresh(true)
     } catch {
       await LunaModal.alert(t('uninstallPluginErr'))
+    }
+  }
+  async checkPluginUpdate(plugin: IPlugin) {
+    try {
+      const latestVersion = await main.checkPluginUpdate(plugin.id)
+      if (latestVersion) {
+        const confirmed = await LunaModal.confirm(
+          t('pluginUpdateAvailable', { version: latestVersion })
+        )
+        if (!confirmed) return
+        try {
+          await main.installPlugin(plugin.id)
+          await this.refresh(true)
+          notify(t('updatePluginSuccess'), { icon: 'success' })
+        } catch {
+          notify(t('updatePluginErr'), { icon: 'error' })
+        }
+      } else {
+        notify(t('pluginUpToDate'), { icon: 'success' })
+      }
+    } catch {
+      notify(t('updatePluginErr'), { icon: 'error' })
     }
   }
   openApp(path: string) {

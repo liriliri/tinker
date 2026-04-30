@@ -29,6 +29,7 @@ export interface IPlugin {
   builtin: boolean
   marketplace?: boolean
   userInstalled?: boolean
+  version?: string
 }
 
 export interface IApp {
@@ -79,6 +80,7 @@ export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
 export type IpcInstallPlugin = (name: string) => Promise<void>
 export type IpcUninstallPlugin = (name: string) => Promise<void>
+export type IpcCheckPluginUpdate = (id: string) => Promise<string | null>
 
 export interface IDownloadOptions {
   url: string

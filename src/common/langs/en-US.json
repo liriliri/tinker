@@ -30,5 +30,9 @@
   "installPluginErr": "Failed to install plugin",
   "uninstallPlugin": "Uninstall",
   "uninstallPluginConfirm": "Are you sure you want to uninstall \"{{name}}\"?",
-  "uninstallPluginErr": "Failed to uninstall plugin"
+  "uninstallPluginErr": "Failed to uninstall plugin",
+  "pluginUpdateAvailable": "New version {{version}} is available. Do you want to update?",
+  "pluginUpToDate": "This plugin is already up to date.",
+  "updatePluginSuccess": "Plugin updated successfully",
+  "updatePluginErr": "Failed to update plugin"
 }

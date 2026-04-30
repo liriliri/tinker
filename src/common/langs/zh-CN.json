@@ -30,5 +30,9 @@
   "installPluginErr": "安装插件失败",
   "uninstallPlugin": "卸载",
   "uninstallPluginConfirm": "确定要卸载 \"{{name}}\" 吗？",
-  "uninstallPluginErr": "卸载插件失败"
+  "uninstallPluginErr": "卸载插件失败",
+  "pluginUpdateAvailable": "发现新版本 {{version}}，是否更新？",
+  "pluginUpToDate": "该插件已是最新版本",
+  "updatePluginSuccess": "插件更新成功",
+  "updatePluginErr": "插件更新失败"
 }

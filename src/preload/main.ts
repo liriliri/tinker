@@ -9,6 +9,7 @@ import {
   IpcClearPluginData,
   IpcInstallPlugin,
   IpcUninstallPlugin,
+  IpcCheckPluginUpdate,
   IpcIsPluginRunning,
   IpcOpenApp,
   IpcOpenPlugin,
@@ -36,6 +37,7 @@ export default Object.assign(mainObj, {
   isPluginRunning: invoke<IpcIsPluginRunning>('isPluginRunning'),
   installPlugin: invoke<IpcInstallPlugin>('installPlugin'),
   uninstallPlugin: invoke<IpcUninstallPlugin>('uninstallPlugin'),
+  checkPluginUpdate: invoke<IpcCheckPluginUpdate>('checkPluginUpdate'),
   getMainStore: invoke<IpcGetStore>('getMainStore'),
   setMainStore: invoke<IpcSetStore>('setMainStore'),
 })

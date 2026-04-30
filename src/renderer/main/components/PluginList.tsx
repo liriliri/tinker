@@ -148,6 +148,12 @@ export default observer(function PluginList() {
       if (plugin.userInstalled) {
         template.push({ type: 'separator' })
         template.push({
+          label: t('checkUpdate'),
+          click() {
+            store.checkPluginUpdate(plugin)
+          },
+        })
+        template.push({
           label: t('uninstallPlugin'),
           click() {
             store.uninstallUserPlugin(plugin)

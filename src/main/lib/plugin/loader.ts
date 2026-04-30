@@ -72,6 +72,7 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     online: startWith(rawPlugin.main, 'https://'),
     builtin: startWith(dir, builtinDir),
     userInstalled: startWith(dir, userPluginDir),
+    version: pkg.version,
   }
   if (plugin.icon) {
     plugin.icon = path.join(dir, plugin.icon)

@@ -18,7 +18,7 @@ import {
   loadSettingsPlugin,
 } from './loader'
 import * as pluginDownload from './download'
-import { installPlugin, uninstallPlugin } from './installer'
+import { installPlugin, uninstallPlugin, checkPluginUpdate } from './installer'
 import {
   PLUGIN_PARTITION,
   pluginViews,
@@ -88,6 +88,7 @@ export function init() {
   handleEvent('isPluginRunning', isPluginRunning)
   handleEvent('installPlugin', installPlugin)
   handleEvent('uninstallPlugin', uninstallPlugin)
+  handleEvent('checkPluginUpdate', checkPluginUpdate)
   handleEvent('captureScreen', captureScreen)
   handleEvent('pluginGetFileIcon', getFileIcon)
   ipcMain.handle('showPluginNotification', (event, body: string) => {
