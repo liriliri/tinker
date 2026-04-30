@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Settings, Cpu } from 'lucide-react'
+import { Settings, Cpu, Package } from 'lucide-react'
 import NavList, { type NavListItem } from 'share/components/NavList'
 import { tw } from 'share/theme'
 import store from '../store'
@@ -15,6 +15,12 @@ export default observer(function Sidebar() {
       icon: Settings,
       iconClassName: tw.primary.text,
       label: t('general'),
+    },
+    {
+      id: 'plugin',
+      icon: Package,
+      iconClassName: tw.primary.text,
+      label: t('plugin'),
     },
     {
       id: 'ai',

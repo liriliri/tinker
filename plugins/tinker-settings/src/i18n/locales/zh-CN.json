@@ -17,6 +17,10 @@
   "autoHide": "自动隐藏",
   "searchLocalApps": "搜索本地应用",
 
+  "plugin": "插件",
+  "showMarketplace": "显示未安装插件",
+  "registry": "镜像源",
+
   "restartRequired": "需要重启应用后生效。",
 
   "ai": "AI",

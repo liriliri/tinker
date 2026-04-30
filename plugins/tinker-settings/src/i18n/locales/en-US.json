@@ -17,6 +17,10 @@
   "autoHide": "Auto Hide",
   "searchLocalApps": "Search Local Apps",
 
+  "plugin": "Plugin",
+  "showMarketplace": "Show Uninstalled Plugins",
+  "registry": "Registry",
+
   "restartRequired": "Restart required to apply changes.",
 
   "ai": "AI",

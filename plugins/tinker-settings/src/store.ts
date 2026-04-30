@@ -12,6 +12,8 @@ class Store extends BaseStore {
   autoHide: boolean = false
   searchLocalApps: boolean = true
   aiProviders: AiProvider[] = []
+  npmRegistry: string = 'https://registry.npmmirror.com'
+  showMarketplace: boolean = true
 
   isLoading: boolean = true
   currentSection: Section = 'general'
@@ -48,6 +50,8 @@ class Store extends BaseStore {
       autoHide,
       searchLocalApps,
       aiProvidersRaw,
+      npmRegistry,
+      showMarketplace,
     ] = await Promise.all([
       tinker.getSetting('theme'),
       tinker.getSetting('language'),
@@ -58,6 +62,8 @@ class Store extends BaseStore {
       tinker.getSetting('autoHide'),
       tinker.getSetting('searchLocalApps'),
       tinker.getSetting('aiProviders'),
+      tinker.getSetting('npmRegistry'),
+      tinker.getSetting('showMarketplace'),
     ])
 
     this.theme = theme ?? 'system'
@@ -76,6 +82,8 @@ class Store extends BaseStore {
       apiType: p.apiType ?? 'openai',
       models: p.models ?? [],
     }))
+    this.npmRegistry = npmRegistry ?? 'https://registry.npmmirror.com'
+    this.showMarketplace = showMarketplace !== false
     this.isLoading = false
   }
 
@@ -117,6 +125,16 @@ class Store extends BaseStore {
   async setSearchLocalApps(value: boolean) {
     this.searchLocalApps = value
     await tinker.setSetting('searchLocalApps', value)
+  }
+
+  async setNpmRegistry(value: string) {
+    this.npmRegistry = value
+    await tinker.setSetting('npmRegistry', value)
+  }
+
+  async setShowMarketplace(value: boolean) {
+    this.showMarketplace = value
+    await tinker.setSetting('showMarketplace', value)
   }
 
   private async saveAiProviders() {

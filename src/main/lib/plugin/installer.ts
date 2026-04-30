@@ -3,6 +3,7 @@ import type { SpawnOptions } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
 import { getUserDataPath } from 'share/main/lib/util'
+import { getSettingsStore } from '../store'
 import { plugins } from './loader'
 
 const pluginInstallDir = getUserDataPath('plugins')
@@ -41,14 +42,9 @@ function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
 
 export async function installPlugin(name: string): Promise<void> {
   await fs.mkdirs(pluginInstallDir)
+  const registry = getSettingsStore().get('npmRegistry')
   await runNpm(
-    [
-      'install',
-      name,
-      '--prefix',
-      pluginInstallDir,
-      '--registry=https://registry.npmmirror.com',
-    ],
+    ['install', name, '--prefix', pluginInstallDir, `--registry=${registry}`],
     { cwd: pluginInstallDir }
   )
 }
@@ -65,12 +61,8 @@ export async function checkPluginUpdate(id: string): Promise<string | null> {
     return null
   }
 
-  const output = await runNpm([
-    'view',
-    id,
-    'version',
-    '--registry=https://registry.npmmirror.com',
-  ])
+  const registry = getSettingsStore().get('npmRegistry')
+  const output = await runNpm(['view', id, 'version', `--registry=${registry}`])
   const latestVersion = output.trim()
   if (latestVersion && latestVersion !== plugin.version) {
     return latestVersion

@@ -9,6 +9,7 @@ import AppearanceSection from './components/AppearanceSection'
 import StartupSection from './components/StartupSection'
 import WindowSection from './components/WindowSection'
 import AiView from './components/AiView'
+import PluginSection from './components/PluginSection'
 
 export default observer(function App() {
   useEffect(() => {
@@ -34,6 +35,11 @@ export default observer(function App() {
             {!store.isLoading && store.currentSection === 'ai' && (
               <div className="flex-1 overflow-hidden">
                 <AiView />
+              </div>
+            )}
+            {!store.isLoading && store.currentSection === 'plugin' && (
+              <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6 space-y-6">
+                <PluginSection />
               </div>
             )}
           </div>

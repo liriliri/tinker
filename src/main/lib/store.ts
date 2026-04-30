@@ -20,6 +20,8 @@ export const getSettingsStore = memoize(function () {
     showShortcut: isMac ? 'Option+Space' : 'Alt+Space',
     autoHide: true,
     searchLocalApps: true,
+    npmRegistry: 'https://registry.npmmirror.com',
+    showMarketplace: true,
   })
 })
 

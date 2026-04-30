@@ -25,6 +25,7 @@ class Store extends BaseStore {
   filter = ''
   pluginStates: IPluginStates = {}
   installingPlugins: Set<string> = new Set()
+  showMarketplace: boolean = true
   constructor() {
     super()
 
@@ -35,6 +36,7 @@ class Store extends BaseStore {
       plugin: observable,
       pluginStates: observable,
       installingPlugins: observable,
+      showMarketplace: observable,
       setFilter: action,
       hidePlugin: action,
       unhidePlugin: action,
@@ -262,11 +264,13 @@ class Store extends BaseStore {
   }
   async refresh(force = false) {
     const searchLocalApps = await main.getSettingsStore('searchLocalApps')
+    const showMarketplace = await main.getSettingsStore('showMarketplace')
     const [plugins, apps] = await Promise.all([
       main.getPlugins(force),
       searchLocalApps !== false ? main.getApps(force) : [],
     ])
     runInAction(() => {
+      this.showMarketplace = showMarketplace !== false
       this.plugins = sortByName(plugins)
       this.apps = sortByName(apps)
       this.applyFilter()
@@ -283,7 +287,9 @@ class Store extends BaseStore {
         (plugin) => !this.pluginStates[plugin.id]?.hidden
       )
       const installed = filtered.filter((plugin) => !plugin.marketplace)
-      const marketplace = filtered.filter((plugin) => plugin.marketplace)
+      const marketplace = this.showMarketplace
+        ? filtered.filter((plugin) => plugin.marketplace)
+        : []
       const pinned = installed.filter(
         (plugin) => this.pluginStates[plugin.id]?.pinned
       )

@@ -1,6 +1,6 @@
 type ApiType = 'openai' | 'claude'
 
-type Section = 'general' | 'ai'
+type Section = 'general' | 'ai' | 'plugin'
 
 interface AiModel {
   name: string
