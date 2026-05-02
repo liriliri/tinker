@@ -21,9 +21,11 @@ function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
     let stderr = ''
     child.stdout?.on('data', (data) => {
       stdout += data
+      process.stdout.write(data)
     })
     child.stderr?.on('data', (data) => {
       stderr += data
+      process.stderr.write(data)
     })
 
     child.on('close', (code) => {
