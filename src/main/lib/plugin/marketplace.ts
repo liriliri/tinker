@@ -152,6 +152,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-life-progress',
+    name: 'Life Progress',
+    description: 'Visualize life, month, and day progress',
+    icon: 'tinker-life-progress.png',
+    locales: {
+      'zh-CN': {
+        name: '人生进度',
+        description: '可视化人生、月份和每日进度',
+      },
+    },
+  },
+  {
     id: 'tinker-lunar-calendar',
     name: 'Lunar Calendar',
     description: 'A perpetual calendar with lunar date support',
