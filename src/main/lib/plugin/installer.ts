@@ -5,17 +5,24 @@ import fs from 'fs-extra'
 import { getUserDataPath } from 'share/main/lib/util'
 import { getSettingsStore } from '../store'
 import { plugins } from './loader'
+import { isDev } from 'share/common/util'
 
 const pluginInstallDir = getUserDataPath('plugins')
 
 function getNpmCliPath() {
-  const npmDir = path.dirname(require.resolve('npm/package.json'))
+  let npmDir = path.dirname(require.resolve('npm/package.json'))
+  if (!isDev()) {
+    npmDir = npmDir.replace('app.asar', 'app.asar.unpacked')
+  }
   return path.join(npmDir, 'bin/npm-cli.js')
 }
 
 function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [getNpmCliPath(), ...args], options)
+    const child = spawn(process.execPath, [getNpmCliPath(), ...args], {
+      ...options,
+      env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+    })
 
     let stdout = ''
     let stderr = ''
