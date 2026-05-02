@@ -16,6 +16,7 @@ const config = {
     output: `../release/${pkg.version}`,
   },
   files: ['main', 'preload', 'renderer', 'plugins'],
+  asarUnpack: ['node_modules/npm/**'],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: {
     from: 'resources',
