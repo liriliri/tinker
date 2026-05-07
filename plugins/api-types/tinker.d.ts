@@ -233,6 +233,14 @@ declare global {
        */
       onProgress(callback: () => void): () => void
     }
+
+    interface WebviewTag extends Electron.WebviewTag {
+      sendCommand(
+        method: string,
+        params?: Record<string, unknown>
+      ): Promise<unknown>
+      showDevTools(devtoolsWebview: Electron.WebviewTag): Promise<void>
+    }
   }
 
   const tinker: {
@@ -429,17 +437,6 @@ declare global {
      * Completed/cancelled downloads have no-op control methods and are already resolved/rejected.
      */
     getDownloads(): Promise<tinker.DownloadTask[]>
-
-    /**
-     * Open the DevTools of a webview and render them in another webview.
-     * Use webview.getWebContentsId() to get the IDs.
-     * @param srcWebContentsId - The webContents ID of the webview to inspect
-     * @param devtoolsWebContentsId - The webContents ID of the webview to display DevTools in
-     */
-    openDevtools(
-      srcWebContentsId: number,
-      devtoolsWebContentsId: number
-    ): Promise<void>
   }
 }
 

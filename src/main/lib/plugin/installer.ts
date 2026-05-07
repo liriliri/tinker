@@ -2,7 +2,7 @@ import { spawn } from 'child_process'
 import type { SpawnOptions } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
-import { getUserDataPath } from 'share/main/lib/util'
+import { getUserDataPath, handleEvent } from 'share/main/lib/util'
 import { getSettingsStore } from '../store'
 import { plugins } from './loader'
 import { isDev } from 'share/common/util'
@@ -47,6 +47,12 @@ function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
 
     child.on('error', (err) => reject(err))
   })
+}
+
+export function init() {
+  handleEvent('installPlugin', installPlugin)
+  handleEvent('uninstallPlugin', uninstallPlugin)
+  handleEvent('checkPluginUpdate', checkPluginUpdate)
 }
 
 export async function installPlugin(name: string): Promise<void> {

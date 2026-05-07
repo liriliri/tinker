@@ -33,5 +33,7 @@
   "cut": "剪切",
   "copy": "复制",
   "paste": "粘贴",
-  "selectAll": "全选"
+  "selectAll": "全选",
+  "capture": "截图",
+  "captureFullPage": "截取完整网页"
 }

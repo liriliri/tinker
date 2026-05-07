@@ -8,6 +8,7 @@ import {
   useDefaultLayout,
 } from 'react-resizable-panels'
 import copy from 'licia/copy'
+import convertBin from 'licia/convertBin'
 import store from '../store'
 import NewTabPage from './NewTabPage'
 import DevToolsPanel from './DevToolsPanel'
@@ -181,6 +182,56 @@ function createWebview(tabId: string, url: string): Electron.WebviewTag {
         {
           label: i18n.t('reload'),
           click: () => store.reload(),
+        },
+        { type: 'separator' },
+        {
+          label: i18n.t('capture'),
+          click: async () => {
+            const image = await wv.capturePage()
+            const png = image.toPNG()
+            const result = await tinker.showSaveDialog({
+              defaultPath: 'screenshot.png',
+              filters: [{ name: 'PNG', extensions: ['png'] }],
+            })
+            if (result.filePath) {
+              await tinker.writeFile(result.filePath, new Uint8Array(png))
+            }
+          },
+        },
+        {
+          label: i18n.t('captureFullPage'),
+          click: async () => {
+            const result = await tinker.showSaveDialog({
+              defaultPath: 'screenshot-full.png',
+              filters: [{ name: 'PNG', extensions: ['png'] }],
+            })
+            if (!result.filePath) return
+
+            const twv = wv as tinker.WebviewTag
+            const dimensions = JSON.parse(
+              await wv.executeJavaScript(
+                `JSON.stringify({ width: Math.max(document.documentElement.scrollWidth, document.documentElement.clientWidth), height: Math.max(document.documentElement.scrollHeight, document.documentElement.clientHeight) })`
+              )
+            )
+            const { width, height } = dimensions
+
+            await twv.sendCommand('Emulation.setDeviceMetricsOverride', {
+              width: Math.ceil(width),
+              height: Math.ceil(height),
+              deviceScaleFactor: 1,
+              mobile: false,
+            })
+
+            const response = (await twv.sendCommand('Page.captureScreenshot', {
+              format: 'png',
+              clip: { x: 0, y: 0, width, height, scale: 1 },
+            })) as { data: string }
+
+            await twv.sendCommand('Emulation.clearDeviceMetricsOverride')
+
+            const bytes = convertBin(response.data, 'Uint8Array')
+            await tinker.writeFile(result.filePath, bytes)
+          },
         },
         { type: 'separator' },
         {

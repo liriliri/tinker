@@ -81,10 +81,16 @@ export type IpcShowPluginNotification = (body: string) => void
 export type IpcInstallPlugin = (name: string) => Promise<void>
 export type IpcUninstallPlugin = (name: string) => Promise<void>
 export type IpcCheckPluginUpdate = (id: string) => Promise<string | null>
-export type IpcOpenPluginDevtools = (
+export type IpcShowDevTools = (
   srcWebContentsId: number,
   devtoolsWebContentsId: number
 ) => Promise<void>
+
+export type IpcSendDebuggerCommand = (
+  webContentsId: number,
+  method: string,
+  params?: Record<string, unknown>
+) => Promise<unknown>
 
 export interface IDownloadOptions {
   url: string

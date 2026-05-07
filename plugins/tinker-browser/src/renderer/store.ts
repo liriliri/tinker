@@ -344,15 +344,13 @@ class Store extends BaseStore {
 
     const doConnect = () => {
       try {
-        tinker
-          .openDevtools(wv.getWebContentsId(), devWv.getWebContentsId())
-          .then(() => {
-            if (this.pendingInspect) {
-              const { x, y } = this.pendingInspect
-              this.pendingInspect = null
-              wv.inspectElement(x, y)
-            }
-          })
+        ;(wv as tinker.WebviewTag).showDevTools(devWv).then(() => {
+          if (this.pendingInspect) {
+            const { x, y } = this.pendingInspect
+            this.pendingInspect = null
+            wv.inspectElement(x, y)
+          }
+        })
       } catch {
         // WebView not ready yet
       }

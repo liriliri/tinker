@@ -179,8 +179,31 @@ export function injectApi() {
     getAIProviders: _tinker.getProviderList,
     download,
     getDownloads,
-    openDevtools: _tinker.openDevtools,
   }
+
+  // Patch webview prototype to add debugger methods
+  window.addEventListener('DOMContentLoaded', () => {
+    const tempWv = document.createElement('webview')
+    const webviewProto = Object.getPrototypeOf(tempWv)
+    if (webviewProto) {
+      webviewProto.sendCommand = function (
+        method: string,
+        params?: Record<string, unknown>
+      ) {
+        return _tinker.sendDebuggerCommand(
+          this.getWebContentsId(),
+          method,
+          params
+        )
+      }
+      webviewProto.showDevTools = function (devtoolsWebview: any) {
+        return _tinker.showDevTools(
+          this.getWebContentsId(),
+          devtoolsWebview.getWebContentsId()
+        )
+      }
+    }
+  })
 
   async function getDownloads() {
     const list = await _tinker.getDownloads()
