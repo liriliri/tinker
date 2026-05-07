@@ -12,9 +12,12 @@ export default observer(function Titlebar() {
 
   useEffect(() => {
     const offShowWin = main.on('showWin', () => inputRef.current?.focus())
+    // ESC key handler: close plugin view and return focus to search input
     const offPressEsc = main.on('pressEsc', () => {
       if (store.plugin) {
         store.closePlugin()
+        // Delay focus until after WebContentsView is removed and re-render completes
+        setTimeout(() => inputRef.current?.focus(), 100)
       } else {
         main.closeWin()
       }
