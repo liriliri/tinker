@@ -9,6 +9,7 @@ export interface PopupWindowOptions {
   alwaysOnTop?: boolean
   webviewTag?: boolean
   transparent?: boolean
+  copyScripts?: string[]
 }
 
 export function openPopupWindow(
@@ -23,6 +24,7 @@ export function openPopupWindow(
     alwaysOnTop = true,
     webviewTag,
     transparent = false,
+    copyScripts = [],
   } = options
 
   const features = [
@@ -46,37 +48,70 @@ export function openPopupWindow(
     popup.document.head.appendChild(node.cloneNode(true))
   })
 
-  const container = popup.document.createElement('div')
-  container.id = 'popup-root'
-  popup.document.body.style.margin = '0'
-  if (transparent) {
-    popup.document.documentElement.style.backgroundColor = 'transparent'
-    popup.document.body.style.backgroundColor = 'transparent'
+  if (copyScripts.length > 0) {
+    popup.tinker = window.tinker
+    const scripts = document.querySelectorAll('script[src]')
+    const loadPromises: Promise<void>[] = []
+    scripts.forEach((node) => {
+      const src = (node as HTMLScriptElement).src
+      if (!src) return
+      if (!copyScripts.some((s) => src.includes(s))) return
+      const script = popup.document.createElement('script')
+      script.src = src
+      loadPromises.push(
+        new Promise<void>((resolve) => {
+          script.onload = () => resolve()
+          script.onerror = () => resolve()
+        })
+      )
+      popup.document.head.appendChild(script)
+    })
+    Promise.all(loadPromises).then(() => renderPopup())
+  } else {
+    renderPopup()
   }
-  popup.document.documentElement.className = document.documentElement.className
-  popup.document.body.appendChild(container)
 
-  const root = createRoot(container)
-  root.render(render(popup, () => popup.close()))
+  function renderPopup() {
+    popup!.addEventListener('error', (e) => {
+      console.error('[PopupWindow Error]', e.message, e.filename, e.lineno)
+    })
+    popup!.addEventListener('unhandledrejection', (e) => {
+      console.error('[PopupWindow Unhandled Rejection]', e.reason)
+    })
 
-  popup.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') popup.close()
-  })
-
-  const unsubscribe = tinker.on('changeTheme', async () => {
-    if (popup.closed) return
-    const theme = await tinker.getTheme()
-    if (theme === 'dark') {
-      popup.document.documentElement.classList.add('dark')
-    } else {
-      popup.document.documentElement.classList.remove('dark')
+    const container = popup!.document.createElement('div')
+    container.id = 'popup-root'
+    popup!.document.body.style.margin = '0'
+    if (transparent) {
+      popup!.document.documentElement.style.backgroundColor = 'transparent'
+      popup!.document.body.style.backgroundColor = 'transparent'
     }
-  })
+    popup!.document.documentElement.className =
+      document.documentElement.className
+    popup!.document.body.appendChild(container)
 
-  popup.addEventListener('beforeunload', () => {
-    root.unmount()
-    unsubscribe()
-  })
+    const root = createRoot(container)
+    root.render(render(popup!, () => popup!.close()))
+
+    popup!.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') popup!.close()
+    })
+
+    const unsubscribe = tinker.on('changeTheme', async () => {
+      if (popup!.closed) return
+      const theme = await tinker.getTheme()
+      if (theme === 'dark') {
+        popup!.document.documentElement.classList.add('dark')
+      } else {
+        popup!.document.documentElement.classList.remove('dark')
+      }
+    })
+
+    popup!.addEventListener('beforeunload', () => {
+      root.unmount()
+      unsubscribe()
+    })
+  }
 
   return popup
 }

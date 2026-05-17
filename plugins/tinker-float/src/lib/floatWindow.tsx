@@ -5,8 +5,7 @@ import store from '../store'
 
 export function launchFloatWindow() {
   const width = store.windowWidth
-  const height =
-    store.contentType === 'image' ? store.effectiveHeight : store.windowHeight
+  const height = store.windowHeight
 
   let webviewTimeout: ReturnType<typeof setTimeout> | null = null
 

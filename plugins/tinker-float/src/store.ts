@@ -14,7 +14,7 @@ import {
 const MIN_WINDOW_SIZE = {
   image: { width: 100, height: 100 },
   text: { width: 200, height: 100 },
-  video: { width: 320, height: 240 },
+  video: { width: 320, height: 200 },
   url: { width: 320, height: 240 },
 }
 
@@ -69,20 +69,14 @@ class Store extends BaseStore {
     return MIN_WINDOW_SIZE[this.contentType].height
   }
 
-  get effectiveHeight(): number {
-    if (
-      this.contentType === 'image' &&
-      this.imageNaturalWidth > 0 &&
-      this.imageNaturalHeight > 0
-    ) {
-      return Math.max(
+  private applyAspectRatio(naturalWidth: number, naturalHeight: number) {
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      const h = Math.max(
         this.minWindowHeight,
-        Math.round(
-          this.windowWidth * (this.imageNaturalHeight / this.imageNaturalWidth)
-        )
+        Math.round(this.windowWidth * (naturalHeight / naturalWidth))
       )
+      this.setWindowHeight(h)
     }
-    return this.windowHeight
   }
 
   private resetContent() {
@@ -116,6 +110,17 @@ class Store extends BaseStore {
     this.resetContent()
     this.contentType = 'video'
     this.videoSrc = src
+  }
+
+  async loadVideoInfo(filePath: string) {
+    try {
+      const info = await tinker.getMediaInfo(filePath)
+      if (info.videoStream) {
+        this.applyAspectRatio(info.videoStream.width, info.videoStream.height)
+      }
+    } catch {
+      // ignore, will use default size
+    }
   }
 
   setUrlSrc(url: string): boolean {
@@ -158,6 +163,7 @@ class Store extends BaseStore {
       this.setImageSrc(fileUrl(filePath))
     } else if (category === 'video') {
       this.setVideoSrc(fileUrl(filePath))
+      await this.loadVideoInfo(filePath)
     } else {
       try {
         const buffer = await tinker.readFile(filePath)
@@ -193,6 +199,7 @@ class Store extends BaseStore {
   setImageNaturalSize(w: number, h: number) {
     this.imageNaturalWidth = w
     this.imageNaturalHeight = h
+    this.applyAspectRatio(w, h)
   }
 
   clearContent() {

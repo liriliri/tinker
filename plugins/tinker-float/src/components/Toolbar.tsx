@@ -63,10 +63,7 @@ export default observer(function Toolbar() {
         onClick={() => setShowSizeDialog(true)}
         title={t('floatSettings')}
       >
-        {store.windowWidth} x{' '}
-        {store.contentType === 'image'
-          ? store.effectiveHeight
-          : store.windowHeight}
+        {store.windowWidth} x {store.windowHeight}
       </button>
 
       <ToolbarSeparator />
@@ -98,12 +95,7 @@ export default observer(function Toolbar() {
         onClose={() => setShowSizeDialog(false)}
         onConfirm={handleSizeConfirm}
         currentWidth={store.windowWidth}
-        currentHeight={
-          store.contentType === 'image'
-            ? store.effectiveHeight
-            : store.windowHeight
-        }
-        heightDisabled={store.contentType === 'image'}
+        currentHeight={store.windowHeight}
       />
     </SharedToolbar>
   )

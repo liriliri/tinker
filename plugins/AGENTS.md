@@ -12,7 +12,7 @@ Guidelines that AI coding assistants must follow when developing code for the Ti
 - **Must Ask**: If a feature requires a new dependency, ask the developer first
 
 **Solution Priority**:
-1. **Licia Library** - Check [licia.liriliri.io](https://licia.liriliri.io/) first (already included)
+1. **Licia Library** - Use the `licia` skill to find suitable utilities (already included)
 2. **Existing Dependencies** - Check `package.json`
 3. **Shared Code** - Check `share/` directory
 4. **Native APIs** - Use JavaScript/TypeScript/Web Standard APIs
