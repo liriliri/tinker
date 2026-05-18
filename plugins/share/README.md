@@ -218,7 +218,7 @@ const popup = openPopupWindow(
 )
 ```
 
-Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?` (default true), `webviewTag?`.
+Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?` (default true), `resizable?` (default true), `webviewTag?`.
 
 ## When To Update This File
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEditor, EditorContent } from '@tiptap/react'
-import { Trash2, ExternalLink, Circle } from 'lucide-react'
+import { Trash2, PictureInPicture2, Circle } from 'lucide-react'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
@@ -201,7 +201,7 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
           onClick={handleOpenWindow}
           title={t('openWindow')}
         >
-          <ExternalLink size={13} />
+          <PictureInPicture2 size={13} />
         </button>
 
         <button

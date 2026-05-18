@@ -7,6 +7,7 @@ export interface PopupWindowOptions {
   minWidth?: number
   minHeight?: number
   alwaysOnTop?: boolean
+  resizable?: boolean
   webviewTag?: boolean
   transparent?: boolean
   copyScripts?: string[]
@@ -22,6 +23,7 @@ export function openPopupWindow(
     minWidth,
     minHeight,
     alwaysOnTop = true,
+    resizable = true,
     webviewTag,
     transparent = false,
     copyScripts = [],
@@ -33,6 +35,7 @@ export function openPopupWindow(
     minWidth != null ? `minWidth=${minWidth}` : '',
     minHeight != null ? `minHeight=${minHeight}` : '',
     `alwaysOnTop=${alwaysOnTop}`,
+    `resizable=${resizable ? 'yes' : 'no'}`,
     'frame=no',
     webviewTag ? 'webviewTag=true' : '',
     transparent ? 'transparent=true' : '',

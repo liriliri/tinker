@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { X, Folder, RefreshCw, ExternalLink } from 'lucide-react'
+import { X, Folder, RefreshCw, PictureInPicture2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   Toolbar,
@@ -72,7 +72,7 @@ export default observer(function ToolbarComponent() {
 
       <div className="ml-auto">
         <ToolbarButton onClick={handleFloatToday} title={t('floatToday')}>
-          <ExternalLink size={TOOLBAR_ICON_SIZE} />
+          <PictureInPicture2 size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
         <ToolbarButton onClick={handleClose} title={t('close')}>
           <X size={TOOLBAR_ICON_SIZE} />

@@ -1,9 +1,16 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { SkipForward, Volume2, VolumeX, RotateCcw } from 'lucide-react'
+import {
+  SkipForward,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  PictureInPicture2,
+} from 'lucide-react'
 import { useState } from 'react'
 import { tw } from 'share/theme'
 import store from '../store'
+import { openFloatingWindow } from './FloatingWindow'
 
 const BUTTON_CLASSES = `${tw.text.secondary} hover:text-gray-800 dark:hover:text-gray-200 transition-colors`
 
@@ -83,8 +90,15 @@ export default observer(function Footer() {
         </span>
       </div>
 
-      {/* Right: Reset */}
-      <div className="flex items-center">
+      {/* Right: Float and Reset */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={openFloatingWindow}
+          className={BUTTON_CLASSES}
+          title={t('float')}
+        >
+          <PictureInPicture2 size={18} />
+        </button>
         <button
           onClick={() => store.reset()}
           className={BUTTON_CLASSES}
