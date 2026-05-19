@@ -9,10 +9,12 @@ import {
   Shuffle,
   Repeat2,
   List,
+  Music,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import store, { PlayMode } from '../store'
+import store from '../store'
+import { PlayMode } from '../types'
 import { formatTime } from '../lib/util'
 import { ProgressBar, VolumeBar } from './ProgressBar'
 
@@ -34,37 +36,49 @@ const PlayerBar = observer(() => {
   const ModeIcon = PLAY_MODE_ICONS[store.playMode]
 
   return (
-    <div className={`border-t ${tw.border} ${tw.bg.primary} px-4 py-2`}>
-      {/* Progress bar */}
-      <div className="flex items-center gap-2 mb-2">
-        <span className={`text-xs ${tw.text.tertiary} w-10 text-right`}>
-          {formatTime(store.currentTime)}
-        </span>
-        <div className="flex-1">
-          <ProgressBar
-            value={store.currentTime}
-            max={store.duration}
-            onChange={(v) => store.seek(v)}
-          />
-        </div>
-        <span className={`text-xs ${tw.text.tertiary} w-10`}>
-          {formatTime(store.duration)}
-        </span>
+    <div className={`relative ${tw.bg.primary}`}>
+      {/* Progress bar at top like a border */}
+      <div className="absolute -top-1.5 left-0 right-0 z-10">
+        <ProgressBar
+          value={store.currentTime}
+          max={store.duration}
+          onChange={(v) => store.seek(v)}
+        />
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center">
-        {/* Track info */}
-        <div className="flex-1 min-w-0">
+      {/* Controls row */}
+      <div className="flex items-center px-4 h-14">
+        {/* Track info - left */}
+        <div className="flex-1 min-w-0 flex items-center gap-3">
           {track ? (
-            <div className="truncate">
-              <span className={`text-sm ${tw.text.primary}`}>
-                {track.title}
-              </span>
-              <span className={`text-xs ${tw.text.tertiary} ml-2`}>
-                {track.artist}
-              </span>
-            </div>
+            <>
+              {track.cover ? (
+                <img
+                  src={track.cover}
+                  className="w-10 h-10 rounded-md object-cover flex-shrink-0 shadow-sm"
+                />
+              ) : (
+                <div
+                  className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${tw.bg.secondary}`}
+                >
+                  <Music size={16} className={tw.text.tertiary} />
+                </div>
+              )}
+              <div className="min-w-0">
+                <div
+                  className={`text-sm font-medium truncate ${tw.text.primary}`}
+                >
+                  {track.title}
+                </div>
+                <div className={`text-xs ${tw.text.tertiary} truncate`}>
+                  {track.artist || t('unknownArtist')}
+                  <span className="mx-1.5 opacity-50">·</span>
+                  {formatTime(store.currentTime)}
+                  <span className="opacity-50"> / </span>
+                  {formatTime(store.duration)}
+                </div>
+              </div>
+            </>
           ) : (
             <span className={`text-sm ${tw.text.tertiary}`}>
               {t('noTrack')}
@@ -72,52 +86,56 @@ const PlayerBar = observer(() => {
           )}
         </div>
 
-        {/* Playback controls */}
-        <div className="flex items-center gap-3">
+        {/* Playback controls - center */}
+        <div className="flex items-center gap-4">
           <button
             onClick={() => store.playPrev()}
-            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
+            className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
           >
-            <SkipBack size={16} />
+            <SkipBack size={18} />
           </button>
           <button
             onClick={() => store.togglePlay()}
-            className={`p-2 rounded-full ${tw.primary.bg} text-white hover:opacity-90`}
+            className={`p-2.5 rounded-full ${tw.primary.bg} text-white hover:opacity-90 transition-opacity shadow-sm`}
           >
-            {store.isPlaying ? <Pause size={16} /> : <Play size={16} />}
+            {store.isPlaying ? (
+              <Pause size={18} fill="currentColor" />
+            ) : (
+              <Play size={18} fill="currentColor" />
+            )}
           </button>
           <button
             onClick={() => store.playNext()}
-            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
+            className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
           >
-            <SkipForward size={16} />
+            <SkipForward size={18} />
           </button>
         </div>
 
         {/* Right controls */}
-        <div className="flex-1 flex items-center justify-end gap-2">
-          {/* Play mode */}
+        <div className="flex-1 flex items-center justify-end gap-3">
           <button
             onClick={() => store.cyclePlayMode()}
-            className={`p-1 rounded ${tw.hover} ${
+            className={`p-1.5 rounded-full ${tw.hover} ${
               store.playMode === 'sequence' ? tw.text.tertiary : tw.primary.text
-            }`}
+            } transition-colors`}
             title={t(PLAY_MODE_LABELS[store.playMode])}
           >
-            <ModeIcon size={14} />
+            <ModeIcon size={15} />
           </button>
 
-          {/* Volume */}
-          <button
-            onClick={() => store.setVolume(store.volume > 0 ? 0 : 0.8)}
-            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
-          >
-            {store.volume > 0 ? <Volume2 size={14} /> : <VolumeX size={14} />}
-          </button>
-          <VolumeBar
-            value={store.volume}
-            onChange={(v) => store.setVolume(v)}
-          />
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => store.setVolume(store.volume > 0 ? 0 : 0.8)}
+              className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
+            >
+              {store.volume > 0 ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            </button>
+            <VolumeBar
+              value={store.volume}
+              onChange={(v) => store.setVolume(v)}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -2,19 +2,25 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import LocalStore from 'licia/LocalStore'
 import randomItem from 'licia/randomItem'
+import debounce from 'licia/debounce'
 import audio from './lib/audio'
+import {
+  Track,
+  getAllTracks,
+  putTracks,
+  removeTrack as dbRemoveTrack,
+} from './lib/db'
 
-interface Track {
-  id: string
-  title: string
-  artist: string
-  duration: number
+import { PlayMode } from './types'
+
+export interface FileSearchResult {
   path: string
+  name: string
 }
 
-export type PlayMode = 'sequence' | 'loop' | 'shuffle'
+const AUDIO_EXTS = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma']
 
-const storage = new LocalStore('tinker-music-player')
+const settings = new LocalStore('tinker-music-player-settings')
 
 class Store extends BaseStore {
   tracks: Track[] = []
@@ -25,6 +31,8 @@ class Store extends BaseStore {
   volume: number = 0.8
   playMode: PlayMode = 'sequence'
   searchQuery: string = ''
+  fileSearchResults: FileSearchResult[] = []
+  isSearchingFiles: boolean = false
 
   constructor() {
     super()
@@ -33,17 +41,20 @@ class Store extends BaseStore {
     this.setupAudio()
   }
 
-  private load() {
-    this.tracks = storage.get<Track[]>('tracks') || []
-    this.volume = storage.get<number>('volume') ?? 0.8
-    this.playMode = storage.get<PlayMode>('playMode') || 'sequence'
+  private async load() {
+    this.volume = settings.get<number>('volume') ?? 0.8
+    this.playMode = settings.get<PlayMode>('playMode') || 'sequence'
     audio.setVolume(this.volume)
+
+    const tracks = await getAllTracks()
+    runInAction(() => {
+      this.tracks = tracks
+    })
   }
 
-  private save() {
-    storage.set('tracks', this.tracks)
-    storage.set('volume', this.volume)
-    storage.set('playMode', this.playMode)
+  private saveSettings() {
+    settings.set('volume', this.volume)
+    settings.set('playMode', this.playMode)
   }
 
   private setupAudio() {
@@ -63,7 +74,7 @@ class Store extends BaseStore {
         this.duration = duration
         if (this.currentTrack && this.currentTrack.duration === 0) {
           this.currentTrack.duration = duration
-          this.save()
+          putTracks([this.currentTrack])
         }
       })
     }
@@ -91,24 +102,94 @@ class Store extends BaseStore {
     )
   }
 
+  private searchFileTask: tinker.SearchFileTask | null = null
+
   setSearchQuery(query: string) {
     this.searchQuery = query
+    this.debouncedFileSearch(query)
+  }
+
+  private debouncedFileSearch = debounce((query: string) => {
+    this.searchFiles(query)
+  }, 300)
+
+  private async searchFiles(query: string) {
+    if (this.searchFileTask) {
+      this.searchFileTask.kill()
+      this.searchFileTask = null
+    }
+
+    if (!query.trim()) {
+      runInAction(() => {
+        this.fileSearchResults = []
+        this.isSearchingFiles = false
+      })
+      return
+    }
+
+    runInAction(() => {
+      this.isSearchingFiles = true
+    })
+
+    try {
+      const task = tinker.searchFile(query, {
+        exts: AUDIO_EXTS,
+        maxResults: 20,
+      })
+      this.searchFileTask = task
+      const results = await task
+      runInAction(() => {
+        this.fileSearchResults = results.map((r) => ({
+          path: r.path,
+          name: r.path.split('/').pop() || r.path,
+        }))
+        this.isSearchingFiles = false
+      })
+    } catch {
+      runInAction(() => {
+        this.fileSearchResults = []
+        this.isSearchingFiles = false
+      })
+    }
+  }
+
+  async addFromSearchResult(filePath: string) {
+    const exists = this.tracks.some((t) => t.path === filePath)
+    if (exists) return
+    await this.addFiles([filePath])
+    this.searchQuery = ''
+    this.fileSearchResults = []
   }
 
   async addFiles(filePaths: string[]) {
-    const newTracks: Track[] = filePaths.map((path) => {
-      const fileName = path.split('/').pop() || path
-      const title = fileName.replace(/\.[^.]+$/, '')
-      return {
+    const newTracks: Track[] = []
+    for (const filePath of filePaths) {
+      const fileName = filePath.split('/').pop() || filePath
+      const baseName = fileName.replace(/\.[^.]+$/, '')
+      const track: Track = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        title,
-        artist: 'Unknown',
+        title: baseName,
+        artist: '',
+        album: '',
         duration: 0,
-        path,
+        path: filePath,
       }
+      try {
+        const info = await tinker.getMediaInfo(filePath)
+        if (info.metadata?.title) track.title = info.metadata.title
+        if (info.metadata?.artist) track.artist = info.metadata.artist
+        if (info.metadata?.album) track.album = info.metadata.album
+        if (info.duration) track.duration = info.duration
+        if (info.audioStream?.cover) track.cover = info.audioStream.cover
+      } catch {
+        // Use filename as fallback
+      }
+      newTracks.push(track)
+    }
+    runInAction(() => {
+      this.tracks.push(...newTracks)
     })
-    this.tracks.push(...newTracks)
-    this.save()
+    await putTracks(newTracks)
   }
 
   removeTrack(id: string) {
@@ -122,7 +203,7 @@ class Store extends BaseStore {
       this.currentIndex--
     }
     this.tracks.splice(index, 1)
-    this.save()
+    dbRemoveTrack(id)
   }
 
   async playTrack(index: number) {
@@ -203,12 +284,12 @@ class Store extends BaseStore {
   setVolume(volume: number) {
     this.volume = volume
     audio.setVolume(volume)
-    this.save()
+    this.saveSettings()
   }
 
   setPlayMode(mode: PlayMode) {
     this.playMode = mode
-    this.save()
+    this.saveSettings()
   }
 
   cyclePlayMode() {

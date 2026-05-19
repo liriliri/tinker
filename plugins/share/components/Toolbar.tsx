@@ -2,6 +2,8 @@ import React, {
   ButtonHTMLAttributes,
   ReactNode,
   useRef,
+  useEffect,
+  useState,
   MouseEvent,
 } from 'react'
 import { Search, X } from 'lucide-react'
@@ -193,15 +195,14 @@ const toolbarTextInputClassName = `w-32 px-2 py-1 text-xs rounded border ${tw.bo
 
 export type ToolbarTextInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
-export function ToolbarTextInput({
-  className = '',
-  type = 'text',
-  ...rest
-}: ToolbarTextInputProps) {
+export const ToolbarTextInput = React.forwardRef<
+  HTMLInputElement,
+  ToolbarTextInputProps
+>(({ className = '', type = 'text', ...rest }, ref) => {
   const combinedClassName = `${toolbarTextInputClassName} ${className}`.trim()
 
-  return <input type={type} className={combinedClassName} {...rest} />
-}
+  return <input ref={ref} type={type} className={combinedClassName} {...rest} />
+})
 
 export const TOOLBAR_ICON_SIZE = 14
 
@@ -255,11 +256,22 @@ export function ToolbarColor({
   )
 }
 
+export interface ToolbarSearchDropdownItem {
+  id: string
+  label: string
+  icon?: ReactNode
+  description?: string
+}
+
 interface ToolbarSearchProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  dropdownItems?: ToolbarSearchDropdownItem[]
+  dropdownLoading?: boolean
+  onDropdownSelect?: (item: ToolbarSearchDropdownItem) => void
+  shortcut?: string
 }
 
 export function ToolbarSearch({
@@ -267,16 +279,76 @@ export function ToolbarSearch({
   onChange,
   placeholder,
   className = '',
+  dropdownItems,
+  dropdownLoading,
+  onDropdownSelect,
+  shortcut,
 }: ToolbarSearchProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isFocused, setIsFocused] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const showDropdown =
+    isFocused &&
+    value.trim() &&
+    ((dropdownItems && dropdownItems.length > 0) || dropdownLoading)
+
+  useEffect(() => {
+    setActiveIndex(-1)
+  }, [dropdownItems])
+
+  useEffect(() => {
+    if (!shortcut) return
+    const handler = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const modifier = isMac ? e.metaKey : e.ctrlKey
+      if (modifier && e.key.toLowerCase() === shortcut.toLowerCase()) {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [shortcut])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || !dropdownItems) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.min(i + 1, dropdownItems.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault()
+      onDropdownSelect?.(dropdownItems[activeIndex])
+    } else if (e.key === 'Escape') {
+      inputRef.current?.blur()
+    }
+  }
+
+  const handleBlur = (e: React.FocusEvent) => {
+    if (containerRef.current?.contains(e.relatedTarget as Node)) return
+    setIsFocused(false)
+  }
+
   return (
-    <div className={`relative w-48 ml-2 ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative w-48 ml-2 ${className}`}
+      onBlur={handleBlur}
+    >
       <Search
         size={14}
         className={`absolute left-2 top-1/2 -translate-y-1/2 ${tw.text.tertiary}`}
       />
       <ToolbarTextInput
+        ref={inputRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className={`w-full pl-7 pr-7 py-1 ${tw.bg.input} ${tw.primary.focusBorder} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`}
       />
@@ -287,6 +359,41 @@ export function ToolbarSearch({
         >
           <X size={14} />
         </button>
+      )}
+      {showDropdown && (
+        <div
+          className={`absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-md shadow-lg border z-50 ${tw.bg.primary} ${tw.border}`}
+        >
+          {dropdownLoading &&
+            (!dropdownItems || dropdownItems.length === 0) && (
+              <div
+                className={`px-3 py-2 text-xs ${tw.text.tertiary} animate-pulse`}
+              >
+                ...
+              </div>
+            )}
+          {dropdownItems?.map((item, index) => (
+            <button
+              key={item.id}
+              tabIndex={-1}
+              className={`w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs cursor-pointer ${
+                index === activeIndex ? tw.bg.select : tw.hover
+              }`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => onDropdownSelect?.(item)}
+              title={item.description}
+            >
+              {item.icon && (
+                <span className={`flex-shrink-0 ${tw.text.tertiary}`}>
+                  {item.icon}
+                </span>
+              )}
+              <span className={`truncate ${tw.text.primary}`}>
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   )

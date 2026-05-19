@@ -120,6 +120,14 @@ declare global {
       /** in Hz */
       sampleRate?: number
       bitrate?: number
+      /** JPEG data URL, extracted from embedded cover art */
+      cover?: string
+    }
+
+    interface MediaMetadata {
+      title?: string
+      artist?: string
+      album?: string
     }
 
     interface MediaInfo {
@@ -127,6 +135,8 @@ declare global {
       size: number
       /** in seconds */
       duration: number
+      /** file-level metadata (title, artist, album) */
+      metadata?: MediaMetadata
       /** present only if the file contains a video stream */
       videoStream?: VideoStream
       /** present only if the file contains an audio stream */
@@ -248,6 +258,10 @@ declare global {
       offset?: number
       /** Maximum number of results (default: 50) */
       maxResults?: number
+      /** Restrict search to specific directories */
+      dirs?: string[]
+      /** Filter by file extensions (without dot), e.g. ['mp3', 'flac'] */
+      exts?: string[]
     }
 
     interface SearchFileTask extends Promise<SearchFileResult[]> {
@@ -463,13 +477,17 @@ declare global {
 
     /**
      * Search files on the system.
-     * Uses Everything on Windows. Returns empty array on other platforms.
+     * Uses Spotlight on macOS and Everything on Windows.
+     * Returns empty array on other platforms.
      * @param query - Search query string
-     * @param options - Optional pagination options
+     * @param options - Optional search options
      * @example
      * const task = tinker.searchFile('*.pdf')
      * task.kill() // cancel the search
      * const results = await task
+     * @example
+     * // Search audio files in specific directories
+     * const task = tinker.searchFile('song', { dirs: ['/Users/me/Music'], exts: ['mp3', 'flac'] })
      */
     searchFile(
       query: string,

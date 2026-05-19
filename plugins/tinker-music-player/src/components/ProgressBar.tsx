@@ -44,12 +44,19 @@ export function ProgressBar({ value, max, onChange }: ProgressBarProps) {
   return (
     <div
       ref={trackRef}
-      className={`group relative h-1 hover:h-1.5 rounded-full ${tw.bg.input} cursor-pointer transition-all`}
+      className="group relative h-3 cursor-pointer"
       onMouseDown={handleMouseDown}
     >
       <div
-        className={`absolute h-full rounded-full ${tw.primary.bg} pointer-events-none`}
+        className={`absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 ${tw.bg.input}`}
+      />
+      <div
+        className={`absolute top-1/2 -translate-y-1/2 h-0.5 ${tw.primary.bg} pointer-events-none`}
         style={{ width: `${percentage}%` }}
+      />
+      <div
+        className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full ${tw.primary.bg} shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
+        style={{ left: `calc(${percentage}% - 5px)` }}
       />
     </div>
   )
@@ -90,12 +97,16 @@ export function VolumeBar({ value, onChange }: VolumeBarProps) {
   return (
     <div
       ref={trackRef}
-      className={`relative h-1 w-20 rounded-full ${tw.bg.input} cursor-pointer`}
+      className={`group relative h-1 w-20 rounded-full ${tw.bg.input} cursor-pointer`}
       onMouseDown={handleMouseDown}
     >
       <div
         className={`absolute h-full rounded-full ${tw.primary.bg} pointer-events-none`}
         style={{ width: `${percentage}%` }}
+      />
+      <div
+        className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full ${tw.primary.bg} shadow-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
+        style={{ left: `calc(${percentage}% - 5px)` }}
       />
     </div>
   )

@@ -18,12 +18,20 @@ export interface AudioStream {
   codec: string
   sampleRate?: number
   bitrate?: number
+  cover?: string
+}
+
+export interface MediaMetadata {
+  title?: string
+  artist?: string
+  album?: string
 }
 
 export interface MediaInfo {
   /** in bytes */
   size: number
   duration: number
+  metadata?: MediaMetadata
   videoStream?: VideoStream
   audioStream?: AudioStream
 }
@@ -66,6 +74,7 @@ const regVideoStream =
 const regVideoBitrate = /Stream[^\n]*?: Video:[^\n]*?(\d+) kb\/s/
 const regAudioStream = /Stream[^\n]*?: Audio: (\w+)[^\n]*?(\d+) Hz/
 const regAudioBitrate = /Stream[^\n]*?: Audio:[^\n]*?(\d+) kb\/s/
+const regMetadata = /^\s{4}(\w+)\s*:\s*(.+)$/gm
 
 function getFFmpegPath(): string {
   let ffmpegPath = ffmpegStatic || ''
@@ -290,6 +299,19 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
         }
       }
 
+      const metadata: MediaMetadata = {}
+      let match: RegExpExecArray | null
+      while ((match = regMetadata.exec(stderrData)) !== null) {
+        const key = match[1].toLowerCase()
+        const value = match[2].trim()
+        if (key === 'title') metadata.title = value
+        else if (key === 'artist') metadata.artist = value
+        else if (key === 'album') metadata.album = value
+      }
+      if (metadata.title || metadata.artist || metadata.album) {
+        info.metadata = metadata
+      }
+
       resolve(info)
     })
 
@@ -305,9 +327,49 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
       filePath,
       info.duration * 0.1
     )
+  } else if (info.audioStream) {
+    try {
+      info.audioStream.cover = await extractCover(filePath)
+    } catch {
+      // No cover art embedded
+    }
   }
 
   return info
+}
+
+function extractCover(filePath: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const ffmpegProcess = spawn(getFFmpegPath(), [
+      '-i',
+      filePath,
+      '-an',
+      '-vcodec',
+      'mjpeg',
+      '-f',
+      'image2pipe',
+      'pipe:1',
+    ])
+
+    const chunks: Buffer[] = []
+
+    ffmpegProcess.stdout?.on('data', (data: Buffer) => {
+      chunks.push(data)
+    })
+
+    ffmpegProcess.on('close', () => {
+      if (chunks.length === 0) {
+        reject(new Error('No cover art found'))
+        return
+      }
+      const buffer = Buffer.concat(chunks)
+      resolve(`data:image/jpeg;base64,${buffer.toString('base64')}`)
+    })
+
+    ffmpegProcess.on('error', (err) => {
+      reject(err)
+    })
+  })
 }
 
 function generateThumbnail(

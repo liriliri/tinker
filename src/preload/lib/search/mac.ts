@@ -2,22 +2,41 @@ import { spawn, ChildProcess } from 'child_process'
 import trim from 'licia/trim'
 import startWith from 'licia/startWith'
 import toInt from 'licia/toInt'
+import map from 'licia/map'
 import { SearchFileResult } from './index'
 
 export function searchFile(
   query: string,
   offset: number,
-  maxResults: number
+  maxResults: number,
+  dirs?: string[],
+  exts?: string[]
 ): { process: ChildProcess; promise: Promise<SearchFileResult[]> } {
-  const args = [
-    '-name',
-    query,
+  const args: string[] = []
+
+  if (dirs && dirs.length > 0) {
+    for (const dir of dirs) {
+      args.push('-onlyin', dir)
+    }
+  }
+
+  if (exts && exts.length > 0) {
+    const extConditions = map(exts, (ext) => `kMDItemFSName == "*.${ext}"`)
+    const extQuery = `(${extConditions.join(
+      ' || '
+    )}) && kMDItemFSName == "*${query}*"cd`
+    args.push(extQuery)
+  } else {
+    args.push('-name', query)
+  }
+
+  args.push(
     '-0',
     '-attr',
     'kMDItemFSSize',
     '-attr',
-    'kMDItemFSContentChangeDate',
-  ]
+    'kMDItemFSContentChangeDate'
+  )
 
   const mdfindProcess = spawn('mdfind', args)
   const results: SearchFileResult[] = []

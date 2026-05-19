@@ -2,11 +2,13 @@
   "import": "导入",
   "search": "搜索",
   "title": "标题",
+  "album": "专辑",
   "duration": "时长",
   "remove": "移除",
   "noTrack": "未在播放",
   "emptyPlaylist": "暂无音乐，点击导入添加文件",
   "modeSequence": "顺序播放",
   "modeLoop": "单曲循环",
-  "modeShuffle": "随机播放"
+  "modeShuffle": "随机播放",
+  "unknownArtist": "未知艺术家"
 }

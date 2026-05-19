@@ -15,15 +15,29 @@ export interface SearchFileResult {
 export interface SearchFileOptions {
   offset?: number
   maxResults?: number
+  dirs?: string[]
+  exts?: string[]
 }
 
 class SearchTask {
   private searchProcess: ChildProcess | null = null
   private promise: Promise<SearchFileResult[]>
 
-  constructor(query: string, offset: number, maxResults: number) {
+  constructor(
+    query: string,
+    offset: number,
+    maxResults: number,
+    dirs?: string[],
+    exts?: string[]
+  ) {
     if (isMac) {
-      const { process, promise } = searchFileMac(query, offset, maxResults)
+      const { process, promise } = searchFileMac(
+        query,
+        offset,
+        maxResults,
+        dirs,
+        exts
+      )
       this.searchProcess = process
       this.promise = promise
     } else if (isWindows) {
@@ -72,7 +86,13 @@ class SearchTaskManager {
     }
 
     const taskId = uuid()
-    const task = new SearchTask(trimmed, offset, maxResults)
+    const task = new SearchTask(
+      trimmed,
+      offset,
+      maxResults,
+      options.dirs,
+      options.exts
+    )
     this.tasks.set(taskId, task)
 
     const promise = task.getPromise().finally(() => {
