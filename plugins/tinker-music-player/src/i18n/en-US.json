@@ -1,0 +1,12 @@
+{
+  "import": "Import",
+  "search": "Search",
+  "title": "Title",
+  "duration": "Duration",
+  "remove": "Remove",
+  "noTrack": "No track playing",
+  "emptyPlaylist": "No music yet. Click Import to add files.",
+  "modeSequence": "Sequential",
+  "modeLoop": "Loop",
+  "modeShuffle": "Shuffle"
+}

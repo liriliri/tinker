@@ -1,0 +1,22 @@
+{
+  "name": "tinker-music-player",
+  "version": "0.1.0",
+  "description": "Local music player for TINKER",
+  "scripts": {
+    "dev": "vite --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "embedded": false,
+  "tinker": {
+    "name": "Music Player",
+    "description": "Play local music files with playlist management",
+    "main": "dist/index.html",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "音乐播放",
+        "description": "播放本地音乐文件，支持播放列表管理"
+      }
+    }
+  }
+}
