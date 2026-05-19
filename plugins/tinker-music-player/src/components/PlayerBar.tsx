@@ -9,6 +9,7 @@ import {
   Shuffle,
   Repeat2,
   List,
+  ListMusic,
   Music,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -36,7 +37,7 @@ const PlayerBar = observer(() => {
   const ModeIcon = PLAY_MODE_ICONS[store.playMode]
 
   return (
-    <div className={`relative ${tw.bg.primary}`}>
+    <div className={`relative ${tw.bg.secondary}`}>
       {/* Progress bar at top like a border */}
       <div className="absolute -top-1.5 left-0 right-0 z-10">
         <ProgressBar
@@ -136,6 +137,16 @@ const PlayerBar = observer(() => {
               onChange={(v) => store.setVolume(v)}
             />
           </div>
+
+          <button
+            onClick={() => store.togglePlayQueue()}
+            className={`p-1.5 rounded-full ${tw.hover} ${
+              store.showPlayQueue ? tw.primary.text : tw.text.secondary
+            } transition-colors`}
+            title={t('playQueue')}
+          >
+            <ListMusic size={15} />
+          </button>
         </div>
       </div>
     </div>

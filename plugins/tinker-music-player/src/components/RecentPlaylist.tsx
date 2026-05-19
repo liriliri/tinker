@@ -5,16 +5,15 @@ import {
   ColDef,
   GetRowIdParams,
   CellDoubleClickedEvent,
-  CellContextMenuEvent,
 } from 'ag-grid-community'
 import Grid from 'share/components/Grid'
 import store from '../store'
 import { formatTime } from '../lib/util'
 import { TitleCellRenderer, TrackRowData } from './TrackCell'
 
-const Playlist = observer(() => {
+const RecentPlaylist = observer(() => {
   const { t } = useTranslation()
-  const tracks = store.filteredTracks
+  const recentTracks = store.recentTracks
 
   const columnDefs: ColDef<TrackRowData>[] = useMemo(
     () => [
@@ -30,7 +29,7 @@ const Playlist = observer(() => {
         headerName: t('title'),
         flex: 2,
         minWidth: 200,
-        sortable: true,
+        sortable: false,
         cellRenderer: TitleCellRenderer,
       },
       {
@@ -38,13 +37,20 @@ const Playlist = observer(() => {
         headerName: t('album'),
         flex: 1,
         minWidth: 100,
-        sortable: true,
+        sortable: false,
+      },
+      {
+        field: 'album',
+        headerName: t('album'),
+        flex: 1,
+        minWidth: 100,
+        sortable: false,
       },
       {
         field: 'duration',
         headerName: t('duration'),
         width: 80,
-        sortable: true,
+        sortable: false,
         valueFormatter: (params) =>
           params.value > 0 ? formatTime(params.value) : '--:--',
       },
@@ -54,7 +60,7 @@ const Playlist = observer(() => {
 
   const rowData: TrackRowData[] = useMemo(
     () =>
-      tracks.map((track, index) => ({
+      recentTracks.map((track, index) => ({
         id: track.id,
         index: index + 1,
         title: track.title,
@@ -64,62 +70,27 @@ const Playlist = observer(() => {
         cover: track.cover,
         path: track.path,
       })),
-    [tracks]
+    [recentTracks]
   )
 
   const getRowId = useCallback(
-    (params: GetRowIdParams<TrackRowData>) => params.data.id,
+    (params: GetRowIdParams<TrackRowData>) =>
+      `${params.data.id}-${params.data.index}`,
     []
   )
 
   const onCellDoubleClicked = useCallback(
     (event: CellDoubleClickedEvent<TrackRowData>) => {
       if (event.data) {
-        const realIndex = store.tracks.findIndex((t) => t.id === event.data!.id)
+        const realIndex = store.tracks.findIndex(
+          (t) => t.path === event.data!.path
+        )
         if (realIndex >= 0) {
           store.playTrack(realIndex)
         }
       }
     },
     []
-  )
-
-  const handleCellContextMenu = useCallback(
-    (event: CellContextMenuEvent<TrackRowData>) => {
-      if (event.data && event.event) {
-        const e = event.event as MouseEvent
-        e.preventDefault()
-        const trackId = event.data!.id
-        const isFav = store.isTrackInFavorite(trackId)
-        const sheetMenuItems = store.customSheets.map((sheet) => ({
-          label: sheet.title,
-          click: () => store.addTrackToSheet(trackId, sheet.id),
-        }))
-
-        tinker.showContextMenu(e.clientX, e.clientY, [
-          {
-            label: isFav ? t('removeFromFavorite') : t('addToFavorite'),
-            click: () => store.toggleFavorite(trackId),
-          },
-          ...(sheetMenuItems.length > 0
-            ? [{ label: t('addToSheet'), submenu: sheetMenuItems }]
-            : []),
-          { type: 'separator' as const },
-          {
-            label: t('remove'),
-            click: () => store.removeTrack(trackId),
-          },
-        ])
-      }
-    },
-    [t]
-  )
-
-  const localeText = useMemo(
-    () => ({
-      noRowsToShow: t('emptyPlaylist'),
-    }),
-    [t]
   )
 
   return (
@@ -137,12 +108,11 @@ const Playlist = observer(() => {
         enableClickSelection: true,
       }}
       onCellDoubleClicked={onCellDoubleClicked}
-      onCellContextMenu={handleCellContextMenu}
       suppressCellFocus={true}
       animateRows={true}
-      localeText={localeText}
+      localeText={{ noRowsToShow: t('emptyRecent') }}
     />
   )
 })
 
-export default Playlist
+export default RecentPlaylist

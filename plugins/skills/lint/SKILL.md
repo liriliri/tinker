@@ -66,7 +66,7 @@ Go through each category below and report violations with file path and line num
 ### 7. Internationalization
 
 - UI strings must use `t()` from `react-i18next`, not hardcoded strings
-- i18n files must exist: `src/i18n/index.ts`, `src/i18n/locales/en-US.json`, `src/i18n/locales/zh-CN.json`
+- i18n files must exist: `src/i18n/en-US.json`, `src/i18n/zh-CN.json`
 - i18n keys must use camelCase naming — no dots (`.`) or other symbols (e.g. use `categoryAll` not `category.all`, `ruleSysTmp` not `rule.sysTmp`)
 
 ### 8. Code Comments

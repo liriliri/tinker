@@ -6,26 +6,39 @@ import debounce from 'licia/debounce'
 import audio from './lib/audio'
 import {
   Track,
+  RecentTrack,
+  MusicSheet,
   getAllTracks,
   putTracks,
   removeTrack as dbRemoveTrack,
+  addRecentTrack,
+  getRecentTracks,
+  getAllSheets,
+  putSheet,
+  removeSheet as dbRemoveSheet,
 } from './lib/db'
 
-import { PlayMode } from './types'
+import { PlayMode, SideTab } from './types'
 
-export interface FileSearchResult {
+interface FileSearchResult {
   path: string
   name: string
 }
 
 const AUDIO_EXTS = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma']
+const FAVORITE_SHEET_ID = 'favorite'
 
 const settings = new LocalStore('tinker-music-player-settings')
 
 class Store extends BaseStore {
   tracks: Track[] = []
+  recentTracks: RecentTrack[] = []
+  sheets: MusicSheet[] = []
+  activeTab: SideTab = 'local'
+  activeSheetId: string = ''
   currentIndex: number = -1
   isPlaying: boolean = false
+  showPlayQueue: boolean = false
   currentTime: number = 0
   duration: number = 0
   volume: number = 0.8
@@ -47,8 +60,22 @@ class Store extends BaseStore {
     audio.setVolume(this.volume)
 
     const tracks = await getAllTracks()
+    const recentTracks = await getRecentTracks()
+    const sheets = await getAllSheets()
     runInAction(() => {
       this.tracks = tracks
+      this.recentTracks = recentTracks
+      this.sheets = sheets
+      if (!sheets.find((s) => s.id === FAVORITE_SHEET_ID)) {
+        const favoriteSheet: MusicSheet = {
+          id: FAVORITE_SHEET_ID,
+          title: '',
+          trackIds: [],
+          createdAt: 0,
+        }
+        this.sheets.unshift(favoriteSheet)
+        putSheet(favoriteSheet)
+      }
     })
   }
 
@@ -83,6 +110,100 @@ class Store extends BaseStore {
       runInAction(() => {
         this.isPlaying = false
       })
+    }
+  }
+
+  setActiveTab(tab: SideTab, sheetId?: string) {
+    this.activeTab = tab
+    if (tab === 'favorite') {
+      this.activeSheetId = FAVORITE_SHEET_ID
+    } else if (sheetId) {
+      this.activeSheetId = sheetId
+    }
+  }
+
+  togglePlayQueue() {
+    this.showPlayQueue = !this.showPlayQueue
+  }
+
+  get favoriteSheet(): MusicSheet | undefined {
+    return this.sheets.find((s) => s.id === FAVORITE_SHEET_ID)
+  }
+
+  get customSheets(): MusicSheet[] {
+    return this.sheets.filter((s) => s.id !== FAVORITE_SHEET_ID)
+  }
+
+  get activeSheetTracks(): Track[] {
+    const sheet = this.sheets.find((s) => s.id === this.activeSheetId)
+    if (!sheet) return []
+    return sheet.trackIds
+      .map((id) => this.tracks.find((t) => t.id === id))
+      .filter(Boolean) as Track[]
+  }
+
+  isTrackInFavorite(trackId: string): boolean {
+    const fav = this.favoriteSheet
+    return fav ? fav.trackIds.includes(trackId) : false
+  }
+
+  async toggleFavorite(trackId: string) {
+    const fav = this.favoriteSheet
+    if (!fav) return
+    const newTrackIds = fav.trackIds.includes(trackId)
+      ? fav.trackIds.filter((id) => id !== trackId)
+      : [...fav.trackIds, trackId]
+    const updated = { ...fav, trackIds: newTrackIds }
+    this.sheets = this.sheets.map((s) => (s.id === fav.id ? updated : s))
+    await putSheet(updated)
+  }
+
+  async addTrackToSheet(trackId: string, sheetId: string) {
+    const sheet = this.sheets.find((s) => s.id === sheetId)
+    if (!sheet || sheet.trackIds.includes(trackId)) return
+    const updated = { ...sheet, trackIds: [...sheet.trackIds, trackId] }
+    this.sheets = this.sheets.map((s) => (s.id === sheetId ? updated : s))
+    await putSheet(updated)
+  }
+
+  async removeTrackFromSheet(trackId: string, sheetId: string) {
+    const sheet = this.sheets.find((s) => s.id === sheetId)
+    if (!sheet) return
+    const updated = {
+      ...sheet,
+      trackIds: sheet.trackIds.filter((id) => id !== trackId),
+    }
+    this.sheets = this.sheets.map((s) => (s.id === sheetId ? updated : s))
+    await putSheet(updated)
+  }
+
+  async createSheet(title: string) {
+    const sheet: MusicSheet = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      title,
+      trackIds: [],
+      createdAt: Date.now(),
+    }
+    this.sheets.push(sheet)
+    await putSheet(sheet)
+    return sheet
+  }
+
+  async renameSheet(sheetId: string, title: string) {
+    const sheet = this.sheets.find((s) => s.id === sheetId)
+    if (!sheet) return
+    const updated = { ...sheet, title }
+    this.sheets = this.sheets.map((s) => (s.id === sheetId ? updated : s))
+    await putSheet(updated)
+  }
+
+  async deleteSheet(sheetId: string) {
+    if (sheetId === FAVORITE_SHEET_ID) return
+    this.sheets = this.sheets.filter((s) => s.id !== sheetId)
+    await dbRemoveSheet(sheetId)
+    if (this.activeSheetId === sheetId) {
+      this.activeTab = 'local'
+      this.activeSheetId = ''
     }
   }
 
@@ -164,6 +285,7 @@ class Store extends BaseStore {
   async addFiles(filePaths: string[]) {
     const newTracks: Track[] = []
     for (const filePath of filePaths) {
+      if (this.tracks.some((t) => t.path === filePath)) continue
       const fileName = filePath.split('/').pop() || filePath
       const baseName = fileName.replace(/\.[^.]+$/, '')
       const track: Track = {
@@ -186,10 +308,33 @@ class Store extends BaseStore {
       }
       newTracks.push(track)
     }
+    if (newTracks.length === 0) return
     runInAction(() => {
       this.tracks.push(...newTracks)
     })
     await putTracks(newTracks)
+
+    if (
+      (this.activeTab === 'favorite' || this.activeTab === 'sheet') &&
+      this.activeSheetId
+    ) {
+      const sheet = this.sheets.find((s) => s.id === this.activeSheetId)
+      if (sheet) {
+        const newIds = newTracks
+          .map((t) => t.id)
+          .filter((id) => !sheet.trackIds.includes(id))
+        if (newIds.length > 0) {
+          const updated = {
+            ...sheet,
+            trackIds: [...sheet.trackIds, ...newIds],
+          }
+          this.sheets = this.sheets.map((s) =>
+            s.id === this.activeSheetId ? updated : s
+          )
+          await putSheet(updated)
+        }
+      }
+    }
   }
 
   removeTrack(id: string) {
@@ -214,6 +359,13 @@ class Store extends BaseStore {
       await audio.play(`file://${track.path}`)
       runInAction(() => {
         this.isPlaying = true
+      })
+      addRecentTrack(track).then(() => {
+        getRecentTracks().then((recent) => {
+          runInAction(() => {
+            this.recentTracks = recent
+          })
+        })
       })
     } catch {
       runInAction(() => {

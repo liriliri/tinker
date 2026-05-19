@@ -50,7 +50,7 @@ Read all target files and check for the following categories of redundancy:
 
 ### 7. Unused i18n Keys
 
-- Keys defined in `src/i18n/locales/*.json` that are never referenced via `t('key')` anywhere in the plugin's `.ts`/`.tsx` files
+- Keys defined in `src/i18n/*.json` that are never referenced via `t('key')` anywhere in the plugin's `.ts`/`.tsx` files
 - Check both locale files (`en-US.json` and `zh-CN.json`) — a key is unused only if it is absent from **all** `t()` calls across the entire plugin source
 
 ## Output Format
@@ -68,7 +68,7 @@ Example:
 [Duplicate Logic] src/components/MediaList.tsx:50,158 — handleContextMenu is identical in ImageCard and MediaRow; extract to a shared hook
 [Duplicate Type] src/components/MediaList.tsx:43,151 — MediaItemProps and MediaRowProps are identical; remove one
 [Unreferenced] src/components/EditProviderDialog.tsx — file is never imported by any other file in the plugin; delete it
-[i18n] src/i18n/locales/en-US.json:12 — key "outputDir" is defined but never used via t()
+[i18n] src/i18n/en-US.json:12 — key "outputDir" is defined but never used via t()
 ```
 
 If no issues are found, report: **No redundancies found.**

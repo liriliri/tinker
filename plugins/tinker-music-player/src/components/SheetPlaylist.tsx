@@ -12,9 +12,9 @@ import store from '../store'
 import { formatTime } from '../lib/util'
 import { TitleCellRenderer, TrackRowData } from './TrackCell'
 
-const Playlist = observer(() => {
+const SheetPlaylist = observer(() => {
   const { t } = useTranslation()
-  const tracks = store.filteredTracks
+  const tracks = store.activeSheetTracks
 
   const columnDefs: ColDef<TrackRowData>[] = useMemo(
     () => [
@@ -30,7 +30,7 @@ const Playlist = observer(() => {
         headerName: t('title'),
         flex: 2,
         minWidth: 200,
-        sortable: true,
+        sortable: false,
         cellRenderer: TitleCellRenderer,
       },
       {
@@ -38,13 +38,13 @@ const Playlist = observer(() => {
         headerName: t('album'),
         flex: 1,
         minWidth: 100,
-        sortable: true,
+        sortable: false,
       },
       {
         field: 'duration',
         headerName: t('duration'),
         width: 80,
-        sortable: true,
+        sortable: false,
         valueFormatter: (params) =>
           params.value > 0 ? formatTime(params.value) : '--:--',
       },
@@ -89,36 +89,15 @@ const Playlist = observer(() => {
       if (event.data && event.event) {
         const e = event.event as MouseEvent
         e.preventDefault()
-        const trackId = event.data!.id
-        const isFav = store.isTrackInFavorite(trackId)
-        const sheetMenuItems = store.customSheets.map((sheet) => ({
-          label: sheet.title,
-          click: () => store.addTrackToSheet(trackId, sheet.id),
-        }))
-
         tinker.showContextMenu(e.clientX, e.clientY, [
           {
-            label: isFav ? t('removeFromFavorite') : t('addToFavorite'),
-            click: () => store.toggleFavorite(trackId),
-          },
-          ...(sheetMenuItems.length > 0
-            ? [{ label: t('addToSheet'), submenu: sheetMenuItems }]
-            : []),
-          { type: 'separator' as const },
-          {
-            label: t('remove'),
-            click: () => store.removeTrack(trackId),
+            label: t('removeFromSheet'),
+            click: () =>
+              store.removeTrackFromSheet(event.data!.id, store.activeSheetId),
           },
         ])
       }
     },
-    [t]
-  )
-
-  const localeText = useMemo(
-    () => ({
-      noRowsToShow: t('emptyPlaylist'),
-    }),
     [t]
   )
 
@@ -140,9 +119,9 @@ const Playlist = observer(() => {
       onCellContextMenu={handleCellContextMenu}
       suppressCellFocus={true}
       animateRows={true}
-      localeText={localeText}
+      localeText={{ noRowsToShow: t('emptySheet') }}
     />
   )
 })
 
-export default Playlist
+export default SheetPlaylist
