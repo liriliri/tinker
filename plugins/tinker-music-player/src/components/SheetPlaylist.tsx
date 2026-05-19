@@ -14,7 +14,7 @@ import { TitleCellRenderer, TrackRowData } from './TrackCell'
 
 const SheetPlaylist = observer(() => {
   const { t } = useTranslation()
-  const tracks = store.activeSheetTracks
+  const tracks = store.filteredSheetTracks
 
   const columnDefs: ColDef<TrackRowData>[] = useMemo(
     () => [

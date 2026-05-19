@@ -52,20 +52,16 @@ const Playlist = observer(() => {
     [t]
   )
 
-  const rowData: TrackRowData[] = useMemo(
-    () =>
-      tracks.map((track, index) => ({
-        id: track.id,
-        index: index + 1,
-        title: track.title,
-        artist: track.artist,
-        album: track.album,
-        duration: track.duration,
-        cover: track.cover,
-        path: track.path,
-      })),
-    [tracks]
-  )
+  const rowData: TrackRowData[] = tracks.map((track, index) => ({
+    id: track.id,
+    index: index + 1,
+    title: track.title,
+    artist: track.artist,
+    album: track.album,
+    duration: track.duration,
+    cover: track.cover,
+    path: track.path,
+  }))
 
   const getRowId = useCallback(
     (params: GetRowIdParams<TrackRowData>) => params.data.id,

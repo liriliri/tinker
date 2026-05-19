@@ -6,6 +6,8 @@ import SheetPlaylist from './components/SheetPlaylist'
 import Sidebar from './components/Sidebar'
 import PlayQueue from './components/PlayQueue'
 import MusicToolbar from './components/Toolbar'
+import ListToolbar from './components/ListToolbar'
+import LocalToolbar from './components/LocalToolbar'
 import { PromptProvider } from 'share/components/Prompt'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -32,8 +34,11 @@ const App = observer(function App() {
         <MusicToolbar />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
-          <div className="flex-1 overflow-hidden">
-            <MainContent />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {store.activeTab === 'local' ? <LocalToolbar /> : <ListToolbar />}
+            <div className="flex-1 overflow-hidden">
+              <MainContent />
+            </div>
           </div>
           {store.showPlayQueue && <PlayQueue />}
         </div>

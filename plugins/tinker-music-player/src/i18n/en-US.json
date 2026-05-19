@@ -24,5 +24,6 @@
   "modeSequence": "Sequential",
   "modeLoop": "Loop",
   "modeShuffle": "Shuffle",
-  "unknownArtist": "Unknown Artist"
+  "unknownArtist": "Unknown Artist",
+  "filter": "Filter"
 }

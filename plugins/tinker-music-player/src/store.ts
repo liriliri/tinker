@@ -45,6 +45,7 @@ class Store extends BaseStore {
   volume: number = 0.8
   playMode: PlayMode = 'sequence'
   searchQuery: string = ''
+  listFilter: string = ''
   fileSearchResults: FileSearchResult[] = []
   isSearchingFiles: boolean = false
 
@@ -127,6 +128,7 @@ class Store extends BaseStore {
 
   setActiveTab(tab: SideTab, sheetId?: string) {
     this.activeTab = tab
+    this.listFilter = ''
     if (tab === 'favorite') {
       this.activeSheetId = FAVORITE_SHEET_ID
     } else if (sheetId) {
@@ -230,12 +232,35 @@ class Store extends BaseStore {
   }
 
   get filteredTracks(): Track[] {
-    if (!this.searchQuery) return this.tracks
-    const q = this.searchQuery.toLowerCase()
+    if (!this.listFilter) return this.tracks
+    const q = this.listFilter.toLowerCase()
     return this.tracks.filter(
       (t) =>
         t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
     )
+  }
+
+  get filteredRecentTracks(): RecentTrack[] {
+    if (!this.listFilter) return this.recentTracks
+    const q = this.listFilter.toLowerCase()
+    return this.recentTracks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
+    )
+  }
+
+  get filteredSheetTracks(): Track[] {
+    const tracks = this.activeSheetTracks
+    if (!this.listFilter) return tracks
+    const q = this.listFilter.toLowerCase()
+    return tracks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
+    )
+  }
+
+  setListFilter(query: string) {
+    this.listFilter = query
   }
 
   private searchFileTask: tinker.SearchFileTask | null = null

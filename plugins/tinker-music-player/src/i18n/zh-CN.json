@@ -24,5 +24,6 @@
   "modeSequence": "顺序播放",
   "modeLoop": "单曲循环",
   "modeShuffle": "随机播放",
-  "unknownArtist": "未知艺术家"
+  "unknownArtist": "未知艺术家",
+  "filter": "筛选"
 }

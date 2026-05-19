@@ -13,7 +13,7 @@ import { TitleCellRenderer, TrackRowData } from './TrackCell'
 
 const RecentPlaylist = observer(() => {
   const { t } = useTranslation()
-  const recentTracks = store.recentTracks
+  const recentTracks = store.filteredRecentTracks
 
   const columnDefs: ColDef<TrackRowData>[] = useMemo(
     () => [

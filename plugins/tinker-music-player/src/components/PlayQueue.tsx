@@ -27,7 +27,7 @@ const PlayQueue = observer(() => {
         {store.tracks.map((track, index) => (
           <button
             key={track.id}
-            className={`w-full flex items-center gap-2 px-3 py-2 text-left ${
+            className={`w-full flex items-center gap-2 px-3 h-10 text-left ${
               tw.hover
             } ${index === store.currentIndex ? tw.active : ''}`}
             onDoubleClick={() => store.playTrack(index)}
