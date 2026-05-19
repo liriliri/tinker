@@ -102,6 +102,16 @@ export async function addRecentTrack(track: Track): Promise<void> {
   }
 }
 
+export async function putRecentTracks(tracks: RecentTrack[]): Promise<void> {
+  const db = await getDB()
+  const tx = db.transaction(RECENT_STORE, 'readwrite')
+  await tx.store.clear()
+  for (const track of tracks) {
+    tx.store.put(track)
+  }
+  await tx.done
+}
+
 export async function getRecentTracks(): Promise<RecentTrack[]> {
   const db = await getDB()
   const all = await db.getAllFromIndex(RECENT_STORE, 'by-playedAt')

@@ -11,8 +11,8 @@ import {
   getAllTracks,
   putTracks,
   removeTrack as dbRemoveTrack,
-  addRecentTrack,
   getRecentTracks,
+  putRecentTracks,
   getAllSheets,
   putSheet,
   removeSheet as dbRemoveSheet,
@@ -27,8 +27,9 @@ interface FileSearchResult {
 
 const AUDIO_EXTS = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma']
 const FAVORITE_SHEET_ID = 'favorite'
+const MAX_RECENT = 100
 
-const settings = new LocalStore('tinker-music-player-settings')
+const settings = new LocalStore('tinker-music-player')
 
 class Store extends BaseStore {
   tracks: Track[] = []
@@ -76,13 +77,24 @@ class Store extends BaseStore {
         this.sheets.unshift(favoriteSheet)
         putSheet(favoriteSheet)
       }
+
+      const savedTrackId = settings.get<string>('currentTrackId')
+      if (savedTrackId) {
+        const idx = this.tracks.findIndex((t) => t.id === savedTrackId)
+        if (idx !== -1) {
+          this.currentIndex = idx
+        }
+      }
     })
   }
 
-  private saveSettings() {
+  private debouncedSaveVolume = debounce(() => {
     settings.set('volume', this.volume)
-    settings.set('playMode', this.playMode)
-  }
+  }, 300)
+
+  private debouncedSaveRecent = debounce(() => {
+    putRecentTracks(this.recentTracks)
+  }, 1000)
 
   private setupAudio() {
     audio.onTimeUpdate = (currentTime, duration) => {
@@ -134,12 +146,15 @@ class Store extends BaseStore {
     return this.sheets.filter((s) => s.id !== FAVORITE_SHEET_ID)
   }
 
+  get trackMap(): Map<string, Track> {
+    return new Map(this.tracks.map((t) => [t.id, t]))
+  }
+
   get activeSheetTracks(): Track[] {
     const sheet = this.sheets.find((s) => s.id === this.activeSheetId)
     if (!sheet) return []
-    return sheet.trackIds
-      .map((id) => this.tracks.find((t) => t.id === id))
-      .filter(Boolean) as Track[]
+    const map = this.trackMap
+    return sheet.trackIds.map((id) => map.get(id)).filter(Boolean) as Track[]
   }
 
   isTrackInFavorite(trackId: string): boolean {
@@ -355,18 +370,19 @@ class Store extends BaseStore {
     if (index < 0 || index >= this.tracks.length) return
     this.currentIndex = index
     const track = this.tracks[index]
+    settings.set('currentTrackId', track.id)
     try {
       await audio.play(`file://${track.path}`)
       runInAction(() => {
         this.isPlaying = true
+        const existIdx = this.recentTracks.findIndex((t) => t.id === track.id)
+        if (existIdx !== -1) this.recentTracks.splice(existIdx, 1)
+        this.recentTracks.unshift({ ...track, playedAt: Date.now() })
+        if (this.recentTracks.length > MAX_RECENT) {
+          this.recentTracks.length = MAX_RECENT
+        }
       })
-      addRecentTrack(track).then(() => {
-        getRecentTracks().then((recent) => {
-          runInAction(() => {
-            this.recentTracks = recent
-          })
-        })
-      })
+      this.debouncedSaveRecent()
     } catch {
       runInAction(() => {
         this.isPlaying = false
@@ -436,12 +452,12 @@ class Store extends BaseStore {
   setVolume(volume: number) {
     this.volume = volume
     audio.setVolume(volume)
-    this.saveSettings()
+    this.debouncedSaveVolume()
   }
 
   setPlayMode(mode: PlayMode) {
     this.playMode = mode
-    this.saveSettings()
+    settings.set('playMode', this.playMode)
   }
 
   cyclePlayMode() {
