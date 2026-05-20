@@ -12,6 +12,8 @@ import {
   ListMusic,
   Music,
   Heart,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
@@ -36,12 +38,21 @@ const PlayerBar = observer(() => {
   const { t } = useTranslation()
   const track = store.currentTrack
   const ModeIcon = PLAY_MODE_ICONS[store.playMode]
+  const handleCoverClick = () => {
+    if (store.showMusicDetail) {
+      store.hideMusicDetail()
+    } else {
+      store.showMusicDetailView()
+    }
+  }
+
+  const CoverIcon = store.showMusicDetail ? Minimize2 : Maximize2
   const isFav = track ? store.isTrackInFavorite(track.id) : false
 
   return (
-    <div className={`relative ${tw.bg.secondary}`}>
+    <div className={`relative z-[60] ${tw.bg.secondary}`}>
       {/* Progress bar at top like a border */}
-      <div className="absolute -top-1.5 left-0 right-0 z-10">
+      <div className="absolute -top-1.5 left-0 right-0">
         <ProgressBar
           value={store.currentTime}
           max={store.duration}
@@ -56,15 +67,30 @@ const PlayerBar = observer(() => {
           {track ? (
             <>
               {track.cover ? (
-                <img
-                  src={track.cover}
-                  className="w-10 h-10 rounded-md object-cover flex-shrink-0 shadow-sm"
-                />
+                <div
+                  onClick={handleCoverClick}
+                  className="relative w-10 h-10 flex-shrink-0 cursor-default group"
+                >
+                  <img
+                    src={track.cover}
+                    className="w-10 h-10 rounded-md object-cover shadow-sm"
+                  />
+                  <div className="absolute inset-0 rounded-md bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <CoverIcon size={14} className="text-white" />
+                  </div>
+                </div>
               ) : (
                 <div
-                  className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${tw.bg.secondary}`}
+                  onClick={handleCoverClick}
+                  className={`relative w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 cursor-default group ${tw.bg.tertiary}`}
                 >
-                  <Music size={16} className={tw.text.tertiary} />
+                  <Music
+                    size={16}
+                    className={`${tw.text.tertiary} group-hover:opacity-0 transition-opacity`}
+                  />
+                  <div className="absolute inset-0 rounded-md bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <CoverIcon size={14} className="text-white" />
+                  </div>
                 </div>
               )}
               <div className="min-w-0 w-24 flex-shrink-0">
@@ -77,7 +103,9 @@ const PlayerBar = observer(() => {
                   {track.artist || t('unknownArtist')}
                 </div>
               </div>
-              <span className={`text-xs flex-shrink-0 ${tw.text.tertiary}`}>
+              <span
+                className={`text-xs flex-shrink-0 tabular-nums ${tw.text.tertiary}`}
+              >
                 {mediaDurationFormat(store.currentTime)}
                 <span className="opacity-50"> / </span>
                 {mediaDurationFormat(store.duration)}
@@ -104,13 +132,13 @@ const PlayerBar = observer(() => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => store.playPrev()}
-            className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
+            className={`p-1.5 rounded-full cursor-default ${tw.hover} ${tw.text.secondary} transition-colors`}
           >
             <SkipBack size={18} />
           </button>
           <button
             onClick={() => store.togglePlay()}
-            className={`p-2.5 rounded-full ${tw.primary.bg} text-white hover:opacity-90 transition-opacity shadow-sm`}
+            className={`p-2.5 rounded-full cursor-default ${tw.primary.bg} text-white hover:opacity-90 transition-opacity shadow-sm`}
           >
             {store.isPlaying ? (
               <Pause size={18} fill="currentColor" />
@@ -120,7 +148,7 @@ const PlayerBar = observer(() => {
           </button>
           <button
             onClick={() => store.playNext()}
-            className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
+            className={`p-1.5 rounded-full cursor-default ${tw.hover} ${tw.text.secondary} transition-colors`}
           >
             <SkipForward size={18} />
           </button>

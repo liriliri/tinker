@@ -4,6 +4,7 @@ import ffmpegStatic from 'ffmpeg-static'
 import uuid from 'licia/uuid'
 import toNum from 'licia/toNum'
 import { isDev } from 'share/common/util'
+import { decodeStr } from './util'
 
 export interface VideoStream {
   codec: string
@@ -250,13 +251,16 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
     const ffmpegPath = getFFmpegPath()
     const ffmpegProcess = spawn(ffmpegPath, ['-i', filePath])
 
-    let stderrData = ''
+    const stderrChunks: Buffer[] = []
 
     ffmpegProcess.stderr?.on('data', (data: Buffer) => {
-      stderrData += data.toString()
+      stderrChunks.push(data)
     })
 
     ffmpegProcess.on('close', () => {
+      const buffer = Buffer.concat(stderrChunks)
+      // Use latin1 to preserve raw bytes for regex parsing
+      const stderrData = buffer.toString('latin1')
       const durationMatch = stderrData.match(regDuration)
       if (!durationMatch) {
         reject(new Error('Not a valid media file'))
@@ -303,7 +307,7 @@ export async function getMediaInfo(filePath: string): Promise<MediaInfo> {
       let match: RegExpExecArray | null
       while ((match = regMetadata.exec(stderrData)) !== null) {
         const key = match[1].toLowerCase()
-        const value = match[2].trim()
+        const value = decodeStr(match[2].trim())
         if (key === 'title') metadata.title = value
         else if (key === 'artist') metadata.artist = value
         else if (key === 'album') metadata.album = value

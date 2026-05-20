@@ -2,61 +2,24 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useMemo, useCallback } from 'react'
 import {
-  ColDef,
   GetRowIdParams,
   CellDoubleClickedEvent,
   CellContextMenuEvent,
 } from 'ag-grid-community'
 import Grid from 'share/components/Grid'
 import store from '../store'
-import { mediaDurationFormat } from 'share/lib/util'
-import { TitleCellRenderer, TrackRowData } from './TrackCell'
+import { TrackRowData } from './TrackCell'
+import { useTrackColumns } from './useTrackColumns'
 
 const RecentPlaylist = observer(() => {
   const { t } = useTranslation()
   const recentTracks = store.filteredRecentTracks
-
-  const columnDefs: ColDef<TrackRowData>[] = useMemo(
-    () => [
-      {
-        field: 'index',
-        headerName: '#',
-        width: 50,
-        sortable: false,
-        suppressMovable: true,
-      },
-      {
-        field: 'title',
-        headerName: t('title'),
-        flex: 2,
-        minWidth: 200,
-        sortable: false,
-        cellRenderer: TitleCellRenderer,
-      },
-      {
-        field: 'album',
-        headerName: t('album'),
-        flex: 1,
-        minWidth: 100,
-        sortable: false,
-      },
-      {
-        field: 'duration',
-        headerName: t('duration'),
-        width: 80,
-        sortable: false,
-        valueFormatter: (params) =>
-          params.value > 0 ? mediaDurationFormat(params.value) : '--:--',
-      },
-    ],
-    [t]
-  )
+  const columnDefs = useTrackColumns()
 
   const rowData: TrackRowData[] = useMemo(
     () =>
-      recentTracks.map((track, index) => ({
+      recentTracks.map((track) => ({
         id: track.id,
-        index: index + 1,
         title: track.title,
         artist: track.artist,
         album: track.album,
@@ -68,8 +31,7 @@ const RecentPlaylist = observer(() => {
   )
 
   const getRowId = useCallback(
-    (params: GetRowIdParams<TrackRowData>) =>
-      `${params.data.id}-${params.data.index}`,
+    (params: GetRowIdParams<TrackRowData>) => params.data.id,
     []
   )
 

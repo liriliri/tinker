@@ -6,6 +6,7 @@ import debounce from 'licia/debounce'
 import splitPath from 'licia/splitPath'
 import uuid from 'licia/uuid'
 import audio from './lib/audio'
+import { LyricLine, parseLrc, loadLrcForPath } from './lib/lyric'
 import {
   Track,
   RecentTrack,
@@ -38,6 +39,7 @@ class Store extends BaseStore {
   tracks: Track[] = []
   recentTracks: RecentTrack[] = []
   sheets: MusicSheet[] = []
+  playQueue: Track[] = []
   activeTab: SideTab = 'local'
   activeSheetId: string = ''
   currentIndex: number = -1
@@ -52,6 +54,8 @@ class Store extends BaseStore {
   listFilter: string = ''
   fileSearchResults: FileSearchResult[] = []
   isSearchingFiles: boolean = false
+  showMusicDetail: boolean = false
+  lyricLines: LyricLine[] = []
 
   constructor() {
     super()
@@ -84,10 +88,25 @@ class Store extends BaseStore {
       }
 
       const savedTrackId = settings.get<string>('currentTrackId')
-      if (savedTrackId) {
-        const idx = this.tracks.findIndex((t) => t.id === savedTrackId)
-        if (idx !== -1) {
-          this.currentIndex = idx
+      const savedQueueIds = settings.get<string[]>('playQueueIds') || []
+      if (savedQueueIds.length > 0) {
+        const trackMap = this.trackMap
+        this.playQueue = savedQueueIds
+          .map((id) => trackMap.get(id))
+          .filter(Boolean) as Track[]
+        if (savedTrackId) {
+          const idx = this.playQueue.findIndex((t) => t.id === savedTrackId)
+          if (idx !== -1) {
+            this.currentIndex = idx
+            this.loadLyrics(this.playQueue[idx])
+          }
+        }
+      } else if (savedTrackId) {
+        const track = this.tracks.find((t) => t.id === savedTrackId)
+        if (track) {
+          this.playQueue = [track]
+          this.currentIndex = 0
+          this.loadLyrics(track)
         }
       }
     })
@@ -96,6 +115,13 @@ class Store extends BaseStore {
   private debouncedSaveVolume = debounce(() => {
     settings.set('volume', this.volume)
   }, 300)
+
+  private saveQueue() {
+    settings.set(
+      'playQueueIds',
+      this.playQueue.map((t) => t.id)
+    )
+  }
 
   private setupAudio() {
     audio.onTimeUpdate = (currentTime, duration) => {
@@ -233,8 +259,8 @@ class Store extends BaseStore {
   }
 
   get currentTrack(): Track | null {
-    if (this.currentIndex >= 0 && this.currentIndex < this.tracks.length) {
-      return this.tracks[this.currentIndex]
+    if (this.currentIndex >= 0 && this.currentIndex < this.playQueue.length) {
+      return this.playQueue[this.currentIndex]
     }
     return null
   }
@@ -408,15 +434,22 @@ class Store extends BaseStore {
   removeTrack(id: string) {
     const index = this.tracks.findIndex((t) => t.id === id)
     if (index === -1) return
-    if (index === this.currentIndex) {
-      audio.pause()
-      this.isPlaying = false
-      this.currentIndex = -1
-    } else if (index < this.currentIndex) {
-      this.currentIndex--
-    }
     this.tracks.splice(index, 1)
     dbRemoveTrack(id)
+
+    // Remove from play queue
+    const queueIdx = this.playQueue.findIndex((t) => t.id === id)
+    if (queueIdx !== -1) {
+      if (queueIdx === this.currentIndex) {
+        audio.pause()
+        this.isPlaying = false
+        this.currentIndex = -1
+      } else if (queueIdx < this.currentIndex) {
+        this.currentIndex--
+      }
+      this.playQueue.splice(queueIdx, 1)
+      this.saveQueue()
+    }
 
     // Remove from all sheets
     for (const sheet of this.sheets) {
@@ -438,17 +471,127 @@ class Store extends BaseStore {
     }
   }
 
+  removeFromQueue(id: string) {
+    const queueIdx = this.playQueue.findIndex((t) => t.id === id)
+    if (queueIdx === -1) return
+    if (queueIdx === this.currentIndex) {
+      audio.pause()
+      this.isPlaying = false
+      this.currentIndex = -1
+    } else if (queueIdx < this.currentIndex) {
+      this.currentIndex--
+    }
+    this.playQueue.splice(queueIdx, 1)
+    this.saveQueue()
+  }
+
   clearPlayQueue() {
-    audio.pause()
+    audio.stop()
     this.isPlaying = false
     this.currentIndex = -1
+    this.currentTime = 0
+    this.duration = 0
+    this.playQueue = []
+    this.showPlayQueue = false
+    settings.set('currentTrackId', '')
+    this.saveQueue()
+  }
+
+  async playAll(tracks: Track[]) {
+    if (tracks.length === 0) return
+    this.playQueue = [...tracks]
+    this.currentIndex = 0
+    this.saveQueue()
+    await this.startPlayback(tracks[0])
   }
 
   async playTrack(index: number) {
     if (index < 0 || index >= this.tracks.length) return
-    this.currentIndex = index
     const track = this.tracks[index]
+    const queueIdx = this.playQueue.findIndex((t) => t.id === track.id)
+    if (queueIdx !== -1) {
+      this.currentIndex = queueIdx
+    } else {
+      this.playQueue.push(track)
+      this.currentIndex = this.playQueue.length - 1
+      this.saveQueue()
+    }
+    await this.startPlayback(track)
+  }
+
+  async togglePlay() {
+    if (this.currentIndex === -1) {
+      if (this.tracks.length > 0) {
+        await this.playTrack(0)
+      }
+      return
+    }
+    if (this.isPlaying) {
+      audio.pause()
+      this.isPlaying = false
+    } else {
+      try {
+        if (audio.paused && !audio.duration) {
+          const track = this.currentTrack
+          if (track) {
+            await audio.play(`file://${track.path}`)
+          }
+        } else {
+          await audio.play()
+        }
+        runInAction(() => {
+          this.isPlaying = true
+        })
+      } catch {
+        runInAction(() => {
+          this.isPlaying = false
+        })
+      }
+    }
+  }
+
+  async playNext() {
+    if (this.playQueue.length === 0) return
+    let nextIndex: number
+    if (this.playMode === 'loop') {
+      nextIndex = this.currentIndex
+    } else if (this.playMode === 'shuffle') {
+      const otherTracks = this.playQueue.filter(
+        (_, i) => i !== this.currentIndex
+      )
+      if (otherTracks.length === 0) {
+        nextIndex = this.currentIndex
+      } else {
+        const picked = randomItem(otherTracks)
+        nextIndex = this.playQueue.indexOf(picked)
+      }
+    } else {
+      nextIndex = (this.currentIndex + 1) % this.playQueue.length
+    }
+    await this.playQueueAt(nextIndex)
+  }
+
+  async playPrev() {
+    if (this.playQueue.length === 0) return
+    if (this.currentTime > 3) {
+      this.seek(0)
+      return
+    }
+    const prevIndex =
+      (this.currentIndex - 1 + this.playQueue.length) % this.playQueue.length
+    await this.playQueueAt(prevIndex)
+  }
+
+  async playQueueAt(index: number) {
+    if (index < 0 || index >= this.playQueue.length) return
+    const track = this.playQueue[index]
+    this.currentIndex = index
+    await this.startPlayback(track)
+  }
+
+  private async startPlayback(track: Track) {
     settings.set('currentTrackId', track.id)
+    this.loadLyrics(track)
     try {
       await audio.play(`file://${track.path}`)
       runInAction(() => {
@@ -466,60 +609,6 @@ class Store extends BaseStore {
         this.isPlaying = false
       })
     }
-  }
-
-  async togglePlay() {
-    if (this.currentIndex === -1) {
-      if (this.tracks.length > 0) {
-        await this.playTrack(0)
-      }
-      return
-    }
-    if (this.isPlaying) {
-      audio.pause()
-      this.isPlaying = false
-    } else {
-      try {
-        await audio.play()
-        runInAction(() => {
-          this.isPlaying = true
-        })
-      } catch {
-        runInAction(() => {
-          this.isPlaying = false
-        })
-      }
-    }
-  }
-
-  async playNext() {
-    if (this.tracks.length === 0) return
-    let nextIndex: number
-    if (this.playMode === 'loop') {
-      nextIndex = this.currentIndex
-    } else if (this.playMode === 'shuffle') {
-      const otherTracks = this.tracks.filter((_, i) => i !== this.currentIndex)
-      if (otherTracks.length === 0) {
-        nextIndex = this.currentIndex
-      } else {
-        const picked = randomItem(otherTracks)
-        nextIndex = this.tracks.indexOf(picked)
-      }
-    } else {
-      nextIndex = (this.currentIndex + 1) % this.tracks.length
-    }
-    await this.playTrack(nextIndex)
-  }
-
-  async playPrev() {
-    if (this.tracks.length === 0) return
-    if (this.currentTime > 3) {
-      this.seek(0)
-      return
-    }
-    const prevIndex =
-      (this.currentIndex - 1 + this.tracks.length) % this.tracks.length
-    await this.playTrack(prevIndex)
   }
 
   seek(time: number) {
@@ -542,6 +631,21 @@ class Store extends BaseStore {
     const modes: PlayMode[] = ['sequence', 'loop', 'shuffle']
     const currentIdx = modes.indexOf(this.playMode)
     this.setPlayMode(modes[(currentIdx + 1) % modes.length])
+  }
+
+  showMusicDetailView() {
+    this.showMusicDetail = true
+  }
+
+  hideMusicDetail() {
+    this.showMusicDetail = false
+  }
+
+  private async loadLyrics(track: Track) {
+    const lrcText = await loadLrcForPath(track.path)
+    runInAction(() => {
+      this.lyricLines = lrcText ? parseLrc(lrcText) : []
+    })
   }
 }
 

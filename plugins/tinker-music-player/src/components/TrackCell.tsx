@@ -1,17 +1,23 @@
 import { observer } from 'mobx-react-lite'
-import { Music } from 'lucide-react'
 import { tw } from 'share/theme'
 import store from '../store'
+import TrackCover from './TrackCover'
 
 export interface TrackRowData {
   id: string
-  index: number
   title: string
   artist: string
   album: string
   duration: number
   cover?: string
   path: string
+}
+
+function playTrack(id: string) {
+  const realIndex = store.tracks.findIndex((t) => t.id === id)
+  if (realIndex >= 0) {
+    store.playTrack(realIndex)
+  }
 }
 
 export const TitleCellRenderer = observer(
@@ -22,18 +28,7 @@ export const TitleCellRenderer = observer(
 
     return (
       <div className="flex items-center gap-3 h-full">
-        {data.cover ? (
-          <img
-            src={data.cover}
-            className="w-7 h-7 rounded object-cover flex-shrink-0"
-          />
-        ) : (
-          <div
-            className={`w-7 h-7 rounded flex items-center justify-center flex-shrink-0 ${tw.bg.secondary}`}
-          >
-            <Music size={12} className={tw.text.tertiary} />
-          </div>
-        )}
+        <TrackCover cover={data.cover} onClick={() => playTrack(data.id)} />
         <div className="min-w-0 flex-1 leading-tight">
           <div
             className={`truncate text-xs ${

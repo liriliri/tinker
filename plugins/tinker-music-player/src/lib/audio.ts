@@ -36,6 +36,11 @@ class AudioController {
     this.audio.pause()
   }
 
+  stop() {
+    this.audio.pause()
+    this.audio.src = ''
+  }
+
   seek(time: number) {
     this.audio.currentTime = time
   }

@@ -26,5 +26,6 @@
   "filter": "Filter",
   "showInFolder": "Show in Folder",
   "playSheet": "Play All",
-  "clearAll": "Clear"
+  "clearAll": "Clear",
+  "noLyric": "No lyrics available"
 }

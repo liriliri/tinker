@@ -1,26 +1,39 @@
 import { useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Music } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import store from '../store'
 import { mediaDurationFormat } from 'share/lib/util'
+import TrackCover from './TrackCover'
 
 const PlayQueue = observer(() => {
   const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     if (store.showPlayQueue) {
-      requestAnimationFrame(() => setVisible(true))
+      setMounted(true)
     } else {
       setVisible(false)
     }
   }, [store.showPlayQueue])
 
+  useEffect(() => {
+    if (mounted && store.showPlayQueue) {
+      requestAnimationFrame(() => setVisible(true))
+    }
+  }, [mounted])
+
   const handleClose = () => {
     setVisible(false)
     setTimeout(() => store.togglePlayQueue(), 300)
+  }
+
+  const handleTransitionEnd = () => {
+    if (!visible) {
+      setMounted(false)
+    }
   }
 
   const handleContextMenu = useCallback(
@@ -39,31 +52,32 @@ const PlayQueue = observer(() => {
         },
         {
           label: t('remove'),
-          click: () => store.removeTrack(trackId),
+          click: () => store.removeFromQueue(trackId),
         },
       ])
     },
     [t]
   )
 
-  if (!store.showPlayQueue) return null
+  if (!mounted) return null
 
   return (
     <>
       <div
-        className={`absolute inset-0 bottom-14 z-19 bg-black/30 transition-opacity duration-300 ${
+        className={`fixed inset-0 bottom-14 z-51 bg-black/30 transition-opacity duration-300 ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handleClose}
       />
       <div
-        className={`absolute right-0 top-0 bottom-14 z-20 w-72 flex flex-col overflow-hidden transition-transform duration-300 ease-in-out border-l ${
+        onTransitionEnd={handleTransitionEnd}
+        className={`fixed right-0 top-0 bottom-14 z-52 w-72 flex flex-col overflow-hidden transition-transform duration-300 ease-in-out border-l ${
           tw.border
         } ${tw.bg.tertiary} ${visible ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-3 h-10 flex-shrink-0">
           <span className={`text-sm font-medium ${tw.text.primary}`}>
-            {t('playQueue')} ({store.tracks.length})
+            {t('playQueue')} ({store.playQueue.length})
           </span>
           <button
             className={`px-2 py-0.5 rounded text-xs ${tw.hover} ${tw.text.secondary}`}
@@ -73,27 +87,23 @@ const PlayQueue = observer(() => {
           </button>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {store.tracks.map((track, index) => (
+          {store.playQueue.map((track, index) => (
             <button
               key={track.id}
               className={`w-full flex items-center gap-2 px-3 h-10 text-left ${
                 tw.hover
               } ${index === store.currentIndex ? tw.active : ''}`}
-              onDoubleClick={() => store.playTrack(index)}
+              onDoubleClick={() => store.playQueueAt(index)}
               onContextMenu={(e) => handleContextMenu(e, track.id, track.path)}
             >
-              {track.cover ? (
-                <img
-                  src={track.cover}
-                  className="w-8 h-8 rounded object-cover flex-shrink-0"
-                />
-              ) : (
-                <div
-                  className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${tw.bg.secondary}`}
-                >
-                  <Music size={12} className={tw.text.tertiary} />
-                </div>
-              )}
+              <TrackCover
+                cover={track.cover}
+                className="w-8 h-8"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  store.playQueueAt(index)
+                }}
+              />
               <div className="min-w-0 flex-1">
                 <div
                   className={`text-xs truncate ${

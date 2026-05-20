@@ -74,6 +74,7 @@
     "fix-path": "^5.0.0",
     "glob": "^13.0.0",
     "i18next": "^25.7.3",
+    "iconv-lite": "^0.7.2",
     "lerna": "^9.0.3",
     "luna-data-grid": "^2.0.2",
     "luna-drag-selector": "^0.1.0",

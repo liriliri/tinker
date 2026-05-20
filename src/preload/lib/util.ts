@@ -1,5 +1,6 @@
 import AdmZip from 'adm-zip'
 import path from 'path'
+import iconv from 'iconv-lite'
 import contain from 'licia/contain'
 import types from 'licia/types'
 import each from 'licia/each'
@@ -58,4 +59,29 @@ export function resolveResources(name: string): string {
   }
 
   return ret
+}
+
+export function decodeStr(latin1Str: string): string {
+  if (/^[\x00-\x7f]*$/.test(latin1Str)) {
+    return latin1Str
+  }
+
+  const buf = Buffer.from(latin1Str, 'latin1')
+  const utf8 = buf.toString('utf8')
+
+  if (utf8.includes('\ufffd')) {
+    return iconv.decode(buf, 'gbk')
+  }
+
+  if (isDoubleEncodedGbk(utf8)) {
+    const rawBytes = Buffer.from([...utf8].map((c) => c.charCodeAt(0)))
+    return iconv.decode(rawBytes, 'gbk')
+  }
+
+  return utf8
+}
+
+function isDoubleEncodedGbk(str: string): boolean {
+  const nonAscii = [...str].filter((c) => c.charCodeAt(0) > 0x7f)
+  return nonAscii.length > 0 && nonAscii.every((c) => c.charCodeAt(0) <= 0xff)
 }

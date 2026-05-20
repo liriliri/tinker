@@ -9,20 +9,13 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import store from '../store'
+import { AUDIO_DIALOG_OPTIONS } from '../lib/util'
 
 const ListToolbar = observer(() => {
   const { t } = useTranslation()
 
   const handleImport = async () => {
-    const result = await tinker.showOpenDialog({
-      properties: ['openFile', 'multiSelections'],
-      filters: [
-        {
-          name: 'Audio Files',
-          extensions: ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma'],
-        },
-      ],
-    })
+    const result = await tinker.showOpenDialog(AUDIO_DIALOG_OPTIONS)
     if (!result.canceled && result.filePaths.length > 0) {
       await store.addFiles(result.filePaths)
       for (const filePath of result.filePaths) {
@@ -40,13 +33,7 @@ const ListToolbar = observer(() => {
   }
 
   const handlePlaySheet = () => {
-    const sheetTracks = store.activeSheetTracks
-    if (sheetTracks.length === 0) return
-    const firstTrack = sheetTracks[0]
-    const index = store.tracks.findIndex((t) => t.id === firstTrack.id)
-    if (index >= 0) {
-      store.playTrack(index)
-    }
+    store.playAll(store.activeSheetTracks)
   }
 
   return (

@@ -9,6 +9,7 @@ import MusicToolbar from './components/Toolbar'
 import ListToolbar from './components/ListToolbar'
 import LocalToolbar from './components/LocalToolbar'
 import AddToSheetModal from './components/AddToSheetModal'
+import MusicDetail from './components/MusicDetail'
 import { PromptProvider } from 'share/components/Prompt'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -45,6 +46,7 @@ const App = observer(function App() {
         <PlayerBar />
         <PlayQueue />
       </div>
+      <MusicDetail />
       <AddToSheetModal />
     </PromptProvider>
   )
