@@ -30,8 +30,7 @@ const MusicToolbar = observer(() => {
         value={store.searchQuery}
         onChange={(val) => store.setSearchQuery(val)}
         placeholder={t('search')}
-        dropdownItems={dropdownItems}
-        dropdownLoading={store.isSearchingFiles}
+        dropdownItems={dropdownItems.length > 0 ? dropdownItems : undefined}
         onDropdownSelect={handleDropdownSelect}
       />
 

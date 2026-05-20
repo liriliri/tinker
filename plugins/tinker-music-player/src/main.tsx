@@ -8,6 +8,7 @@ import PlayQueue from './components/PlayQueue'
 import MusicToolbar from './components/Toolbar'
 import ListToolbar from './components/ListToolbar'
 import LocalToolbar from './components/LocalToolbar'
+import AddToSheetModal from './components/AddToSheetModal'
 import { PromptProvider } from 'share/components/Prompt'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -30,7 +31,7 @@ const MainContent = observer(function MainContent() {
 const App = observer(function App() {
   return (
     <PromptProvider>
-      <div className="flex flex-col h-screen overflow-hidden">
+      <div className="relative flex flex-col h-screen overflow-hidden">
         <MusicToolbar />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
@@ -40,10 +41,11 @@ const App = observer(function App() {
               <MainContent />
             </div>
           </div>
-          {store.showPlayQueue && <PlayQueue />}
         </div>
         <PlayerBar />
+        <PlayQueue />
       </div>
+      <AddToSheetModal />
     </PromptProvider>
   )
 })

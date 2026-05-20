@@ -14,6 +14,7 @@ import {
   removeTrack as dbRemoveTrack,
   getRecentTracks,
   putRecentTracks,
+  addRecentTrack,
   getAllSheets,
   putSheet,
   removeSheet as dbRemoveSheet,
@@ -41,6 +42,7 @@ class Store extends BaseStore {
   currentIndex: number = -1
   isPlaying: boolean = false
   showPlayQueue: boolean = false
+  addToSheetTrackId: string = ''
   currentTime: number = 0
   duration: number = 0
   volume: number = 0.8
@@ -94,10 +96,6 @@ class Store extends BaseStore {
     settings.set('volume', this.volume)
   }, 300)
 
-  private debouncedSaveRecent = debounce(() => {
-    putRecentTracks(this.recentTracks)
-  }, 1000)
-
   private setupAudio() {
     audio.onTimeUpdate = (currentTime, duration) => {
       runInAction(() => {
@@ -139,6 +137,14 @@ class Store extends BaseStore {
 
   togglePlayQueue() {
     this.showPlayQueue = !this.showPlayQueue
+  }
+
+  showAddToSheet(trackId: string) {
+    this.addToSheetTrackId = trackId
+  }
+
+  hideAddToSheet() {
+    this.addToSheetTrackId = ''
   }
 
   get favoriteSheet(): MusicSheet | undefined {
@@ -316,11 +322,32 @@ class Store extends BaseStore {
   }
 
   async addFromSearchResult(filePath: string) {
-    const exists = this.tracks.some((t) => t.path === filePath)
-    if (exists) return
+    const existing = this.tracks.find((t) => t.path === filePath)
+    if (existing) {
+      const index = this.tracks.indexOf(existing)
+      this.searchQuery = ''
+      this.fileSearchResults = []
+      await this.playTrack(index)
+      return
+    }
+
+    const savedTab = this.activeTab
+    const savedSheetId = this.activeSheetId
+    this.activeTab = 'local'
+    this.activeSheetId = ''
     await this.addFiles([filePath])
-    this.searchQuery = ''
-    this.fileSearchResults = []
+    runInAction(() => {
+      this.activeTab = savedTab
+      this.activeSheetId = savedSheetId
+      this.searchQuery = ''
+      this.fileSearchResults = []
+    })
+
+    const newTrack = this.tracks.find((t) => t.path === filePath)
+    if (newTrack) {
+      const index = this.tracks.indexOf(newTrack)
+      await this.playTrack(index)
+    }
   }
 
   async addFiles(filePaths: string[]) {
@@ -390,6 +417,25 @@ class Store extends BaseStore {
     }
     this.tracks.splice(index, 1)
     dbRemoveTrack(id)
+
+    // Remove from all sheets
+    for (const sheet of this.sheets) {
+      if (sheet.trackIds.includes(id)) {
+        const updated = {
+          ...sheet,
+          trackIds: sheet.trackIds.filter((tid) => tid !== id),
+        }
+        this.sheets = this.sheets.map((s) => (s.id === sheet.id ? updated : s))
+        putSheet(updated)
+      }
+    }
+
+    // Remove from recent tracks
+    const recentIdx = this.recentTracks.findIndex((t) => t.id === id)
+    if (recentIdx !== -1) {
+      this.recentTracks.splice(recentIdx, 1)
+      putRecentTracks(this.recentTracks)
+    }
   }
 
   async playTrack(index: number) {
@@ -408,7 +454,7 @@ class Store extends BaseStore {
           this.recentTracks.length = MAX_RECENT
         }
       })
-      this.debouncedSaveRecent()
+      addRecentTrack(track)
     } catch {
       runInAction(() => {
         this.isPlaying = false

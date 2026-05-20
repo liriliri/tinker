@@ -84,7 +84,7 @@ const Sidebar = observer(() => {
     >
       <NavList items={mainItems} activeId={activeId} onSelect={handleSelect} />
       <div className={`mx-2 mt-1 border-t ${tw.border}`} />
-      <div className="flex items-center justify-between px-2 py-1">
+      <div className="flex items-center justify-between px-2 h-9">
         <span className={`text-xs ${tw.text.tertiary}`}>{t('mySheets')}</span>
         <button
           className={`p-0.5 rounded ${tw.hover} ${tw.text.secondary}`}

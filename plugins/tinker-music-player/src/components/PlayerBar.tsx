@@ -11,6 +11,7 @@ import {
   List,
   ListMusic,
   Music,
+  Heart,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
@@ -35,6 +36,7 @@ const PlayerBar = observer(() => {
   const { t } = useTranslation()
   const track = store.currentTrack
   const ModeIcon = PLAY_MODE_ICONS[store.playMode]
+  const isFav = track ? store.isTrackInFavorite(track.id) : false
 
   return (
     <div className={`relative ${tw.bg.secondary}`}>
@@ -84,6 +86,18 @@ const PlayerBar = observer(() => {
             <span className={`text-sm ${tw.text.tertiary}`}>
               {t('noTrack')}
             </span>
+          )}
+          {track && (
+            <button
+              onClick={() => store.toggleFavorite(track.id)}
+              className={`p-1.5 rounded-full ${
+                tw.hover
+              } transition-colors ml-2 ${
+                isFav ? 'text-red-500' : tw.text.tertiary
+              }`}
+            >
+              <Heart size={15} fill={isFav ? 'currentColor' : 'none'} />
+            </button>
           )}
         </div>
 

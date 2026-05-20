@@ -25,5 +25,6 @@
   "modeLoop": "单曲循环",
   "modeShuffle": "随机播放",
   "unknownArtist": "未知艺术家",
-  "filter": "筛选"
+  "filter": "筛选",
+  "showInFolder": "打开所在文件夹"
 }

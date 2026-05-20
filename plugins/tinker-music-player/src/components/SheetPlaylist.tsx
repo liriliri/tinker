@@ -95,6 +95,11 @@ const SheetPlaylist = observer(() => {
             click: () =>
               store.removeTrackFromSheet(event.data!.id, store.activeSheetId),
           },
+          { type: 'separator' as const },
+          {
+            label: t('showInFolder'),
+            click: () => tinker.showItemInPath(event.data!.path),
+          },
         ])
       }
     },

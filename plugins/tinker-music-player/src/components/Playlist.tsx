@@ -86,21 +86,17 @@ const Playlist = observer(() => {
         const e = event.event as MouseEvent
         e.preventDefault()
         const trackId = event.data!.id
-        const isFav = store.isTrackInFavorite(trackId)
-        const sheetMenuItems = store.customSheets.map((sheet) => ({
-          label: sheet.title,
-          click: () => store.addTrackToSheet(trackId, sheet.id),
-        }))
 
         tinker.showContextMenu(e.clientX, e.clientY, [
           {
-            label: isFav ? t('removeFromFavorite') : t('addToFavorite'),
-            click: () => store.toggleFavorite(trackId),
+            label: t('addToSheet'),
+            click: () => store.showAddToSheet(trackId),
           },
-          ...(sheetMenuItems.length > 0
-            ? [{ label: t('addToSheet'), submenu: sheetMenuItems }]
-            : []),
           { type: 'separator' as const },
+          {
+            label: t('showInFolder'),
+            click: () => tinker.showItemInPath(event.data!.path),
+          },
           {
             label: t('remove'),
             click: () => store.removeTrack(trackId),

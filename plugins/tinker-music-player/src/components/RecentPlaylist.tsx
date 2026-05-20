@@ -5,6 +5,7 @@ import {
   ColDef,
   GetRowIdParams,
   CellDoubleClickedEvent,
+  CellContextMenuEvent,
 } from 'ag-grid-community'
 import Grid from 'share/components/Grid'
 import store from '../store'
@@ -31,13 +32,6 @@ const RecentPlaylist = observer(() => {
         minWidth: 200,
         sortable: false,
         cellRenderer: TitleCellRenderer,
-      },
-      {
-        field: 'album',
-        headerName: t('album'),
-        flex: 1,
-        minWidth: 100,
-        sortable: false,
       },
       {
         field: 'album',
@@ -93,6 +87,22 @@ const RecentPlaylist = observer(() => {
     []
   )
 
+  const handleCellContextMenu = useCallback(
+    (event: CellContextMenuEvent<TrackRowData>) => {
+      if (event.data && event.event) {
+        const e = event.event as MouseEvent
+        e.preventDefault()
+        tinker.showContextMenu(e.clientX, e.clientY, [
+          {
+            label: t('showInFolder'),
+            click: () => tinker.showItemInPath(event.data!.path),
+          },
+        ])
+      }
+    },
+    [t]
+  )
+
   return (
     <Grid<TrackRowData>
       isDark={store.isDark}
@@ -108,6 +118,7 @@ const RecentPlaylist = observer(() => {
         enableClickSelection: true,
       }}
       onCellDoubleClicked={onCellDoubleClicked}
+      onCellContextMenu={handleCellContextMenu}
       suppressCellFocus={true}
       animateRows={true}
       localeText={{ noRowsToShow: t('emptyRecent') }}

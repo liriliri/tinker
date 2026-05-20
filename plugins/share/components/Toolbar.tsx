@@ -269,7 +269,6 @@ interface ToolbarSearchProps {
   placeholder?: string
   className?: string
   dropdownItems?: ToolbarSearchDropdownItem[]
-  dropdownLoading?: boolean
   onDropdownSelect?: (item: ToolbarSearchDropdownItem) => void
   shortcut?: string
 }
@@ -280,7 +279,6 @@ export function ToolbarSearch({
   placeholder,
   className = '',
   dropdownItems,
-  dropdownLoading,
   onDropdownSelect,
   shortcut,
 }: ToolbarSearchProps) {
@@ -290,9 +288,7 @@ export function ToolbarSearch({
   const containerRef = useRef<HTMLDivElement>(null)
 
   const showDropdown =
-    isFocused &&
-    value.trim() &&
-    ((dropdownItems && dropdownItems.length > 0) || dropdownLoading)
+    isFocused && value.trim() && dropdownItems && dropdownItems.length > 0
 
   useEffect(() => {
     setActiveIndex(-1)
@@ -364,14 +360,6 @@ export function ToolbarSearch({
         <div
           className={`absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-md shadow-lg border z-50 ${tw.bg.primary} ${tw.border}`}
         >
-          {dropdownLoading &&
-            (!dropdownItems || dropdownItems.length === 0) && (
-              <div
-                className={`px-3 py-2 text-xs ${tw.text.tertiary} animate-pulse`}
-              >
-                ...
-              </div>
-            )}
           {dropdownItems?.map((item, index) => (
             <button
               key={item.id}
