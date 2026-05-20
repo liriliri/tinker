@@ -17,8 +17,6 @@
   "renameSheet": "重命名",
   "deleteSheet": "删除",
   "removeFromSheet": "从歌单移除",
-  "addToFavorite": "添加到我喜欢",
-  "removeFromFavorite": "从我喜欢移除",
   "addToSheet": "添加到歌单",
   "playQueue": "播放列表",
   "modeSequence": "顺序播放",
@@ -26,5 +24,7 @@
   "modeShuffle": "随机播放",
   "unknownArtist": "未知艺术家",
   "filter": "筛选",
-  "showInFolder": "打开所在文件夹"
+  "showInFolder": "打开所在文件夹",
+  "playSheet": "播放全部",
+  "clearAll": "清空"
 }

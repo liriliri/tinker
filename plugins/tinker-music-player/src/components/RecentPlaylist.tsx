@@ -9,7 +9,7 @@ import {
 } from 'ag-grid-community'
 import Grid from 'share/components/Grid'
 import store from '../store'
-import { formatTime } from '../lib/util'
+import { mediaDurationFormat } from 'share/lib/util'
 import { TitleCellRenderer, TrackRowData } from './TrackCell'
 
 const RecentPlaylist = observer(() => {
@@ -46,7 +46,7 @@ const RecentPlaylist = observer(() => {
         width: 80,
         sortable: false,
         valueFormatter: (params) =>
-          params.value > 0 ? formatTime(params.value) : '--:--',
+          params.value > 0 ? mediaDurationFormat(params.value) : '--:--',
       },
     ],
     [t]

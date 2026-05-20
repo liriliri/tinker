@@ -24,7 +24,12 @@ const LocalToolbar = observer(() => {
       ],
     })
     if (!result.canceled && result.filePaths.length > 0) {
-      store.addFiles(result.filePaths)
+      await store.addFiles(result.filePaths)
+      const added = store.tracks.find((t) => t.path === result.filePaths[0])
+      if (added) {
+        const index = store.tracks.indexOf(added)
+        store.playTrack(index)
+      }
     }
   }
 

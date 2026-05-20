@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Music, X } from 'lucide-react'
+import { Music } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import store from '../store'
-import { formatTime } from '../lib/util'
+import { mediaDurationFormat } from 'share/lib/util'
 
 const PlayQueue = observer(() => {
   const { t } = useTranslation()
@@ -66,10 +66,10 @@ const PlayQueue = observer(() => {
             {t('playQueue')} ({store.tracks.length})
           </span>
           <button
-            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
-            onClick={handleClose}
+            className={`px-2 py-0.5 rounded text-xs ${tw.hover} ${tw.text.secondary}`}
+            onClick={() => store.clearPlayQueue()}
           >
-            <X size={14} />
+            {t('clearAll')}
           </button>
         </div>
         <div className="flex-1 overflow-y-auto">
@@ -111,7 +111,7 @@ const PlayQueue = observer(() => {
                 )}
               </div>
               <span className={`text-[11px] ${tw.text.tertiary} flex-shrink-0`}>
-                {track.duration > 0 ? formatTime(track.duration) : ''}
+                {track.duration > 0 ? mediaDurationFormat(track.duration) : ''}
               </span>
             </button>
           ))}

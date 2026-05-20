@@ -4,6 +4,7 @@ import LocalStore from 'licia/LocalStore'
 import randomItem from 'licia/randomItem'
 import debounce from 'licia/debounce'
 import splitPath from 'licia/splitPath'
+import uuid from 'licia/uuid'
 import audio from './lib/audio'
 import {
   Track,
@@ -203,7 +204,7 @@ class Store extends BaseStore {
 
   async createSheet(title: string) {
     const sheet: MusicSheet = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      id: uuid(),
       title,
       trackIds: [],
       createdAt: Date.now(),
@@ -354,10 +355,9 @@ class Store extends BaseStore {
     const newTracks: Track[] = []
     for (const filePath of filePaths) {
       if (this.tracks.some((t) => t.path === filePath)) continue
-      const fileName = filePath.split('/').pop() || filePath
-      const baseName = fileName.replace(/\.[^.]+$/, '')
+      const baseName = splitPath(filePath).name
       const track: Track = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: uuid(),
         title: baseName,
         artist: '',
         album: '',
@@ -436,6 +436,12 @@ class Store extends BaseStore {
       this.recentTracks.splice(recentIdx, 1)
       putRecentTracks(this.recentTracks)
     }
+  }
+
+  clearPlayQueue() {
+    audio.pause()
+    this.isPlaying = false
+    this.currentIndex = -1
   }
 
   async playTrack(index: number) {

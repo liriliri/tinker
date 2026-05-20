@@ -17,8 +17,6 @@
   "renameSheet": "Rename",
   "deleteSheet": "Delete",
   "removeFromSheet": "Remove from Playlist",
-  "addToFavorite": "Add to Favorites",
-  "removeFromFavorite": "Remove from Favorites",
   "addToSheet": "Add to Playlist",
   "playQueue": "Play Queue",
   "modeSequence": "Sequential",
@@ -26,5 +24,7 @@
   "modeShuffle": "Shuffle",
   "unknownArtist": "Unknown Artist",
   "filter": "Filter",
-  "showInFolder": "Show in Folder"
+  "showInFolder": "Show in Folder",
+  "playSheet": "Play All",
+  "clearAll": "Clear"
 }

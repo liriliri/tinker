@@ -7,8 +7,8 @@ import {
   Volume2,
   VolumeX,
   Shuffle,
+  Repeat1,
   Repeat2,
-  List,
   ListMusic,
   Music,
   Heart,
@@ -17,12 +17,12 @@ import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import store from '../store'
 import { PlayMode } from '../types'
-import { formatTime } from '../lib/util'
+import { mediaDurationFormat } from 'share/lib/util'
 import { ProgressBar, VolumeBar } from './ProgressBar'
 
-const PLAY_MODE_ICONS: Record<PlayMode, typeof List> = {
-  sequence: List,
-  loop: Repeat2,
+const PLAY_MODE_ICONS: Record<PlayMode, typeof Repeat1> = {
+  sequence: Repeat2,
+  loop: Repeat1,
   shuffle: Shuffle,
 }
 
@@ -67,7 +67,7 @@ const PlayerBar = observer(() => {
                   <Music size={16} className={tw.text.tertiary} />
                 </div>
               )}
-              <div className="min-w-0">
+              <div className="min-w-0 w-24 flex-shrink-0">
                 <div
                   className={`text-sm font-medium truncate ${tw.text.primary}`}
                 >
@@ -75,29 +75,28 @@ const PlayerBar = observer(() => {
                 </div>
                 <div className={`text-xs ${tw.text.tertiary} truncate`}>
                   {track.artist || t('unknownArtist')}
-                  <span className="mx-1.5 opacity-50">·</span>
-                  {formatTime(store.currentTime)}
-                  <span className="opacity-50"> / </span>
-                  {formatTime(store.duration)}
                 </div>
               </div>
+              <span className={`text-xs flex-shrink-0 ${tw.text.tertiary}`}>
+                {mediaDurationFormat(store.currentTime)}
+                <span className="opacity-50"> / </span>
+                {mediaDurationFormat(store.duration)}
+              </span>
+              <button
+                onClick={() => store.toggleFavorite(track.id)}
+                className={`p-1.5 rounded-full flex-shrink-0 ${
+                  tw.hover
+                } transition-colors ${
+                  isFav ? 'text-red-500' : tw.text.tertiary
+                }`}
+              >
+                <Heart size={15} fill={isFav ? 'currentColor' : 'none'} />
+              </button>
             </>
           ) : (
             <span className={`text-sm ${tw.text.tertiary}`}>
               {t('noTrack')}
             </span>
-          )}
-          {track && (
-            <button
-              onClick={() => store.toggleFavorite(track.id)}
-              className={`p-1.5 rounded-full ${
-                tw.hover
-              } transition-colors ml-2 ${
-                isFav ? 'text-red-500' : tw.text.tertiary
-              }`}
-            >
-              <Heart size={15} fill={isFav ? 'currentColor' : 'none'} />
-            </button>
           )}
         </div>
 
