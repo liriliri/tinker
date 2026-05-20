@@ -59,7 +59,9 @@ function filetimeToTimestamp(filetime: number): number {
 export async function searchFile(
   query: string,
   offset: number,
-  maxResults: number
+  maxResults: number,
+  dirs?: string[],
+  exts?: string[]
 ): Promise<{ process: ChildProcess; promise: Promise<SearchFileResult[]> }> {
   await ensureEverythingRunning()
 
@@ -72,8 +74,19 @@ export async function searchFile(
     String(offset),
     '-max-results',
     String(maxResults),
-    escaped,
   ]
+
+  if (dirs && dirs.length > 0) {
+    for (const dir of dirs) {
+      args.push('-parent-path', dir)
+    }
+  }
+
+  args.push(escaped)
+
+  if (exts && exts.length > 0) {
+    args.push(`ext:${exts.join(';')}`)
+  }
 
   const esProcess = spawn(esPath, args, { windowsHide: true })
   let stdoutData = ''

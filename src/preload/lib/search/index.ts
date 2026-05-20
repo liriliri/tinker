@@ -41,7 +41,7 @@ class SearchTask {
       this.searchProcess = process
       this.promise = promise
     } else if (isWindows) {
-      this.promise = searchFileWin(query, offset, maxResults).then(
+      this.promise = searchFileWin(query, offset, maxResults, dirs, exts).then(
         ({ process, promise }) => {
           this.searchProcess = process
           return promise

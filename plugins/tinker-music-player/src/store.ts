@@ -3,6 +3,7 @@ import BaseStore from 'share/BaseStore'
 import LocalStore from 'licia/LocalStore'
 import randomItem from 'licia/randomItem'
 import debounce from 'licia/debounce'
+import splitPath from 'licia/splitPath'
 import audio from './lib/audio'
 import {
   Track,
@@ -302,7 +303,7 @@ class Store extends BaseStore {
       runInAction(() => {
         this.fileSearchResults = results.map((r) => ({
           path: r.path,
-          name: r.path.split('/').pop() || r.path,
+          name: splitPath(r.path).name,
         }))
         this.isSearchingFiles = false
       })
