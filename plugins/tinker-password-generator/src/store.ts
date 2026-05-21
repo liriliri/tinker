@@ -14,6 +14,8 @@ export interface CharType {
 
 const storage = new LocalStore('tinker-password-generator')
 
+const STORAGE_SETTINGS = 'settings'
+
 interface StorageData {
   length: number
   repeat: number
@@ -50,7 +52,7 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const saved = storage.get<StorageData | undefined>('settings')
+    const saved = storage.get<StorageData | undefined>(STORAGE_SETTINGS)
     if (saved) {
       this.length = saved.length ?? 12
       this.repeat = saved.repeat ?? 0
@@ -76,7 +78,7 @@ class Store extends BaseStore {
       dash: this.dash,
       space: this.space,
     }
-    storage.set('settings', settings)
+    storage.set(STORAGE_SETTINGS, settings)
   }
 
   setPhrase(value: string) {

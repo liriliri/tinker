@@ -7,7 +7,7 @@ import math, { createScope, formatResult } from './lib/math'
 const storage = new LocalStore('tinker-calculator')
 
 const OPERATORS = ['+', '-', '*', '/', '^']
-const STATE_KEY = 'calculator-state'
+const STORAGE_STATE = 'calculator-state'
 
 type StoredState = {
   expression: string
@@ -33,11 +33,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadState()
+    this.loadStorage()
   }
 
-  private loadState() {
-    const saved = storage.get<StoredState | undefined>(STATE_KEY)
+  private loadStorage() {
+    const saved = storage.get<StoredState | undefined>(STORAGE_STATE)
     if (!saved) return
     this.expression = saved.expression || ''
     this.displayValue = saved.expression || '0'
@@ -46,7 +46,7 @@ class Store extends BaseStore {
   }
 
   private persistState() {
-    storage.set(STATE_KEY, {
+    storage.set(STORAGE_STATE, {
       expression: this.expression,
       memory: this.memory,
       isDegree: this.isDegree,

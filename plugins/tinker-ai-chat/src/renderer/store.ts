@@ -10,9 +10,9 @@ import type { Session, SessionData } from './types'
 
 const storage = new LocalStore('tinker-ai-chat')
 
-const ACTIVE_SESSION_KEY = 'activeSessionId'
-const PROVIDER_KEY = 'provider'
-const MODEL_KEY = 'model'
+const STORAGE_ACTIVE_SESSION = 'activeSessionId'
+const STORAGE_PROVIDER = 'provider'
+const STORAGE_MODEL = 'model'
 
 const WEB_SEARCH_AGENT_TOOL: AgentTool = {
   definition: WEB_SEARCH_TOOL,
@@ -89,14 +89,17 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.init()
+    this.loadStorage()
+    this.loadDb()
   }
 
-  private async init() {
-    this.selectedProvider = storage.get(PROVIDER_KEY) || ''
-    this.selectedModel = storage.get(MODEL_KEY) || ''
+  private loadStorage() {
+    this.selectedProvider = storage.get(STORAGE_PROVIDER) || ''
+    this.selectedModel = storage.get(STORAGE_MODEL) || ''
+  }
 
-    const savedActiveId: string = storage.get(ACTIVE_SESSION_KEY) || ''
+  private async loadDb() {
+    const savedActiveId: string = storage.get(STORAGE_ACTIVE_SESSION) || ''
     const [savedSessions] = await Promise.all([
       db.getAllSessions(),
       this.loadProviders(),
@@ -128,15 +131,15 @@ class Store extends BaseStore {
           this.selectedProvider = providers[0].name
           const firstModel = providers[0].models[0]?.name || ''
           this.selectedModel = firstModel
-          storage.set(PROVIDER_KEY, this.selectedProvider)
-          storage.set(MODEL_KEY, this.selectedModel)
+          storage.set(STORAGE_PROVIDER, this.selectedProvider)
+          storage.set(STORAGE_MODEL, this.selectedModel)
         } else {
           const hasModel = provider.models.some(
             (m) => m.name === this.selectedModel
           )
           if (!hasModel) {
             this.selectedModel = provider.models[0]?.name || ''
-            storage.set(MODEL_KEY, this.selectedModel)
+            storage.set(STORAGE_MODEL, this.selectedModel)
           }
         }
       }
@@ -196,16 +199,16 @@ class Store extends BaseStore {
 
   setSelectedProvider(name: string) {
     this.selectedProvider = name
-    storage.set(PROVIDER_KEY, name)
+    storage.set(STORAGE_PROVIDER, name)
     const provider = this.providers.find((p) => p.name === name)
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
-    storage.set(MODEL_KEY, firstModel)
+    storage.set(STORAGE_MODEL, firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
-    storage.set(MODEL_KEY, name)
+    storage.set(STORAGE_MODEL, name)
   }
 
   setSelectedCombined(val: string) {
@@ -214,9 +217,9 @@ class Store extends BaseStore {
     const provider = val.slice(0, idx)
     const model = val.slice(idx + 1)
     this.selectedProvider = provider
-    storage.set(PROVIDER_KEY, provider)
+    storage.set(STORAGE_PROVIDER, provider)
     this.selectedModel = model
-    storage.set(MODEL_KEY, model)
+    storage.set(STORAGE_MODEL, model)
   }
 
   setSystemPrompt(val: string) {
@@ -228,7 +231,7 @@ class Store extends BaseStore {
 
   selectSession(id: string) {
     this.activeSessionId = id
-    storage.set(ACTIVE_SESSION_KEY, id)
+    storage.set(STORAGE_ACTIVE_SESSION, id)
   }
 
   newSession() {
@@ -240,7 +243,7 @@ class Store extends BaseStore {
     const session = createSession()
     this.sessions.unshift(session)
     this.activeSessionId = session.id
-    storage.set(ACTIVE_SESSION_KEY, session.id)
+    storage.set(STORAGE_ACTIVE_SESSION, session.id)
   }
 
   deleteSession(id: string) {
@@ -254,7 +257,7 @@ class Store extends BaseStore {
       } else {
         this.activeSessionId = this.sessions[0].id
       }
-      storage.set(ACTIVE_SESSION_KEY, this.activeSessionId)
+      storage.set(STORAGE_ACTIVE_SESSION, this.activeSessionId)
     }
   }
 

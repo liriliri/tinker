@@ -15,6 +15,9 @@ import {
 
 const storage = new LocalStore('tinker-authenticator')
 
+const STORAGE_ACCOUNTS = 'accounts'
+const STORAGE_PASSWORD_HASH = 'passwordHash'
+
 class Store extends BaseStore {
   accounts: Account[] = []
   codes: Map<string, string> = new Map()
@@ -38,16 +41,18 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadStorage()
     this.init()
   }
 
+  private loadStorage() {
+    const passwordHash = storage.get<string | undefined>(STORAGE_PASSWORD_HASH)
+    this.hasPassword = !!passwordHash
+    this.isLocked = !!passwordHash
+  }
+
   private async init() {
-    const passwordHash = storage.get<string | undefined>('passwordHash')
-    runInAction(() => {
-      this.hasPassword = !!passwordHash
-      this.isLocked = !!passwordHash
-    })
-    if (!passwordHash) {
+    if (!this.hasPassword) {
       await this.loadAccounts()
       await this.refreshCodes()
     }
@@ -90,9 +95,9 @@ class Store extends BaseStore {
           return { ...acc, secret }
         })
       )
-      storage.set('accounts', encrypted)
+      storage.set(STORAGE_ACCOUNTS, encrypted)
     } else {
-      storage.set('accounts', this.accounts)
+      storage.set(STORAGE_ACCOUNTS, this.accounts)
     }
   }
 
@@ -272,8 +277,8 @@ class Store extends BaseStore {
       ),
       hashPassword(password),
     ])
-    storage.set('accounts', encrypted)
-    storage.set('passwordHash', hash)
+    storage.set(STORAGE_ACCOUNTS, encrypted)
+    storage.set(STORAGE_PASSWORD_HASH, hash)
     runInAction(() => {
       this.sessionPassword = password
       this.hasPassword = true
@@ -311,8 +316,8 @@ class Store extends BaseStore {
     const ok = await verifyPassword(password, hash)
     if (!ok) return false
 
-    storage.set('accounts', this.accounts)
-    storage.remove('passwordHash')
+    storage.set(STORAGE_ACCOUNTS, this.accounts)
+    storage.remove(STORAGE_PASSWORD_HASH)
     runInAction(() => {
       this.sessionPassword = ''
       this.hasPassword = false

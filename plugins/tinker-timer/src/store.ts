@@ -6,6 +6,11 @@ import i18n from 'i18next'
 
 const storage = new LocalStore('tinker-timer')
 
+const STORAGE_TAB = 'tab'
+const STORAGE_CD_HOURS = 'cdHours'
+const STORAGE_CD_MINUTES = 'cdMinutes'
+const STORAGE_CD_SECONDS = 'cdSeconds'
+
 export interface Lap {
   index: number
   lapTime: number
@@ -44,12 +49,12 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedTab = storage.get<Tab | undefined>('tab')
+    const savedTab = storage.get<Tab | undefined>(STORAGE_TAB)
     if (savedTab) this.tab = savedTab
 
-    const savedCdH = storage.get('cdHours')
-    const savedCdM = storage.get('cdMinutes')
-    const savedCdS = storage.get('cdSeconds')
+    const savedCdH = storage.get(STORAGE_CD_HOURS)
+    const savedCdM = storage.get(STORAGE_CD_MINUTES)
+    const savedCdS = storage.get(STORAGE_CD_SECONDS)
     if (savedCdH !== undefined) this.cdHours = savedCdH
     if (savedCdM !== undefined) this.cdMinutes = savedCdM
     if (savedCdS !== undefined) this.cdSeconds = savedCdS
@@ -57,7 +62,7 @@ class Store extends BaseStore {
 
   setTab(tab: Tab) {
     this.tab = tab
-    storage.set('tab', tab)
+    storage.set(STORAGE_TAB, tab)
   }
 
   swStart() {
@@ -172,17 +177,17 @@ class Store extends BaseStore {
 
   setCdHours(h: number) {
     this.cdHours = Math.max(0, Math.min(23, Math.floor(h)))
-    storage.set('cdHours', this.cdHours)
+    storage.set(STORAGE_CD_HOURS, this.cdHours)
   }
 
   setCdMinutes(m: number) {
     this.cdMinutes = Math.max(0, Math.min(59, Math.floor(m)))
-    storage.set('cdMinutes', this.cdMinutes)
+    storage.set(STORAGE_CD_MINUTES, this.cdMinutes)
   }
 
   setCdSeconds(s: number) {
     this.cdSeconds = Math.max(0, Math.min(59, Math.floor(s)))
-    storage.set('cdSeconds', this.cdSeconds)
+    storage.set(STORAGE_CD_SECONDS, this.cdSeconds)
   }
 
   cdStart() {

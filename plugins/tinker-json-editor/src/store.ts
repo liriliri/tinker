@@ -8,9 +8,9 @@ import BaseStore from 'share/BaseStore'
 
 type EditorMode = 'text' | 'tree'
 
-const STORAGE_KEY = 'tinker-json-editor-content'
-const MODE_STORAGE_KEY = 'tinker-json-editor-mode'
-const FILE_PATH_KEY = 'file-path'
+const STORAGE_CONTENT = 'tinker-json-editor-content'
+const STORAGE_MODE = 'tinker-json-editor-mode'
+const STORAGE_FILE_PATH = 'file-path'
 
 const storage = new LocalStore('tinker-json-editor')
 
@@ -46,7 +46,7 @@ class Store extends BaseStore {
   }
 
   private async loadSavedFile() {
-    const savedFilePath = storage.get<string | undefined>(FILE_PATH_KEY)
+    const savedFilePath = storage.get<string | undefined>(STORAGE_FILE_PATH)
 
     if (savedFilePath) {
       try {
@@ -54,10 +54,10 @@ class Store extends BaseStore {
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.jsonInput = content
-        storage.remove(STORAGE_KEY)
+        storage.remove(STORAGE_CONTENT)
       } catch {
         // File no longer exists or can't be read, clear the saved path
-        storage.remove(FILE_PATH_KEY)
+        storage.remove(STORAGE_FILE_PATH)
         console.log('Failed to load saved file')
       }
     }
@@ -104,8 +104,8 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedContent = storage.get<string | undefined>(STORAGE_KEY)
-    const savedMode = storage.get<EditorMode | undefined>(MODE_STORAGE_KEY)
+    const savedContent = storage.get<string | undefined>(STORAGE_CONTENT)
+    const savedMode = storage.get<EditorMode | undefined>(STORAGE_MODE)
 
     if (savedContent) {
       this.jsonInput = savedContent
@@ -118,13 +118,13 @@ class Store extends BaseStore {
   setJsonInput(value: string) {
     this.jsonInput = value
     if (!this.currentFilePath) {
-      storage.set(STORAGE_KEY, value)
+      storage.set(STORAGE_CONTENT, value)
     }
   }
 
   setMode(mode: EditorMode) {
     this.mode = mode
-    storage.set(MODE_STORAGE_KEY, mode)
+    storage.set(STORAGE_MODE, mode)
   }
 
   formatJson() {
@@ -162,8 +162,8 @@ class Store extends BaseStore {
     if (filePath) {
       this.currentFilePath = filePath
       this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
-      storage.remove(STORAGE_KEY)
+      storage.set(STORAGE_FILE_PATH, filePath)
+      storage.remove(STORAGE_CONTENT)
     }
     this.setJsonInput(content)
     this.fileVersion++
@@ -172,8 +172,8 @@ class Store extends BaseStore {
   newFile() {
     this.currentFilePath = null
     this.savedContent = ''
-    storage.remove(FILE_PATH_KEY)
-    storage.remove(STORAGE_KEY)
+    storage.remove(STORAGE_FILE_PATH)
+    storage.remove(STORAGE_CONTENT)
     this.clearJson()
     this.fileVersion++
   }
@@ -200,8 +200,8 @@ class Store extends BaseStore {
       const content = await tinker.readFile(filePath, 'utf-8')
       this.currentFilePath = filePath
       this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
-      storage.remove(STORAGE_KEY)
+      storage.set(STORAGE_FILE_PATH, filePath)
+      storage.remove(STORAGE_CONTENT)
       this.loadFromFile(content)
     } catch (err) {
       console.error('Failed to open file:', err)
@@ -238,8 +238,8 @@ class Store extends BaseStore {
       await tinker.writeFile(result.filePath, this.jsonInput, 'utf-8')
       this.currentFilePath = result.filePath
       this.savedContent = this.jsonInput
-      storage.set(FILE_PATH_KEY, result.filePath)
-      storage.remove(STORAGE_KEY)
+      storage.set(STORAGE_FILE_PATH, result.filePath)
+      storage.remove(STORAGE_CONTENT)
     } catch (err) {
       console.error('Failed to save file as:', err)
     }

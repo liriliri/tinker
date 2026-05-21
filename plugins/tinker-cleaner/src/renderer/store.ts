@@ -3,7 +3,9 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { CleanRule, Category } from './types'
 
-const localStore = new LocalStore('tinker-cleaner')
+const storage = new LocalStore('tinker-cleaner')
+
+const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
 class Store extends BaseStore {
   view: 'scanning' | 'result' = 'scanning'
@@ -14,7 +16,7 @@ class Store extends BaseStore {
   cleaning = false
   scanProgress = { current: 0, total: 0 }
   currentScanPath = ''
-  moveToTrash: boolean = localStore.get('moveToTrash') !== false
+  moveToTrash: boolean = storage.get(STORAGE_MOVE_TO_TRASH) !== false
 
   constructor() {
     super()
@@ -111,7 +113,7 @@ class Store extends BaseStore {
 
   setMoveToTrash(value: boolean) {
     this.moveToTrash = value
-    localStore.set('moveToTrash', value)
+    storage.set(STORAGE_MOVE_TO_TRASH, value)
   }
 
   async scan() {

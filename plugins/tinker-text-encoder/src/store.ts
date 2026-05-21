@@ -6,8 +6,8 @@ import i18n from 'i18next'
 
 export type EncodingType = 'url' | 'morse' | 'unicode'
 
-const STORAGE_KEY = 'content'
-const ENCODING_TYPE_KEY = 'encodingType'
+const STORAGE_CONTENT = 'content'
+const STORAGE_ENCODING_TYPE = 'encodingType'
 
 const storage = new LocalStore('tinker-text-encoder')
 
@@ -23,9 +23,9 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedContent = storage.get<string | undefined>(STORAGE_KEY)
+    const savedContent = storage.get<string | undefined>(STORAGE_CONTENT)
     const savedEncodingType = storage.get<EncodingType | undefined>(
-      ENCODING_TYPE_KEY
+      STORAGE_ENCODING_TYPE
     )
 
     if (savedContent) {
@@ -45,7 +45,7 @@ class Store extends BaseStore {
 
   private saveToStorage() {
     storage.set(
-      STORAGE_KEY,
+      STORAGE_CONTENT,
       JSON.stringify({
         input: this.inputText,
         output: this.outputText,
@@ -65,7 +65,7 @@ class Store extends BaseStore {
 
   setEncodingType(type: EncodingType) {
     this.encodingType = type
-    storage.set(ENCODING_TYPE_KEY, type)
+    storage.set(STORAGE_ENCODING_TYPE, type)
   }
 
   clearInput() {

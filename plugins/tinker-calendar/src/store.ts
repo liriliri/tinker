@@ -18,7 +18,7 @@ import * as db from './lib/db'
 import i18n from 'i18next'
 
 const storage = new LocalStore('tinker-calendar')
-const SIDEBAR_KEY = 'sidebar-open'
+const STORAGE_SIDEBAR_OPEN = 'sidebar-open'
 const HOLIDAY_COLOR = '#fb923c'
 
 export type CalendarEvent = {
@@ -53,7 +53,7 @@ class Store extends BaseStore {
 
   private async loadStorage() {
     try {
-      const saved = storage.get(SIDEBAR_KEY)
+      const saved = storage.get(STORAGE_SIDEBAR_OPEN)
       if (saved !== null && saved !== undefined) {
         this.sidebarOpen = saved as boolean
       }
@@ -66,7 +66,7 @@ class Store extends BaseStore {
   }
 
   private saveSidebarState() {
-    storage.set(SIDEBAR_KEY, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   setSelectedDate(value: string | Date) {

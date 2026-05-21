@@ -14,15 +14,15 @@ import type { ToolType, ShapeType } from './types'
 
 export type { ToolType, ShapeType }
 
-const STORAGE_FOREGROUND_KEY = 'foreground-color'
-const STORAGE_BACKGROUND_KEY = 'background-color'
-const STORAGE_TOOL_KEY = 'tool'
-const STORAGE_STROKE_WIDTH_KEY = 'stroke-width'
-const STORAGE_FONT_SIZE_KEY = 'font-size'
-const STORAGE_SHAPE_TYPE_KEY = 'shape-type'
-const STORAGE_WATERMARK_ENABLED_KEY = 'watermark-enabled'
-const STORAGE_WATERMARK_TEXT_KEY = 'watermark-text'
-const STORAGE_WATERMARK_COLOR_KEY = 'watermark-color'
+const STORAGE_FOREGROUND = 'foreground-color'
+const STORAGE_BACKGROUND = 'background-color'
+const STORAGE_TOOL = 'tool'
+const STORAGE_STROKE_WIDTH = 'stroke-width'
+const STORAGE_FONT_SIZE = 'font-size'
+const STORAGE_SHAPE_TYPE = 'shape-type'
+const STORAGE_WATERMARK_ENABLED = 'watermark-enabled'
+const STORAGE_WATERMARK_TEXT = 'watermark-text'
+const STORAGE_WATERMARK_COLOR = 'watermark-color'
 const storage = new LocalStore('tinker-image-annotator')
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
@@ -119,22 +119,22 @@ class Store extends BaseStore {
   setTool(tool: ToolType) {
     this.tool = tool
     this.syncEditorMode()
-    storage.set(STORAGE_TOOL_KEY, tool)
+    storage.set(STORAGE_TOOL, tool)
   }
 
   setShapeType(shapeType: ShapeType) {
     this.shapeType = shapeType
-    storage.set(STORAGE_SHAPE_TYPE_KEY, shapeType)
+    storage.set(STORAGE_SHAPE_TYPE, shapeType)
   }
 
   setForegroundColor(color: string) {
     this.foregroundColor = color
-    storage.set(STORAGE_FOREGROUND_KEY, color)
+    storage.set(STORAGE_FOREGROUND, color)
   }
 
   setBackgroundColor(color: string) {
     this.backgroundColor = color
-    storage.set(STORAGE_BACKGROUND_KEY, color)
+    storage.set(STORAGE_BACKGROUND, color)
   }
 
   swapColors() {
@@ -142,18 +142,18 @@ class Store extends BaseStore {
     const nextBackground = this.foregroundColor
     this.foregroundColor = nextForeground
     this.backgroundColor = nextBackground
-    storage.set(STORAGE_FOREGROUND_KEY, nextForeground)
-    storage.set(STORAGE_BACKGROUND_KEY, nextBackground)
+    storage.set(STORAGE_FOREGROUND, nextForeground)
+    storage.set(STORAGE_BACKGROUND, nextBackground)
   }
 
   setStrokeWidth(value: number) {
     this.strokeWidth = value
-    storage.set(STORAGE_STROKE_WIDTH_KEY, value)
+    storage.set(STORAGE_STROKE_WIDTH, value)
   }
 
   setFontSize(value: number) {
     this.fontSize = value
-    storage.set(STORAGE_FONT_SIZE_KEY, value)
+    storage.set(STORAGE_FONT_SIZE, value)
     if (!this.app?.editor) return
     this.app.editor.list.forEach((item) => {
       if (item instanceof Text) {
@@ -178,19 +178,19 @@ class Store extends BaseStore {
 
   setWatermarkEnabled(enabled: boolean) {
     this.watermarkEnabled = enabled
-    storage.set(STORAGE_WATERMARK_ENABLED_KEY, enabled)
+    storage.set(STORAGE_WATERMARK_ENABLED, enabled)
     this.updateWatermarkSvg()
   }
 
   setWatermarkText(text: string) {
     this.watermarkText = text
-    storage.set(STORAGE_WATERMARK_TEXT_KEY, text)
+    storage.set(STORAGE_WATERMARK_TEXT, text)
     this.updateWatermarkSvg()
   }
 
   setWatermarkColor(color: string) {
     this.watermarkColor = color
-    storage.set(STORAGE_WATERMARK_COLOR_KEY, color)
+    storage.set(STORAGE_WATERMARK_COLOR, color)
     this.updateWatermarkSvg()
   }
 
@@ -517,10 +517,10 @@ class Store extends BaseStore {
 
   private loadColorsFromStorage() {
     const savedForeground = storage.get<string | undefined>(
-      STORAGE_FOREGROUND_KEY
+      STORAGE_FOREGROUND
     )
     const savedBackground = storage.get<string | undefined>(
-      STORAGE_BACKGROUND_KEY
+      STORAGE_BACKGROUND
     )
 
     if (savedForeground) {
@@ -532,7 +532,7 @@ class Store extends BaseStore {
   }
 
   private loadToolFromStorage() {
-    const savedTool = storage.get<ToolType | undefined>(STORAGE_TOOL_KEY)
+    const savedTool = storage.get<ToolType | undefined>(STORAGE_TOOL)
     if (savedTool) {
       this.tool = savedTool
     }
@@ -540,7 +540,7 @@ class Store extends BaseStore {
 
   private loadShapeTypeFromStorage() {
     const savedShapeType = storage.get<ShapeType | undefined>(
-      STORAGE_SHAPE_TYPE_KEY
+      STORAGE_SHAPE_TYPE
     )
     if (savedShapeType) {
       this.shapeType = savedShapeType
@@ -549,7 +549,7 @@ class Store extends BaseStore {
 
   private loadStrokeWidthFromStorage() {
     const savedStrokeWidth = storage.get<number | undefined>(
-      STORAGE_STROKE_WIDTH_KEY
+      STORAGE_STROKE_WIDTH
     )
     if (typeof savedStrokeWidth === 'number') {
       this.strokeWidth = savedStrokeWidth
@@ -557,7 +557,7 @@ class Store extends BaseStore {
   }
 
   private loadFontSizeFromStorage() {
-    const savedFontSize = storage.get<number | undefined>(STORAGE_FONT_SIZE_KEY)
+    const savedFontSize = storage.get<number | undefined>(STORAGE_FONT_SIZE)
     if (typeof savedFontSize === 'number') {
       this.fontSize = savedFontSize
     }
@@ -565,13 +565,13 @@ class Store extends BaseStore {
 
   private loadWatermarkFromStorage() {
     const savedEnabled = storage.get<boolean | undefined>(
-      STORAGE_WATERMARK_ENABLED_KEY
+      STORAGE_WATERMARK_ENABLED
     )
     const savedText = storage.get<string | undefined>(
-      STORAGE_WATERMARK_TEXT_KEY
+      STORAGE_WATERMARK_TEXT
     )
     const savedColor = storage.get<string | undefined>(
-      STORAGE_WATERMARK_COLOR_KEY
+      STORAGE_WATERMARK_COLOR
     )
 
     if (typeof savedEnabled === 'boolean') {

@@ -16,12 +16,12 @@ import isUndef from 'licia/isUndef'
 import findKey from 'licia/findKey'
 
 const storage = new LocalStore('tinker-code-image')
-const STORAGE_KEY_LANGUAGE = 'language'
-const STORAGE_KEY_THEME = 'theme'
-const STORAGE_KEY_DARK_MODE = 'darkMode'
-const STORAGE_KEY_SHOW_LINE_NUMBERS = 'showLineNumbers'
-const STORAGE_KEY_CODE = 'code'
-const STORAGE_KEY_FILE_NAME = 'fileName'
+const STORAGE_LANGUAGE = 'language'
+const STORAGE_THEME = 'theme'
+const STORAGE_DARK_MODE = 'darkMode'
+const STORAGE_SHOW_LINE_NUMBERS = 'showLineNumbers'
+const STORAGE_CODE = 'code'
+const STORAGE_FILE_NAME = 'fileName'
 
 export { Language, Theme, LANGUAGES, THEMES, shikiTheme }
 
@@ -60,32 +60,32 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedLanguage = storage.get(STORAGE_KEY_LANGUAGE)
+    const savedLanguage = storage.get(STORAGE_LANGUAGE)
     if (savedLanguage && LANGUAGES[savedLanguage]) {
       this.selectedLanguage = LANGUAGES[savedLanguage]
     }
 
-    const savedTheme = storage.get(STORAGE_KEY_THEME)
+    const savedTheme = storage.get(STORAGE_THEME)
     if (savedTheme && THEMES[savedTheme]) {
       this.selectedTheme = THEMES[savedTheme]
     }
 
-    const savedDarkMode = storage.get(STORAGE_KEY_DARK_MODE)
+    const savedDarkMode = storage.get(STORAGE_DARK_MODE)
     if (savedDarkMode !== undefined) {
       this.darkMode = savedDarkMode
     }
 
-    const savedShowLineNumbers = storage.get(STORAGE_KEY_SHOW_LINE_NUMBERS)
+    const savedShowLineNumbers = storage.get(STORAGE_SHOW_LINE_NUMBERS)
     if (savedShowLineNumbers !== undefined) {
       this.showLineNumbers = savedShowLineNumbers
     }
 
-    const savedCode = storage.get(STORAGE_KEY_CODE)
+    const savedCode = storage.get(STORAGE_CODE)
     if (!isUndef(savedCode) && !isStrBlank(savedCode)) {
       this.code = savedCode
     }
 
-    const savedFileName = storage.get(STORAGE_KEY_FILE_NAME)
+    const savedFileName = storage.get(STORAGE_FILE_NAME)
     if (!isUndef(savedFileName) && !isStrBlank(savedFileName)) {
       this.fileName = savedFileName
     }
@@ -97,40 +97,40 @@ class Store extends BaseStore {
 
   setCode(code: string) {
     this.code = code
-    storage.set(STORAGE_KEY_CODE, code)
+    storage.set(STORAGE_CODE, code)
   }
 
   setLanguage(language: Language) {
     this.selectedLanguage = language
     const langKey = findKey(LANGUAGES, (value) => value === language)
     if (langKey) {
-      storage.set(STORAGE_KEY_LANGUAGE, langKey)
+      storage.set(STORAGE_LANGUAGE, langKey)
     }
   }
 
   setTheme(theme: Theme) {
     this.selectedTheme = theme
-    storage.set(STORAGE_KEY_THEME, theme.id)
+    storage.set(STORAGE_THEME, theme.id)
   }
 
   toggleDarkMode() {
     this.darkMode = !this.darkMode
-    storage.set(STORAGE_KEY_DARK_MODE, this.darkMode)
+    storage.set(STORAGE_DARK_MODE, this.darkMode)
   }
 
   toggleLineNumbers() {
     this.showLineNumbers = !this.showLineNumbers
-    storage.set(STORAGE_KEY_SHOW_LINE_NUMBERS, this.showLineNumbers)
+    storage.set(STORAGE_SHOW_LINE_NUMBERS, this.showLineNumbers)
   }
 
   setShowLineNumbers(show: boolean) {
     this.showLineNumbers = show
-    storage.set(STORAGE_KEY_SHOW_LINE_NUMBERS, this.showLineNumbers)
+    storage.set(STORAGE_SHOW_LINE_NUMBERS, this.showLineNumbers)
   }
 
   setFileName(fileName: string) {
     this.fileName = fileName
-    storage.set(STORAGE_KEY_FILE_NAME, fileName)
+    storage.set(STORAGE_FILE_NAME, fileName)
   }
 
   get themeCSS(): CSSProperties {

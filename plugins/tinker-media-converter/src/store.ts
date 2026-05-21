@@ -14,11 +14,11 @@ import {
 } from './lib/constants'
 import { buildFFmpegArgs, getOutputPath } from './lib/ffmpegArgs'
 
-const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
-const STORAGE_KEY_MODE = 'mode'
-const STORAGE_KEY_VIDEO_FORMAT = 'videoFormat'
-const STORAGE_KEY_AUDIO_FORMAT = 'audioFormat'
-const STORAGE_KEY_IMAGE_FORMAT = 'imageFormat'
+const STORAGE_OUTPUT_DIR = 'outputDir'
+const STORAGE_MODE = 'mode'
+const STORAGE_VIDEO_FORMAT = 'videoFormat'
+const STORAGE_AUDIO_FORMAT = 'audioFormat'
+const STORAGE_IMAGE_FORMAT = 'imageFormat'
 const storage = new LocalStore('tinker-media-converter')
 
 class Store extends BaseStore {
@@ -69,10 +69,10 @@ class Store extends BaseStore {
       currentTask: false,
       cancelRequested: false,
     } as Record<string, false>)
-    this.init()
+    this.loadStorage()
   }
 
-  private init() {
+  private loadStorage() {
     this.loadOutputDir()
     this.loadMode()
     this.loadVideoFormat()
@@ -81,35 +81,35 @@ class Store extends BaseStore {
   }
 
   private loadOutputDir() {
-    const saved = storage.get(STORAGE_KEY_OUTPUT_DIR)
+    const saved = storage.get(STORAGE_OUTPUT_DIR)
     if (saved !== null) {
       this.outputDir = saved
     }
   }
 
   private loadMode() {
-    const saved = storage.get(STORAGE_KEY_MODE)
+    const saved = storage.get(STORAGE_MODE)
     if (saved === 'video' || saved === 'audio' || saved === 'image') {
       this.mode = saved
     }
   }
 
   private loadVideoFormat() {
-    const saved = storage.get(STORAGE_KEY_VIDEO_FORMAT)
+    const saved = storage.get(STORAGE_VIDEO_FORMAT)
     if (saved && VIDEO_OUTPUT_FORMATS.some((f) => f.value === saved)) {
       this.videoOutputFormat = saved
     }
   }
 
   private loadAudioFormat() {
-    const saved = storage.get(STORAGE_KEY_AUDIO_FORMAT)
+    const saved = storage.get(STORAGE_AUDIO_FORMAT)
     if (saved && AUDIO_OUTPUT_FORMATS.includes(saved)) {
       this.audioOutputFormat = saved
     }
   }
 
   private loadImageFormat() {
-    const saved = storage.get(STORAGE_KEY_IMAGE_FORMAT)
+    const saved = storage.get(STORAGE_IMAGE_FORMAT)
     if (saved && IMAGE_OUTPUT_FORMATS.includes(saved)) {
       this.imageOutputFormat = saved
     }
@@ -117,25 +117,25 @@ class Store extends BaseStore {
 
   setMode(mode: MediaType) {
     this.mode = mode
-    storage.set(STORAGE_KEY_MODE, mode)
+    storage.set(STORAGE_MODE, mode)
   }
 
   setOutputFormat(format: string) {
     if (this.mode === 'video') {
       this.videoOutputFormat = format
-      storage.set(STORAGE_KEY_VIDEO_FORMAT, format)
+      storage.set(STORAGE_VIDEO_FORMAT, format)
     } else if (this.mode === 'audio') {
       this.audioOutputFormat = format
-      storage.set(STORAGE_KEY_AUDIO_FORMAT, format)
+      storage.set(STORAGE_AUDIO_FORMAT, format)
     } else {
       this.imageOutputFormat = format
-      storage.set(STORAGE_KEY_IMAGE_FORMAT, format)
+      storage.set(STORAGE_IMAGE_FORMAT, format)
     }
   }
 
   setOutputDir(dir: string) {
     this.outputDir = dir.replace(/[/\\]+$/, '')
-    storage.set(STORAGE_KEY_OUTPUT_DIR, this.outputDir)
+    storage.set(STORAGE_OUTPUT_DIR, this.outputDir)
   }
 
   async browseOutputDir() {

@@ -19,6 +19,8 @@ export type { KdbxEntry, KdbxGroup }
 
 const storage = new LocalStore('tinker-password-manager')
 
+const STORAGE_RECENT_FILES = 'recent-files'
+
 class Store extends BaseStore {
   // Database state
   db: kdbxweb.Kdbx | null = null
@@ -44,7 +46,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadRecentFiles()
+    this.loadStorage()
     this.bindEvent()
   }
 
@@ -58,15 +60,15 @@ class Store extends BaseStore {
     )
   }
 
-  private loadRecentFiles() {
-    const recent = storage.get('recent-files')
+  private loadStorage() {
+    const recent = storage.get(STORAGE_RECENT_FILES)
     if (recent) {
       this.recentFiles = recent
     }
   }
 
   private saveRecentFiles() {
-    storage.set('recent-files', this.recentFiles)
+    storage.set(STORAGE_RECENT_FILES, this.recentFiles)
   }
 
   addRecentFile(path: string) {

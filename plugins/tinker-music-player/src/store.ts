@@ -38,7 +38,12 @@ const AUDIO_EXTS = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma']
 const FAVORITE_SHEET_ID = 'favorite'
 const MAX_RECENT = 100
 
-const settings = new LocalStore('tinker-music-player')
+const storage = new LocalStore('tinker-music-player')
+
+const STORAGE_VOLUME = 'volume'
+const STORAGE_PLAY_MODE = 'playMode'
+const STORAGE_CURRENT_TRACK_ID = 'currentTrackId'
+const STORAGE_PLAY_QUEUE_IDS = 'playQueueIds'
 
 class Store extends BaseStore {
   tracks: Track[] = []
@@ -67,15 +72,18 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.load()
+    this.loadStorage()
+    this.loadDb()
     this.setupAudio()
   }
 
-  private async load() {
-    this.volume = settings.get<number>('volume') ?? 0.8
-    this.playMode = settings.get<PlayMode>('playMode') || 'sequence'
+  private loadStorage() {
+    this.volume = storage.get<number>(STORAGE_VOLUME) ?? 0.8
+    this.playMode = storage.get<PlayMode>(STORAGE_PLAY_MODE) || 'sequence'
     audio.setVolume(this.volume)
+  }
 
+  private async loadDb() {
     const tracks = await getAllTracks()
     const recentTracks = await getRecentTracks()
     const sheets = await getAllSheets()
@@ -94,8 +102,8 @@ class Store extends BaseStore {
         putSheet(favoriteSheet)
       }
 
-      const savedTrackId = settings.get<string>('currentTrackId')
-      const savedQueueIds = settings.get<string[]>('playQueueIds') || []
+      const savedTrackId = storage.get<string>(STORAGE_CURRENT_TRACK_ID)
+      const savedQueueIds = storage.get<string[]>(STORAGE_PLAY_QUEUE_IDS) || []
       if (savedQueueIds.length > 0) {
         const trackMap = this.trackMap
         this.playQueue = savedQueueIds
@@ -120,12 +128,12 @@ class Store extends BaseStore {
   }
 
   private debouncedSaveVolume = debounce(() => {
-    settings.set('volume', this.volume)
+    storage.set(STORAGE_VOLUME, this.volume)
   }, 300)
 
   private saveQueue() {
-    settings.set(
-      'playQueueIds',
+    storage.set(
+      STORAGE_PLAY_QUEUE_IDS,
       this.playQueue.map((t) => t.id)
     )
   }
@@ -508,7 +516,7 @@ class Store extends BaseStore {
     this.duration = 0
     this.playQueue = []
     this.showPlayQueue = false
-    settings.set('currentTrackId', '')
+    storage.set(STORAGE_CURRENT_TRACK_ID, '')
     this.saveQueue()
   }
 
@@ -605,7 +613,7 @@ class Store extends BaseStore {
   }
 
   private async startPlayback(track: Track) {
-    settings.set('currentTrackId', track.id)
+    storage.set(STORAGE_CURRENT_TRACK_ID, track.id)
     this.loadLyrics(track)
     try {
       await audio.play(`file://${track.path}`)
@@ -639,7 +647,7 @@ class Store extends BaseStore {
 
   setPlayMode(mode: PlayMode) {
     this.playMode = mode
-    settings.set('playMode', this.playMode)
+    storage.set(STORAGE_PLAY_MODE, this.playMode)
   }
 
   cyclePlayMode() {

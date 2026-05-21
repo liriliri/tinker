@@ -10,8 +10,8 @@ import { FilterTab } from './types'
 
 export type { ClipboardType, ClipboardItem, FilterTab }
 
-const STORAGE_KEY_FILTER_TAB = 'filter-tab'
-const STORAGE_KEY_SEARCH_QUERY = 'search-query'
+const STORAGE_FILTER_TAB = 'filter-tab'
+const STORAGE_SEARCH_QUERY = 'search-query'
 
 const storage = new LocalStore('tinker-clipboard')
 
@@ -107,8 +107,8 @@ class Store extends BaseStore {
 
   private async loadStorage() {
     try {
-      const filterTab = storage.get(STORAGE_KEY_FILTER_TAB)
-      const searchQuery = storage.get(STORAGE_KEY_SEARCH_QUERY)
+      const filterTab = storage.get(STORAGE_FILTER_TAB)
+      const searchQuery = storage.get(STORAGE_SEARCH_QUERY)
 
       if (filterTab) {
         this.filterTab = filterTab as FilterTab
@@ -130,8 +130,8 @@ class Store extends BaseStore {
 
   private saveFilters() {
     try {
-      storage.set(STORAGE_KEY_FILTER_TAB, this.filterTab)
-      storage.set(STORAGE_KEY_SEARCH_QUERY, this.searchQuery)
+      storage.set(STORAGE_FILTER_TAB, this.filterTab)
+      storage.set(STORAGE_SEARCH_QUERY, this.searchQuery)
     } catch (error) {
       console.error('Failed to save filters:', error)
     }

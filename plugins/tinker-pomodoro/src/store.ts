@@ -7,6 +7,12 @@ import TimerWorker from './lib/timer.worker?worker'
 
 const storage = new LocalStore('tinker-pomodoro')
 
+const STORAGE_FOCUS_TIME = 'focus-time'
+const STORAGE_SHORT_BREAK_TIME = 'short-break-time'
+const STORAGE_LONG_BREAK_TIME = 'long-break-time'
+const STORAGE_TOTAL_FOCUS_COMPLETED = 'total-focus-completed'
+const STORAGE_VOLUME = 'volume'
+
 type TimerMode = 'focus' | 'shortBreak' | 'longBreak'
 
 class Store extends BaseStore {
@@ -51,11 +57,11 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedFocus = storage.get('focus-time')
-    const savedShortBreak = storage.get('short-break-time')
-    const savedLongBreak = storage.get('long-break-time')
-    const savedTotalFocus = storage.get('total-focus-completed')
-    const savedVolume = storage.get('volume')
+    const savedFocus = storage.get(STORAGE_FOCUS_TIME)
+    const savedShortBreak = storage.get(STORAGE_SHORT_BREAK_TIME)
+    const savedLongBreak = storage.get(STORAGE_LONG_BREAK_TIME)
+    const savedTotalFocus = storage.get(STORAGE_TOTAL_FOCUS_COMPLETED)
+    const savedVolume = storage.get(STORAGE_VOLUME)
 
     if (savedFocus) this.focusTime = savedFocus
     if (savedShortBreak) this.shortBreakTime = savedShortBreak
@@ -93,7 +99,7 @@ class Store extends BaseStore {
     this.mode = 'focus'
     this.timeLeft = this.focusTime * 60
     this.totalFocusCompleted = 0
-    storage.set('total-focus-completed', 0)
+    storage.set(STORAGE_TOTAL_FOCUS_COMPLETED, 0)
     if (this.worker) {
       this.worker.postMessage({ type: 'reset' })
     }
@@ -109,7 +115,7 @@ class Store extends BaseStore {
 
   setVolume(value: number) {
     this.volume = clamp(value, 0, 100)
-    storage.set('volume', this.volume)
+    storage.set(STORAGE_VOLUME, this.volume)
   }
 
   toggleMute() {
@@ -160,7 +166,7 @@ class Store extends BaseStore {
   private nextRound() {
     if (this.mode === 'focus') {
       this.totalFocusCompleted++
-      storage.set('total-focus-completed', this.totalFocusCompleted)
+      storage.set(STORAGE_TOTAL_FOCUS_COMPLETED, this.totalFocusCompleted)
 
       if (this.currentRound >= this.totalRounds) {
         this.mode = 'longBreak'

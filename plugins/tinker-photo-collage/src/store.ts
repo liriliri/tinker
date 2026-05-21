@@ -9,15 +9,15 @@ import type { Photo, LayoutTemplate, PhotoSlot } from './types'
 
 export type { Photo, LayoutTemplate, PhotoSlot }
 
-const STORAGE_KEY_CANVAS_BG_COLOR = 'canvasBgColor'
-const STORAGE_KEY_IMAGE_BG_COLOR = 'imageBgColor'
-const STORAGE_KEY_TEMPLATE_ID = 'templateId'
-const STORAGE_KEY_PHOTO_COUNT = 'photoCount'
-const STORAGE_KEY_PADDING = 'padding'
-const STORAGE_KEY_SPACING = 'spacing'
-const STORAGE_KEY_RADIUS = 'radius'
-const STORAGE_KEY_CANVAS_WIDTH = 'canvasWidth'
-const STORAGE_KEY_CANVAS_HEIGHT = 'canvasHeight'
+const STORAGE_CANVAS_BG_COLOR = 'canvasBgColor'
+const STORAGE_IMAGE_BG_COLOR = 'imageBgColor'
+const STORAGE_TEMPLATE_ID = 'templateId'
+const STORAGE_PHOTO_COUNT = 'photoCount'
+const STORAGE_PADDING = 'padding'
+const STORAGE_SPACING = 'spacing'
+const STORAGE_RADIUS = 'radius'
+const STORAGE_CANVAS_WIDTH = 'canvasWidth'
+const STORAGE_CANVAS_HEIGHT = 'canvasHeight'
 const storage = new LocalStore('tinker-photo-collage')
 
 class Store extends BaseStore {
@@ -51,47 +51,47 @@ class Store extends BaseStore {
   }
 
   loadStorage() {
-    const savedCanvasBgColor = storage.get(STORAGE_KEY_CANVAS_BG_COLOR)
+    const savedCanvasBgColor = storage.get(STORAGE_CANVAS_BG_COLOR)
     if (savedCanvasBgColor) {
       this.canvasBgColor = savedCanvasBgColor
     }
 
-    const savedImageBgColor = storage.get(STORAGE_KEY_IMAGE_BG_COLOR)
+    const savedImageBgColor = storage.get(STORAGE_IMAGE_BG_COLOR)
     if (savedImageBgColor) {
       this.imageBgColor = savedImageBgColor
     }
 
-    const savedPhotoCount = storage.get(STORAGE_KEY_PHOTO_COUNT)
+    const savedPhotoCount = storage.get(STORAGE_PHOTO_COUNT)
     if (savedPhotoCount) {
       this.selectedPhotoCount = parseInt(savedPhotoCount)
     }
 
-    const savedPadding = storage.get(STORAGE_KEY_PADDING)
+    const savedPadding = storage.get(STORAGE_PADDING)
     if (savedPadding) {
       this.padding = parseInt(savedPadding)
     }
 
-    const savedSpacing = storage.get(STORAGE_KEY_SPACING)
+    const savedSpacing = storage.get(STORAGE_SPACING)
     if (savedSpacing) {
       this.spacing = parseInt(savedSpacing)
     }
 
-    const savedRadius = storage.get(STORAGE_KEY_RADIUS)
+    const savedRadius = storage.get(STORAGE_RADIUS)
     if (savedRadius) {
       this.radius = parseInt(savedRadius)
     }
 
-    const savedCanvasWidth = storage.get(STORAGE_KEY_CANVAS_WIDTH)
+    const savedCanvasWidth = storage.get(STORAGE_CANVAS_WIDTH)
     if (savedCanvasWidth) {
       this.canvasWidth = parseInt(savedCanvasWidth)
     }
 
-    const savedCanvasHeight = storage.get(STORAGE_KEY_CANVAS_HEIGHT)
+    const savedCanvasHeight = storage.get(STORAGE_CANVAS_HEIGHT)
     if (savedCanvasHeight) {
       this.canvasHeight = parseInt(savedCanvasHeight)
     }
 
-    const savedTemplateId = storage.get(STORAGE_KEY_TEMPLATE_ID)
+    const savedTemplateId = storage.get(STORAGE_TEMPLATE_ID)
     if (savedTemplateId) {
       const template = getTemplateById(savedTemplateId)
       if (template) {
@@ -153,7 +153,7 @@ class Store extends BaseStore {
       offsetY: 0,
     }))
     this.initializeGridSizes(templateId)
-    storage.set(STORAGE_KEY_TEMPLATE_ID, templateId)
+    storage.set(STORAGE_TEMPLATE_ID, templateId)
   }
 
   initializeGridSizes(templateId: string) {
@@ -199,39 +199,39 @@ class Store extends BaseStore {
       const firstTemplate = templates[0]
       this.setTemplate(firstTemplate.id, firstTemplate.areas)
     }
-    storage.set(STORAGE_KEY_PHOTO_COUNT, count.toString())
+    storage.set(STORAGE_PHOTO_COUNT, count.toString())
   }
 
   setPadding(value: number) {
     this.padding = value
-    storage.set(STORAGE_KEY_PADDING, value.toString())
+    storage.set(STORAGE_PADDING, value.toString())
   }
 
   setSpacing(value: number) {
     this.spacing = value
-    storage.set(STORAGE_KEY_SPACING, value.toString())
+    storage.set(STORAGE_SPACING, value.toString())
   }
 
   setRadius(value: number) {
     this.radius = value
-    storage.set(STORAGE_KEY_RADIUS, value.toString())
+    storage.set(STORAGE_RADIUS, value.toString())
   }
 
   setCanvasSize(width: number, height: number) {
     this.canvasWidth = width
     this.canvasHeight = height
-    storage.set(STORAGE_KEY_CANVAS_WIDTH, width.toString())
-    storage.set(STORAGE_KEY_CANVAS_HEIGHT, height.toString())
+    storage.set(STORAGE_CANVAS_WIDTH, width.toString())
+    storage.set(STORAGE_CANVAS_HEIGHT, height.toString())
   }
 
   setCanvasBgColor(color: string) {
     this.canvasBgColor = color
-    storage.set(STORAGE_KEY_CANVAS_BG_COLOR, color)
+    storage.set(STORAGE_CANVAS_BG_COLOR, color)
   }
 
   setImageBgColor(color: string) {
     this.imageBgColor = color
-    storage.set(STORAGE_KEY_IMAGE_BG_COLOR, color)
+    storage.set(STORAGE_IMAGE_BG_COLOR, color)
   }
 
   setPhotoScale(areaName: string, scale: number) {

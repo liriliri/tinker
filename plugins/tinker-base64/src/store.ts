@@ -15,8 +15,8 @@ import i18n from 'i18next'
 type InputType = 'text' | 'file'
 
 const storage = new LocalStore('tinker-base64')
-const STORAGE_KEY_INPUT_TYPE = 'inputType'
-const STORAGE_KEY_OUTPUT_AS_DATA_URL = 'outputAsDataUrl'
+const STORAGE_INPUT_TYPE = 'inputType'
+const STORAGE_OUTPUT_AS_DATA_URL = 'outputAsDataUrl'
 
 class Store extends BaseStore {
   inputType: InputType = 'text'
@@ -58,12 +58,12 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedInputType = storage.get(STORAGE_KEY_INPUT_TYPE)
+    const savedInputType = storage.get(STORAGE_INPUT_TYPE)
     if (savedInputType === 'text' || savedInputType === 'file') {
       this.inputType = savedInputType
     }
 
-    const savedOutputAsDataUrl = storage.get(STORAGE_KEY_OUTPUT_AS_DATA_URL)
+    const savedOutputAsDataUrl = storage.get(STORAGE_OUTPUT_AS_DATA_URL)
     if (typeof savedOutputAsDataUrl === 'boolean') {
       this.outputAsDataUrl = savedOutputAsDataUrl
     }
@@ -71,7 +71,7 @@ class Store extends BaseStore {
 
   setInputType(type: InputType) {
     this.inputType = type
-    storage.set(STORAGE_KEY_INPUT_TYPE, type)
+    storage.set(STORAGE_INPUT_TYPE, type)
   }
 
   setInputText(value: string) {
@@ -87,7 +87,7 @@ class Store extends BaseStore {
 
   setOutputAsDataUrl(value: boolean) {
     this.outputAsDataUrl = value
-    storage.set(STORAGE_KEY_OUTPUT_AS_DATA_URL, value)
+    storage.set(STORAGE_OUTPUT_AS_DATA_URL, value)
   }
 
   async copyToClipboardWithToast(text: string) {

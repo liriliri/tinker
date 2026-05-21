@@ -20,6 +20,10 @@ const MIN_WINDOW_SIZE = {
 
 const storage = new LocalStore('tinker-float')
 
+const STORAGE_WINDOW_WIDTH = 'windowWidth'
+const STORAGE_WINDOW_HEIGHT = 'windowHeight'
+const STORAGE_ALWAYS_ON_TOP = 'alwaysOnTop'
+
 class Store extends BaseStore {
   contentType: 'image' | 'text' | 'video' | 'url' = 'text'
   textContent: string = ''
@@ -41,9 +45,9 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const width = storage.get<number | undefined>('windowWidth')
-    const height = storage.get<number | undefined>('windowHeight')
-    const alwaysOnTop = storage.get<boolean | undefined>('alwaysOnTop')
+    const width = storage.get<number | undefined>(STORAGE_WINDOW_WIDTH)
+    const height = storage.get<number | undefined>(STORAGE_WINDOW_HEIGHT)
+    const alwaysOnTop = storage.get<boolean | undefined>(STORAGE_ALWAYS_ON_TOP)
     if (width != null) this.windowWidth = width
     if (height != null) this.windowHeight = height
     if (alwaysOnTop != null) this.alwaysOnTop = alwaysOnTop
@@ -183,17 +187,17 @@ class Store extends BaseStore {
 
   setWindowWidth(w: number) {
     this.windowWidth = Math.max(this.minWindowWidth, w)
-    storage.set('windowWidth', this.windowWidth)
+    storage.set(STORAGE_WINDOW_WIDTH, this.windowWidth)
   }
 
   setWindowHeight(h: number) {
     this.windowHeight = Math.max(this.minWindowHeight, h)
-    storage.set('windowHeight', this.windowHeight)
+    storage.set(STORAGE_WINDOW_HEIGHT, this.windowHeight)
   }
 
   setAlwaysOnTop(v: boolean) {
     this.alwaysOnTop = v
-    storage.set('alwaysOnTop', v)
+    storage.set(STORAGE_ALWAYS_ON_TOP, v)
   }
 
   setImageNaturalSize(w: number, h: number) {

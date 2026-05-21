@@ -5,6 +5,8 @@ import { config, getType, calculate } from './lib/units'
 
 const storage = new LocalStore('tinker-unit-converter')
 
+const STORAGE_STATE = 'state'
+
 type ConversionResult = {
   key: string
   value: string
@@ -20,11 +22,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadSavedState()
+    this.loadStorage()
   }
 
-  private loadSavedState() {
-    const saved = storage.get('state')
+  private loadStorage() {
+    const saved = storage.get(STORAGE_STATE)
     if (saved) {
       this.type = saved.type || 'length'
       this.from = saved.from || 'm'
@@ -96,7 +98,7 @@ class Store extends BaseStore {
   }
 
   private saveState() {
-    storage.set('state', {
+    storage.set(STORAGE_STATE, {
       type: this.type,
       from: this.from,
       input: this.input,

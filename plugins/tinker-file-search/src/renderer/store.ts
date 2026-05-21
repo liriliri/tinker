@@ -6,7 +6,10 @@ import { getFileIcon } from 'share/lib/util'
 import type { FileResult } from './types'
 
 const MAX_RESULTS = 100
-const localStore = new LocalStore('tinker-file-search')
+const storage = new LocalStore('tinker-file-search')
+
+const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
+const STORAGE_SHOW_PREVIEW = 'showPreview'
 
 class Store extends BaseStore {
   query = ''
@@ -14,9 +17,9 @@ class Store extends BaseStore {
   searching = false
   hasMore = false
   iconCache: Map<string, string> = new Map()
-  moveToTrash: boolean = localStore.get('moveToTrash') !== false
+  moveToTrash: boolean = storage.get(STORAGE_MOVE_TO_TRASH) !== false
   pendingDeletePath: string | null = null
-  showPreview: boolean = localStore.get('showPreview') !== false
+  showPreview: boolean = storage.get(STORAGE_SHOW_PREVIEW) !== false
   selectedFile: FileResult | null = null
 
   private debounceSearch = debounce(() => this.search(), 300)
@@ -126,7 +129,7 @@ class Store extends BaseStore {
 
   setMoveToTrash(value: boolean) {
     this.moveToTrash = value
-    localStore.set('moveToTrash', value)
+    storage.set(STORAGE_MOVE_TO_TRASH, value)
   }
 
   requestDelete(filePath: string) {
@@ -135,7 +138,7 @@ class Store extends BaseStore {
 
   setShowPreview(value: boolean) {
     this.showPreview = value
-    localStore.set('showPreview', value)
+    storage.set(STORAGE_SHOW_PREVIEW, value)
   }
 
   setSelectedFile(file: FileResult | null) {

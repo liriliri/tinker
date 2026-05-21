@@ -8,7 +8,7 @@ import { execRules } from './lib/rules'
 import { parseFile, ruleDescription } from './lib/util'
 
 const storage = new LocalStore('tinker-renamer')
-const RULES_KEY = 'rules'
+const STORAGE_RULES = 'rules'
 
 class Store extends BaseStore {
   files: string[] = []
@@ -28,14 +28,14 @@ class Store extends BaseStore {
   }
 
   private loadRules() {
-    const saved = storage.get(RULES_KEY)
+    const saved = storage.get(STORAGE_RULES)
     if (Array.isArray(saved)) {
       this.rules = saved
     }
   }
 
   private saveRules() {
-    storage.set(RULES_KEY, toJS(this.rules))
+    storage.set(STORAGE_RULES, toJS(this.rules))
   }
 
   get fileInfos(): FileInfo[] {

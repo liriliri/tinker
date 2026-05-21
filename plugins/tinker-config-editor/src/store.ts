@@ -7,9 +7,9 @@ import BaseStore from 'share/BaseStore'
 import { getConfigFiles } from './lib/configFiles'
 import type { ConfigFile } from './types'
 
-const STORAGE_KEY = 'file-path'
-const FONT_SIZE_KEY = 'font-size'
-const SIDEBAR_OPEN_KEY = 'sidebarOpen'
+const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_FONT_SIZE = 'font-size'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 
 const DEFAULT_FONT_SIZE = 14
 const MIN_FONT_SIZE = 10
@@ -33,6 +33,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadStorage()
     this.init()
     this.bindEvent()
   }
@@ -46,10 +47,13 @@ class Store extends BaseStore {
     )
   }
 
-  private async init() {
+  private loadStorage() {
     this.sidebarOpen =
-      storage.get<boolean | undefined>(SIDEBAR_OPEN_KEY) ?? true
-    this.fontSize = Number(storage.get(FONT_SIZE_KEY)) || DEFAULT_FONT_SIZE
+      storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
+    this.fontSize = Number(storage.get(STORAGE_FONT_SIZE)) || DEFAULT_FONT_SIZE
+  }
+
+  private async init() {
     await this.loadConfigFiles()
     await this.loadSavedFile()
   }
@@ -62,7 +66,7 @@ class Store extends BaseStore {
   }
 
   private async loadSavedFile() {
-    const savedFilePath = storage.get<string | undefined>(STORAGE_KEY)
+    const savedFilePath = storage.get<string | undefined>(STORAGE_FILE_PATH)
 
     if (savedFilePath) {
       try {
@@ -75,7 +79,7 @@ class Store extends BaseStore {
         })
         return
       } catch {
-        storage.remove(STORAGE_KEY)
+        storage.remove(STORAGE_FILE_PATH)
       }
     }
 
@@ -126,14 +130,14 @@ class Store extends BaseStore {
   increaseFontSize() {
     if (this.fontSize < MAX_FONT_SIZE) {
       this.fontSize = this.fontSize + 1
-      storage.set(FONT_SIZE_KEY, this.fontSize)
+      storage.set(STORAGE_FONT_SIZE, this.fontSize)
     }
   }
 
   decreaseFontSize() {
     if (this.fontSize > MIN_FONT_SIZE) {
       this.fontSize = this.fontSize - 1
-      storage.set(FONT_SIZE_KEY, this.fontSize)
+      storage.set(STORAGE_FONT_SIZE, this.fontSize)
     }
   }
 
@@ -147,13 +151,13 @@ class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set(SIDEBAR_OPEN_KEY, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   loadFromFile(content: string, filePath: string) {
     this.currentFilePath = filePath
     this.savedContent = content
-    storage.set(STORAGE_KEY, filePath)
+    storage.set(STORAGE_FILE_PATH, filePath)
     this.setContent(content)
     this.fileVersion++
   }

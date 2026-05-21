@@ -12,7 +12,9 @@ import {
 } from './lib/dataProcess'
 import type { ChartControls } from './lib/d3chart'
 
-const localStore = new LocalStore('tinker-disk-usage')
+const storage = new LocalStore('tinker-disk-usage')
+
+const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
 export type ViewState = 'open' | 'scanning' | 'chart'
 
@@ -28,7 +30,7 @@ class Store extends BaseStore {
   navigationIndex: number = -1
   chartControls: ChartControls | null = null
   scanTask: tinker.DiskUsageTask | null = null
-  moveToTrash: boolean = localStore.get('moveToTrash') !== false
+  moveToTrash: boolean = storage.get(STORAGE_MOVE_TO_TRASH) !== false
 
   constructor() {
     super()
@@ -220,7 +222,7 @@ class Store extends BaseStore {
 
   setMoveToTrash(value: boolean) {
     this.moveToTrash = value
-    localStore.set('moveToTrash', value)
+    storage.set(STORAGE_MOVE_TO_TRASH, value)
   }
 
   async deleteItem(id: string): Promise<boolean> {

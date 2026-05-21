@@ -12,6 +12,10 @@ import { getAllItems, addItems, putItem, deleteItemsBySource } from './lib/db'
 
 const storage = new LocalStore('tinker-rss-reader')
 
+const STORAGE_SOURCES = 'sources'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_VIEW_MODE = 'viewMode'
+
 class Store extends BaseStore {
   sources: RSSSource[] = []
   items: RSSItem[] = []
@@ -28,14 +32,18 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.sources = storage.get<RSSSource[] | undefined>('sources') || []
-    this.sidebarOpen = storage.get<boolean | undefined>('sidebarOpen') ?? true
-    this.viewMode = storage.get<ViewMode | undefined>('viewMode') ?? 'list'
+    this.loadStorage()
     getAllItems().then((items) => {
       runInAction(() => {
         this.items = items
       })
     })
+  }
+
+  private loadStorage() {
+    this.sources = storage.get<RSSSource[] | undefined>(STORAGE_SOURCES) || []
+    this.sidebarOpen = storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
+    this.viewMode = storage.get<ViewMode | undefined>(STORAGE_VIEW_MODE) ?? 'list'
   }
 
   get filteredItems(): RSSItem[] {
@@ -65,12 +73,12 @@ class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set('sidebarOpen', this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   setViewMode(mode: ViewMode) {
     this.viewMode = mode
-    storage.set('viewMode', mode)
+    storage.set(STORAGE_VIEW_MODE, mode)
   }
 
   setSelectedSource(id: string | null) {
@@ -87,7 +95,7 @@ class Store extends BaseStore {
       item.hasRead = true
       const source = find(this.sources, (s) => s.id === item.sourceId)
       if (source) source.unreadCount = Math.max(0, source.unreadCount - 1)
-      storage.set('sources', this.sources)
+      storage.set(STORAGE_SOURCES, this.sources)
       putItem(item)
     }
   }
@@ -135,7 +143,7 @@ class Store extends BaseStore {
       source.unreadCount = this.items.filter(
         (i) => i.sourceId === source.id && !i.hasRead
       ).length
-      storage.set('sources', this.sources)
+      storage.set(STORAGE_SOURCES, this.sources)
     }
     putItem(item)
   }
@@ -154,7 +162,7 @@ class Store extends BaseStore {
     this.sources.forEach((s) => {
       if (targetIds.has(s.id)) s.unreadCount = 0
     })
-    storage.set('sources', this.sources)
+    storage.set(STORAGE_SOURCES, this.sources)
     addItems(changed)
   }
 
@@ -184,7 +192,7 @@ class Store extends BaseStore {
     runInAction(() => {
       this.sources.push(source)
       this.items.push(...newItems)
-      storage.set('sources', this.sources)
+      storage.set(STORAGE_SOURCES, this.sources)
     })
   }
 
@@ -193,7 +201,7 @@ class Store extends BaseStore {
     this.items = this.items.filter((i) => i.sourceId !== id)
     if (this.selectedSourceId === id) this.selectedSourceId = null
     if (this.selectedItem?.sourceId === id) this.selectedItemId = null
-    storage.set('sources', this.sources)
+    storage.set(STORAGE_SOURCES, this.sources)
     await deleteItemsBySource(id)
   }
 
@@ -226,7 +234,7 @@ class Store extends BaseStore {
           (i) => i.sourceId === id && !i.hasRead
         ).length
         if (result.title) source.name = result.title
-        storage.set('sources', this.sources)
+        storage.set(STORAGE_SOURCES, this.sources)
       })
     } finally {
       runInAction(() => {

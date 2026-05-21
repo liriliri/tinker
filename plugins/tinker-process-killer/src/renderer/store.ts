@@ -15,7 +15,7 @@ import toast from 'react-hot-toast'
 import type { ProcessInfo, NetworkConnection } from '../common/types'
 import type { SortField, SortOrder, ViewMode } from './types'
 
-const STORAGE_KEY_VIEW_MODE = 'view-mode'
+const STORAGE_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-process-killer')
 const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
@@ -189,7 +189,7 @@ class Store extends BaseStore {
 
   private loadStorage() {
     try {
-      const viewMode = storage.get<ViewMode | undefined>(STORAGE_KEY_VIEW_MODE)
+      const viewMode = storage.get<ViewMode | undefined>(STORAGE_VIEW_MODE)
       if (viewMode) {
         this.viewMode = viewMode
       }
@@ -200,7 +200,7 @@ class Store extends BaseStore {
 
   private saveViewMode() {
     try {
-      storage.set(STORAGE_KEY_VIEW_MODE, this.viewMode)
+      storage.set(STORAGE_VIEW_MODE, this.viewMode)
     } catch (error) {
       console.error('Failed to save view mode:', error)
     }

@@ -5,7 +5,7 @@ import { Languages } from './lib/formatter/types'
 
 const storage = new LocalStore('tinker-code-formatter')
 
-const STORAGE_KEY = 'code-formatter-state'
+const STORAGE_STATE = 'code-formatter-state'
 
 type StoredState = {
   input: string
@@ -21,11 +21,11 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadState()
+    this.loadStorage()
   }
 
-  private loadState() {
-    const saved = storage.get<StoredState | null>(STORAGE_KEY)
+  private loadStorage() {
+    const saved = storage.get<StoredState | null>(STORAGE_STATE)
     if (saved) {
       this.input = saved.input || ''
       this.language = saved.language || 'javascript'
@@ -34,7 +34,7 @@ class Store extends BaseStore {
   }
 
   private saveState() {
-    storage.set(STORAGE_KEY, {
+    storage.set(STORAGE_STATE, {
       input: this.input,
       language: this.language,
       tabWidth: this.tabWidth,

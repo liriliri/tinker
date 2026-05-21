@@ -9,8 +9,8 @@ import {
 
 type InputType = 'text' | 'file'
 
-const STORAGE_KEY_UPPERCASE = 'uppercase'
-const STORAGE_KEY_INPUT_TYPE = 'inputType'
+const STORAGE_UPPERCASE = 'uppercase'
+const STORAGE_INPUT_TYPE = 'inputType'
 const storage = new LocalStore('tinker-hash')
 
 const EMPTY_HASH_RESULTS: Record<HashAlgorithm, string> = {
@@ -41,12 +41,12 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedUppercase = storage.get(STORAGE_KEY_UPPERCASE)
+    const savedUppercase = storage.get(STORAGE_UPPERCASE)
     if (savedUppercase !== null) {
       this.uppercase = savedUppercase === true || savedUppercase === 'true'
     }
 
-    const savedInputType = storage.get(STORAGE_KEY_INPUT_TYPE)
+    const savedInputType = storage.get(STORAGE_INPUT_TYPE)
     if (savedInputType === 'text' || savedInputType === 'file') {
       this.inputType = savedInputType
     }
@@ -59,14 +59,14 @@ class Store extends BaseStore {
 
   setUppercase(value: boolean) {
     this.uppercase = value
-    storage.set(STORAGE_KEY_UPPERCASE, value)
+    storage.set(STORAGE_UPPERCASE, value)
     this.calculateHashes()
     this.recalculateFileHashes()
   }
 
   setInputType(value: InputType) {
     this.inputType = value
-    storage.set(STORAGE_KEY_INPUT_TYPE, value)
+    storage.set(STORAGE_INPUT_TYPE, value)
   }
 
   clear() {

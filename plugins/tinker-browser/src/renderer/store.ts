@@ -15,6 +15,10 @@ const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
 const DEVTOOLS_POSITIONS = ['bottom', 'left', 'right'] as const
 
 const storage = new LocalStore('tinker-browser')
+
+const STORAGE_SITES = 'sites'
+const STORAGE_DEVTOOLS_POSITION = 'devToolsPosition'
+
 type DevToolsPosition = (typeof DEVTOOLS_POSITIONS)[number]
 
 class Store extends BaseStore {
@@ -40,17 +44,17 @@ class Store extends BaseStore {
       webviewRefs: false,
     })
     this.addTab()
-    this.loadSites()
+    this.loadStorage()
   }
 
-  private loadSites() {
-    const saved = storage.get('sites')
+  private loadStorage() {
+    const saved = storage.get(STORAGE_SITES)
     if (isArr(saved)) {
       this.sites = saved
     }
 
     const savedDevToolsPosition = storage.get<DevToolsPosition | undefined>(
-      'devToolsPosition'
+      STORAGE_DEVTOOLS_POSITION
     )
     if (
       isStr(savedDevToolsPosition) &&
@@ -67,7 +71,7 @@ class Store extends BaseStore {
   }
 
   private saveSites() {
-    storage.set('sites', this.sites)
+    storage.set(STORAGE_SITES, this.sites)
   }
 
   openSiteDialog(site?: ISite) {
@@ -112,7 +116,7 @@ class Store extends BaseStore {
 
   private async fetchAndCacheFavicon(id: string, url: string) {
     let fullUrl = url
-    if (!startWith(fullUrl, ['http://', 'https://'])) {
+    if (!startWith(fullUrl, 'http://') && !startWith(fullUrl, 'https://')) {
       fullUrl = 'https://' + fullUrl
     }
     const data = await browser.fetchFavicon(fullUrl)
@@ -224,7 +228,7 @@ class Store extends BaseStore {
 
     if (!startWith(url, 'view-source:')) {
       if (this.isValidUrl(url)) {
-        if (!startWith(url, ['http://', 'https://'])) {
+        if (!startWith(url, 'http://') && !startWith(url, 'https://')) {
           url = 'https://' + url
         }
       } else {
@@ -246,7 +250,7 @@ class Store extends BaseStore {
   }
 
   private isValidUrl(str: string): boolean {
-    if (startWith(str, ['http://', 'https://'])) return true
+    if (startWith(str, 'http://') || startWith(str, 'https://')) return true
     if (str.includes(' ')) return false
     if (str.includes('.')) return true
     if (startWith(str, 'localhost')) return true
@@ -324,7 +328,7 @@ class Store extends BaseStore {
 
   setDevToolsPosition(position: DevToolsPosition) {
     this.devToolsPosition = position
-    storage.set('devToolsPosition', position)
+    storage.set(STORAGE_DEVTOOLS_POSITION, position)
   }
 
   toggleDevTools() {

@@ -8,8 +8,9 @@ import i18n from 'i18next'
 import type { MindMapNode, MindMapInstance } from './types'
 
 const storage = new LocalStore('tinker-mind-map')
-const FILE_PATH_KEY = 'file-path'
-const STORAGE_KEY_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_MINDMAP_DATA = 'mindmap-data'
 
 class Store extends BaseStore {
   mindMap: MindMapInstance | null = null
@@ -32,7 +33,7 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedSidebarOpen = storage.get(STORAGE_KEY_SIDEBAR_OPEN)
+    const savedSidebarOpen = storage.get(STORAGE_SIDEBAR_OPEN)
     if (savedSidebarOpen !== undefined) {
       this.sidebarOpen = savedSidebarOpen
     }
@@ -85,7 +86,7 @@ class Store extends BaseStore {
   }
 
   private async loadSavedFile() {
-    const savedFilePath = storage.get(FILE_PATH_KEY)
+    const savedFilePath = storage.get(STORAGE_FILE_PATH)
 
     if (savedFilePath && this.mindMap) {
       try {
@@ -100,7 +101,7 @@ class Store extends BaseStore {
           this.fit()
         }, 100)
       } catch {
-        storage.remove(FILE_PATH_KEY)
+        storage.remove(STORAGE_FILE_PATH)
         this.isLoadingFile = false
       }
     }
@@ -140,7 +141,7 @@ class Store extends BaseStore {
   }
 
   loadData() {
-    const savedData = storage.get('mindmap-data')
+    const savedData = storage.get(STORAGE_MINDMAP_DATA)
     if (savedData) {
       return savedData
     }
@@ -154,14 +155,14 @@ class Store extends BaseStore {
   private saveData() {
     if (!this.mindMap) return
     const data = this.mindMap.getData(true)
-    storage.set('mindmap-data', data)
+    storage.set(STORAGE_MINDMAP_DATA, data)
   }
 
   newFile() {
     if (!this.mindMap) return
     this.isLoadingFile = true
     this.currentFilePath = null
-    storage.remove(FILE_PATH_KEY)
+    storage.remove(STORAGE_FILE_PATH)
     this.mindMap.setData(this.getDefaultTemplate())
     setTimeout(() => {
       this.hasChanges = false
@@ -188,7 +189,7 @@ class Store extends BaseStore {
         const data = JSON.parse(content as string)
         this.mindMap?.setFullData(data)
         this.currentFilePath = filePath
-        storage.set(FILE_PATH_KEY, filePath)
+        storage.set(STORAGE_FILE_PATH, filePath)
         setTimeout(() => {
           this.hasChanges = false
           this.isLoadingFile = false
@@ -224,7 +225,7 @@ class Store extends BaseStore {
           await tinker.writeFile(result.filePath, content)
           this.currentFilePath = result.filePath
           this.hasChanges = false
-          storage.set(FILE_PATH_KEY, result.filePath)
+          storage.set(STORAGE_FILE_PATH, result.filePath)
         }
       }
     } catch {
@@ -292,12 +293,12 @@ class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   setSidebarOpen(open: boolean) {
     this.sidebarOpen = open
-    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   showNodeContextMenu(e: MouseEvent, node: MindMapNode) {

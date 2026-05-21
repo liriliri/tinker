@@ -17,9 +17,9 @@ import {
 } from './lib/compress'
 import { extractJpegExif, injectJpegExif } from './lib/exif'
 
-const STORAGE_KEY_QUALITY = 'quality'
-const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
-const STORAGE_KEY_KEEP_EXIF = 'keepExif'
+const STORAGE_QUALITY = 'quality'
+const STORAGE_OVERWRITE = 'overwriteOriginal'
+const STORAGE_KEEP_EXIF = 'keepExif'
 const storage = new LocalStore('tinker-image-compressor')
 
 class Store extends BaseStore {
@@ -34,31 +34,31 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.init()
+    this.loadStorage()
   }
 
-  private async init() {
+  private loadStorage() {
     this.loadQuality()
     this.loadOverwriteSetting()
     this.loadKeepExifSetting()
   }
 
   private loadQuality() {
-    const savedQuality = storage.get(STORAGE_KEY_QUALITY)
+    const savedQuality = storage.get(STORAGE_QUALITY)
     if (savedQuality !== null) {
       this.quality = clamp(toNum(savedQuality), 1, 100)
     }
   }
 
   private loadOverwriteSetting() {
-    const savedOverwrite = storage.get(STORAGE_KEY_OVERWRITE)
+    const savedOverwrite = storage.get(STORAGE_OVERWRITE)
     if (savedOverwrite !== null) {
       this.overwriteOriginal = savedOverwrite === 'true'
     }
   }
 
   private loadKeepExifSetting() {
-    const saved = storage.get(STORAGE_KEY_KEEP_EXIF)
+    const saved = storage.get(STORAGE_KEEP_EXIF)
     if (saved !== null) {
       this.keepExif = saved === 'true'
     }
@@ -70,18 +70,18 @@ class Store extends BaseStore {
 
   setQuality(quality: number) {
     this.quality = quality
-    storage.set(STORAGE_KEY_QUALITY, String(quality))
+    storage.set(STORAGE_QUALITY, String(quality))
     this.invalidateCompressedData()
   }
 
   setOverwriteOriginal(overwrite: boolean) {
     this.overwriteOriginal = overwrite
-    storage.set(STORAGE_KEY_OVERWRITE, String(overwrite))
+    storage.set(STORAGE_OVERWRITE, String(overwrite))
   }
 
   setKeepExif(keepExif: boolean) {
     this.keepExif = keepExif
-    storage.set(STORAGE_KEY_KEEP_EXIF, String(keepExif))
+    storage.set(STORAGE_KEEP_EXIF, String(keepExif))
     this.invalidateCompressedData()
   }
 

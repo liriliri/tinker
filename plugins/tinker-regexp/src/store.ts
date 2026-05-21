@@ -5,6 +5,10 @@ import type { Match } from './types'
 
 const storage = new LocalStore('tinker-regexp')
 
+const STORAGE_PATTERN = 'pattern'
+const STORAGE_FLAGS = 'flags'
+const STORAGE_TEXT = 'text'
+
 class Store extends BaseStore {
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'
@@ -20,13 +24,13 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadState()
+    this.loadStorage()
   }
 
-  private loadState() {
-    const savedPattern = storage.get('pattern')
-    const savedFlags = storage.get('flags')
-    const savedText = storage.get('text')
+  private loadStorage() {
+    const savedPattern = storage.get(STORAGE_PATTERN)
+    const savedFlags = storage.get(STORAGE_FLAGS)
+    const savedText = storage.get(STORAGE_TEXT)
 
     if (savedPattern) this.pattern = savedPattern
     if (savedFlags) this.flags = savedFlags
@@ -37,13 +41,13 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   setPattern(pattern: string) {
     this.pattern = pattern
-    storage.set('pattern', pattern)
+    storage.set(STORAGE_PATTERN, pattern)
     this.updateMatches()
   }
 
   setFlags(flags: string) {
     this.flags = flags
-    storage.set('flags', flags)
+    storage.set(STORAGE_FLAGS, flags)
     this.updateMatches()
   }
 
@@ -57,7 +61,7 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   setTestText(text: string) {
     this.testText = text
-    storage.set('text', text)
+    storage.set(STORAGE_TEXT, text)
     this.updateMatches()
   }
 

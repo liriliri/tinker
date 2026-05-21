@@ -5,9 +5,9 @@ import BaseStore from 'share/BaseStore'
 
 type ViewMode = 'edit' | 'diff'
 
-const STORAGE_KEY = 'content'
-const MODE_STORAGE_KEY = 'mode'
-const LANGUAGE_STORAGE_KEY = 'language'
+const STORAGE_CONTENT = 'content'
+const STORAGE_MODE = 'mode'
+const STORAGE_LANGUAGE = 'language'
 
 const storage = new LocalStore('tinker-text-diff')
 
@@ -40,9 +40,9 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedContent = storage.get<string | undefined>(STORAGE_KEY)
-    const savedMode = storage.get<ViewMode | undefined>(MODE_STORAGE_KEY)
-    const savedLanguage = storage.get<string | undefined>(LANGUAGE_STORAGE_KEY)
+    const savedContent = storage.get<string | undefined>(STORAGE_CONTENT)
+    const savedMode = storage.get<ViewMode | undefined>(STORAGE_MODE)
+    const savedLanguage = storage.get<string | undefined>(STORAGE_LANGUAGE)
 
     if (savedContent) {
       try {
@@ -64,7 +64,7 @@ class Store extends BaseStore {
 
   private saveToStorage() {
     storage.set(
-      STORAGE_KEY,
+      STORAGE_CONTENT,
       JSON.stringify({
         original: this.originalText,
         modified: this.modifiedText,
@@ -134,12 +134,12 @@ class Store extends BaseStore {
 
   setMode(mode: ViewMode) {
     this.mode = mode
-    storage.set(MODE_STORAGE_KEY, mode)
+    storage.set(STORAGE_MODE, mode)
   }
 
   setLanguage(language: string) {
     this.language = language
-    storage.set(LANGUAGE_STORAGE_KEY, language)
+    storage.set(STORAGE_LANGUAGE, language)
   }
 
   setOriginalFileName(fileName: string) {

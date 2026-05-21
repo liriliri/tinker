@@ -5,8 +5,8 @@ import BaseStore from 'share/BaseStore'
 type TimestampUnit = 'millisecond' | 'second'
 type Timezone = string
 
-const STORAGE_KEY_UNIT = 'unit'
-const STORAGE_KEY_TIMEZONE = 'timezone'
+const STORAGE_UNIT = 'unit'
+const STORAGE_TIMEZONE = 'timezone'
 const storage = new LocalStore('tinker-timestamp')
 
 const TIMEZONE_KEYS: Record<string, string> = {
@@ -79,12 +79,12 @@ class Store extends BaseStore {
   }
 
   loadStorage() {
-    const savedUnit = storage.get(STORAGE_KEY_UNIT)
+    const savedUnit = storage.get(STORAGE_UNIT)
     if (savedUnit === 'millisecond' || savedUnit === 'second') {
       this.timestampUnit = savedUnit
     }
 
-    const savedTimezone = storage.get(STORAGE_KEY_TIMEZONE)
+    const savedTimezone = storage.get(STORAGE_TIMEZONE)
     if (savedTimezone && this.timezones.includes(savedTimezone)) {
       this.timezone = savedTimezone
     }
@@ -98,12 +98,12 @@ class Store extends BaseStore {
 
   setTimestampUnit(unit: TimestampUnit) {
     this.timestampUnit = unit
-    storage.set(STORAGE_KEY_UNIT, unit)
+    storage.set(STORAGE_UNIT, unit)
   }
 
   setTimezone(timezone: Timezone) {
     this.timezone = timezone
-    storage.set(STORAGE_KEY_TIMEZONE, timezone)
+    storage.set(STORAGE_TIMEZONE, timezone)
   }
 
   setSelectedDate(date: Date) {

@@ -17,13 +17,13 @@ import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
 import { resolveSavePath } from 'share/lib/util'
 
-const STORAGE_KEY_QUALITY = 'quality'
-const STORAGE_KEY_OUTPUT_DIR = 'outputDir'
-const STORAGE_KEY_MODE = 'mode'
-const STORAGE_KEY_VIDEO_MODE = 'videoMode'
-const STORAGE_KEY_AUDIO_MODE = 'audioMode'
-const STORAGE_KEY_TARGET_SIZE = 'targetSize'
-const STORAGE_KEY_TARGET_SIZE_UNIT = 'targetSizeUnit'
+const STORAGE_QUALITY = 'quality'
+const STORAGE_OUTPUT_DIR = 'outputDir'
+const STORAGE_MODE = 'mode'
+const STORAGE_VIDEO_MODE = 'videoMode'
+const STORAGE_AUDIO_MODE = 'audioMode'
+const STORAGE_TARGET_SIZE = 'targetSize'
+const STORAGE_TARGET_SIZE_UNIT = 'targetSizeUnit'
 const storage = new LocalStore('tinker-media-compressor')
 
 class Store extends BaseStore {
@@ -52,10 +52,10 @@ class Store extends BaseStore {
       cancelRequested: false,
       sizeUpdateCount: false,
     } as Record<string, false>)
-    this.init()
+    this.loadStorage()
   }
 
-  private init() {
+  private loadStorage() {
     this.loadQuality()
     this.loadOutputDir()
     this.loadMode()
@@ -65,7 +65,7 @@ class Store extends BaseStore {
   }
 
   private loadQuality() {
-    const saved = storage.get(STORAGE_KEY_QUALITY)
+    const saved = storage.get(STORAGE_QUALITY)
     if (saved != null) {
       const q = clamp(toNum(saved), 0, 4)
       if (!isNaN(q)) {
@@ -75,21 +75,21 @@ class Store extends BaseStore {
   }
 
   private loadOutputDir() {
-    const saved = storage.get(STORAGE_KEY_OUTPUT_DIR)
+    const saved = storage.get(STORAGE_OUTPUT_DIR)
     if (saved !== null) {
       this.outputDir = saved
     }
   }
 
   private loadMode() {
-    const saved = storage.get(STORAGE_KEY_MODE)
+    const saved = storage.get(STORAGE_MODE)
     if (saved === 'video' || saved === 'audio') {
       this.mode = saved
     }
   }
 
   private loadVideoMode() {
-    const saved = storage.get(STORAGE_KEY_VIDEO_MODE)
+    const saved = storage.get(STORAGE_VIDEO_MODE)
     if (
       saved === 'crf' ||
       saved === 'bitrate' ||
@@ -101,7 +101,7 @@ class Store extends BaseStore {
   }
 
   private loadAudioMode() {
-    const saved = storage.get(STORAGE_KEY_AUDIO_MODE)
+    const saved = storage.get(STORAGE_AUDIO_MODE)
     if (
       saved === 'bitrate' ||
       saved === 'samplerate' ||
@@ -112,14 +112,14 @@ class Store extends BaseStore {
   }
 
   private loadTargetSize() {
-    const savedSize = storage.get(STORAGE_KEY_TARGET_SIZE)
+    const savedSize = storage.get(STORAGE_TARGET_SIZE)
     if (savedSize != null) {
       const s = toNum(savedSize)
       if (!isNaN(s) && s > 0) {
         this.targetSize = s
       }
     }
-    const savedUnit = storage.get(STORAGE_KEY_TARGET_SIZE_UNIT)
+    const savedUnit = storage.get(STORAGE_TARGET_SIZE_UNIT)
     if (savedUnit === 'KB' || savedUnit === 'MB' || savedUnit === 'GB') {
       this.targetSizeUnit = savedUnit
     }
@@ -127,24 +127,24 @@ class Store extends BaseStore {
 
   setMode(mode: MediaType) {
     this.mode = mode
-    storage.set(STORAGE_KEY_MODE, mode)
+    storage.set(STORAGE_MODE, mode)
   }
 
   setVideoCompressionMode(mode: VideoCompressionMode) {
     this.videoCompressionMode = mode
-    storage.set(STORAGE_KEY_VIDEO_MODE, mode)
+    storage.set(STORAGE_VIDEO_MODE, mode)
   }
 
   setAudioCompressionMode(mode: AudioCompressionMode) {
     this.audioCompressionMode = mode
-    storage.set(STORAGE_KEY_AUDIO_MODE, mode)
+    storage.set(STORAGE_AUDIO_MODE, mode)
   }
 
   setTargetSize(size: number, unit: TargetSizeUnit) {
     this.targetSize = size
     this.targetSizeUnit = unit
-    storage.set(STORAGE_KEY_TARGET_SIZE, String(size))
-    storage.set(STORAGE_KEY_TARGET_SIZE_UNIT, unit)
+    storage.set(STORAGE_TARGET_SIZE, String(size))
+    storage.set(STORAGE_TARGET_SIZE_UNIT, unit)
   }
 
   get targetSizeBytes(): number {
@@ -158,12 +158,12 @@ class Store extends BaseStore {
 
   setQuality(quality: number) {
     this.quality = clamp(quality, 0, 4)
-    storage.set(STORAGE_KEY_QUALITY, String(this.quality))
+    storage.set(STORAGE_QUALITY, String(this.quality))
   }
 
   setOutputDir(dir: string) {
     this.outputDir = dir.replace(/[/\\]+$/, '')
-    storage.set(STORAGE_KEY_OUTPUT_DIR, this.outputDir)
+    storage.set(STORAGE_OUTPUT_DIR, this.outputDir)
   }
 
   async browseOutputDir() {

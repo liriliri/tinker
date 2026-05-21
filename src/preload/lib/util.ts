@@ -62,6 +62,7 @@ export function resolveResources(name: string): string {
 }
 
 export function decodeStr(latin1Str: string): string {
+  // eslint-disable-next-line no-control-regex
   if (/^[\x00-\x7f]*$/.test(latin1Str)) {
     return latin1Str
   }

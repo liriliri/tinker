@@ -11,9 +11,9 @@ import type { Session, SessionData } from './types'
 
 const storage = new LocalStore('tinker-ai-assistant')
 
-const PROVIDER_KEY = 'provider'
-const MODEL_KEY = 'model'
-const WORKING_DIR_KEY = 'workingDir'
+const STORAGE_PROVIDER = 'provider'
+const STORAGE_MODEL = 'model'
+const STORAGE_WORKING_DIR = 'workingDir'
 
 function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
   return TOOLS.map((toolDef) => {
@@ -138,16 +138,20 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.init()
+    this.loadStorage()
+    this.loadDb()
   }
 
-  private async init() {
-    this.selectedProvider = storage.get(PROVIDER_KEY) || ''
-    this.selectedModel = storage.get(MODEL_KEY) || ''
+  private loadStorage() {
+    this.selectedProvider = storage.get(STORAGE_PROVIDER) || ''
+    this.selectedModel = storage.get(STORAGE_MODEL) || ''
     const savedWorkingDir: string =
-      storage.get(WORKING_DIR_KEY) || aiAssistant.getHomeDir()
+      storage.get(STORAGE_WORKING_DIR) || aiAssistant.getHomeDir()
     this.workingDir = savedWorkingDir
+  }
 
+  private async loadDb() {
+    const savedWorkingDir = this.workingDir
     const [savedSession] = await Promise.all([
       db.loadSession(),
       this.loadProviders(),
@@ -174,15 +178,15 @@ class Store extends BaseStore {
           this.selectedProvider = providers[0].name
           const firstModel = providers[0].models[0]?.name || ''
           this.selectedModel = firstModel
-          storage.set(PROVIDER_KEY, this.selectedProvider)
-          storage.set(MODEL_KEY, this.selectedModel)
+          storage.set(STORAGE_PROVIDER, this.selectedProvider)
+          storage.set(STORAGE_MODEL, this.selectedModel)
         } else {
           const hasModel = provider.models.some(
             (m) => m.name === this.selectedModel
           )
           if (!hasModel) {
             this.selectedModel = provider.models[0]?.name || ''
-            storage.set(MODEL_KEY, this.selectedModel)
+            storage.set(STORAGE_MODEL, this.selectedModel)
           }
         }
       }
@@ -253,16 +257,16 @@ class Store extends BaseStore {
 
   setSelectedProvider(name: string) {
     this.selectedProvider = name
-    storage.set(PROVIDER_KEY, name)
+    storage.set(STORAGE_PROVIDER, name)
     const provider = this.providers.find((p) => p.name === name)
     const firstModel = provider?.models[0]?.name || ''
     this.selectedModel = firstModel
-    storage.set(MODEL_KEY, firstModel)
+    storage.set(STORAGE_MODEL, firstModel)
   }
 
   setSelectedModel(name: string) {
     this.selectedModel = name
-    storage.set(MODEL_KEY, name)
+    storage.set(STORAGE_MODEL, name)
   }
 
   setSelectedCombined(val: string) {
@@ -271,14 +275,14 @@ class Store extends BaseStore {
     const provider = val.slice(0, idx)
     const model = val.slice(idx + 1)
     this.selectedProvider = provider
-    storage.set(PROVIDER_KEY, provider)
+    storage.set(STORAGE_PROVIDER, provider)
     this.selectedModel = model
-    storage.set(MODEL_KEY, model)
+    storage.set(STORAGE_MODEL, model)
   }
 
   setWorkingDir(dir: string) {
     this.workingDir = dir
-    storage.set(WORKING_DIR_KEY, dir)
+    storage.set(STORAGE_WORKING_DIR, dir)
     this.session = {
       workingDir: dir,
       agent: createAgent(dir, this.session.agent.getMessages()),

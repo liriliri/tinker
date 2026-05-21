@@ -9,8 +9,8 @@ import convertBin from 'licia/convertBin'
 import i18n from 'i18next'
 
 const storage = new LocalStore('tinker-pdf')
-const STORAGE_KEY_SIDEBAR_OPEN = 'sidebarOpen'
-const STORAGE_KEY_SIDEBAR_VIEW = 'sidebarView'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_SIDEBAR_VIEW = 'sidebarView'
 
 export type SidebarView = 'thumbnails' | 'outline'
 
@@ -44,12 +44,12 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedSidebarOpen = storage.get(STORAGE_KEY_SIDEBAR_OPEN)
+    const savedSidebarOpen = storage.get(STORAGE_SIDEBAR_OPEN)
     if (savedSidebarOpen !== undefined) {
       this.sidebarOpen = savedSidebarOpen
     }
 
-    const savedSidebarView = storage.get(STORAGE_KEY_SIDEBAR_VIEW)
+    const savedSidebarView = storage.get(STORAGE_SIDEBAR_VIEW)
     if (savedSidebarView === 'thumbnails' || savedSidebarView === 'outline') {
       this.sidebarView = savedSidebarView
     }
@@ -133,17 +133,17 @@ class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   setSidebarOpen(open: boolean) {
     this.sidebarOpen = open
-    storage.set(STORAGE_KEY_SIDEBAR_OPEN, this.sidebarOpen)
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   setSidebarView(view: SidebarView) {
     this.sidebarView = view
-    storage.set(STORAGE_KEY_SIDEBAR_VIEW, view)
+    storage.set(STORAGE_SIDEBAR_VIEW, view)
   }
 
   setLoading(loading: boolean) {

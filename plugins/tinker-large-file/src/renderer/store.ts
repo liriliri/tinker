@@ -5,7 +5,10 @@ import { getFileCategory, getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
 
-const localStore = new LocalStore('tinker-large-file')
+const storage = new LocalStore('tinker-large-file')
+
+const STORAGE_SHOW_PREVIEW = 'showPreview'
+const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
@@ -18,9 +21,9 @@ class Store extends BaseStore {
   filterTab: FilterTab = 'all'
   selectedFiles: Set<string> = new Set()
   iconCache: Map<string, string> = new Map()
-  showPreview: boolean = localStore.get('showPreview') === true
+  showPreview: boolean = storage.get(STORAGE_SHOW_PREVIEW) === true
   selectedFile: FileEntry | null = null
-  moveToTrash: boolean = localStore.get('moveToTrash') !== false
+  moveToTrash: boolean = storage.get(STORAGE_MOVE_TO_TRASH) !== false
 
   constructor() {
     super()
@@ -40,7 +43,7 @@ class Store extends BaseStore {
 
   setShowPreview(value: boolean) {
     this.showPreview = value
-    localStore.set('showPreview', value)
+    storage.set(STORAGE_SHOW_PREVIEW, value)
   }
 
   setSelectedFile(file: FileEntry | null) {
@@ -79,7 +82,7 @@ class Store extends BaseStore {
 
   setMoveToTrash(value: boolean) {
     this.moveToTrash = value
-    localStore.set('moveToTrash', value)
+    storage.set(STORAGE_MOVE_TO_TRASH, value)
   }
 
   async deleteSelected(): Promise<{

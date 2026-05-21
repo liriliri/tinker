@@ -14,10 +14,10 @@ import { parseTodoItem, createRawTodo, getLocalDateStr } from './lib/todo'
 import { fileExists } from 'share/lib/util'
 
 const storage = new LocalStore('tinker-todo')
-const STORAGE_KEY_CURRENT_FILTER = 'currentFilter'
-const STORAGE_KEY_SHOW_COMPLETED = 'showCompleted'
-const STORAGE_KEY_FILE_PATH = 'filePath'
-const STORAGE_KEY_RECENT_FILES = 'recentFiles'
+const STORAGE_CURRENT_FILTER = 'currentFilter'
+const STORAGE_SHOW_COMPLETED = 'showCompleted'
+const STORAGE_FILE_PATH = 'filePath'
+const STORAGE_RECENT_FILES = 'recentFiles'
 
 class Store extends BaseStore {
   todos: TodoItem[] = []
@@ -43,7 +43,7 @@ class Store extends BaseStore {
 
   private loadStorage() {
     const savedFilter = storage.get<FilterType | undefined>(
-      STORAGE_KEY_CURRENT_FILTER
+      STORAGE_CURRENT_FILTER
     )
     if (
       savedFilter &&
@@ -55,14 +55,14 @@ class Store extends BaseStore {
     }
 
     const savedShowCompleted = storage.get<boolean | undefined>(
-      STORAGE_KEY_SHOW_COMPLETED
+      STORAGE_SHOW_COMPLETED
     )
     if (savedShowCompleted !== undefined) {
       this.showCompleted = savedShowCompleted
     }
 
     const savedRecentFiles = storage.get<string[] | undefined>(
-      STORAGE_KEY_RECENT_FILES
+      STORAGE_RECENT_FILES
     )
     if (savedRecentFiles) {
       this.recentFiles = savedRecentFiles
@@ -74,12 +74,12 @@ class Store extends BaseStore {
       path,
       ...this.recentFiles.filter((p) => p !== path),
     ].slice(0, 5)
-    storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
+    storage.set(STORAGE_RECENT_FILES, this.recentFiles)
   }
 
   removeRecentFile(path: string) {
     this.recentFiles = this.recentFiles.filter((p) => p !== path)
-    storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
+    storage.set(STORAGE_RECENT_FILES, this.recentFiles)
   }
 
   private bindEvent() {
@@ -98,7 +98,7 @@ class Store extends BaseStore {
   }
 
   private async initializeFile() {
-    const savedPath = storage.get<string | undefined>(STORAGE_KEY_FILE_PATH)
+    const savedPath = storage.get<string | undefined>(STORAGE_FILE_PATH)
     if (savedPath) {
       try {
         const content = await tinker.readFile(savedPath, 'utf-8')
@@ -111,7 +111,7 @@ class Store extends BaseStore {
           )
         })
       } catch (error) {
-        storage.remove(STORAGE_KEY_FILE_PATH)
+        storage.remove(STORAGE_FILE_PATH)
         runInAction(() => {
           this.needsFileSelection = true
           this.error =
@@ -127,12 +127,12 @@ class Store extends BaseStore {
     if (!(await fileExists(path))) {
       runInAction(() => {
         this.recentFiles = this.recentFiles.filter((p) => p !== path)
-        storage.set(STORAGE_KEY_RECENT_FILES, this.recentFiles)
+        storage.set(STORAGE_RECENT_FILES, this.recentFiles)
       })
       throw new Error('fileNotFound')
     }
     this.filePath = path
-    storage.set(STORAGE_KEY_FILE_PATH, path)
+    storage.set(STORAGE_FILE_PATH, path)
     this.needsFileSelection = false
     this.addRecentFile(path)
     await this.loadTodos()
@@ -146,7 +146,7 @@ class Store extends BaseStore {
     this.filePath = ''
     this.todos = []
     this.needsFileSelection = true
-    storage.remove(STORAGE_KEY_FILE_PATH)
+    storage.remove(STORAGE_FILE_PATH)
     tinker.setTitle('')
   }
 
@@ -227,7 +227,7 @@ class Store extends BaseStore {
 
   setCurrentFilter(filter: FilterType) {
     this.currentFilter = filter
-    storage.set(STORAGE_KEY_CURRENT_FILTER, filter)
+    storage.set(STORAGE_CURRENT_FILTER, filter)
   }
 
   setSearchQuery(query: string) {
@@ -244,7 +244,7 @@ class Store extends BaseStore {
 
   setShowCompleted(show: boolean) {
     this.showCompleted = show
-    storage.set(STORAGE_KEY_SHOW_COMPLETED, show)
+    storage.set(STORAGE_SHOW_COMPLETED, show)
   }
 
   addTodo(dueDate?: string) {

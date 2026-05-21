@@ -6,7 +6,8 @@ import LocalStore from 'licia/LocalStore'
 import i18n from 'i18next'
 import { hexToRgb, rgbToHsl, hslToRgb, rgbToHex } from './lib/util'
 
-const STORAGE_KEY = 'current'
+const STORAGE_CURRENT = 'current'
+const STORAGE_ALPHA = 'alpha'
 const storage = new LocalStore('tinker-color')
 
 class Store extends BaseStore {
@@ -20,11 +21,11 @@ class Store extends BaseStore {
   }
 
   private loadStorage() {
-    const savedColor = storage.get(STORAGE_KEY)
+    const savedColor = storage.get(STORAGE_CURRENT)
     if (savedColor) {
       this.currentColor = savedColor
     }
-    const savedAlpha = storage.get('alpha')
+    const savedAlpha = storage.get(STORAGE_ALPHA)
     if (savedAlpha !== undefined) {
       this.alpha = savedAlpha
     }
@@ -32,17 +33,17 @@ class Store extends BaseStore {
 
   setColor(color: string) {
     this.currentColor = color
-    storage.set(STORAGE_KEY, color)
+    storage.set(STORAGE_CURRENT, color)
   }
 
   handleColorChange(color: ColorResult) {
     this.currentColor = color.hex
-    storage.set(STORAGE_KEY, color.hex)
+    storage.set(STORAGE_CURRENT, color.hex)
   }
 
   setAlpha(alpha: number) {
     this.alpha = alpha
-    storage.set('alpha', alpha)
+    storage.set(STORAGE_ALPHA, alpha)
   }
 
   async copyToClipboardWithToast(text: string) {
@@ -59,7 +60,7 @@ class Store extends BaseStore {
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
     const newRgb = hslToRgb(hsl.h, saturation, hsl.l)
     this.currentColor = rgbToHex(newRgb.r, newRgb.g, newRgb.b)
-    storage.set(STORAGE_KEY, this.currentColor)
+    storage.set(STORAGE_CURRENT, this.currentColor)
   }
 
   adjustLightness(lightness: number) {
@@ -67,7 +68,7 @@ class Store extends BaseStore {
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
     const newRgb = hslToRgb(hsl.h, hsl.s, lightness)
     this.currentColor = rgbToHex(newRgb.r, newRgb.g, newRgb.b)
-    storage.set(STORAGE_KEY, this.currentColor)
+    storage.set(STORAGE_CURRENT, this.currentColor)
   }
 
   getCurrentHsl() {

@@ -5,9 +5,9 @@ import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
-const STORAGE_KEY = 'content'
-const FILE_PATH_KEY = 'file-path'
-const VIEW_MODE_KEY = 'view-mode'
+const STORAGE_CONTENT = 'content'
+const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-markdown-editor')
 
@@ -26,6 +26,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadStorage()
     this.init()
     this.bindEvent()
   }
@@ -40,16 +41,20 @@ class Store extends BaseStore {
     )
   }
 
-  private async init() {
-    // Load from localStorage first (as fallback)
-    this.loadFromLocalStorage()
-    // Load saved file if exists
-    await this.loadSavedFile()
+  private loadStorage() {
+    const savedContent = storage.get(STORAGE_CONTENT)
+    if (savedContent) {
+      this.markdownInput = savedContent
+    }
     this.loadViewMode()
   }
 
+  private async init() {
+    await this.loadSavedFile()
+  }
+
   private loadViewMode() {
-    const savedMode = storage.get(VIEW_MODE_KEY)
+    const savedMode = storage.get(STORAGE_VIEW_MODE)
     if (
       savedMode === 'split' ||
       savedMode === 'editor' ||
@@ -60,7 +65,7 @@ class Store extends BaseStore {
   }
 
   private async loadSavedFile() {
-    const savedFilePath = storage.get(FILE_PATH_KEY)
+    const savedFilePath = storage.get(STORAGE_FILE_PATH)
 
     if (savedFilePath) {
       try {
@@ -69,10 +74,10 @@ class Store extends BaseStore {
         this.savedContent = content
         this.markdownInput = content
         // Clear localStorage content since we're loading from a file
-        storage.remove(STORAGE_KEY)
+        storage.remove(STORAGE_CONTENT)
       } catch {
         // File no longer exists or can't be read, clear the saved path
-        storage.remove(FILE_PATH_KEY)
+        storage.remove(STORAGE_FILE_PATH)
         console.log('Failed to load saved file')
       }
     }
@@ -108,20 +113,12 @@ class Store extends BaseStore {
     return this.markdownInput !== this.savedContent
   }
 
-  private loadFromLocalStorage() {
-    const savedContent = storage.get(STORAGE_KEY)
-
-    if (savedContent) {
-      this.markdownInput = savedContent
-    }
-  }
-
   setMarkdownInput(value: string) {
     this.markdownInput = value
     // Only save to localStorage if there's no file path
     // When editing a file, content is managed by the file system
     if (!this.currentFilePath) {
-      storage.set(STORAGE_KEY, value)
+      storage.set(STORAGE_CONTENT, value)
     }
   }
 
@@ -146,9 +143,9 @@ class Store extends BaseStore {
     if (filePath) {
       this.currentFilePath = filePath
       this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
+      storage.set(STORAGE_FILE_PATH, filePath)
       // Clear localStorage content since we're now editing a file
-      storage.remove(STORAGE_KEY)
+      storage.remove(STORAGE_CONTENT)
     }
     this.setMarkdownInput(content)
     this.fileVersion++
@@ -157,9 +154,9 @@ class Store extends BaseStore {
   newFile() {
     this.currentFilePath = null
     this.savedContent = ''
-    storage.remove(FILE_PATH_KEY)
+    storage.remove(STORAGE_FILE_PATH)
     // Clear localStorage content when creating new file
-    storage.remove(STORAGE_KEY)
+    storage.remove(STORAGE_CONTENT)
     this.clearMarkdown()
     this.fileVersion++
   }
@@ -186,9 +183,9 @@ class Store extends BaseStore {
       const content = await tinker.readFile(filePath, 'utf-8')
       this.currentFilePath = filePath
       this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
+      storage.set(STORAGE_FILE_PATH, filePath)
       // Clear localStorage content since we're now editing a file
-      storage.remove(STORAGE_KEY)
+      storage.remove(STORAGE_CONTENT)
       this.loadFromFile(content)
     } catch (err) {
       console.error('Failed to open file:', err)
@@ -231,9 +228,9 @@ class Store extends BaseStore {
       await tinker.writeFile(result.filePath, this.markdownInput, 'utf-8')
       this.currentFilePath = result.filePath
       this.savedContent = this.markdownInput
-      storage.set(FILE_PATH_KEY, result.filePath)
+      storage.set(STORAGE_FILE_PATH, result.filePath)
       // Clear localStorage content since we now have a file path
-      storage.remove(STORAGE_KEY)
+      storage.remove(STORAGE_CONTENT)
     } catch (err) {
       console.error('Failed to save file as:', err)
     }
@@ -261,7 +258,7 @@ class Store extends BaseStore {
 
   setViewMode(mode: ViewMode) {
     this.viewMode = mode
-    storage.set(VIEW_MODE_KEY, mode)
+    storage.set(STORAGE_VIEW_MODE, mode)
   }
 }
 

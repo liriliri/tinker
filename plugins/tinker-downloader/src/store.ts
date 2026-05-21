@@ -8,6 +8,8 @@ import { FilterTab } from './types'
 
 const storage = new LocalStore('tinker-downloader')
 
+const STORAGE_SAVE_DIR = 'saveDir'
+
 function isFinished(d: tinker.DownloadTask): boolean {
   return d.state === 'completed' || d.state === 'cancelled'
 }
@@ -24,14 +26,19 @@ class Store extends BaseStore {
     makeAutoObservable(this, {
       downloads: observable.shallow,
     })
+    this.loadStorage()
     this.init()
   }
 
-  private async init() {
-    const savedDir = storage.get<string | undefined>('saveDir')
+  private loadStorage() {
+    const savedDir = storage.get<string | undefined>(STORAGE_SAVE_DIR)
     if (savedDir) {
       this.saveDir = savedDir
-    } else {
+    }
+  }
+
+  private async init() {
+    if (!this.saveDir) {
       const defaultDir = await tinker.getPath('downloads')
       runInAction(() => {
         this.saveDir = defaultDir
@@ -42,7 +49,7 @@ class Store extends BaseStore {
 
   setSaveDir(dir: string) {
     this.saveDir = dir
-    storage.set('saveDir', dir)
+    storage.set(STORAGE_SAVE_DIR, dir)
   }
 
   buildSavePath(fileName: string): string {

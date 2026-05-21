@@ -5,9 +5,9 @@ import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/BaseStore'
 
-const STORAGE_KEY = 'content'
-const FILE_PATH_KEY = 'file-path'
-const FONT_SIZE_KEY = 'font-size'
+const STORAGE_CONTENT = 'content'
+const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_FONT_SIZE = 'font-size'
 
 const DEFAULT_FONT_SIZE = 14
 const MIN_FONT_SIZE = 10
@@ -30,6 +30,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.loadStorage()
     this.init()
     this.bindEvent()
   }
@@ -43,14 +44,20 @@ class Store extends BaseStore {
     )
   }
 
+  private loadStorage() {
+    const savedContent = storage.get(STORAGE_CONTENT)
+    if (savedContent) {
+      this.content = savedContent
+    }
+    this.fontSize = Number(storage.get(STORAGE_FONT_SIZE)) || DEFAULT_FONT_SIZE
+  }
+
   private async init() {
-    this.loadFromLocalStorage()
     await this.loadSavedFile()
-    this.fontSize = Number(storage.get(FONT_SIZE_KEY)) || DEFAULT_FONT_SIZE
   }
 
   private async loadSavedFile() {
-    const savedFilePath = storage.get(FILE_PATH_KEY)
+    const savedFilePath = storage.get(STORAGE_FILE_PATH)
 
     if (savedFilePath) {
       try {
@@ -58,9 +65,9 @@ class Store extends BaseStore {
         this.currentFilePath = savedFilePath
         this.savedContent = content
         this.content = content
-        storage.remove(STORAGE_KEY)
+        storage.remove(STORAGE_CONTENT)
       } catch {
-        storage.remove(FILE_PATH_KEY)
+        storage.remove(STORAGE_FILE_PATH)
       }
     }
   }
@@ -88,17 +95,10 @@ class Store extends BaseStore {
     return this.content !== this.savedContent
   }
 
-  private loadFromLocalStorage() {
-    const savedContent = storage.get(STORAGE_KEY)
-    if (savedContent) {
-      this.content = savedContent
-    }
-  }
-
   setContent(value: string) {
     this.content = value
     if (!this.currentFilePath) {
-      storage.set(STORAGE_KEY, value)
+      storage.set(STORAGE_CONTENT, value)
     }
   }
 
@@ -114,14 +114,14 @@ class Store extends BaseStore {
   increaseFontSize() {
     if (this.fontSize < MAX_FONT_SIZE) {
       this.fontSize = this.fontSize + 1
-      storage.set(FONT_SIZE_KEY, this.fontSize)
+      storage.set(STORAGE_FONT_SIZE, this.fontSize)
     }
   }
 
   decreaseFontSize() {
     if (this.fontSize > MIN_FONT_SIZE) {
       this.fontSize = this.fontSize - 1
-      storage.set(FONT_SIZE_KEY, this.fontSize)
+      storage.set(STORAGE_FONT_SIZE, this.fontSize)
     }
   }
 
@@ -146,8 +146,8 @@ class Store extends BaseStore {
     if (filePath) {
       this.currentFilePath = filePath
       this.savedContent = content
-      storage.set(FILE_PATH_KEY, filePath)
-      storage.remove(STORAGE_KEY)
+      storage.set(STORAGE_FILE_PATH, filePath)
+      storage.remove(STORAGE_CONTENT)
     }
     this.setContent(content)
     this.fileVersion++
@@ -156,8 +156,8 @@ class Store extends BaseStore {
   newFile() {
     this.currentFilePath = null
     this.savedContent = ''
-    storage.remove(FILE_PATH_KEY)
-    storage.remove(STORAGE_KEY)
+    storage.remove(STORAGE_FILE_PATH)
+    storage.remove(STORAGE_CONTENT)
     this.setContent('')
     this.fileVersion++
   }
@@ -218,8 +218,8 @@ class Store extends BaseStore {
       await tinker.writeFile(result.filePath, this.content, 'utf-8')
       this.currentFilePath = result.filePath
       this.savedContent = this.content
-      storage.set(FILE_PATH_KEY, result.filePath)
-      storage.remove(STORAGE_KEY)
+      storage.set(STORAGE_FILE_PATH, result.filePath)
+      storage.remove(STORAGE_CONTENT)
     } catch (err) {
       console.error('Failed to save file as:', err)
     }

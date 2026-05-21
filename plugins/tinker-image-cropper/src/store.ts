@@ -3,7 +3,7 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import { openImageFile } from 'share/lib/util'
 
-const STORAGE_KEY_OVERWRITE = 'overwriteOriginal'
+const STORAGE_OVERWRITE = 'overwriteOriginal'
 const storage = new LocalStore('tinker-image-cropper')
 
 export interface ImageInfo {
@@ -46,7 +46,7 @@ class Store extends BaseStore {
   }
 
   private loadOverwriteSetting() {
-    const savedOverwrite = storage.get(STORAGE_KEY_OVERWRITE)
+    const savedOverwrite = storage.get(STORAGE_OVERWRITE)
     if (savedOverwrite !== null) {
       this.overwriteOriginal = savedOverwrite === 'true'
     }
@@ -54,7 +54,7 @@ class Store extends BaseStore {
 
   setOverwriteOriginal(overwrite: boolean) {
     this.overwriteOriginal = overwrite
-    storage.set(STORAGE_KEY_OVERWRITE, String(overwrite))
+    storage.set(STORAGE_OVERWRITE, String(overwrite))
   }
 
   setAspectRatio(ratio: number | null) {

@@ -8,8 +8,8 @@ import { ViewMode } from './types'
 import BaseStore from 'share/BaseStore'
 import i18n from 'i18next'
 
-const STORAGE_KEY_CONFIGS = 'configs'
-const STORAGE_KEY_ACTIVE_IDS = 'active-ids'
+const STORAGE_CONFIGS = 'configs'
+const STORAGE_ACTIVE_IDS = 'active-ids'
 
 const storage = new LocalStore('tinker-hosts')
 
@@ -30,8 +30,8 @@ class Store extends BaseStore {
 
   private loadStorage() {
     try {
-      const savedConfigs = storage.get(STORAGE_KEY_CONFIGS)
-      const savedActiveIds = storage.get(STORAGE_KEY_ACTIVE_IDS)
+      const savedConfigs = storage.get(STORAGE_CONFIGS)
+      const savedActiveIds = storage.get(STORAGE_ACTIVE_IDS)
 
       if (savedConfigs) {
         this.configs = JSON.parse(savedConfigs)
@@ -51,7 +51,7 @@ class Store extends BaseStore {
 
   saveConfigs() {
     try {
-      storage.set(STORAGE_KEY_CONFIGS, JSON.stringify(this.configs))
+      storage.set(STORAGE_CONFIGS, JSON.stringify(this.configs))
     } catch (error) {
       console.error('Failed to save configs:', error)
       this.error = i18n.t('saveConfigFailed', {
@@ -63,7 +63,7 @@ class Store extends BaseStore {
 
   saveActiveIds() {
     try {
-      storage.set(STORAGE_KEY_ACTIVE_IDS, JSON.stringify(this.activeIds))
+      storage.set(STORAGE_ACTIVE_IDS, JSON.stringify(this.activeIds))
     } catch (error) {
       console.error('Failed to save active IDs:', error)
       this.error = i18n.t('saveConfigFailed', {
