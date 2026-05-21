@@ -1,5 +1,5 @@
 import { app, dialog } from 'electron'
-import { resolve } from 'path'
+import { normalize, resolve } from 'path'
 import fs from 'fs-extra'
 import isMac from 'licia/isMac'
 import isWindows from 'licia/isWindows'
@@ -8,36 +8,36 @@ import { exec } from 'share/main/lib/util'
 
 const CLI_NAME = 'tinker'
 
+function getBinDir(): string {
+  return resolve(app.getAppPath(), '..', 'bin')
+}
+
 function getTargetPath(): string {
-  return resolve(app.getAppPath(), '..', 'bin', CLI_NAME)
+  return resolve(getBinDir(), CLI_NAME)
 }
 
 function getSymlinkPath(): string {
   return `/usr/local/bin/${CLI_NAME}`
 }
 
+async function isCliInstalledOnWindows(): Promise<boolean> {
+  const binDir = normalize(getBinDir()).toLowerCase()
+  const stdout = await exec(
+    `powershell -Command "[Environment]::GetEnvironmentVariable('Path', 'User')"`
+  )
+  const paths = stdout.trim().split(';')
+  return paths.some((p) => normalize(p).toLowerCase() === binDir)
+}
+
 export async function isCliInstalled(): Promise<boolean> {
-  if (isWindows) {
-    try {
-      const binDir = resolve(app.getAppPath(), '..', 'bin')
-      const stdout = await exec(
-        `powershell -Command "[Environment]::GetEnvironmentVariable('Path', 'User')"`
-      )
-      const paths = stdout.trim().split(';')
-      return paths.some(
-        (p) =>
-          p.replace(/[\\/]+$/, '').toLowerCase() === binDir.toLowerCase()
-      )
-    } catch {
-      return false
+  try {
+    if (isWindows) {
+      return await isCliInstalledOnWindows()
     }
-  } else {
-    try {
-      const stdout = await exec(`which ${CLI_NAME}`)
-      return stdout.trim().length > 0
-    } catch {
-      return false
-    }
+    const stdout = await exec(`which ${CLI_NAME}`)
+    return stdout.trim().length > 0
+  } catch {
+    return false
   }
 }
 
@@ -51,8 +51,7 @@ export async function installCli(): Promise<void> {
     const command = `osascript -e "do shell script \\"mkdir -p /usr/local/bin && ln -sf '${target}' '${symlinkPath}'\\" with administrator privileges"`
     await exec(command)
   } else if (isWindows) {
-    const binDir = resolve(app.getAppPath(), '..', 'bin')
-    const command = `powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';${binDir}', 'User')"`
+    const command = `powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';${getBinDir()}', 'User')"`
     await exec(command)
   } else {
     const target = getTargetPath()
