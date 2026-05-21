@@ -1,0 +1,2 @@
+#!/bin/sh
+ELECTRON_RUN_AS_NODE=1 exec "$(dirname "$0")/../../TINKER.exe" "$(dirname "$0")/../app.asar/main/cli.js" "$@"

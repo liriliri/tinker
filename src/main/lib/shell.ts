@@ -19,8 +19,15 @@ function getSymlinkPath(): string {
 export async function isCliInstalled(): Promise<boolean> {
   if (isWindows) {
     try {
-      const stdout = await exec(`where ${CLI_NAME}`)
-      return stdout.trim().length > 0
+      const binDir = resolve(app.getAppPath(), '..', 'bin')
+      const stdout = await exec(
+        `powershell -Command "[Environment]::GetEnvironmentVariable('Path', 'User')"`
+      )
+      const paths = stdout.trim().split(';')
+      return paths.some(
+        (p) =>
+          p.replace(/[\\/]+$/, '').toLowerCase() === binDir.toLowerCase()
+      )
     } catch {
       return false
     }
