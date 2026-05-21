@@ -27,5 +27,6 @@
   "showInFolder": "Show in Folder",
   "playSheet": "Play All",
   "clearAll": "Clear",
-  "noLyric": "No lyrics available"
+  "noLyric": "No lyrics available",
+  "miniMode": "Mini Mode"
 }

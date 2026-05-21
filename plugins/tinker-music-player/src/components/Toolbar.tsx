@@ -1,13 +1,17 @@
 import { observer } from 'mobx-react-lite'
-import { Music } from 'lucide-react'
+import { Music, PictureInPicture2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Toolbar,
   ToolbarSpacer,
   ToolbarSearch,
   ToolbarSearchDropdownItem,
+  ToolbarButton,
+  TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import { openPopupWindow } from 'share/lib/popupWindow'
 import store from '../store'
+import MiniMode from './MiniMode'
 
 const MusicToolbar = observer(() => {
   const { t } = useTranslation()
@@ -24,6 +28,20 @@ const MusicToolbar = observer(() => {
     store.addFromSearchResult(item.id)
   }
 
+  const handleMiniMode = () => {
+    openPopupWindow(
+      {
+        width: 360,
+        height: 72,
+        minWidth: 280,
+        minHeight: 72,
+        transparent: true,
+        resizable: false,
+      },
+      (_popup, onClose) => <MiniMode onClose={onClose} />
+    )
+  }
+
   return (
     <Toolbar>
       <ToolbarSearch
@@ -35,6 +53,10 @@ const MusicToolbar = observer(() => {
       />
 
       <ToolbarSpacer />
+
+      <ToolbarButton onClick={handleMiniMode} title={t('miniMode')}>
+        <PictureInPicture2 size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
     </Toolbar>
   )
 })

@@ -27,5 +27,6 @@
   "showInFolder": "打开所在文件夹",
   "playSheet": "播放全部",
   "clearAll": "清空",
-  "noLyric": "暂无歌词"
+  "noLyric": "暂无歌词",
+  "miniMode": "迷你模式"
 }
