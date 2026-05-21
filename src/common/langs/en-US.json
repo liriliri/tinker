@@ -34,5 +34,7 @@
   "pluginUpdateAvailable": "New version {{version}} is available. Do you want to update?",
   "pluginUpToDate": "This plugin is already up to date.",
   "updatePluginSuccess": "Plugin updated successfully",
-  "updatePluginErr": "Failed to update plugin"
+  "updatePluginErr": "Failed to update plugin",
+  "installCli": "Install Command Line",
+  "installCliSuccess": "Command line installed successfully"
 }

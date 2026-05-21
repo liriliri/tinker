@@ -18,6 +18,7 @@ import { isDev } from 'share/common/util'
 import * as updater from 'share/main/lib/updater'
 import { openPlugin } from './plugin/view'
 import * as window from 'share/main/lib/window'
+import { isCliInstalled, installCli } from './shell'
 
 const logger = log('tray')
 let tray: Tray | null = null
@@ -44,6 +45,8 @@ async function updateContextMenu() {
   }
 
   logger.info('update context menu')
+
+  const cliInstalled = await isCliInstalled()
 
   const helpMenu: MenuItemConstructorOptions = {
     label: t('help'),
@@ -113,6 +116,21 @@ async function updateContextMenu() {
             process.showWin()
           },
         },
+        ...(!cliInstalled
+          ? [
+              { type: 'separator' as const },
+              {
+                label: `${t('installCli')}...`,
+                async click() {
+                  try {
+                    await installCli()
+                  } catch {
+                    // user cancelled or failed
+                  }
+                },
+              },
+            ]
+          : []),
       ],
     },
     helpMenu,
