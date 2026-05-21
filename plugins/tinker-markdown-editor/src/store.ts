@@ -27,8 +27,8 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.init()
     this.bindEvent()
+    this.loadSavedFile()
   }
 
   private bindEvent() {
@@ -47,10 +47,6 @@ class Store extends BaseStore {
       this.markdownInput = savedContent
     }
     this.loadViewMode()
-  }
-
-  private async init() {
-    await this.loadSavedFile()
   }
 
   private loadViewMode() {

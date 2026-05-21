@@ -516,12 +516,8 @@ class Store extends BaseStore {
   }
 
   private loadColorsFromStorage() {
-    const savedForeground = storage.get<string | undefined>(
-      STORAGE_FOREGROUND
-    )
-    const savedBackground = storage.get<string | undefined>(
-      STORAGE_BACKGROUND
-    )
+    const savedForeground = storage.get<string | undefined>(STORAGE_FOREGROUND)
+    const savedBackground = storage.get<string | undefined>(STORAGE_BACKGROUND)
 
     if (savedForeground) {
       this.foregroundColor = savedForeground
@@ -567,12 +563,8 @@ class Store extends BaseStore {
     const savedEnabled = storage.get<boolean | undefined>(
       STORAGE_WATERMARK_ENABLED
     )
-    const savedText = storage.get<string | undefined>(
-      STORAGE_WATERMARK_TEXT
-    )
-    const savedColor = storage.get<string | undefined>(
-      STORAGE_WATERMARK_COLOR
-    )
+    const savedText = storage.get<string | undefined>(STORAGE_WATERMARK_TEXT)
+    const savedColor = storage.get<string | undefined>(STORAGE_WATERMARK_COLOR)
 
     if (typeof savedEnabled === 'boolean') {
       this.watermarkEnabled = savedEnabled

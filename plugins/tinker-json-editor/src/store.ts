@@ -27,8 +27,9 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-    this.init()
+    this.loadStorage()
     this.bindEvent()
+    this.loadSavedFile()
   }
 
   private bindEvent() {
@@ -38,11 +39,6 @@ class Store extends BaseStore {
         tinker.setTitle(fileName || '')
       }
     )
-  }
-
-  private async init() {
-    this.loadStorage()
-    await this.loadSavedFile()
   }
 
   private async loadSavedFile() {

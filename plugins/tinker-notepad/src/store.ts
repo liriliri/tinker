@@ -31,8 +31,8 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.init()
     this.bindEvent()
+    this.loadSavedFile()
   }
 
   private bindEvent() {
@@ -50,10 +50,6 @@ class Store extends BaseStore {
       this.content = savedContent
     }
     this.fontSize = Number(storage.get(STORAGE_FONT_SIZE)) || DEFAULT_FONT_SIZE
-  }
-
-  private async init() {
-    await this.loadSavedFile()
   }
 
   private async loadSavedFile() {

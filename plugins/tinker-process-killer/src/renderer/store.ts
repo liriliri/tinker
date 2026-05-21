@@ -36,12 +36,9 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.init()
-  }
-
-  private async init() {
-    await this.refreshProcessList(false)
-    this.startAutoRefresh()
+    this.refreshProcessList(false).then(() => {
+      this.startAutoRefresh()
+    })
   }
 
   async refreshProcessList(showLoading: boolean = true) {

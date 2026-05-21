@@ -27,7 +27,16 @@ class Store extends BaseStore {
       downloads: observable.shallow,
     })
     this.loadStorage()
-    this.init()
+    if (!this.saveDir) {
+      tinker.getPath('downloads').then((defaultDir) => {
+        runInAction(() => {
+          this.saveDir = defaultDir
+        })
+        this.restoreDownloads()
+      })
+    } else {
+      this.restoreDownloads()
+    }
   }
 
   private loadStorage() {
@@ -35,16 +44,6 @@ class Store extends BaseStore {
     if (savedDir) {
       this.saveDir = savedDir
     }
-  }
-
-  private async init() {
-    if (!this.saveDir) {
-      const defaultDir = await tinker.getPath('downloads')
-      runInAction(() => {
-        this.saveDir = defaultDir
-      })
-    }
-    this.restoreDownloads()
   }
 
   setSaveDir(dir: string) {

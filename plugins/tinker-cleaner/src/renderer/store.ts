@@ -21,21 +21,16 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
-  }
-
-  async init() {
     const defs = cleaner.getRules()
-    runInAction(() => {
-      this.rules = defs.map((def) => ({
-        id: def.id,
-        category: def.category as Category,
-        nameKey: def.nameKey,
-        path: def.path,
-        size: 0,
-        scanned: false,
-      }))
-    })
-    await this.scan()
+    this.rules = defs.map((def) => ({
+      id: def.id,
+      category: def.category as Category,
+      nameKey: def.nameKey,
+      path: def.path,
+      size: 0,
+      scanned: false,
+    }))
+    this.scan()
   }
 
   get visibleRules(): CleanRule[] {

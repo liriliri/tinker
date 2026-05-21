@@ -42,21 +42,19 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.init()
+    if (!this.hasPassword) {
+      this.loadAccounts()
+        .then(() => this.refreshCodes())
+        .then(() => this.startTimer())
+    } else {
+      this.startTimer()
+    }
   }
 
   private loadStorage() {
     const passwordHash = storage.get<string | undefined>(STORAGE_PASSWORD_HASH)
     this.hasPassword = !!passwordHash
     this.isLocked = !!passwordHash
-  }
-
-  private async init() {
-    if (!this.hasPassword) {
-      await this.loadAccounts()
-      await this.refreshCodes()
-    }
-    this.startTimer()
   }
 
   /** Unique periods across all accounts — used by the timer to detect boundary crossings */

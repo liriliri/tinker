@@ -42,8 +42,10 @@ class Store extends BaseStore {
 
   private loadStorage() {
     this.sources = storage.get<RSSSource[] | undefined>(STORAGE_SOURCES) || []
-    this.sidebarOpen = storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
-    this.viewMode = storage.get<ViewMode | undefined>(STORAGE_VIEW_MODE) ?? 'list'
+    this.sidebarOpen =
+      storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
+    this.viewMode =
+      storage.get<ViewMode | undefined>(STORAGE_VIEW_MODE) ?? 'list'
   }
 
   get filteredItems(): RSSItem[] {

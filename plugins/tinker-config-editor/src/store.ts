@@ -34,8 +34,14 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.init()
     this.bindEvent()
+    this.loadConfigFiles().then(() => this.loadSavedFile())
+  }
+
+  private loadStorage() {
+    this.sidebarOpen =
+      storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
+    this.fontSize = Number(storage.get(STORAGE_FONT_SIZE)) || DEFAULT_FONT_SIZE
   }
 
   private bindEvent() {
@@ -45,17 +51,6 @@ class Store extends BaseStore {
         tinker.setTitle(fileName || '')
       }
     )
-  }
-
-  private loadStorage() {
-    this.sidebarOpen =
-      storage.get<boolean | undefined>(STORAGE_SIDEBAR_OPEN) ?? true
-    this.fontSize = Number(storage.get(STORAGE_FONT_SIZE)) || DEFAULT_FONT_SIZE
-  }
-
-  private async init() {
-    await this.loadConfigFiles()
-    await this.loadSavedFile()
   }
 
   private async loadConfigFiles() {
