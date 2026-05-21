@@ -11,6 +11,7 @@ export interface PopupWindowOptions {
   webviewTag?: boolean
   transparent?: boolean
   copyScripts?: string[]
+  positionKey?: string
 }
 
 export function openPopupWindow(
@@ -27,11 +28,30 @@ export function openPopupWindow(
     webviewTag,
     transparent = false,
     copyScripts = [],
+    positionKey,
   } = options
 
+  let savedBounds: {
+    x: number
+    y: number
+    width: number
+    height: number
+  } | null = null
+  if (positionKey) {
+    try {
+      const raw = localStorage.getItem(`popupWindow_${positionKey}`)
+      if (raw) savedBounds = JSON.parse(raw)
+    } catch {
+      // Ignore invalid stored bounds
+    }
+  }
+
+  const actualWidth = savedBounds?.width ?? width
+  const actualHeight = savedBounds?.height ?? height
+
   const features = [
-    `width=${width}`,
-    `height=${height}`,
+    `width=${actualWidth}`,
+    `height=${actualHeight}`,
     minWidth != null ? `minWidth=${minWidth}` : '',
     minHeight != null ? `minHeight=${minHeight}` : '',
     `alwaysOnTop=${alwaysOnTop}`,
@@ -39,6 +59,8 @@ export function openPopupWindow(
     'frame=no',
     webviewTag ? 'webviewTag=true' : '',
     transparent ? 'transparent=true' : '',
+    savedBounds ? `left=${savedBounds.x}` : '',
+    savedBounds ? `top=${savedBounds.y}` : '',
   ]
     .filter(Boolean)
     .join(',')
@@ -52,7 +74,7 @@ export function openPopupWindow(
   })
 
   if (copyScripts.length > 0) {
-    popup.tinker = window.tinker
+    ;(popup as unknown as { tinker: typeof tinker }).tinker = tinker
     const scripts = document.querySelectorAll('script[src]')
     const loadPromises: Promise<void>[] = []
     scripts.forEach((node) => {
@@ -111,6 +133,18 @@ export function openPopupWindow(
     })
 
     popup!.addEventListener('beforeunload', () => {
+      if (positionKey) {
+        const bounds = {
+          x: popup!.screenX,
+          y: popup!.screenY,
+          width: popup!.outerWidth,
+          height: popup!.outerHeight,
+        }
+        localStorage.setItem(
+          `popupWindow_${positionKey}`,
+          JSON.stringify(bounds)
+        )
+      }
       root.unmount()
       unsubscribe()
     })

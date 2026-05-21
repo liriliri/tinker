@@ -39,7 +39,13 @@ export default observer(function ToolbarComponent() {
       return
     }
     const popup = openPopupWindow(
-      { width: 320, height: 300, minWidth: 240, minHeight: 150 },
+      {
+        width: 320,
+        height: 300,
+        minWidth: 240,
+        minHeight: 150,
+        positionKey: 'todo',
+      },
       (_popup, onClose) => <FloatTodos onClose={onClose} />
     )
     store.popupWindow = popup

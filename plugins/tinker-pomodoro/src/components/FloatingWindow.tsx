@@ -53,7 +53,7 @@ export function openFloatingWindow() {
     return
   }
   popupWindow = openPopupWindow(
-    { width: 280, height: 280, resizable: false },
+    { width: 280, height: 280, resizable: false, positionKey: 'pomodoro' },
     () => <FloatingTimer />
   )
 }

@@ -41,6 +41,7 @@ const MusicToolbar = observer(() => {
         minHeight: 72,
         transparent: true,
         resizable: false,
+        positionKey: 'miniMode',
       },
       (_popup, onClose) => <MiniMode onClose={onClose} />
     )

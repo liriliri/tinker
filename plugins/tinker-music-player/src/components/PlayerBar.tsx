@@ -196,6 +196,7 @@ const PlayerBar = observer(() => {
                   minHeight: 100,
                   transparent: true,
                   resizable: true,
+                  positionKey: 'floatLyric',
                 },
                 (_popup, onClose) => <FloatLyric onClose={onClose} />
               )
