@@ -6,7 +6,12 @@ import debounce from 'licia/debounce'
 import splitPath from 'licia/splitPath'
 import uuid from 'licia/uuid'
 import audio from './lib/audio'
-import { LyricLine, parseLrc, loadLrcForPath } from './lib/lyric'
+import {
+  LyricLine,
+  parseLrc,
+  loadLrcForPath,
+  findCurrentLine,
+} from './lib/lyric'
 import {
   Track,
   RecentTrack,
@@ -56,6 +61,8 @@ class Store extends BaseStore {
   isSearchingFiles: boolean = false
   showMusicDetail: boolean = false
   lyricLines: LyricLine[] = []
+  miniModeWindow: Window | null = null
+  floatLyricWindow: Window | null = null
 
   constructor() {
     super()
@@ -263,6 +270,14 @@ class Store extends BaseStore {
       return this.playQueue[this.currentIndex]
     }
     return null
+  }
+
+  get currentLyricText(): string {
+    const idx = findCurrentLine(this.lyricLines, this.currentTime)
+    if (idx >= 0) {
+      return this.lyricLines[idx].text
+    }
+    return ''
   }
 
   get filteredTracks(): Track[] {

@@ -14,13 +14,16 @@ import {
   Heart,
   Maximize2,
   Minimize2,
+  Captions,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import { openPopupWindow } from 'share/lib/popupWindow'
 import store from '../store'
 import { PlayMode } from '../types'
 import { mediaDurationFormat } from 'share/lib/util'
 import { ProgressBar, VolumeBar } from './ProgressBar'
+import FloatLyric from './FloatLyric'
 
 const PLAY_MODE_ICONS: Record<PlayMode, typeof Repeat1> = {
   sequence: Repeat2,
@@ -178,6 +181,30 @@ const PlayerBar = observer(() => {
               onChange={(v) => store.setVolume(v)}
             />
           </div>
+
+          <button
+            onClick={() => {
+              if (store.floatLyricWindow && !store.floatLyricWindow.closed) {
+                store.floatLyricWindow.focus()
+                return
+              }
+              store.floatLyricWindow = openPopupWindow(
+                {
+                  width: 800,
+                  height: 120,
+                  minWidth: 400,
+                  minHeight: 100,
+                  transparent: true,
+                  resizable: true,
+                },
+                (_popup, onClose) => <FloatLyric onClose={onClose} />
+              )
+            }}
+            className={`p-1.5 rounded-full ${tw.hover} ${tw.text.secondary} transition-colors`}
+            title={t('floatLyric')}
+          >
+            <Captions size={15} />
+          </button>
 
           <button
             onClick={() => store.togglePlayQueue()}

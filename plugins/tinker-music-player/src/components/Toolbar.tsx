@@ -29,7 +29,11 @@ const MusicToolbar = observer(() => {
   }
 
   const handleMiniMode = () => {
-    openPopupWindow(
+    if (store.miniModeWindow && !store.miniModeWindow.closed) {
+      store.miniModeWindow.focus()
+      return
+    }
+    store.miniModeWindow = openPopupWindow(
       {
         width: 360,
         height: 72,

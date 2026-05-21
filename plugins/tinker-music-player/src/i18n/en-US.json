@@ -28,5 +28,6 @@
   "playSheet": "Play All",
   "clearAll": "Clear",
   "noLyric": "No lyrics available",
-  "miniMode": "Mini Mode"
+  "miniMode": "Mini Mode",
+  "floatLyric": "Float Lyric"
 }

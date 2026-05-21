@@ -28,5 +28,6 @@
   "playSheet": "播放全部",
   "clearAll": "清空",
   "noLyric": "暂无歌词",
-  "miniMode": "迷你模式"
+  "miniMode": "迷你模式",
+  "floatLyric": "悬浮歌词"
 }

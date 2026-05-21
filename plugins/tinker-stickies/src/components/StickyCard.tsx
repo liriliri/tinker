@@ -5,6 +5,8 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import { Trash2, PictureInPicture2, Circle } from 'lucide-react'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import { tw } from 'share/theme'
+
+const popupWindows = new Map<string, Window>()
 import { confirm } from 'share/components/Confirm'
 import store, { STICKY_COLORS, type Sticky } from '../store'
 import {
@@ -124,10 +126,19 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
   function handleOpenWindow(e: React.MouseEvent) {
     e.stopPropagation()
 
-    openPopupWindow(
+    const existing = popupWindows.get(sticky.id)
+    if (existing && !existing.closed) {
+      existing.focus()
+      return
+    }
+
+    const popup = openPopupWindow(
       { width: 400, height: 350, minWidth: 300, minHeight: 200 },
       (_popup, onClose) => <PopupEditor sticky={sticky} onClose={onClose} />
     )
+    if (popup) {
+      popupWindows.set(sticky.id, popup)
+    }
   }
 
   return (

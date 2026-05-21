@@ -45,8 +45,15 @@ const FloatingTimer = observer(function FloatingTimer() {
   )
 })
 
+let popupWindow: Window | null = null
+
 export function openFloatingWindow() {
-  openPopupWindow({ width: 280, height: 280, resizable: false }, () => (
-    <FloatingTimer />
-  ))
+  if (popupWindow && !popupWindow.closed) {
+    popupWindow.focus()
+    return
+  }
+  popupWindow = openPopupWindow(
+    { width: 280, height: 280, resizable: false },
+    () => <FloatingTimer />
+  )
 }

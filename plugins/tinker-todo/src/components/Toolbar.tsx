@@ -34,6 +34,10 @@ export default observer(function ToolbarComponent() {
   }
 
   const handleFloatToday = () => {
+    if (store.popupWindow && !store.popupWindow.closed) {
+      store.popupWindow.focus()
+      return
+    }
     const popup = openPopupWindow(
       { width: 320, height: 300, minWidth: 240, minHeight: 150 },
       (_popup, onClose) => <FloatTodos onClose={onClose} />
