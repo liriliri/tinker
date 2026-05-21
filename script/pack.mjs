@@ -40,6 +40,16 @@ const config = {
       },
     ],
   },
+  linux: {
+    target: [
+      {
+        target: 'deb',
+      },
+      {
+        target: 'rpm',
+      },
+    ],
+  },
   mac: {
     hardenedRuntime: true,
     electronLanguages: ['zh_CN', 'en'],

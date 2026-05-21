@@ -22,13 +22,15 @@ function closePlugin(id: string) {
 
 async function listPlugins() {
   const plugins = await getPlugins()
-  return plugins.map((p) => ({
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    version: p.version,
-    builtin: p.builtin,
-  }))
+  return plugins
+    .filter((p) => !p.marketplace)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      version: p.version,
+      builtin: p.builtin,
+    }))
 }
 
 function listRunningPlugins() {
