@@ -31,6 +31,13 @@ async function listPlugins() {
   }))
 }
 
+function listRunningPlugins() {
+  return Object.keys(pluginViews).map((id) => ({
+    id,
+    pid: pluginViews[id].view.webContents.getOSProcessId(),
+  }))
+}
+
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
   try {
     switch (req.command) {
@@ -46,6 +53,10 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
         return { id: req.id, success: true }
       case 'list': {
         const data = await listPlugins()
+        return { id: req.id, success: true, data }
+      }
+      case 'ps': {
+        const data = listRunningPlugins()
         return { id: req.id, success: true, data }
       }
       default:

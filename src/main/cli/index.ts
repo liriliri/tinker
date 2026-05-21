@@ -4,14 +4,6 @@ import { Command } from 'commander'
 import { sendCommand, waitForServer, IpcResponse } from './ipc'
 import { isDev } from 'share/common/util'
 
-function getElectronPath(): string {
-  if (isDev()) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('electron') as unknown as string
-  }
-  return process.execPath
-}
-
 function launchElectron(args: string[]) {
   if (isDev()) {
     args.unshift(path.resolve(__dirname, 'index.js'))
@@ -20,8 +12,7 @@ function launchElectron(args: string[]) {
   const env = { ...process.env }
   delete env['ELECTRON_RUN_AS_NODE']
 
-  const electronPath = getElectronPath()
-  const child = spawn(electronPath, args, {
+  const child = spawn(process.execPath, args, {
     detached: true,
     stdio: 'ignore',
     cwd: path.resolve(__dirname, '../..'),
@@ -62,6 +53,8 @@ async function executeCommand(
     console.error(`Error: ${res.error}`)
     process.exit(1)
   }
+
+  process.exit(0)
 }
 
 function printData(command: string, data: unknown) {
@@ -81,6 +74,17 @@ function printData(command: string, data: unknown) {
         const version = !p.builtin && p.version ? ` (${p.version})` : ''
         const tag = p.builtin ? ' [builtin]' : ''
         console.log(`  ${p.id}${version}${tag}`)
+      }
+      break
+    }
+    case 'ps': {
+      const running = data as Array<{ id: string; pid: number }>
+      if (running.length === 0) {
+        console.log('No running plugins.')
+        return
+      }
+      for (const p of running) {
+        console.log(`  ${p.id} ${p.pid}`)
       }
       break
     }
@@ -121,6 +125,13 @@ program
   .description('List installed plugins')
   .action(() => {
     executeCommand('list')
+  })
+
+program
+  .command('ps')
+  .description('List running plugins with process IDs')
+  .action(() => {
+    executeCommand('ps')
   })
 
 program.parse(process.argv.slice(2), { from: 'user' })
