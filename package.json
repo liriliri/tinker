@@ -40,7 +40,10 @@
   "keywords": [
     "git"
   ],
-  "author": "surunzi",
+  "author": {
+    "name": "surunzi",
+    "email": "surunzi@foxmail.com"
+  },
   "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/liriliri/tinker/issues"
