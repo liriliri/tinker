@@ -99,6 +99,13 @@ for (let i = 0, len = files.length; i < len; i++) {
 
 await fs.copy('build', 'dist/build')
 await fs.copy('resources', 'dist/resources')
+if (isMac) {
+  await fs.copy('bin/mac', 'dist/bin')
+} else if (isWindows) {
+  await fs.copy('bin/win', 'dist/bin')
+} else {
+  await fs.copy('bin/linux', 'dist/bin')
+}
 cd('dist')
 
 await fs.writeJson('package.json', pkg, {

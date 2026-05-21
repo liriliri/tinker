@@ -25,9 +25,11 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       outDir: 'dist/main',
       minify: mode === 'development' ? false : 'esbuild',
       lib: {
-        entry: resolve(__dirname, 'src/main/index.ts'),
+        entry: {
+          index: resolve(__dirname, 'src/main/index.ts'),
+          cli: resolve(__dirname, 'src/main/cli/index.ts'),
+        },
         name: 'Main',
-        fileName: 'index',
         formats: ['cjs'],
       },
       rollupOptions: {

@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+#
+# Tinker CLI launcher (macOS)
+
+if [ ! -L "$0" ]; then
+  SCRIPT_PATH="$(dirname "$0")"
+else
+  if command -v readlink >/dev/null; then
+    SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
+  else
+    SCRIPT_PATH="$(dirname "$0")"
+  fi
+fi
+
+ELECTRON="$SCRIPT_PATH/../../MacOS/TINKER"
+CLI="$SCRIPT_PATH/../app.asar/main/cli.js"
+ELECTRON_RUN_AS_NODE=1 "$ELECTRON" "$CLI" "$@"
+exit $?

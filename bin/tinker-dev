@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+#
+# Tinker CLI launcher (development)
+
+SCRIPT_PATH="$(dirname "$0")"
+ROOT="$SCRIPT_PATH/.."
+
+CLI="$ROOT/dist/main/cli.js"
+ELECTRON="$ROOT/node_modules/.bin/electron"
+
+ELECTRON_RUN_AS_NODE=1 "$ELECTRON" "$CLI" "$@"
+exit $?

@@ -12,6 +12,7 @@ import noop from 'licia/noop'
 import fixPath from 'fix-path'
 import { getSettingsStore } from './lib/store'
 import * as shortcut from './lib/shortcut'
+import * as cli from './cli/handler'
 import 'share/main'
 
 const logger = log('main')
@@ -41,6 +42,8 @@ protocol.registerSchemesAsPrivileged([
     },
   },
 ])
+
+cli.init()
 
 app.on('ready', () => {
   logger.info('app ready')

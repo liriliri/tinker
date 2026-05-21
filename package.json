@@ -64,6 +64,7 @@
     "@xterm/xterm": "^5.5.0",
     "adm-zip": "^0.5.16",
     "autoprefixer": "^10.4.22",
+    "commander": "^14.0.3",
     "concurrently": "^9.2.0",
     "custom-electron-titlebar": "4.2.8",
     "electron": "30.5.1",

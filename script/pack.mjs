@@ -18,11 +18,17 @@ const config = {
   files: ['main', 'preload', 'renderer', 'plugins'],
   asarUnpack: ['node_modules/npm/**'],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
-  extraResources: {
-    from: 'resources',
-    to: './',
-    filter: ['**/*'],
-  },
+  extraResources: [
+    {
+      from: 'resources',
+      to: './',
+      filter: ['**/*'],
+    },
+    {
+      from: 'bin',
+      to: 'bin',
+    },
+  ],
   nsis: {
     allowToChangeInstallationDirectory: true,
     oneClick: false,
