@@ -121,19 +121,18 @@ program
   .description('Tinker desktop toolbox CLI')
   .version(VERSION)
 
-program
-  .command('open <plugin>')
-  .description('Open a plugin in a detached window')
-  .action((pluginName: string) => {
-    executeCommand('open', { id: normalizePluginId(pluginName) })
-  })
+function pluginCommand(name: string, description: string) {
+  program
+    .command(`${name} <plugin>`)
+    .description(description)
+    .action((pluginName: string) => {
+      executeCommand(name, { id: normalizePluginId(pluginName) })
+    })
+}
 
-program
-  .command('close <plugin>')
-  .description('Close a running plugin')
-  .action((pluginName: string) => {
-    executeCommand('close', { id: normalizePluginId(pluginName) })
-  })
+pluginCommand('open', 'Open a plugin in a detached window')
+pluginCommand('close', 'Close a running plugin')
+pluginCommand('restart', 'Restart a running plugin (close then open)')
 
 program
   .command('quit')

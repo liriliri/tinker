@@ -28,44 +28,59 @@ function listRunningPlugins() {
   }))
 }
 
+function success(req: IpcRequest, data?: unknown): IpcResponse {
+  return { id: req.id, success: true, data }
+}
+
+function fail(req: IpcRequest, error: string): IpcResponse {
+  return { id: req.id, success: false, error }
+}
+
+async function ensurePlugin(req: IpcRequest): Promise<string | IpcResponse> {
+  await getPlugins()
+  const id = req.data?.id as string
+  if (!hasPlugin(id)) {
+    return fail(req, `Plugin not found: ${id}`)
+  }
+  return id
+}
+
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
   try {
     switch (req.command) {
       case 'open': {
-        await getPlugins()
-        const id = req.data?.id as string
-        if (!hasPlugin(id)) {
-          return {
-            id: req.id,
-            success: false,
-            error: `Plugin not found: ${id}`,
-          }
-        }
-        openPlugin(id, true)
-        return { id: req.id, success: true }
+        const result = await ensurePlugin(req)
+        if (typeof result !== 'string') return result
+        openPlugin(result, true)
+        return success(req)
       }
       case 'close': {
         const id = req.data?.id as string
         if (!isPluginRunning(id)) {
-          return {
-            id: req.id,
-            success: false,
-            error: `Plugin is not running: ${id}`,
-          }
+          return fail(req, `Plugin is not running: ${id}`)
         }
         await closePlugin(id, true)
-        return { id: req.id, success: true }
+        return success(req)
+      }
+      case 'restart': {
+        const result = await ensurePlugin(req)
+        if (typeof result !== 'string') return result
+        if (isPluginRunning(result)) {
+          await closePlugin(result, true)
+        }
+        openPlugin(result, true)
+        return success(req)
       }
       case 'quit':
         setTimeout(() => app.quit(), 100)
-        return { id: req.id, success: true }
+        return success(req)
       case 'list': {
         const data = await listPlugins()
-        return { id: req.id, success: true, data }
+        return success(req, data)
       }
       case 'ps': {
         const data = listRunningPlugins()
-        return { id: req.id, success: true, data }
+        return success(req, data)
       }
       default:
         return {
