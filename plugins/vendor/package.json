@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
@@ -22,7 +22,8 @@
     "build:hottoast": "vite build --config vite.config.ts --mode hottoast",
     "build:tiptap": "vite build --config vite.config.ts --mode tiptap",
     "build:videojs": "vite build --config vite.config.ts --mode videojs",
-    "build:i18next": "vite build --config vite.config.ts --mode i18next"
+    "build:i18next": "vite build --config vite.config.ts --mode i18next",
+    "build:cryptojs": "vite build --config vite.config.ts --mode cryptojs"
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
