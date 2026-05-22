@@ -41,6 +41,8 @@ const config = {
     ],
   },
   linux: {
+    executableName: 'tinker',
+    category: 'Utility',
     target: [
       {
         target: 'deb',

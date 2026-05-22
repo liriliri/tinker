@@ -31,12 +31,19 @@ export function init() {
   }
   tray = new Tray(icon)
   tray.setToolTip(`${PRODUCT_NAME} ${VERSION}`)
-  tray.on('click', () => {
-    main.showWin()
-  })
-  tray.on('right-click', () => {
+  if (isMac) {
+    tray.on('click', () => {
+      main.showWin()
+    })
+    tray.on('right-click', () => {
+      updateContextMenu()
+    })
+  } else {
+    tray.on('click', () => {
+      main.showWin()
+    })
     updateContextMenu()
-  })
+  }
 }
 
 async function updateContextMenu() {
@@ -168,5 +175,9 @@ async function updateContextMenu() {
       },
     },
   ])
-  tray.popUpContextMenu(contextMenu)
+  if (isMac) {
+    tray.popUpContextMenu(contextMenu)
+  } else {
+    tray.setContextMenu(contextMenu)
+  }
 }
