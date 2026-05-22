@@ -23,6 +23,10 @@ const DEFAULT_ICON = resolveResources('default-plugin.png')
 
 export const plugins: types.PlainObj<IPlugin> = {}
 
+export function hasPlugin(id: string) {
+  return !!plugins[id]
+}
+
 export async function loadSettingsPlugin() {
   const name = 'tinker-settings'
   plugins[name] = await loadPlugin(name, path.join(getBuiltinPluginDir(), name))

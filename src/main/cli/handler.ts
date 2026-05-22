@@ -1,6 +1,11 @@
 import { app } from 'electron'
-import { openPlugin, closePlugin, pluginViews } from '../lib/plugin/view'
-import { getPlugins } from '../lib/plugin/loader'
+import {
+  openPlugin,
+  closePlugin,
+  isPluginRunning,
+  pluginViews,
+} from '../lib/plugin/view'
+import { getPlugins, hasPlugin } from '../lib/plugin/loader'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 
 async function listPlugins() {
@@ -26,13 +31,31 @@ function listRunningPlugins() {
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
   try {
     switch (req.command) {
-      case 'open':
+      case 'open': {
         await getPlugins()
-        openPlugin(req.data?.id as string, true)
+        const id = req.data?.id as string
+        if (!hasPlugin(id)) {
+          return {
+            id: req.id,
+            success: false,
+            error: `Plugin not found: ${id}`,
+          }
+        }
+        openPlugin(id, true)
         return { id: req.id, success: true }
-      case 'close':
-        await closePlugin(req.data?.id as string, true)
+      }
+      case 'close': {
+        const id = req.data?.id as string
+        if (!isPluginRunning(id)) {
+          return {
+            id: req.id,
+            success: false,
+            error: `Plugin is not running: ${id}`,
+          }
+        }
+        await closePlugin(id, true)
         return { id: req.id, success: true }
+      }
       case 'quit':
         setTimeout(() => app.quit(), 100)
         return { id: req.id, success: true }

@@ -3,10 +3,27 @@ import path from 'path'
 import { Command } from 'commander'
 import { sendCommand, waitForServer, IpcResponse } from './ipc'
 import { isDev, getPlatform } from 'share/common/util'
+import isMac from 'licia/isMac'
 
 function launchElectron(args: string[]) {
   if (isDev()) {
     args.unshift(path.resolve(__dirname, 'index.js'))
+  }
+
+  if (isMac && !isDev()) {
+    const execPath = process.execPath
+    const contentsIndex = execPath.indexOf('.app/Contents/')
+    const appPath = execPath.substring(0, contentsIndex + 4)
+    const openArgs = ['-a', appPath]
+    if (args.length > 0) {
+      openArgs.push('--args', ...args)
+    }
+    const child = spawn('open', openArgs, {
+      detached: true,
+      stdio: 'ignore',
+    })
+    child.unref()
+    return
   }
 
   if (getPlatform() === 'linux') {
