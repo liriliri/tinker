@@ -20,7 +20,7 @@ function launchElectron(args: string[]) {
     }
     const child = spawn('open', openArgs, {
       detached: true,
-      stdio: 'ignore',
+      stdio: 'inherit',
     })
     child.unref()
     return
