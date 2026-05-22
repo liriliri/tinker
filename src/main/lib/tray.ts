@@ -16,14 +16,16 @@ import * as process from 'share/main/window/process'
 import * as about from 'share/main/window/about'
 import { isDev } from 'share/common/util'
 import * as updater from 'share/main/lib/updater'
-import { openPlugin } from './plugin/view'
+import { openPlugin, closePlugin, getAttachedPlugin } from './plugin/view'
 import * as window from 'share/main/lib/window'
 import { isCliInstalled, installCli } from './shell'
 
 const logger = log('tray')
 let tray: Tray | null = null
+let cliInstalled = false
 
-export function init() {
+export async function init() {
+  cliInstalled = await isCliInstalled()
   const iconPath = isMac ? 'tray-template.png' : 'tray.png'
   const icon = nativeImage.createFromPath(resolveResources(iconPath))
   if (isMac) {
@@ -46,14 +48,12 @@ export function init() {
   }
 }
 
-async function updateContextMenu() {
+function updateContextMenu() {
   if (!tray) {
     return
   }
 
   logger.info('update context menu')
-
-  const cliInstalled = await isCliInstalled()
 
   const helpMenu: MenuItemConstructorOptions = {
     label: t('help'),
@@ -131,6 +131,8 @@ async function updateContextMenu() {
                 async click() {
                   try {
                     await installCli()
+                    cliInstalled = true
+                    updateContextMenu()
                   } catch {
                     // user cancelled or failed
                   }
@@ -153,7 +155,13 @@ async function updateContextMenu() {
     {
       label: `${t('checkUpdate')}...`,
       click() {
-        window.sendTo('main', 'closePlugin')
+        const mainWin = window.getWin('main')
+        if (mainWin) {
+          const plugin = getAttachedPlugin(mainWin)
+          if (plugin) {
+            closePlugin(plugin.id)
+          }
+        }
         main.showWin()
         updater.checkUpdate()
       },

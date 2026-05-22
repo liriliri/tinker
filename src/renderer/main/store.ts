@@ -172,6 +172,8 @@ class Store extends BaseStore {
       return
     }
     main.closePlugin(this.plugin.id)
+  }
+  private onPluginClosed() {
     preload.setTitle(pkg.productName)
     main.preparePluginView()
     this.plugin = null
@@ -335,8 +337,10 @@ class Store extends BaseStore {
         runInAction(() => (this.filter = title))
       }
     })
-    main.on('closePlugin', () => {
-      this.closePlugin()
+    main.on('pluginClosed', (id: string) => {
+      if (this.plugin?.id === id) {
+        this.onPluginClosed()
+      }
     })
   }
   private loadCache() {

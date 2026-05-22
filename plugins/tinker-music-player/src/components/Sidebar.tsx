@@ -80,7 +80,7 @@ const Sidebar = observer(() => {
 
   return (
     <div
-      className={`flex flex-col w-44 flex-shrink-0 border-r overflow-y-auto ${tw.border} ${tw.bg.tertiary}`}
+      className={`flex flex-col w-54 flex-shrink-0 border-r overflow-y-auto ${tw.border} ${tw.bg.tertiary}`}
     >
       <NavList items={mainItems} activeId={activeId} onSelect={handleSelect} />
       <div className={`mx-2 mt-1 border-t ${tw.border}`} />

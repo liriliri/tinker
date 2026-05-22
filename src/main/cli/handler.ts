@@ -1,24 +1,7 @@
 import { app } from 'electron'
-import { openPlugin, pluginViews } from '../lib/plugin/view'
+import { openPlugin, closePlugin, pluginViews } from '../lib/plugin/view'
 import { getPlugins } from '../lib/plugin/loader'
-import * as window from 'share/main/lib/window'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
-
-function closePlugin(id: string) {
-  const entry = pluginViews[id]
-  if (!entry) return
-  const { view, win } = entry
-  const mainWin = window.getWin('main')
-  if (win) {
-    if (win === mainWin) {
-      window.sendTo('main', 'closePlugin')
-    } else {
-      win.close()
-    }
-  }
-  view.webContents.close()
-  delete pluginViews[id]
-}
 
 async function listPlugins() {
   const plugins = await getPlugins()
@@ -48,7 +31,7 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
         openPlugin(req.data?.id as string, true)
         return { id: req.id, success: true }
       case 'close':
-        closePlugin(req.data?.id as string)
+        await closePlugin(req.data?.id as string, true)
         return { id: req.id, success: true }
       case 'quit':
         setTimeout(() => app.quit(), 100)

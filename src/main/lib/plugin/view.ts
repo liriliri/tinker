@@ -248,9 +248,11 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
     return
   }
 
+  const isMainWin = win === window.getWin('main')
+
   if (win) {
     win.contentView.removeChildView(view)
-    if (win === window.getWin('main')) {
+    if (isMainWin) {
       win.webContents.focus()
     }
   }
@@ -260,6 +262,9 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
     const pluginStates = mainStore.get('pluginStates') || {}
     if (pluginStates[id]?.runInBackground) {
       pluginViews[id].win = null
+      if (isMainWin) {
+        window.sendTo('main', 'pluginClosed', id)
+      }
       return
     }
   }
@@ -267,9 +272,10 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   view.webContents.close()
   delete pluginViews[id]
 
-  // Close the detached window if it's not the main window
-  if (win && win !== window.getWin('main')) {
+  if (win && !isMainWin) {
     win.close()
+  } else if (isMainWin) {
+    window.sendTo('main', 'pluginClosed', id)
   }
 }
 
