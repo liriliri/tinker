@@ -4,6 +4,9 @@ import { Command } from 'commander'
 import { sendCommand, waitForServer, IpcResponse } from './ipc'
 import { isDev, getPlatform } from 'share/common/util'
 import isMac from 'licia/isMac'
+import log from 'share/common/log'
+
+const logger = log('cli')
 
 function launchElectron(args: string[]) {
   if (isDev()) {
@@ -18,6 +21,7 @@ function launchElectron(args: string[]) {
     if (args.length > 0) {
       openArgs.push('--args', ...args)
     }
+    logger.info(`open ${openArgs.join(' ')}`)
     const child = spawn('open', openArgs, {
       detached: true,
       stdio: 'inherit',
