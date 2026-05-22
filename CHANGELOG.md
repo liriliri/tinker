@@ -1,3 +1,9 @@
+## v1.15.0 (22 May 2025)
+
+* feat: cli
+* feat: add music player
+* feat(pomodoro): float mini mode
+
 ## v1.14.0 (13 May 2026)
 
 * feat: add file search
