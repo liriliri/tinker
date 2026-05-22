@@ -22,7 +22,7 @@
     "build:preload": "vite build --config vite.preload.ts",
     "build:plugin": "cd plugins/vendor && npm run build && cd ../../ && lerna run build",
     "pack": "zx script/pack.mjs",
-    "start": "electron ./dist/main/index.js --inspect=9229",
+    "start": "electron ./dist/main/index.js --inspect=9229 --remote-debugging-port=9222",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"plugins/tinker-*/src/**/*.{ts,tsx}\" \"plugins/share/**/*.{ts,tsx}\" \"plugins/vendor/*.ts\"",
     "format": "lsla prettier \"src/**/*.{ts,tsx,scss,css,json}\" \"*.{js,ts,json}\" \"script/*.mjs\" --write && npm run format:plugin",
     "format:plugin": "lsla prettier \"plugins/tinker-*/src/**/*.{ts,tsx,json,scss}\" \"plugins/*.{js,ts,json}\" \"plugins/share/**/*.{ts,tsx}\" \"plugins/vendor/*.{json,ts}\" --write",
