@@ -12,7 +12,7 @@ else
   fi
 fi
 
-ELECTRON="$SCRIPT_PATH/../../TINKER"
+ELECTRON="$SCRIPT_PATH/../../tinker-app"
 CLI="$SCRIPT_PATH/../app.asar/main/cli.js"
 ELECTRON_RUN_AS_NODE=1 "$ELECTRON" "$CLI" "$@"
 exit $?

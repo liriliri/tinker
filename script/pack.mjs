@@ -41,7 +41,7 @@ const config = {
     ],
   },
   linux: {
-    executableName: 'tinker',
+    executableName: 'tinker-app',
     category: 'Utility',
     executableArgs: ['--no-sandbox'],
     target: [
