@@ -2,11 +2,15 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { Command } from 'commander'
 import { sendCommand, waitForServer, IpcResponse } from './ipc'
-import { isDev } from 'share/common/util'
+import { isDev, getPlatform } from 'share/common/util'
 
 function launchElectron(args: string[]) {
   if (isDev()) {
     args.unshift(path.resolve(__dirname, 'index.js'))
+  }
+
+  if (getPlatform() === 'linux') {
+    args.unshift('--no-sandbox')
   }
 
   const env = { ...process.env }
