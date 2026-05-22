@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Timestamp Converter Plugin for TINKER",
   "scripts": {
-    "dev": "vite --config ../vite.config.ts",
+    "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
