@@ -43,7 +43,7 @@ const config = {
   linux: {
     executableName: 'tinker',
     category: 'Utility',
-    chromiumSandbox: false,
+    executableArgs: ['--no-sandbox'],
     target: [
       {
         target: 'deb',
