@@ -1,0 +1,6 @@
+{
+  "run": "Run",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "cursor": "Ln {{line}}, Col {{col}}"
+}

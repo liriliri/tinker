@@ -16,7 +16,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ children, className = '' }: ToolbarProps) {
-  const baseClass = `${tw.bg.secondary} border-b ${tw.border} ${tw.text.primary} px-1.5 h-10 flex gap-1 items-center`
+  const baseClass = `${tw.bg.secondary} border-b ${tw.border} ${tw.text.primary} px-1.5 h-10 shrink-0 flex gap-1 items-center`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
 }

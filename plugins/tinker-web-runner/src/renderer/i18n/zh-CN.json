@@ -1,0 +1,6 @@
+{
+  "run": "运行",
+  "darkMode": "深色模式",
+  "lightMode": "浅色模式",
+  "cursor": "行 {{line}}, 列 {{col}}"
+}
