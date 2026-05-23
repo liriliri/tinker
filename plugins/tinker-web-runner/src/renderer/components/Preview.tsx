@@ -35,7 +35,8 @@ const Preview = observer(
               saveImage: true,
               saveAs: true,
               print: true,
-              viewSource: true,
+              navigation: false,
+              viewSource: false,
               inspect: true,
             }}
             onInspectElement={handleInspectElement}

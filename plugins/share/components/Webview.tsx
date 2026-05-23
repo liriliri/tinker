@@ -95,6 +95,7 @@ export interface ContextMenuFeatures {
   captureFullPage?: boolean
   saveAs?: boolean
   print?: boolean
+  navigation?: boolean
   viewSource?: boolean
   inspect?: boolean
 }
@@ -235,20 +236,22 @@ function buildContextMenuItems(
       { type: 'separator' }
     )
   } else if (!params.linkURL && !params.hasImageContents) {
-    items.push(
-      {
-        label: t('back'),
-        click: () => wv.goBack(),
-        enabled: wv.canGoBack(),
-      },
-      {
-        label: t('forward'),
-        click: () => wv.goForward(),
-        enabled: wv.canGoForward(),
-      },
-      { label: t('reload'), click: () => wv.reload() },
-      { type: 'separator' }
-    )
+    if (features.navigation !== false) {
+      items.push(
+        {
+          label: t('back'),
+          click: () => wv.goBack(),
+          enabled: wv.canGoBack(),
+        },
+        {
+          label: t('forward'),
+          click: () => wv.goForward(),
+          enabled: wv.canGoForward(),
+        },
+        { label: t('reload'), click: () => wv.reload() },
+        { type: 'separator' }
+      )
+    }
 
     if (features.capture) {
       items.push({
