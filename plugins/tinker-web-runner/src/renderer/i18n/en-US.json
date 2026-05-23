@@ -2,5 +2,8 @@
   "run": "Run",
   "darkMode": "Dark Mode",
   "lightMode": "Light Mode",
-  "cursor": "Ln {{line}}, Col {{col}}"
+  "cursor": "Ln {{line}}, Col {{col}}",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear"
 }

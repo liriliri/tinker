@@ -11,16 +11,16 @@ const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 
   let html = currentHtml
-  const darkStyle = currentDark
-    ? '<style>:root{color-scheme:dark}body{background:#1e1e1e;color:#d4d4d4}</style>'
-    : ''
+  const darkMeta = currentDark
+    ? '<meta name="color-scheme" content="dark"><style>:root{color-scheme:dark}body{background:#1e1e1e;color:#d4d4d4}</style>'
+    : '<meta name="color-scheme" content="light"><style>:root{color-scheme:light}body{background:#ffffff;color:#1e1e1e}</style>'
 
   if (!html.includes('<html')) {
     html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-${darkStyle}
+${darkMeta}
 <style>${currentCss}</style>
 </head>
 <body>
@@ -30,8 +30,8 @@ ${html}
 </html>`
   } else {
     // Inject CSS and JS into existing HTML
-    if (currentCss || darkStyle) {
-      const styleTag = `${darkStyle}<style>${currentCss}</style>`
+    if (currentCss || darkMeta) {
+      const styleTag = `${darkMeta}<style>${currentCss}</style>`
       if (html.includes('</head>')) {
         html = html.replace('</head>', `${styleTag}</head>`)
       } else {

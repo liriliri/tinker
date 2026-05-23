@@ -178,7 +178,7 @@ export function ToolbarButtonGroup({
   children,
   className = '',
 }: ToolbarButtonGroupProps) {
-  const baseClass = `flex items-center overflow-hidden rounded border -my-px ${tw.border} ${tw.bg.secondary}`
+  const baseClass = `flex items-center overflow-hidden rounded border -my-px h-7 ${tw.border} ${tw.bg.secondary}`
 
   return <div className={`${baseClass} ${className}`}>{children}</div>
 }
