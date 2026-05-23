@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 
@@ -152,6 +153,45 @@ class Store extends BaseStore {
 
   run() {
     webRunner.updateCode(this.html, this.css, this.js, this.previewDark)
+  }
+
+  async saveToDirectory() {
+    const result = await tinker.showOpenDialog({
+      properties: ['openDirectory'],
+    })
+    if (result.canceled || !result.filePaths.length) return
+
+    const dir = result.filePaths[0]
+    const hasCss = !isStrBlank(this.css)
+    const hasJs = !isStrBlank(this.js)
+
+    let html = this.html
+    if (!html.includes('<html')) {
+      const cssLink = hasCss ? '<link rel="stylesheet" href="style.css">' : ''
+      const jsScript = hasJs ? '<script src="script.js"></script>' : ''
+      html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+${cssLink}
+</head>
+<body>
+${html}
+${jsScript}
+</body>
+</html>`
+    }
+
+    const indexPath = `${dir}/index.html`
+    await tinker.writeFile(indexPath, html)
+    if (hasCss) {
+      await tinker.writeFile(`${dir}/style.css`, this.css)
+    }
+    if (hasJs) {
+      await tinker.writeFile(`${dir}/script.js`, this.js)
+    }
+
+    tinker.showItemInPath(indexPath)
   }
 
   get previewUrl(): string {

@@ -701,7 +701,9 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
     <Panel id="devtools" minSize={80} defaultSize={300}>
       <div className="h-full flex flex-col">
         <div
-          className={`flex items-center justify-between px-2 py-1 ${tw.bg.secondary} ${tw.border} border-t`}
+          className={`flex items-center justify-between px-2 py-1 ${
+            tw.bg.secondary
+          } ${devToolsPosition === 'bottom' ? `${tw.border} border-t` : ''}`}
         >
           <div className="flex items-center gap-1">
             {dockButtons.map(({ pos, Icon, title }) => (

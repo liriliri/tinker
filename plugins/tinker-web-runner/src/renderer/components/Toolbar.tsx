@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import {
   Play,
+  Save,
   PanelRight,
   PanelLeft,
   PanelTop,
@@ -14,6 +15,7 @@ import {
   ToolbarButtonGroup,
   ToolbarTextButton,
   ToolbarButton,
+  TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
 import DarkModeSwitch from 'share/components/DarkModeSwitch'
@@ -35,6 +37,10 @@ const ToolbarComponent = observer(function ToolbarComponent({ onRun }: Props) {
 
   return (
     <Toolbar className="relative">
+      <ToolbarButton onClick={() => store.saveToDirectory()} title={t('save')}>
+        <Save size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarSeparator />
       <ToolbarButtonGroup>
         {LAYOUT_BUTTONS.map(({ pos, Icon }, index) => (
           <ToolbarButton

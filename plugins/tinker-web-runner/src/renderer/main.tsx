@@ -104,7 +104,7 @@ const App = observer(function App() {
           <Panel id="javascript" minSize={80}>
             <EditorPanel
               language="javascript"
-              label="JavaScript"
+              label="JS"
               value={store.js}
               cursor={store.jsCursor}
               onChange={(val) => store.setJs(val)}
