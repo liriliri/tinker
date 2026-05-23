@@ -33,9 +33,9 @@ Toolbox for Everyone.
 
 Click [here](https://github.com/liriliri/tinker/releases/) to download and install TINKER. Windows x64, Mac arm64, Mac x64 and Linux x86_64 are supported.
 
-## Builtin Plugins
+## Built-in Plugins
 
-TINKER integrates a rich set of high-quality builtin plugins to help you efficiently accomplish various tasks.
+TINKER integrates a rich set of high-quality built-in plugins to help you efficiently accomplish various tasks.
 
 <table width="100%" style="text-align:center">
   <tbody>
@@ -276,7 +276,7 @@ TINKER integrates a rich set of high-quality builtin plugins to help you efficie
 
 ## Official Plugins
 
-Official non-builtin plugins are maintained at [tinker-plugins](https://github.com/liriliri/tinker-plugins). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-whois`.
+Official non-built-in plugins are maintained at [tinker-plugins](https://github.com/liriliri/tinker-plugins). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-whois`.
 
 ## Third-party Plugins
 
