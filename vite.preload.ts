@@ -1,14 +1,17 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import { builtinModules } from 'node:module'
+import fs from 'fs-extra'
+import path from 'path'
+import keys from 'licia/keys'
 import { alias } from './vite.config'
 
+const pkg = fs.readJSONSync(path.resolve(__dirname, 'package.json'))
 const external = builtinModules.filter((e) => !e.startsWith('_'))
 external.push(
   'electron',
-  'ffmpeg-static',
-  'fs-extra',
-  'licia',
+  ...keys(pkg.optionalDependencies || {}),
+  ...keys(pkg.dependencies || {}),
   ...external.map((m) => `node:${m}`)
 )
 

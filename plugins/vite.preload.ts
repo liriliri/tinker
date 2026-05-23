@@ -1,13 +1,17 @@
 import { defineConfig, UserConfig } from 'vite'
 import { builtinModules } from 'node:module'
+import fs from 'fs-extra'
 import path from 'path'
-import { shareExternal } from './vendor/vite.config'
+import keys from 'licia/keys'
 
+const rootPkg = fs.readJSONSync(path.resolve(__dirname, '../package.json'))
+const vendorPkg = fs.readJSONSync(path.resolve(__dirname, 'vendor/package.json'))
 const external = builtinModules.filter((e) => !e.startsWith('_'))
 external.push(
   'electron',
-  'licia',
-  ...shareExternal,
+  ...keys(rootPkg.optionalDependencies || {}),
+  ...keys(rootPkg.dependencies || {}),
+  ...keys(vendorPkg.dependencies || {}),
   ...external.map((m) => `node:${m}`)
 )
 
