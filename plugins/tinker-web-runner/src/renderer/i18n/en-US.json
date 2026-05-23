@@ -6,5 +6,6 @@
   "cursor": "Ln {{line}}, Col {{col}}",
   "copy": "Copy",
   "paste": "Paste",
-  "clear": "Clear"
+  "clear": "Clear",
+  "format": "Format"
 }

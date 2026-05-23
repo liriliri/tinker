@@ -51,6 +51,12 @@ const globals: Record<string, string> = {
   i18next: 'i18next',
   'react-i18next': 'reactI18next',
   'crypto-js': 'CryptoJS',
+  'prettier/standalone': 'prettier',
+  'prettier/plugins/babel': 'prettierPluginBabel',
+  'prettier/plugins/estree': 'prettierPluginEstree',
+  'prettier/plugins/postcss': 'prettierPluginPostcss',
+  'prettier/plugins/html': 'prettierPluginHtml',
+  'prettier/plugins/typescript': 'prettierPluginTypescript',
 }
 
 export const shareExternal = ['systeminformation']
@@ -261,6 +267,10 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'cryptojs') {
     return createConfig('cryptojs', 'PluginVendorCryptoJS')
+  }
+
+  if (target === 'prettier') {
+    return createConfig('prettier', 'PluginVendorPrettier')
   }
 
   if (target === 'i18next') {

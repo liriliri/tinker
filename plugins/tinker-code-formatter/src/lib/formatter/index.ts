@@ -1,35 +1,40 @@
 import { Config, Languages, Format } from './types'
 import sortBy from 'licia/sortBy'
+import { formatter as javascriptFormatter } from './javascript'
+import { formatter as typescriptFormatter } from './typescript'
+import { formatter as cssFormatter } from './css'
+import { formatter as htmlFormatter } from './html'
+import { formatter as jsonFormatter } from './json'
 
 const languages: { [k in Languages]: Config<k> } = {
   javascript: {
     beautify: true,
     load() {
-      return import('./javascript').then((m) => m.formatter)
+      return Promise.resolve(javascriptFormatter)
     },
   },
   typescript: {
     beautify: true,
     load() {
-      return import('./typescript').then((m) => m.formatter)
+      return Promise.resolve(typescriptFormatter)
     },
   },
   css: {
     beautify: true,
     load() {
-      return import('./css').then((m) => m.formatter)
+      return Promise.resolve(cssFormatter)
     },
   },
   html: {
     beautify: true,
     load() {
-      return import('./html').then((m) => m.formatter)
+      return Promise.resolve(htmlFormatter)
     },
   },
   json: {
     beautify: true,
     load() {
-      return import('./json').then((m) => m.formatter)
+      return Promise.resolve(jsonFormatter)
     },
   },
 }

@@ -1,7 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { Editor, OnMount } from '@monaco-editor/react'
-import { Clipboard, Eraser } from 'lucide-react'
+import { Clipboard, Eraser, WandSparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'prettier/standalone'
+import babel from 'prettier/plugins/babel'
+import estree from 'prettier/plugins/estree'
+import postcss from 'prettier/plugins/postcss'
+import htmlPlugin from 'prettier/plugins/html'
 import {
   Toolbar,
   ToolbarLabel,
@@ -51,6 +56,26 @@ const EditorPanel = observer(function EditorPanel({
     onChange(value + text)
   }
 
+  const handleFormat = async () => {
+    try {
+      const parserMap: Record<string, { parser: string; plugins: unknown[] }> =
+        {
+          html: { parser: 'html', plugins: [htmlPlugin] },
+          css: { parser: 'css', plugins: [postcss] },
+          javascript: { parser: 'babel', plugins: [babel, estree] },
+        }
+      const config = parserMap[language]
+      const formatted = await format(value, {
+        parser: config.parser,
+        plugins: config.plugins,
+        tabWidth: 2,
+      })
+      onChange(formatted)
+    } catch {
+      // ignore format errors
+    }
+  }
+
   return (
     <div
       className={`h-full flex flex-col overflow-hidden ${
@@ -75,6 +100,14 @@ const EditorPanel = observer(function EditorPanel({
           title={t('clear')}
         >
           <Eraser size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+        <ToolbarSeparator />
+        <ToolbarButton
+          onClick={handleFormat}
+          disabled={!value}
+          title={t('format')}
+        >
+          <WandSparkles size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
         <ToolbarSpacer />
         <span className={`text-xs ${tw.text.secondary}`}>

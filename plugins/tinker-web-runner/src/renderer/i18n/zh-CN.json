@@ -6,5 +6,6 @@
   "cursor": "行 {{line}}, 列 {{col}}",
   "copy": "复制",
   "paste": "粘贴",
-  "clear": "清空"
+  "clear": "清空",
+  "format": "格式化"
 }

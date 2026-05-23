@@ -13,12 +13,10 @@
     "main": "dist/index.html",
     "locales": {
       "zh-CN": {
-        "name": "代码格式化",
-        "description": "代码格式化，支持多种编程语言"
+        "name": "\u4ee3\u7801\u683c\u5f0f\u5316",
+        "description": "\u4ee3\u7801\u683c\u5f0f\u5316\uff0c\u652f\u6301\u591a\u79cd\u7f16\u7a0b\u8bed\u8a00"
       }
     }
   },
-  "devDependencies": {
-    "prettier": "^3.7.4"
-  }
+  "devDependencies": {}
 }
