@@ -97,15 +97,17 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
 
     // Initial title update
     const name = terminal.getProcessName(paneId)
-    if (name) store.setPaneTitle(paneId, name)
+    const cwd = terminal.getCwd(paneId)
+    if (name) store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
   })
 
   const titleInterval = setInterval(() => {
     const name = terminal.getProcessName(paneId)
     if (name) {
-      store.setPaneTitle(paneId, name)
+      const cwd = terminal.getCwd(paneId)
+      store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
     }
-  }, 300)
+  }, 1000)
 
   const instance: TerminalInstance = {
     element,
@@ -183,6 +185,11 @@ export default function Terminal({ paneId }: TerminalProps) {
         {
           label: t('splitHorizontal'),
           click: () => store.splitPane(paneId, 'vertical'),
+        },
+        { type: 'separator' },
+        {
+          label: t('closePane'),
+          click: () => store.closePane(paneId),
         },
       ])
     },

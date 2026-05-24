@@ -1,6 +1,8 @@
 import { contextBridge } from 'electron'
+import { execSync } from 'child_process'
 import * as pty from 'node-pty'
 import { homedir, platform } from 'os'
+import { basename } from 'path'
 
 const isWindows = platform() === 'win32'
 const defaultShell = isWindows
@@ -94,6 +96,26 @@ const terminalObj = {
       return session.process.process
     }
     return ''
+  },
+
+  getCwd(id: string): string {
+    const session = sessions.get(id)
+    if (!session) return ''
+
+    try {
+      const pid = session.process.pid
+      if (isWindows) {
+        return ''
+      }
+      const output = execSync(
+        `lsof -p ${pid} -Fn -a -d cwd 2>/dev/null | grep "^n"`,
+        { encoding: 'utf8', timeout: 500 }
+      )
+      const cwd = output.trim().slice(1) // Remove leading 'n'
+      return basename(cwd)
+    } catch {
+      return ''
+    }
   },
 }
 

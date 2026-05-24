@@ -152,25 +152,26 @@ class Store extends BaseStore {
 
   setActivePane(paneId: string) {
     this.activePaneId = paneId
+    const title = this.paneTitles[paneId]
+    if (title) {
+      const tab = this.tabs.find((t) => t.id === this.activeTabId)
+      if (tab) {
+        tab.title = title
+      }
+    }
   }
 
   setPaneTitle(paneId: string, title: string) {
     if (this.paneTitles[paneId] === title) return
     this.paneTitles[paneId] = title
 
-    // Update tab title if this pane is the first pane of its tab
-    for (const tab of this.tabs) {
-      const firstPaneId = this.getFirstPaneId(tab.layout)
-      if (firstPaneId === paneId) {
+    // Update tab title if this pane is the active pane
+    if (paneId === this.activePaneId) {
+      const tab = this.tabs.find((t) => t.id === this.activeTabId)
+      if (tab) {
         tab.title = title
-        break
       }
     }
-  }
-
-  private getFirstPaneId(node: ILayoutNode): string {
-    if (node.type === 'leaf') return node.paneId
-    return this.getFirstPaneId(node.first)
   }
 
   moveTab(fromIndex: number, toIndex: number) {
