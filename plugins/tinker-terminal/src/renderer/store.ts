@@ -1,7 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { IBaseTab } from 'share/components/TabBar'
+
+const storage = new LocalStore('tinker-terminal')
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 
 export type SplitDirection = 'horizontal' | 'vertical'
 
@@ -75,6 +79,7 @@ class Store extends BaseStore {
   paneTitles: Record<string, string> = {}
   pendingCwd: Record<string, string> = {}
   onDestroyPane: ((paneId: string) => void) | null = null
+  sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? false
 
   private tabCounter = 0
 
@@ -85,6 +90,11 @@ class Store extends BaseStore {
       pendingCwd: false,
     })
     this.addTab()
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen
+    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
   addTab(afterTabId?: string) {

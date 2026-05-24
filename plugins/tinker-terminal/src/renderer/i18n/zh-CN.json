@@ -8,5 +8,7 @@
   "selectAll": "全选",
   "splitVertical": "垂直拆分",
   "splitHorizontal": "水平拆分",
-  "closePane": "关闭面板"
+  "closePane": "关闭面板",
+  "showSidebar": "显示侧边栏",
+  "hideSidebar": "隐藏侧边栏"
 }

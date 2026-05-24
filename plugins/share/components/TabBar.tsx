@@ -270,7 +270,7 @@ export default function TabBar<T extends IBaseTab>({
 }: TabBarProps<T>) {
   return (
     <div
-      className={`relative flex items-center ${tw.bg.secondary} h-[38px] min-h-[38px]`}
+      className={`relative flex items-center ${tw.bg.secondary} h-10 min-h-[40px]`}
     >
       <div className="flex items-stretch overflow-x-hidden min-w-0 h-full relative">
         {tabs.map((tab, i) => (

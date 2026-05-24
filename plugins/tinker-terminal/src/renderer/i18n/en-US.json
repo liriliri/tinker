@@ -8,5 +8,7 @@
   "selectAll": "Select All",
   "splitVertical": "Split Vertically",
   "splitHorizontal": "Split Horizontally",
-  "closePane": "Close Pane"
+  "closePane": "Close Pane",
+  "showSidebar": "Show Sidebar",
+  "hideSidebar": "Hide Sidebar"
 }
