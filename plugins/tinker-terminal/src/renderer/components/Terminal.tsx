@@ -85,7 +85,11 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
 
   requestAnimationFrame(() => {
     fitAddon.fit()
-    terminal.create(paneId, xterm.cols, xterm.rows)
+    const pendingCwd = store.pendingCwd[paneId]
+    if (pendingCwd) {
+      delete store.pendingCwd[paneId]
+    }
+    terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd)
 
     terminal.onData(paneId, (data: string) => {
       xterm.write(data)

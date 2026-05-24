@@ -18,7 +18,7 @@ interface PtySession {
 const sessions = new Map<string, PtySession>()
 
 const terminalObj = {
-  create(id: string, cols: number, rows: number) {
+  create(id: string, cols: number, rows: number, cwd?: string) {
     const existing = sessions.get(id)
     if (existing) {
       existing.process.kill()
@@ -29,7 +29,7 @@ const terminalObj = {
       name: 'xterm-256color',
       cols,
       rows,
-      cwd: homedir(),
+      cwd: cwd || homedir(),
     })
 
     const session: PtySession = {
@@ -113,6 +113,25 @@ const terminalObj = {
       )
       const cwd = output.trim().slice(1) // Remove leading 'n'
       return basename(cwd)
+    } catch {
+      return ''
+    }
+  },
+
+  getFullCwd(id: string): string {
+    const session = sessions.get(id)
+    if (!session) return ''
+
+    try {
+      const pid = session.process.pid
+      if (isWindows) {
+        return ''
+      }
+      const output = execSync(
+        `lsof -p ${pid} -Fn -a -d cwd 2>/dev/null | grep "^n"`,
+        { encoding: 'utf8', timeout: 500 }
+      )
+      return output.trim().slice(1) // Remove leading 'n'
     } catch {
       return ''
     }

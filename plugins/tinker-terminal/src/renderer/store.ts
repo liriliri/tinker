@@ -73,6 +73,7 @@ class Store extends BaseStore {
   activeTabId = ''
   activePaneId = ''
   paneTitles: Record<string, string> = {}
+  pendingCwd: Record<string, string> = {}
   onDestroyPane: ((paneId: string) => void) | null = null
 
   private tabCounter = 0
@@ -81,6 +82,7 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this, {
       onDestroyPane: false,
+      pendingCwd: false,
     })
     this.addTab()
   }
@@ -193,6 +195,10 @@ class Store extends BaseStore {
     if (!tab) return
 
     const newPaneId = uuid()
+    const cwd = terminal.getFullCwd(paneId)
+    if (cwd) {
+      this.pendingCwd[newPaneId] = cwd
+    }
     tab.layout = splitNode(tab.layout, paneId, direction, newPaneId)
     this.activePaneId = newPaneId
   }
