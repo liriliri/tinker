@@ -171,17 +171,17 @@ class Store extends BaseStore {
   }
 
   closeTab(id: string) {
+    if (this.tabs.length <= 1) {
+      window.close()
+      return
+    }
+
     const index = this.tabs.findIndex((t) => t.id === id)
     if (index === -1) return
 
     this.webviewRefs.delete(id)
     this.devToolsOpenTabs.delete(id)
     this.tabs.splice(index, 1)
-
-    if (this.tabs.length === 0) {
-      this.addTab()
-      return
-    }
 
     if (this.activeTabId === id) {
       const newIndex = Math.min(index, this.tabs.length - 1)

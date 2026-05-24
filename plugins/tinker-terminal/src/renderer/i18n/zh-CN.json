@@ -1,1 +1,12 @@
-{}
+{
+  "addTabToRight": "在右侧新建标签页",
+  "closeTab": "关闭标签页",
+  "closeOtherTabs": "关闭其他标签页",
+  "closeTabsToRight": "关闭右侧标签页",
+  "copy": "复制",
+  "paste": "粘贴",
+  "selectAll": "全选",
+  "splitVertical": "垂直拆分",
+  "splitHorizontal": "水平拆分",
+  "closePane": "关闭面板"
+}

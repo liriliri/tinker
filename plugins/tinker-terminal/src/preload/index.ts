@@ -7,62 +7,93 @@ const defaultShell = isWindows
   ? 'powershell.exe'
   : process.env.SHELL || '/bin/zsh'
 
-let ptyProcess: pty.IPty | null = null
-let dataCallback: ((data: string) => void) | null = null
-let closeCallback: (() => void) | null = null
+interface PtySession {
+  process: pty.IPty
+  dataCallback: ((data: string) => void) | null
+  closeCallback: (() => void) | null
+}
+
+const sessions = new Map<string, PtySession>()
 
 const terminalObj = {
-  create(cols: number, rows: number) {
-    if (ptyProcess) {
-      ptyProcess.kill()
+  create(id: string, cols: number, rows: number) {
+    const existing = sessions.get(id)
+    if (existing) {
+      existing.process.kill()
+      sessions.delete(id)
     }
 
-    ptyProcess = pty.spawn(defaultShell, [], {
+    const process = pty.spawn(defaultShell, [], {
       name: 'xterm-256color',
       cols,
       rows,
       cwd: homedir(),
     })
 
-    ptyProcess.onData((data: string) => {
-      if (dataCallback) {
-        dataCallback(data)
+    const session: PtySession = {
+      process,
+      dataCallback: null,
+      closeCallback: null,
+    }
+
+    process.onData((data: string) => {
+      if (session.dataCallback) {
+        session.dataCallback(data)
       }
     })
 
-    ptyProcess.onExit(() => {
-      if (closeCallback) {
-        closeCallback()
+    process.onExit(() => {
+      if (session.closeCallback) {
+        session.closeCallback()
       }
-      ptyProcess = null
+      sessions.delete(id)
     })
+
+    sessions.set(id, session)
   },
 
-  write(data: string) {
-    if (ptyProcess) {
-      ptyProcess.write(data)
+  write(id: string, data: string) {
+    const session = sessions.get(id)
+    if (session) {
+      session.process.write(data)
     }
   },
 
-  resize(cols: number, rows: number) {
-    if (ptyProcess) {
-      ptyProcess.resize(cols, rows)
+  resize(id: string, cols: number, rows: number) {
+    const session = sessions.get(id)
+    if (session) {
+      session.process.resize(cols, rows)
     }
   },
 
-  destroy() {
-    if (ptyProcess) {
-      ptyProcess.kill()
-      ptyProcess = null
+  destroy(id: string) {
+    const session = sessions.get(id)
+    if (session) {
+      session.process.kill()
+      sessions.delete(id)
     }
   },
 
-  onData(callback: (data: string) => void) {
-    dataCallback = callback
+  onData(id: string, callback: (data: string) => void) {
+    const session = sessions.get(id)
+    if (session) {
+      session.dataCallback = callback
+    }
   },
 
-  onClose(callback: () => void) {
-    closeCallback = callback
+  onClose(id: string, callback: () => void) {
+    const session = sessions.get(id)
+    if (session) {
+      session.closeCallback = callback
+    }
+  },
+
+  getProcessName(id: string): string {
+    const session = sessions.get(id)
+    if (session) {
+      return session.process.process
+    }
+    return ''
   },
 }
 

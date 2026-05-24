@@ -1,48 +1,89 @@
 import { observer } from 'mobx-react-lite'
-import { Plus } from 'lucide-react'
+import { Globe } from 'lucide-react'
 import { tw } from 'share/theme'
+import { useTranslation } from 'react-i18next'
+import TabBar from 'share/components/TabBar'
 import store from '../store'
-import Tab from './Tab'
+import type { ITab } from '../../common/types'
 
-export default observer(function TabBar() {
+export default observer(function BrowserTabBar() {
+  const { t } = useTranslation()
+
+  const renderIcon = (tab: ITab) => {
+    if (tab.favicon) {
+      return <img src={tab.favicon} className="w-4 h-4" alt="" />
+    }
+    return <Globe size={14} className={tw.text.tertiary} />
+  }
+
+  const handleContextMenu = (e: React.MouseEvent, tabId: string) => {
+    const tab = store.tabs.find((t) => t.id === tabId)
+    if (!tab) return
+
+    const wv = store.webviewRefs.get(tabId)
+    tinker.showContextMenu(e.clientX, e.clientY, [
+      {
+        label: t('addTabToRight'),
+        click: () => store.addTab(undefined, tabId),
+      },
+      { type: 'separator' },
+      {
+        label: t('reload'),
+        click: () => {
+          if (wv) wv.reload()
+        },
+      },
+      {
+        label: t('duplicate'),
+        click: () => store.addTab(tab.url, tabId),
+      },
+      {
+        label: wv && wv.isAudioMuted() ? t('unmuteSite') : t('muteSite'),
+        click: () => {
+          if (wv) wv.setAudioMuted(!wv.isAudioMuted())
+        },
+      },
+      { type: 'separator' },
+      {
+        label: t('closeTab'),
+        click: () => store.closeTab(tabId),
+      },
+      {
+        label: t('closeOtherTabs'),
+        enabled: store.tabs.length > 1,
+        click: () => {
+          const tabs = [...store.tabs]
+          tabs.forEach((t) => {
+            if (t.id !== tabId) store.closeTab(t.id)
+          })
+        },
+      },
+      {
+        label: t('closeTabsToRight'),
+        enabled: store.tabs.indexOf(tab) < store.tabs.length - 1,
+        click: () => {
+          const index = store.tabs.indexOf(tab)
+          const tabs = [...store.tabs]
+          for (let i = tabs.length - 1; i > index; i--) {
+            store.closeTab(tabs[i].id)
+          }
+        },
+      },
+    ])
+  }
+
   return (
-    <div
-      className={`relative flex items-center ${tw.bg.secondary} h-[38px] min-h-[38px]`}
-    >
-      <div className="flex items-end overflow-x-hidden min-w-0 h-full pt-[4px] relative">
-        {store.tabs.map((tab, i) => {
-          return <Tab key={tab.id} tab={tab} isFirst={i === 0} />
-        })}
-        {/* Separators rendered at TabBar level to avoid z-index stacking issues */}
-        {store.tabs.map((tab, i) => {
-          const nextTab = store.tabs[i + 1]
-          const isActive = tab.id === store.activeTabId
-          const nextIsActive = nextTab?.id === store.activeTabId
-          const isLast = i === store.tabs.length - 1
-          const showSep = !isLast && !isActive && !nextIsActive
-
-          if (!showSep) return null
-
-          const left = `${((i + 1) / store.tabs.length) * 100}%`
-
-          return (
-            <div
-              key={`sep-${tab.id}`}
-              className={`absolute top-1/4 bottom-1/4 w-px z-[10] ${tw.bg.border}`}
-              style={{ left }}
-            />
-          )
-        })}
-      </div>
-      <button
-        className={`p-1 mx-1.5 rounded-md flex-shrink-0 ${tw.hover} transition-colors`}
-        onClick={() => store.addTab()}
-      >
-        <Plus size={14} className={tw.text.secondary} />
-      </button>
-      <div
-        className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
-      />
-    </div>
+    <TabBar
+      tabs={store.tabs}
+      activeTabId={store.activeTabId}
+      onAddTab={() => store.addTab()}
+      onClose={(id) => store.closeTab(id)}
+      onActivate={(id) => store.setActiveTab(id)}
+      onMove={(from, to) => store.moveTab(from, to)}
+      onContextMenu={handleContextMenu}
+      renderIcon={renderIcon}
+      isLoading={(tab) => tab.isLoading}
+      getTitle={(tab) => tab.title || (tab.url ? tab.url : t('newTab'))}
+    />
   )
 })

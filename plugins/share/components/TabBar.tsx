@@ -1,21 +1,44 @@
-import { useRef, useCallback, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
-import { X, Loader2, Globe } from 'lucide-react'
+import { useRef, useCallback, useEffect, ReactNode } from 'react'
+import { X, Loader2, Plus } from 'lucide-react'
 import { tw } from 'share/theme'
-import { useTranslation } from 'react-i18next'
-import store from '../store'
-import type { ITab } from '../../common/types'
 
 const DRAG_THRESHOLD = 5
 
-interface TabProps {
-  tab: ITab
-  isFirst: boolean
+export interface IBaseTab {
+  id: string
+  title: string
 }
 
-export default observer(function Tab({ tab, isFirst }: TabProps) {
-  const { t } = useTranslation()
-  const isActive = store.activeTabId === tab.id
+export interface TabProps {
+  id: string
+  title: string
+  isActive: boolean
+  isFirst: boolean
+  icon?: ReactNode
+  isLoading?: boolean
+  closable?: boolean
+  onClose: (id: string) => void
+  onActivate: (id: string) => void
+  onMove: (fromIndex: number, toIndex: number) => void
+  onContextMenu?: (e: React.MouseEvent, id: string) => void
+  tabIndex: number
+  tabCount: number
+}
+
+function Tab({
+  id,
+  title,
+  isActive,
+  isFirst,
+  icon,
+  isLoading,
+  closable = true,
+  onClose,
+  onActivate,
+  onMove,
+  onContextMenu,
+  tabCount,
+}: TabProps) {
   const tabRef = useRef<HTMLDivElement>(null)
   const dragState = useRef<{
     startX: number
@@ -26,7 +49,7 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation()
-    store.closeTab(tab.id)
+    onClose(id)
   }
 
   const handleMouseDown = useCallback(
@@ -34,7 +57,7 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
       if (e.button !== 0) return
       e.preventDefault()
 
-      store.setActiveTab(tab.id)
+      onActivate(id)
 
       const el = tabRef.current
       if (!el) return
@@ -64,10 +87,6 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
         state.offsetX = dx
         el.style.transform = `translateX(${dx}px)`
 
-        // Determine if we should swap
-        const currentIndex = store.tabs.findIndex((t) => t.id === tab.id)
-        if (currentIndex === -1) return
-
         const parent = el.parentElement
         if (!parent) return
 
@@ -76,16 +95,18 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
           c.hasAttribute('data-tab-id')
         )
 
+        const currentIndex = tabElements.indexOf(el)
+        if (currentIndex === -1) return
+
         if (dx > 0) {
-          // Moving right
           const nextIndex = currentIndex + 1
-          if (nextIndex < store.tabs.length) {
+          if (nextIndex < tabCount) {
             const nextEl = tabElements[nextIndex]
             if (nextEl) {
               const nextCenter = nextEl.offsetLeft + nextEl.offsetWidth / 2
               const currentRight = el.offsetLeft + el.offsetWidth + dx
               if (currentRight >= nextCenter) {
-                store.moveTab(currentIndex, nextIndex)
+                onMove(currentIndex, nextIndex)
                 state.startX += nextEl.offsetWidth
                 state.offsetX = ev.clientX - state.startX
                 el.style.transform = `translateX(${state.offsetX}px)`
@@ -93,7 +114,6 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
             }
           }
         } else {
-          // Moving left
           const prevIndex = currentIndex - 1
           if (prevIndex >= 0) {
             const prevEl = tabElements[prevIndex]
@@ -101,7 +121,7 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
               const prevCenter = prevEl.offsetLeft + prevEl.offsetWidth / 2
               const currentLeft = el.offsetLeft + dx
               if (currentLeft <= prevCenter) {
-                store.moveTab(currentIndex, prevIndex)
+                onMove(currentIndex, prevIndex)
                 state.startX -= prevEl.offsetWidth
                 state.offsetX = ev.clientX - state.startX
                 el.style.transform = `translateX(${state.offsetX}px)`
@@ -136,7 +156,7 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
       window.addEventListener('mousemove', onMouseMove)
       window.addEventListener('mouseup', onMouseUp)
     },
-    [tab.id]
+    [id, tabCount, onActivate, onMove]
   )
 
   useEffect(() => {
@@ -146,63 +166,16 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
   }, [])
 
   const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    const wv = store.webviewRefs.get(tab.id)
-    tinker.showContextMenu(e.clientX, e.clientY, [
-      {
-        label: t('addTabToRight'),
-        click: () => store.addTab(undefined, tab.id),
-      },
-      { type: 'separator' },
-      {
-        label: t('reload'),
-        click: () => {
-          if (wv) wv.reload()
-        },
-      },
-      {
-        label: t('duplicate'),
-        click: () => store.addTab(tab.url, tab.id),
-      },
-      {
-        label: wv && wv.isAudioMuted() ? t('unmuteSite') : t('muteSite'),
-        click: () => {
-          if (wv) wv.setAudioMuted(!wv.isAudioMuted())
-        },
-      },
-      { type: 'separator' },
-      {
-        label: t('closeTab'),
-        click: () => store.closeTab(tab.id),
-      },
-      {
-        label: t('closeOtherTabs'),
-        enabled: store.tabs.length > 1,
-        click: () => {
-          const tabs = [...store.tabs]
-          tabs.forEach((t) => {
-            if (t.id !== tab.id) store.closeTab(t.id)
-          })
-        },
-      },
-      {
-        label: t('closeTabsToRight'),
-        enabled: store.tabs.indexOf(tab) < store.tabs.length - 1,
-        click: () => {
-          const index = store.tabs.indexOf(tab)
-          const tabs = [...store.tabs]
-          for (let i = tabs.length - 1; i > index; i--) {
-            store.closeTab(tabs[i].id)
-          }
-        },
-      },
-    ])
+    if (onContextMenu) {
+      e.preventDefault()
+      onContextMenu(e, id)
+    }
   }
 
   return (
     <div
       ref={tabRef}
-      data-tab-id={tab.id}
+      data-tab-id={id}
       className={`group relative flex items-center h-full w-[240px] min-w-[72px] cursor-default transition-colors duration-100 select-none ${
         isActive
           ? `${tw.bg.secondary} z-[2]`
@@ -230,12 +203,10 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
       )}
       <div className="flex items-center overflow-hidden flex-1 min-w-0 ml-2.5">
         <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-          {tab.isLoading ? (
+          {isLoading ? (
             <Loader2 size={14} className={`animate-spin ${tw.text.tertiary}`} />
-          ) : tab.favicon ? (
-            <img src={tab.favicon} className="w-4 h-4" alt="" />
           ) : (
-            <Globe size={14} className={tw.text.tertiary} />
+            icon
           )}
         </div>
         <span
@@ -243,18 +214,112 @@ export default observer(function Tab({ tab, isFirst }: TabProps) {
             isActive ? tw.text.primary : tw.text.secondary
           }`}
         >
-          {tab.title || (tab.url ? tab.url : t('newTab'))}
+          {title}
         </span>
       </div>
-      <button
-        className={`flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full mr-1.5 transition-all duration-100 opacity-0 group-hover:opacity-70 hover:!opacity-100 hover:bg-black/10 dark:hover:bg-white/10 ${
-          isActive ? '!opacity-70' : ''
-        }`}
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={handleClose}
-      >
-        <X size={14} className={tw.text.secondary} />
-      </button>
+      {closable && (
+        <button
+          className={`flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full mr-1.5 transition-all duration-100 opacity-0 group-hover:opacity-70 hover:!opacity-100 hover:bg-black/10 dark:hover:bg-white/10 ${
+            isActive ? '!opacity-70' : ''
+          }`}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={handleClose}
+        >
+          <X size={14} className={tw.text.secondary} />
+        </button>
+      )}
+      {!closable && (
+        <button
+          className={`flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full mr-1.5 transition-all duration-100 opacity-0 group-hover:opacity-70 hover:!opacity-100 ${
+            isActive ? '!opacity-70' : ''
+          }`}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={handleClose}
+        >
+          <X size={14} className={tw.text.tertiary} />
+        </button>
+      )}
     </div>
   )
-})
+}
+
+export interface TabBarProps<T extends IBaseTab> {
+  tabs: T[]
+  activeTabId: string
+  onAddTab: () => void
+  onClose: (id: string) => void
+  onActivate: (id: string) => void
+  onMove: (fromIndex: number, toIndex: number) => void
+  onContextMenu?: (e: React.MouseEvent, id: string) => void
+  renderIcon?: (tab: T) => ReactNode
+  isLoading?: (tab: T) => boolean
+  getTitle?: (tab: T) => string
+}
+
+export default function TabBar<T extends IBaseTab>({
+  tabs,
+  activeTabId,
+  onAddTab,
+  onClose,
+  onActivate,
+  onMove,
+  onContextMenu,
+  renderIcon,
+  isLoading,
+  getTitle,
+}: TabBarProps<T>) {
+  return (
+    <div
+      className={`relative flex items-center ${tw.bg.secondary} h-[38px] min-h-[38px]`}
+    >
+      <div className="flex items-stretch overflow-x-hidden min-w-0 h-full relative">
+        {tabs.map((tab, i) => (
+          <Tab
+            key={tab.id}
+            id={tab.id}
+            title={getTitle ? getTitle(tab) : tab.title}
+            isActive={tab.id === activeTabId}
+            isFirst={i === 0}
+            icon={renderIcon ? renderIcon(tab) : undefined}
+            isLoading={isLoading ? isLoading(tab) : false}
+            closable={tabs.length > 1}
+            onClose={onClose}
+            onActivate={onActivate}
+            onMove={onMove}
+            onContextMenu={onContextMenu}
+            tabIndex={i}
+            tabCount={tabs.length}
+          />
+        ))}
+        {tabs.map((tab, i) => {
+          const nextTab = tabs[i + 1]
+          const isActive = tab.id === activeTabId
+          const nextIsActive = nextTab?.id === activeTabId
+          const isLast = i === tabs.length - 1
+          const showSep = !isLast && !isActive && !nextIsActive
+
+          if (!showSep) return null
+
+          const left = `${((i + 1) / tabs.length) * 100}%`
+
+          return (
+            <div
+              key={`sep-${tab.id}`}
+              className={`absolute top-1/4 bottom-1/4 w-px z-[10] ${tw.bg.border}`}
+              style={{ left }}
+            />
+          )
+        })}
+      </div>
+      <button
+        className={`p-1 mx-1.5 rounded-md flex-shrink-0 ${tw.hover} transition-colors`}
+        onClick={onAddTab}
+      >
+        <Plus size={14} className={tw.text.secondary} />
+      </button>
+      <div
+        className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
+      />
+    </div>
+  )
+}

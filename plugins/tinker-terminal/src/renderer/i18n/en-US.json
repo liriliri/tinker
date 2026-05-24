@@ -1,1 +1,12 @@
-{}
+{
+  "addTabToRight": "Add Tab to Right",
+  "closeTab": "Close Tab",
+  "closeOtherTabs": "Close Other Tabs",
+  "closeTabsToRight": "Close Tabs to Right",
+  "copy": "Copy",
+  "paste": "Paste",
+  "selectAll": "Select All",
+  "splitVertical": "Split Vertically",
+  "splitHorizontal": "Split Horizontally",
+  "closePane": "Close Pane"
+}

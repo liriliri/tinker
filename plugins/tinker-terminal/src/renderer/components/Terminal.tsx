@@ -1,83 +1,208 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
+import { tw, THEME_COLORS } from 'share/theme'
+import { useTranslation } from 'react-i18next'
+import store from '../store'
 import '@xterm/xterm/css/xterm.css'
 
-const THEME_BG = '#1a1b26'
+function getBgColor() {
+  return store.isDark
+    ? THEME_COLORS.bg.dark.primary
+    : THEME_COLORS.bg.light.primary
+}
 
-export default function Terminal() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const xtermRef = useRef<XTerm | null>(null)
-  const fitAddonRef = useRef<FitAddon | null>(null)
+function getFgColor() {
+  return store.isDark
+    ? THEME_COLORS.text.dark.primary
+    : THEME_COLORS.text.light.primary
+}
 
-  useEffect(() => {
-    if (!containerRef.current) return
+// Persistent terminal instances that survive remounts
+interface TerminalInstance {
+  element: HTMLDivElement
+  xterm: XTerm
+  fitAddon: FitAddon
+  resizeObserver: ResizeObserver
+  inputDisposable: { dispose: () => void }
+  titleInterval: ReturnType<typeof setInterval>
+}
 
-    const xterm = new XTerm({
-      cursorBlink: true,
-      fontSize: 14,
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      theme: {
-        background: THEME_BG,
-        foreground: '#c0caf5',
-        cursor: '#c0caf5',
-      },
-      allowProposedApi: true,
-    })
+const instances = new Map<string, TerminalInstance>()
 
-    const fitAddon = new FitAddon()
-    xterm.loadAddon(fitAddon)
-    xterm.open(containerRef.current)
+export function destroyPane(paneId: string) {
+  terminal.destroy(paneId)
+  const instance = instances.get(paneId)
+  if (instance) {
+    clearInterval(instance.titleInterval)
+    instance.inputDisposable.dispose()
+    instance.resizeObserver.disconnect()
+    instance.xterm.dispose()
+    instances.delete(paneId)
+  }
+}
 
-    xtermRef.current = xterm
-    fitAddonRef.current = fitAddon
+function getOrCreateInstance(paneId: string): TerminalInstance {
+  const existing = instances.get(paneId)
+  if (existing) return existing
 
-    // Fit after a frame to ensure DOM is ready
+  const bg = getBgColor()
+  const fg = getFgColor()
+
+  const element = document.createElement('div')
+  element.className = 'h-full w-full overflow-hidden'
+  element.style.backgroundColor = bg
+
+  const xterm = new XTerm({
+    cursorBlink: true,
+    fontSize: 14,
+    fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+    theme: {
+      background: bg,
+      foreground: fg,
+      cursor: fg,
+    },
+    allowProposedApi: true,
+  })
+
+  const fitAddon = new FitAddon()
+  xterm.loadAddon(fitAddon)
+  xterm.open(element)
+
+  const inputDisposable = xterm.onData((data) => {
+    terminal.write(paneId, data)
+  })
+
+  const resizeObserver = new ResizeObserver(() => {
     requestAnimationFrame(() => {
-      fitAddon.fit()
-
-      // Create pty with terminal dimensions
-      terminal.create(xterm.cols, xterm.rows)
+      if (element.offsetWidth > 0 && element.offsetHeight > 0) {
+        fitAddon.fit()
+        terminal.resize(paneId, xterm.cols, xterm.rows)
+      }
     })
+  })
+  resizeObserver.observe(element)
 
-    // Connect pty data to xterm
-    terminal.onData((data: string) => {
+  requestAnimationFrame(() => {
+    fitAddon.fit()
+    terminal.create(paneId, xterm.cols, xterm.rows)
+
+    terminal.onData(paneId, (data: string) => {
       xterm.write(data)
     })
 
-    terminal.onClose(() => {
+    terminal.onClose(paneId, () => {
       xterm.writeln('\r\n[Process exited]')
     })
 
-    // Send user input to pty
-    const inputDisposable = xterm.onData((data) => {
-      terminal.write(data)
-    })
+    // Initial title update
+    const name = terminal.getProcessName(paneId)
+    if (name) store.setPaneTitle(paneId, name)
+  })
 
-    // Handle resize
-    const resizeObserver = new ResizeObserver(() => {
-      requestAnimationFrame(() => {
-        if (fitAddonRef.current && xtermRef.current) {
-          fitAddonRef.current.fit()
-          terminal.resize(xtermRef.current.cols, xtermRef.current.rows)
-        }
-      })
+  const titleInterval = setInterval(() => {
+    const name = terminal.getProcessName(paneId)
+    if (name) {
+      store.setPaneTitle(paneId, name)
+    }
+  }, 300)
+
+  const instance: TerminalInstance = {
+    element,
+    xterm,
+    fitAddon,
+    resizeObserver,
+    inputDisposable,
+    titleInterval,
+  }
+  instances.set(paneId, instance)
+  return instance
+}
+
+interface TerminalProps {
+  paneId: string
+}
+
+export default function Terminal({ paneId }: TerminalProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const instance = getOrCreateInstance(paneId)
+    container.appendChild(instance.element)
+
+    // Refit after reparent
+    requestAnimationFrame(() => {
+      instance.fitAddon.fit()
     })
-    resizeObserver.observe(containerRef.current)
 
     return () => {
-      inputDisposable.dispose()
-      resizeObserver.disconnect()
-      terminal.destroy()
-      xterm.dispose()
+      if (instance.element.parentElement === container) {
+        container.removeChild(instance.element)
+      }
     }
-  }, [])
+  }, [paneId])
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      const instance = instances.get(paneId)
+      if (!instance) return
+      const xterm = instance.xterm
+
+      tinker.showContextMenu(e.clientX, e.clientY, [
+        {
+          label: t('copy'),
+          enabled: xterm.hasSelection(),
+          click: () => {
+            navigator.clipboard.writeText(xterm.getSelection())
+          },
+        },
+        {
+          label: t('paste'),
+          click: async () => {
+            const text = await navigator.clipboard.readText()
+            terminal.write(paneId, text)
+          },
+        },
+        { type: 'separator' },
+        {
+          label: t('selectAll'),
+          click: () => {
+            xterm.selectAll()
+          },
+        },
+        { type: 'separator' },
+        {
+          label: t('splitVertical'),
+          click: () => store.splitPane(paneId, 'horizontal'),
+        },
+        {
+          label: t('splitHorizontal'),
+          click: () => store.splitPane(paneId, 'vertical'),
+        },
+      ])
+    },
+    [paneId, t]
+  )
+
+  const handleFocus = useCallback(() => {
+    store.setActivePane(paneId)
+  }, [paneId])
 
   return (
     <div
       ref={containerRef}
-      className="h-full w-full overflow-hidden"
-      style={{ backgroundColor: THEME_BG }}
+      className={`h-full w-full overflow-hidden ${tw.bg.primary}`}
+      onContextMenu={handleContextMenu}
+      onFocus={handleFocus}
+      onMouseDown={handleFocus}
     />
   )
 }
+
+// Register destroyPane on store to avoid circular import
+store.onDestroyPane = destroyPane
