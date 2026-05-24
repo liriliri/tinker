@@ -25,7 +25,6 @@ interface TerminalInstance {
   fitAddon: FitAddon
   resizeObserver: ResizeObserver
   inputDisposable: { dispose: () => void }
-  titleInterval: ReturnType<typeof setInterval>
 }
 
 const instances = new Map<string, TerminalInstance>()
@@ -34,7 +33,6 @@ export function destroyPane(paneId: string) {
   terminal.destroy(paneId)
   const instance = instances.get(paneId)
   if (instance) {
-    clearInterval(instance.titleInterval)
     instance.inputDisposable.dispose()
     instance.resizeObserver.disconnect()
     instance.xterm.dispose()
@@ -91,27 +89,43 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
     }
     terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd)
 
+    // Debounced title update - triggered by both input and output
+    let titleTimer: ReturnType<typeof setTimeout> | null = null
+    let lastTitle = ''
+    const updateTitle = () => {
+      if (titleTimer) clearTimeout(titleTimer)
+      titleTimer = setTimeout(async () => {
+        const name = terminal.getProcessName(paneId)
+        if (name) {
+          const cwd = await terminal.getCwd(paneId)
+          const title = cwd ? `${cwd}:${name}` : name
+          if (title !== lastTitle) {
+            lastTitle = title
+            store.setPaneTitle(paneId, title)
+          }
+        }
+      }, 300)
+    }
+
     terminal.onData(paneId, (data: string) => {
       xterm.write(data)
+      updateTitle()
     })
 
     terminal.onClose(paneId, () => {
       xterm.writeln('\r\n[Process exited]')
     })
 
+    terminal.onInput(paneId, updateTitle)
+
     // Initial title update
     const name = terminal.getProcessName(paneId)
-    const cwd = terminal.getCwd(paneId)
-    if (name) store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
-  })
-
-  const titleInterval = setInterval(() => {
-    const name = terminal.getProcessName(paneId)
     if (name) {
-      const cwd = terminal.getCwd(paneId)
-      store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
+      terminal.getCwd(paneId).then((cwd) => {
+        store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
+      })
     }
-  }, 1000)
+  })
 
   const instance: TerminalInstance = {
     element,
@@ -119,7 +133,6 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
     fitAddon,
     resizeObserver,
     inputDisposable,
-    titleInterval,
   }
   instances.set(paneId, instance)
   return instance

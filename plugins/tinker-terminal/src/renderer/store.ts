@@ -190,12 +190,12 @@ class Store extends BaseStore {
     this.tabs.splice(toIndex, 0, tab)
   }
 
-  splitPane(paneId: string, direction: SplitDirection) {
+  async splitPane(paneId: string, direction: SplitDirection) {
     const tab = this.tabs.find((t) => t.id === this.activeTabId)
     if (!tab) return
 
     const newPaneId = uuid()
-    const cwd = terminal.getFullCwd(paneId)
+    const cwd = await terminal.getFullCwd(paneId)
     if (cwd) {
       this.pendingCwd[newPaneId] = cwd
     }

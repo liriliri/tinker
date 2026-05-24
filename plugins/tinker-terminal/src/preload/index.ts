@@ -1,5 +1,5 @@
 import { contextBridge } from 'electron'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 import * as pty from 'node-pty'
 import { homedir, platform } from 'os'
 import { basename } from 'path'
@@ -13,6 +13,7 @@ interface PtySession {
   process: pty.IPty
   dataCallback: ((data: string) => void) | null
   closeCallback: (() => void) | null
+  inputCallback: (() => void) | null
 }
 
 const sessions = new Map<string, PtySession>()
@@ -36,6 +37,7 @@ const terminalObj = {
       process,
       dataCallback: null,
       closeCallback: null,
+      inputCallback: null,
     }
 
     process.onData((data: string) => {
@@ -58,6 +60,9 @@ const terminalObj = {
     const session = sessions.get(id)
     if (session) {
       session.process.write(data)
+      if (data.includes('\r') || data.includes('\n')) {
+        session.inputCallback?.()
+      }
     }
   },
 
@@ -90,6 +95,13 @@ const terminalObj = {
     }
   },
 
+  onInput(id: string, callback: () => void) {
+    const session = sessions.get(id)
+    if (session) {
+      session.inputCallback = callback
+    }
+  },
+
   getProcessName(id: string): string {
     const session = sessions.get(id)
     if (session) {
@@ -98,43 +110,48 @@ const terminalObj = {
     return ''
   },
 
-  getCwd(id: string): string {
+  getCwd(id: string): Promise<string> {
     const session = sessions.get(id)
-    if (!session) return ''
+    if (!session) return Promise.resolve('')
 
-    try {
-      const pid = session.process.pid
-      if (isWindows) {
-        return ''
-      }
-      const output = execSync(
+    const pid = session.process.pid
+    if (isWindows) return Promise.resolve('')
+
+    return new Promise((resolve) => {
+      exec(
         `lsof -p ${pid} -Fn -a -d cwd 2>/dev/null | grep "^n"`,
-        { encoding: 'utf8', timeout: 500 }
+        { encoding: 'utf8', timeout: 500 },
+        (err, stdout) => {
+          if (err || !stdout) {
+            resolve('')
+            return
+          }
+          resolve(basename(stdout.trim().slice(1)))
+        }
       )
-      const cwd = output.trim().slice(1) // Remove leading 'n'
-      return basename(cwd)
-    } catch {
-      return ''
-    }
+    })
   },
 
-  getFullCwd(id: string): string {
+  getFullCwd(id: string): Promise<string> {
     const session = sessions.get(id)
-    if (!session) return ''
+    if (!session) return Promise.resolve('')
 
-    try {
-      const pid = session.process.pid
-      if (isWindows) {
-        return ''
-      }
-      const output = execSync(
+    const pid = session.process.pid
+    if (isWindows) return Promise.resolve('')
+
+    return new Promise((resolve) => {
+      exec(
         `lsof -p ${pid} -Fn -a -d cwd 2>/dev/null | grep "^n"`,
-        { encoding: 'utf8', timeout: 500 }
+        { encoding: 'utf8', timeout: 500 },
+        (err, stdout) => {
+          if (err || !stdout) {
+            resolve('')
+            return
+          }
+          resolve(stdout.trim().slice(1))
+        }
       )
-      return output.trim().slice(1) // Remove leading 'n'
-    } catch {
-      return ''
-    }
+    })
   },
 }
 

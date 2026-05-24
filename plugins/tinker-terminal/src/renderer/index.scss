@@ -9,22 +9,3 @@ body,
   padding: 0;
   overflow: hidden;
 }
-
-[data-separator] {
-  position: relative;
-  flex: 0 0 1px !important;
-  z-index: 20;
-  background-color: var(--color-border, #e5e7eb);
-}
-
-:root.dark [data-separator] {
-  background-color: #3e3e42;
-}
-
-[data-separator][data-orientation='horizontal'] {
-  cursor: col-resize;
-}
-
-[data-separator][data-orientation='vertical'] {
-  cursor: row-resize;
-}
