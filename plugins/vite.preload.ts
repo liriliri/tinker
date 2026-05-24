@@ -5,7 +5,9 @@ import path from 'path'
 import keys from 'licia/keys'
 
 const rootPkg = fs.readJSONSync(path.resolve(__dirname, '../package.json'))
-const vendorPkg = fs.readJSONSync(path.resolve(__dirname, 'vendor/package.json'))
+const vendorPkg = fs.readJSONSync(
+  path.resolve(__dirname, 'vendor/package.json')
+)
 const external = builtinModules.filter((e) => !e.startsWith('_'))
 external.push(
   'electron',

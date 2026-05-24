@@ -50,6 +50,7 @@
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",
+    "prettier": "^3.7.4",
     "react-hex-editor": "0.3.0",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^16.5.4",
@@ -59,7 +60,6 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "styled-components": "^4.4.1",
-    "wavesurfer.js": "7.12.2",
-    "prettier": "^3.7.4"
+    "wavesurfer.js": "7.12.2"
   }
 }
