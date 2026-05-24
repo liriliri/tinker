@@ -45,6 +45,8 @@ import {
   ListVideo,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import evalCss from 'licia/evalCss'
+import once from 'licia/once'
 import { addI18nNamespace } from '../lib/i18n'
 
 const I18N_NS = 'videoPlayer'
@@ -93,7 +95,8 @@ addI18nNamespace(I18N_NS, {
 const SEEK_TIME = 10
 const ICON_SIZE = 18
 
-const THEME_STYLES = `
+const injectStyles = once(() =>
+  evalCss(`
 .media-default-skin {
   border-radius: 0;
   --media-color-primary: #1f2937;
@@ -143,16 +146,8 @@ const THEME_STYLES = `
   flex: 1 1 0;
   min-width: 0;
 }
-`
-
-let styleInjected = false
-function injectStyles() {
-  if (styleInjected) return
-  styleInjected = true
-  const style = document.createElement('style')
-  style.textContent = THEME_STYLES
-  document.head.appendChild(style)
-}
+`)
+)
 
 export interface VideoPlayerProps extends PropsWithChildren {
   className?: string

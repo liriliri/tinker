@@ -17,6 +17,7 @@ import each from 'licia/each'
 import endWith from 'licia/endWith'
 import escape from 'licia/escape'
 import escapeRegExp from 'licia/escapeRegExp'
+import evalCss from 'licia/evalCss'
 import fileSize from 'licia/fileSize'
 import fileUrl from 'licia/fileUrl'
 import filter from 'licia/filter'
@@ -45,6 +46,7 @@ import map from 'licia/map'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
 import naturalSort from 'licia/naturalSort'
+import once from 'licia/once'
 import openFile from 'licia/openFile'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
@@ -84,6 +86,7 @@ const licia = {
   endWith,
   escape,
   escapeRegExp,
+  evalCss,
   fileSize,
   fileUrl,
   filter,
@@ -112,6 +115,7 @@ const licia = {
   md5,
   mime,
   naturalSort,
+  once,
   openFile,
   query,
   randomBytes,
@@ -155,6 +159,7 @@ export {
   endWith,
   escape,
   escapeRegExp,
+  evalCss,
   fileSize,
   fileUrl,
   filter,
@@ -183,6 +188,7 @@ export {
   md5,
   mime,
   naturalSort,
+  once,
   openFile,
   query,
   randomBytes,

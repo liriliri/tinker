@@ -1,28 +1,2 @@
 @use '../../../share/base.scss';
 @config "../../tailwind.config.js";
-
-[data-separator] {
-  position: relative;
-  flex: 0 0 5px !important;
-  z-index: 20;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    transition: background-color 0.2s;
-  }
-
-  &:hover::before {
-    background-color: var(--color-accent);
-    opacity: 0.3;
-  }
-}
-
-[data-separator][data-orientation='horizontal'] {
-  cursor: col-resize;
-}
-
-[data-separator][data-orientation='vertical'] {
-  cursor: row-resize;
-}

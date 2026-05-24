@@ -16,8 +16,37 @@ import copy from 'licia/copy'
 import convertBin from 'licia/convertBin'
 import { X, PanelBottom, PanelLeft, PanelRight, LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import evalCss from 'licia/evalCss'
+import once from 'licia/once'
 import { tw } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
+
+const injectSeparatorStyles = once(() =>
+  evalCss(`
+[data-separator] {
+  position: relative;
+  z-index: 20;
+  flex: 0 0 5px !important;
+  outline: none;
+}
+[data-separator]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transition: background-color 0.2s;
+}
+[data-separator]:hover::before {
+  background-color: var(--color-accent);
+  opacity: 0.3;
+}
+[data-separator][data-orientation='horizontal'] {
+  cursor: col-resize;
+}
+[data-separator][data-orientation='vertical'] {
+  cursor: row-resize;
+}
+`)
+)
 
 const I18N_NS = 'webview'
 
@@ -372,6 +401,8 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
   },
   ref
 ) {
+  if (devTools) injectSeparatorStyles()
+
   const { t } = useTranslation(I18N_NS)
   const containerRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
