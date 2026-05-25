@@ -1,6 +1,8 @@
 import { contextBridge } from 'electron'
 import { exec } from 'child_process'
+import { readFileSync } from 'fs'
 import * as pty from 'node-pty'
+import { Client, ClientChannel } from 'ssh2'
 import { homedir, platform } from 'os'
 import { basename } from 'path'
 import { existsSync } from 'fs'
@@ -15,8 +17,20 @@ interface ShellInfo {
   path: string
 }
 
+interface SSHConfig {
+  host: string
+  port: number
+  username: string
+  authType: 'none' | 'password' | 'privateKey'
+  password?: string
+  privateKey?: string
+}
+
 interface PtySession {
-  process: pty.IPty
+  type: 'local' | 'ssh'
+  process?: pty.IPty
+  sshClient?: Client
+  sshStream?: ClientChannel
   dataCallback: ((data: string) => void) | null
   closeCallback: (() => void) | null
   inputCallback: (() => void) | null
@@ -28,7 +42,9 @@ const terminalObj = {
   create(id: string, cols: number, rows: number, cwd?: string, shell?: string) {
     const existing = sessions.get(id)
     if (existing) {
-      existing.process.kill()
+      if (existing.type === 'local' && existing.process) {
+        existing.process.kill()
+      }
       sessions.delete(id)
     }
 
@@ -40,6 +56,7 @@ const terminalObj = {
     })
 
     const session: PtySession = {
+      type: 'local',
       process,
       dataCallback: null,
       closeCallback: null,
@@ -62,10 +79,145 @@ const terminalObj = {
     sessions.set(id, session)
   },
 
+  createSSH(id: string, cols: number, rows: number, config: SSHConfig) {
+    const existing = sessions.get(id)
+    if (existing) {
+      if (existing.type === 'local' && existing.process) {
+        existing.process.kill()
+      } else if (existing.type === 'ssh') {
+        existing.sshStream?.end()
+        existing.sshClient?.end()
+      }
+      sessions.delete(id)
+    }
+
+    const client = new Client()
+
+    const session: PtySession = {
+      type: 'ssh',
+      sshClient: client,
+      dataCallback: null,
+      closeCallback: null,
+      inputCallback: null,
+    }
+
+    sessions.set(id, session)
+
+    client.on('ready', () => {
+      client.shell({ term: 'xterm-256color', cols, rows }, (err, stream) => {
+        if (err) {
+          if (session.dataCallback) {
+            session.dataCallback(`\r\n[SSH Error: ${err.message}]\r\n`)
+          }
+          if (session.closeCallback) {
+            session.closeCallback()
+          }
+          client.end()
+          sessions.delete(id)
+          return
+        }
+
+        session.sshStream = stream
+
+        stream.on('data', (data: Buffer) => {
+          if (session.dataCallback) {
+            session.dataCallback(data.toString('utf8'))
+          }
+        })
+
+        stream.on('close', () => {
+          if (session.closeCallback) {
+            session.closeCallback()
+          }
+          client.end()
+          sessions.delete(id)
+        })
+
+        stream.stderr.on('data', (data: Buffer) => {
+          if (session.dataCallback) {
+            session.dataCallback(data.toString('utf8'))
+          }
+        })
+      })
+    })
+
+    client.on('error', (err) => {
+      if (session.dataCallback) {
+        session.dataCallback(`\r\n[SSH Error: ${err.message}]\r\n`)
+      }
+      if (session.closeCallback) {
+        session.closeCallback()
+      }
+      sessions.delete(id)
+    })
+
+    client.on('close', () => {
+      if (sessions.has(id)) {
+        if (session.closeCallback) {
+          session.closeCallback()
+        }
+        sessions.delete(id)
+      }
+    })
+
+    const connectConfig: Record<string, unknown> = {
+      host: config.host,
+      port: config.port,
+      username: config.username,
+      readyTimeout: 10000,
+      keepaliveInterval: 10000,
+      keepaliveCountMax: 3,
+      tryKeyboard: true,
+    }
+
+    if (config.authType === 'password' && config.password) {
+      connectConfig.password = config.password
+    } else if (config.authType === 'privateKey' && config.privateKey) {
+      try {
+        const keyPath = config.privateKey.replace(/^~/, homedir())
+        connectConfig.privateKey = readFileSync(keyPath, 'utf8')
+      } catch (err) {
+        if (session.dataCallback) {
+          session.dataCallback(
+            `\r\n[SSH Error: Cannot read private key: ${
+              (err as Error).message
+            }]\r\n`
+          )
+        }
+        if (session.closeCallback) {
+          session.closeCallback()
+        }
+        sessions.delete(id)
+        return
+      }
+    }
+
+    // Keyboard-interactive auth: respond to server prompts
+    client.on(
+      'keyboard-interactive',
+      (_name, _instructions, _lang, prompts, finish) => {
+        if (config.authType === 'password' && config.password) {
+          finish([config.password])
+        } else {
+          finish(prompts.map(() => ''))
+        }
+      }
+    )
+
+    client.connect(connectConfig as Parameters<typeof client.connect>[0])
+  },
+
   write(id: string, data: string) {
     const session = sessions.get(id)
-    if (session) {
+    if (!session) return
+
+    if (session.type === 'local' && session.process) {
       session.process.write(data)
+      if (data.includes('\r') || data.includes('\n')) {
+        session.inputCallback?.()
+      }
+    } else if (session.type === 'ssh' && session.sshStream) {
+      session.sshStream.write(data)
       if (data.includes('\r') || data.includes('\n')) {
         session.inputCallback?.()
       }
@@ -74,17 +226,26 @@ const terminalObj = {
 
   resize(id: string, cols: number, rows: number) {
     const session = sessions.get(id)
-    if (session) {
+    if (!session) return
+
+    if (session.type === 'local' && session.process) {
       session.process.resize(cols, rows)
+    } else if (session.type === 'ssh' && session.sshStream) {
+      session.sshStream.setWindow(rows, cols, 0, 0)
     }
   },
 
   destroy(id: string) {
     const session = sessions.get(id)
-    if (session) {
+    if (!session) return
+
+    if (session.type === 'local' && session.process) {
       session.process.kill()
-      sessions.delete(id)
+    } else if (session.type === 'ssh') {
+      session.sshStream?.end()
+      session.sshClient?.end()
     }
+    sessions.delete(id)
   },
 
   onData(id: string, callback: (data: string) => void) {
@@ -110,7 +271,7 @@ const terminalObj = {
 
   getProcessName(id: string): string {
     const session = sessions.get(id)
-    if (session) {
+    if (session?.type === 'local' && session.process) {
       return session.process.process
     }
     return ''
@@ -118,7 +279,9 @@ const terminalObj = {
 
   getCwd(id: string): Promise<string> {
     const session = sessions.get(id)
-    if (!session) return Promise.resolve('')
+    if (!session || session.type !== 'local' || !session.process) {
+      return Promise.resolve('')
+    }
 
     const pid = session.process.pid
     if (isWindows) return Promise.resolve('')
@@ -140,7 +303,9 @@ const terminalObj = {
 
   getFullCwd(id: string): Promise<string> {
     const session = sessions.get(id)
-    if (!session) return Promise.resolve('')
+    if (!session || session.type !== 'local' || !session.process) {
+      return Promise.resolve('')
+    }
 
     const pid = session.process.pid
     if (isWindows) return Promise.resolve('')

@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Folder, Terminal } from 'lucide-react'
+import { Folder, Terminal, Globe } from 'lucide-react'
 import { tw } from 'share/theme'
 import className from 'licia/className'
 import uuid from 'licia/uuid'
@@ -10,7 +10,7 @@ import { prompt } from 'share/components/Prompt'
 import { confirm } from 'share/components/Confirm'
 import SessionConfigDialog from './SessionConfigDialog'
 import store from '../store'
-import type { ISessionFolder, ISessionConfig } from '../lib/db'
+import type { ISessionFolder, ISessionConfig, SessionType } from '../lib/db'
 import type { MenuItemConstructorOptions } from 'electron'
 
 interface SessionNodeData extends TreeNodeData {
@@ -62,20 +62,24 @@ export default observer(function SessionTree({ filter }: SessionTreeProps) {
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogFolderId, setDialogFolderId] = useState('')
+  const [dialogSessionType, setDialogSessionType] =
+    useState<SessionType>('local')
   const [editingConfig, setEditingConfig] = useState<ISessionConfig | null>(
     null
   )
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastClickIdRef = useRef<string | null>(null)
 
-  const openNewSessionDialog = (folderId: string) => {
+  const openNewSessionDialog = (folderId: string, type: SessionType) => {
     setDialogFolderId(folderId)
+    setDialogSessionType(type)
     setEditingConfig(null)
     setDialogOpen(true)
   }
 
   const openEditSessionDialog = (folderId: string, config: ISessionConfig) => {
     setDialogFolderId(folderId)
+    setDialogSessionType(config.type)
     setEditingConfig(config)
     setDialogOpen(true)
   }
@@ -97,9 +101,20 @@ export default observer(function SessionTree({ filter }: SessionTreeProps) {
     if (node.isFolder) {
       items.push({
         label: t('newSession'),
-        click: () => {
-          openNewSessionDialog(node.folderId)
-        },
+        submenu: [
+          {
+            label: t('localSession'),
+            click: () => {
+              openNewSessionDialog(node.folderId, 'local')
+            },
+          },
+          {
+            label: t('sshSession'),
+            click: () => {
+              openNewSessionDialog(node.folderId, 'ssh')
+            },
+          },
+        ],
       })
 
       items.push({ type: 'separator' })
@@ -201,6 +216,8 @@ export default observer(function SessionTree({ filter }: SessionTreeProps) {
           <>
             {node.isFolder ? (
               <Folder size={14} className="flex-shrink-0 mr-1.5" />
+            ) : node.config?.type === 'ssh' ? (
+              <Globe size={14} className="flex-shrink-0 mr-1.5" />
             ) : (
               <Terminal size={14} className="flex-shrink-0 mr-1.5" />
             )}
@@ -221,6 +238,7 @@ export default observer(function SessionTree({ filter }: SessionTreeProps) {
         onClose={() => setDialogOpen(false)}
         onConfirm={handleDialogConfirm}
         initialConfig={editingConfig}
+        sessionType={dialogSessionType}
       />
     </>
   )

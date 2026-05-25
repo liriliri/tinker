@@ -86,6 +86,7 @@ class Store extends BaseStore {
   paneTitles: Record<string, string> = {}
   pendingCwd: Record<string, string> = {}
   pendingShell: Record<string, string> = {}
+  pendingSSHConfig: Record<string, ISessionConfig> = {}
   onDestroyPane: ((paneId: string) => void) | null = null
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? false
   sessions: ISessionFolder[] = []
@@ -98,6 +99,7 @@ class Store extends BaseStore {
       onDestroyPane: false,
       pendingCwd: false,
       pendingShell: false,
+      pendingSSHConfig: false,
     })
     this.addTab()
     this.loadSessions()
@@ -318,11 +320,15 @@ class Store extends BaseStore {
       layout: { type: 'leaf', paneId },
     }
 
-    if (config.cwd) {
-      this.pendingCwd[paneId] = config.cwd
-    }
-    if (config.shell) {
-      this.pendingShell[paneId] = config.shell
+    if (config.type === 'ssh') {
+      this.pendingSSHConfig[paneId] = config
+    } else {
+      if (config.cwd) {
+        this.pendingCwd[paneId] = config.cwd
+      }
+      if (config.shell) {
+        this.pendingShell[paneId] = config.shell
+      }
     }
 
     this.tabs.push(tab)

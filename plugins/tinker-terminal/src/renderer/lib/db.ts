@@ -1,6 +1,7 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 
 export type SessionType = 'local' | 'ssh'
+export type SSHAuthType = 'none' | 'password' | 'privateKey'
 
 export interface ISessionConfig {
   id: string
@@ -8,6 +9,13 @@ export interface ISessionConfig {
   type: SessionType
   shell?: string
   cwd?: string
+  // SSH fields
+  host?: string
+  port?: number
+  username?: string
+  authType?: SSHAuthType
+  password?: string
+  privateKey?: string
 }
 
 export interface ISessionFolder {

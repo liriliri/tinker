@@ -6,13 +6,14 @@ import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
 import Select from 'share/components/Select'
 import type { SelectOption } from 'share/components/Select'
-import type { ISessionConfig } from '../lib/db'
+import type { ISessionConfig, SessionType, SSHAuthType } from '../lib/db'
 
 interface SessionConfigDialogProps {
   open: boolean
   onClose: () => void
   onConfirm: (config: Omit<ISessionConfig, 'id'>) => void
   initialConfig?: ISessionConfig | null
+  sessionType: SessionType
 }
 
 export default function SessionConfigDialog({
@@ -20,27 +21,52 @@ export default function SessionConfigDialog({
   onClose,
   onConfirm,
   initialConfig,
+  sessionType,
 }: SessionConfigDialogProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [shell, setShell] = useState('')
   const [cwd, setCwd] = useState('')
+  // SSH fields
+  const [host, setHost] = useState('')
+  const [port, setPort] = useState('22')
+  const [username, setUsername] = useState('')
+  const [authType, setAuthType] = useState<SSHAuthType>('none')
+  const [password, setPassword] = useState('')
+  const [privateKey, setPrivateKey] = useState('')
+
   const isEditing = !!initialConfig
+  const isSSH = sessionType === 'ssh'
 
   const shellOptions: SelectOption[] = useMemo(() => {
-    if (!open) return []
+    if (!open || isSSH) return []
     const shells = terminal.getAvailableShells()
     return [
       { label: t('defaultShell'), value: '' },
       ...shells.map((s) => ({ label: s.name, value: s.path })),
     ]
-  }, [open, t])
+  }, [open, t, isSSH])
+
+  const authTypeOptions: SelectOption[] = useMemo(
+    () => [
+      { label: t('authNone'), value: 'none' },
+      { label: t('authPassword'), value: 'password' },
+      { label: t('authPrivateKey'), value: 'privateKey' },
+    ],
+    [t]
+  )
 
   useEffect(() => {
     if (open) {
       setName(initialConfig?.name || '')
       setShell(initialConfig?.shell || '')
       setCwd(initialConfig?.cwd || '')
+      setHost(initialConfig?.host || '')
+      setPort(String(initialConfig?.port || 22))
+      setUsername(initialConfig?.username || '')
+      setAuthType(initialConfig?.authType || 'none')
+      setPassword(initialConfig?.password || '')
+      setPrivateKey(initialConfig?.privateKey || '')
     }
   }, [open, initialConfig])
 
@@ -53,23 +79,53 @@ export default function SessionConfigDialog({
     }
   }
 
+  const handleBrowseKey = async () => {
+    const result = await tinker.showOpenDialog({
+      properties: ['openFile'],
+    })
+    if (!result.canceled && result.filePaths[0]) {
+      setPrivateKey(result.filePaths[0])
+    }
+  }
+
   const handleConfirm = () => {
     if (!name.trim()) return
-    onConfirm({
-      name: name.trim(),
-      type: 'local',
-      shell: shell || undefined,
-      cwd: cwd || undefined,
-    })
+
+    if (isSSH) {
+      if (!host.trim() || !username.trim()) return
+      onConfirm({
+        name: name.trim(),
+        type: 'ssh',
+        host: host.trim(),
+        port: parseInt(port, 10) || 22,
+        username: username.trim(),
+        authType,
+        password: authType === 'password' ? password : undefined,
+        privateKey: authType === 'privateKey' ? privateKey : undefined,
+      })
+    } else {
+      onConfirm({
+        name: name.trim(),
+        type: 'local',
+        shell: shell || undefined,
+        cwd: cwd || undefined,
+      })
+    }
     onClose()
   }
 
+  const title = isEditing
+    ? t('editSession')
+    : isSSH
+    ? t('sshSession')
+    : t('localSession')
+
+  const isConfirmDisabled = isSSH
+    ? !name.trim() || !host.trim() || !username.trim()
+    : !name.trim()
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      title={isEditing ? t('editSession') : t('newSession')}
-    >
+    <Dialog open={open} onClose={onClose} title={title}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <label className={`text-sm font-medium ${tw.text.secondary}`}>
@@ -85,42 +141,131 @@ export default function SessionConfigDialog({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className={`text-sm font-medium ${tw.text.secondary}`}>
-            {t('shellType')}
-          </label>
-          <Select
-            value={shell}
-            onChange={(v) => setShell(v)}
-            options={shellOptions}
-            className="w-full"
-          />
-        </div>
+        {isSSH ? (
+          <>
+            <div className="flex gap-3">
+              <div className="flex flex-col gap-1.5 w-1/2">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('host')}
+                </label>
+                <TextInput
+                  value={host}
+                  onChange={(e) => setHost(e.target.value)}
+                  placeholder="192.168.1.1"
+                />
+              </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className={`text-sm font-medium ${tw.text.secondary}`}>
-            {t('workingDirectory')}
-          </label>
-          <div className="flex gap-2">
-            <TextInput
-              value={cwd}
-              onChange={(e) => setCwd(e.target.value)}
-              placeholder="~"
-            />
-            <button
-              onClick={handleBrowse}
-              className={`flex-shrink-0 px-3 py-2 rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
-            >
-              <FolderOpen size={16} />
-            </button>
-          </div>
-        </div>
+              <div className="flex flex-col gap-1.5 w-1/2">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('port')}
+                </label>
+                <TextInput
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
+                  placeholder="22"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="flex flex-col gap-1.5 w-1/2">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('username')}
+                </label>
+                <TextInput
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="root"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 w-1/2">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('authType')}
+                </label>
+                <Select
+                  value={authType}
+                  onChange={(v) => setAuthType(v as SSHAuthType)}
+                  options={authTypeOptions}
+                  className="w-full h-[42px]"
+                />
+              </div>
+            </div>
+
+            {authType === 'password' && (
+              <div className="flex flex-col gap-1.5">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('password')}
+                </label>
+                <TextInput
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type="password"
+                />
+              </div>
+            )}
+
+            {authType === 'privateKey' && (
+              <div className="flex flex-col gap-1.5">
+                <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                  {t('privateKey')}
+                </label>
+                <div className="flex gap-2">
+                  <TextInput
+                    value={privateKey}
+                    onChange={(e) => setPrivateKey(e.target.value)}
+                    placeholder="~/.ssh/id_rsa"
+                  />
+                  <button
+                    onClick={handleBrowseKey}
+                    className={`flex-shrink-0 px-3 py-2 rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+                  >
+                    <FolderOpen size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col gap-1.5">
+              <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                {t('shellType')}
+              </label>
+              <Select
+                value={shell}
+                onChange={(v) => setShell(v)}
+                options={shellOptions}
+                className="w-full h-[38px]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={`text-sm font-medium ${tw.text.secondary}`}>
+                {t('workingDirectory')}
+              </label>
+              <div className="flex gap-2">
+                <TextInput
+                  value={cwd}
+                  onChange={(e) => setCwd(e.target.value)}
+                  placeholder="~"
+                />
+                <button
+                  onClick={handleBrowse}
+                  className={`flex-shrink-0 px-3 py-2 rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+                >
+                  <FolderOpen size={16} />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="flex justify-end gap-2 pt-1">
           <DialogButton variant="text" onClick={onClose}>
             {t('cancel')}
           </DialogButton>
-          <DialogButton onClick={handleConfirm} disabled={!name.trim()}>
+          <DialogButton onClick={handleConfirm} disabled={isConfirmDisabled}>
             {isEditing ? t('save') : t('create')}
           </DialogButton>
         </div>

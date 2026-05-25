@@ -83,51 +83,74 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
 
   requestAnimationFrame(() => {
     fitAddon.fit()
-    const pendingCwd = store.pendingCwd[paneId]
-    if (pendingCwd) {
-      delete store.pendingCwd[paneId]
-    }
-    const pendingShell = store.pendingShell[paneId]
-    if (pendingShell) {
-      delete store.pendingShell[paneId]
-    }
-    terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd, pendingShell)
-
-    // Debounced title update - triggered by both input and output
-    let titleTimer: ReturnType<typeof setTimeout> | null = null
-    let lastTitle = ''
-    const updateTitle = () => {
-      if (titleTimer) clearTimeout(titleTimer)
-      titleTimer = setTimeout(async () => {
-        const name = terminal.getProcessName(paneId)
-        if (name) {
-          const cwd = await terminal.getCwd(paneId)
-          const title = cwd ? `${cwd}:${name}` : name
-          if (title !== lastTitle) {
-            lastTitle = title
-            store.setPaneTitle(paneId, title)
-          }
-        }
-      }, 300)
-    }
-
-    terminal.onData(paneId, (data: string) => {
-      xterm.write(data)
-      updateTitle()
-    })
-
-    terminal.onClose(paneId, () => {
-      xterm.writeln('\r\n[Process exited]')
-    })
-
-    terminal.onInput(paneId, updateTitle)
-
-    // Initial title update
-    const name = terminal.getProcessName(paneId)
-    if (name) {
-      terminal.getCwd(paneId).then((cwd) => {
-        store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
+    const sshConfig = store.pendingSSHConfig[paneId]
+    if (sshConfig) {
+      delete store.pendingSSHConfig[paneId]
+      terminal.createSSH(paneId, xterm.cols, xterm.rows, {
+        host: sshConfig.host!,
+        port: sshConfig.port || 22,
+        username: sshConfig.username!,
+        authType: sshConfig.authType || 'password',
+        password: sshConfig.password,
+        privateKey: sshConfig.privateKey,
       })
+
+      terminal.onData(paneId, (data: string) => {
+        xterm.write(data)
+      })
+
+      terminal.onClose(paneId, () => {
+        xterm.writeln('\r\n[Connection closed]')
+      })
+
+      store.setPaneTitle(paneId, `${sshConfig.username}@${sshConfig.host}`)
+    } else {
+      const pendingCwd = store.pendingCwd[paneId]
+      if (pendingCwd) {
+        delete store.pendingCwd[paneId]
+      }
+      const pendingShell = store.pendingShell[paneId]
+      if (pendingShell) {
+        delete store.pendingShell[paneId]
+      }
+      terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd, pendingShell)
+
+      // Debounced title update - triggered by both input and output
+      let titleTimer: ReturnType<typeof setTimeout> | null = null
+      let lastTitle = ''
+      const updateTitle = () => {
+        if (titleTimer) clearTimeout(titleTimer)
+        titleTimer = setTimeout(async () => {
+          const name = terminal.getProcessName(paneId)
+          if (name) {
+            const cwd = await terminal.getCwd(paneId)
+            const title = cwd ? `${cwd}:${name}` : name
+            if (title !== lastTitle) {
+              lastTitle = title
+              store.setPaneTitle(paneId, title)
+            }
+          }
+        }, 300)
+      }
+
+      terminal.onData(paneId, (data: string) => {
+        xterm.write(data)
+        updateTitle()
+      })
+
+      terminal.onClose(paneId, () => {
+        xterm.writeln('\r\n[Process exited]')
+      })
+
+      terminal.onInput(paneId, updateTitle)
+
+      // Initial title update
+      const name = terminal.getProcessName(paneId)
+      if (name) {
+        terminal.getCwd(paneId).then((cwd) => {
+          store.setPaneTitle(paneId, cwd ? `${cwd}:${name}` : name)
+        })
+      }
     }
   })
 
