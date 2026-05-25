@@ -84,37 +84,52 @@ export default observer(function AddDownloadModal({
       showClose
     >
       <div className="space-y-3">
-        <textarea
-          value={downloadUrl}
-          onChange={(e) => handleUrlChange(e.target.value)}
-          placeholder={t('downloadUrl')}
-          rows={3}
-          className={`w-full px-3 py-2 rounded text-sm outline-none resize-none ${tw.bg.input} ${tw.text.primary} ${tw.border} border`}
-        />
-        <input
-          type="text"
-          value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
-          placeholder={t('fileName')}
-          className={`w-full h-8 px-3 rounded text-sm outline-none ${tw.bg.input} ${tw.text.primary} ${tw.border} border`}
-        />
-        <div
-          className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
-        >
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-sm font-medium ${tw.text.secondary}`}>
+            {t('downloadUrl')}
+          </label>
+          <textarea
+            value={downloadUrl}
+            onChange={(e) => handleUrlChange(e.target.value)}
+            placeholder={t('downloadUrl')}
+            rows={3}
+            className={`w-full px-3 py-2 rounded text-sm outline-none resize-none ${tw.bg.input} ${tw.text.primary} ${tw.border} border`}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-sm font-medium ${tw.text.secondary}`}>
+            {t('fileName')}
+          </label>
           <input
             type="text"
-            value={store.saveDir}
-            readOnly
-            placeholder={t('saveDir')}
-            className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary} cursor-default`}
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder={t('fileName')}
+            className={`w-full h-8 px-3 rounded text-sm outline-none ${tw.bg.input} ${tw.text.primary} ${tw.border} border`}
           />
-          <button
-            type="button"
-            onClick={handleChooseDir}
-            className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-sm font-medium ${tw.text.secondary}`}>
+            {t('saveDir')}
+          </label>
+          <div
+            className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
           >
-            <FolderOpen size={16} />
-          </button>
+            <input
+              type="text"
+              value={store.saveDir}
+              readOnly
+              placeholder={t('saveDir')}
+              className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary} cursor-default`}
+            />
+            <button
+              type="button"
+              onClick={handleChooseDir}
+              className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
+            >
+              <FolderOpen size={16} />
+            </button>
+          </div>
         </div>
       </div>
       <div className="flex justify-end mt-4">

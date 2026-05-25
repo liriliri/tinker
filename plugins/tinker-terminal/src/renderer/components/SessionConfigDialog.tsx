@@ -210,15 +210,20 @@ export default function SessionConfigDialog({
                 <label className={`text-sm font-medium ${tw.text.secondary}`}>
                   {t('privateKey')}
                 </label>
-                <div className="flex gap-2">
-                  <TextInput
+                <div
+                  className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
+                >
+                  <input
+                    type="text"
                     value={privateKey}
                     onChange={(e) => setPrivateKey(e.target.value)}
                     placeholder="~/.ssh/id_rsa"
+                    className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
                   />
                   <button
+                    type="button"
                     onClick={handleBrowseKey}
-                    className={`flex-shrink-0 px-3 py-2 rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+                    className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
                   >
                     <FolderOpen size={16} />
                   </button>
@@ -244,15 +249,20 @@ export default function SessionConfigDialog({
               <label className={`text-sm font-medium ${tw.text.secondary}`}>
                 {t('workingDirectory')}
               </label>
-              <div className="flex gap-2">
-                <TextInput
+              <div
+                className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
+              >
+                <input
+                  type="text"
                   value={cwd}
                   onChange={(e) => setCwd(e.target.value)}
                   placeholder="~"
+                  className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
                 />
                 <button
+                  type="button"
                   onClick={handleBrowse}
-                  className={`flex-shrink-0 px-3 py-2 rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+                  className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
                 >
                   <FolderOpen size={16} />
                 </button>

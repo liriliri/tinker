@@ -61,7 +61,7 @@ export default function CanvasSizeDialog({
     <Dialog open={open} onClose={onClose} title={t('setCanvasSize')}>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <label className={`text-sm font-medium ${tw.text.primary} w-12`}>
+          <label className={`text-sm font-medium ${tw.text.secondary} w-12`}>
             {t('width')}
           </label>
           <input
@@ -76,7 +76,7 @@ export default function CanvasSizeDialog({
         </div>
 
         <div className="flex items-center gap-3">
-          <label className={`text-sm font-medium ${tw.text.primary} w-12`}>
+          <label className={`text-sm font-medium ${tw.text.secondary} w-12`}>
             {t('height')}
           </label>
           <input

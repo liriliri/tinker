@@ -57,7 +57,7 @@ export default function AddProviderDialog({ open, onClose }: Props) {
     <Dialog open={open} onClose={handleClose} title={t('addProvider')}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className={`text-xs font-medium ${tw.text.secondary}`}>
+          <label className={`text-sm font-medium ${tw.text.secondary}`}>
             {t('providerName')}
           </label>
           <TextInput
@@ -68,7 +68,7 @@ export default function AddProviderDialog({ open, onClose }: Props) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={`text-xs font-medium ${tw.text.secondary}`}>
+          <label className={`text-sm font-medium ${tw.text.secondary}`}>
             {t('apiType')}
           </label>
           <Select

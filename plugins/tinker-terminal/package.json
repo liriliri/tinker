@@ -22,8 +22,5 @@
         "description": "终端模拟器，支持 SSH 配置管理"
       }
     }
-  },
-  "devDependencies": {
-    "ssh2": "^1.17.0"
   }
 }
