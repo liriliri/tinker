@@ -29,7 +29,7 @@ interface TerminalInstance {
 
 const instances = new Map<string, TerminalInstance>()
 
-export function destroyPane(paneId: string) {
+function destroyPane(paneId: string) {
   terminal.destroy(paneId)
   const instance = instances.get(paneId)
   if (instance) {

@@ -59,7 +59,7 @@ export default observer(function Sidebar() {
           <PanelLeftClose size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </Toolbar>
-      <div className={`flex-1 overflow-hidden border-r ${tw.border}`}>
+      <div className={`flex-1 overflow-y-auto border-r ${tw.border}`}>
         <SessionTree filter={filter} />
       </div>
     </div>

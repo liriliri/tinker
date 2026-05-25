@@ -254,6 +254,7 @@ class Store extends BaseStore {
     const folder: ISessionFolder = {
       id: uuid(),
       name,
+      order: this.sessions.length,
       children: [],
     }
     this.sessions.push(folder)

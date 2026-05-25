@@ -21,6 +21,7 @@ export interface ISessionConfig {
 export interface ISessionFolder {
   id: string
   name: string
+  order: number
   children: ISessionConfig[]
 }
 
@@ -52,7 +53,8 @@ function getDB(): Promise<IDBPDatabase<TerminalDB>> {
 
 export async function getAllFolders(): Promise<ISessionFolder[]> {
   const db = await getDB()
-  return db.getAll(STORE_NAME)
+  const folders = await db.getAll(STORE_NAME)
+  return folders.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
 
 export async function putFolder(folder: ISessionFolder): Promise<void> {
