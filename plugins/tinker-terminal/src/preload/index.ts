@@ -3,11 +3,17 @@ import { exec } from 'child_process'
 import * as pty from 'node-pty'
 import { homedir, platform } from 'os'
 import { basename } from 'path'
+import { existsSync } from 'fs'
 
 const isWindows = platform() === 'win32'
 const defaultShell = isWindows
   ? 'powershell.exe'
   : process.env.SHELL || '/bin/zsh'
+
+interface ShellInfo {
+  name: string
+  path: string
+}
 
 interface PtySession {
   process: pty.IPty
@@ -19,14 +25,14 @@ interface PtySession {
 const sessions = new Map<string, PtySession>()
 
 const terminalObj = {
-  create(id: string, cols: number, rows: number, cwd?: string) {
+  create(id: string, cols: number, rows: number, cwd?: string, shell?: string) {
     const existing = sessions.get(id)
     if (existing) {
       existing.process.kill()
       sessions.delete(id)
     }
 
-    const process = pty.spawn(defaultShell, [], {
+    const process = pty.spawn(shell || defaultShell, [], {
       name: 'xterm-256color',
       cols,
       rows,
@@ -152,6 +158,36 @@ const terminalObj = {
         }
       )
     })
+  },
+
+  getDefaultShell(): string {
+    return defaultShell
+  },
+
+  getAvailableShells(): ShellInfo[] {
+    const shells: ShellInfo[] = []
+    const candidates = isWindows
+      ? [
+          { name: 'PowerShell', path: 'powershell.exe' },
+          { name: 'Command Prompt', path: 'cmd.exe' },
+        ]
+      : [
+          { name: 'zsh', path: '/bin/zsh' },
+          { name: 'bash', path: '/bin/bash' },
+          { name: 'sh', path: '/bin/sh' },
+          { name: 'fish', path: '/usr/local/bin/fish' },
+          { name: 'fish', path: '/opt/homebrew/bin/fish' },
+        ]
+
+    for (const c of candidates) {
+      if (isWindows || existsSync(c.path)) {
+        if (!shells.find((s) => s.name === c.name)) {
+          shells.push(c)
+        }
+      }
+    }
+
+    return shells
   },
 }
 

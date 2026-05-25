@@ -1,8 +1,15 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import type { IBaseTab } from 'share/components/TabBar'
+import {
+  getAllFolders,
+  putFolder,
+  deleteFolder as dbDeleteFolder,
+  ISessionFolder,
+  ISessionConfig,
+} from './lib/db'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
@@ -78,8 +85,10 @@ class Store extends BaseStore {
   activePaneId = ''
   paneTitles: Record<string, string> = {}
   pendingCwd: Record<string, string> = {}
+  pendingShell: Record<string, string> = {}
   onDestroyPane: ((paneId: string) => void) | null = null
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? false
+  sessions: ISessionFolder[] = []
 
   private tabCounter = 0
 
@@ -88,8 +97,10 @@ class Store extends BaseStore {
     makeAutoObservable(this, {
       onDestroyPane: false,
       pendingCwd: false,
+      pendingShell: false,
     })
     this.addTab()
+    this.loadSessions()
   }
 
   toggleSidebar() {
@@ -230,6 +241,93 @@ class Store extends BaseStore {
       const remaining = collectPaneIds(tab.layout)
       this.activePaneId = remaining[0]
     }
+  }
+
+  // Session management
+  async loadSessions() {
+    this.sessions = await getAllFolders()
+  }
+
+  async createFolder(name: string) {
+    const folder: ISessionFolder = {
+      id: uuid(),
+      name,
+      children: [],
+    }
+    this.sessions.push(folder)
+    await putFolder(toJS(folder))
+  }
+
+  async renameFolder(id: string, name: string) {
+    const folder = this.sessions.find((f) => f.id === id)
+    if (!folder) return
+    folder.name = name
+    await putFolder(toJS(folder))
+  }
+
+  async deleteFolder(id: string) {
+    const index = this.sessions.findIndex((f) => f.id === id)
+    if (index === -1) return
+    this.sessions.splice(index, 1)
+    await dbDeleteFolder(id)
+  }
+
+  async createSession(folderId: string, config: ISessionConfig) {
+    const folder = this.sessions.find((f) => f.id === folderId)
+    if (!folder) return
+    folder.children.push(config)
+    await putFolder(toJS(folder))
+  }
+
+  async renameSession(folderId: string, sessionId: string, name: string) {
+    const folder = this.sessions.find((f) => f.id === folderId)
+    if (!folder) return
+    const session = folder.children.find((s) => s.id === sessionId)
+    if (!session) return
+    session.name = name
+    await putFolder(toJS(folder))
+  }
+
+  async updateSession(
+    folderId: string,
+    sessionId: string,
+    config: Omit<ISessionConfig, 'id'>
+  ) {
+    const folder = this.sessions.find((f) => f.id === folderId)
+    if (!folder) return
+    const index = folder.children.findIndex((s) => s.id === sessionId)
+    if (index === -1) return
+    folder.children[index] = { ...folder.children[index], ...config }
+    await putFolder(toJS(folder))
+  }
+
+  async deleteSession(folderId: string, sessionId: string) {
+    const folder = this.sessions.find((f) => f.id === folderId)
+    if (!folder) return
+    folder.children = folder.children.filter((s) => s.id !== sessionId)
+    await putFolder(toJS(folder))
+  }
+
+  openSession(config: ISessionConfig) {
+    this.tabCounter++
+    const paneId = uuid()
+    const id = uuid()
+    const tab: ITerminalTab = {
+      id,
+      title: config.name,
+      layout: { type: 'leaf', paneId },
+    }
+
+    if (config.cwd) {
+      this.pendingCwd[paneId] = config.cwd
+    }
+    if (config.shell) {
+      this.pendingShell[paneId] = config.shell
+    }
+
+    this.tabs.push(tab)
+    this.activeTabId = id
+    this.activePaneId = paneId
   }
 }
 

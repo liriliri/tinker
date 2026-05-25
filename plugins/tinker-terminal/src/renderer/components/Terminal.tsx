@@ -87,7 +87,11 @@ function getOrCreateInstance(paneId: string): TerminalInstance {
     if (pendingCwd) {
       delete store.pendingCwd[paneId]
     }
-    terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd)
+    const pendingShell = store.pendingShell[paneId]
+    if (pendingShell) {
+      delete store.pendingShell[paneId]
+    }
+    terminal.create(paneId, xterm.cols, xterm.rows, pendingCwd, pendingShell)
 
     // Debounced title update - triggered by both input and output
     let titleTimer: ReturnType<typeof setTimeout> | null = null
