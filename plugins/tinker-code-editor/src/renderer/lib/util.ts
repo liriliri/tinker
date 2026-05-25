@@ -1,0 +1,42 @@
+const LANGUAGE_MAP: Record<string, string> = {
+  js: 'javascript',
+  jsx: 'javascript',
+  ts: 'typescript',
+  tsx: 'typescript',
+  json: 'json',
+  html: 'html',
+  htm: 'html',
+  css: 'css',
+  scss: 'scss',
+  less: 'less',
+  md: 'markdown',
+  py: 'python',
+  rb: 'ruby',
+  go: 'go',
+  rs: 'rust',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  h: 'c',
+  hpp: 'cpp',
+  sh: 'shell',
+  bash: 'shell',
+  zsh: 'shell',
+  yaml: 'yaml',
+  yml: 'yaml',
+  xml: 'xml',
+  sql: 'sql',
+  swift: 'swift',
+  kt: 'kotlin',
+  dart: 'dart',
+  lua: 'lua',
+  toml: 'ini',
+  ini: 'ini',
+  vue: 'html',
+  svelte: 'html',
+}
+
+export function getLanguage(filePath: string): string {
+  const ext = filePath.split('.').pop()?.toLowerCase() || ''
+  return LANGUAGE_MAP[ext] || 'plaintext'
+}

@@ -246,7 +246,7 @@ function Tab({
 export interface TabBarProps<T extends IBaseTab> {
   tabs: T[]
   activeTabId: string
-  onAddTab: () => void
+  onAddTab?: () => void
   onClose: (id: string) => void
   onActivate: (id: string) => void
   onMove: (fromIndex: number, toIndex: number) => void
@@ -311,12 +311,14 @@ export default function TabBar<T extends IBaseTab>({
           )
         })}
       </div>
-      <button
-        className={`p-1 mx-1.5 rounded-md flex-shrink-0 ${tw.hover} transition-colors`}
-        onClick={onAddTab}
-      >
-        <Plus size={14} className={tw.text.secondary} />
-      </button>
+      {onAddTab && (
+        <button
+          className={`p-1 mx-1.5 rounded-md flex-shrink-0 ${tw.hover} transition-colors`}
+          onClick={onAddTab}
+        >
+          <Plus size={14} className={tw.text.secondary} />
+        </button>
+      )}
       <div
         className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
       />

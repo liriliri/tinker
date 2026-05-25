@@ -1,5 +1,16 @@
 @use 'tailwindcss';
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
 button:focus-visible {
   outline: 1px solid var(--theme-primary);
 }

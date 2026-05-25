@@ -1,31 +1,37 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import {
+  StatusBar,
+  StatusBarItem,
+  StatusBarSpacer,
+} from 'share/components/StatusBar'
 import store from '../store'
 import { formatTime } from '../lib/audioUtils'
 
-export default observer(function StatusBar() {
+export default observer(function StatusBarComponent() {
   const { t } = useTranslation()
 
   return (
-    <div
-      className={`flex items-center gap-4 px-4 py-0.5 text-xs ${tw.text.secondary} ${tw.bg.tertiary} border-t ${tw.border}`}
-    >
-      <span className="shrink-0">
+    <StatusBar>
+      <StatusBarItem clickable={false}>
         {t('duration')}: {formatTime(store.duration)}
-      </span>
-      <span className="shrink-0">
+      </StatusBarItem>
+      <StatusBarItem clickable={false}>
         {t('cursor')}: {formatTime(store.currentTime)}
-      </span>
+      </StatusBarItem>
       {store.hasSelection && (
-        <span className={`ml-auto shrink-0 ${tw.primary.text}`}>
-          {formatTime(store.selectionStart!)} -{' '}
-          {formatTime(store.selectionEnd!)}
-          {' ('}
-          {formatTime(store.selectionEnd! - store.selectionStart!)}
-          {')'}
-        </span>
+        <>
+          <StatusBarSpacer />
+          <StatusBarItem clickable={false} className={tw.primary.text}>
+            {formatTime(store.selectionStart!)} -{' '}
+            {formatTime(store.selectionEnd!)}
+            {' ('}
+            {formatTime(store.selectionEnd! - store.selectionStart!)}
+            {')'}
+          </StatusBarItem>
+        </>
       )}
-    </div>
+    </StatusBar>
   )
 })

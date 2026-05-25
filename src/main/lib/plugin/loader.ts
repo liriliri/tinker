@@ -79,7 +79,13 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     version: pkg.version,
   }
   if (plugin.icon) {
-    plugin.icon = path.join(dir, plugin.icon)
+    const iconPath = path.join(dir, plugin.icon)
+    if (await fs.pathExists(iconPath)) {
+      plugin.icon = iconPath
+    } else {
+      logger.warn(`plugin ${id} icon not found: ${iconPath}, using default`)
+      plugin.icon = DEFAULT_ICON
+    }
   } else {
     plugin.icon = DEFAULT_ICON
   }

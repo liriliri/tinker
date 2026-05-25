@@ -15,7 +15,6 @@ import SessionTree from './SessionTree'
 
 export default observer(function Sidebar() {
   const { t } = useTranslation()
-  const isVisible = store.sidebarOpen
   const [filter, setFilter] = useState('')
 
   const handleCreateFolder = async () => {
@@ -29,18 +28,12 @@ export default observer(function Sidebar() {
     }
   }
 
+  if (!store.sidebarOpen) return null
+
   return (
     <div
-      className={`
-        w-56 h-full flex flex-col
-        ${tw.bg.tertiary}
-        transition-all duration-200
-        ${isVisible ? 'translate-x-0' : '-translate-x-full'}
-      `}
-      style={{
-        flexShrink: 0,
-        marginLeft: isVisible ? 0 : -224,
-      }}
+      className={`w-56 h-full flex flex-col ${tw.bg.tertiary}`}
+      style={{ flexShrink: 0 }}
     >
       <Toolbar>
         <ToolbarSearch

@@ -37,6 +37,7 @@ import isUrl from 'licia/isUrl'
 import isWindows from 'licia/isWindows'
 import jsonClone from 'licia/jsonClone'
 import kebabCase from 'licia/kebabCase'
+import last from 'licia/last'
 import keys from 'licia/keys'
 import LinkedList from 'licia/LinkedList'
 import LocalStore from 'licia/LocalStore'
@@ -107,6 +108,7 @@ const licia = {
   jsonClone,
   kebabCase,
   keys,
+  last,
   LinkedList,
   LocalStore,
   lowerCase,
@@ -180,6 +182,7 @@ export {
   jsonClone,
   kebabCase,
   keys,
+  last,
   LinkedList,
   LocalStore,
   lowerCase,
