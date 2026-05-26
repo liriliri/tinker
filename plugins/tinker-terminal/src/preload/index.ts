@@ -244,6 +244,5 @@ const terminalObj = {
 contextBridge.exposeInMainWorld('terminal', terminalObj)
 
 declare global {
-  // @ts-expect-error Each plugin declares its own terminal global
   var terminal: typeof terminalObj
 }

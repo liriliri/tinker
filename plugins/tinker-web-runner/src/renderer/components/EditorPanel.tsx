@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Editor, OnMount } from '@monaco-editor/react'
 import { Clipboard, Eraser, WandSparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import type { Plugin } from 'prettier'
 import { format } from 'prettier/standalone'
 import babel from 'prettier/plugins/babel'
 import estree from 'prettier/plugins/estree'
@@ -58,12 +59,11 @@ const EditorPanel = observer(function EditorPanel({
 
   const handleFormat = async () => {
     try {
-      const parserMap: Record<string, { parser: string; plugins: unknown[] }> =
-        {
-          html: { parser: 'html', plugins: [htmlPlugin] },
-          css: { parser: 'css', plugins: [postcss] },
-          javascript: { parser: 'babel', plugins: [babel, estree] },
-        }
+      const parserMap: Record<string, { parser: string; plugins: Plugin[] }> = {
+        html: { parser: 'html', plugins: [htmlPlugin] },
+        css: { parser: 'css', plugins: [postcss] },
+        javascript: { parser: 'babel', plugins: [babel, estree] },
+      }
       const config = parserMap[language]
       const formatted = await format(value, {
         parser: config.parser,

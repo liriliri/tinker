@@ -35,9 +35,9 @@ addI18nNamespace(I18N_NS, {
 
 interface FileStat {
   size: number
-  mtime: string
-  atime: string
-  ctime: string
+  mtime: Date
+  atime: Date
+  ctime: Date
 }
 
 export interface FilePreviewProps {

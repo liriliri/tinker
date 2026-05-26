@@ -1,3 +1,4 @@
+import type { MenuItemConstructorOptions } from 'electron'
 import { useEffect, useRef, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
@@ -37,7 +38,7 @@ export interface TerminalProps {
   onInit?: (id: string, cols: number, rows: number) => void
   onTitleChange?: (id: string, title: string) => void
   onFocus?: () => void
-  extraContextMenuItems?: () => tinker.MenuItem[]
+  extraContextMenuItems?: () => MenuItemConstructorOptions[]
 }
 
 interface TerminalInstance {
@@ -201,7 +202,7 @@ export default function Terminal({
       if (!instance) return
       const xterm = instance.xterm
 
-      const items: tinker.MenuItem[] = [
+      const items: MenuItemConstructorOptions[] = [
         {
           label: t('copy'),
           enabled: xterm.hasSelection(),

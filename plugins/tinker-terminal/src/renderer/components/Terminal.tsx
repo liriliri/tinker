@@ -1,3 +1,4 @@
+import type { MenuItemConstructorOptions } from 'electron'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import SharedTerminal, { destroyTerminal } from 'share/components/Terminal'
@@ -60,7 +61,7 @@ export default function Terminal({ paneId }: TerminalProps) {
   }, [paneId])
 
   const extraContextMenuItems = useCallback(
-    (): tinker.MenuItem[] => [
+    (): MenuItemConstructorOptions[] => [
       {
         label: t('splitVertical'),
         click: () => store.splitPane(paneId, 'horizontal'),
