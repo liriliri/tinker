@@ -9,8 +9,12 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { tw } from 'share/theme'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import AiSection from './AiSection'
 import ProviderDetail from './ProviderDetail'
 
@@ -49,7 +53,7 @@ export default observer(function AiView() {
           onLayoutChange={onLayoutChange}
         >
           <Panel id="list" minSize={200}>
-            <div className={`h-full border-r ${tw.border} overflow-hidden`}>
+            <div className="h-full overflow-hidden">
               <AiSection
                 search={search}
                 addOpen={addOpen}
@@ -57,6 +61,7 @@ export default observer(function AiView() {
               />
             </div>
           </Panel>
+          <Separator />
           <Panel id="detail" minSize={200}>
             <div className="h-full overflow-hidden">
               <ProviderDetail />

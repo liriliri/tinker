@@ -4,7 +4,12 @@ import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import store from './store'
 import Welcome from './components/Welcome'
 import Toolbar from './components/Toolbar'
@@ -52,21 +57,21 @@ const App = observer(function App() {
                 >
                   {/* Left Panel - Groups */}
                   <Panel id="left" minSize={200}>
-                    <div
-                      className={`h-full border-r ${tw.border} ${tw.bg.tertiary} overflow-hidden`}
-                    >
+                    <div className={`h-full ${tw.bg.tertiary} overflow-hidden`}>
                       <GroupTree />
                     </div>
                   </Panel>
 
+                  <Separator />
+
                   {/* Center Panel - Entry List */}
                   <Panel id="center" minSize={300}>
-                    <div
-                      className={`h-full border-r ${tw.border} overflow-hidden`}
-                    >
+                    <div className="h-full overflow-hidden">
                       <EntryList />
                     </div>
                   </Panel>
+
+                  <Separator />
 
                   {/* Right Panel - Entry Detail */}
                   <Panel id="right" minSize={300}>

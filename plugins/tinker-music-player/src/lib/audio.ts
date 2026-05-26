@@ -4,6 +4,8 @@ class AudioController {
   onEnded: (() => void) | null = null
   onError: ((error: string) => void) | null = null
   onLoadedMetadata: ((duration: number) => void) | null = null
+  onPlay: (() => void) | null = null
+  onPause: (() => void) | null = null
 
   constructor() {
     this.audio = new Audio()
@@ -22,6 +24,14 @@ class AudioController {
 
     this.audio.addEventListener('loadedmetadata', () => {
       this.onLoadedMetadata?.(this.audio.duration)
+    })
+
+    this.audio.addEventListener('play', () => {
+      this.onPlay?.()
+    })
+
+    this.audio.addEventListener('pause', () => {
+      this.onPause?.()
     })
   }
 

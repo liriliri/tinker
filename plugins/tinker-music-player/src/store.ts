@@ -165,6 +165,18 @@ class Store extends BaseStore {
         this.isPlaying = false
       })
     }
+
+    audio.onPlay = () => {
+      runInAction(() => {
+        this.isPlaying = true
+      })
+    }
+
+    audio.onPause = () => {
+      runInAction(() => {
+        this.isPlaying = false
+      })
+    }
   }
 
   setActiveTab(tab: SideTab, sheetId?: string) {
@@ -465,7 +477,6 @@ class Store extends BaseStore {
     if (queueIdx !== -1) {
       if (queueIdx === this.currentIndex) {
         audio.pause()
-        this.isPlaying = false
         this.currentIndex = -1
       } else if (queueIdx < this.currentIndex) {
         this.currentIndex--
@@ -499,7 +510,6 @@ class Store extends BaseStore {
     if (queueIdx === -1) return
     if (queueIdx === this.currentIndex) {
       audio.pause()
-      this.isPlaying = false
       this.currentIndex = -1
     } else if (queueIdx < this.currentIndex) {
       this.currentIndex--
@@ -510,7 +520,6 @@ class Store extends BaseStore {
 
   clearPlayQueue() {
     audio.stop()
-    this.isPlaying = false
     this.currentIndex = -1
     this.currentTime = 0
     this.duration = 0
@@ -551,7 +560,6 @@ class Store extends BaseStore {
     }
     if (this.isPlaying) {
       audio.pause()
-      this.isPlaying = false
     } else {
       try {
         if (audio.paused && !audio.duration) {
@@ -562,13 +570,8 @@ class Store extends BaseStore {
         } else {
           await audio.play()
         }
-        runInAction(() => {
-          this.isPlaying = true
-        })
       } catch {
-        runInAction(() => {
-          this.isPlaying = false
-        })
+        // error handled by audio.onError
       }
     }
   }
@@ -618,7 +621,6 @@ class Store extends BaseStore {
     try {
       await audio.play(`file://${track.path}`)
       runInAction(() => {
-        this.isPlaying = true
         const existIdx = this.recentTracks.findIndex((t) => t.id === track.id)
         if (existIdx !== -1) this.recentTracks.splice(existIdx, 1)
         this.recentTracks.unshift({ ...track, playedAt: Date.now() })
@@ -628,9 +630,7 @@ class Store extends BaseStore {
       })
       addRecentTrack(track)
     } catch {
-      runInAction(() => {
-        this.isPlaying = false
-      })
+      // error handled by audio.onError
     }
   }
 

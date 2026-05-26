@@ -1,5 +1,10 @@
 import { observer } from 'mobx-react-lite'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
@@ -34,10 +39,11 @@ const App = observer(function App() {
               onLayoutChange={onLayoutChange}
             >
               <Panel id="files" minSize={100}>
-                <div className={`h-full border-b ${tw.border} overflow-hidden`}>
+                <div className="h-full overflow-hidden">
                   <FileList />
                 </div>
               </Panel>
+              <Separator />
               <Panel id="rules" minSize={80} defaultSize={250}>
                 <RuleList />
               </Panel>

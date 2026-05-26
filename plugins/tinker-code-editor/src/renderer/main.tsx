@@ -2,7 +2,12 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import { File } from 'lucide-react'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import renderApp from 'share/lib/renderApp'
@@ -132,6 +137,7 @@ const App = observer(function App() {
                 </div>
               </div>
             </Panel>
+            {store.terminalOpen && <Separator />}
             {store.terminalOpen && (
               <Panel id="terminal" defaultSize={200} minSize={100}>
                 <TerminalPanel />

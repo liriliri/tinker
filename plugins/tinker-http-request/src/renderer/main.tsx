@@ -1,5 +1,10 @@
 import { observer } from 'mobx-react-lite'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { tw } from 'share/theme'
@@ -34,12 +39,12 @@ const App = observer(function App() {
               onLayoutChange={onLayoutChange}
             >
               <Panel id="sidebar" minSize={150} defaultSize={200}>
-                <div
-                  className={`h-full border-r ${tw.border} ${tw.bg.tertiary} overflow-hidden`}
-                >
+                <div className={`h-full ${tw.bg.tertiary} overflow-hidden`}>
                   <CollectionTree />
                 </div>
               </Panel>
+
+              <Separator />
 
               <Panel id="main" minSize={400}>
                 <div className="h-full flex flex-col">

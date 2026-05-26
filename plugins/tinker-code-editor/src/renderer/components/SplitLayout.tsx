@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import { Panel, Group } from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
 import type { ILayoutNode } from '../../common/types'
-import { tw } from 'share/theme'
 import Terminal from './Terminal'
 import PaneHeader from './PaneHeader'
 
@@ -31,7 +30,6 @@ const LayoutNode = observer(function LayoutNode({
 
   const orientation =
     node.direction === 'horizontal' ? 'horizontal' : 'vertical'
-  const borderClass = node.direction === 'horizontal' ? 'border-l' : 'border-t'
 
   return (
     <Group key={node.key} orientation={orientation} className="h-full">
@@ -46,14 +44,13 @@ const LayoutNode = observer(function LayoutNode({
           paneIndex={paneIndex}
         />
       </Panel>
+      <Separator />
       <Panel id={getLeafId(node.second)} minSize={50}>
-        <div className={`h-full ${borderClass} ${tw.border}`}>
-          <LayoutNode
-            node={node.second}
-            showHeader={showHeader}
-            paneIndex={paneIndex + countLeaves(node.first)}
-          />
-        </div>
+        <LayoutNode
+          node={node.second}
+          showHeader={showHeader}
+          paneIndex={paneIndex + countLeaves(node.first)}
+        />
       </Panel>
     </Group>
   )

@@ -44,7 +44,7 @@ const PRIORITY_STYLES: Record<
 }
 
 export default observer(function TodoItem({ todo }: TodoItemProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
 
   const handleDelete = async () => {
@@ -82,7 +82,10 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
     yesterday.setDate(yesterday.getDate() - 1)
     if (dateToCheck.getTime() === yesterday.getTime()) return t('yesterday')
 
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return date.toLocaleDateString(i18n.language, {
+      month: 'short',
+      day: 'numeric',
+    })
   }
 
   const priorityStyle = PRIORITY_STYLES[todo.priority || 'null']
