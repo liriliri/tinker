@@ -9,11 +9,8 @@ export default observer(function Sidebar() {
   if (!store.sidebarOpen) return null
 
   return (
-    <div
-      className={`relative z-10 w-56 h-full flex flex-col ${tw.bg.tertiary}`}
-      style={{ flexShrink: 0 }}
-    >
-      <div className={`flex-1 overflow-y-auto border-r ${tw.border}`}>
+    <div className={`relative z-10 h-full flex flex-col ${tw.bg.tertiary}`}>
+      <div className="flex-1 overflow-y-auto">
         {store.rootPath ? (
           <FileTree />
         ) : (

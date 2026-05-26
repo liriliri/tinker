@@ -190,7 +190,9 @@ function Tab({
           <div
             className={`pointer-events-none absolute inset-0 border-x border-t ${
               tw.border
-            } ${isFirst ? 'border-l-transparent' : ''}`}
+            } ${
+              isFirst ? 'border-l-transparent dark:border-l-transparent' : ''
+            }`}
           />
           <div
             className={`pointer-events-none absolute bottom-0 left-0 right-0 h-px ${tw.bg.secondary}`}
