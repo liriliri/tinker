@@ -8,7 +8,7 @@
   "selectAll": "全选",
   "splitVertical": "垂直拆分",
   "splitHorizontal": "水平拆分",
-  "closePane": "关闭面板",
+  "closePane": "关闭",
   "showSidebar": "显示侧边栏",
   "hideSidebar": "隐藏侧边栏",
   "newFolder": "新建目录",
@@ -39,5 +39,8 @@
   "confirmDeleteFolder": "确定要删除此目录及其所有会话吗？",
   "confirmDeleteSession": "确定要删除此会话吗？",
   "noSessions": "暂无会话",
-  "searchSession": "搜索"
+  "searchSession": "搜索",
+  "dualColumns": "双栏",
+  "tripleColumns": "三栏",
+  "gridLayout": "四格"
 }

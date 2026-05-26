@@ -1,5 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { Terminal as TerminalIcon, PanelLeft } from 'lucide-react'
+import {
+  Terminal as TerminalIcon,
+  PanelLeft,
+  Columns2,
+  Columns3,
+  Grid2x2,
+} from 'lucide-react'
 import { tw } from 'share/theme'
 import { useTranslation } from 'react-i18next'
 import TabBar from 'share/components/TabBar'
@@ -96,6 +102,29 @@ const App = observer(function App() {
                     <TerminalIcon size={14} className={tw.text.tertiary} />
                   )}
                 />
+              </div>
+              <div className="flex-shrink-0 flex items-center justify-center h-full px-1.5">
+                <button
+                  className={`p-1.5 rounded transition-colors ${tw.hover}`}
+                  onClick={() => store.setDualColumns()}
+                  title={t('dualColumns')}
+                >
+                  <Columns2 size={14} className={tw.text.secondary} />
+                </button>
+                <button
+                  className={`p-1.5 rounded transition-colors ${tw.hover}`}
+                  onClick={() => store.setTripleColumns()}
+                  title={t('tripleColumns')}
+                >
+                  <Columns3 size={14} className={tw.text.secondary} />
+                </button>
+                <button
+                  className={`p-1.5 rounded transition-colors ${tw.hover}`}
+                  onClick={() => store.setGrid()}
+                  title={t('gridLayout')}
+                >
+                  <Grid2x2 size={14} className={tw.text.secondary} />
+                </button>
               </div>
               <div
                 className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}

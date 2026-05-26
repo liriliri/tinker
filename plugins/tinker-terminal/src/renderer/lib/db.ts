@@ -66,13 +66,3 @@ export async function deleteFolder(id: string): Promise<void> {
   const db = await getDB()
   await db.delete(STORE_NAME, id)
 }
-
-export async function saveAllFolders(folders: ISessionFolder[]): Promise<void> {
-  const db = await getDB()
-  const tx = db.transaction(STORE_NAME, 'readwrite')
-  await tx.store.clear()
-  for (const folder of folders) {
-    await tx.store.put(folder)
-  }
-  await tx.done
-}

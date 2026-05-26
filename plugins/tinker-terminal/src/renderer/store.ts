@@ -2,7 +2,6 @@ import { makeAutoObservable, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import type { IBaseTab } from 'share/components/TabBar'
 import {
   getAllFolders,
   putFolder,
@@ -10,74 +9,18 @@ import {
   ISessionFolder,
   ISessionConfig,
 } from './lib/db'
+import {
+  collectPaneIds,
+  splitNode,
+  removePane,
+  dualColumnsLayout,
+  tripleColumnsLayout,
+  gridLayout,
+} from './lib/layout'
+import type { ILayoutNode, ITerminalTab, SplitDirection } from './lib/layout'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
-
-export type SplitDirection = 'horizontal' | 'vertical'
-
-export interface ISplitNode {
-  type: 'split'
-  direction: SplitDirection
-  first: ILayoutNode
-  second: ILayoutNode
-}
-
-export interface ILeafNode {
-  type: 'leaf'
-  paneId: string
-}
-
-export type ILayoutNode = ISplitNode | ILeafNode
-
-export interface ITerminalTab extends IBaseTab {
-  id: string
-  title: string
-  layout: ILayoutNode
-}
-
-function collectPaneIds(node: ILayoutNode): string[] {
-  if (node.type === 'leaf') return [node.paneId]
-  return [...collectPaneIds(node.first), ...collectPaneIds(node.second)]
-}
-
-function splitNode(
-  node: ILayoutNode,
-  targetPaneId: string,
-  direction: SplitDirection,
-  newPaneId: string
-): ILayoutNode {
-  if (node.type === 'leaf') {
-    if (node.paneId === targetPaneId) {
-      return {
-        type: 'split',
-        direction,
-        first: { type: 'leaf', paneId: targetPaneId },
-        second: { type: 'leaf', paneId: newPaneId },
-      }
-    }
-    return node
-  }
-  return {
-    ...node,
-    first: splitNode(node.first, targetPaneId, direction, newPaneId),
-    second: splitNode(node.second, targetPaneId, direction, newPaneId),
-  }
-}
-
-function removePane(
-  node: ILayoutNode,
-  targetPaneId: string
-): ILayoutNode | null {
-  if (node.type === 'leaf') {
-    return node.paneId === targetPaneId ? null : node
-  }
-  const first = removePane(node.first, targetPaneId)
-  const second = removePane(node.second, targetPaneId)
-  if (!first) return second
-  if (!second) return first
-  return { ...node, first, second }
-}
 
 class Store extends BaseStore {
   tabs: ITerminalTab[] = []
@@ -231,7 +174,10 @@ class Store extends BaseStore {
     if (!tab) return
 
     const paneIds = collectPaneIds(tab.layout)
-    if (paneIds.length <= 1) return
+    if (paneIds.length <= 1) {
+      this.closeTab(tab.id)
+      return
+    }
 
     this.onDestroyPane?.(paneId)
     const result = removePane(tab.layout, paneId)
@@ -242,6 +188,57 @@ class Store extends BaseStore {
     if (this.activePaneId === paneId) {
       const remaining = collectPaneIds(tab.layout)
       this.activePaneId = remaining[0]
+    }
+  }
+
+  async setDualColumns() {
+    await this.applyLayout(2, dualColumnsLayout)
+  }
+
+  async setTripleColumns() {
+    await this.applyLayout(3, tripleColumnsLayout)
+  }
+
+  async setGrid() {
+    await this.applyLayout(4, gridLayout)
+  }
+
+  private async applyLayout(
+    targetCount: number,
+    buildLayout: (paneIds: string[]) => ILayoutNode
+  ) {
+    const tab = this.tabs.find((t) => t.id === this.activeTabId)
+    if (!tab) return
+
+    const paneIds = collectPaneIds(tab.layout)
+
+    // Destroy excess panes
+    if (paneIds.length > targetCount) {
+      const toRemove = paneIds.slice(targetCount)
+      toRemove.forEach((pid) => this.onDestroyPane?.(pid))
+      if (toRemove.includes(this.activePaneId)) {
+        this.activePaneId = paneIds[0]
+      }
+    }
+
+    // Create missing panes
+    const newPaneIds: string[] = []
+    if (paneIds.length < targetCount) {
+      const cwd = await terminal.getFullCwd(paneIds[0])
+      for (let i = paneIds.length; i < targetCount; i++) {
+        const newPaneId = uuid()
+        if (cwd) {
+          this.pendingCwd[newPaneId] = cwd
+        }
+        newPaneIds.push(newPaneId)
+      }
+    }
+
+    const finalPanes = [...paneIds.slice(0, targetCount), ...newPaneIds]
+    tab.layout = buildLayout(finalPanes)
+
+    if (newPaneIds.length > 0) {
+      this.activePaneId = newPaneIds[0]
     }
   }
 

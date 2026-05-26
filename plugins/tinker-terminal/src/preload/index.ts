@@ -28,35 +28,28 @@ const sessions = new Map<string, Session>()
 const localSessions = sessions as unknown as Map<string, PtySession>
 const baseApi = createTerminalApi(localSessions)
 
+function destroySession(id: string) {
+  const session = sessions.get(id)
+  if (!session) return
+  if (session.type === 'local') {
+    session.process.kill()
+  } else if (session.type === 'ssh') {
+    session.sshStream?.end()
+    session.sshClient.end()
+  }
+  sessions.delete(id)
+}
+
 const terminalObj = {
   ...baseApi,
 
   create(id: string, cols: number, rows: number, cwd?: string, shell?: string) {
-    const existing = sessions.get(id)
-    if (existing) {
-      if (existing.type === 'local') {
-        existing.process.kill()
-      } else if (existing.type === 'ssh') {
-        existing.sshStream?.end()
-        existing.sshClient.end()
-      }
-      sessions.delete(id)
-    }
-
+    destroySession(id)
     baseApi.create(id, cols, rows, cwd, shell)
   },
 
   createSSH(id: string, cols: number, rows: number, config: SSHConfig) {
-    const existing = sessions.get(id)
-    if (existing) {
-      if (existing.type === 'local') {
-        existing.process.kill()
-      } else if (existing.type === 'ssh') {
-        existing.sshStream?.end()
-        existing.sshClient.end()
-      }
-      sessions.delete(id)
-    }
+    destroySession(id)
 
     const client = new Client()
 
@@ -199,16 +192,7 @@ const terminalObj = {
   },
 
   destroy(id: string) {
-    const session = sessions.get(id)
-    if (!session) return
-
-    if (session.type === 'local') {
-      session.process.kill()
-    } else if (session.type === 'ssh') {
-      session.sshStream?.end()
-      session.sshClient.end()
-    }
-    sessions.delete(id)
+    destroySession(id)
   },
 
   onData(id: string, callback: (data: string) => void) {
@@ -260,5 +244,6 @@ const terminalObj = {
 contextBridge.exposeInMainWorld('terminal', terminalObj)
 
 declare global {
-  const terminal: typeof terminalObj
+  // @ts-expect-error Each plugin declares its own terminal global
+  var terminal: typeof terminalObj
 }

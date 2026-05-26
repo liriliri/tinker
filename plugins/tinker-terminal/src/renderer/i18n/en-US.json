@@ -8,7 +8,7 @@
   "selectAll": "Select All",
   "splitVertical": "Split Vertically",
   "splitHorizontal": "Split Horizontally",
-  "closePane": "Close Pane",
+  "closePane": "Close",
   "showSidebar": "Show Sidebar",
   "hideSidebar": "Hide Sidebar",
   "newFolder": "New Folder",
@@ -39,5 +39,8 @@
   "confirmDeleteFolder": "Delete this folder and all its sessions?",
   "confirmDeleteSession": "Delete this session?",
   "noSessions": "No sessions",
-  "searchSession": "Search"
+  "searchSession": "Search",
+  "dualColumns": "Dual Columns",
+  "tripleColumns": "Triple Columns",
+  "gridLayout": "Grid"
 }
