@@ -57,6 +57,8 @@ const globals: Record<string, string> = {
   'prettier/plugins/postcss': 'prettierPluginPostcss',
   'prettier/plugins/html': 'prettierPluginHtml',
   'prettier/plugins/typescript': 'prettierPluginTypescript',
+  '@xterm/xterm': 'xterm',
+  '@xterm/addon-fit': 'xtermAddonFit',
 }
 
 export const shareExternal = ['systeminformation']
@@ -65,6 +67,8 @@ export const shareDeps = keys(globals)
 
 const globalsExports: Record<string, string[]> = {
   'lucide-react': keys(lucide),
+  '@xterm/xterm': ['Terminal'],
+  '@xterm/addon-fit': ['FitAddon'],
 }
 
 function moduleKeys(id: string) {
@@ -280,6 +284,10 @@ export default defineConfig(({ mode }) => {
       'use-sync-external-store/shim/with-selector',
       'use-sync-external-store/with-selector',
     ])
+  }
+
+  if (target === 'xterm') {
+    return createConfig('xterm', 'PluginVendorXterm', [], 'dist/xterm')
   }
 
   return createConfig('react', 'PluginVendorReact')

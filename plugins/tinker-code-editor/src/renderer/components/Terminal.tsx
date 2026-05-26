@@ -14,7 +14,7 @@ const api: TerminalApi = {
   getCwd: (id) => terminal.getCwd(id),
 }
 
-function destroyPane(paneId: string) {
+export function destroyPane(paneId: string) {
   destroyTerminal(paneId, terminal)
 }
 
@@ -26,29 +26,11 @@ export default function Terminal({ paneId }: TerminalProps) {
   const { t } = useTranslation()
 
   const handleInit = useCallback((id: string, cols: number, rows: number) => {
-    const sshConfig = store.pendingSSHConfig[id]
-    if (sshConfig) {
-      delete store.pendingSSHConfig[id]
-      terminal.createSSH(id, cols, rows, {
-        host: sshConfig.host!,
-        port: sshConfig.port || 22,
-        username: sshConfig.username!,
-        authType: sshConfig.authType || 'password',
-        password: sshConfig.password,
-        privateKey: sshConfig.privateKey,
-      })
-      store.setPaneTitle(id, `${sshConfig.username}@${sshConfig.host}`)
-    } else {
-      const pendingCwd = store.pendingCwd[id]
-      if (pendingCwd) {
-        delete store.pendingCwd[id]
-      }
-      const pendingShell = store.pendingShell[id]
-      if (pendingShell) {
-        delete store.pendingShell[id]
-      }
-      terminal.create(id, cols, rows, pendingCwd, pendingShell)
+    const pendingCwd = store.pendingCwd[id]
+    if (pendingCwd) {
+      delete store.pendingCwd[id]
     }
+    terminal.create(id, cols, rows, pendingCwd || store.rootPath || undefined)
   }, [])
 
   const handleTitleChange = useCallback((id: string, title: string) => {
@@ -90,5 +72,3 @@ export default function Terminal({ paneId }: TerminalProps) {
     />
   )
 }
-
-store.onDestroyPane = destroyPane

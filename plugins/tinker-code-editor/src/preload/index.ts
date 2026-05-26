@@ -2,6 +2,7 @@ import { contextBridge } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
 import { homedir } from 'os'
+import { createTerminalApi } from 'share/lib/terminal'
 
 interface IDirEntry {
   name: string
@@ -56,8 +57,12 @@ const codeEditorObj = {
   },
 }
 
+const terminalApi = createTerminalApi()
+
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
+contextBridge.exposeInMainWorld('terminal', terminalApi)
 
 declare global {
   const codeEditor: typeof codeEditorObj
+  const terminal: typeof terminalApi
 }

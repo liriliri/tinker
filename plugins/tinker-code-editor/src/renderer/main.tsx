@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import { File } from 'lucide-react'
+import { Panel, Group } from 'react-resizable-panels'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import renderApp from 'share/lib/renderApp'
@@ -9,6 +10,7 @@ import store from './store'
 import Sidebar from './components/Sidebar'
 import EditorPane from './components/EditorPane'
 import StatusBar from './components/StatusBar'
+import TerminalPanel from './components/TerminalPanel'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -21,6 +23,10 @@ const App = observer(function App() {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault()
         store.saveFile()
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '`') {
+        e.preventDefault()
+        store.toggleTerminal()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -67,49 +73,61 @@ const App = observer(function App() {
       <div className="flex-1 flex min-h-0">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 -ml-px">
-          {store.tabs.length > 0 && (
-            <div
-              className={`relative flex items-center h-10 min-h-[40px] ${tw.bg.secondary}`}
-            >
-              <div className="flex-1 min-w-0 h-full">
-                <TabBar
-                  tabs={tabs}
-                  activeTabId={store.activeTabId}
-                  onClose={(id) => store.closeTab(id)}
-                  onActivate={(id) => store.setActiveTab(id)}
-                  onMove={(from, to) => store.moveTab(from, to)}
-                  onContextMenu={handleContextMenu}
-                  renderIcon={() => (
-                    <File size={14} className={tw.text.tertiary} />
+          <Group orientation="vertical" className="h-full">
+            <Panel id="editor">
+              <div className="flex flex-col h-full">
+                {store.tabs.length > 0 && (
+                  <div
+                    className={`relative flex items-center h-10 min-h-[40px] ${tw.bg.secondary}`}
+                  >
+                    <div className="flex-1 min-w-0 h-full">
+                      <TabBar
+                        tabs={tabs}
+                        activeTabId={store.activeTabId}
+                        onClose={(id) => store.closeTab(id)}
+                        onActivate={(id) => store.setActiveTab(id)}
+                        onMove={(from, to) => store.moveTab(from, to)}
+                        onContextMenu={handleContextMenu}
+                        renderIcon={() => (
+                          <File size={14} className={tw.text.tertiary} />
+                        )}
+                      />
+                    </div>
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
+                    />
+                  </div>
+                )}
+                <div className="flex-1 relative overflow-hidden">
+                  {store.tabs.length > 0 ? (
+                    store.tabs.map((tab) => (
+                      <div
+                        key={tab.id}
+                        className="absolute inset-0"
+                        style={{
+                          display:
+                            tab.id === store.activeTabId ? 'block' : 'none',
+                        }}
+                      >
+                        <EditorPane tabId={tab.id} />
+                      </div>
+                    ))
+                  ) : (
+                    <div
+                      className={`flex items-center justify-center h-full ${tw.text.tertiary} text-sm`}
+                    >
+                      {t('openFileToEdit')}
+                    </div>
                   )}
-                />
-              </div>
-              <div
-                className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
-              />
-            </div>
-          )}
-          <div className="flex-1 relative overflow-hidden">
-            {store.tabs.length > 0 ? (
-              store.tabs.map((tab) => (
-                <div
-                  key={tab.id}
-                  className="absolute inset-0"
-                  style={{
-                    display: tab.id === store.activeTabId ? 'block' : 'none',
-                  }}
-                >
-                  <EditorPane tabId={tab.id} />
                 </div>
-              ))
-            ) : (
-              <div
-                className={`flex items-center justify-center h-full ${tw.text.tertiary} text-sm`}
-              >
-                {t('openFileToEdit')}
               </div>
+            </Panel>
+            {store.terminalOpen && (
+              <Panel id="terminal" defaultSize={200} minSize={100}>
+                <TerminalPanel />
+              </Panel>
             )}
-          </div>
+          </Group>
         </div>
       </div>
       <StatusBar />

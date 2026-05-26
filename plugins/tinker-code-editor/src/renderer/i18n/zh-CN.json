@@ -3,5 +3,8 @@
   "openFileToEdit": "打开文件开始编辑",
   "closeTab": "关闭",
   "closeOtherTabs": "关闭其他",
-  "save": "保存"
+  "save": "保存",
+  "splitVertical": "垂直拆分",
+  "splitHorizontal": "水平拆分",
+  "closePane": "关闭面板"
 }

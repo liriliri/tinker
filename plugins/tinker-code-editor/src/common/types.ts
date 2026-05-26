@@ -11,3 +11,25 @@ export interface IEditorTab {
   content: string
   isDirty: boolean
 }
+
+export type SplitDirection = 'horizontal' | 'vertical'
+
+export interface ISplitNode {
+  type: 'split'
+  direction: SplitDirection
+  first: ILayoutNode
+  second: ILayoutNode
+}
+
+export interface ILeafNode {
+  type: 'leaf'
+  paneId: string
+}
+
+export type ILayoutNode = ISplitNode | ILeafNode
+
+export interface ITerminalTab {
+  id: string
+  title: string
+  layout: ILayoutNode
+}

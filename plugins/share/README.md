@@ -220,6 +220,33 @@ const popup = openPopupWindow(
 
 Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?` (default true), `resizable?` (default true), `webviewTag?`.
 
+### Terminal (Preload)
+
+```ts
+import { createTerminalApi } from 'share/lib/terminal'
+import type { TerminalApi, ShellInfo, PtySession } from 'share/lib/terminal'
+
+const api = createTerminalApi()
+// Expose via contextBridge in your preload script
+```
+
+Creates a local PTY manager for use in preload scripts. Methods:
+
+- `create(id, cols, rows, cwd?, shell?)` — spawn a shell
+- `write(id, data)` — send input to terminal
+- `resize(id, cols, rows)` — resize PTY
+- `destroy(id)` — kill terminal
+- `onData(id, callback)` — listen for output data
+- `onClose(id, callback)` — listen for process exit
+- `onInput(id, callback)` — listen for user input (newline)
+- `getProcessName(id)` — current process name
+- `getCwd(id)` — current working directory basename
+- `getFullCwd(id)` — full CWD path
+- `getDefaultShell()` — system default shell path
+- `getAvailableShells()` — list available shells as `ShellInfo[]`
+
+Accepts an optional `sessions` Map for sharing session state with plugin-specific extensions (e.g. SSH).
+
 ## When To Update This File
 
 Update this README when you change shared APIs, conventions, or recommended usage in `share/`.

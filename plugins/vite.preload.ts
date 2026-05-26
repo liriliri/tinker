@@ -38,5 +38,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
           external.some((pkg) => id === pkg || id.startsWith(pkg + '/')),
       },
     },
+    resolve: {
+      alias: {
+        share: path.join(cwd, '../share/'),
+      },
+    },
   }
 })

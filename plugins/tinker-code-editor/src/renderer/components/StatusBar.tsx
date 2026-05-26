@@ -1,6 +1,10 @@
 import { observer } from 'mobx-react-lite'
-import { PanelLeft, PanelLeftClose, FolderOpen } from 'lucide-react'
-import { StatusBar, StatusBarItem } from 'share/components/StatusBar'
+import { PanelLeft, PanelLeftClose, FolderOpen, Terminal } from 'lucide-react'
+import {
+  StatusBar,
+  StatusBarItem,
+  StatusBarSpacer,
+} from 'share/components/StatusBar'
 import store from '../store'
 
 export default observer(function StatusBarComponent() {
@@ -15,6 +19,10 @@ export default observer(function StatusBarComponent() {
       </StatusBarItem>
       <StatusBarItem onClick={() => store.openFolder()}>
         <FolderOpen size={14} />
+      </StatusBarItem>
+      <StatusBarSpacer />
+      <StatusBarItem onClick={() => store.toggleTerminal()}>
+        <Terminal size={14} />
       </StatusBarItem>
     </StatusBar>
   )
