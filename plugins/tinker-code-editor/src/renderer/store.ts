@@ -181,7 +181,7 @@ class Store extends BaseStore {
     if (!tab) return
 
     const newPaneId = uuid()
-    const cwd = await terminal.getFullCwd(paneId)
+    const cwd = await codeEditor.getTerminalFullCwd(paneId)
     if (cwd) {
       this.pendingCwd[newPaneId] = cwd
     }

@@ -5,17 +5,17 @@ import type { TerminalApi } from 'share/components/Terminal'
 import store from '../store'
 
 const api: TerminalApi = {
-  write: (id, data) => terminal.write(id, data),
-  resize: (id, cols, rows) => terminal.resize(id, cols, rows),
-  onData: (id, cb) => terminal.onData(id, cb),
-  onClose: (id, cb) => terminal.onClose(id, cb),
-  onInput: (id, cb) => terminal.onInput(id, cb),
-  getProcessName: (id) => terminal.getProcessName(id),
-  getCwd: (id) => terminal.getCwd(id),
+  write: (id, data) => codeEditor.writeTerminal(id, data),
+  resize: (id, cols, rows) => codeEditor.resizeTerminal(id, cols, rows),
+  onData: (id, cb) => codeEditor.onTerminalData(id, cb),
+  onClose: (id, cb) => codeEditor.onTerminalClose(id, cb),
+  onInput: (id, cb) => codeEditor.onTerminalInput(id, cb),
+  getProcessName: (id) => codeEditor.getTerminalProcessName(id),
+  getCwd: (id) => codeEditor.getTerminalCwd(id),
 }
 
 export function destroyPane(paneId: string) {
-  destroyTerminal(paneId, terminal)
+  destroyTerminal(paneId, { destroy: codeEditor.destroyTerminal })
 }
 
 interface TerminalProps {
@@ -30,7 +30,12 @@ export default function Terminal({ paneId }: TerminalProps) {
     if (pendingCwd) {
       delete store.pendingCwd[id]
     }
-    terminal.create(id, cols, rows, pendingCwd || store.rootPath || undefined)
+    codeEditor.createTerminal(
+      id,
+      cols,
+      rows,
+      pendingCwd || store.rootPath || undefined
+    )
   }, [])
 
   const handleTitleChange = useCallback((id: string, title: string) => {

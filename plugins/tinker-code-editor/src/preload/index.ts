@@ -10,6 +10,8 @@ interface IDirEntry {
   isDirectory: boolean
 }
 
+const terminalApi = createTerminalApi()
+
 const codeEditorObj = {
   getHomedir(): string {
     return homedir()
@@ -55,14 +57,23 @@ const codeEditorObj = {
       return false
     }
   },
+
+  createTerminal: terminalApi.create,
+  writeTerminal: terminalApi.write,
+  resizeTerminal: terminalApi.resize,
+  destroyTerminal: terminalApi.destroy,
+  onTerminalData: terminalApi.onData,
+  onTerminalClose: terminalApi.onClose,
+  onTerminalInput: terminalApi.onInput,
+  getTerminalProcessName: terminalApi.getProcessName,
+  getTerminalCwd: terminalApi.getCwd,
+  getTerminalFullCwd: terminalApi.getFullCwd,
+  getDefaultShell: terminalApi.getDefaultShell,
+  getAvailableShells: terminalApi.getAvailableShells,
 }
 
-const terminalApi = createTerminalApi()
-
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
-contextBridge.exposeInMainWorld('terminal', terminalApi)
 
 declare global {
   const codeEditor: typeof codeEditorObj
-  const terminal: typeof terminalApi
 }
