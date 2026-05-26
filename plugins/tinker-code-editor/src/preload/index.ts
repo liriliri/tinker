@@ -41,14 +41,6 @@ const codeEditorObj = {
     return result
   },
 
-  async readFile(filePath: string): Promise<string> {
-    return fs.promises.readFile(filePath, 'utf-8')
-  },
-
-  async writeFile(filePath: string, content: string): Promise<void> {
-    await fs.promises.writeFile(filePath, content, 'utf-8')
-  },
-
   async exists(filePath: string): Promise<boolean> {
     try {
       await fs.promises.access(filePath)

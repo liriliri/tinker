@@ -19,6 +19,8 @@ export interface ISplitNode {
   direction: SplitDirection
   first: ILayoutNode
   second: ILayoutNode
+  firstSize?: string
+  key?: string
 }
 
 export interface ILeafNode {

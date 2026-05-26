@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import { File } from 'lucide-react'
-import { Panel, Group } from 'react-resizable-panels'
+import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import renderApp from 'share/lib/renderApp'
@@ -17,6 +17,11 @@ import './index.scss'
 
 const App = observer(function App() {
   const { t } = useTranslation()
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    panelIds: ['editor', 'terminal'],
+    id: 'tinker-code-editor-layout',
+    storage: localStorage,
+  })
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -73,7 +78,12 @@ const App = observer(function App() {
       <div className="flex-1 flex min-h-0">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 -ml-px">
-          <Group orientation="vertical" className="h-full">
+          <Group
+            orientation="vertical"
+            className="h-full"
+            defaultLayout={defaultLayout}
+            onLayoutChange={onLayoutChange}
+          >
             <Panel id="editor">
               <div className="flex flex-col h-full">
                 {store.tabs.length > 0 && (

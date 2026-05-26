@@ -1,5 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { Terminal as TerminalIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import {
+  Terminal as TerminalIcon,
+  Columns2,
+  Columns3,
+  Grid2x2,
+} from 'lucide-react'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import store from '../store'
@@ -9,6 +15,8 @@ import { destroyPane } from './Terminal'
 store.onDestroyPane = destroyPane
 
 export default observer(function TerminalPanel() {
+  const { t } = useTranslation()
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -27,7 +35,35 @@ export default observer(function TerminalPanel() {
             )}
           />
         </div>
-        <div className={`absolute top-0 left-0 right-0 h-px ${tw.bg.border}`} />
+        <div className="flex-shrink-0 flex items-center justify-center h-full px-1.5">
+          <button
+            className={`p-1.5 rounded transition-colors ${tw.hover}`}
+            onClick={() => store.setDualColumns()}
+            title={t('dualColumns')}
+          >
+            <Columns2 size={14} className={tw.text.secondary} />
+          </button>
+          <button
+            className={`p-1.5 rounded transition-colors ${tw.hover}`}
+            onClick={() => store.setTripleColumns()}
+            title={t('tripleColumns')}
+          >
+            <Columns3 size={14} className={tw.text.secondary} />
+          </button>
+          <button
+            className={`p-1.5 rounded transition-colors ${tw.hover}`}
+            onClick={() => store.setGrid()}
+            title={t('gridLayout')}
+          >
+            <Grid2x2 size={14} className={tw.text.secondary} />
+          </button>
+        </div>
+        <div
+          className={`absolute top-0 left-0 right-0 h-px z-10 ${tw.bg.border}`}
+        />
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
+        />
       </div>
       <div className="flex-1 relative overflow-hidden">
         {store.terminalTabs.map((tab) => (

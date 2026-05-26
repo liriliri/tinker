@@ -6,5 +6,8 @@
   "save": "保存",
   "splitVertical": "垂直拆分",
   "splitHorizontal": "水平拆分",
-  "closePane": "关闭面板"
+  "closePane": "关闭",
+  "dualColumns": "双栏",
+  "tripleColumns": "三栏",
+  "gridLayout": "四格"
 }

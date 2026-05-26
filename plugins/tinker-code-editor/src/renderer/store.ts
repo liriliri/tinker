@@ -59,6 +59,59 @@ function removePane(
   return { ...node, first, second }
 }
 
+function dualColumnsLayout(paneIds: string[]): ILayoutNode {
+  return {
+    type: 'split',
+    direction: 'horizontal',
+    firstSize: '50%',
+    key: uuid(),
+    first: { type: 'leaf', paneId: paneIds[0] },
+    second: { type: 'leaf', paneId: paneIds[1] },
+  }
+}
+
+function tripleColumnsLayout(paneIds: string[]): ILayoutNode {
+  return {
+    type: 'split',
+    direction: 'horizontal',
+    firstSize: '33%',
+    key: uuid(),
+    first: { type: 'leaf', paneId: paneIds[0] },
+    second: {
+      type: 'split',
+      direction: 'horizontal',
+      key: uuid(),
+      first: { type: 'leaf', paneId: paneIds[1] },
+      second: { type: 'leaf', paneId: paneIds[2] },
+    },
+  }
+}
+
+function gridLayout(paneIds: string[]): ILayoutNode {
+  return {
+    type: 'split',
+    direction: 'vertical',
+    firstSize: '50%',
+    key: uuid(),
+    first: {
+      type: 'split',
+      direction: 'horizontal',
+      firstSize: '50%',
+      key: uuid(),
+      first: { type: 'leaf', paneId: paneIds[0] },
+      second: { type: 'leaf', paneId: paneIds[1] },
+    },
+    second: {
+      type: 'split',
+      direction: 'horizontal',
+      firstSize: '50%',
+      key: uuid(),
+      first: { type: 'leaf', paneId: paneIds[2] },
+      second: { type: 'leaf', paneId: paneIds[3] },
+    },
+  }
+}
+
 class Store extends BaseStore {
   rootPath: string = storage.get(STORAGE_ROOT_PATH) || ''
   fileTree: ITreeNode[] = []
@@ -115,6 +168,20 @@ class Store extends BaseStore {
   }
 
   closeTerminalTab(id: string) {
+    if (this.terminalTabs.length <= 1) {
+      const tab = this.terminalTabs.find((t) => t.id === id)
+      if (tab) {
+        const paneIds = collectPaneIds(tab.layout)
+        paneIds.forEach((pid) => this.onDestroyPane?.(pid))
+      }
+      this.terminalTabs = []
+      this.activeTerminalTabId = ''
+      this.activePaneId = ''
+      this.terminalOpen = false
+      storage.set(STORAGE_TERMINAL_OPEN, false)
+      return
+    }
+
     const tab = this.terminalTabs.find((t) => t.id === id)
     if (!tab) return
 
@@ -125,16 +192,11 @@ class Store extends BaseStore {
     this.terminalTabs.splice(index, 1)
 
     if (this.activeTerminalTabId === id) {
-      if (this.terminalTabs.length > 0) {
-        const newIndex = Math.min(index, this.terminalTabs.length - 1)
-        this.activeTerminalTabId = this.terminalTabs[newIndex].id
-        const newTab = this.terminalTabs[newIndex]
-        const remaining = collectPaneIds(newTab.layout)
-        this.activePaneId = remaining[0]
-      } else {
-        this.activeTerminalTabId = ''
-        this.activePaneId = ''
-      }
+      const newIndex = Math.min(index, this.terminalTabs.length - 1)
+      this.activeTerminalTabId = this.terminalTabs[newIndex].id
+      const newTab = this.terminalTabs[newIndex]
+      const remaining = collectPaneIds(newTab.layout)
+      this.activePaneId = remaining[0]
     }
   }
 
@@ -194,7 +256,10 @@ class Store extends BaseStore {
     if (!tab) return
 
     const paneIds = collectPaneIds(tab.layout)
-    if (paneIds.length <= 1) return
+    if (paneIds.length <= 1) {
+      this.closeTerminalTab(tab.id)
+      return
+    }
 
     this.onDestroyPane?.(paneId)
     const result = removePane(tab.layout, paneId)
@@ -205,6 +270,57 @@ class Store extends BaseStore {
     if (this.activePaneId === paneId) {
       const remaining = collectPaneIds(tab.layout)
       this.activePaneId = remaining[0]
+    }
+  }
+
+  async setDualColumns() {
+    await this.applyLayout(2, dualColumnsLayout)
+  }
+
+  async setTripleColumns() {
+    await this.applyLayout(3, tripleColumnsLayout)
+  }
+
+  async setGrid() {
+    await this.applyLayout(4, gridLayout)
+  }
+
+  private async applyLayout(
+    targetCount: number,
+    buildLayout: (paneIds: string[]) => ILayoutNode
+  ) {
+    const tab = this.terminalTabs.find((t) => t.id === this.activeTerminalTabId)
+    if (!tab) return
+
+    const paneIds = collectPaneIds(tab.layout)
+
+    // Destroy excess panes
+    if (paneIds.length > targetCount) {
+      const toRemove = paneIds.slice(targetCount)
+      toRemove.forEach((pid) => this.onDestroyPane?.(pid))
+      if (toRemove.includes(this.activePaneId)) {
+        this.activePaneId = paneIds[0]
+      }
+    }
+
+    // Create missing panes
+    const newPaneIds: string[] = []
+    if (paneIds.length < targetCount) {
+      const cwd = await codeEditor.getTerminalFullCwd(paneIds[0])
+      for (let i = paneIds.length; i < targetCount; i++) {
+        const newPaneId = uuid()
+        if (cwd) {
+          this.pendingCwd[newPaneId] = cwd
+        }
+        newPaneIds.push(newPaneId)
+      }
+    }
+
+    const finalPanes = [...paneIds.slice(0, targetCount), ...newPaneIds]
+    tab.layout = buildLayout(finalPanes)
+
+    if (newPaneIds.length > 0) {
+      this.activePaneId = newPaneIds[0]
     }
   }
 
@@ -256,7 +372,7 @@ class Store extends BaseStore {
     }
 
     try {
-      const content = await codeEditor.readFile(filePath)
+      const content = (await tinker.readFile(filePath, 'utf-8')) as string
       const tab: IEditorTab = {
         id: uuid(),
         title: fileName,
@@ -285,7 +401,7 @@ class Store extends BaseStore {
     if (!tab) return
 
     try {
-      await codeEditor.writeFile(tab.filePath, tab.content)
+      await tinker.writeFile(tab.filePath, tab.content, 'utf-8')
       tab.isDirty = false
     } catch {
       // ignore write errors

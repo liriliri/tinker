@@ -34,8 +34,12 @@ const LayoutNode = observer(function LayoutNode({
   const borderClass = node.direction === 'horizontal' ? 'border-l' : 'border-t'
 
   return (
-    <Group orientation={orientation} className="h-full">
-      <Panel id={getLeafId(node.first)} minSize={50}>
+    <Group key={node.key} orientation={orientation} className="h-full">
+      <Panel
+        id={getLeafId(node.first)}
+        minSize={50}
+        defaultSize={node.firstSize}
+      >
         <LayoutNode
           node={node.first}
           showHeader={showHeader}

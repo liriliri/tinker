@@ -6,5 +6,8 @@
   "save": "Save",
   "splitVertical": "Split Vertically",
   "splitHorizontal": "Split Horizontally",
-  "closePane": "Close Pane"
+  "closePane": "Close",
+  "dualColumns": "Dual Columns",
+  "tripleColumns": "Triple Columns",
+  "gridLayout": "Grid"
 }
