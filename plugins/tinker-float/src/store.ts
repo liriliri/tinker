@@ -3,13 +3,13 @@ import fileUrl from 'licia/fileUrl'
 import isUrl from 'licia/isUrl'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import { getFileCategory } from 'share/lib/util'
 import {
-  isImageUrl,
-  IMAGE_EXTENSIONS,
-  TEXT_EXTENSIONS,
-  VIDEO_EXTENSIONS,
-} from './lib/util'
+  getFileCategory,
+  IMAGE_EXTS,
+  TEXT_EXTS,
+  VIDEO_EXTS,
+} from 'share/lib/fileType'
+import { isImageUrl } from './lib/util'
 
 const MIN_WINDOW_SIZE = {
   image: { width: 100, height: 100 },
@@ -146,15 +146,11 @@ class Store extends BaseStore {
       filters: [
         {
           name: 'All Supported',
-          extensions: [
-            ...IMAGE_EXTENSIONS,
-            ...TEXT_EXTENSIONS,
-            ...VIDEO_EXTENSIONS,
-          ],
+          extensions: [...IMAGE_EXTS, ...TEXT_EXTS, ...VIDEO_EXTS],
         },
-        { name: 'Images', extensions: IMAGE_EXTENSIONS },
-        { name: 'Video', extensions: VIDEO_EXTENSIONS },
-        { name: 'Text', extensions: TEXT_EXTENSIONS },
+        { name: 'Images', extensions: [...IMAGE_EXTS] },
+        { name: 'Video', extensions: [...VIDEO_EXTS] },
+        { name: 'Text', extensions: [...TEXT_EXTS] },
       ],
       properties: ['openFile'],
     })

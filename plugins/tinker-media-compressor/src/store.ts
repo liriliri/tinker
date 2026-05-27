@@ -12,7 +12,7 @@ import type {
   TargetSizeUnit,
 } from './types'
 import BaseStore from 'share/BaseStore'
-import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
+import { VIDEO_EXTS, AUDIO_EXTS } from 'share/lib/fileType'
 import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
 import { resolveSavePath } from 'share/lib/util'
@@ -180,7 +180,7 @@ class Store extends BaseStore {
 
   private detectMediaType(filePath: string): MediaType {
     const { ext } = splitPath(filePath)
-    if (VIDEO_EXTENSIONS.has(ext.toLowerCase())) return 'video'
+    if (VIDEO_EXTS.has(ext.slice(1).toLowerCase())) return 'video'
     return 'audio'
   }
 
@@ -201,13 +201,13 @@ class Store extends BaseStore {
           ? [
               {
                 name: 'Video',
-                extensions: [...VIDEO_EXTENSIONS].map((e) => e.slice(1)),
+                extensions: [...VIDEO_EXTS],
               },
             ]
           : [
               {
                 name: 'Audio',
-                extensions: [...AUDIO_EXTENSIONS].map((e) => e.slice(1)),
+                extensions: [...AUDIO_EXTS],
               },
             ]
 

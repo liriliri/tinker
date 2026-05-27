@@ -27,6 +27,7 @@ import {
   removeSheet as dbRemoveSheet,
 } from './lib/db'
 
+import { AUDIO_EXTS } from 'share/lib/fileType'
 import { PlayMode, SideTab } from './types'
 
 interface FileSearchResult {
@@ -34,7 +35,6 @@ interface FileSearchResult {
   name: string
 }
 
-const AUDIO_EXTS = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma']
 const FAVORITE_SHEET_ID = 'favorite'
 const MAX_RECENT = 100
 
@@ -363,7 +363,7 @@ class Store extends BaseStore {
 
     try {
       const task = tinker.searchFile(query, {
-        exts: AUDIO_EXTS,
+        exts: [...AUDIO_EXTS],
         maxResults: 20,
       })
       this.searchFileTask = task

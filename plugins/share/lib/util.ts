@@ -1,14 +1,11 @@
 import durationFormat from 'licia/durationFormat'
 import dateFormat from 'licia/dateFormat'
 import compact from 'licia/compact'
-import mime from 'licia/mime'
 import splitPath from 'licia/splitPath'
 import contain from 'licia/contain'
 import isWindows from 'licia/isWindows'
 
 const sep = isWindows ? '\\' : '/'
-
-export type FileCategory = 'image' | 'audio' | 'video' | 'document' | 'other'
 
 export function joinPath(...parts: string[]): string {
   return compact(parts).join(sep)
@@ -111,30 +108,6 @@ export function getFileIcon(filePath: string): Promise<string | undefined> {
 
   fileIconCache.set(cacheKey, promise)
   return promise
-}
-
-export function getMimeTypeFromPath(filePath: string): string {
-  const { ext } = splitPath(filePath)
-  if (!ext) return ''
-  return (mime(ext.slice(1)) as string) || ''
-}
-
-export function getFileCategory(filePath: string): FileCategory {
-  const mimeType = getMimeTypeFromPath(filePath)
-  if (!mimeType) return 'other'
-  if (mimeType.startsWith('image/')) return 'image'
-  if (mimeType.startsWith('audio/')) return 'audio'
-  if (mimeType.startsWith('video/')) return 'video'
-  if (
-    mimeType.startsWith('text/') ||
-    mimeType.includes('pdf') ||
-    mimeType.includes('document') ||
-    mimeType.includes('spreadsheet') ||
-    mimeType.includes('presentation')
-  ) {
-    return 'document'
-  }
-  return 'other'
 }
 
 export function mediaDurationFormat(seconds: number) {

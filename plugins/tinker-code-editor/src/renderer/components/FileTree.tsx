@@ -11,45 +11,9 @@ import {
 import { useTranslation } from 'react-i18next'
 import { tw, THEME_COLORS } from 'share/theme'
 import { getFileIcon } from 'share/lib/util'
+import { CODE_EXTS } from 'share/lib/fileType'
 import store from '../store'
 import type { ITreeNode } from '../../common/types'
-
-const CODE_EXTS = new Set([
-  'js',
-  'jsx',
-  'ts',
-  'tsx',
-  'json',
-  'html',
-  'htm',
-  'css',
-  'scss',
-  'less',
-  'md',
-  'py',
-  'rb',
-  'go',
-  'rs',
-  'java',
-  'c',
-  'cpp',
-  'h',
-  'hpp',
-  'sh',
-  'bash',
-  'yaml',
-  'yml',
-  'xml',
-  'sql',
-  'swift',
-  'kt',
-  'dart',
-  'lua',
-  'toml',
-  'ini',
-  'vue',
-  'svelte',
-])
 
 function isCodeFile(name: string): boolean {
   const ext = name.split('.').pop()?.toLowerCase() || ''

@@ -6,7 +6,7 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MediaList from './components/MediaList'
 import store from './store'
-import { VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from './lib/constants'
+import { VIDEO_EXTS, AUDIO_EXTS } from 'share/lib/fileType'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -40,10 +40,9 @@ const App = observer(function App() {
 
     if (store.isCompressing) return
 
-    const extensions =
-      store.mode === 'video' ? VIDEO_EXTENSIONS : AUDIO_EXTENSIONS
+    const extensions = store.mode === 'video' ? VIDEO_EXTS : AUDIO_EXTS
     const files = Array.from(e.dataTransfer.files).filter((file) => {
-      const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0] || ''
+      const ext = file.name.toLowerCase().match(/\.([^.]+)$/)?.[1] || ''
       return extensions.has(ext)
     })
 

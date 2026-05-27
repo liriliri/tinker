@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import { getFileCategory, getFileIcon } from 'share/lib/util'
+import { getFileCategory } from 'share/lib/fileType'
+import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
 

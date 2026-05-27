@@ -1,23 +1,6 @@
-export const VIDEO_EXTENSIONS = new Set([
-  '.mp4',
-  '.mkv',
-  '.avi',
-  '.mov',
-  '.webm',
-])
-export const AUDIO_EXTENSIONS = new Set([
-  '.mp3',
-  '.m4a',
-  '.aac',
-  '.ogg',
-  '.flac',
-  '.wav',
-])
+import { VIDEO_EXTS, AUDIO_EXTS } from 'share/lib/fileType'
 
-export const SUPPORTED_EXTENSIONS = new Set([
-  ...VIDEO_EXTENSIONS,
-  ...AUDIO_EXTENSIONS,
-])
+export const SUPPORTED_EXTENSIONS = new Set([...VIDEO_EXTS, ...AUDIO_EXTS])
 
 // CRF presets for H.264/VP9: lower value = higher quality (0-51, typical 18-28)
 export const VIDEO_CRF_PRESETS = [35, 28, 23, 18, 15]

@@ -1,21 +1,7 @@
 import lpad from 'licia/lpad'
+import { AUDIO_EXTS, VIDEO_EXTS } from 'share/lib/fileType'
 
-export const SUPPORTED_EXTENSIONS = [
-  'mp3',
-  'wav',
-  'ogg',
-  'flac',
-  'm4a',
-  'aac',
-  'opus',
-  'webm',
-  'mp4',
-  'mkv',
-  'avi',
-  'mov',
-  'wmv',
-  'flv',
-]
+export const SUPPORTED_EXTENSIONS = [...AUDIO_EXTS, ...VIDEO_EXTS]
 
 export const SUPPORTED_ACCEPT = SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(
   ','

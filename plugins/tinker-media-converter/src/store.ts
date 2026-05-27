@@ -3,10 +3,8 @@ import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { MediaItem, MediaType, AudioInfo } from './types'
 import BaseStore from 'share/BaseStore'
+import { VIDEO_EXTS, AUDIO_EXTS, IMAGE_EXTS } from 'share/lib/fileType'
 import {
-  VIDEO_EXTENSIONS,
-  AUDIO_EXTENSIONS,
-  IMAGE_EXTENSIONS,
   VIDEO_OUTPUT_FORMATS,
   AUDIO_OUTPUT_FORMATS,
   IMAGE_OUTPUT_FORMATS,
@@ -152,10 +150,10 @@ class Store extends BaseStore {
 
   private detectMediaType(filePath: string): MediaType | null {
     const { ext } = splitPath(filePath)
-    const e = ext.toLowerCase()
-    if (VIDEO_EXTENSIONS.has(e)) return 'video'
-    if (AUDIO_EXTENSIONS.has(e)) return 'audio'
-    if (IMAGE_EXTENSIONS.has(e)) return 'image'
+    const e = ext.slice(1).toLowerCase()
+    if (VIDEO_EXTS.has(e)) return 'video'
+    if (AUDIO_EXTS.has(e)) return 'audio'
+    if (IMAGE_EXTS.has(e)) return 'image'
     return null
   }
 
@@ -166,21 +164,21 @@ class Store extends BaseStore {
         filters = [
           {
             name: 'Video',
-            extensions: [...VIDEO_EXTENSIONS].map((e) => e.slice(1)),
+            extensions: [...VIDEO_EXTS],
           },
         ]
       } else if (this.mode === 'audio') {
         filters = [
           {
             name: 'Audio',
-            extensions: [...AUDIO_EXTENSIONS].map((e) => e.slice(1)),
+            extensions: [...AUDIO_EXTS],
           },
         ]
       } else {
         filters = [
           {
             name: 'Image',
-            extensions: [...IMAGE_EXTENSIONS].map((e) => e.slice(1)),
+            extensions: [...IMAGE_EXTS],
           },
         ]
       }
