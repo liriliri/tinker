@@ -14,8 +14,14 @@ export default observer(function Sidebar() {
         {store.rootPath ? (
           <FileTree />
         ) : (
-          <div className={`p-4 text-xs text-center ${tw.text.tertiary}`}>
-            {t('noFolderOpened')}
+          <div className="h-full flex items-center justify-center p-4">
+            <button
+              type="button"
+              onClick={() => store.openFolder()}
+              className={`px-3 py-1.5 text-xs rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+            >
+              {t('noFolderOpened')}
+            </button>
           </div>
         )}
       </div>

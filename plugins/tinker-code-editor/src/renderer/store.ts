@@ -125,6 +125,8 @@ class Store extends BaseStore {
   paneTitles: Record<string, string> = {}
   pendingCwd: Record<string, string> = {}
   onDestroyPane?: (id: string) => void
+  cursorLine = 1
+  cursorColumn = 1
   private terminalTabCounter = 0
 
   constructor() {
@@ -144,6 +146,11 @@ class Store extends BaseStore {
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setCursor(line: number, column: number) {
+    this.cursorLine = line
+    this.cursorColumn = column
   }
 
   toggleTerminal() {

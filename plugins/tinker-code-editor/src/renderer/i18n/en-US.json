@@ -1,6 +1,7 @@
 {
-  "noFolderOpened": "No folder opened",
+  "noFolderOpened": "Open Folder",
   "openFileToEdit": "Open a file to start editing",
+  "cursor": "Ln {{line}}, Col {{col}}",
   "closeTab": "Close",
   "closeOtherTabs": "Close Others",
   "save": "Save",
@@ -9,5 +10,9 @@
   "closePane": "Close",
   "dualColumns": "Dual Columns",
   "tripleColumns": "Triple Columns",
-  "gridLayout": "Grid"
+  "gridLayout": "Grid",
+  "newFile": "New File",
+  "newFolder": "New Folder",
+  "rename": "Rename",
+  "delete": "Delete"
 }

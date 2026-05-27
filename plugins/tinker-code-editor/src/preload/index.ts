@@ -41,6 +41,14 @@ const codeEditorObj = {
     return result
   },
 
+  async createDir(dirPath: string): Promise<void> {
+    await fs.promises.mkdir(dirPath)
+  },
+
+  async renameItem(oldPath: string, newPath: string): Promise<void> {
+    await fs.promises.rename(oldPath, newPath)
+  },
+
   async exists(filePath: string): Promise<boolean> {
     try {
       await fs.promises.access(filePath)

@@ -96,7 +96,7 @@ const App = observer(function App() {
           onLayoutChange={onSidebarLayoutChange}
         >
           {store.sidebarOpen && (
-            <Panel id="sidebar" defaultSize={224} minSize={120}>
+            <Panel id="sidebar" defaultSize={224} minSize={180}>
               <Sidebar />
             </Panel>
           )}

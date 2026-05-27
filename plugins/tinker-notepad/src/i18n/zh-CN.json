@@ -10,5 +10,5 @@
   "increaseFontSize": "增大字体",
   "decreaseFontSize": "减小字体",
   "search": "搜索",
-  "cursor": "Ln {{line}}, Col {{col}}"
+  "cursor": "行 {{line}}, 列 {{col}}"
 }

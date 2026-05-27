@@ -7,7 +7,7 @@
   "increaseFontSize": "增大字体",
   "decreaseFontSize": "减小字体",
   "search": "搜索",
-  "cursor": "Ln {{line}}, Col {{col}}",
+  "cursor": "行 {{line}}, 列 {{col}}",
   "showSidebar": "显示侧边栏",
   "hideSidebar": "隐藏侧边栏",
   "noConfigFiles": "未找到配置文件",
