@@ -44,7 +44,9 @@ const App = observer(function App() {
   return (
     <ToasterProvider>
       <AlertProvider>
-        <div className={`min-h-screen ${tw.bg.secondary} transition-colors`}>
+        <div
+          className={`h-screen overflow-y-auto ${tw.bg.secondary} transition-colors`}
+        >
           <div className="max-w-4xl mx-auto px-4 py-6">
             <InfoSection>
               {system?.manufacturer && (
