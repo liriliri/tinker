@@ -1,4 +1,10 @@
-## v1.15.0 (22 May 2025)
+## v1.16.0 (27 May 2026)
+
+* feat: add web runner
+* feat: add terminal
+* feat: add code editor
+
+## v1.15.0 (22 May 2026)
 
 * feat: cli
 * feat: add music player
