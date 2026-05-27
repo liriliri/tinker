@@ -14,6 +14,7 @@ export interface TabProps {
   title: string
   isActive: boolean
   isFirst: boolean
+  hideFirstBorder?: boolean
   icon?: ReactNode
   isLoading?: boolean
   closable?: boolean
@@ -30,6 +31,7 @@ function Tab({
   title,
   isActive,
   isFirst,
+  hideFirstBorder,
   icon,
   isLoading,
   closable = true,
@@ -191,7 +193,9 @@ function Tab({
             className={`pointer-events-none absolute inset-0 border-x border-t ${
               tw.border
             } ${
-              isFirst ? 'border-l-transparent dark:border-l-transparent' : ''
+              isFirst && hideFirstBorder
+                ? 'border-l-transparent dark:border-l-transparent'
+                : ''
             }`}
           />
           <div
@@ -256,6 +260,7 @@ export interface TabBarProps<T extends IBaseTab> {
   renderIcon?: (tab: T) => ReactNode
   isLoading?: (tab: T) => boolean
   getTitle?: (tab: T) => string
+  hideFirstBorder?: boolean
 }
 
 export default function TabBar<T extends IBaseTab>({
@@ -269,6 +274,7 @@ export default function TabBar<T extends IBaseTab>({
   renderIcon,
   isLoading,
   getTitle,
+  hideFirstBorder = false,
 }: TabBarProps<T>) {
   return (
     <div
@@ -282,6 +288,7 @@ export default function TabBar<T extends IBaseTab>({
             title={getTitle ? getTitle(tab) : tab.title}
             isActive={tab.id === activeTabId}
             isFirst={i === 0}
+            hideFirstBorder={hideFirstBorder}
             icon={renderIcon ? renderIcon(tab) : undefined}
             isLoading={isLoading ? isLoading(tab) : false}
             closable={tabs.length > 1}

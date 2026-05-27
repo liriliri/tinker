@@ -76,6 +76,7 @@ export default observer(function BrowserTabBar() {
     <TabBar
       tabs={store.tabs}
       activeTabId={store.activeTabId}
+      hideFirstBorder
       onAddTab={() => store.addTab()}
       onClose={(id) => store.closeTab(id)}
       onActivate={(id) => store.setActiveTab(id)}

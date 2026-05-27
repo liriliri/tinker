@@ -26,6 +26,7 @@ export default observer(function TerminalPanel() {
           <TabBar
             tabs={store.terminalTabs}
             activeTabId={store.activeTerminalTabId}
+            hideFirstBorder
             onAddTab={() => store.addTerminalTab()}
             onClose={(id) => store.closeTerminalTab(id)}
             onActivate={(id) => store.setActiveTerminalTab(id)}

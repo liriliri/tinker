@@ -119,6 +119,7 @@ const App = observer(function App() {
                           <TabBar
                             tabs={tabs}
                             activeTabId={store.activeTabId}
+                            hideFirstBorder
                             onClose={(id) => store.closeTab(id)}
                             onActivate={(id) => store.setActiveTab(id)}
                             onMove={(from, to) => store.moveTab(from, to)}
