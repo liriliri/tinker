@@ -10,6 +10,7 @@ import {
   Image,
   File,
   PanelRight,
+  PanelRightClose,
 } from 'lucide-react'
 import {
   Toolbar as ToolbarBase,
@@ -96,12 +97,14 @@ export default observer(function ToolbarComponent() {
           })}
           <ToolbarSeparator />
           <ToolbarButton
-            variant="toggle"
-            active={store.showPreview}
             onClick={() => store.setShowPreview(!store.showPreview)}
             title={t('preview')}
           >
-            <PanelRight size={TOOLBAR_ICON_SIZE} />
+            {store.showPreview ? (
+              <PanelRightClose size={TOOLBAR_ICON_SIZE} />
+            ) : (
+              <PanelRight size={TOOLBAR_ICON_SIZE} />
+            )}
           </ToolbarButton>
         </>
       )}

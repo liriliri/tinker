@@ -8,7 +8,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { LoadingCircle } from 'share/components/Loading'
-import { PanelRight } from 'lucide-react'
+import { PanelRight, PanelRightClose } from 'lucide-react'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -24,12 +24,14 @@ export default observer(function ToolbarComponent() {
       {store.searching && <LoadingCircle className="w-5 h-5 ml-1" />}
       <ToolbarSpacer />
       <ToolbarButton
-        variant="toggle"
-        active={store.showPreview}
         onClick={() => store.setShowPreview(!store.showPreview)}
         title={t('preview')}
       >
-        <PanelRight size={TOOLBAR_ICON_SIZE} />
+        {store.showPreview ? (
+          <PanelRightClose size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <PanelRight size={TOOLBAR_ICON_SIZE} />
+        )}
       </ToolbarButton>
     </Toolbar>
   )
