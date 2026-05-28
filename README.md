@@ -271,6 +271,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/file_search.png"/></th>
       <th><img src="https://tinker.liriliri.io/music_player.png"/></th>
     </tr>
+    <tr>
+      <th>Web Runner</th>
+      <th>Terminal</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/web_runner.png"/></th>
+      <th><img src="https://tinker.liriliri.io/terminal.png"/></th>
+    </tr>
   </tbody>
 </table>
 
