@@ -42,7 +42,7 @@ addI18nNamespace(I18N_NS, {
     saveAs: 'Save As...',
     print: 'Print',
     viewPageSource: 'View Page Source',
-    inspect: 'Inspect Element',
+    inspect: 'Inspect',
   },
   'zh-CN': {
     back: '后退',
