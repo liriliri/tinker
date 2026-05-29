@@ -58,9 +58,7 @@ async function executeCommand(
     try {
       const launchArgs: string[] = []
       if (data?.remoteDebuggingPort) {
-        launchArgs.push(
-          `--remote-debugging-port=${data.remoteDebuggingPort}`
-        )
+        launchArgs.push(`--remote-debugging-port=${data.remoteDebuggingPort}`)
       }
       launchTinker(launchArgs)
       await waitForServer()

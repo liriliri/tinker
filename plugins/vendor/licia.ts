@@ -1,3 +1,4 @@
+import average from 'licia/average'
 import base64 from 'licia/base64'
 import camelCase from 'licia/camelCase'
 import capitalize from 'licia/capitalize'
@@ -48,6 +49,7 @@ import md5 from 'licia/md5'
 import mime from 'licia/mime'
 import naturalSort from 'licia/naturalSort'
 import once from 'licia/once'
+import pluck from 'licia/pluck'
 import openFile from 'licia/openFile'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
@@ -68,6 +70,7 @@ import upperFirst from 'licia/upperFirst'
 import uuid from 'licia/uuid'
 
 const licia = {
+  average,
   base64,
   camelCase,
   capitalize,
@@ -119,6 +122,7 @@ const licia = {
   naturalSort,
   once,
   openFile,
+  pluck,
   query,
   randomBytes,
   remove,
@@ -142,6 +146,7 @@ const g = globalThis as Record<string, unknown>
 g.licia = licia
 
 export {
+  average,
   base64,
   camelCase,
   capitalize,
@@ -193,6 +198,7 @@ export {
   naturalSort,
   once,
   openFile,
+  pluck,
   query,
   randomBytes,
   remove,
