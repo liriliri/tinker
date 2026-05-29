@@ -18,6 +18,7 @@ export type BatteryInfo = {
 }
 
 export type DataPoint = {
+  timestamp: number
   cpu: number
   memoryActive: number
   memoryTotal: number

@@ -8,6 +8,7 @@ import { detectPlatform, listUserDiskMounts, toDiskSpaceMount } from './disk'
 
 export function snapshotToDataPoint(snap: SystemSnapshot): DataPoint {
   return {
+    timestamp: performance.now(),
     cpu: snap.currentLoad,
     memoryActive: snap.mem.active,
     memoryTotal: snap.mem.total,

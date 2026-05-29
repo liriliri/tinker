@@ -6,7 +6,7 @@ import type { DataPoint, ResourceUsagePayload } from '../common/types'
 import { buildPayload, snapshotToDataPoint } from './lib/collector'
 import { RingBuffer } from './lib/ringBuffer'
 
-const DEFAULT_INTERVAL = 2000
+const DEFAULT_INTERVAL = 500
 const DEFAULT_HISTORY = 60
 
 class Store extends BaseStore {

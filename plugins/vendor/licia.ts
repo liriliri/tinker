@@ -30,6 +30,7 @@ import has from 'licia/has'
 import isArr from 'licia/isArr'
 import isDataUrl from 'licia/isDataUrl'
 import isEmpty from 'licia/isEmpty'
+import isEqual from 'licia/isEqual'
 import isMac from 'licia/isMac'
 import isStr from 'licia/isStr'
 import isStrBlank from 'licia/isStrBlank'
@@ -102,6 +103,7 @@ const licia = {
   isArr,
   isDataUrl,
   isEmpty,
+  isEqual,
   isMac,
   isStr,
   isStrBlank,
@@ -178,6 +180,7 @@ export {
   isArr,
   isDataUrl,
   isEmpty,
+  isEqual,
   isMac,
   isStr,
   isStrBlank,

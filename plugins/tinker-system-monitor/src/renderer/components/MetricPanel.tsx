@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import contain from 'licia/contain'
 import last from 'licia/last'
@@ -7,7 +7,7 @@ import { LoadingCircle } from 'share/components/Loading'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { MetricId } from '../../common/types'
 import { CARD_LAYOUT } from '../lib/cardLayout'
-import { drawLineChart } from '../lib/chart'
+import { useChartAnimationLoop } from '../lib/useChartAnimationLoop'
 import {
   formatMetricValue,
   getMetricDetail,
@@ -34,35 +34,28 @@ const MetricPanel = observer(function MetricPanel({ id }: MetricPanelProps) {
   const payload = store.payload
   const showRing = !contain(RING_LESS_METRICS, id)
 
-  const history = payload ? getHistoryValues(payload.history, id) : []
-  const lastValue = history.length > 0 ? last(history) : 0
+  const history = payload ? payload.history : []
+  const values = getHistoryValues(history, id)
+  const lastValue = values.length > 0 ? last(values) : 0
   const color = METRIC_COLORS[id]
   const Icon = METRIC_ICONS[id]
   const detail = getMetricDetail(id, payload?.current)
+  const formatLabel = useCallback(
+    (value: number) => formatMetricValue(id, value),
+    [id]
+  )
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || history.length < 2) return
+  useChartAnimationLoop(canvasRef, {
+    id,
+    history,
+    color,
+    refreshInterval: store.refreshInterval,
+    paused: store.paused,
+    isDark: store.isDark,
+    formatLabel,
+  })
 
-    const isDark = store.isDark
-    const textPrimary = isDark
-      ? THEME_COLORS.text.dark.primary
-      : THEME_COLORS.text.light.primary
-    const bg = isDark
-      ? THEME_COLORS.bg.dark.primary
-      : THEME_COLORS.bg.light.primary
-
-    drawLineChart(canvas, {
-      id,
-      history,
-      color,
-      fgColor: textPrimary,
-      bgColor: bg,
-      formatLabel: (v) => formatMetricValue(id, v),
-    })
-  }, [id, history, color, store.isDark, cardSize])
-
-  const progress = getRingProgress(id, lastValue, history)
+  const progress = getRingProgress(id, lastValue, values)
   const stats = formatMetricValue(id, lastValue)
 
   return (
