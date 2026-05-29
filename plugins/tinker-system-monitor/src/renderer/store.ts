@@ -19,6 +19,7 @@ class Store extends BaseStore {
 
   private history = new RingBuffer<DataPoint>(DEFAULT_HISTORY)
   private refreshTimer: ReturnType<typeof setInterval> | null = null
+  private popupRefreshTimer: number | null = null
 
   constructor() {
     super()
@@ -52,16 +53,39 @@ class Store extends BaseStore {
   attachPopupWindow(popup: Window | null) {
     this.popupWindow = popup
     this.floatOpen = !!popup
-    if (!popup) return
+    if (!popup) {
+      if (!this.paused) {
+        this.startPolling()
+      }
+      return
+    }
+    this.startPolling()
     popup.addEventListener('beforeunload', () => {
       this.floatOpen = false
       this.popupWindow = null
+      this.stopPopupPolling()
+      if (!this.paused) {
+        this.startPolling()
+      }
     })
   }
 
   private startPolling() {
     this.stopPolling()
+    if (this.paused) return
+
     this.refresh()
+
+    const popup = this.popupWindow
+    if (popup && !popup.closed) {
+      this.popupRefreshTimer = popup.setInterval(() => {
+        if (!this.paused) {
+          this.refresh()
+        }
+      }, this.refreshInterval)
+      return
+    }
+
     this.refreshTimer = setInterval(() => {
       if (!this.paused) {
         this.refresh()
@@ -70,9 +94,21 @@ class Store extends BaseStore {
   }
 
   private stopPolling() {
+    this.stopMainPolling()
+    this.stopPopupPolling()
+  }
+
+  private stopMainPolling() {
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer)
       this.refreshTimer = null
+    }
+  }
+
+  private stopPopupPolling() {
+    if (this.popupRefreshTimer) {
+      clearInterval(this.popupRefreshTimer)
+      this.popupRefreshTimer = null
     }
   }
 }
