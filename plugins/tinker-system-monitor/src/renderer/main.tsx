@@ -5,6 +5,7 @@ import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import Dashboard from './components/Dashboard'
+import FloatOpened from './components/FloatOpened'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -17,7 +18,7 @@ const App = observer(function App() {
       <ToasterProvider>
         <AlertProvider>
           <div
-            className={`h-screen flex items-center justify-center ${tw.bg.secondary}`}
+            className={`h-screen flex items-center justify-center ${tw.bg.primary}`}
           >
             <LoadingCircle />
           </div>
@@ -30,11 +31,11 @@ const App = observer(function App() {
     <ToasterProvider>
       <AlertProvider>
         <div
-          className={`h-screen flex flex-col ${tw.bg.secondary} transition-colors`}
+          className={`h-screen flex flex-col ${tw.bg.primary} transition-colors`}
         >
           <Toolbar />
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 min-h-0">
-            <Dashboard />
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-1.5 min-h-0 flex flex-col">
+            {store.floatOpen ? <FloatOpened /> : <Dashboard />}
           </div>
         </div>
       </AlertProvider>

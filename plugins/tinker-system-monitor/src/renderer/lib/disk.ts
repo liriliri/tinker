@@ -1,5 +1,4 @@
 import filter from 'licia/filter'
-import find from 'licia/find'
 import sortBy from 'licia/sortBy'
 import type { DiskSpaceMount } from '../../common/types'
 import type { Systeminformation } from 'systeminformation'
@@ -15,7 +14,7 @@ const DARWIN_HIDDEN_MOUNTS = new Set([
   '/System/Volumes/Hardware',
 ])
 
-export function diskUsePercent(used: number, size: number): number {
+function diskUsePercent(used: number, size: number): number {
   return size > 0 ? (used / size) * 100 : 0
 }
 
@@ -84,28 +83,6 @@ export function listUserDiskMounts(
     filter(fsSize, (d) => isUserFacingMount(d, platform, fsSize)),
     (d) => d.mount
   )
-}
-
-export function getPrimaryDiskMount(
-  fsSize: FsSizeEntry[],
-  platform: string
-): FsSizeEntry | null {
-  const mounts = listUserDiskMounts(fsSize, platform)
-
-  if (platform === 'darwin') {
-    return (
-      find(mounts, (d) => d.mount === '/System/Volumes/Data') ??
-      find(mounts, (d) => d.mount === '/') ??
-      mounts[0] ??
-      null
-    )
-  }
-
-  if (platform === 'win32') {
-    return find(mounts, (d) => /^C:$/i.test(d.mount)) ?? mounts[0] ?? null
-  }
-
-  return find(mounts, (d) => d.mount === '/') ?? mounts[0] ?? null
 }
 
 export function toDiskSpaceMount(disk: FsSizeEntry): DiskSpaceMount {

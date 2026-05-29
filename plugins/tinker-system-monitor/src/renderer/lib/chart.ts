@@ -1,7 +1,7 @@
 import fileSize from 'licia/fileSize'
 import last from 'licia/last'
 import type { MetricId } from '../../common/types'
-import { isPercentMetric, isPowerMetric } from './metrics'
+import { isPercentMetric } from './metrics'
 
 function rgba(hex: string, alpha: number): string {
   const h = hex.replace('#', '')
@@ -67,10 +67,6 @@ export function drawLineChart(
   if (isPercentMetric(id)) {
     dataMin = 0
     dataMax = 100
-  } else if (isPowerMetric(id)) {
-    const maxVal = Math.max(1, ...history.map(Math.abs))
-    dataMin = -maxVal * 1.15
-    dataMax = maxVal * 1.15
   } else {
     dataMin = 0
     dataMax = history.length > 0 ? Math.max(1, ...history) * 1.15 : 1
@@ -92,17 +88,6 @@ export function drawLineChart(
     ctx.moveTo(0, y)
     ctx.lineTo(w, y)
     ctx.stroke()
-  }
-
-  if (isPowerMetric(id)) {
-    const yZero = yPos(0)
-    ctx.strokeStyle = rgba(fgColor, 0.15)
-    ctx.setLineDash([3, 3])
-    ctx.beginPath()
-    ctx.moveTo(0, yZero)
-    ctx.lineTo(w, yZero)
-    ctx.stroke()
-    ctx.setLineDash([])
   }
 
   const grad = ctx.createLinearGradient(0, padTop, 0, padTop + drawH)

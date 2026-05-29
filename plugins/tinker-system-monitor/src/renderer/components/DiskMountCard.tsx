@@ -5,10 +5,11 @@ import fileSize from 'licia/fileSize'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { DiskSpaceMount } from '../../common/types'
 import { CARD_LAYOUT } from '../lib/cardLayout'
-import { METRIC_COLORS } from '../lib/metrics'
 import { useCardSize } from '../lib/useCardSize'
 import store from '../store'
 import StatsRing from './StatsRing'
+
+const DISK_COLOR = '#06b6d4'
 
 interface DiskMountCardProps {
   disk: DiskSpaceMount
@@ -27,13 +28,13 @@ const DiskMountCard = observer(function DiskMountCard({
     <div
       ref={cardRef}
       style={{ height: layout.height }}
-      className={`${tw.bg.primary} ${tw.border} border rounded-lg shadow-sm flex items-center justify-center min-w-0 px-1`}
+      className={`${tw.bg.tertiary} ${tw.border} border rounded-lg shadow-sm flex items-center justify-center min-w-0 px-1`}
     >
       <StatsRing
         label={disk.mount}
         stats={stats}
         progress={disk.use}
-        color={METRIC_COLORS.diskSpace}
+        color={DISK_COLOR}
         trackColor={
           store.isDark ? THEME_COLORS.border.dark : THEME_COLORS.border.light
         }

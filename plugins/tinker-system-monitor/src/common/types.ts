@@ -8,42 +8,23 @@ export type SystemSnapshot = {
   networkStats: si.Systeminformation.NetworkStatsData[]
   fsStats: si.Systeminformation.FsStatsData
   fsSize: si.Systeminformation.FsSizeData[]
-  cpuCurrentSpeed: si.Systeminformation.CpuCurrentSpeedData
-  cpuTemperature: si.Systeminformation.CpuTemperatureData
-  battery: BatterySnapshot
-  time: si.Systeminformation.TimeData
-  cpuBrand: string
-  unavailableMetrics: string[]
+  battery: BatteryInfo
+  uptime: number
 }
 
-export type BatterySnapshot = {
+export type BatteryInfo = {
   hasBattery: boolean
-  isCharging: boolean
-  acConnected: boolean
   percent: number
-  health: number
-  powerRate: number
-  powerState: 'charging' | 'discharging' | 'full' | 'idle' | 'none'
-  currentCapacity: number
-  maxCapacity: number
 }
 
 export type DataPoint = {
   cpu: number
   memoryActive: number
-  memoryUsed: number
   memoryTotal: number
   networkRx: number
   networkTx: number
   diskRx: number
   diskWx: number
-  diskSpaceUse: number
-  diskSpaceUsed: number
-  diskSpaceTotal: number
-  batteryPercent: number
-  batteryPower: number
-  cpuTemperature: number
-  cpuSpeedAvg: number
 }
 
 export type DiskSpaceMount = {
@@ -55,37 +36,21 @@ export type DiskSpaceMount = {
 }
 
 export type TextMetrics = {
-  battery: BatterySnapshot
-  cpuTemp: number
-  cpuSpeed: { avg: number; min: number; max: number }
-  osDistro: string
-  hostname: string
-  arch: string
-  kernel: string
-  cpuBrand: string
-  memTotal: number
-  swapTotal: number
-  uptime: number
   diskSpace: DiskSpaceMount[]
+  battery: BatteryInfo
+  uptime: number
 }
 
 export type ResourceUsagePayload = {
   history: DataPoint[]
   current: DataPoint
   textMetrics: TextMetrics
-  unavailableMetrics: string[]
 }
 
 export type MetricId =
   | 'cpu'
   | 'memActive'
-  | 'memUsed'
   | 'netRx'
   | 'netTx'
   | 'diskRx'
   | 'diskWx'
-  | 'diskSpace'
-  | 'battery'
-  | 'batteryPower'
-  | 'cpuTemp'
-  | 'cpuSpeed'

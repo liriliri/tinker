@@ -3,11 +3,7 @@ import BaseStore from 'share/BaseStore'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
 import type { DataPoint, ResourceUsagePayload } from '../common/types'
-import {
-  buildPayload,
-  computeUnavailableMetrics,
-  snapshotToDataPoint,
-} from './lib/collector'
+import { buildPayload, snapshotToDataPoint } from './lib/collector'
 import { RingBuffer } from './lib/ringBuffer'
 
 const DEFAULT_INTERVAL = 2000
@@ -18,6 +14,8 @@ class Store extends BaseStore {
   isLoading = true
   refreshInterval = DEFAULT_INTERVAL
   paused = false
+  floatOpen = false
+  popupWindow: Window | null = null
 
   private history = new RingBuffer<DataPoint>(DEFAULT_HISTORY)
   private refreshTimer: ReturnType<typeof setInterval> | null = null
@@ -31,7 +29,6 @@ class Store extends BaseStore {
   async refresh() {
     try {
       const snap = await systemMonitor.getSnapshot()
-      snap.unavailableMetrics = computeUnavailableMetrics(snap)
       const point = snapshotToDataPoint(snap)
       this.history.push(point)
       this.payload = buildPayload(this.history.toArray(), point, snap)
@@ -50,6 +47,16 @@ class Store extends BaseStore {
     } else {
       this.startPolling()
     }
+  }
+
+  attachPopupWindow(popup: Window | null) {
+    this.popupWindow = popup
+    this.floatOpen = !!popup
+    if (!popup) return
+    popup.addEventListener('beforeunload', () => {
+      this.floatOpen = false
+      this.popupWindow = null
+    })
   }
 
   private startPolling() {
