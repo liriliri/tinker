@@ -271,6 +271,58 @@ declare global {
       quit(): void
     }
 
+    interface SearchTextSubmatch {
+      /** The matched substring */
+      text: string
+      /** Byte offset of the match start within the line */
+      start: number
+      /** Byte offset of the match end within the line */
+      end: number
+    }
+
+    interface SearchTextResult {
+      /** Absolute file path of the matched file */
+      path: string
+      /** 1-based line number of the match */
+      lineNumber: number
+      /** Full content of the matched line (may include trailing newline) */
+      text: string
+      /** Per-hit ranges within `text` (multiple hits possible per line) */
+      submatches: SearchTextSubmatch[]
+    }
+
+    interface SearchTextOptions {
+      /** Directories to search in. Defaults to ripgrep's CWD if omitted. */
+      dirs?: string[]
+      /** Filter by file extensions (without dot), e.g. ['ts', 'tsx'] */
+      exts?: string[]
+      /** Extra ripgrep glob patterns. Prefix with `!` to exclude. */
+      globs?: string[]
+      /** Case-sensitive match. Default: false */
+      caseSensitive?: boolean
+      /** Match whole words only (`--word-regexp`) */
+      wholeWord?: boolean
+      /** Treat `query` as a regex. Default: false (literal/fixed-string) */
+      regex?: boolean
+      /** Allow multiline regex matches (`--multiline`) */
+      multiline?: boolean
+      /** Stop after this many matches (default: 1000) */
+      maxResults?: number
+      /** Skip files larger than this, e.g. '2M', '500K' */
+      maxFilesize?: string
+      /** Search hidden files and dirs (`--hidden`) */
+      hidden?: boolean
+      /** Follow symbolic links (`-L`) */
+      followSymlinks?: boolean
+    }
+
+    interface SearchTextTask extends Promise<SearchTextResult[]> {
+      /** Force kill (SIGKILL) */
+      kill(): void
+      /** Graceful quit (SIGTERM) */
+      quit(): void
+    }
+
     interface WebviewTag extends Electron.WebviewTag {
       sendCommand(
         method: string,
@@ -493,6 +545,37 @@ declare global {
       query: string,
       options?: tinker.SearchFileOptions
     ): tinker.SearchFileTask
+
+    /**
+     * Search for text content inside files using ripgrep.
+     * Returns matches across files (path + line + per-hit ranges).
+     * The promise resolves with the full result array when ripgrep completes
+     * or `maxResults` is hit; pass `onMatch` to also consume matches as they
+     * stream in for incremental UI rendering.
+     * @param query - Search string (literal by default, regex if `options.regex` is true)
+     * @param options - Optional search options (dirs, exts, regex flags, etc.)
+     * @param onMatch - Optional callback fired once per match as ripgrep emits it
+     * @example
+     * // One-shot
+     * const results = await tinker.searchText('TODO', {
+     *   dirs: ['/Users/me/proj'],
+     *   exts: ['ts', 'tsx'],
+     * })
+     * @example
+     * // Streaming
+     * const task = tinker.searchText(
+     *   'fetch\\w+',
+     *   { dirs: ['./src'], regex: true, maxResults: 5000 },
+     *   (m) => appendRow(m)
+     * )
+     * setTimeout(() => task.kill(), 5000) // cancel midway
+     * const all = await task
+     */
+    searchText(
+      query: string,
+      options?: tinker.SearchTextOptions,
+      onMatch?: (match: tinker.SearchTextResult) => void
+    ): tinker.SearchTextTask
   }
 }
 

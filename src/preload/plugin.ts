@@ -20,6 +20,7 @@ import { injectRendererScript, domReady } from './lib/util'
 import { runFFmpeg, killFFmpeg, quitFFmpeg, getMediaInfo } from './lib/ffmpeg'
 import { getDiskUsage, killDiskUsage, quitDiskUsage } from './lib/pdu'
 import { searchFile, killSearchFile, quitSearchFile } from './lib/search'
+import { searchText, killSearchText, quitSearchText } from './lib/ripgrep'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import { callAI, callAIStream, abortAI, getProviderList } from './lib/ai/index'
 import {
@@ -166,6 +167,9 @@ const tinkerObj = {
   searchFile,
   killSearchFile,
   quitSearchFile,
+  searchText,
+  killSearchText,
+  quitSearchText,
   callAI,
   callAIStream,
   abortAI,
