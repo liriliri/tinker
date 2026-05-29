@@ -5,7 +5,7 @@ import { sendCommand, waitForServer, IpcResponse } from './ipc'
 import { isDev, getPlatform } from 'share/common/util'
 import isMac from 'licia/isMac'
 
-function launchElectron(args: string[]) {
+function launchTinker(args: string[]) {
   if (isDev()) {
     args.unshift(path.resolve(__dirname, 'index.js'))
   }
@@ -56,7 +56,13 @@ async function executeCommand(
     res = await sendCommand(command, data)
   } catch {
     try {
-      launchElectron([])
+      const launchArgs: string[] = []
+      if (data?.remoteDebuggingPort) {
+        launchArgs.push(
+          `--remote-debugging-port=${data.remoteDebuggingPort}`
+        )
+      }
+      launchTinker(launchArgs)
       await waitForServer()
       res = await sendCommand(command, data)
     } catch (err: any) {
@@ -130,7 +136,20 @@ function pluginCommand(name: string, description: string) {
     })
 }
 
-pluginCommand('open', 'Open a plugin in a detached window')
+program
+  .command('open <plugin>')
+  .description('Open a plugin in a detached window')
+  .option(
+    '--remote-debugging-port <port>',
+    'Enable remote debugging on the specified port'
+  )
+  .action((pluginName: string, opts: { remoteDebuggingPort?: string }) => {
+    executeCommand('open', {
+      id: normalizePluginId(pluginName),
+      remoteDebuggingPort: opts.remoteDebuggingPort,
+    })
+  })
+
 pluginCommand('close', 'Close a running plugin')
 pluginCommand('restart', 'Restart a running plugin (close then open)')
 

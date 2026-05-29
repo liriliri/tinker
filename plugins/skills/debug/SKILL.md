@@ -41,11 +41,25 @@ For agent-browser interaction commands (click, fill, screenshot, etc.), refer to
 
 ## Tab Selection Tips
 
-- The main window tab usually shows `http://localhost:8080/?page=plugin`
+- The plugin hosting window tab shows `http://localhost:8080/?page=plugin` (this is the outer shell, not the plugin content)
 - The actual plugin content is in the `plugin://tinker-<name>/index.html` tab
 - Always switch to the `plugin://` tab before running snapshot or interact commands
 
+## Connection Recovery
+
+If `agent-browser connect 9222` fails with "Connection refused", restart Tinker with remote debugging enabled:
+
+```bash
+../bin/tinker-dev quit
+../bin/tinker-dev open <plugin-name> --remote-debugging-port=9222
+```
+
+Then retry connecting:
+
+```bash
+agent-browser connect 9222
+```
+
 ## Notes
 
-- If `agent-browser connect 9222` fails with "Connection refused", make sure Tinker was started with `--remote-debugging-port=9222`
 - If the plugin tab doesn't appear, wait a moment after `tinker-dev open/restart` for the page to load
