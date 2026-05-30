@@ -1,43 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
 import className from 'licia/className'
-import lowerCase from 'licia/lowerCase'
-import store, { shikiTheme } from '../store'
+import store from '../store'
+import { highlightCode } from '../lib/highlight'
 
 export default observer(function CodeEditor() {
-  const [highlightedHtml, setHighlightedHtml] = useState('')
   const numberOfLines = (store.code.match(/\n/g) || []).length + 1
-
-  useEffect(() => {
-    const generateHighlightedHtml = async () => {
-      if (!store.highlighter) return ''
-
-      const loadedLanguages = store.highlighter.getLoadedLanguages() || []
-      const languageName = lowerCase(store.selectedLanguage.name)
-      const hasLoadedLanguage = loadedLanguages.includes(languageName)
-
-      if (!hasLoadedLanguage && store.selectedLanguage.src) {
-        await store.highlighter.loadLanguage(store.selectedLanguage.src)
-      }
-
-      return store.highlighter.codeToHtml(store.code, {
-        lang: languageName,
-        theme: shikiTheme,
-        transformers: [
-          {
-            line(node, line) {
-              node.properties['data-line'] = line
-              this.addClassToHast(node, 'line')
-            },
-          },
-        ],
-      })
-    }
-
-    generateHighlightedHtml().then((html) => {
-      setHighlightedHtml(html)
-    })
-  }, [store.code, store.selectedLanguage, store.highlighter, store.darkMode, store.selectedTheme, store.showLineNumbers])
+  const highlightedHtml = highlightCode(store.code, store.selectedLanguage.mode)
 
   const showLineNumbers = store.showLineNumbers
   const lineNumberPadding = showLineNumbers

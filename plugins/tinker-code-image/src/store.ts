@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx'
-import type { Highlighter } from 'shiki'
 import { CSSProperties } from 'react'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
@@ -8,8 +7,7 @@ import {
   type Theme,
   type FrameColors,
   THEMES,
-  convertToShikiTheme,
-  shikiTheme,
+  convertToCmTheme,
 } from './lib/themes'
 import isStrBlank from 'licia/isStrBlank'
 import isUndef from 'licia/isUndef'
@@ -23,7 +21,7 @@ const STORAGE_SHOW_LINE_NUMBERS = 'showLineNumbers'
 const STORAGE_CODE = 'code'
 const STORAGE_FILE_NAME = 'fileName'
 
-export { Language, Theme, LANGUAGES, THEMES, shikiTheme }
+export { Language, Theme, LANGUAGES, THEMES }
 
 const defaultCode = `import { useState } from 'react';
 
@@ -41,8 +39,6 @@ export default function Counter() {
 }`
 
 class Store extends BaseStore {
-  highlighter: Highlighter | null = null
-
   code: string = defaultCode
   selectedLanguage: Language = LANGUAGES.javascript
 
@@ -91,10 +87,6 @@ class Store extends BaseStore {
     }
   }
 
-  setHighlighter(highlighter: Highlighter) {
-    this.highlighter = highlighter
-  }
-
   setCode(code: string) {
     this.code = code
     storage.set(STORAGE_CODE, code)
@@ -118,11 +110,6 @@ class Store extends BaseStore {
     storage.set(STORAGE_DARK_MODE, this.darkMode)
   }
 
-  toggleLineNumbers() {
-    this.showLineNumbers = !this.showLineNumbers
-    storage.set(STORAGE_SHOW_LINE_NUMBERS, this.showLineNumbers)
-  }
-
   setShowLineNumbers(show: boolean) {
     this.showLineNumbers = show
     storage.set(STORAGE_SHOW_LINE_NUMBERS, this.showLineNumbers)
@@ -137,7 +124,16 @@ class Store extends BaseStore {
     const syntaxColors = this.darkMode
       ? this.selectedTheme.syntax.dark
       : this.selectedTheme.syntax.light
-    return convertToShikiTheme(syntaxColors)
+    return convertToCmTheme(syntaxColors)
+  }
+
+  get languageKey(): string {
+    return (
+      findKey(
+        LANGUAGES,
+        (value) => value.name === this.selectedLanguage.name
+      ) || ''
+    )
   }
 
   get frameColors(): FrameColors {

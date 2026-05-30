@@ -17,8 +17,5 @@
         "description": "将代码片段生成为美观的可分享图片"
       }
     }
-  },
-  "devDependencies": {
-    "shiki": "^1.22.0"
   }
 }

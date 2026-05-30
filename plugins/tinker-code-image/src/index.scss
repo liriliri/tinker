@@ -14,6 +14,10 @@
   transition: padding 0.2s;
 }
 
+.code-editor-highlighted {
+  color: var(--cm-foreground);
+}
+
 .code-editor-highlighted pre {
   margin: 0 !important;
   background-color: transparent !important;
@@ -23,6 +27,60 @@
 
 .code-editor-highlighted code {
   font-family: inherit !important;
+}
+
+/* CodeMirror token → theme color slot mapping */
+.code-editor-highlighted {
+  .cm-keyword,
+  .cm-tag,
+  .cm-header {
+    color: var(--cm-token-keyword);
+  }
+
+  .cm-atom,
+  .cm-builtin,
+  .cm-qualifier,
+  .cm-type,
+  .cm-variable-3 {
+    color: var(--cm-token-constant);
+  }
+
+  .cm-number {
+    color: var(--cm-token-number);
+  }
+
+  .cm-string {
+    color: var(--cm-token-string);
+  }
+
+  .cm-string-2 {
+    color: var(--cm-token-string-expression);
+  }
+
+  .cm-comment {
+    color: var(--cm-token-comment);
+    font-style: italic;
+  }
+
+  .cm-def {
+    color: var(--cm-token-function);
+  }
+
+  .cm-variable-2 {
+    color: var(--cm-token-parameter);
+  }
+
+  .cm-property,
+  .cm-attribute {
+    color: var(--cm-token-property);
+  }
+
+  .cm-operator,
+  .cm-meta,
+  .cm-bracket,
+  .cm-punctuation {
+    color: var(--cm-token-punctuation);
+  }
 }
 
 /* Line numbers */
@@ -40,7 +98,7 @@
   width: 1.5rem;
   margin-right: 1.5rem;
   margin-left: -3rem;
-  color: var(--shiki-foreground, #999);
+  color: var(--cm-foreground, #999);
   opacity: 0;
   content: attr(data-line);
   text-align: right;

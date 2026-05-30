@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Save, Copy, Check } from 'lucide-react'
+import { Save, Copy, Check, WandSparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import className from 'licia/className'
 import find from 'licia/find'
+import upperFirst from 'licia/upperFirst'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -14,8 +15,10 @@ import {
 import Checkbox from 'share/components/Checkbox'
 import DarkModeSwitch from 'share/components/DarkModeSwitch'
 import Select from 'share/components/Select'
+import { alert } from 'share/components/Alert'
 import { tw } from 'share/theme'
 import store, { LANGUAGES, THEMES } from '../store'
+import { isFormattable, formatCode } from '../lib/formatter'
 import * as htmlToImage from 'html-to-image'
 
 const languageOptions = Object.values(LANGUAGES).map((lang) => ({
@@ -30,7 +33,7 @@ export default observer(function ToolbarComponent() {
   const themeOptions = useMemo(
     () =>
       Object.values(THEMES).map((theme) => ({
-        label: t(`theme.${theme.id}`),
+        label: t(`theme${upperFirst(theme.id)}`),
         value: theme.id,
       })),
     [t]
@@ -86,6 +89,22 @@ export default observer(function ToolbarComponent() {
     }
   }
 
+  const formattable = isFormattable(store.languageKey)
+
+  const handleFormat = async () => {
+    const lang = store.languageKey
+    if (!isFormattable(lang)) return
+    try {
+      const result = await formatCode(store.code, lang)
+      store.setCode(result)
+    } catch (error) {
+      await alert({
+        title: t('formatError'),
+        message: (error as Error).message,
+      })
+    }
+  }
+
   return (
     <Toolbar>
       <Select
@@ -124,6 +143,14 @@ export default observer(function ToolbarComponent() {
       />
 
       <ToolbarSpacer />
+
+      <ToolbarButton
+        onClick={handleFormat}
+        disabled={!formattable}
+        title={t('format')}
+      >
+        <WandSparkles size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
 
       <ToolbarButton
         onClick={handleCopy}

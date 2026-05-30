@@ -1,7 +1,6 @@
 import { CSSProperties } from 'react'
-import { createCssVariablesTheme } from './theme-css-variables'
 
-export type SyntaxColors = {
+type SyntaxColors = {
   foreground: string
   constant?: string
   string?: string
@@ -521,25 +520,18 @@ export const THEMES: { [index: string]: Theme } = {
   },
 }
 
-export function convertToShikiTheme(syntaxObject: SyntaxColors): CSSProperties {
+export function convertToCmTheme(syntaxObject: SyntaxColors): CSSProperties {
   return {
-    '--shiki-foreground': syntaxObject.foreground,
-    '--shiki-token-constant': syntaxObject.constant,
-    '--shiki-token-string': syntaxObject.string,
-    '--shiki-token-comment': syntaxObject.comment,
-    '--shiki-token-keyword': syntaxObject.keyword,
-    '--shiki-token-parameter': syntaxObject.parameter,
-    '--shiki-token-function': syntaxObject.function,
-    '--shiki-token-string-expression': syntaxObject.stringExpression,
-    '--shiki-token-punctuation': syntaxObject.punctuation,
-    '--shiki-token-number': syntaxObject.number,
-    '--shiki-token-property': syntaxObject.property,
+    '--cm-foreground': syntaxObject.foreground,
+    '--cm-token-constant': syntaxObject.constant,
+    '--cm-token-string': syntaxObject.string,
+    '--cm-token-comment': syntaxObject.comment,
+    '--cm-token-keyword': syntaxObject.keyword,
+    '--cm-token-parameter': syntaxObject.parameter,
+    '--cm-token-function': syntaxObject.function,
+    '--cm-token-string-expression': syntaxObject.stringExpression,
+    '--cm-token-punctuation': syntaxObject.punctuation,
+    '--cm-token-number': syntaxObject.number,
+    '--cm-token-property': syntaxObject.property,
   } as CSSProperties
 }
-
-export const shikiTheme = createCssVariablesTheme({
-  name: 'css-variables',
-  variablePrefix: '--shiki-',
-  variableDefaults: {},
-  fontStyle: true,
-})
