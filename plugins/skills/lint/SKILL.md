@@ -54,7 +54,11 @@ Go through each category below and report violations with file path and line num
 - Logic in `store.ts` that has no dependency on store state or MobX should be extracted to `src/lib/`. Candidates: pure functions, data transformation, algorithm helpers, API wrappers
 - Never create `src/lib/index.ts` as a catch-all. Name files by their purpose (e.g. `util.ts`, `math.ts`). When unsure of the name, use `lib/util.ts`
 
-### 6. TypeScript
+### 6. React Hooks (`hooks/` directory)
+
+- Custom React hooks must live in `src/hooks/` (or `src/renderer/hooks/`), not in `lib/`
+
+### 7. TypeScript
 
 - No `any` types — use proper types or union types
 - Types/interfaces referenced in more than one file must be extracted:
@@ -63,25 +67,25 @@ Go through each category below and report violations with file path and line num
   - Types/interfaces shared between `preload` and `renderer` must be extracted to `src/common/types.ts`
 - Each file must import types directly from the source file where they are defined — **never import a type just to re-export it** (e.g. `import type { Foo } from './types'; export type { Foo }` in an unrelated file is forbidden)
 
-### 7. Internationalization
+### 8. Internationalization
 
 - UI strings must use `t()` from `react-i18next`, not hardcoded strings
 - i18n files must exist: `src/i18n/en-US.json`, `src/i18n/zh-CN.json`
 - i18n keys must use camelCase naming — no dots (`.`) or other symbols (e.g. use `categoryAll` not `category.all`, `ruleSysTmp` not `rule.sysTmp`)
 
-### 8. Code Comments
+### 9. Code Comments
 
 - All comments must be in English
 - No redundant comments that restate what the code does (e.g. `// Set loading state` before `this.isLoading = true`)
 - Comments should explain "why", not "what"
 
-### 9. SCSS Usage
+### 10. SCSS Usage
 
 - SCSS (`index.scss`) should only be used for third-party library style overrides
 - Application styles must use Tailwind CSS classes
 - Hardcoded colors inside third-party library style overrides in SCSS are allowed
 
-### 10. Icons
+### 11. Icons
 
 - Use `lucide-react` for icons: `import { Copy } from 'lucide-react'`
 - Custom SVG: `import Icon from '../assets/icon.svg?react'`
