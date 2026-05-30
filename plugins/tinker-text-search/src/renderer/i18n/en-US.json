@@ -1,0 +1,32 @@
+{
+  "searchPlaceholder": "Search",
+  "includesPlaceholder": "files to include",
+  "excludesPlaceholder": "files to exclude",
+  "filesToInclude": "files to include",
+  "filesToExclude": "files to exclude",
+
+  "caseSensitive": "Match Case",
+  "wholeWord": "Match Whole Word",
+  "regex": "Use Regular Expression",
+  "toggleSearchDetails": "Toggle Search Details",
+  "advancedOptions": "Advanced Options",
+  "multiline": "Multiline",
+  "hidden": "Search hidden files",
+  "followSymlinks": "Follow symbolic links",
+  "maxResults": "Max results",
+
+  "pickFolder": "Choose Folder",
+  "noFolder": "Open a folder to search",
+  "openFolderHint": "Click to choose, or drag a folder here",
+  "noQuery": "Type to search",
+  "noResults": "No results found",
+  "summary_one": "{{matches}} result in {{files}} file",
+  "summary_other": "{{matches}} results in {{files}} files",
+  "truncated": "(truncated)",
+
+  "showInFolder": "Reveal in File Manager",
+  "copyPath": "Copy Path",
+  "copyLine": "Copy Match",
+  "previewError": "Failed to load file: {{message}}",
+  "previewEmpty": "Select a match to preview"
+}

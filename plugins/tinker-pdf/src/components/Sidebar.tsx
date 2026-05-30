@@ -128,7 +128,6 @@ export default observer(function Sidebar() {
         ref={containerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{
-          scrollbarWidth: 'thin',
           display: store.sidebarView === 'thumbnails' ? 'block' : 'none',
         }}
       >

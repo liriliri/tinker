@@ -28,7 +28,6 @@ export default observer(function ConfigFileList() {
   return (
     <div
       className={`flex flex-col h-full border-r ${tw.border} ${tw.bg.tertiary} overflow-y-auto overflow-x-hidden`}
-      style={{ scrollbarWidth: 'thin' }}
     >
       <NavList
         items={items}

@@ -45,6 +45,7 @@ import LinkedList from 'licia/LinkedList'
 import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import lpad from 'licia/lpad'
+import ltrim from 'licia/ltrim'
 import map from 'licia/map'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
@@ -55,6 +56,7 @@ import openFile from 'licia/openFile'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
 import remove from 'licia/remove'
+import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
 import snakeCase from 'licia/snakeCase'
 import sortBy from 'licia/sortBy'
@@ -118,6 +120,7 @@ const licia = {
   LocalStore,
   lowerCase,
   lpad,
+  ltrim,
   map,
   md5,
   mime,
@@ -128,6 +131,7 @@ const licia = {
   query,
   randomBytes,
   remove,
+  rtrim,
   shuffle,
   snakeCase,
   sortBy,
@@ -195,6 +199,7 @@ export {
   LocalStore,
   lowerCase,
   lpad,
+  ltrim,
   map,
   md5,
   mime,
@@ -205,6 +210,7 @@ export {
   query,
   randomBytes,
   remove,
+  rtrim,
   shuffle,
   snakeCase,
   sortBy,
