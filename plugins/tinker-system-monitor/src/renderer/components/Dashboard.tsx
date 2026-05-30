@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { DASHBOARD_METRICS } from '../lib/metricDisplay'
-import { useGridMinColumn } from '../lib/useGridMinColumn'
+import { useGridMinColumn } from '../hooks/useGridMinColumn'
 import store from '../store'
 import DiskMountCard from './DiskMountCard'
 import MetricPanel from './MetricPanel'

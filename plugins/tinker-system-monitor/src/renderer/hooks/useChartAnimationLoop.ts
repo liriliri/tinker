@@ -2,8 +2,8 @@ import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
 import isEqual from 'licia/isEqual'
 import { THEME_COLORS } from 'share/theme'
 import type { DataPoint, MetricId } from '../../common/types'
-import { drawStreamingChart } from './chart'
-import { historyToSamples, type MetricSample } from './metrics'
+import { drawStreamingChart } from '../lib/chart'
+import { historyToSamples, type MetricSample } from '../lib/metrics'
 
 interface ChartAnimationOptions {
   id: MetricId

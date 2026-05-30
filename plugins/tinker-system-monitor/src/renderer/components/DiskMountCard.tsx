@@ -5,7 +5,7 @@ import fileSize from 'licia/fileSize'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { DiskSpaceMount } from '../../common/types'
 import { CARD_LAYOUT } from '../lib/cardLayout'
-import { useCardSize } from '../lib/useCardSize'
+import { useCardSize } from '../hooks/useCardSize'
 import store from '../store'
 import StatsRing from './StatsRing'
 

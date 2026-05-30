@@ -7,7 +7,7 @@ import { LoadingCircle } from 'share/components/Loading'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { MetricId } from '../../common/types'
 import { CARD_LAYOUT } from '../lib/cardLayout'
-import { useChartAnimationLoop } from '../lib/useChartAnimationLoop'
+import { useChartAnimationLoop } from '../hooks/useChartAnimationLoop'
 import {
   formatMetricValue,
   getMetricDetail,
@@ -15,7 +15,7 @@ import {
   METRIC_ICONS,
 } from '../lib/metricDisplay'
 import { getHistoryValues, METRIC_COLORS } from '../lib/metrics'
-import { useCardSize } from '../lib/useCardSize'
+import { useCardSize } from '../hooks/useCardSize'
 import store from '../store'
 import StatsRing from './StatsRing'
 

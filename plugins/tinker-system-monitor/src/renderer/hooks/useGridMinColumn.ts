@@ -1,5 +1,5 @@
 import { type RefObject } from 'react'
-import { gridMinColumn } from './cardLayout'
+import { gridMinColumn } from '../lib/cardLayout'
 import { useElementWidth } from './useElementWidth'
 
 export function useGridMinColumn(ref: RefObject<HTMLElement | null>): number {
