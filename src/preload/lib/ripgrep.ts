@@ -4,6 +4,18 @@ import trim from 'licia/trim'
 import uuid from 'licia/uuid'
 import each from 'licia/each'
 import map from 'licia/map'
+import { isDev } from 'share/common/util'
+
+function getRgPath(): string {
+  let path = rgPath || ''
+  if (!path) {
+    throw new Error('Ripgrep binary not found')
+  }
+  if (!isDev()) {
+    path = path.replace('app.asar', 'app.asar.unpacked')
+  }
+  return path
+}
 
 export interface SearchTextSubmatch {
   text: string
@@ -84,7 +96,7 @@ class SearchTextTask {
     const searchDirs = dirs && dirs.length > 0 ? dirs : ['.']
     args.push('--', ...searchDirs)
 
-    const rg = spawn(rgPath, args)
+    const rg = spawn(getRgPath(), args)
     this.rgProcess = rg
 
     const results: SearchTextResult[] = []
