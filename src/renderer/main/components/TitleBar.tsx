@@ -140,7 +140,8 @@ export default observer(function Titlebar() {
         return
       }
       if (store.visiblePlugins.length > 0) {
-        store.openPlugin(store.visiblePlugins[0].id)
+        const plugin = store.visiblePlugins[0]
+        store.openPlugin(plugin.id, store.isPluginAutoDetach(plugin.id))
       } else if (store.visibleApps.length > 0) {
         store.openApp(store.visibleApps[0].path)
       }
