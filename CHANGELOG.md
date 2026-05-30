@@ -1,3 +1,9 @@
+## v1.17.0 (30 May 2026)
+
+* feat: add system monitor
+* feat: add text search
+* feat(code-editor): text search
+
 ## v1.16.0 (27 May 2026)
 
 * feat: add web runner
