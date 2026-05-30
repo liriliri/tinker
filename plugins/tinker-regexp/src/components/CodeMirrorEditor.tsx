@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import CodeMirror from 'codemirror'
-import 'codemirror/lib/codemirror.css'
 import { tw } from 'share/theme'
 
 interface CodeMirrorEditorProps {

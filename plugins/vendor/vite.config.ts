@@ -59,6 +59,7 @@ const globals: Record<string, string> = {
   'prettier/plugins/typescript': 'prettierPluginTypescript',
   '@xterm/xterm': 'xterm',
   '@xterm/addon-fit': 'xtermAddonFit',
+  codemirror: 'CodeMirror',
 }
 
 export const shareExternal = ['systeminformation']
@@ -69,6 +70,7 @@ const globalsExports: Record<string, string[]> = {
   'lucide-react': keys(lucide),
   '@xterm/xterm': ['Terminal'],
   '@xterm/addon-fit': ['FitAddon'],
+  codemirror: [],
 }
 
 function moduleKeys(id: string) {
@@ -288,6 +290,15 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'xterm') {
     return createConfig('xterm', 'PluginVendorXterm', [], 'dist/xterm')
+  }
+
+  if (target === 'codemirror') {
+    return createConfig(
+      'codemirror',
+      'PluginVendorCodeMirror',
+      [],
+      'dist/codemirror'
+    )
   }
 
   return createConfig('react', 'PluginVendorReact')

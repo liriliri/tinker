@@ -17,8 +17,5 @@
         "description": "正则表达式测试，支持实时匹配和语法高亮"
       }
     }
-  },
-  "devDependencies": {
-    "codemirror": "^5.65.20"
   }
 }
