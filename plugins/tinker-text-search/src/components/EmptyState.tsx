@@ -15,7 +15,7 @@ export default observer(function EmptyState({ variant }: EmptyStateProps) {
     return (
       <div
         onClick={() => store.pickFolder()}
-        className={`flex-1 flex flex-col items-center justify-center cursor-pointer p-6 ${tw.hover}`}
+        className={`flex-1 flex flex-col items-center justify-center cursor-pointer p-6 ${tw.bg.tertiary} ${tw.hover}`}
       >
         <FolderOpen
           className={`w-10 h-10 mb-3 ${tw.gray.text400}`}
@@ -30,7 +30,9 @@ export default observer(function EmptyState({ variant }: EmptyStateProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6">
+    <div
+      className={`flex-1 flex flex-col items-center justify-center p-6 ${tw.bg.tertiary}`}
+    >
       <Search className={`w-8 h-8 mb-2 ${tw.gray.text400}`} strokeWidth={1.5} />
       <p className={`text-xs ${tw.text.tertiary}`}>
         {variant === 'no-query' ? t('noQuery') : t('noResults')}

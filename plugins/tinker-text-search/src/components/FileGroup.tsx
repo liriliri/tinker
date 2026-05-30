@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { useEffect } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import splitPath from 'licia/splitPath'
 import ltrim from 'licia/ltrim'
 import { tw } from 'share/theme'
@@ -17,18 +16,11 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
   const { t } = useTranslation()
   const collapsed = store.isCollapsed(group.path)
   const { name, dir } = splitPath(group.path)
-  const icon = store.iconCache.get(group.path)
   const relativeDir = store.rootDir
     ? dir.startsWith(store.rootDir)
       ? ltrim(dir.slice(store.rootDir.length), ['/', '\\']) || '.'
       : dir
     : dir
-
-  useEffect(() => {
-    if (!icon) {
-      store.loadFileIcon(group.path)
-    }
-  }, [group.path, icon])
 
   const handleToggle = () => {
     store.toggleCollapse(group.path)
@@ -64,11 +56,7 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
             <ChevronDown size={14} className={tw.text.tertiary} />
           )}
         </span>
-        {icon ? (
-          <img src={icon} alt="" className="w-4 h-4 shrink-0 mr-1.5" />
-        ) : (
-          <span className="w-4 h-4 shrink-0 mr-1.5" />
-        )}
+        <FileText size={14} className={`shrink-0 mr-1.5 ${tw.text.tertiary}`} />
         <span
           className={`truncate font-medium ${tw.text.primary}`}
           title={group.path}

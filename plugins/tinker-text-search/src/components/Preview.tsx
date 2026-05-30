@@ -92,10 +92,10 @@ const Preview = observer(function Preview() {
   return (
     <div className={`h-full flex flex-col ${tw.bg.primary}`}>
       <div
-        className={`shrink-0 px-3 py-1.5 border-b ${tw.border} text-xs ${tw.text.secondary} truncate`}
+        className={`shrink-0 h-10 flex items-center px-3 border-b ${tw.border} ${tw.bg.tertiary} text-xs ${tw.text.secondary}`}
         title={path}
       >
-        {path}
+        <span className="truncate">{path}</span>
       </div>
       <div className="flex-1 min-h-0">
         <Editor

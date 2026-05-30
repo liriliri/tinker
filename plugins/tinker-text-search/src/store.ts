@@ -3,7 +3,6 @@ import debounce from 'licia/debounce'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
-import { getFileIcon } from 'share/lib/util'
 import type { ActiveMatch, FileGroup } from './types'
 
 const storage = new LocalStore('tinker-text-search')
@@ -14,9 +13,6 @@ const STORAGE_EXCLUDES = 'excludes'
 const STORAGE_CASE_SENSITIVE = 'caseSensitive'
 const STORAGE_WHOLE_WORD = 'wholeWord'
 const STORAGE_REGEX = 'regex'
-const STORAGE_MULTILINE = 'multiline'
-const STORAGE_HIDDEN = 'hidden'
-const STORAGE_FOLLOW_SYMLINKS = 'followSymlinks'
 const STORAGE_MAX_RESULTS = 'maxResults'
 const STORAGE_SHOW_INCLUDE = 'showInclude'
 
@@ -28,16 +24,11 @@ class Store extends BaseStore {
   caseSensitive: boolean = storage.get(STORAGE_CASE_SENSITIVE) === true
   wholeWord: boolean = storage.get(STORAGE_WHOLE_WORD) === true
   regex: boolean = storage.get(STORAGE_REGEX) === true
-  multiline: boolean = storage.get(STORAGE_MULTILINE) === true
-  hidden: boolean = storage.get(STORAGE_HIDDEN) === true
-  followSymlinks: boolean = storage.get(STORAGE_FOLLOW_SYMLINKS) === true
   maxResults: number = storage.get(STORAGE_MAX_RESULTS) || 1000
   showInclude: boolean = storage.get(STORAGE_SHOW_INCLUDE) === true
-  showAdvanced: boolean = false
 
   groups: FileGroup[] = []
   collapsed: Map<string, boolean> = new Map()
-  iconCache: Map<string, string> = new Map()
   searching: boolean = false
   totalMatches: number = 0
   totalFiles: number = 0
@@ -113,24 +104,6 @@ class Store extends BaseStore {
     this.debounceSearch()
   }
 
-  setMultiline(value: boolean) {
-    this.multiline = value
-    storage.set(STORAGE_MULTILINE, value)
-    this.debounceSearch()
-  }
-
-  setHidden(value: boolean) {
-    this.hidden = value
-    storage.set(STORAGE_HIDDEN, value)
-    this.debounceSearch()
-  }
-
-  setFollowSymlinks(value: boolean) {
-    this.followSymlinks = value
-    storage.set(STORAGE_FOLLOW_SYMLINKS, value)
-    this.debounceSearch()
-  }
-
   setMaxResults(value: number) {
     this.maxResults = value
     storage.set(STORAGE_MAX_RESULTS, value)
@@ -142,8 +115,17 @@ class Store extends BaseStore {
     storage.set(STORAGE_SHOW_INCLUDE, value)
   }
 
-  setShowAdvanced(value: boolean) {
-    this.showAdvanced = value
+  clear() {
+    this.cancelTask()
+    this.query = ''
+    this.includes = ''
+    this.excludes = ''
+    storage.set(STORAGE_INCLUDES, '')
+    storage.set(STORAGE_EXCLUDES, '')
+    this.resetResults()
+    this.activeMatch = null
+    this.activeMatchKey = ''
+    this.searching = false
   }
 
   toggleCollapse(path: string) {
@@ -161,16 +143,6 @@ class Store extends BaseStore {
     const dir = result.filePaths[0]
     if (result.canceled || !dir) return
     this.setRootDir(dir)
-  }
-
-  async loadFileIcon(path: string) {
-    if (this.iconCache.has(path)) return
-    const icon = await getFileIcon(path)
-    if (icon) {
-      runInAction(() => {
-        this.iconCache.set(path, icon)
-      })
-    }
   }
 
   selectMatch(match: ActiveMatch) {
@@ -266,9 +238,6 @@ class Store extends BaseStore {
       caseSensitive: this.caseSensitive,
       wholeWord: this.wholeWord,
       regex: this.regex,
-      multiline: this.multiline,
-      hidden: this.hidden,
-      followSymlinks: this.followSymlinks,
       maxResults: this.maxResults,
     }
 

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight, FolderOpen, Settings } from 'lucide-react'
+import { ChevronDown, ChevronRight, Eraser, FolderOpen } from 'lucide-react'
 import className from 'licia/className'
 import { tw } from 'share/theme'
 import { LoadingCircle } from 'share/components/Loading'
@@ -8,12 +8,13 @@ import TextInput from 'share/components/TextInput'
 import {
   Toolbar,
   ToolbarButton,
+  ToolbarSeparator,
   ToolbarSpacer,
+  ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import store from '../store'
 import IncludeExcludePanel from './IncludeExcludePanel'
-import AdvancedPanel from './AdvancedPanel'
 
 export default observer(function SearchHeader() {
   const { t } = useTranslation()
@@ -40,26 +41,23 @@ export default observer(function SearchHeader() {
         >
           <FolderOpen size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
+        <ToolbarSeparator />
+        <ToolbarTextInput
+          type="number"
+          min={1}
+          value={store.maxResults}
+          onChange={(e) => {
+            const v = Number(e.target.value)
+            if (Number.isFinite(v) && v > 0) store.setMaxResults(v)
+          }}
+          className="!w-20"
+          title={t('maxResults')}
+        />
         <ToolbarSpacer />
-        <div className="relative">
-          <ToolbarButton
-            variant="toggle"
-            active={store.showAdvanced}
-            onClick={() => store.setShowAdvanced(!store.showAdvanced)}
-            title={t('advancedOptions')}
-          >
-            <Settings size={TOOLBAR_ICON_SIZE} />
-          </ToolbarButton>
-          {store.showAdvanced && (
-            <>
-              <div
-                className="fixed inset-0 z-[5]"
-                onClick={() => store.setShowAdvanced(false)}
-              />
-              <AdvancedPanel />
-            </>
-          )}
-        </div>
+        <ToolbarButton onClick={() => store.clear()} title={t('clear')}>
+          <Eraser size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+        <ToolbarSeparator />
         <ToolbarButton
           variant="toggle"
           active={store.showInclude}
@@ -74,44 +72,46 @@ export default observer(function SearchHeader() {
         </ToolbarButton>
       </Toolbar>
 
-      <div className={`${tw.bg.secondary} border-b ${tw.border} p-2 space-y-2`}>
-        <div className="relative">
-          <TextInput
-            type="text"
-            value={store.query}
-            onChange={(e) => store.setQuery(e.target.value)}
-            placeholder={t('searchPlaceholder')}
-            className={`pr-24 focus:ring-2 ${tw.primary.focusRing}`}
-          />
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-            <ToggleIconButton
-              active={store.caseSensitive}
-              onClick={() => store.setCaseSensitive(!store.caseSensitive)}
-              title={t('caseSensitive')}
-            >
-              <span className="font-semibold text-[11px]">Aa</span>
-            </ToggleIconButton>
-            <ToggleIconButton
-              active={store.wholeWord}
-              onClick={() => store.setWholeWord(!store.wholeWord)}
-              title={t('wholeWord')}
-            >
-              <span className="font-semibold text-[11px]">ab|</span>
-            </ToggleIconButton>
-            <ToggleIconButton
-              active={store.regex}
-              onClick={() => store.setRegex(!store.regex)}
-              title={t('regex')}
-            >
-              <span className="font-mono text-[11px]">.*</span>
-            </ToggleIconButton>
+      <div className={`${tw.bg.secondary} border-b ${tw.border}`}>
+        <div className="p-2 space-y-2">
+          <div className="relative">
+            <TextInput
+              type="text"
+              value={store.query}
+              onChange={(e) => store.setQuery(e.target.value)}
+              placeholder={t('searchPlaceholder')}
+              className={`pr-24 focus:ring-2 ${tw.primary.focusRing}`}
+            />
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              <ToggleIconButton
+                active={store.caseSensitive}
+                onClick={() => store.setCaseSensitive(!store.caseSensitive)}
+                title={t('caseSensitive')}
+              >
+                <span className="font-semibold text-[11px]">Aa</span>
+              </ToggleIconButton>
+              <ToggleIconButton
+                active={store.wholeWord}
+                onClick={() => store.setWholeWord(!store.wholeWord)}
+                title={t('wholeWord')}
+              >
+                <span className="font-semibold text-[11px]">ab|</span>
+              </ToggleIconButton>
+              <ToggleIconButton
+                active={store.regex}
+                onClick={() => store.setRegex(!store.regex)}
+                title={t('regex')}
+              >
+                <span className="font-mono text-[11px]">.*</span>
+              </ToggleIconButton>
+            </div>
           </div>
+
+          {store.showInclude && <IncludeExcludePanel />}
         </div>
 
-        {store.showInclude && <IncludeExcludePanel />}
-
         <div
-          className={`flex items-center gap-1.5 text-xs ${tw.text.tertiary} min-h-[1rem]`}
+          className={`flex items-center justify-center gap-1.5 text-[11px] px-2 py-1 border-t ${tw.border} ${tw.text.secondary} min-h-[1.5rem]`}
         >
           {store.searching && <LoadingCircle className="w-3 h-3" />}
           <span className="truncate">{summary}</span>
@@ -139,7 +139,7 @@ function ToggleIconButton({
       onClick={onClick}
       title={title}
       className={className(
-        'p-1 rounded transition-colors',
+        'w-6 h-6 flex items-center justify-center rounded transition-colors',
         active
           ? `${tw.primary.bgFocused} ${tw.primary.text}`
           : `${tw.text.tertiary} ${tw.hover}`
