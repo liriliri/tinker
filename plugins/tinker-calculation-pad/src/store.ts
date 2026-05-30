@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { evaluate } from 'mathjs'
 import isStrBlank from 'licia/isStrBlank'
-import find from 'licia/find'
 import BaseStore from 'share/BaseStore'
 
 interface CalculationLine {
@@ -42,6 +41,12 @@ class Store extends BaseStore {
     this.activeLineId = id
   }
 
+  focusLine(id: number) {
+    setTimeout(() => {
+      this.inputRefs[id]?.focus()
+    }, 0)
+  }
+
   updateExpression(id: number, value: string) {
     const result = this.calculateResult(value)
     this.lines = this.lines.map((line) =>
@@ -68,27 +73,22 @@ class Store extends BaseStore {
       result: '',
     })
     this.activeLineId = newId
-
-    setTimeout(() => {
-      this.inputRefs[newId]?.focus()
-    }, 0)
+    this.focusLine(newId)
   }
 
   deleteLine(id: number) {
     if (this.lines.length === 1) return
 
-    const currentLine = find(this.lines, (line) => line.id === id)
-    if (!currentLine || !isStrBlank(currentLine.expression)) return
-
     const currentIndex = this.lines.findIndex((line) => line.id === id)
+    if (currentIndex < 0 || !isStrBlank(this.lines[currentIndex].expression))
+      return
+
     this.lines = this.lines.filter((line) => line.id !== id)
 
     if (currentIndex > 0) {
       const prevLineId = this.lines[currentIndex - 1].id
       this.activeLineId = prevLineId
-      setTimeout(() => {
-        this.inputRefs[prevLineId]?.focus()
-      }, 0)
+      this.focusLine(prevLineId)
     }
   }
 
@@ -99,9 +99,7 @@ class Store extends BaseStore {
   }
 
   focusActiveLine() {
-    if (this.activeLineId && this.inputRefs[this.activeLineId]) {
-      this.inputRefs[this.activeLineId]?.focus()
-    }
+    this.focusLine(this.activeLineId)
   }
 }
 

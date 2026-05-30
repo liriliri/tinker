@@ -39,9 +39,7 @@ export default observer(function CalculationList() {
         }
 
         store.setActiveLineId(nextLineId)
-        setTimeout(() => {
-          store.inputRefs[nextLineId]?.focus()
-        }, 0)
+        store.focusLine(nextLineId)
       } else {
         store.addNewLine(lineId)
       }
@@ -61,9 +59,7 @@ export default observer(function CalculationList() {
 
   const handleLineClick = (id: number) => {
     store.setActiveLineId(id)
-    setTimeout(() => {
-      store.inputRefs[id]?.focus()
-    }, 0)
+    store.focusLine(id)
   }
 
   const handleResultClick = async (e: React.MouseEvent, result: string) => {
