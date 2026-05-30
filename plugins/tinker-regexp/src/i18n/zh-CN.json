@@ -2,7 +2,6 @@
   "regexp": "正则表达式",
   "pattern": "正则表达式",
   "testString": "测试字符串",
-  "flags": "标志",
   "matches": "匹配结果",
   "matchCount": "{{count}} 个匹配",
   "noMatches": "无匹配结果",

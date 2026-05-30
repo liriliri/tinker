@@ -2,7 +2,6 @@
   "regexp": "Regular Expression",
   "pattern": "Pattern",
   "testString": "Test String",
-  "flags": "Flags",
   "matches": "Matches",
   "matchCount": "{{count}} match",
   "matchCount_other": "{{count}} matches",

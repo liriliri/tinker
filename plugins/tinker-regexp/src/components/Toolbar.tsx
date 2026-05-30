@@ -1,21 +1,22 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, Eraser, Flag } from 'lucide-react'
+import { Clipboard, Eraser } from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarButtonGroup,
 } from 'share/components/Toolbar'
+import { tw } from 'share/theme'
 import CopyButton from 'share/components/CopyButton'
 import store from '../store'
-import FlagsPanel from './FlagsPanel'
+
+const FLAGS = ['g', 'i', 'm', 's', 'u', 'y'] as const
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
-  const [showFlags, setShowFlags] = useState(false)
 
   const matchCount = store.matches.length
   const matchText = store.error
@@ -62,24 +63,24 @@ export default observer(function ToolbarComponent() {
         {matchText}
       </div>
 
-      <div className="relative">
-        <ToolbarButton
-          onClick={() => setShowFlags(!showFlags)}
-          title={t('flags')}
-        >
-          <Flag size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        {showFlags && (
-          <>
-            <div
-              className="fixed inset-0 z-[5]"
-              onClick={() => setShowFlags(false)}
-            />
-            <FlagsPanel />
-          </>
-        )}
-      </div>
+      <ToolbarButtonGroup>
+        {FLAGS.map((flag, index) => (
+          <ToolbarButton
+            key={flag}
+            variant="toggle"
+            active={store.flags.includes(flag)}
+            onClick={() => store.toggleFlag(flag)}
+            title={`${flag} - ${t(`flagLabels.${flag}`)}`}
+            className={`rounded-none ${index === 0 ? 'rounded-l' : ''} ${
+              index === FLAGS.length - 1 ? 'rounded-r' : ''
+            } ${
+              index < FLAGS.length - 1 ? `border-r ${tw.border}` : ''
+            } text-xs w-7 justify-center font-bold`}
+          >
+            {flag}
+          </ToolbarButton>
+        ))}
+      </ToolbarButtonGroup>
     </Toolbar>
   )
 })
