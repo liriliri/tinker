@@ -1,37 +1,36 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import TextInput from 'share/components/TextInput'
 import store from '../store'
 
 export default observer(function IncludeExcludePanel() {
   const { t } = useTranslation()
 
-  const inputClass = `w-full px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary}`
-
   return (
-    <div className="space-y-1.5">
-      <div className="space-y-0.5">
-        <label className={`text-[11px] ${tw.text.tertiary}`}>
+    <div className="space-y-2">
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs font-medium ${tw.text.secondary}`}>
           {t('filesToInclude')}
         </label>
-        <input
+        <TextInput
           type="text"
           value={store.includes}
           onChange={(e) => store.setIncludes(e.target.value)}
           placeholder={t('includesPlaceholder')}
-          className={inputClass}
+          className={`focus:ring-2 ${tw.primary.focusRing}`}
         />
       </div>
-      <div className="space-y-0.5">
-        <label className={`text-[11px] ${tw.text.tertiary}`}>
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs font-medium ${tw.text.secondary}`}>
           {t('filesToExclude')}
         </label>
-        <input
+        <TextInput
           type="text"
           value={store.excludes}
           onChange={(e) => store.setExcludes(e.target.value)}
           placeholder={t('excludesPlaceholder')}
-          className={inputClass}
+          className={`focus:ring-2 ${tw.primary.focusRing}`}
         />
       </div>
     </div>

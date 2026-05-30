@@ -1,37 +1,38 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import debounce from 'licia/debounce'
 import LocalStore from 'licia/LocalStore'
+import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
 import { getFileIcon } from 'share/lib/util'
 import type { ActiveMatch, FileGroup } from './types'
 
 const storage = new LocalStore('tinker-text-search')
 
-const KEY_ROOT_DIR = 'rootDir'
-const KEY_INCLUDES = 'includes'
-const KEY_EXCLUDES = 'excludes'
-const KEY_CASE_SENSITIVE = 'caseSensitive'
-const KEY_WHOLE_WORD = 'wholeWord'
-const KEY_REGEX = 'regex'
-const KEY_MULTILINE = 'multiline'
-const KEY_HIDDEN = 'hidden'
-const KEY_FOLLOW_SYMLINKS = 'followSymlinks'
-const KEY_MAX_RESULTS = 'maxResults'
-const KEY_SHOW_INCLUDE = 'showInclude'
+const STORAGE_ROOT_DIR = 'rootDir'
+const STORAGE_INCLUDES = 'includes'
+const STORAGE_EXCLUDES = 'excludes'
+const STORAGE_CASE_SENSITIVE = 'caseSensitive'
+const STORAGE_WHOLE_WORD = 'wholeWord'
+const STORAGE_REGEX = 'regex'
+const STORAGE_MULTILINE = 'multiline'
+const STORAGE_HIDDEN = 'hidden'
+const STORAGE_FOLLOW_SYMLINKS = 'followSymlinks'
+const STORAGE_MAX_RESULTS = 'maxResults'
+const STORAGE_SHOW_INCLUDE = 'showInclude'
 
 class Store extends BaseStore {
   query: string = ''
-  rootDir: string = storage.get(KEY_ROOT_DIR) || ''
-  includes: string = storage.get(KEY_INCLUDES) || ''
-  excludes: string = storage.get(KEY_EXCLUDES) || ''
-  caseSensitive: boolean = storage.get(KEY_CASE_SENSITIVE) === true
-  wholeWord: boolean = storage.get(KEY_WHOLE_WORD) === true
-  regex: boolean = storage.get(KEY_REGEX) === true
-  multiline: boolean = storage.get(KEY_MULTILINE) === true
-  hidden: boolean = storage.get(KEY_HIDDEN) === true
-  followSymlinks: boolean = storage.get(KEY_FOLLOW_SYMLINKS) === true
-  maxResults: number = storage.get(KEY_MAX_RESULTS) || 1000
-  showInclude: boolean = storage.get(KEY_SHOW_INCLUDE) === true
+  rootDir: string = storage.get(STORAGE_ROOT_DIR) || ''
+  includes: string = storage.get(STORAGE_INCLUDES) || ''
+  excludes: string = storage.get(STORAGE_EXCLUDES) || ''
+  caseSensitive: boolean = storage.get(STORAGE_CASE_SENSITIVE) === true
+  wholeWord: boolean = storage.get(STORAGE_WHOLE_WORD) === true
+  regex: boolean = storage.get(STORAGE_REGEX) === true
+  multiline: boolean = storage.get(STORAGE_MULTILINE) === true
+  hidden: boolean = storage.get(STORAGE_HIDDEN) === true
+  followSymlinks: boolean = storage.get(STORAGE_FOLLOW_SYMLINKS) === true
+  maxResults: number = storage.get(STORAGE_MAX_RESULTS) || 1000
+  showInclude: boolean = storage.get(STORAGE_SHOW_INCLUDE) === true
   showAdvanced: boolean = false
 
   groups: FileGroup[] = []
@@ -58,6 +59,16 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    setTimeout(() => this.updateTitle(), 0)
+  }
+
+  private updateTitle() {
+    if (this.rootDir) {
+      const name = splitPath(this.rootDir).name || this.rootDir
+      tinker.setTitle(name)
+    } else {
+      tinker.setTitle('')
+    }
   }
 
   setQuery(value: string) {
@@ -67,67 +78,68 @@ class Store extends BaseStore {
 
   setRootDir(value: string) {
     this.rootDir = value
-    storage.set(KEY_ROOT_DIR, value)
+    storage.set(STORAGE_ROOT_DIR, value)
+    this.updateTitle()
     this.debounceSearch()
   }
 
   setIncludes(value: string) {
     this.includes = value
-    storage.set(KEY_INCLUDES, value)
+    storage.set(STORAGE_INCLUDES, value)
     this.debounceSearch()
   }
 
   setExcludes(value: string) {
     this.excludes = value
-    storage.set(KEY_EXCLUDES, value)
+    storage.set(STORAGE_EXCLUDES, value)
     this.debounceSearch()
   }
 
   setCaseSensitive(value: boolean) {
     this.caseSensitive = value
-    storage.set(KEY_CASE_SENSITIVE, value)
+    storage.set(STORAGE_CASE_SENSITIVE, value)
     this.debounceSearch()
   }
 
   setWholeWord(value: boolean) {
     this.wholeWord = value
-    storage.set(KEY_WHOLE_WORD, value)
+    storage.set(STORAGE_WHOLE_WORD, value)
     this.debounceSearch()
   }
 
   setRegex(value: boolean) {
     this.regex = value
-    storage.set(KEY_REGEX, value)
+    storage.set(STORAGE_REGEX, value)
     this.debounceSearch()
   }
 
   setMultiline(value: boolean) {
     this.multiline = value
-    storage.set(KEY_MULTILINE, value)
+    storage.set(STORAGE_MULTILINE, value)
     this.debounceSearch()
   }
 
   setHidden(value: boolean) {
     this.hidden = value
-    storage.set(KEY_HIDDEN, value)
+    storage.set(STORAGE_HIDDEN, value)
     this.debounceSearch()
   }
 
   setFollowSymlinks(value: boolean) {
     this.followSymlinks = value
-    storage.set(KEY_FOLLOW_SYMLINKS, value)
+    storage.set(STORAGE_FOLLOW_SYMLINKS, value)
     this.debounceSearch()
   }
 
   setMaxResults(value: number) {
     this.maxResults = value
-    storage.set(KEY_MAX_RESULTS, value)
+    storage.set(STORAGE_MAX_RESULTS, value)
     this.debounceSearch()
   }
 
   setShowInclude(value: boolean) {
     this.showInclude = value
-    storage.set(KEY_SHOW_INCLUDE, value)
+    storage.set(STORAGE_SHOW_INCLUDE, value)
   }
 
   setShowAdvanced(value: boolean) {

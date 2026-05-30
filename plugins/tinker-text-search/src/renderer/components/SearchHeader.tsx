@@ -1,20 +1,22 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight, Folder, Settings } from 'lucide-react'
+import { ChevronDown, ChevronRight, FolderOpen, Settings } from 'lucide-react'
 import className from 'licia/className'
-import splitPath from 'licia/splitPath'
 import { tw } from 'share/theme'
 import { LoadingCircle } from 'share/components/Loading'
-import { TOOLBAR_ICON_SIZE } from 'share/components/Toolbar'
+import TextInput from 'share/components/TextInput'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import store from '../store'
 import IncludeExcludePanel from './IncludeExcludePanel'
 import AdvancedPanel from './AdvancedPanel'
 
 export default observer(function SearchHeader() {
   const { t } = useTranslation()
-  const folderName = store.rootDir
-    ? splitPath(store.rootDir).name || store.rootDir
-    : ''
 
   const summary = (() => {
     if (!store.rootDir) return t('noFolder')
@@ -30,26 +32,38 @@ export default observer(function SearchHeader() {
   })()
 
   return (
-    <div
-      className={`shrink-0 ${tw.bg.secondary} border-b ${tw.border} ${tw.text.primary}`}
-    >
-      <div className="flex items-center gap-1 px-2 py-1.5">
-        <button
+    <div className={`shrink-0 ${tw.text.primary}`}>
+      <Toolbar>
+        <ToolbarButton
           onClick={() => store.pickFolder()}
-          className={`flex-1 flex items-center gap-1.5 min-w-0 px-1.5 py-1 rounded ${tw.hover}`}
           title={store.rootDir || t('pickFolder')}
         >
-          <Folder size={TOOLBAR_ICON_SIZE} className={tw.text.tertiary} />
-          <span className={`text-xs truncate ${tw.text.primary}`}>
-            {folderName || t('pickFolder')}
-          </span>
-        </button>
-        <button
-          onClick={() => store.setShowInclude(!store.showInclude)}
-          className={className(
-            'p-1 rounded',
-            store.showInclude ? tw.active : tw.hover
+          <FolderOpen size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+        <ToolbarSpacer />
+        <div className="relative">
+          <ToolbarButton
+            variant="toggle"
+            active={store.showAdvanced}
+            onClick={() => store.setShowAdvanced(!store.showAdvanced)}
+            title={t('advancedOptions')}
+          >
+            <Settings size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+          {store.showAdvanced && (
+            <>
+              <div
+                className="fixed inset-0 z-[5]"
+                onClick={() => store.setShowAdvanced(false)}
+              />
+              <AdvancedPanel />
+            </>
           )}
+        </div>
+        <ToolbarButton
+          variant="toggle"
+          active={store.showInclude}
+          onClick={() => store.setShowInclude(!store.showInclude)}
           title={t('toggleSearchDetails')}
         >
           {store.showInclude ? (
@@ -57,21 +71,19 @@ export default observer(function SearchHeader() {
           ) : (
             <ChevronRight size={TOOLBAR_ICON_SIZE} />
           )}
-        </button>
-      </div>
+        </ToolbarButton>
+      </Toolbar>
 
-      <div className="px-2 pb-2 space-y-1.5">
-        <div className="flex items-stretch gap-1">
-          <div
-            className={`flex-1 flex items-center gap-0.5 rounded border ${tw.border} ${tw.bg.input} focus-within:ring-1 ${tw.primary.focusRing} focus-within:border-transparent pr-1`}
-          >
-            <input
-              type="text"
-              value={store.query}
-              onChange={(e) => store.setQuery(e.target.value)}
-              placeholder={t('searchPlaceholder')}
-              className={`flex-1 min-w-0 px-2 py-1 text-xs bg-transparent ${tw.text.primary} placeholder:${tw.text.tertiary} dark:placeholder:${tw.text.tertiary} focus:outline-none`}
-            />
+      <div className={`${tw.bg.secondary} border-b ${tw.border} p-2 space-y-2`}>
+        <div className="relative">
+          <TextInput
+            type="text"
+            value={store.query}
+            onChange={(e) => store.setQuery(e.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className={`pr-24 focus:ring-2 ${tw.primary.focusRing}`}
+          />
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
             <ToggleIconButton
               active={store.caseSensitive}
               onClick={() => store.setCaseSensitive(!store.caseSensitive)}
@@ -93,28 +105,6 @@ export default observer(function SearchHeader() {
             >
               <span className="font-mono text-[11px]">.*</span>
             </ToggleIconButton>
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={() => store.setShowAdvanced(!store.showAdvanced)}
-              className={className(
-                'h-full p-1.5 rounded',
-                store.showAdvanced ? tw.active : tw.hover
-              )}
-              title={t('advancedOptions')}
-            >
-              <Settings size={TOOLBAR_ICON_SIZE} />
-            </button>
-            {store.showAdvanced && (
-              <>
-                <div
-                  className="fixed inset-0 z-[5]"
-                  onClick={() => store.setShowAdvanced(false)}
-                />
-                <AdvancedPanel />
-              </>
-            )}
           </div>
         </div>
 
