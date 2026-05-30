@@ -1,7 +1,10 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
+import TextSearch, { type TextSearchActiveMatch } from 'share/lib/TextSearch'
+import { byteRangeToColumns } from 'share/lib/textSearchHighlight'
+import type { editor as MonacoEditor } from 'monaco-editor'
 import type {
   ITreeNode,
   IEditorTab,
@@ -15,6 +18,14 @@ const storage = new LocalStore('tinker-code-editor')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_TERMINAL_OPEN = 'terminalOpen'
+const STORAGE_SIDEBAR_MODE = 'sidebarMode'
+
+export type SidebarMode = 'explorer' | 'search'
+
+interface RevealTarget {
+  lineNumber: number
+  submatches?: tinker.SearchTextSubmatch[]
+}
 
 function collectPaneIds(node: ILayoutNode): string[] {
   if (node.type === 'leaf') return [node.paneId]
@@ -118,6 +129,8 @@ class Store extends BaseStore {
   tabs: IEditorTab[] = []
   activeTabId = ''
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
+  sidebarMode: SidebarMode =
+    (storage.get(STORAGE_SIDEBAR_MODE) as SidebarMode) || 'explorer'
   terminalOpen: boolean = storage.get(STORAGE_TERMINAL_OPEN) ?? false
   terminalTabs: ITerminalTab[] = []
   activeTerminalTabId = ''
@@ -127,25 +140,54 @@ class Store extends BaseStore {
   onDestroyPane?: (id: string) => void
   cursorLine = 1
   cursorColumn = 1
+  textSearch = new TextSearch({
+    storageNamespace: 'tinker-code-editor-search',
+    initialRootDir: storage.get(STORAGE_ROOT_PATH) || '',
+  })
   private terminalTabCounter = 0
+  private editorInstances: Map<string, MonacoEditor.IStandaloneCodeEditor> =
+    new Map()
+  private pendingReveals: Map<string, RevealTarget> = new Map()
 
   constructor() {
     super()
     makeAutoObservable(this, {
       onDestroyPane: false,
       pendingCwd: false,
+      textSearch: false,
     })
     if (this.rootPath) {
       this.loadDirectory(this.rootPath)
+      this.textSearch.setRootDir(this.rootPath)
     }
     if (this.terminalOpen) {
       this.addTerminalTab()
     }
+    // Keep search rootDir in sync with the project root.
+    reaction(
+      () => this.rootPath,
+      (rootPath) => {
+        this.textSearch.setRootDir(rootPath)
+      }
+    )
   }
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setSidebarMode(mode: SidebarMode) {
+    this.sidebarMode = mode
+    storage.set(STORAGE_SIDEBAR_MODE, mode)
+    if (!this.sidebarOpen) {
+      this.sidebarOpen = true
+      storage.set(STORAGE_SIDEBAR_OPEN, true)
+    }
+  }
+
+  toggleSidebarMode() {
+    this.setSidebarMode(this.sidebarMode === 'explorer' ? 'search' : 'explorer')
   }
 
   setCursor(line: number, column: number) {
@@ -371,11 +413,11 @@ class Store extends BaseStore {
     }
   }
 
-  async openFile(filePath: string, fileName: string) {
+  async openFile(filePath: string, fileName: string): Promise<string | null> {
     const existing = this.tabs.find((t) => t.filePath === filePath)
     if (existing) {
       this.activeTabId = existing.id
-      return
+      return existing.id
     }
 
     try {
@@ -389,9 +431,72 @@ class Store extends BaseStore {
       }
       this.tabs.push(tab)
       this.activeTabId = tab.id
+      return tab.id
     } catch {
-      // ignore read errors
+      return null
     }
+  }
+
+  selectSearchMatch = async (match: TextSearchActiveMatch) => {
+    const fileName = last(match.path.split('/')) || match.path
+    const tabId = await this.openFile(match.path, fileName)
+    if (!tabId) return
+    this.revealInTab(tabId, match.lineNumber, match.submatches)
+  }
+
+  registerEditor(tabId: string, instance: MonacoEditor.IStandaloneCodeEditor) {
+    this.editorInstances.set(tabId, instance)
+    const pending = this.pendingReveals.get(tabId)
+    if (pending) {
+      this.applyReveal(instance, pending)
+      this.pendingReveals.delete(tabId)
+    }
+  }
+
+  unregisterEditor(tabId: string) {
+    this.editorInstances.delete(tabId)
+    this.pendingReveals.delete(tabId)
+  }
+
+  private revealInTab(
+    tabId: string,
+    lineNumber: number,
+    submatches?: tinker.SearchTextSubmatch[]
+  ) {
+    const target: RevealTarget = { lineNumber, submatches }
+    const inst = this.editorInstances.get(tabId)
+    if (inst) {
+      this.applyReveal(inst, target)
+    } else {
+      // Editor not mounted yet (file just opened); apply on register.
+      this.pendingReveals.set(tabId, target)
+    }
+  }
+
+  private applyReveal(
+    inst: MonacoEditor.IStandaloneCodeEditor,
+    target: RevealTarget
+  ) {
+    const { lineNumber, submatches } = target
+    inst.revealLineInCenter(lineNumber)
+    if (submatches && submatches.length > 0) {
+      const lineText = inst.getModel()?.getLineContent(lineNumber) || ''
+      const sm = submatches[0]
+      const { startColumn, endColumn } = byteRangeToColumns(
+        lineText,
+        sm.start,
+        sm.end
+      )
+      inst.setSelection({
+        startLineNumber: lineNumber,
+        startColumn,
+        endLineNumber: lineNumber,
+        endColumn,
+      })
+    } else {
+      inst.setPosition({ lineNumber, column: 1 })
+    }
+    inst.focus()
   }
 
   updateContent(tabId: string, content: string) {
@@ -420,6 +525,7 @@ class Store extends BaseStore {
     if (index === -1) return
 
     this.tabs.splice(index, 1)
+    this.unregisterEditor(id)
 
     if (this.activeTabId === id) {
       if (this.tabs.length > 0) {

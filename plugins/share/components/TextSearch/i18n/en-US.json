@@ -1,0 +1,25 @@
+{
+  "searchPlaceholder": "Search",
+  "includesPlaceholder": "files to include",
+  "excludesPlaceholder": "files to exclude",
+
+  "caseSensitive": "Match Case",
+  "wholeWord": "Match Whole Word",
+  "regex": "Use Regular Expression",
+  "toggleSearchDetails": "Toggle Search Details",
+  "maxResults": "Max results",
+  "clear": "Clear",
+
+  "pickFolder": "Choose Folder",
+  "noFolder": "Open a folder to search",
+  "openFolderHint": "Click to choose, or drag a folder here",
+  "noQuery": "Type to search",
+  "noResults": "No results found",
+  "summary_one": "{{matches}} result in {{files}} file",
+  "summary_other": "{{matches}} results in {{files}} files",
+  "truncated": "(truncated)",
+
+  "showInFolder": "Reveal in File Manager",
+  "copyPath": "Copy Path",
+  "copyLine": "Copy Match"
+}

@@ -1,7 +1,11 @@
 import clamp from 'licia/clamp'
 import rtrim from 'licia/rtrim'
 import sortBy from 'licia/sortBy'
-import type { Segment } from '../types'
+
+export interface TextSearchSegment {
+  text: string
+  matched: boolean
+}
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
@@ -15,7 +19,7 @@ const decoder = new TextDecoder()
 export function buildSegments(
   line: string,
   submatches: tinker.SearchTextSubmatch[]
-): Segment[] {
+): TextSearchSegment[] {
   const text = rtrim(line, ['\n', '\r'])
   if (!submatches || submatches.length === 0) {
     return [{ text, matched: false }]
@@ -23,7 +27,7 @@ export function buildSegments(
 
   const sorted = sortBy(submatches, (sm) => sm.start)
   const bytes = encoder.encode(text)
-  const segments: Segment[] = []
+  const segments: TextSearchSegment[] = []
   let cursor = 0
 
   for (const sm of sorted) {

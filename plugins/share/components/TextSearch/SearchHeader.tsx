@@ -2,9 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, Eraser, FolderOpen } from 'lucide-react'
 import className from 'licia/className'
-import { tw } from 'share/theme'
-import { LoadingCircle } from 'share/components/Loading'
-import TextInput from 'share/components/TextInput'
+import { tw } from '../../theme'
+import { LoadingCircle } from '../Loading'
+import TextInput from '../TextInput'
 import {
   Toolbar,
   ToolbarButton,
@@ -12,59 +12,65 @@ import {
   ToolbarSpacer,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
-} from 'share/components/Toolbar'
-import store from '../store'
+} from '../Toolbar'
 import IncludeExcludePanel from './IncludeExcludePanel'
+import { useTextSearchContext } from './context'
+import { TEXT_SEARCH_NS } from './namespace'
 
 export default observer(function SearchHeader() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(TEXT_SEARCH_NS)
+  const { search, showFolderPicker = true } = useTextSearchContext()
 
   const summary = (() => {
-    if (!store.rootDir) return t('noFolder')
-    if (!store.query.trim()) return t('noQuery')
-    if (store.searching && store.totalMatches === 0) return ''
-    if (store.totalMatches === 0) return t('noResults')
+    if (!search.rootDir) return t('noFolder')
+    if (!search.query.trim()) return t('noQuery')
+    if (search.searching && search.totalMatches === 0) return ''
+    if (search.totalMatches === 0) return t('noResults')
     const text = t('summary', {
-      count: store.totalMatches,
-      matches: store.totalMatches,
-      files: store.totalFiles,
+      count: search.totalMatches,
+      matches: search.totalMatches,
+      files: search.totalFiles,
     })
-    return store.truncated ? `${text} ${t('truncated')}` : text
+    return search.truncated ? `${text} ${t('truncated')}` : text
   })()
 
   return (
     <div className={`shrink-0 ${tw.text.primary}`}>
       <Toolbar>
-        <ToolbarButton
-          onClick={() => store.pickFolder()}
-          title={store.rootDir || t('pickFolder')}
-        >
-          <FolderOpen size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-        <ToolbarSeparator />
+        {showFolderPicker && (
+          <>
+            <ToolbarButton
+              onClick={() => search.pickFolder()}
+              title={search.rootDir || t('pickFolder')}
+            >
+              <FolderOpen size={TOOLBAR_ICON_SIZE} />
+            </ToolbarButton>
+            <ToolbarSeparator />
+          </>
+        )}
         <ToolbarTextInput
           type="number"
           min={1}
-          value={store.maxResults}
+          value={search.maxResults}
           onChange={(e) => {
             const v = Number(e.target.value)
-            if (Number.isFinite(v) && v > 0) store.setMaxResults(v)
+            if (Number.isFinite(v) && v > 0) search.setMaxResults(v)
           }}
           className="!w-20"
           title={t('maxResults')}
         />
         <ToolbarSpacer />
-        <ToolbarButton onClick={() => store.clear()} title={t('clear')}>
+        <ToolbarButton onClick={() => search.clear()} title={t('clear')}>
           <Eraser size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
         <ToolbarSeparator />
         <ToolbarButton
           variant="toggle"
-          active={store.showInclude}
-          onClick={() => store.setShowInclude(!store.showInclude)}
+          active={search.showInclude}
+          onClick={() => search.setShowInclude(!search.showInclude)}
           title={t('toggleSearchDetails')}
         >
-          {store.showInclude ? (
+          {search.showInclude ? (
             <ChevronDown size={TOOLBAR_ICON_SIZE} />
           ) : (
             <ChevronRight size={TOOLBAR_ICON_SIZE} />
@@ -77,29 +83,29 @@ export default observer(function SearchHeader() {
           <div className="relative">
             <TextInput
               type="text"
-              value={store.query}
-              onChange={(e) => store.setQuery(e.target.value)}
+              value={search.query}
+              onChange={(e) => search.setQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
               className={`pr-24 focus:ring-2 ${tw.primary.focusRing}`}
             />
             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
               <ToggleIconButton
-                active={store.caseSensitive}
-                onClick={() => store.setCaseSensitive(!store.caseSensitive)}
+                active={search.caseSensitive}
+                onClick={() => search.setCaseSensitive(!search.caseSensitive)}
                 title={t('caseSensitive')}
               >
                 <span className="font-semibold text-[11px]">Aa</span>
               </ToggleIconButton>
               <ToggleIconButton
-                active={store.wholeWord}
-                onClick={() => store.setWholeWord(!store.wholeWord)}
+                active={search.wholeWord}
+                onClick={() => search.setWholeWord(!search.wholeWord)}
                 title={t('wholeWord')}
               >
                 <span className="font-semibold text-[11px]">ab|</span>
               </ToggleIconButton>
               <ToggleIconButton
-                active={store.regex}
-                onClick={() => store.setRegex(!store.regex)}
+                active={search.regex}
+                onClick={() => search.setRegex(!search.regex)}
                 title={t('regex')}
               >
                 <span className="font-mono text-[11px]">.*</span>
@@ -107,13 +113,13 @@ export default observer(function SearchHeader() {
             </div>
           </div>
 
-          {store.showInclude && <IncludeExcludePanel />}
+          {search.showInclude && <IncludeExcludePanel />}
         </div>
 
         <div
           className={`flex items-center justify-center gap-1.5 text-[11px] px-2 py-1 border-t ${tw.border} ${tw.text.secondary} min-h-[1.5rem]`}
         >
-          {store.searching && <LoadingCircle className="w-3 h-3" />}
+          {search.searching && <LoadingCircle className="w-3 h-3" />}
           <span className="truncate">{summary}</span>
         </div>
       </div>

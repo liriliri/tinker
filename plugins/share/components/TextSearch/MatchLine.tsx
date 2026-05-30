@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { tw } from 'share/theme'
+import { tw } from '../../theme'
 import className from 'licia/className'
-import store from '../store'
-import { buildSegments } from '../lib/highlight'
-import type { ActiveMatch } from '../types'
+import { buildSegments } from '../../lib/textSearchHighlight'
+import type { TextSearchActiveMatch } from '../../lib/TextSearch'
+import { useTextSearchContext } from './context'
+import { TEXT_SEARCH_NS } from './namespace'
 
 interface MatchLineProps {
   filePath: string
@@ -16,9 +17,10 @@ export default observer(function MatchLine({
   filePath,
   result,
 }: MatchLineProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(TEXT_SEARCH_NS)
+  const { search, onSelectMatch } = useTextSearchContext()
   const key = `${filePath}:${result.lineNumber}`
-  const isActive = store.activeMatchKey === key
+  const isActive = search.activeMatchKey === key
 
   const segments = useMemo(
     () => buildSegments(result.text, result.submatches),
@@ -26,13 +28,14 @@ export default observer(function MatchLine({
   )
 
   const handleClick = () => {
-    const am: ActiveMatch = {
+    const am: TextSearchActiveMatch = {
       path: filePath,
       lineNumber: result.lineNumber,
       text: result.text,
       submatches: result.submatches,
     }
-    store.selectMatch(am)
+    search.setActiveMatchKey(key)
+    onSelectMatch?.(am)
   }
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -47,12 +50,12 @@ export default observer(function MatchLine({
       },
       {
         label: t('copyPath'),
-        click: () => store.copyPath(filePath),
+        click: () => search.copyPath(filePath),
       },
       { type: 'separator' },
       {
         label: t('showInFolder'),
-        click: () => store.showInFolder(filePath),
+        click: () => search.showInFolder(filePath),
       },
     ])
   }

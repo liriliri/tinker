@@ -1,0 +1,16 @@
+@use 'sass:meta';
+
+.tts-line-active {
+  background: rgba(15, 194, 94, 0.1);
+}
+
+.tts-match-inline {
+  background: rgba(15, 194, 94, 0.25);
+  color: #0a4d27;
+  border-radius: 2px;
+}
+
+html.dark .tts-match-inline {
+  background: rgba(15, 194, 94, 0.3);
+  color: #c5f5d6;
+}

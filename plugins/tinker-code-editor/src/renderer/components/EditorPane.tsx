@@ -1,5 +1,6 @@
 import { Editor, loader } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from '../lib/util'
@@ -21,6 +22,11 @@ interface EditorPaneProps {
 
 export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   const tab = store.tabs.find((t) => t.id === tabId)
+
+  useEffect(() => {
+    return () => store.unregisterEditor(tabId)
+  }, [tabId])
+
   if (!tab) return null
 
   const handleChange = (value: string | undefined) => {
@@ -28,6 +34,7 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   }
 
   const handleMount = (instance: editor.IStandaloneCodeEditor) => {
+    store.registerEditor(tabId, instance)
     const updateCursor = () => {
       const position = instance.getPosition()
       if (position) {

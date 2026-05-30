@@ -5,9 +5,9 @@ import { useEffect, useRef } from 'react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { File } from 'lucide-react'
 import { tw } from 'share/theme'
+import { byteRangeToColumns, getLineText } from 'share/lib/textSearchHighlight'
 import store from '../store'
 import { getLanguage } from '../lib/language'
-import { byteRangeToColumns, getLineText } from '../lib/highlight'
 
 type MonacoApi = typeof import('monaco-editor')
 

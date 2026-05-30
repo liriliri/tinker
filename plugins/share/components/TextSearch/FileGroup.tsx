@@ -3,27 +3,29 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import splitPath from 'licia/splitPath'
 import ltrim from 'licia/ltrim'
-import { tw } from 'share/theme'
-import store from '../store'
-import type { FileGroup as FileGroupData } from '../types'
+import { tw } from '../../theme'
+import type { TextSearchFileGroup } from '../../lib/TextSearch'
 import MatchLine from './MatchLine'
+import { useTextSearchContext } from './context'
+import { TEXT_SEARCH_NS } from './namespace'
 
 interface FileGroupProps {
-  group: FileGroupData
+  group: TextSearchFileGroup
 }
 
 export default observer(function FileGroup({ group }: FileGroupProps) {
-  const { t } = useTranslation()
-  const collapsed = store.isCollapsed(group.path)
+  const { t } = useTranslation(TEXT_SEARCH_NS)
+  const { search } = useTextSearchContext()
+  const collapsed = search.isCollapsed(group.path)
   const { name, dir } = splitPath(group.path)
-  const relativeDir = store.rootDir
-    ? dir.startsWith(store.rootDir)
-      ? ltrim(dir.slice(store.rootDir.length), ['/', '\\']) || '.'
+  const relativeDir = search.rootDir
+    ? dir.startsWith(search.rootDir)
+      ? ltrim(dir.slice(search.rootDir.length), ['/', '\\']) || '.'
       : dir
     : dir
 
   const handleToggle = () => {
-    store.toggleCollapse(group.path)
+    search.toggleCollapse(group.path)
   }
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -32,11 +34,11 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
     tinker.showContextMenu(e.clientX, e.clientY, [
       {
         label: t('showInFolder'),
-        click: () => store.showInFolder(group.path),
+        click: () => search.showInFolder(group.path),
       },
       {
         label: t('copyPath'),
-        click: () => store.copyPath(group.path),
+        click: () => search.copyPath(group.path),
       },
     ])
   }

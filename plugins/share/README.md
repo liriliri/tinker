@@ -128,6 +128,22 @@ import VideoPlayer from 'share/components/VideoPlayer'
 
 Wrap inside the player's `Provider` and `Container` from `createPlayer`. Requires `videojs` vendor scripts.
 
+### TextSearch
+
+```ts
+import TextSearchSidebar from 'share/components/TextSearch'
+import TextSearch from 'share/lib/TextSearch'
+
+const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
+;<TextSearchSidebar
+  search={search}
+  onSelectMatch={(m) => openInEditor(m.path, m.lineNumber, m.submatches)}
+  showFolderPicker={false}
+/>
+```
+
+Display-only — `TextSearch` owns query/options/results. Helpers in `share/lib/textSearchHighlight` (`buildSegments`, `byteRangeToColumns`, `getLineText`) for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
+
 ### Other Components
 
 ```ts

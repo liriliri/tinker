@@ -1,15 +1,28 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { PanelLeft, PanelLeftClose, FolderOpen, Terminal } from 'lucide-react'
+import className from 'licia/className'
+import {
+  PanelLeft,
+  PanelLeftClose,
+  FolderOpen,
+  Search,
+  FileText,
+  Terminal,
+} from 'lucide-react'
 import {
   StatusBar,
   StatusBarItem,
   StatusBarSpacer,
 } from 'share/components/StatusBar'
+import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function StatusBarComponent() {
   const { t } = useTranslation()
+
+  const explorerActive = store.sidebarOpen && store.sidebarMode === 'explorer'
+  const searchActive = store.sidebarOpen && store.sidebarMode === 'search'
+
   return (
     <StatusBar>
       <StatusBarItem onClick={() => store.toggleSidebar()}>
@@ -21,6 +34,18 @@ export default observer(function StatusBarComponent() {
       </StatusBarItem>
       <StatusBarItem onClick={() => store.openFolder()}>
         <FolderOpen size={14} />
+      </StatusBarItem>
+      <StatusBarItem
+        onClick={() => store.setSidebarMode('explorer')}
+        className={className(explorerActive && tw.primary.text)}
+      >
+        <FileText size={14} />
+      </StatusBarItem>
+      <StatusBarItem
+        onClick={() => store.setSidebarMode('search')}
+        className={className(searchActive && tw.primary.text)}
+      >
+        <Search size={14} />
       </StatusBarItem>
       <StatusBarSpacer />
       {store.activeTabId && (
