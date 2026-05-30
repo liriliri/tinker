@@ -28,7 +28,6 @@ export default observer(function SearchHeader() {
     if (search.totalMatches === 0) return t('noResults')
     const text = t('summary', {
       count: search.totalMatches,
-      matches: search.totalMatches,
       files: search.totalFiles,
     })
     return search.truncated ? `${text} ${t('truncated')}` : text

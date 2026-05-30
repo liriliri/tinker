@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import debounce from 'licia/debounce'
 import LocalStore from 'licia/LocalStore'
+import { fileExists } from './util'
 
 export interface TextSearchFileGroup {
   path: string
@@ -57,6 +58,14 @@ export default class TextSearch {
   totalFiles: number = 0
   truncated: boolean = false
   activeMatchKey: string = ''
+  /**
+   * `false` while the persisted rootDir is being verified on startup.
+   * Becomes `true` once verification completes (whether the directory exists
+   * or has been cleared because it was missing). Hosts that need to wait for
+   * a confirmed rootDir (e.g. before setting the window title) should gate on
+   * this flag.
+   */
+  restored: boolean = true
 
   private storage: LocalStore | null = null
   private groupIndex: Map<string, number> = new Map()
@@ -79,6 +88,9 @@ export default class TextSearch {
       this.rootDir = opts.initialRootDir
     }
 
+    const needsVerify = !!this.rootDir
+    if (needsVerify) this.restored = false
+
     makeAutoObservable<
       this,
       'storage' | 'groupIndex' | 'currentTask' | 'debounceSearch'
@@ -87,6 +99,19 @@ export default class TextSearch {
       groupIndex: false,
       currentTask: false,
       debounceSearch: false,
+    })
+
+    if (needsVerify) this.verifyRootDir(this.rootDir)
+  }
+
+  private async verifyRootDir(dir: string) {
+    const exists = await fileExists(dir)
+    runInAction(() => {
+      if (!exists && this.rootDir === dir) {
+        this.rootDir = ''
+        this.storage?.set(STORAGE_ROOT_DIR, '')
+      }
+      this.restored = true
     })
   }
 

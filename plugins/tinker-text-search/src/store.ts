@@ -18,10 +18,12 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this, { search: false })
-    this.updateTitle()
     reaction(
-      () => this.search.rootDir,
-      () => this.updateTitle()
+      () => (this.search.restored ? this.search.rootDir : null),
+      (rootDir) => {
+        if (rootDir !== null) this.updateTitle(rootDir)
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -30,14 +32,9 @@ class Store extends BaseStore {
     this.loadPreview(match.path)
   }
 
-  private updateTitle() {
-    const rootDir = this.search.rootDir
-    if (rootDir) {
-      const name = splitPath(rootDir).name || rootDir
-      tinker.setTitle(name)
-    } else {
-      tinker.setTitle('')
-    }
+  private updateTitle(rootDir: string) {
+    const title = rootDir ? splitPath(rootDir).name || rootDir : ''
+    tinker.setTitle(title)
   }
 
   private async loadPreview(path: string) {

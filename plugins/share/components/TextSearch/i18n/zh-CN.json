@@ -12,11 +12,10 @@
 
   "pickFolder": "选择文件夹",
   "noFolder": "打开一个文件夹以搜索",
-  "openFolderHint": "点击选择,或拖入文件夹",
   "noQuery": "输入以搜索",
   "noResults": "未找到结果",
-  "summary_one": "{{files}} 个文件中找到 {{matches}} 个结果",
-  "summary_other": "{{files}} 个文件中找到 {{matches}} 个结果",
+  "summary_one": "{{files}} 个文件中找到 {{count}} 个结果",
+  "summary_other": "{{files}} 个文件中找到 {{count}} 个结果",
   "truncated": "(已截断)",
 
   "showInFolder": "在文件管理器中显示",

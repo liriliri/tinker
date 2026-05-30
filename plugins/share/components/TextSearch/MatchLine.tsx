@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { tw } from '../../theme'
 import className from 'licia/className'
 import { buildSegments } from '../../lib/textSearchHighlight'
-import type { TextSearchActiveMatch } from '../../lib/TextSearch'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './namespace'
 
@@ -28,14 +27,8 @@ export default observer(function MatchLine({
   )
 
   const handleClick = () => {
-    const am: TextSearchActiveMatch = {
-      path: filePath,
-      lineNumber: result.lineNumber,
-      text: result.text,
-      submatches: result.submatches,
-    }
     search.setActiveMatchKey(key)
-    onSelectMatch?.(am)
+    onSelectMatch?.({ path: filePath, ...result })
   }
 
   const handleContextMenu = (e: React.MouseEvent) => {

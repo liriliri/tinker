@@ -14,24 +14,30 @@ export default observer(function EmptyState({ variant }: EmptyStateProps) {
   const { search, showFolderPicker = true } = useTextSearchContext()
 
   if (variant === 'no-folder') {
-    const interactive = showFolderPicker
+    if (!showFolderPicker) {
+      return (
+        <div
+          className={`flex-1 flex flex-col items-center justify-center p-6 ${tw.bg.tertiary}`}
+        >
+          <FolderOpen
+            className={`w-10 h-10 mb-3 ${tw.gray.text400}`}
+            strokeWidth={1.5}
+          />
+          <p className={`text-sm ${tw.text.primary}`}>{t('noFolder')}</p>
+        </div>
+      )
+    }
     return (
       <div
-        onClick={interactive ? () => search.pickFolder() : undefined}
-        className={`flex-1 flex flex-col items-center justify-center p-6 ${
-          tw.bg.tertiary
-        } ${interactive ? `cursor-pointer ${tw.hover}` : ''}`}
+        className={`flex-1 flex items-center justify-center p-4 ${tw.bg.tertiary}`}
       >
-        <FolderOpen
-          className={`w-10 h-10 mb-3 ${tw.gray.text400}`}
-          strokeWidth={1.5}
-        />
-        <p className={`text-sm ${tw.text.primary}`}>{t('noFolder')}</p>
-        {interactive && (
-          <p className={`text-xs mt-1 ${tw.text.tertiary}`}>
-            {t('openFolderHint')}
-          </p>
-        )}
+        <button
+          type="button"
+          onClick={() => search.pickFolder()}
+          className={`px-3 py-1.5 text-xs rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
+        >
+          {t('pickFolder')}
+        </button>
       </div>
     )
   }
