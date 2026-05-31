@@ -23,12 +23,12 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(
-          github.event.inputs.platform == 'all' && '["windows-2022","macos-latest","macos-15-intel","ubuntu-latest"]' ||
-          github.event.inputs.platform == 'windows' && '["windows-2022"]' ||
+          github.event.inputs.platform == 'all' && '["windows-2025","macos-latest","macos-15-intel","ubuntu-latest"]' ||
+          github.event.inputs.platform == 'windows' && '["windows-2025"]' ||
           github.event.inputs.platform == 'macos' && '["macos-latest"]' ||
           github.event.inputs.platform == 'macos-intel' && '["macos-15-intel"]' ||
           github.event.inputs.platform == 'linux' && '["ubuntu-latest"]' ||
-          '["windows-2022","macos-latest","macos-15-intel","ubuntu-latest"]'
+          '["windows-2025","macos-latest","macos-15-intel","ubuntu-latest"]'
           ) }}
 
     steps:

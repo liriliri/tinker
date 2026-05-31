@@ -14,7 +14,6 @@ function getRgPath(): string {
   if (!isDev()) {
     path = path.replace('app.asar', 'app.asar.unpacked')
   }
-  console.log('rgPath:', path)
   return path
 }
 
