@@ -23,12 +23,12 @@ jobs:
     strategy:
       matrix:
         os: ${{ fromJSON(
-          github.event.inputs.platform == 'all' && '["windows-2025","macos-latest","macos-15-intel","ubuntu-latest"]' ||
-          github.event.inputs.platform == 'windows' && '["windows-2025"]' ||
+          github.event.inputs.platform == 'all' && '["windows-latest","macos-latest","macos-15-intel","ubuntu-latest"]' ||
+          github.event.inputs.platform == 'windows' && '["windows-latest"]' ||
           github.event.inputs.platform == 'macos' && '["macos-latest"]' ||
           github.event.inputs.platform == 'macos-intel' && '["macos-15-intel"]' ||
           github.event.inputs.platform == 'linux' && '["ubuntu-latest"]' ||
-          '["windows-2025","macos-latest","macos-15-intel","ubuntu-latest"]'
+          '["windows-latest","macos-latest","macos-15-intel","ubuntu-latest"]'
           ) }}
 
     steps:
@@ -42,6 +42,7 @@ jobs:
       with:
         node-version: '20.x'
     - run: |
+        npm install -g npm@latest
         npm i
         npm run init
         npm run build
