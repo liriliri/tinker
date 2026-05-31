@@ -42,7 +42,6 @@ jobs:
       with:
         node-version: '20.x'
     - run: |
-        npm install -g npm@latest
         npm i
         npm run init
         npm run build
