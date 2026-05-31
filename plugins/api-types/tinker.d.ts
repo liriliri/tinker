@@ -330,6 +330,42 @@ declare global {
       ): Promise<unknown>
       showDevTools(devtoolsWebview: Electron.WebviewTag): Promise<void>
     }
+
+    interface CreateTerminalOptions {
+      cols: number
+      rows: number
+      /** Working directory; defaults to the user home directory. */
+      cwd?: string
+      /** Shell executable path; defaults to the system default shell. */
+      shell?: string
+    }
+
+    interface Terminal {
+      /** Send input to the shell. */
+      write(data: string): void
+      /** Resize the PTY. */
+      resize(cols: number, rows: number): void
+      /** Kill the session. After this all other methods are no-ops. */
+      destroy(): void
+      /** Subscribe to shell output. Latest registration wins. */
+      onData(callback: (data: string) => void): void
+      /** Subscribe to process exit. Latest registration wins. */
+      onClose(callback: () => void): void
+      /** Subscribe to user-input newline events. Latest registration wins. */
+      onInput(callback: () => void): void
+      /**
+       * Get the session's foreground process name and current working
+       * directory in one IPC round trip.
+       */
+      getInfo(): Promise<tinker.TerminalInfo>
+    }
+
+    interface TerminalInfo {
+      /** Foreground process name (e.g. "vim", "zsh"). */
+      processName: string
+      /** Full path of the current working directory. */
+      cwd: string
+    }
   }
 
   const tinker: {
@@ -576,6 +612,12 @@ declare global {
       options?: tinker.SearchTextOptions,
       onMatch?: (match: tinker.SearchTextResult) => void
     ): tinker.SearchTextTask
+
+    /**
+     * Spawn a PTY shell session in the main process. The session is
+     * automatically destroyed when the plugin's webContents is closed.
+     */
+    createTerminal(options: tinker.CreateTerminalOptions): tinker.Terminal
   }
 }
 

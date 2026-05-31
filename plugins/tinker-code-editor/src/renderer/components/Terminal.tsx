@@ -2,22 +2,9 @@ import type { MenuItemConstructorOptions } from 'electron'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import SharedTerminal, { destroyTerminal } from 'share/components/Terminal'
-import type { TerminalApi } from 'share/components/Terminal'
 import store from '../store'
 
-const api: TerminalApi = {
-  write: (id, data) => codeEditor.writeTerminal(id, data),
-  resize: (id, cols, rows) => codeEditor.resizeTerminal(id, cols, rows),
-  onData: (id, cb) => codeEditor.onTerminalData(id, cb),
-  onClose: (id, cb) => codeEditor.onTerminalClose(id, cb),
-  onInput: (id, cb) => codeEditor.onTerminalInput(id, cb),
-  getProcessName: (id) => codeEditor.getTerminalProcessName(id),
-  getCwd: (id) => codeEditor.getTerminalCwd(id),
-}
-
-export function destroyPane(paneId: string) {
-  destroyTerminal(paneId, { destroy: codeEditor.destroyTerminal })
-}
+export { destroyTerminal as destroyPane }
 
 interface TerminalProps {
   paneId: string
@@ -26,18 +13,20 @@ interface TerminalProps {
 export default function Terminal({ paneId }: TerminalProps) {
   const { t } = useTranslation()
 
-  const handleInit = useCallback((id: string, cols: number, rows: number) => {
-    const pendingCwd = store.pendingCwd[id]
-    if (pendingCwd) {
-      delete store.pendingCwd[id]
-    }
-    codeEditor.createTerminal(
-      id,
-      cols,
-      rows,
-      pendingCwd || store.rootPath || undefined
-    )
-  }, [])
+  const createSession = useCallback(
+    (cols: number, rows: number) => {
+      const pendingCwd = store.pendingCwd[paneId]
+      if (pendingCwd) {
+        delete store.pendingCwd[paneId]
+      }
+      return tinker.createTerminal({
+        cols,
+        rows,
+        cwd: pendingCwd || store.rootPath || undefined,
+      })
+    },
+    [paneId]
+  )
 
   const handleTitleChange = useCallback((id: string, title: string) => {
     store.setPaneTitle(id, title)
@@ -69,9 +58,8 @@ export default function Terminal({ paneId }: TerminalProps) {
   return (
     <SharedTerminal
       id={paneId}
-      api={api}
+      createSession={createSession}
       isDark={store.isDark}
-      onInit={handleInit}
       onTitleChange={handleTitleChange}
       onFocus={handleFocus}
       extraContextMenuItems={extraContextMenuItems}

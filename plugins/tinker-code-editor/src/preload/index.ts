@@ -2,15 +2,12 @@ import { contextBridge } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
 import { homedir } from 'os'
-import { createTerminalApi } from 'share/lib/terminal'
 
 interface IDirEntry {
   name: string
   path: string
   isDirectory: boolean
 }
-
-const terminalApi = createTerminalApi()
 
 const codeEditorObj = {
   getHomedir(): string {
@@ -57,19 +54,6 @@ const codeEditorObj = {
       return false
     }
   },
-
-  createTerminal: terminalApi.create,
-  writeTerminal: terminalApi.write,
-  resizeTerminal: terminalApi.resize,
-  destroyTerminal: terminalApi.destroy,
-  onTerminalData: terminalApi.onData,
-  onTerminalClose: terminalApi.onClose,
-  onTerminalInput: terminalApi.onInput,
-  getTerminalProcessName: terminalApi.getProcessName,
-  getTerminalCwd: terminalApi.getCwd,
-  getTerminalFullCwd: terminalApi.getFullCwd,
-  getDefaultShell: terminalApi.getDefaultShell,
-  getAvailableShells: terminalApi.getAvailableShells,
 }
 
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)

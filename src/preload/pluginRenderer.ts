@@ -206,6 +206,47 @@ export function injectApi() {
     return task
   }
 
+  function createTerminal(opts: {
+    cols: number
+    rows: number
+    cwd?: string
+    shell?: string
+  }) {
+    const id = uuid()
+    let destroyed = false
+
+    _tinker.createTerminal(id, opts.cols, opts.rows, opts.cwd, opts.shell)
+
+    return {
+      write(data: string) {
+        if (destroyed) return
+        _tinker.writeTerminal(id, data)
+      },
+      resize(cols: number, rows: number) {
+        if (destroyed) return
+        _tinker.resizeTerminal(id, cols, rows)
+      },
+      destroy() {
+        if (destroyed) return
+        destroyed = true
+        _tinker.destroyTerminal(id)
+      },
+      onData(cb: (data: string) => void) {
+        _tinker.onTerminalData(id, cb)
+      },
+      onClose(cb: () => void) {
+        _tinker.onTerminalClose(id, cb)
+      },
+      onInput(cb: () => void) {
+        _tinker.onTerminalInput(id, cb)
+      },
+      getInfo() {
+        if (destroyed) return Promise.resolve({ processName: '', cwd: '' })
+        return _tinker.getTerminalInfo(id)
+      },
+    }
+  }
+
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -237,6 +278,7 @@ export function injectApi() {
     searchText,
     download,
     getDownloads,
+    createTerminal,
   }
 
   // Patch webview prototype to add debugger methods

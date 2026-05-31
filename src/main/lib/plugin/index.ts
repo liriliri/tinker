@@ -20,6 +20,7 @@ import {
 import * as pluginDownload from './download'
 import * as pluginWebview from './webview'
 import * as pluginInstaller from './installer'
+import * as pluginTerminal from './terminal'
 import {
   PLUGIN_PARTITION,
   pluginViews,
@@ -76,6 +77,7 @@ export function init() {
   pluginDownload.init()
   pluginInstaller.init()
   pluginWebview.init()
+  pluginTerminal.init()
   handleEvent('getPlugins', getPlugins)
   handleEvent('openPlugin', openPlugin)
   handleEvent('reopenPlugin', reopenPlugin)

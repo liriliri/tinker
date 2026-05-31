@@ -18,6 +18,7 @@ import {
   gridLayout,
 } from './lib/layout'
 import type { ILayoutNode, ITerminalTab, SplitDirection } from './lib/layout'
+import { getTerminalSession } from 'share/components/Terminal'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
@@ -161,7 +162,7 @@ class Store extends BaseStore {
     if (!tab) return
 
     const newPaneId = uuid()
-    const cwd = await terminal.getFullCwd(paneId)
+    const cwd = (await getTerminalSession(paneId)?.getInfo())?.cwd ?? ''
     if (cwd) {
       this.pendingCwd[newPaneId] = cwd
     }
@@ -224,7 +225,7 @@ class Store extends BaseStore {
     // Create missing panes
     const newPaneIds: string[] = []
     if (paneIds.length < targetCount) {
-      const cwd = await terminal.getFullCwd(paneIds[0])
+      const cwd = (await getTerminalSession(paneIds[0])?.getInfo())?.cwd ?? ''
       for (let i = paneIds.length; i < targetCount; i++) {
         const newPaneId = uuid()
         if (cwd) {

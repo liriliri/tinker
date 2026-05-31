@@ -113,3 +113,21 @@ export type IpcPausePluginDownload = (downloadId: string) => void
 export type IpcResumePluginDownload = (downloadId: string) => void
 export type IpcCancelPluginDownload = (downloadId: string) => void
 export type IpcGetPluginDownloads = () => Promise<IDownloadProgress[]>
+
+export type IpcCreateTerminal = (
+  sessionId: string,
+  cols: number,
+  rows: number,
+  cwd?: string,
+  shell?: string
+) => void
+export type IpcWriteTerminal = (sessionId: string, data: string) => void
+export type IpcResizeTerminal = (
+  sessionId: string,
+  cols: number,
+  rows: number
+) => void
+export type IpcDestroyTerminal = (sessionId: string) => void
+export type IpcGetTerminalInfo = (
+  sessionId: string
+) => Promise<{ processName: string; cwd: string }>

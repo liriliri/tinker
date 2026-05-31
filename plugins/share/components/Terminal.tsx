@@ -5,6 +5,7 @@ import { FitAddon } from '@xterm/addon-fit'
 import { useTranslation } from 'react-i18next'
 import { tw, THEME_COLORS } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
+import type { TerminalSession } from '../lib/terminal'
 
 const I18N_NS = 'terminal'
 
@@ -21,21 +22,10 @@ addI18nNamespace(I18N_NS, {
   },
 })
 
-export interface TerminalApi {
-  write(id: string, data: string): void
-  resize(id: string, cols: number, rows: number): void
-  onData(id: string, cb: (data: string) => void): void
-  onClose(id: string, cb: () => void): void
-  onInput(id: string, cb: () => void): void
-  getProcessName(id: string): string
-  getCwd(id: string): Promise<string>
-}
-
 export interface TerminalProps {
   id: string
-  api: TerminalApi
+  createSession: (cols: number, rows: number) => TerminalSession
   isDark: boolean
-  onInit?: (id: string, cols: number, rows: number) => void
   onTitleChange?: (id: string, title: string) => void
   onFocus?: () => void
   extraContextMenuItems?: () => MenuItemConstructorOptions[]
@@ -47,29 +37,30 @@ interface TerminalInstance {
   fitAddon: FitAddon
   resizeObserver: ResizeObserver
   inputDisposable: { dispose: () => void }
+  session: TerminalSession
 }
 
 const instances = new Map<string, TerminalInstance>()
 
-export function destroyTerminal(
-  id: string,
-  api: { destroy(id: string): void }
-) {
-  api.destroy(id)
+/** Look up an active session by pane id. Returns undefined if not yet mounted. */
+export function getTerminalSession(id: string): TerminalSession | undefined {
+  return instances.get(id)?.session
+}
+
+export function destroyTerminal(id: string) {
   const instance = instances.get(id)
-  if (instance) {
-    instance.inputDisposable.dispose()
-    instance.resizeObserver.disconnect()
-    instance.xterm.dispose()
-    instances.delete(id)
-  }
+  if (!instance) return
+  instance.session.destroy()
+  instance.inputDisposable.dispose()
+  instance.resizeObserver.disconnect()
+  instance.xterm.dispose()
+  instances.delete(id)
 }
 
 function getOrCreateInstance(
   id: string,
-  api: TerminalApi,
+  createSession: (cols: number, rows: number) => TerminalSession,
   isDark: boolean,
-  onInit?: (id: string, cols: number, rows: number) => void,
   onTitleChange?: (id: string, title: string) => void
 ): TerminalInstance {
   const existing = instances.get(id)
@@ -102,26 +93,49 @@ function getOrCreateInstance(
   xterm.loadAddon(fitAddon)
   xterm.open(element)
 
+  // Defer session creation until xterm has fitted to its container so we
+  // know the real cols/rows.
+  const sessionRef: { current: TerminalSession | null } = { current: null }
+
   const inputDisposable = xterm.onData((data) => {
-    api.write(id, data)
+    sessionRef.current?.write(data)
   })
 
   const resizeObserver = new ResizeObserver(() => {
     requestAnimationFrame(() => {
       if (element.offsetWidth > 0 && element.offsetHeight > 0) {
         fitAddon.fit()
-        api.resize(id, xterm.cols, xterm.rows)
+        sessionRef.current?.resize(xterm.cols, xterm.rows)
       }
     })
   })
   resizeObserver.observe(element)
 
+  const instance: TerminalInstance = {
+    element,
+    xterm,
+    fitAddon,
+    resizeObserver,
+    inputDisposable,
+    // Placeholder; will be replaced once we spawn the session below.
+    session: {
+      write() {},
+      resize() {},
+      destroy() {},
+      onData() {},
+      onClose() {},
+      onInput() {},
+      getInfo: () => Promise.resolve({ processName: '', cwd: '' }),
+    },
+  }
+  instances.set(id, instance)
+
   requestAnimationFrame(() => {
     fitAddon.fit()
 
-    if (onInit) {
-      onInit(id, xterm.cols, xterm.rows)
-    }
+    const session = createSession(xterm.cols, xterm.rows)
+    sessionRef.current = session
+    instance.session = session
 
     let titleTimer: ReturnType<typeof setTimeout> | null = null
     let lastTitle = ''
@@ -129,10 +143,10 @@ function getOrCreateInstance(
       if (!onTitleChange) return
       if (titleTimer) clearTimeout(titleTimer)
       titleTimer = setTimeout(async () => {
-        const name = api.getProcessName(id)
-        if (name) {
-          const cwd = await api.getCwd(id)
-          const title = cwd ? `${cwd}:${name}` : name
+        const { processName, cwd } = await session.getInfo()
+        if (processName) {
+          const cwdName = cwd.split(/[/\\]/).pop() || ''
+          const title = cwdName ? `${cwdName}:${processName}` : processName
           if (title !== lastTitle) {
             lastTitle = title
             onTitleChange(id, title)
@@ -141,35 +155,26 @@ function getOrCreateInstance(
       }, 300)
     }
 
-    api.onData(id, (data: string) => {
+    session.onData((data: string) => {
       xterm.write(data)
       updateTitle()
     })
 
-    api.onClose(id, () => {
+    session.onClose(() => {
       xterm.writeln('\r\n[Process exited]')
     })
 
-    api.onInput(id, updateTitle)
+    session.onInput(updateTitle)
     updateTitle()
   })
 
-  const instance: TerminalInstance = {
-    element,
-    xterm,
-    fitAddon,
-    resizeObserver,
-    inputDisposable,
-  }
-  instances.set(id, instance)
   return instance
 }
 
 export default function Terminal({
   id,
-  api,
+  createSession,
   isDark,
-  onInit,
   onTitleChange,
   onFocus,
   extraContextMenuItems,
@@ -181,7 +186,12 @@ export default function Terminal({
     const container = containerRef.current
     if (!container) return
 
-    const instance = getOrCreateInstance(id, api, isDark, onInit, onTitleChange)
+    const instance = getOrCreateInstance(
+      id,
+      createSession,
+      isDark,
+      onTitleChange
+    )
     container.appendChild(instance.element)
 
     requestAnimationFrame(() => {
@@ -214,7 +224,7 @@ export default function Terminal({
           label: t('paste'),
           click: async () => {
             const text = await navigator.clipboard.readText()
-            api.write(id, text)
+            instance.session.write(text)
           },
         },
         { type: 'separator' },
@@ -232,7 +242,7 @@ export default function Terminal({
 
       tinker.showContextMenu(e.clientX, e.clientY, items)
     },
-    [id, t, api, extraContextMenuItems]
+    [id, t, extraContextMenuItems]
   )
 
   const handleFocus = useCallback(() => {

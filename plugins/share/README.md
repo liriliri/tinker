@@ -236,32 +236,29 @@ const popup = openPopupWindow(
 
 Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?` (default true), `resizable?` (default true), `webviewTag?`.
 
-### Terminal (Preload)
+### Terminal (Renderer)
+
+Use `tinker.createTerminal(opts)` directly from the renderer — there is no preload wrapper to write. PTY processes are owned by the main process (`src/main/lib/plugin/terminal.ts`) and automatically destroyed when the plugin's webContents closes.
 
 ```ts
-import { createTerminalApi } from 'share/lib/terminal'
-import type { TerminalApi, ShellInfo, PtySession } from 'share/lib/terminal'
-
-const api = createTerminalApi()
-// Expose via contextBridge in your preload script
+const session = tinker.createTerminal({ cols, rows, cwd, shell })
+session.onData((data) => xterm.write(data))
+session.write('ls\n')
+session.resize(120, 40)
+session.destroy()
 ```
 
-Creates a local PTY manager for use in preload scripts. Methods:
+`session` is a `tinker.Terminal` instance with `write/resize/destroy/onData/onClose/onInput/getProcessName/getCwd/getFullCwd`. See `plugins/api-types/tinker.d.ts` for the full type.
 
-- `create(id, cols, rows, cwd?, shell?)` — spawn a shell
-- `write(id, data)` — send input to terminal
-- `resize(id, cols, rows)` — resize PTY
-- `destroy(id)` — kill terminal
-- `onData(id, callback)` — listen for output data
-- `onClose(id, callback)` — listen for process exit
-- `onInput(id, callback)` — listen for user input (newline)
-- `getProcessName(id)` — current process name
-- `getCwd(id)` — current working directory basename
-- `getFullCwd(id)` — full CWD path
-- `getDefaultShell()` — system default shell path
-- `getAvailableShells()` — list available shells as `ShellInfo[]`
+For shell discovery (preload only — uses `fs`/`os`):
 
-Accepts an optional `sessions` Map for sharing session state with plugin-specific extensions (e.g. SSH).
+```ts
+import { getDefaultShell, getAvailableShells } from 'share/lib/terminal'
+```
+
+Re-export through your plugin's `contextBridge` if the renderer needs them.
+
+The shared `<Terminal>` component in `share/components/Terminal.tsx` accepts a `createSession: (cols, rows) => TerminalSession` factory so plugins can mix `tinker.createTerminal(...)` with other session types (e.g. an SSH wrapper exposed by the plugin's own preload). Use `getTerminalSession(paneId)` from the same module to look up an active session by pane id.
 
 ## When To Update This File
 

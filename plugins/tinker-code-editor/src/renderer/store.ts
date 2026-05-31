@@ -3,6 +3,7 @@ import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
 import TextSearch, { type TextSearchActiveMatch } from 'share/lib/TextSearch'
+import { getTerminalSession } from 'share/components/Terminal'
 import { byteRangeToColumns } from 'share/lib/textSearchHighlight'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import type {
@@ -292,7 +293,7 @@ class Store extends BaseStore {
     if (!tab) return
 
     const newPaneId = uuid()
-    const cwd = await codeEditor.getTerminalFullCwd(paneId)
+    const cwd = (await getTerminalSession(paneId)?.getInfo())?.cwd ?? ''
     if (cwd) {
       this.pendingCwd[newPaneId] = cwd
     }
@@ -355,7 +356,7 @@ class Store extends BaseStore {
     // Create missing panes
     const newPaneIds: string[] = []
     if (paneIds.length < targetCount) {
-      const cwd = await codeEditor.getTerminalFullCwd(paneIds[0])
+      const cwd = (await getTerminalSession(paneIds[0])?.getInfo())?.cwd ?? ''
       for (let i = paneIds.length; i < targetCount; i++) {
         const newPaneId = uuid()
         if (cwd) {

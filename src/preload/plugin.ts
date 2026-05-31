@@ -32,6 +32,16 @@ import {
   getDownloads,
   attachDownload,
 } from './lib/download'
+import {
+  createTerminal,
+  writeTerminal,
+  resizeTerminal,
+  destroyTerminal,
+  onTerminalData,
+  onTerminalClose,
+  onTerminalInput,
+  getTerminalInfo,
+} from './lib/terminal'
 import types from 'licia/types'
 import { i18n } from 'common/util'
 import fs from 'node:fs'
@@ -174,6 +184,14 @@ const tinkerObj = {
   callAIStream,
   abortAI,
   getProviderList,
+  createTerminal,
+  writeTerminal,
+  resizeTerminal,
+  destroyTerminal,
+  onTerminalData,
+  onTerminalClose,
+  onTerminalInput,
+  getTerminalInfo,
   t(key: string) {
     return i18n.t(key)
   },
