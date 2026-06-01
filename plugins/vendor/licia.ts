@@ -55,6 +55,7 @@ import pluck from 'licia/pluck'
 import openFile from 'licia/openFile'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
+import randomItem from 'licia/randomItem'
 import remove from 'licia/remove'
 import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
@@ -130,6 +131,7 @@ const licia = {
   pluck,
   query,
   randomBytes,
+  randomItem,
   remove,
   rtrim,
   shuffle,
@@ -209,6 +211,7 @@ export {
   pluck,
   query,
   randomBytes,
+  randomItem,
   remove,
   rtrim,
   shuffle,
