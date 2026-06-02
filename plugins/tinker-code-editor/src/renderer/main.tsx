@@ -78,10 +78,7 @@ const App = observer(function App() {
     ])
   }
 
-  const tabs = store.tabs.map((tab) => ({
-    ...tab,
-    title: tab.isDirty ? `● ${tab.title}` : tab.title,
-  }))
+  void store.tabDirtyRevision
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden">
@@ -117,16 +114,23 @@ const App = observer(function App() {
                       >
                         <div className="flex-1 min-w-0 h-full">
                           <TabBar
-                            tabs={tabs}
+                            tabs={store.tabs}
                             activeTabId={store.activeTabId}
                             hideFirstBorder
                             onClose={(id) => store.closeTab(id)}
                             onActivate={(id) => store.setActiveTab(id)}
                             onMove={(from, to) => store.moveTab(from, to)}
                             onContextMenu={handleContextMenu}
-                            renderIcon={() => (
-                              <File size={14} className={tw.text.tertiary} />
-                            )}
+                            renderIcon={(tab) =>
+                              tab.isDirty ? (
+                                <span
+                                  className={`inline-block w-1.5 h-1.5 rounded-full ${tw.primary.bg}`}
+                                  aria-hidden
+                                />
+                              ) : (
+                                <File size={14} className={tw.text.tertiary} />
+                              )
+                            }
                           />
                         </div>
                         <div

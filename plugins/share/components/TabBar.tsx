@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, ReactNode } from 'react'
+import { useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { X, Loader2, Plus } from 'lucide-react'
 import { tw } from 'share/theme'
 

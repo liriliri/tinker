@@ -1,7 +1,24 @@
 import { contextBridge } from 'electron'
+import { watch, type FSWatcher } from 'chokidar'
+import debounce from 'licia/debounce'
 import * as fs from 'fs'
 import * as path from 'path'
 import { homedir } from 'os'
+import normalizePath from 'licia/normalizePath'
+import type { IFileWatchEvent, FileWatchEventType } from '../common/types'
+
+const WATCH_EVENTS = new Set<FileWatchEventType>([
+  'add',
+  'addDir',
+  'change',
+  'unlink',
+  'unlinkDir',
+])
+
+let watcher: FSWatcher | null = null
+let watchSession = 0
+let pendingEvents: IFileWatchEvent[] = []
+let flushDebounced: ReturnType<typeof debounce> | null = null
 
 interface IDirEntry {
   name: string
@@ -19,9 +36,6 @@ const codeEditorObj = {
     const result: IDirEntry[] = []
 
     for (const entry of entries) {
-      if (entry.name.startsWith('.')) continue
-      if (entry.name === 'node_modules') continue
-
       result.push({
         name: entry.name,
         path: path.join(dirPath, entry.name),
@@ -52,6 +66,72 @@ const codeEditorObj = {
       return true
     } catch {
       return false
+    }
+  },
+
+  watchPaths(
+    paths: string[],
+    onChange: (events: IFileWatchEvent[]) => void
+  ): () => void {
+    const session = ++watchSession
+    flushDebounced?.cancel()
+    flushDebounced = null
+    pendingEvents = []
+    void watcher?.close()
+    watcher = null
+
+    if (paths.length === 0) {
+      return () => {
+        watchSession++
+        flushDebounced?.cancel()
+        flushDebounced = null
+        pendingEvents = []
+        void watcher?.close()
+        watcher = null
+      }
+    }
+
+    flushDebounced = debounce(() => {
+      if (session !== watchSession) return
+      const batch = pendingEvents
+      pendingEvents = []
+      if (batch.length > 0) onChange(batch)
+    }, 300)
+
+    setImmediate(() => {
+      if (session !== watchSession) return
+
+      const w = watch(paths, {
+        ignoreInitial: true,
+        persistent: true,
+        depth: 0,
+        ignorePermissionErrors: true,
+      })
+
+      if (session !== watchSession) {
+        void w.close()
+        return
+      }
+
+      watcher = w
+
+      w.on('all', (event, filePath) => {
+        if (!WATCH_EVENTS.has(event as FileWatchEventType)) return
+        pendingEvents.push({
+          type: event as FileWatchEventType,
+          path: normalizePath(filePath),
+        })
+        flushDebounced?.()
+      })
+    })
+
+    return () => {
+      watchSession++
+      flushDebounced?.cancel()
+      flushDebounced = null
+      pendingEvents = []
+      void watcher?.close()
+      watcher = null
     }
   },
 }

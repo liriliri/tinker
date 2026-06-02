@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { tw, THEME_COLORS } from 'share/theme'
 import { getFileIcon } from 'share/lib/util'
 import { CODE_EXTS } from 'share/lib/fileType'
+import normalizePath from 'licia/normalizePath'
 import store from '../store'
 import type { ITreeNode } from '../../common/types'
 
@@ -123,11 +124,19 @@ const TreeNodeItem = observer(function TreeNodeItem({
       return
     }
 
-    if (!loaded) {
+    const willExpand = !expanded
+    if (willExpand && !loaded) {
       await loadChildren()
     }
-    setExpanded(!expanded)
+    setExpanded(willExpand)
+    store.setDirExpanded(node.path, willExpand)
   }
+
+  useEffect(() => {
+    const dirPath = normalizePath(node.path)
+    if (!expanded || !loaded || !store.treeRefreshDirs.has(dirPath)) return
+    void loadChildren().finally(() => store.consumeTreeRefresh(node.path))
+  }, [store.treeRefreshVersion, expanded, loaded, node.path, loadChildren])
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -143,6 +152,7 @@ const TreeNodeItem = observer(function TreeNodeItem({
             if (!expanded) {
               if (!loaded) await loadChildren()
               setExpanded(true)
+              store.setDirExpanded(node.path, true)
             }
             onStartCreate(node.path, 'file')
           },
@@ -153,6 +163,7 @@ const TreeNodeItem = observer(function TreeNodeItem({
             if (!expanded) {
               if (!loaded) await loadChildren()
               setExpanded(true)
+              store.setDirExpanded(node.path, true)
             }
             onStartCreate(node.path, 'directory')
           },
@@ -334,6 +345,8 @@ export default observer(function FileTree() {
   const handleRefreshParent = async (parentPath: string) => {
     if (parentPath === store.rootPath) {
       await store.loadDirectory(store.rootPath)
+    } else if (store.watchedDirs.has(normalizePath(parentPath))) {
+      store.markTreeDirDirty(parentPath)
     }
   }
 

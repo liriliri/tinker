@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction } from 'mobx'
+import { makeAutoObservable, observable, reaction } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
@@ -12,8 +12,13 @@ import type {
   ITerminalTab,
   ILayoutNode,
   SplitDirection,
+  IFileWatchEvent,
 } from '../common/types'
+import normalizePath from 'licia/normalizePath'
+import { parentDir } from '../common/path'
 import last from 'licia/last'
+
+const SAVE_IGNORE_MS = 500
 
 const storage = new LocalStore('tinker-code-editor')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
@@ -149,6 +154,16 @@ class Store extends BaseStore {
   private editorInstances: Map<string, MonacoEditor.IStandaloneCodeEditor> =
     new Map()
   private pendingReveals: Map<string, RevealTarget> = new Map()
+  private unwatch?: () => void
+  private refreshingTree = false
+  watchedDirs = observable.set<string>()
+  treeRefreshDirs = observable.set<string>()
+  treeRefreshVersion = 0
+  private recentlySavedPaths = new Map<string, number>()
+
+  get tabDirtyRevision(): string {
+    return this.tabs.map((t) => `${t.id}:${t.isDirty ? 1 : 0}`).join('|')
+  }
 
   constructor() {
     super()
@@ -171,6 +186,113 @@ class Store extends BaseStore {
         this.textSearch.setRootDir(rootPath)
       }
     )
+    reaction(
+      () => this.getWatchPaths().join('\0'),
+      () => this.syncFileWatcher()
+    )
+  }
+
+  private getWatchPaths(): string[] {
+    const paths = new Set<string>()
+    if (this.rootPath) paths.add(normalizePath(this.rootPath))
+    this.watchedDirs.forEach((dir) => paths.add(dir))
+    for (const tab of this.tabs) paths.add(normalizePath(tab.filePath))
+    return [...paths]
+  }
+
+  private syncFileWatcher() {
+    this.unwatch?.()
+    this.unwatch = undefined
+
+    const paths = this.getWatchPaths()
+    if (paths.length === 0) return
+
+    this.unwatch = codeEditor.watchPaths(paths, (events) => {
+      this.handleWatchEvents(events)
+    })
+  }
+
+  setDirExpanded(dirPath: string, expanded: boolean) {
+    const dir = normalizePath(dirPath)
+    if (expanded) {
+      this.watchedDirs.add(dir)
+    } else {
+      this.watchedDirs.delete(dir)
+    }
+  }
+
+  consumeTreeRefresh(dirPath: string) {
+    this.treeRefreshDirs.delete(normalizePath(dirPath))
+  }
+
+  markTreeDirDirty(dirPath: string) {
+    const dir = normalizePath(dirPath)
+    if (!this.treeRefreshDirs.has(dir)) {
+      this.treeRefreshDirs.add(dir)
+    }
+    this.treeRefreshVersion++
+  }
+
+  private shouldIgnoreFileChange(filePath: string): boolean {
+    const normalized = normalizePath(filePath)
+    const savedAt = this.recentlySavedPaths.get(normalized)
+    if (!savedAt) return false
+    if (Date.now() - savedAt < SAVE_IGNORE_MS) return true
+    this.recentlySavedPaths.delete(normalized)
+    return false
+  }
+
+  private handleWatchEvents(events: IFileWatchEvent[]) {
+    let refreshRoot = false
+    const dirsToRefresh = new Set<string>()
+    const filesToReload = new Set<string>()
+    const root = this.rootPath ? normalizePath(this.rootPath) : ''
+
+    for (const event of events) {
+      const filePath = normalizePath(event.path)
+
+      if (event.type === 'change') {
+        if (!this.shouldIgnoreFileChange(filePath)) {
+          filesToReload.add(filePath)
+        }
+        continue
+      }
+
+      const parent = parentDir(filePath)
+      if (parent === root) {
+        refreshRoot = true
+      } else if (this.watchedDirs.has(parent)) {
+        dirsToRefresh.add(parent)
+      }
+    }
+
+    if (refreshRoot) {
+      void this.refreshRootTree()
+    }
+    dirsToRefresh.forEach((dir) => this.markTreeDirDirty(dir))
+    filesToReload.forEach((filePath) => void this.reloadOpenFile(filePath))
+  }
+
+  private async reloadOpenFile(filePath: string) {
+    const normalized = normalizePath(filePath)
+    const tab = this.tabs.find((t) => normalizePath(t.filePath) === normalized)
+    if (!tab || tab.isDirty) return
+
+    try {
+      tab.content = (await tinker.readFile(filePath, 'utf-8')) as string
+    } catch {
+      // ignore read errors
+    }
+  }
+
+  private async refreshRootTree() {
+    if (!this.rootPath || this.refreshingTree) return
+    this.refreshingTree = true
+    try {
+      await this.loadDirectory(this.rootPath)
+    } finally {
+      this.refreshingTree = false
+    }
   }
 
   toggleSidebar() {
@@ -395,6 +517,8 @@ class Store extends BaseStore {
     if (!result.canceled && result.filePaths.length > 0) {
       this.rootPath = result.filePaths[0]
       storage.set(STORAGE_ROOT_PATH, this.rootPath)
+      this.watchedDirs.clear()
+      this.treeRefreshDirs.clear()
       await this.loadDirectory(this.rootPath)
     }
   }
@@ -516,6 +640,7 @@ class Store extends BaseStore {
     try {
       await tinker.writeFile(tab.filePath, tab.content, 'utf-8')
       tab.isDirty = false
+      this.recentlySavedPaths.set(normalizePath(tab.filePath), Date.now())
     } catch {
       // ignore write errors
     }
