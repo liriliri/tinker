@@ -3,9 +3,30 @@ import { useEffect, useRef, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { useTranslation } from 'react-i18next'
+import isWindows from 'licia/isWindows'
 import { tw, THEME_COLORS } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
 import type { TerminalSession } from '../lib/terminal'
+
+function formatPathForShell(path: string): string {
+  if (isWindows) {
+    return /[\s&^()[\]{};!'+,=`~]/.test(path) ? `"${path}"` : path
+  }
+  if (/[^A-Za-z0-9_./:@%+\-,~]/.test(path)) {
+    return `'${path.replace(/'/g, "'\\''")}'`
+  }
+  return path
+}
+
+function getPathsFromDataTransfer(dataTransfer: DataTransfer): string[] {
+  const paths: string[] = []
+  const { files } = dataTransfer
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i] as File & { path?: string }
+    if (file.path) paths.push(file.path)
+  }
+  return paths
+}
 
 const I18N_NS = 'terminal'
 
@@ -248,6 +269,42 @@ export default function Terminal({
   const handleFocus = useCallback(() => {
     onFocus?.()
   }, [onFocus])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const paths = e.dataTransfer
+        ? getPathsFromDataTransfer(e.dataTransfer)
+        : []
+      if (paths.length === 0) return
+
+      const instance = instances.get(id)
+      if (!instance) return
+
+      const text = paths.map(formatPathForShell).join(' ')
+      instance.session.write(text)
+      instance.xterm.focus()
+      onFocus?.()
+    }
+
+    container.addEventListener('dragover', handleDragOver)
+    container.addEventListener('drop', handleDrop)
+
+    return () => {
+      container.removeEventListener('dragover', handleDragOver)
+      container.removeEventListener('drop', handleDrop)
+    }
+  }, [id, onFocus])
 
   return (
     <div

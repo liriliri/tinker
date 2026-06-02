@@ -14,5 +14,9 @@
   "newFile": "新建文件",
   "newFolder": "新建文件夹",
   "rename": "重命名",
-  "delete": "删除"
+  "delete": "删除",
+  "showInFolder": "在文件管理器中显示",
+  "openInIntegratedTerminal": "在集成终端中打开",
+  "copyPath": "复制路径",
+  "copyRelativePath": "复制相对路径"
 }

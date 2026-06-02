@@ -13,6 +13,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 import { getFileIcon } from 'share/lib/util'
 import { CODE_EXTS } from 'share/lib/fileType'
 import normalizePath from 'licia/normalizePath'
+import { relativePath } from '../lib/path'
 import store from '../store'
 import type { ITreeNode } from '../../common/types'
 
@@ -173,6 +174,28 @@ const TreeNodeItem = observer(function TreeNodeItem({
     }
 
     items.push(
+      {
+        label: t('showInFolder'),
+        click: () => tinker.showItemInPath(node.path),
+      },
+      {
+        label: t('openInIntegratedTerminal'),
+        click: () =>
+          store.openInIntegratedTerminal(node.path, node.isDirectory),
+      },
+      { type: 'separator' },
+      {
+        label: t('copyPath'),
+        click: () => navigator.clipboard.writeText(node.path),
+      },
+      {
+        label: t('copyRelativePath'),
+        click: () =>
+          navigator.clipboard.writeText(
+            relativePath(store.rootPath, node.path)
+          ),
+      },
+      { type: 'separator' },
       {
         label: t('rename'),
         click: () => onStartRename(node.path),

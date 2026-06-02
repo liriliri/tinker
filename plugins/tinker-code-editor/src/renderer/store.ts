@@ -17,7 +17,7 @@ import type {
   IFileWatchEvent,
 } from '../common/types'
 import normalizePath from 'licia/normalizePath'
-import { parentDir } from '../common/path'
+import { parentDir } from './lib/path'
 import last from 'licia/last'
 
 const SAVE_IGNORE_MS = 500
@@ -328,9 +328,12 @@ class Store extends BaseStore {
     }
   }
 
-  addTerminalTab() {
+  addTerminalTab(cwd?: string) {
     this.terminalTabCounter++
     const paneId = uuid()
+    if (cwd) {
+      this.pendingCwd[paneId] = cwd
+    }
     const tab: ITerminalTab = {
       id: uuid(),
       title: `Terminal ${this.terminalTabCounter}`,
@@ -339,6 +342,13 @@ class Store extends BaseStore {
     this.terminalTabs.push(tab)
     this.activeTerminalTabId = tab.id
     this.activePaneId = paneId
+  }
+
+  openInIntegratedTerminal(path: string, isDirectory: boolean) {
+    const cwd = isDirectory ? path : parentDir(path)
+    this.terminalOpen = true
+    storage.set(STORAGE_TERMINAL_OPEN, true)
+    this.addTerminalTab(cwd)
   }
 
   closeTerminalTab(id: string) {
