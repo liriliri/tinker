@@ -1,9 +1,13 @@
 import { createContext, useContext } from 'react'
-import type TextSearch from '../../lib/TextSearch'
-import type { TextSearchActiveMatch } from '../../lib/TextSearch'
+import type {
+  TextSearchActiveMatch,
+  TextSearchUIActions,
+  TextSearchUIState,
+} from '../../lib/textSearch'
 
-export interface TextSearchContextValue {
-  search: TextSearch
+export interface TextSearchContextValue
+  extends TextSearchUIState,
+    TextSearchUIActions {
   /** Called when the user clicks a match line. */
   onSelectMatch?: (match: TextSearchActiveMatch) => void
   /** Show the folder picker button in the toolbar (default: true). */

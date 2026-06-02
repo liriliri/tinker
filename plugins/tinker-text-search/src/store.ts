@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import splitPath from 'licia/splitPath'
 import BaseStore from 'share/BaseStore'
-import TextSearch, { type TextSearchActiveMatch } from 'share/lib/TextSearch'
+import TextSearch, { type TextSearchActiveMatch } from 'share/lib/textSearch'
 
 class Store extends BaseStore {
   search = new TextSearch({ storageNamespace: 'tinker-text-search' })

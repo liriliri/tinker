@@ -6,7 +6,9 @@ import {
   useDefaultLayout,
 } from 'react-resizable-panels'
 import { ToasterProvider } from 'share/components/Toaster'
-import TextSearchSidebar from 'share/components/TextSearch'
+import TextSearchSidebar, {
+  getTextSearchUIProps,
+} from 'share/components/TextSearch'
 import { tw } from 'share/theme'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -34,7 +36,7 @@ const App = observer(function App() {
         >
           <Panel id="sidebar" defaultSize={360} minSize={280}>
             <TextSearchSidebar
-              search={store.search}
+              {...getTextSearchUIProps(store.search)}
               onSelectMatch={store.selectMatch}
             />
           </Panel>

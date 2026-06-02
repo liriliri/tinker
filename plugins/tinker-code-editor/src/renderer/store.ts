@@ -2,9 +2,11 @@ import { makeAutoObservable, observable, reaction } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import TextSearch, { type TextSearchActiveMatch } from 'share/lib/TextSearch'
+import TextSearch, {
+  byteRangeToColumns,
+  type TextSearchActiveMatch,
+} from 'share/lib/textSearch'
 import { getTerminalSession } from 'share/components/Terminal'
-import { byteRangeToColumns } from 'share/lib/textSearchHighlight'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import type {
   ITreeNode,

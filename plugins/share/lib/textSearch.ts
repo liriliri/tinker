@@ -1,6 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import clamp from 'licia/clamp'
 import debounce from 'licia/debounce'
 import LocalStore from 'licia/LocalStore'
+import rtrim from 'licia/rtrim'
+import sortBy from 'licia/sortBy'
 import { fileExists } from './util'
 
 export interface TextSearchFileGroup {
@@ -26,6 +29,47 @@ export interface TextSearchOptions {
   initialRootDir?: string
 }
 
+export interface TextSearchUIState {
+  query: string
+  rootDir: string
+  includes: string
+  excludes: string
+  caseSensitive: boolean
+  wholeWord: boolean
+  regex: boolean
+  maxResults: number
+  showInclude: boolean
+  groups: TextSearchFileGroup[]
+  collapsed: Record<string, boolean>
+  searching: boolean
+  totalMatches: number
+  totalFiles: number
+  truncated: boolean
+  activeMatchKey: string
+}
+
+export interface TextSearchUIActions {
+  onQueryChange: (value: string) => void
+  onIncludesChange: (value: string) => void
+  onExcludesChange: (value: string) => void
+  onCaseSensitiveChange: (value: boolean) => void
+  onWholeWordChange: (value: boolean) => void
+  onRegexChange: (value: boolean) => void
+  onMaxResultsChange: (value: number) => void
+  onShowIncludeChange: (value: boolean) => void
+  onActiveMatchKeyChange: (key: string) => void
+  onClear: () => void
+  onToggleCollapse: (path: string) => void
+  onPickFolder: () => void
+  onShowInFolder: (path: string) => void
+  onCopyPath: (path: string) => void
+}
+
+export interface TextSearchSegment {
+  text: string
+  matched: boolean
+}
+
 const STORAGE_ROOT_DIR = 'rootDir'
 const STORAGE_INCLUDES = 'includes'
 const STORAGE_EXCLUDES = 'excludes'
@@ -34,6 +78,130 @@ const STORAGE_WHOLE_WORD = 'wholeWord'
 const STORAGE_REGEX = 'regex'
 const STORAGE_MAX_RESULTS = 'maxResults'
 const STORAGE_SHOW_INCLUDE = 'showInclude'
+
+const encoder = new TextEncoder()
+const decoder = new TextDecoder()
+
+/** Map a MobX `TextSearch` instance to plain UI props. Call inside an observer. */
+export function getTextSearchUIProps(
+  search: TextSearch
+): TextSearchUIState & TextSearchUIActions {
+  return {
+    query: search.query,
+    rootDir: search.rootDir,
+    includes: search.includes,
+    excludes: search.excludes,
+    caseSensitive: search.caseSensitive,
+    wholeWord: search.wholeWord,
+    regex: search.regex,
+    maxResults: search.maxResults,
+    showInclude: search.showInclude,
+    groups: search.groups,
+    collapsed: Object.fromEntries(search.collapsed),
+    searching: search.searching,
+    totalMatches: search.totalMatches,
+    totalFiles: search.totalFiles,
+    truncated: search.truncated,
+    activeMatchKey: search.activeMatchKey,
+    onQueryChange: (value) => search.setQuery(value),
+    onIncludesChange: (value) => search.setIncludes(value),
+    onExcludesChange: (value) => search.setExcludes(value),
+    onCaseSensitiveChange: (value) => search.setCaseSensitive(value),
+    onWholeWordChange: (value) => search.setWholeWord(value),
+    onRegexChange: (value) => search.setRegex(value),
+    onMaxResultsChange: (value) => search.setMaxResults(value),
+    onShowIncludeChange: (value) => search.setShowInclude(value),
+    onActiveMatchKeyChange: (key) => search.setActiveMatchKey(key),
+    onClear: () => search.clear(),
+    onToggleCollapse: (path) => search.toggleCollapse(path),
+    onPickFolder: () => search.pickFolder(),
+    onShowInFolder: (path) => search.showInFolder(path),
+    onCopyPath: (path) => search.copyPath(path),
+  }
+}
+
+/**
+ * Split a line of text into segments using ripgrep submatches.
+ * `start`/`end` are UTF-8 byte offsets within the line; we encode the line
+ * to bytes, slice on byte boundaries, then decode back so multi-byte chars
+ * (e.g. CJK) are not chopped.
+ */
+export function buildSegments(
+  line: string,
+  submatches: tinker.SearchTextSubmatch[]
+): TextSearchSegment[] {
+  const text = rtrim(line, ['\n', '\r'])
+  if (!submatches || submatches.length === 0) {
+    return [{ text, matched: false }]
+  }
+
+  const sorted = sortBy(submatches, (sm) => sm.start)
+  const bytes = encoder.encode(text)
+  const segments: TextSearchSegment[] = []
+  let cursor = 0
+
+  for (const sm of sorted) {
+    const start = clamp(sm.start, 0, bytes.length)
+    const end = clamp(sm.end, start, bytes.length)
+    if (start > cursor) {
+      segments.push({
+        text: decoder.decode(bytes.slice(cursor, start)),
+        matched: false,
+      })
+    }
+    if (end > start) {
+      segments.push({
+        text: decoder.decode(bytes.slice(start, end)),
+        matched: true,
+      })
+    }
+    cursor = end
+  }
+
+  if (cursor < bytes.length) {
+    segments.push({
+      text: decoder.decode(bytes.slice(cursor)),
+      matched: false,
+    })
+  }
+
+  return segments
+}
+
+/**
+ * Convert a (lineText, byteStart, byteEnd) triple to UTF-16 column offsets
+ * (1-based, suitable for monaco-editor).
+ */
+export function byteRangeToColumns(
+  lineText: string,
+  byteStart: number,
+  byteEnd: number
+): { startColumn: number; endColumn: number } {
+  const text = rtrim(lineText, ['\n', '\r'])
+  const bytes = encoder.encode(text)
+  const start = clamp(byteStart, 0, bytes.length)
+  const end = clamp(byteEnd, start, bytes.length)
+
+  const before = decoder.decode(bytes.slice(0, start))
+  const matched = decoder.decode(bytes.slice(start, end))
+
+  const startColumn = before.length + 1
+  const endColumn = startColumn + matched.length
+  return { startColumn, endColumn }
+}
+
+/** Extract a single 1-based line from a multi-line string. */
+export function getLineText(content: string, lineNumber: number): string {
+  if (!content || lineNumber < 1) return ''
+  let start = 0
+  for (let i = 1; i < lineNumber; i++) {
+    const idx = content.indexOf('\n', start)
+    if (idx === -1) return ''
+    start = idx + 1
+  }
+  const end = content.indexOf('\n', start)
+  return end === -1 ? content.slice(start) : content.slice(start, end)
+}
 
 /**
  * Reusable text search state + logic. Owns ripgrep task lifecycle, search

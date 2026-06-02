@@ -131,18 +131,22 @@ Wrap inside the player's `Provider` and `Container` from `createPlayer`. Require
 ### TextSearch
 
 ```ts
-import TextSearchSidebar from 'share/components/TextSearch'
-import TextSearch from 'share/lib/TextSearch'
+import TextSearchSidebar, {
+  getTextSearchUIProps,
+} from 'share/components/TextSearch'
+import TextSearch from 'share/lib/textSearch'
 
 const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
+
+// Call getTextSearchUIProps inside an observer — it reads MobX state.
 ;<TextSearchSidebar
-  search={search}
+  {...getTextSearchUIProps(search)}
   onSelectMatch={(m) => openInEditor(m.path, m.lineNumber, m.submatches)}
   showFolderPicker={false}
 />
 ```
 
-Display-only — `TextSearch` owns query/options/results. Helpers in `share/lib/textSearchHighlight` (`buildSegments`, `byteRangeToColumns`, `getLineText`) for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
+`TextSearchSidebar` is a pure UI component (no MobX). `TextSearch` owns query/options/results; `getTextSearchUIProps` maps it to props. Highlight helpers (`buildSegments`, `byteRangeToColumns`, `getLineText`) are exported from the same module for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
 
 ### Other Components
 

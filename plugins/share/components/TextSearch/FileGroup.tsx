@@ -1,32 +1,28 @@
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import splitPath from 'licia/splitPath'
 import ltrim from 'licia/ltrim'
 import { tw } from '../../theme'
-import type { TextSearchFileGroup } from '../../lib/TextSearch'
+import type { TextSearchFileGroup } from '../../lib/textSearch'
 import MatchLine from './MatchLine'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './namespace'
 
 interface FileGroupProps {
   group: TextSearchFileGroup
+  collapsed: boolean
 }
 
-export default observer(function FileGroup({ group }: FileGroupProps) {
+export default function FileGroup({ group, collapsed }: FileGroupProps) {
   const { t } = useTranslation(TEXT_SEARCH_NS)
-  const { search } = useTextSearchContext()
-  const collapsed = search.isCollapsed(group.path)
+  const { rootDir, onToggleCollapse, onShowInFolder, onCopyPath } =
+    useTextSearchContext()
   const { name, dir } = splitPath(group.path)
-  const relativeDir = search.rootDir
-    ? dir.startsWith(search.rootDir)
-      ? ltrim(dir.slice(search.rootDir.length), ['/', '\\']) || '.'
+  const relativeDir = rootDir
+    ? dir.startsWith(rootDir)
+      ? ltrim(dir.slice(rootDir.length), ['/', '\\']) || '.'
       : dir
     : dir
-
-  const handleToggle = () => {
-    search.toggleCollapse(group.path)
-  }
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -34,11 +30,11 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
     tinker.showContextMenu(e.clientX, e.clientY, [
       {
         label: t('showInFolder'),
-        click: () => search.showInFolder(group.path),
+        click: () => onShowInFolder(group.path),
       },
       {
         label: t('copyPath'),
-        click: () => search.copyPath(group.path),
+        click: () => onCopyPath(group.path),
       },
     ])
   }
@@ -46,7 +42,7 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
   return (
     <div>
       <div
-        onClick={handleToggle}
+        onClick={() => onToggleCollapse(group.path)}
         onContextMenu={handleContextMenu}
         className={`flex items-center py-0.5 cursor-pointer text-xs ${tw.hover}`}
         style={{ paddingLeft: 8, paddingRight: 8 }}
@@ -90,4 +86,4 @@ export default observer(function FileGroup({ group }: FileGroupProps) {
       )}
     </div>
   )
-})
+}

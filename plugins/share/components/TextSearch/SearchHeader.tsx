@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, Eraser, FolderOpen } from 'lucide-react'
 import className from 'licia/className'
@@ -17,20 +16,41 @@ import IncludeExcludePanel from './IncludeExcludePanel'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './namespace'
 
-export default observer(function SearchHeader() {
+export default function SearchHeader() {
   const { t } = useTranslation(TEXT_SEARCH_NS)
-  const { search, showFolderPicker = true } = useTextSearchContext()
+  const {
+    rootDir,
+    query,
+    searching,
+    totalMatches,
+    totalFiles,
+    truncated,
+    maxResults,
+    showInclude,
+    caseSensitive,
+    wholeWord,
+    regex,
+    showFolderPicker = true,
+    onPickFolder,
+    onMaxResultsChange,
+    onClear,
+    onShowIncludeChange,
+    onQueryChange,
+    onCaseSensitiveChange,
+    onWholeWordChange,
+    onRegexChange,
+  } = useTextSearchContext()
 
   const summary = (() => {
-    if (!search.rootDir) return t('noFolder')
-    if (!search.query.trim()) return t('noQuery')
-    if (search.searching && search.totalMatches === 0) return ''
-    if (search.totalMatches === 0) return t('noResults')
+    if (!rootDir) return t('noFolder')
+    if (!query.trim()) return t('noQuery')
+    if (searching && totalMatches === 0) return ''
+    if (totalMatches === 0) return t('noResults')
     const text = t('summary', {
-      count: search.totalMatches,
-      files: search.totalFiles,
+      count: totalMatches,
+      files: totalFiles,
     })
-    return search.truncated ? `${text} ${t('truncated')}` : text
+    return truncated ? `${text} ${t('truncated')}` : text
   })()
 
   return (
@@ -39,8 +59,8 @@ export default observer(function SearchHeader() {
         {showFolderPicker && (
           <>
             <ToolbarButton
-              onClick={() => search.pickFolder()}
-              title={search.rootDir || t('pickFolder')}
+              onClick={() => onPickFolder()}
+              title={rootDir || t('pickFolder')}
             >
               <FolderOpen size={TOOLBAR_ICON_SIZE} />
             </ToolbarButton>
@@ -50,26 +70,26 @@ export default observer(function SearchHeader() {
         <ToolbarTextInput
           type="number"
           min={1}
-          value={search.maxResults}
+          value={maxResults}
           onChange={(e) => {
             const v = Number(e.target.value)
-            if (Number.isFinite(v) && v > 0) search.setMaxResults(v)
+            if (Number.isFinite(v) && v > 0) onMaxResultsChange(v)
           }}
           className="!w-20"
           title={t('maxResults')}
         />
         <ToolbarSpacer />
-        <ToolbarButton onClick={() => search.clear()} title={t('clear')}>
+        <ToolbarButton onClick={() => onClear()} title={t('clear')}>
           <Eraser size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
         <ToolbarSeparator />
         <ToolbarButton
           variant="toggle"
-          active={search.showInclude}
-          onClick={() => search.setShowInclude(!search.showInclude)}
+          active={showInclude}
+          onClick={() => onShowIncludeChange(!showInclude)}
           title={t('toggleSearchDetails')}
         >
-          {search.showInclude ? (
+          {showInclude ? (
             <ChevronDown size={TOOLBAR_ICON_SIZE} />
           ) : (
             <ChevronRight size={TOOLBAR_ICON_SIZE} />
@@ -82,29 +102,29 @@ export default observer(function SearchHeader() {
           <div className="relative">
             <TextInput
               type="text"
-              value={search.query}
-              onChange={(e) => search.setQuery(e.target.value)}
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
               placeholder={t('searchPlaceholder')}
               className={`pr-24 focus:ring-2 ${tw.primary.focusRing}`}
             />
             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
               <ToggleIconButton
-                active={search.caseSensitive}
-                onClick={() => search.setCaseSensitive(!search.caseSensitive)}
+                active={caseSensitive}
+                onClick={() => onCaseSensitiveChange(!caseSensitive)}
                 title={t('caseSensitive')}
               >
                 <span className="font-semibold text-[11px]">Aa</span>
               </ToggleIconButton>
               <ToggleIconButton
-                active={search.wholeWord}
-                onClick={() => search.setWholeWord(!search.wholeWord)}
+                active={wholeWord}
+                onClick={() => onWholeWordChange(!wholeWord)}
                 title={t('wholeWord')}
               >
                 <span className="font-semibold text-[11px]">ab|</span>
               </ToggleIconButton>
               <ToggleIconButton
-                active={search.regex}
-                onClick={() => search.setRegex(!search.regex)}
+                active={regex}
+                onClick={() => onRegexChange(!regex)}
                 title={t('regex')}
               >
                 <span className="font-mono text-[11px]">.*</span>
@@ -112,19 +132,19 @@ export default observer(function SearchHeader() {
             </div>
           </div>
 
-          {search.showInclude && <IncludeExcludePanel />}
+          {showInclude && <IncludeExcludePanel />}
         </div>
 
         <div
           className={`flex items-center justify-center gap-1.5 text-[11px] px-2 py-1 border-t ${tw.border} ${tw.text.secondary} min-h-[1.5rem]`}
         >
-          {search.searching && <LoadingCircle className="w-3 h-3" />}
+          {searching && <LoadingCircle className="w-3 h-3" />}
           <span className="truncate">{summary}</span>
         </div>
       </div>
     </div>
   )
-})
+}
 
 interface ToggleIconButtonProps {
   active: boolean

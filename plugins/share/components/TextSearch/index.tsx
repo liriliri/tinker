@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { tw } from '../../theme'
 import { addI18nNamespace } from '../../lib/i18n'
 import enUS from './i18n/en-US.json'
@@ -12,37 +11,37 @@ import EmptyState from './EmptyState'
 addI18nNamespace(TEXT_SEARCH_NS, { 'en-US': enUS, 'zh-CN': zhCN })
 
 export type { TextSearchContextValue } from './context'
+export type {
+  TextSearchUIState,
+  TextSearchUIActions,
+} from '../../lib/textSearch'
+export { getTextSearchUIProps } from '../../lib/textSearch'
 
 interface TextSearchSidebarProps extends TextSearchContextValue {
   className?: string
 }
 
-const TextSearchSidebar = observer(function TextSearchSidebar({
-  search,
-  onSelectMatch,
-  showFolderPicker,
+export default function TextSearchSidebar({
   className = '',
+  ...contextValue
 }: TextSearchSidebarProps) {
   const renderBody = () => {
-    if (!search.rootDir) return <EmptyState variant="no-folder" />
-    if (!search.query.trim()) return <EmptyState variant="no-query" />
-    if (search.groups.length === 0) {
-      if (search.searching) return <div className="flex-1" />
+    const { rootDir, query, groups, searching } = contextValue
+    if (!rootDir) return <EmptyState variant="no-folder" />
+    if (!query.trim()) return <EmptyState variant="no-query" />
+    if (groups.length === 0) {
+      if (searching) return <div className="flex-1" />
       return <EmptyState variant="no-results" />
     }
     return <ResultList />
   }
 
   return (
-    <TextSearchContext.Provider
-      value={{ search, onSelectMatch, showFolderPicker }}
-    >
+    <TextSearchContext.Provider value={contextValue}>
       <div className={`h-full flex flex-col ${tw.bg.primary} ${className}`}>
         <SearchHeader />
         {renderBody()}
       </div>
     </TextSearchContext.Provider>
   )
-})
-
-export default TextSearchSidebar
+}

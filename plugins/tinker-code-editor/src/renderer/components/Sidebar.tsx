@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import TextSearchSidebar from 'share/components/TextSearch'
+import TextSearchSidebar, {
+  getTextSearchUIProps,
+} from 'share/components/TextSearch'
 import { tw } from 'share/theme'
 import store from '../store'
 import FileTree from './FileTree'
@@ -13,7 +15,7 @@ export default observer(function Sidebar() {
     return (
       <div className={`relative z-10 h-full ${tw.bg.tertiary}`}>
         <TextSearchSidebar
-          search={store.textSearch}
+          {...getTextSearchUIProps(store.textSearch)}
           onSelectMatch={store.selectSearchMatch}
           showFolderPicker={false}
         />

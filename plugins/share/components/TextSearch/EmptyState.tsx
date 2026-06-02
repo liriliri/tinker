@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen, Search } from 'lucide-react'
 import { tw } from '../../theme'
@@ -9,9 +8,9 @@ interface EmptyStateProps {
   variant: 'no-folder' | 'no-query' | 'no-results'
 }
 
-export default observer(function EmptyState({ variant }: EmptyStateProps) {
+export default function EmptyState({ variant }: EmptyStateProps) {
   const { t } = useTranslation(TEXT_SEARCH_NS)
-  const { search, showFolderPicker = true } = useTextSearchContext()
+  const { showFolderPicker = true, onPickFolder } = useTextSearchContext()
 
   if (variant === 'no-folder') {
     if (!showFolderPicker) {
@@ -33,7 +32,7 @@ export default observer(function EmptyState({ variant }: EmptyStateProps) {
       >
         <button
           type="button"
-          onClick={() => search.pickFolder()}
+          onClick={() => onPickFolder()}
           className={`px-3 py-1.5 text-xs rounded border ${tw.border} ${tw.hover} ${tw.text.secondary}`}
         >
           {t('pickFolder')}
@@ -52,4 +51,4 @@ export default observer(function EmptyState({ variant }: EmptyStateProps) {
       </p>
     </div>
   )
-})
+}

@@ -50,6 +50,7 @@ import map from 'licia/map'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
 import naturalSort from 'licia/naturalSort'
+import normalizePath from 'licia/normalizePath'
 import once from 'licia/once'
 import pluck from 'licia/pluck'
 import openFile from 'licia/openFile'
@@ -126,6 +127,7 @@ const licia = {
   md5,
   mime,
   naturalSort,
+  normalizePath,
   once,
   openFile,
   pluck,
@@ -206,6 +208,7 @@ export {
   md5,
   mime,
   naturalSort,
+  normalizePath,
   once,
   openFile,
   pluck,

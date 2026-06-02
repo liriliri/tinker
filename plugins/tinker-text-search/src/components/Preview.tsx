@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { File } from 'lucide-react'
 import { tw } from 'share/theme'
-import { byteRangeToColumns, getLineText } from 'share/lib/textSearchHighlight'
+import { byteRangeToColumns, getLineText } from 'share/lib/textSearch'
 import store from '../store'
 import { getLanguage } from '../lib/language'
 

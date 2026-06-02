@@ -1,9 +1,8 @@
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { tw } from '../../theme'
 import className from 'licia/className'
-import { buildSegments } from '../../lib/textSearchHighlight'
+import { buildSegments } from '../../lib/textSearch'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './namespace'
 
@@ -12,14 +11,17 @@ interface MatchLineProps {
   result: tinker.SearchTextResult
 }
 
-export default observer(function MatchLine({
-  filePath,
-  result,
-}: MatchLineProps) {
+export default function MatchLine({ filePath, result }: MatchLineProps) {
   const { t } = useTranslation(TEXT_SEARCH_NS)
-  const { search, onSelectMatch } = useTextSearchContext()
+  const {
+    activeMatchKey,
+    onSelectMatch,
+    onActiveMatchKeyChange,
+    onCopyPath,
+    onShowInFolder,
+  } = useTextSearchContext()
   const key = `${filePath}:${result.lineNumber}`
-  const isActive = search.activeMatchKey === key
+  const isActive = activeMatchKey === key
 
   const segments = useMemo(
     () => buildSegments(result.text, result.submatches),
@@ -27,7 +29,7 @@ export default observer(function MatchLine({
   )
 
   const handleClick = () => {
-    search.setActiveMatchKey(key)
+    onActiveMatchKeyChange(key)
     onSelectMatch?.({ path: filePath, ...result })
   }
 
@@ -43,12 +45,12 @@ export default observer(function MatchLine({
       },
       {
         label: t('copyPath'),
-        click: () => search.copyPath(filePath),
+        click: () => onCopyPath(filePath),
       },
       { type: 'separator' },
       {
         label: t('showInFolder'),
-        click: () => search.showInFolder(filePath),
+        click: () => onShowInFolder(filePath),
       },
     ])
   }
@@ -85,4 +87,4 @@ export default observer(function MatchLine({
       </span>
     </div>
   )
-})
+}
