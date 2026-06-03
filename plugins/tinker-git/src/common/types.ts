@@ -41,6 +41,8 @@ export interface IRepoTab {
   editorContent: string
   loading: boolean
   loadingCommits: boolean
+  loadingMoreCommits: boolean
+  hasMoreCommits: boolean
   loadingDetail: boolean
   error: string | null
 }

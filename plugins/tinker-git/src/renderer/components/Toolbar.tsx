@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen, GitBranch, RotateCw } from 'lucide-react'
+import { FolderOpen, GitBranch } from 'lucide-react'
 import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarButton,
   ToolbarSeparator,
-  ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { formatRefLabel } from '../lib/util'
@@ -48,16 +47,6 @@ export default observer(function ToolbarComponent() {
           </button>
         </>
       )}
-
-      <ToolbarSpacer />
-
-      <ToolbarButton
-        onClick={() => store.refreshBranches()}
-        disabled={!store.repoPath || store.loading}
-        title={t('refresh')}
-      >
-        <RotateCw size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
 
       <BranchSelectDialog
         open={showBranchDialog}

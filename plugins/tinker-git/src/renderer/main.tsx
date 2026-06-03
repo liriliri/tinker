@@ -35,12 +35,12 @@ const RepoPanels = observer(function RepoPanels() {
         onLayoutChange={onLayoutChange}
       >
         <Panel id="history" defaultSize="32%" minSize="22%">
-          <div className="h-full overflow-hidden">
+          <div className={`h-full overflow-hidden ${tw.bg.tertiary}`}>
             <CommitList />
           </div>
         </Panel>
         <Separator />
-        <Panel id="detail" minSize="30%">
+        <Panel id="detail" minSize="60%">
           <div className="h-full overflow-hidden">
             <CommitEditor />
           </div>

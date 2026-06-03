@@ -6,7 +6,6 @@
   "closeTabsToRight": "关闭右侧标签页",
   "openRepo": "打开仓库",
   "dropRepoHere": "将仓库文件夹拖放到此处，或点击选择",
-  "refresh": "刷新",
   "selectBranchHint": "选择分支以查看历史",
   "selectCommitHint": "选择提交以查看详情",
   "branches": "分支",
@@ -19,7 +18,9 @@
   "noTagRefs": "没有标签",
   "noSearchResults": "没有匹配的引用",
   "history": "历史",
-  "commitDetail": "提交",
   "noCommits": "未找到提交",
-  "loading": "加载中..."
+  "loading": "加载中...",
+  "copySuccess": "复制成功",
+  "copyFailed": "复制失败",
+  "clickToCopy": "点击复制"
 }

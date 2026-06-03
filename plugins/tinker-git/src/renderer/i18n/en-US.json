@@ -6,7 +6,6 @@
   "closeTabsToRight": "Close Tabs to the Right",
   "openRepo": "Open Repository",
   "dropRepoHere": "Drop a repository folder here or click to select",
-  "refresh": "Refresh",
   "selectBranchHint": "Select a branch to view history",
   "selectCommitHint": "Select a commit to view details",
   "branches": "Branches",
@@ -19,7 +18,9 @@
   "noTagRefs": "No tags",
   "noSearchResults": "No matching refs",
   "history": "History",
-  "commitDetail": "Commit",
   "noCommits": "No commits found",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "copySuccess": "Copied successfully",
+  "copyFailed": "Copy failed",
+  "clickToCopy": "Click to copy"
 }

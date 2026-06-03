@@ -4,6 +4,8 @@ import type { GitBranch, GitCommitSummary, IRepoTab } from '../common/types'
 import { formatCommitContent } from './lib/formatCommit'
 import { repoDirName } from './lib/util'
 
+const COMMITS_PAGE_SIZE = 50
+
 function createEmptyTab(id: string): IRepoTab {
   return {
     id,
@@ -17,6 +19,8 @@ function createEmptyTab(id: string): IRepoTab {
     editorContent: '',
     loading: false,
     loadingCommits: false,
+    loadingMoreCommits: false,
+    hasMoreCommits: false,
     loadingDetail: false,
     error: null,
   }
@@ -76,6 +80,14 @@ class Store extends BaseStore {
 
   get loadingCommits() {
     return this.activeTab?.loadingCommits ?? false
+  }
+
+  get loadingMoreCommits() {
+    return this.activeTab?.loadingMoreCommits ?? false
+  }
+
+  get hasMoreCommits() {
+    return this.activeTab?.hasMoreCommits ?? false
   }
 
   get loadingDetail() {
@@ -266,17 +278,53 @@ class Store extends BaseStore {
     if (!tab) return
 
     tab.loadingCommits = true
+    tab.hasMoreCommits = false
     this.setTabError(tab, null)
 
     try {
       await this.syncPreloadRepo(tab)
-      tab.commits = await git.getCommits(refName)
+      const commits = await git.getCommits(refName, COMMITS_PAGE_SIZE, 0)
+      tab.commits = commits
+      tab.hasMoreCommits = commits.length === COMMITS_PAGE_SIZE
     } catch (err) {
       console.error('Failed to load commits:', err)
       this.setTabError(tab, String(err))
       tab.commits = []
+      tab.hasMoreCommits = false
     } finally {
       tab.loadingCommits = false
+    }
+  }
+
+  async loadMoreCommits(tab: IRepoTab = this.activeTab!) {
+    if (
+      !tab?.selectedBranch ||
+      !tab.hasMoreCommits ||
+      tab.loadingCommits ||
+      tab.loadingMoreCommits
+    ) {
+      return
+    }
+
+    tab.loadingMoreCommits = true
+    this.setTabError(tab, null)
+
+    try {
+      await this.syncPreloadRepo(tab)
+      const commits = await git.getCommits(
+        tab.selectedBranch.fullName,
+        COMMITS_PAGE_SIZE,
+        tab.commits.length
+      )
+      tab.commits.push(...commits)
+      if (commits.length < COMMITS_PAGE_SIZE) {
+        tab.hasMoreCommits = false
+      }
+    } catch (err) {
+      console.error('Failed to load more commits:', err)
+      this.setTabError(tab, String(err))
+    } finally {
+      tab.loadingMoreCommits = false
     }
   }
 

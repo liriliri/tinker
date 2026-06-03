@@ -180,12 +180,29 @@ const gitObj = {
     })
   },
 
-  async getCommits(refName: string, limit = 100): Promise<GitCommitSummary[]> {
+  async getCommits(
+    refName: string,
+    limit = 100,
+    skip = 0
+  ): Promise<GitCommitSummary[]> {
     const currentRepo = requireRepo()
     const commit = await currentRepo.getReferenceCommit(refName)
     const revwalk = currentRepo.createRevWalk()
     revwalk.sorting(NodeGit.Revwalk.SORT.TIME)
     revwalk.push(await commit.id())
+
+    for (let i = 0; i < skip; i++) {
+      try {
+        await revwalk.next()
+      } catch (error) {
+        const err = error as { errno?: number }
+        if (err.errno === NodeGit.Error.CODE.ITEROVER) {
+          return []
+        }
+        throw error
+      }
+    }
+
     const commits = await revwalk.getCommits(limit)
 
     return commits.map((item) => {
