@@ -20,6 +20,9 @@
   "history": "History",
   "noCommits": "No commits found",
   "loading": "Loading...",
+  "noDiffs": "No diffs found",
+  "expand": "Expand",
+  "collapse": "Collapse",
   "copySuccess": "Copied successfully",
   "copyFailed": "Copy failed",
   "clickToCopy": "Click to copy"

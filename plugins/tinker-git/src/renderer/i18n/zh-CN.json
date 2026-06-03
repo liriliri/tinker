@@ -20,6 +20,9 @@
   "history": "历史",
   "noCommits": "未找到提交",
   "loading": "加载中...",
+  "noDiffs": "未找到 diff",
+  "expand": "展开",
+  "collapse": "折叠",
   "copySuccess": "复制成功",
   "copyFailed": "复制失败",
   "clickToCopy": "点击复制"

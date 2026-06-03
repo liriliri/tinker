@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
 import type { GitBranch, GitCommitSummary, IRepoTab } from '../common/types'
-import { formatCommitContent } from './lib/formatCommit'
 import { repoDirName } from './lib/util'
 
 const COMMITS_PAGE_SIZE = 50
@@ -342,7 +341,7 @@ class Store extends BaseStore {
       await this.syncPreloadRepo(tab)
       const detail = await git.getCommitDetail(commit.sha)
       tab.commitDetail = detail
-      tab.editorContent = formatCommitContent(detail)
+      tab.editorContent = detail.diff
     } catch (err) {
       console.error('Failed to load commit detail:', err)
       this.setTabError(tab, String(err))
