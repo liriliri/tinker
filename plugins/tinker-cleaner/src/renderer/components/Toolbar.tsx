@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RefreshCw, Trash2 } from 'lucide-react'
+import { RotateCw, Trash2 } from 'lucide-react'
 import {
   Toolbar as ToolbarBase,
   ToolbarButton,
@@ -58,7 +58,7 @@ export default observer(function ToolbarComponent() {
         title={t('scan')}
         disabled={store.scanning || store.cleaning}
       >
-        <RefreshCw
+        <RotateCw
           size={TOOLBAR_ICON_SIZE}
           className={store.scanning ? 'animate-spin' : ''}
         />

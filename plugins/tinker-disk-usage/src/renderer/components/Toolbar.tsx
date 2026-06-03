@@ -5,7 +5,7 @@ import {
   ArrowRight,
   ArrowUp,
   FolderOpen,
-  RefreshCw,
+  RotateCw,
 } from 'lucide-react'
 import {
   Toolbar as ToolbarBase,
@@ -58,7 +58,7 @@ export default observer(function Toolbar() {
 
       {store.view === 'chart' && (
         <ToolbarButton onClick={() => store.rescan()} title={t('rescan')}>
-          <RefreshCw size={TOOLBAR_ICON_SIZE} />
+          <RotateCw size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       )}
     </ToolbarBase>

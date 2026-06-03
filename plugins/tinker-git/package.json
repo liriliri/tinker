@@ -1,0 +1,26 @@
+{
+  "name": "tinker-git",
+  "version": "0.1.0",
+  "description": "Git Plugin for TINKER",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
+    "dev:renderer": "vite build --watch --config ../vite.config.ts",
+    "dev:preload": "vite build --watch --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
+  },
+  "tinker": {
+    "name": "Git",
+    "description": "View git history and perform common git operations",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
+    "icon": "icon.png",
+    "locales": {
+      "zh-CN": {
+        "name": "Git",
+        "description": "查看 Git 历史记录并执行常用 Git 操作"
+      }
+    }
+  }
+}

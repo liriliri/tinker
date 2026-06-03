@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { X, Folder, RefreshCw, PictureInPicture2 } from 'lucide-react'
+import { X, Folder, RotateCw, PictureInPicture2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   Toolbar,
@@ -62,7 +62,7 @@ export default observer(function ToolbarComponent() {
       </ToolbarButton>
 
       <ToolbarButton onClick={handleReload} title={t('reload')}>
-        <RefreshCw size={TOOLBAR_ICON_SIZE} />
+        <RotateCw size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
       <ToolbarSeparator />
