@@ -2,6 +2,7 @@ import { Editor } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
+import { Toolbar } from 'share/components/Toolbar'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
@@ -60,11 +61,11 @@ export default observer(function CommitFileViewer() {
 
   return (
     <div className="h-full w-full flex flex-col min-w-0">
-      <div
-        className={`h-8 flex items-center px-3 border-b text-xs font-mono ${tw.border} ${tw.text.secondary} ${tw.bg.secondary}`}
-      >
-        {fileName}
-      </div>
+      <Toolbar>
+        <span className={`text-xs font-mono ${tw.text.secondary}`}>
+          {fileName}
+        </span>
+      </Toolbar>
       <div className="flex-1 min-h-0">
         <Editor
           language={getLanguage(store.selectedFilePath)}
