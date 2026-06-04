@@ -52,11 +52,10 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
   return (
     <div className="tree-node">
       <div
-        className={`
-          flex items-center py-2.5 px-2 cursor-pointer
-          transition-colors
-          ${isActive ? tw.bg.secondary : tw.hover}
-        `}
+        className={className(
+          'flex items-center py-2.5 px-2 cursor-pointer transition-colors',
+          isActive ? tw.active : tw.hover
+        )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={handleClick}
         onContextMenu={handleContextMenu}

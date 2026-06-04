@@ -39,10 +39,10 @@ html.dark {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.4);
+  background: rgba(128, 128, 128, 0.6);
   border-radius: 2px;
 
   &:hover {
-    background: rgba(128, 128, 128, 0.6);
+    background: rgba(128, 128, 128, 0.8);
   }
 }
