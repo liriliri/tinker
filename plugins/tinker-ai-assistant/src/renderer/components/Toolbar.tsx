@@ -23,17 +23,17 @@ export default observer(function ToolbarComponent() {
 
   return (
     <Toolbar>
-      <button
+      <ToolbarButton
         onClick={selectWorkingDir}
         title={store.workingDir}
-        className={`flex items-center gap-1 px-2 py-1 my-1 text-xs font-mono truncate max-w-[200px] ${tw.text.secondary} ${tw.hover} rounded`}
+        className={`font-mono max-w-[200px] flex items-center gap-1 ${tw.text.secondary}`}
       >
-        <FolderOpen size={12} className="shrink-0" />
+        <FolderOpen size={TOOLBAR_ICON_SIZE} className="shrink-0" />
         <span className="truncate">
           {store.workingDir.split('/').filter(Boolean).pop() ??
             store.workingDir}
         </span>
-      </button>
+      </ToolbarButton>
       <ToolbarSpacer />
       <ToolbarButton
         title={t('clearMessages')}

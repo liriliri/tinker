@@ -283,20 +283,15 @@ export default observer(function ToolbarComponent({
       {store.hasImage && (
         <>
           {/* Crop box dimensions */}
-          <button
-            className={`text-xs px-2 py-1 ${tw.hover} rounded transition-colors cursor-pointer`}
+          <ToolbarButton
             onClick={() => setShowSizeDialog(true)}
             disabled={store.cropBoxWidth <= 0 || store.cropBoxHeight <= 0}
             title={t('setCropSize')}
           >
-            {store.cropBoxWidth > 0 && store.cropBoxHeight > 0 ? (
-              <div>
-                {store.cropBoxWidth} × {store.cropBoxHeight}
-              </div>
-            ) : (
-              <div className={tw.text.tertiary}>-</div>
-            )}
-          </button>
+            {store.cropBoxWidth > 0 && store.cropBoxHeight > 0
+              ? `${store.cropBoxWidth} × ${store.cropBoxHeight}`
+              : '-'}
+          </ToolbarButton>
 
           {/* Aspect Ratio Select */}
           <div className="flex gap-2 items-center">

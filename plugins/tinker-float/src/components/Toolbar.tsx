@@ -12,7 +12,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import Checkbox from 'share/components/Checkbox'
-import { tw } from 'share/theme'
+
 import store from '../store'
 import { launchFloatWindow } from '../lib/floatWindow'
 import SizeDialog from './SizeDialog'
@@ -58,13 +58,12 @@ export default observer(function Toolbar() {
         onKeyDown={handleUrlKeyDown}
       />
 
-      <button
-        className={`text-xs px-2 py-1 ${tw.hover} rounded transition-colors cursor-pointer`}
+      <ToolbarButton
         onClick={() => setShowSizeDialog(true)}
         title={t('floatSettings')}
       >
         {store.windowWidth} x {store.windowHeight}
-      </button>
+      </ToolbarButton>
 
       <ToolbarSeparator />
 

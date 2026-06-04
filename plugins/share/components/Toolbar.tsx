@@ -43,7 +43,7 @@ export function ToolbarButton({
   onContextMenu,
   ...props
 }: ToolbarButtonProps) {
-  const baseClass = 'p-1.5 rounded transition-colors'
+  const baseClass = 'p-1.5 rounded transition-colors text-xs'
   const longPressTimerRef = useRef<number | null>(null)
   const isLongPressRef = useRef(false)
 

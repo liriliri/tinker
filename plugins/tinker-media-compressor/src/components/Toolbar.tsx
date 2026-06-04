@@ -213,13 +213,12 @@ export default observer(function ToolbarComponent() {
           <ToolbarSeparator />
 
           {isTargetSize ? (
-            <button
+            <ToolbarButton
               onClick={() => setTargetSizeDialogOpen(true)}
               disabled={store.isCompressing}
-              className={`px-2 py-1 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} ${tw.hover} disabled:opacity-50 disabled:cursor-not-allowed w-24 text-left`}
             >
               {`${store.targetSize} ${store.targetSizeUnit}`}
-            </button>
+            </ToolbarButton>
           ) : (
             <Select
               value={store.quality}

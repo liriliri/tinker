@@ -99,15 +99,12 @@ export default observer(function ToolbarComponent() {
 
         <ToolbarSeparator />
 
-        <button
-          className={`text-xs px-2 py-1 ${tw.hover} rounded transition-colors cursor-pointer`}
+        <ToolbarButton
           onClick={() => setShowSizeDialog(true)}
           title={t('setCanvasSize')}
         >
-          <div>
-            {store.canvasWidth} × {store.canvasHeight}
-          </div>
-        </button>
+          {store.canvasWidth} × {store.canvasHeight}
+        </ToolbarButton>
 
         <ToolbarButton
           onClick={handleSetBackgroundImage}
