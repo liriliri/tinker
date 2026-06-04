@@ -28,21 +28,3 @@ export interface OpenRepositoryResult {
   repoPath: string
   headRef: string
 }
-
-export interface IRepoTab {
-  id: string
-  title: string
-  repoPath: string
-  branches: GitBranch[]
-  commits: GitCommitSummary[]
-  selectedBranch: GitBranch | null
-  selectedCommit: GitCommitSummary | null
-  commitDetail: GitCommitDetail | null
-  editorContent: string
-  loading: boolean
-  loadingCommits: boolean
-  loadingMoreCommits: boolean
-  hasMoreCommits: boolean
-  loadingDetail: boolean
-  error: string | null
-}

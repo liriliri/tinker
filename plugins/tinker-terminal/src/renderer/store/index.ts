@@ -8,23 +8,16 @@ import {
   deleteFolder as dbDeleteFolder,
   ISessionFolder,
   ISessionConfig,
-} from './lib/db'
-import {
-  collectPaneIds,
-  splitNode,
-  removePane,
-  dualColumnsLayout,
-  tripleColumnsLayout,
-  gridLayout,
-} from './lib/layout'
-import type { ILayoutNode, ITerminalTab, SplitDirection } from './lib/layout'
+} from '../lib/db'
+import type { ILayoutNode, SplitDirection } from '../types'
+import TerminalTab from './TerminalTab'
 import { getTerminalSession } from 'share/components/Terminal'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 
 class Store extends BaseStore {
-  tabs: ITerminalTab[] = []
+  tabs: TerminalTab[] = []
   activeTabId = ''
   activePaneId = ''
   paneTitles: Record<string, string> = {}
@@ -58,11 +51,7 @@ class Store extends BaseStore {
     this.tabCounter++
     const paneId = uuid()
     const id = uuid()
-    const tab: ITerminalTab = {
-      id,
-      title: `Terminal ${this.tabCounter}`,
-      layout: { type: 'leaf', paneId },
-    }
+    const tab = new TerminalTab(id, `Terminal ${this.tabCounter}`, paneId)
 
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
@@ -88,7 +77,7 @@ class Store extends BaseStore {
     const tab = this.tabs.find((t) => t.id === id)
     if (!tab) return
 
-    const paneIds = collectPaneIds(tab.layout)
+    const paneIds = tab.collectPaneIds()
     paneIds.forEach((pid) => this.onDestroyPane?.(pid))
 
     const index = this.tabs.findIndex((t) => t.id === id)
@@ -103,7 +92,7 @@ class Store extends BaseStore {
       const newIndex = Math.min(index, this.tabs.length - 1)
       this.activeTabId = this.tabs[newIndex].id
       const newTab = this.tabs[newIndex]
-      const paneIds = collectPaneIds(newTab.layout)
+      const paneIds = newTab.collectPaneIds()
       this.activePaneId = paneIds[0]
     }
   }
@@ -112,7 +101,7 @@ class Store extends BaseStore {
     this.activeTabId = id
     const tab = this.tabs.find((t) => t.id === id)
     if (tab) {
-      const paneIds = collectPaneIds(tab.layout)
+      const paneIds = tab.collectPaneIds()
       if (!paneIds.includes(this.activePaneId)) {
         this.activePaneId = paneIds[0]
       }
@@ -166,7 +155,7 @@ class Store extends BaseStore {
     if (cwd) {
       this.pendingCwd[newPaneId] = cwd
     }
-    tab.layout = splitNode(tab.layout, paneId, direction, newPaneId)
+    tab.splitPane(paneId, direction, newPaneId)
     this.activePaneId = newPaneId
   }
 
@@ -174,34 +163,31 @@ class Store extends BaseStore {
     const tab = this.tabs.find((t) => t.id === this.activeTabId)
     if (!tab) return
 
-    const paneIds = collectPaneIds(tab.layout)
+    const paneIds = tab.collectPaneIds()
     if (paneIds.length <= 1) {
       this.closeTab(tab.id)
       return
     }
 
     this.onDestroyPane?.(paneId)
-    const result = removePane(tab.layout, paneId)
-    if (result) {
-      tab.layout = result
-    }
+    tab.removePane(paneId)
 
     if (this.activePaneId === paneId) {
-      const remaining = collectPaneIds(tab.layout)
+      const remaining = tab.collectPaneIds()
       this.activePaneId = remaining[0]
     }
   }
 
   async setDualColumns() {
-    await this.applyLayout(2, dualColumnsLayout)
+    await this.applyLayout(2, TerminalTab.dualColumnsLayout)
   }
 
   async setTripleColumns() {
-    await this.applyLayout(3, tripleColumnsLayout)
+    await this.applyLayout(3, TerminalTab.tripleColumnsLayout)
   }
 
   async setGrid() {
-    await this.applyLayout(4, gridLayout)
+    await this.applyLayout(4, TerminalTab.gridLayout)
   }
 
   private async applyLayout(
@@ -211,7 +197,7 @@ class Store extends BaseStore {
     const tab = this.tabs.find((t) => t.id === this.activeTabId)
     if (!tab) return
 
-    const paneIds = collectPaneIds(tab.layout)
+    const paneIds = tab.collectPaneIds()
 
     // Destroy excess panes
     if (paneIds.length > targetCount) {
@@ -313,11 +299,7 @@ class Store extends BaseStore {
     this.tabCounter++
     const paneId = uuid()
     const id = uuid()
-    const tab: ITerminalTab = {
-      id,
-      title: config.name,
-      layout: { type: 'leaf', paneId },
-    }
+    const tab = new TerminalTab(id, config.name, paneId)
 
     if (config.type === 'ssh') {
       this.pendingSSHConfig[paneId] = config

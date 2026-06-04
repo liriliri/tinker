@@ -1,32 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import type { GitBranch, GitCommitSummary, IRepoTab } from '../common/types'
-import { repoDirName } from './lib/util'
-
-const COMMITS_PAGE_SIZE = 50
-
-function createEmptyTab(id: string): IRepoTab {
-  return {
-    id,
-    title: '',
-    repoPath: '',
-    branches: [],
-    commits: [],
-    selectedBranch: null,
-    selectedCommit: null,
-    commitDetail: null,
-    editorContent: '',
-    loading: false,
-    loadingCommits: false,
-    loadingMoreCommits: false,
-    hasMoreCommits: false,
-    loadingDetail: false,
-    error: null,
-  }
-}
+import RepoTab from './RepoTab'
+import { repoDirName } from '../lib/util'
 
 class Store extends BaseStore {
-  tabs: IRepoTab[] = []
+  tabs: RepoTab[] = []
   activeTabId = ''
 
   private nextId = 1
@@ -37,11 +15,11 @@ class Store extends BaseStore {
     this.addTab()
   }
 
-  private getTab(id: string): IRepoTab | undefined {
+  private getTab(id: string): RepoTab | undefined {
     return this.tabs.find((t) => t.id === id)
   }
 
-  get activeTab(): IRepoTab | undefined {
+  get activeTab(): RepoTab | undefined {
     return this.getTab(this.activeTabId)
   }
 
@@ -97,13 +75,21 @@ class Store extends BaseStore {
     return this.activeTab?.error ?? null
   }
 
-  private setTabError(tab: IRepoTab, message: string | null) {
-    tab.error = message
-  }
-
   updateTabTitle(tabId: string, title: string) {
     const tab = this.getTab(tabId)
     if (tab) tab.title = title
+  }
+
+  selectBranch(branch: Parameters<RepoTab['selectBranch']>[0]) {
+    return this.activeTab?.selectBranch(branch)
+  }
+
+  selectCommit(commit: Parameters<RepoTab['selectCommit']>[0]) {
+    return this.activeTab?.selectCommit(commit)
+  }
+
+  loadMoreCommits() {
+    return this.activeTab?.loadMoreCommits()
   }
 
   private updateWindowTitle() {
@@ -111,15 +97,9 @@ class Store extends BaseStore {
     tinker.setTitle(tab?.title || '')
   }
 
-  private async syncPreloadRepo(tab: IRepoTab) {
-    if (!tab.repoPath) return
-    if (git.getRepoPath() === tab.repoPath) return
-    await git.openRepository(tab.repoPath)
-  }
-
   addTab(afterTabId?: string) {
     const id = `tab-${this.nextId++}`
-    const tab = createEmptyTab(id)
+    const tab = new RepoTab(id)
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
       if (index !== -1) {
@@ -154,7 +134,7 @@ class Store extends BaseStore {
     this.activeTabId = id
     const tab = this.activeTab
     if (tab?.repoPath) {
-      void this.syncPreloadRepo(tab)
+      void tab.syncPreloadRepo()
     }
     this.updateWindowTitle()
   }
@@ -191,7 +171,7 @@ class Store extends BaseStore {
     } catch (err) {
       console.error('Failed to open repository:', err)
       const tab = this.activeTab
-      if (tab) this.setTabError(tab, String(err))
+      if (tab) tab.setError(String(err))
     }
   }
 
@@ -201,7 +181,7 @@ class Store extends BaseStore {
 
     runInAction(() => {
       tab.loading = true
-      this.setTabError(tab, null)
+      tab.setError(null)
       tab.repoPath = path
       this.updateTabTitle(tab.id, repoDirName(path))
       this.updateWindowTitle()
@@ -212,7 +192,7 @@ class Store extends BaseStore {
     } catch (err) {
       console.error('Failed to open repository:', err)
       runInAction(() => {
-        this.setTabError(tab, String(err))
+        tab.setError(String(err))
         tab.repoPath = ''
         tab.branches = []
         tab.commits = []
@@ -230,14 +210,14 @@ class Store extends BaseStore {
     }
   }
 
-  async refreshBranches(tab: IRepoTab = this.activeTab!) {
+  async refreshBranches(tab: RepoTab = this.activeTab!) {
     if (!tab?.repoPath) return
 
     tab.loading = true
-    this.setTabError(tab, null)
+    tab.setError(null)
 
     try {
-      await this.syncPreloadRepo(tab)
+      await tab.syncPreloadRepo()
       const branches = await git.getBranches()
       tab.branches = branches
 
@@ -247,108 +227,21 @@ class Store extends BaseStore {
         null
 
       if (current) {
-        await this.selectBranch(current, tab)
+        await tab.selectBranch(current)
       } else {
-        tab.selectedBranch = null
-        tab.commits = []
-        tab.selectedCommit = null
-        tab.commitDetail = null
-        tab.editorContent = ''
+        runInAction(() => {
+          tab.selectedBranch = null
+          tab.commits = []
+          tab.selectedCommit = null
+          tab.commitDetail = null
+          tab.editorContent = ''
+        })
       }
     } catch (err) {
       console.error('Failed to load branches:', err)
-      this.setTabError(tab, String(err))
+      tab.setError(String(err))
     } finally {
       tab.loading = false
-    }
-  }
-
-  async selectBranch(branch: GitBranch, tab: IRepoTab = this.activeTab!) {
-    if (!tab) return
-
-    tab.selectedBranch = branch
-    tab.selectedCommit = null
-    tab.commitDetail = null
-    tab.editorContent = ''
-    await this.loadCommits(branch.fullName, tab)
-  }
-
-  async loadCommits(refName: string, tab: IRepoTab = this.activeTab!) {
-    if (!tab) return
-
-    tab.loadingCommits = true
-    tab.hasMoreCommits = false
-    this.setTabError(tab, null)
-
-    try {
-      await this.syncPreloadRepo(tab)
-      const commits = await git.getCommits(refName, COMMITS_PAGE_SIZE, 0)
-      tab.commits = commits
-      tab.hasMoreCommits = commits.length === COMMITS_PAGE_SIZE
-    } catch (err) {
-      console.error('Failed to load commits:', err)
-      this.setTabError(tab, String(err))
-      tab.commits = []
-      tab.hasMoreCommits = false
-    } finally {
-      tab.loadingCommits = false
-    }
-  }
-
-  async loadMoreCommits(tab: IRepoTab = this.activeTab!) {
-    if (
-      !tab?.selectedBranch ||
-      !tab.hasMoreCommits ||
-      tab.loadingCommits ||
-      tab.loadingMoreCommits
-    ) {
-      return
-    }
-
-    tab.loadingMoreCommits = true
-    this.setTabError(tab, null)
-
-    try {
-      await this.syncPreloadRepo(tab)
-      const commits = await git.getCommits(
-        tab.selectedBranch.fullName,
-        COMMITS_PAGE_SIZE,
-        tab.commits.length
-      )
-      tab.commits.push(...commits)
-      if (commits.length < COMMITS_PAGE_SIZE) {
-        tab.hasMoreCommits = false
-      }
-    } catch (err) {
-      console.error('Failed to load more commits:', err)
-      this.setTabError(tab, String(err))
-    } finally {
-      tab.loadingMoreCommits = false
-    }
-  }
-
-  async selectCommit(
-    commit: GitCommitSummary,
-    tab: IRepoTab = this.activeTab!
-  ) {
-    if (!tab) return
-
-    tab.selectedCommit = commit
-    tab.loadingDetail = true
-    this.setTabError(tab, null)
-
-    try {
-      await this.syncPreloadRepo(tab)
-      const detail = await git.getCommitDetail(commit.sha)
-      tab.commitDetail = detail
-      tab.editorContent = detail.diff
-    } catch (err) {
-      console.error('Failed to load commit detail:', err)
-      this.setTabError(tab, String(err))
-      tab.commitDetail = null
-      tab.editorContent = ''
-    } finally {
-      tab.loadingDetail = false
     }
   }
 }

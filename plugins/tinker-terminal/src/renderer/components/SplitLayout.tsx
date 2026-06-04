@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Panel, Group, Separator } from 'react-resizable-panels'
-import type { ILayoutNode } from '../lib/layout'
+import type { ILayoutNode } from '../types'
 import Terminal from './Terminal'
 import PaneHeader from './PaneHeader'
 
