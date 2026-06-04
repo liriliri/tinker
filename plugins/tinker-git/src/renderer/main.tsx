@@ -14,7 +14,7 @@ import store from './store'
 import TabBar from './components/TabBar'
 import Toolbar from './components/Toolbar'
 import CommitList from './components/CommitList'
-import CommitEditor from './components/CommitEditor'
+import CommitDetail from './components/CommitDetail'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -42,7 +42,7 @@ const RepoPanels = observer(function RepoPanels() {
         <Separator />
         <Panel id="detail" minSize="60%">
           <div className="h-full overflow-hidden">
-            <CommitEditor />
+            <CommitDetail />
           </div>
         </Panel>
       </Group>

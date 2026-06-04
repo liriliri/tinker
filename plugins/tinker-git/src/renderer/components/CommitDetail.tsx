@@ -142,7 +142,7 @@ const CommitDiffBlockView = observer(function CommitDiffBlockView({
   )
 })
 
-export default observer(function CommitEditor() {
+export default observer(function CommitDetail() {
   const { t } = useTranslation()
   const commit = store.selectedCommit
   const detail = store.commitDetail
