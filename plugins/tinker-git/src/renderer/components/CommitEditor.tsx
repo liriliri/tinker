@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -10,22 +10,75 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { formatCommitListDate } from '../lib/util'
-import { parseCommitDiff } from '../lib/parseCommitDiff'
+import { isDiffTextUnrenderable } from '../lib/diffLimits'
+import {
+  parseCommitDiff,
+  type CommitDiffLine,
+  type CommitDiffLineType,
+} from '../lib/parseCommitDiff'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
+
+function diffLineBackground(type: CommitDiffLineType): string {
+  switch (type) {
+    case 'add':
+      return tw.diff.addLine
+    case 'delete':
+      return tw.diff.deleteLine
+    default:
+      return ''
+  }
+}
+
+function diffLinePrefix(type: CommitDiffLineType): string {
+  switch (type) {
+    case 'add':
+      return '+'
+    case 'delete':
+      return '-'
+    default:
+      return ' '
+  }
+}
+
+function CommitDiffLineView({ line }: { line: CommitDiffLine }) {
+  return (
+    <div
+      className={`flex min-w-0 ${diffLineBackground(line.type)} ${
+        tw.text.primary
+      }`}
+    >
+      <span
+        className={`shrink-0 w-6 text-center select-none ${tw.diff.prefix}`}
+        aria-hidden
+      >
+        {diffLinePrefix(line.type)}
+      </span>
+      <span className="flex-1 min-w-0 whitespace-pre-wrap break-words">
+        {line.content.length > 0 ? line.content : '\u00a0'}
+      </span>
+    </div>
+  )
+}
 
 interface CommitDiffBlockViewProps {
   block: ReturnType<typeof parseCommitDiff>[number]
   isCollapsed: boolean
+  isLargeExpanded: boolean
   onToggle: (key: string) => void
+  onShowLargeDiff: (key: string) => void
 }
 
 const CommitDiffBlockView = observer(function CommitDiffBlockView({
   block,
   isCollapsed,
+  isLargeExpanded,
   onToggle,
+  onShowLargeDiff,
 }: CommitDiffBlockViewProps) {
   const { t } = useTranslation()
+  const showLargePlaceholder =
+    block.isLarge && !isLargeExpanded && !block.isBinary
 
   return (
     <div className={`rounded border overflow-hidden ${tw.border}`}>
@@ -50,24 +103,40 @@ const CommitDiffBlockView = observer(function CommitDiffBlockView({
           </span>
         </div>
         <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
-          <span className="text-green-600 dark:text-green-400">
-            +{block.additions}
-          </span>
-          <span className="text-red-600 dark:text-red-400">
-            -{block.deletions}
-          </span>
+          <span className={tw.diff.statAdd}>+{block.additions}</span>
+          <span className={tw.diff.statDelete}>-{block.deletions}</span>
           {block.isBinary && (
             <span className={`text-[11px] ${tw.text.secondary}`}>Binary</span>
           )}
         </div>
       </Toolbar>
 
-      {!isCollapsed && (
-        <pre
-          className={`m-0 border-t ${tw.border} px-3 py-3 font-mono text-xs leading-5 whitespace-pre-wrap break-words ${tw.text.primary}`}
+      {!isCollapsed && showLargePlaceholder && (
+        <div
+          className={`border-t ${tw.border} px-4 py-6 flex flex-col items-center gap-3 text-center`}
         >
-          {block.body}
-        </pre>
+          <p className={`text-sm ${tw.text.primary}`}>{t('diffTooLarge')}</p>
+          <p className={`text-xs max-w-md ${tw.text.secondary}`}>
+            {t('diffTooLargeHint')}
+          </p>
+          <button
+            type="button"
+            className={`text-xs px-3 py-1.5 rounded ${tw.primary.bg} ${tw.primary.bgHover} text-white transition-colors cursor-pointer`}
+            onClick={() => onShowLargeDiff(block.key)}
+          >
+            {t('showDiff')}
+          </button>
+        </div>
+      )}
+
+      {!isCollapsed && !showLargePlaceholder && (
+        <div
+          className={`border-t ${tw.border} px-3 py-3 font-mono text-xs leading-5`}
+        >
+          {block.lines.map((line, index) => (
+            <CommitDiffLineView key={index} line={line} />
+          ))}
+        </div>
       )}
     </div>
   )
@@ -80,15 +149,35 @@ export default observer(function CommitEditor() {
   const [collapsedBlocks, setCollapsedBlocks] = useState<
     Record<string, boolean>
   >({})
-  const diffBlocks = useMemo(
-    () => parseCommitDiff(detail?.diff ?? ''),
-    [detail?.diff]
+  const [expandedLargeBlocks, setExpandedLargeBlocks] = useState<
+    Record<string, boolean>
+  >({})
+  const diffText = detail?.diff ?? ''
+  const diffUnrenderable = useMemo(
+    () => isDiffTextUnrenderable(diffText),
+    [diffText]
   )
+  const diffBlocks = useMemo(
+    () => (diffUnrenderable ? [] : parseCommitDiff(diffText)),
+    [diffText, diffUnrenderable]
+  )
+
+  useEffect(() => {
+    setCollapsedBlocks({})
+    setExpandedLargeBlocks({})
+  }, [commit?.sha])
 
   const handleToggleBlock = (key: string) => {
     setCollapsedBlocks((prev) => ({
       ...prev,
       [key]: !prev[key],
+    }))
+  }
+
+  const handleShowLargeDiff = (key: string) => {
+    setExpandedLargeBlocks((prev) => ({
+      ...prev,
+      [key]: true,
     }))
   }
 
@@ -139,6 +228,8 @@ export default observer(function CommitEditor() {
 
       {store.loadingDetail ? (
         <CenteredMessage>{t('loading')}</CenteredMessage>
+      ) : diffUnrenderable ? (
+        <CenteredMessage>{t('diffUnrenderable')}</CenteredMessage>
       ) : diffBlocks.length === 0 ? (
         <CenteredMessage>{t('noDiffs')}</CenteredMessage>
       ) : (
@@ -148,7 +239,9 @@ export default observer(function CommitEditor() {
               key={block.key}
               block={block}
               isCollapsed={Boolean(collapsedBlocks[block.key])}
+              isLargeExpanded={Boolean(expandedLargeBlocks[block.key])}
               onToggle={handleToggleBlock}
+              onShowLargeDiff={handleShowLargeDiff}
             />
           ))}
         </div>

@@ -182,6 +182,15 @@ export const tw = {
     border: 'border-[#dcdfe6] dark:border-[#4c4d50]',
     text: 'text-gray-800 dark:text-[#f0f1f2]',
   },
+
+  // Unified diff line backgrounds (GitHub Desktop–style)
+  diff: {
+    addLine: 'bg-[#e6ffec] dark:bg-[#0d2818]',
+    deleteLine: 'bg-[#ffebe9] dark:bg-[#3d1418]',
+    prefix: 'text-gray-500 dark:text-gray-400',
+    statAdd: 'text-green-600 dark:text-green-400',
+    statDelete: 'text-red-600 dark:text-red-400',
+  },
 } as const
 
 // Export for CSS variable usage (for non-Tailwind scenarios)

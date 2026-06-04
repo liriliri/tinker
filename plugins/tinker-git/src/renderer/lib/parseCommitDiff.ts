@@ -1,12 +1,37 @@
+import { isDiffBlockTooLarge } from './diffLimits'
+
+export type CommitDiffLineType = 'add' | 'delete' | 'context'
+
+export interface CommitDiffLine {
+  type: CommitDiffLineType
+  /** Line text without the unified-diff origin prefix (+, -, or space). */
+  content: string
+}
+
 export interface CommitDiffBlock {
   key: string
   oldPath: string
   newPath: string
   title: string
   body: string
+  lines: CommitDiffLine[]
   additions: number
   deletions: number
   isBinary: boolean
+  isLarge: boolean
+}
+
+export function classifyDiffLine(line: string): CommitDiffLine {
+  if (line.startsWith('+') && !line.startsWith('+++')) {
+    return { type: 'add', content: line.slice(1) }
+  }
+  if (line.startsWith('-') && !line.startsWith('---')) {
+    return { type: 'delete', content: line.slice(1) }
+  }
+  if (line.startsWith(' ')) {
+    return { type: 'context', content: line.slice(1) }
+  }
+  return { type: 'context', content: line }
 }
 
 const DIFF_HEADER_RE = /^diff --git a\/(.+) b\/(.+)$/
@@ -62,10 +87,12 @@ export function parseCommitDiff(diff: string): CommitDiffBlock[] {
       newPath,
       title: formatBlockTitle(oldPath, newPath, body || currentHeaderLine),
       body,
+      lines: currentLines.map(classifyDiffLine),
       additions,
       deletions,
       isBinary:
         body.includes('Binary files ') || body.includes('GIT binary patch'),
+      isLarge: isDiffBlockTooLarge(body, currentLines),
     })
   }
 

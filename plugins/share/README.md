@@ -29,7 +29,7 @@ import { tw, THEME_COLORS } from 'share/theme'
 <input className={`${tw.bg.input} border ${tw.border}`} />
 ```
 
-Common tokens: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.*`, `tw.hover`, `tw.active`.
+Common tokens: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.divide`, `tw.text.*`, `tw.hover`, `tw.active`, `tw.diff.*`
 
 ## BaseStore
 
