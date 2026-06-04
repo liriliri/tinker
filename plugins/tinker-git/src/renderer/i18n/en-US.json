@@ -30,5 +30,7 @@
   "copyFailed": "Copy failed",
   "clickToCopy": "Click to copy",
   "browseFiles": "Browse Files",
-  "selectFileToView": "Select a file to view"
+  "selectFileToView": "Select a file to view",
+  "blame": "Blame",
+  "blameHide": "Hide Blame"
 }

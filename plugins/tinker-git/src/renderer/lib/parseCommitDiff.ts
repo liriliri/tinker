@@ -8,7 +8,7 @@ export interface CommitDiffLine {
   content: string
 }
 
-export interface CommitDiffBlock {
+interface CommitDiffBlock {
   key: string
   oldPath: string
   newPath: string

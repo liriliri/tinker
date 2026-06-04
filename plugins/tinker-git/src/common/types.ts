@@ -28,3 +28,12 @@ export interface OpenRepositoryResult {
   repoPath: string
   headRef: string
 }
+
+export interface GitBlameHunk {
+  sha: string
+  author: string
+  message: string
+  date: string
+  startLineNumber: number
+  lineCount: number
+}

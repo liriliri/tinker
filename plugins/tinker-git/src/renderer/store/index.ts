@@ -95,6 +95,26 @@ class Store extends BaseStore {
     return this.activeTab?.loadingFileContent ?? false
   }
 
+  get showingBlame() {
+    return this.activeTab?.showingBlame ?? false
+  }
+
+  get loadingBlame() {
+    return this.activeTab?.loadingBlame ?? false
+  }
+
+  get blameLineAnnotations() {
+    return this.activeTab?.blameLineAnnotations ?? []
+  }
+
+  get highlightedBlameSha() {
+    return this.activeTab?.highlightedBlameSha ?? null
+  }
+
+  setHighlightedBlameSha(sha: string | null) {
+    return this.activeTab?.setHighlightedBlameSha(sha)
+  }
+
   updateTabTitle(tabId: string, title: string) {
     const tab = this.getTab(tabId)
     if (tab) tab.title = title
@@ -118,6 +138,10 @@ class Store extends BaseStore {
 
   async openFile(filePath: string) {
     return this.activeTab?.openFile(filePath)
+  }
+
+  async toggleBlame() {
+    return this.activeTab?.toggleBlame()
   }
 
   private updateWindowTitle() {

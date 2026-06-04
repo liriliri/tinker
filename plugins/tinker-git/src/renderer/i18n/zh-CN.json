@@ -30,5 +30,7 @@
   "copyFailed": "复制失败",
   "clickToCopy": "点击复制",
   "browseFiles": "浏览文件",
-  "selectFileToView": "选择文件以查看"
+  "selectFileToView": "选择文件以查看",
+  "blame": "Blame",
+  "blameHide": "隐藏 Blame"
 }

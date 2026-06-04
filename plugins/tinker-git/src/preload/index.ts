@@ -1,6 +1,7 @@
 import { contextBridge } from 'electron'
 import NodeGit from 'nodegit'
 import type {
+  GitBlameHunk,
   GitBranch,
   GitCommitDetail,
   GitCommitSummary,
@@ -140,6 +141,60 @@ async function getCommitFileContent(
   const entry = await tree.entryByPath(filePath)
   const blob = await currentRepo.getBlob(entry.id())
   return blob.content().toString('utf-8')
+}
+
+async function getCommitFileBlame(
+  sha: string,
+  filePath: string
+): Promise<GitBlameHunk[]> {
+  const currentRepo = requireRepo()
+  const oid = NodeGit.Oid.fromString(sha)
+  const blameOpts = new NodeGit.BlameOptions()
+  blameOpts.newestCommit = oid
+  const blame = await NodeGit.Blame.file(currentRepo, filePath, blameOpts)
+  const hunks: GitBlameHunk[] = []
+  const hunkCount = blame.getHunkCount()
+
+  for (let i = 0; i < hunkCount; i++) {
+    const hunk = blame.getHunkByIndex(i)
+    const commitId = hunk.finalCommitId()
+    const sig = hunk.finalSignature()
+    const when = sig.when() as { time?: () => number; sec?: () => number }
+    const date = new Date(
+      (typeof when.time === 'function'
+        ? when.time()
+        : typeof when.sec === 'function'
+        ? when.sec()
+        : 0) * 1000
+    )
+
+    let message = ''
+    try {
+      const commit = await currentRepo.getCommit(commitId)
+      message = commit.message().split('\n')[0]
+    } catch {
+      message = ''
+    }
+
+    hunks.push({
+      sha: commitId.tostrS(),
+      author: sig.name(),
+      message,
+      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        '0'
+      )}-${String(date.getDate()).padStart(2, '0')} ${String(
+        date.getHours()
+      ).padStart(2, '0')}:${String(date.getMinutes()).padStart(
+        2,
+        '0'
+      )}:${String(date.getSeconds()).padStart(2, '0')}`,
+      startLineNumber: hunk.finalStartLineNumber(),
+      lineCount: hunk.linesInHunk(),
+    })
+  }
+
+  return hunks
 }
 
 const gitObj = {
@@ -292,6 +347,7 @@ const gitObj = {
 
   getCommitTree,
   getCommitFileContent,
+  getCommitFileBlame,
 }
 
 contextBridge.exposeInMainWorld('git', gitObj)

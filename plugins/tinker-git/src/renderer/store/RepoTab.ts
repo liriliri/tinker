@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import type { ITreeNode } from 'share/components/FileTree/types'
 import type {
+  GitBlameHunk,
   GitBranch,
   GitCommitSummary,
   GitCommitDetail,
@@ -31,6 +32,12 @@ class RepoTab {
   selectedFilePath = ''
   fileContent = ''
   loadingFileContent = false
+
+  // Blame state
+  blameHunks: GitBlameHunk[] = []
+  showingBlame = false
+  loadingBlame = false
+  highlightedBlameSha: string | null = null
 
   constructor(id: string) {
     this.id = id
@@ -167,6 +174,8 @@ class RepoTab {
 
     this.selectedFilePath = filePath
     this.loadingFileContent = true
+    this.showingBlame = false
+    this.blameHunks = []
 
     try {
       await this.syncPreloadRepo()
@@ -185,6 +194,83 @@ class RepoTab {
     } finally {
       runInAction(() => {
         this.loadingFileContent = false
+      })
+    }
+  }
+
+  get blameLineAnnotations(): Array<{
+    lineNumber: number
+    isLeader: boolean
+    sha: string
+    text: string
+    date: string
+  }> {
+    if (this.blameHunks.length === 0) return []
+
+    const annotations: Array<{
+      lineNumber: number
+      isLeader: boolean
+      sha: string
+      text: string
+      date: string
+    }> = []
+
+    for (const hunk of this.blameHunks) {
+      const shortMsg =
+        hunk.message.length > 32
+          ? hunk.message.slice(0, 32) + '\u2026'
+          : hunk.message
+      const dateShort = hunk.date.slice(0, 10).replace(/-/g, '')
+      const text = `\u00A0${hunk.author}\u00A0${shortMsg}\u00A0`
+
+      annotations.push({
+        lineNumber: hunk.startLineNumber,
+        isLeader: true,
+        sha: hunk.sha,
+        text,
+        date: dateShort,
+      })
+
+      for (let i = 1; i < hunk.lineCount; i++) {
+        annotations.push({
+          lineNumber: hunk.startLineNumber + i,
+          isLeader: false,
+          sha: hunk.sha,
+          text: '',
+          date: '',
+        })
+      }
+    }
+
+    return annotations
+  }
+
+  setHighlightedBlameSha(sha: string | null) {
+    this.highlightedBlameSha = this.highlightedBlameSha === sha ? null : sha
+  }
+
+  async toggleBlame() {
+    if (this.showingBlame) {
+      this.showingBlame = false
+      return
+    }
+
+    this.loadingBlame = true
+    try {
+      await this.syncPreloadRepo()
+      const hunks = await git.getCommitFileBlame(
+        this.selectedCommit!.sha,
+        this.selectedFilePath
+      )
+      runInAction(() => {
+        this.blameHunks = hunks
+        this.showingBlame = true
+      })
+    } catch (err) {
+      console.error('Failed to load blame:', err)
+    } finally {
+      runInAction(() => {
+        this.loadingBlame = false
       })
     }
   }

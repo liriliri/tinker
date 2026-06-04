@@ -1,3 +1,79 @@
 @use '../../../share/base.scss';
 @use '../../../share/styles/resizablepanels.scss';
-@config "../../tailwind.config.js";
+@config '../../tailwind.config.js';
+
+// Blame gutter base
+.blame-before {
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+// Message + author — fixed 38ch, truncates on overflow
+.blame-before--msg {
+  width: 38ch;
+  background: var(--theme-background-secondary, #f3f3f3);
+  padding-left: 1ch;
+  border-left: 1px solid var(--theme-border, #e0e0e0);
+  color: var(--theme-text-secondary, #6b7280);
+  opacity: 0.85;
+  text-overflow: ellipsis;
+}
+
+// Date — fixed 10ch, right-aligned
+.blame-before--date {
+  width: 10ch;
+  background: var(--theme-background-secondary, #f3f3f3);
+  padding-right: 1ch;
+  border-right: 1px solid var(--theme-border, #e0e0e0);
+  color: var(--theme-text-secondary, #6b7280);
+  opacity: 0.85;
+  text-align: right;
+}
+
+// Compact lines — 48ch total, same as msg+date
+.blame-before--compact {
+  width: 48ch;
+  background: var(--theme-background-secondary, #f3f3f3);
+  padding: 0 1ch;
+  border-right: 1px solid var(--theme-border, #e0e0e0);
+  color: transparent !important;
+}
+
+// Highlighted blame gutter — applied via inlineClassName when highlightedSha matches
+.blame-before--hl {
+  background: var(--theme-primary-bg, rgba(0, 188, 242, 0.1)) !important;
+  color: var(--theme-primary, #00bcf2) !important;
+  opacity: 1 !important;
+}
+
+// Editor line highlight — overlay div for code background
+.blame-line-highlight {
+  background: var(--theme-primary-bg, rgba(0, 188, 242, 0.08)) !important;
+}
+
+html.dark {
+  .blame-before--msg,
+  .blame-before--date,
+  .blame-before--compact {
+    background: var(--theme-background-secondary, #252526);
+    border-color: var(--theme-border, #4a4a4a);
+  }
+
+  .blame-before--msg,
+  .blame-before--date {
+    color: var(--theme-text-secondary, #9ca3af);
+  }
+
+  .blame-before--hl {
+    background: var(--theme-primary-bg, rgba(0, 188, 242, 0.15)) !important;
+    color: var(--theme-primary, #00bcf2) !important;
+  }
+
+  .blame-line-highlight {
+    background: var(--theme-primary-bg, rgba(0, 188, 242, 0.1)) !important;
+  }
+}
