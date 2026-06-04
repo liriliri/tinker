@@ -4,7 +4,7 @@ import { tw } from '../../theme'
 import className from 'licia/className'
 import { buildSegments } from '../../lib/textSearch'
 import { useTextSearchContext } from './context'
-import { TEXT_SEARCH_NS } from './namespace'
+import { TEXT_SEARCH_NS } from './i18n'
 
 interface MatchLineProps {
   filePath: string

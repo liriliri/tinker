@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { FolderOpen, Search } from 'lucide-react'
 import { tw } from '../../theme'
 import { useTextSearchContext } from './context'
-import { TEXT_SEARCH_NS } from './namespace'
+import { TEXT_SEARCH_NS } from './i18n'
 
 interface EmptyStateProps {
   variant: 'no-folder' | 'no-query' | 'no-results'

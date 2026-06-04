@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { tw } from '../../theme'
 import TextInput from '../TextInput'
 import { useTextSearchContext } from './context'
-import { TEXT_SEARCH_NS } from './namespace'
+import { TEXT_SEARCH_NS } from './i18n'
 
 export default function IncludeExcludePanel() {
   const { t } = useTranslation(TEXT_SEARCH_NS)

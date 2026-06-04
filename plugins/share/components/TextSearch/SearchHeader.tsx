@@ -14,7 +14,7 @@ import {
 } from '../Toolbar'
 import IncludeExcludePanel from './IncludeExcludePanel'
 import { useTextSearchContext } from './context'
-import { TEXT_SEARCH_NS } from './namespace'
+import { TEXT_SEARCH_NS } from './i18n'
 
 export default function SearchHeader() {
   const { t } = useTranslation(TEXT_SEARCH_NS)

@@ -249,6 +249,70 @@ import { getDefaultShell, getAvailableShells } from 'share/lib/terminal' // prel
 
 Use `<Terminal createSession={(cols, rows) => …} />`. Return `tinker.createTerminal({ cols, rows, cwd?, shell? })` for a local PTY, or any `TerminalSession` (e.g. SSH via preload). `getTerminalSession(paneId)` looks up the active session. Dropping files or folders pastes shell-quoted paths. See `plugins/api-types/tinker.d.ts` for `tinker.Terminal`.
 
+### FileTree
+
+```ts
+import FileTree, {
+  type ITreeNode,
+  type IFileTreeDataSource,
+} from 'share/components/FileTree'
+```
+
+Lazy-loading file tree with pluggable data sources and customizable context menus.
+
+**Quick usage (local filesystem):**
+
+```ts
+const dataSource: IFileTreeDataSource = {
+  readDir: async (path) => {
+    const entries = await codeEditor.readDir(path)
+    return entries
+  },
+  createNode: async (parentPath, name, type) => {
+    // create file or directory
+  },
+  renameNode: async (oldPath, newPath) => {
+    // rename
+  },
+  deleteNode: async (path) => {
+    // delete
+  },
+}
+
+<FileTree
+  nodes={tree}
+  dataSource={dataSource}
+  onOpenFile={(path, name) => openFile(path, name)}
+  getContextMenu={(node) => [
+    /* custom menu items, appended between built-in create and rename/delete */
+  ]}
+  onExpandChange={(path, expanded) => trackWatching(path, expanded)}
+  onRefreshChildren={(parentPath) => markDirty(parentPath)}
+  refreshDirs={dirtyDirs}
+  refreshVersion={version}
+/>
+```
+
+**Key properties:**
+
+- `nodes` — root-level tree nodes
+- `dataSource` — adapter providing `readDir` plus optional `createNode`/`renameNode`/`deleteNode`. CRUD methods control which built-in menu items appear.
+- `onOpenFile` — called when a file node is clicked
+- `getContextMenu` — returns custom menu items, appended between built-in create and rename/delete groups
+- `onExpandChange` — consumer tracks which dirs are expanded (for starting/stopping file watching)
+- `refreshDirs` + `refreshVersion` — consumer signals which expanded dirs need children re-fetched (e.g. after file system events)
+- `onRefreshChildren` — consumer refreshes parent after rename/delete operations (typically calls `markTreeDirDirty` or `loadDirectory`)
+
+**Data source patterns:**
+
+| Source | `readDir` | `createNode` | `renameNode` | `deleteNode` |
+|--------|-----------|-------------|-------------|-------------|
+| Local  | `codeEditor.readDir()` | `tinker.writeFile` | `codeEditor.renameItem` | `tinker.rm` |
+| Remote | `fetch(api/list)` | `fetch(api/create)` | `fetch(api/rename)` | `fetch(api/delete)` |
+| Git    | `git ls-tree` | — | — | — |
+
+**File watching:** The shared FileTree does not manage file watching — that's the consumer's job. Use `onExpandChange` to start/stop watching, and `refreshDirs` + `refreshVersion` to trigger re-fetches after file system events.
+
 ## When To Update This File
 
 Update this README when you change shared APIs, conventions, or recommended usage in `share/`.

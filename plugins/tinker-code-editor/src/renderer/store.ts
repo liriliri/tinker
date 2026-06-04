@@ -8,8 +8,8 @@ import TextSearch, {
 } from 'share/lib/textSearch'
 import { getTerminalSession } from 'share/components/Terminal'
 import type { editor as MonacoEditor } from 'monaco-editor'
+import type { ITreeNode } from 'share/components/FileTree'
 import type {
-  ITreeNode,
   IEditorTab,
   ITerminalTab,
   ILayoutNode,

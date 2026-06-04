@@ -1,14 +1,8 @@
 import { tw } from '../../theme'
-import { addI18nNamespace } from '../../lib/i18n'
-import enUS from './i18n/en-US.json'
-import zhCN from './i18n/zh-CN.json'
-import { TEXT_SEARCH_NS } from './namespace'
 import { TextSearchContext, type TextSearchContextValue } from './context'
 import SearchHeader from './SearchHeader'
 import ResultList from './ResultList'
 import EmptyState from './EmptyState'
-
-addI18nNamespace(TEXT_SEARCH_NS, { 'en-US': enUS, 'zh-CN': zhCN })
 
 export type { TextSearchContextValue } from './context'
 export type {

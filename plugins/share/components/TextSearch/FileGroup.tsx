@@ -6,7 +6,7 @@ import { tw } from '../../theme'
 import type { TextSearchFileGroup } from '../../lib/textSearch'
 import MatchLine from './MatchLine'
 import { useTextSearchContext } from './context'
-import { TEXT_SEARCH_NS } from './namespace'
+import { TEXT_SEARCH_NS } from './i18n'
 
 interface FileGroupProps {
   group: TextSearchFileGroup
