@@ -17,7 +17,6 @@
   "noRemoteRefs": "No remote branches",
   "noTagRefs": "No tags",
   "noSearchResults": "No matching refs",
-  "history": "History",
   "noCommits": "No commits found",
   "loading": "Loading...",
   "noDiffs": "No diffs found",
@@ -29,5 +28,7 @@
   "diffUnrenderable": "The diff is too large to be displayed.",
   "copySuccess": "Copied successfully",
   "copyFailed": "Copy failed",
-  "clickToCopy": "Click to copy"
+  "clickToCopy": "Click to copy",
+  "browseFiles": "Browse Files",
+  "selectFileToView": "Select a file to view"
 }

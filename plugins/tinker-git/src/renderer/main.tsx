@@ -15,6 +15,8 @@ import TabBar from './components/TabBar'
 import Toolbar from './components/Toolbar'
 import CommitList from './components/CommitList'
 import CommitDetail from './components/CommitDetail'
+import CommitFileTree from './components/CommitFileTree'
+import CommitFileViewer from './components/CommitFileViewer'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -25,6 +27,36 @@ const RepoPanels = observer(function RepoPanels() {
     id: 'tinker-git-v3-layout',
     storage: localStorage,
   })
+
+  const {
+    defaultLayout: fileBrowserLayout,
+    onLayoutChange: onFileBrowserLayoutChange,
+  } = useDefaultLayout({
+    panelIds: ['fileTree', 'fileViewer'],
+    id: 'tinker-git-files-layout',
+    storage: localStorage,
+  })
+
+  if (store.browsingFiles) {
+    return (
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <Group
+          orientation="horizontal"
+          className="h-full"
+          defaultLayout={fileBrowserLayout}
+          onLayoutChange={onFileBrowserLayoutChange}
+        >
+          <Panel id="fileTree" defaultSize="25%" minSize="18%">
+            <CommitFileTree />
+          </Panel>
+          <Separator />
+          <Panel id="fileViewer" minSize="60%">
+            <CommitFileViewer />
+          </Panel>
+        </Group>
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1 min-h-0 overflow-hidden">

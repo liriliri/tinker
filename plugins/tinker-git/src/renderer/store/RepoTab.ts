@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import type { ITreeNode } from 'share/components/FileTree/types'
 import type {
   GitBranch,
   GitCommitSummary,
@@ -24,6 +25,13 @@ class RepoTab {
   loadingDetail = false
   error: string | null = null
 
+  // File browsing state
+  browsingFiles = false
+  treeNodes: ITreeNode[] = []
+  selectedFilePath = ''
+  fileContent = ''
+  loadingFileContent = false
+
   constructor(id: string) {
     this.id = id
     makeAutoObservable(this)
@@ -40,6 +48,7 @@ class RepoTab {
   }
 
   async selectBranch(branch: GitBranch) {
+    this.setBrowsingFiles(false)
     this.selectedBranch = branch
     this.selectedCommit = null
     this.commitDetail = null
@@ -127,6 +136,56 @@ class RepoTab {
       })
     } finally {
       this.loadingDetail = false
+    }
+  }
+
+  async setBrowsingFiles(on: boolean) {
+    this.browsingFiles = on
+    if (!on) {
+      this.selectedFilePath = ''
+      this.fileContent = ''
+      this.treeNodes = []
+      return
+    }
+
+    if (!this.selectedCommit) return
+
+    try {
+      await this.syncPreloadRepo()
+      const nodes = await git.getCommitTree(this.selectedCommit.sha)
+      runInAction(() => {
+        this.treeNodes = nodes
+      })
+    } catch (err) {
+      console.error('Failed to load commit tree:', err)
+    }
+  }
+
+  async openFile(filePath: string) {
+    if (!this.selectedCommit) return
+    if (this.selectedFilePath === filePath) return
+
+    this.selectedFilePath = filePath
+    this.loadingFileContent = true
+
+    try {
+      await this.syncPreloadRepo()
+      const content = await git.getCommitFileContent(
+        this.selectedCommit.sha,
+        filePath
+      )
+      runInAction(() => {
+        this.fileContent = content
+      })
+    } catch (err) {
+      console.error('Failed to load file content:', err)
+      runInAction(() => {
+        this.fileContent = `// Failed to load: ${err}`
+      })
+    } finally {
+      runInAction(() => {
+        this.loadingFileContent = false
+      })
     }
   }
 }

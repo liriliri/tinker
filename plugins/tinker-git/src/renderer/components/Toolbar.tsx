@@ -28,7 +28,24 @@ export default observer(function ToolbarComponent() {
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      {store.repoPath && store.branches.length > 0 && (
+      {store.repoPath && store.browsingFiles && store.selectedCommit && (
+        <>
+          <ToolbarSeparator />
+          <button
+            type="button"
+            className={`text-xs px-2 py-1 flex items-center gap-1.5 max-w-48 min-w-0 ${tw.hover} rounded transition-colors cursor-pointer`}
+            onClick={() => setShowBranchDialog(true)}
+            title={t('branches')}
+          >
+            <GitBranch size={14} className="shrink-0" />
+            <span className="truncate font-mono">
+              {store.selectedCommit.shortSha}
+            </span>
+          </button>
+        </>
+      )}
+
+      {store.repoPath && store.branches.length > 0 && !store.browsingFiles && (
         <>
           <ToolbarSeparator />
           <button

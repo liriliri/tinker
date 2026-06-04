@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, Folder } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarButton,
+  ToolbarSeparator,
+  ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { formatCommitListDate } from '../lib/util'
@@ -211,6 +213,7 @@ export default observer(function CommitDetail() {
         >
           {commit.summary}
         </span>
+        <ToolbarSpacer />
         <span
           onClick={handleCopySha}
           className={`font-mono text-xs shrink-0 ${tw.text.secondary} ${tw.primary.textHover} cursor-pointer transition-colors`}
@@ -224,6 +227,14 @@ export default observer(function CommitDetail() {
         >
           {dateLabel}
         </span>
+        <ToolbarSeparator />
+        <ToolbarButton
+          variant="action"
+          onClick={() => store.setBrowsingFiles(true)}
+          title={t('browseFiles')}
+        >
+          <Folder size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
       </Toolbar>
 
       {store.loadingDetail ? (

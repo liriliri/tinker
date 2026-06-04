@@ -94,6 +94,54 @@ async function buildDiffText(commit: NodeGit.Commit): Promise<string> {
   return parts.join('\n')
 }
 
+async function getCommitTree(
+  sha: string,
+  dirPath = ''
+): Promise<Array<{ name: string; path: string; isDirectory: boolean }>> {
+  const currentRepo = requireRepo()
+  const commit = await currentRepo.getCommit(sha)
+  let tree = await commit.getTree()
+
+  if (dirPath) {
+    const entry = await tree.entryByPath(dirPath)
+    if (entry.isTree()) {
+      tree = await currentRepo.getTree(entry.id())
+    } else {
+      return []
+    }
+  }
+
+  const entries = tree.entries()
+  const result: Array<{ name: string; path: string; isDirectory: boolean }> = []
+
+  for (const entry of entries) {
+    result.push({
+      name: entry.name(),
+      path: dirPath ? `${dirPath}/${entry.name()}` : entry.name(),
+      isDirectory: entry.isTree(),
+    })
+  }
+
+  result.sort((a, b) => {
+    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1
+    return a.name.localeCompare(b.name)
+  })
+
+  return result
+}
+
+async function getCommitFileContent(
+  sha: string,
+  filePath: string
+): Promise<string> {
+  const currentRepo = requireRepo()
+  const commit = await currentRepo.getCommit(sha)
+  const tree = await commit.getTree()
+  const entry = await tree.entryByPath(filePath)
+  const blob = await currentRepo.getBlob(entry.id())
+  return blob.content().toString('utf-8')
+}
+
 const gitObj = {
   getRepoPath(): string {
     return repoPath
@@ -241,6 +289,9 @@ const gitObj = {
       diff,
     }
   },
+
+  getCommitTree,
+  getCommitFileContent,
 }
 
 contextBridge.exposeInMainWorld('git', gitObj)

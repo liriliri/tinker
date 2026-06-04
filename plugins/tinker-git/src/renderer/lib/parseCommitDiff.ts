@@ -21,7 +21,7 @@ export interface CommitDiffBlock {
   isLarge: boolean
 }
 
-export function classifyDiffLine(line: string): CommitDiffLine {
+function classifyDiffLine(line: string): CommitDiffLine {
   if (line.startsWith('+') && !line.startsWith('+++')) {
     return { type: 'add', content: line.slice(1) }
   }

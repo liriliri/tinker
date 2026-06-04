@@ -75,6 +75,26 @@ class Store extends BaseStore {
     return this.activeTab?.error ?? null
   }
 
+  get browsingFiles() {
+    return this.activeTab?.browsingFiles ?? false
+  }
+
+  get treeNodes() {
+    return this.activeTab?.treeNodes ?? []
+  }
+
+  get selectedFilePath() {
+    return this.activeTab?.selectedFilePath ?? ''
+  }
+
+  get fileContent() {
+    return this.activeTab?.fileContent ?? ''
+  }
+
+  get loadingFileContent() {
+    return this.activeTab?.loadingFileContent ?? false
+  }
+
   updateTabTitle(tabId: string, title: string) {
     const tab = this.getTab(tabId)
     if (tab) tab.title = title
@@ -90,6 +110,14 @@ class Store extends BaseStore {
 
   loadMoreCommits() {
     return this.activeTab?.loadMoreCommits()
+  }
+
+  async setBrowsingFiles(on: boolean) {
+    return this.activeTab?.setBrowsingFiles(on)
+  }
+
+  async openFile(filePath: string) {
+    return this.activeTab?.openFile(filePath)
   }
 
   private updateWindowTitle() {

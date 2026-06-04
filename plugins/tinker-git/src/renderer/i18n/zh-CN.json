@@ -17,7 +17,6 @@
   "noRemoteRefs": "没有远程分支",
   "noTagRefs": "没有标签",
   "noSearchResults": "没有匹配的引用",
-  "history": "历史",
   "noCommits": "未找到提交",
   "loading": "加载中...",
   "noDiffs": "未找到 diff",
@@ -29,5 +28,7 @@
   "diffUnrenderable": "差异过大，无法显示。",
   "copySuccess": "复制成功",
   "copyFailed": "复制失败",
-  "clickToCopy": "点击复制"
+  "clickToCopy": "点击复制",
+  "browseFiles": "浏览文件",
+  "selectFileToView": "选择文件以查看"
 }
