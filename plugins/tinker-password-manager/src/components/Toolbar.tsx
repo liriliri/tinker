@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Save, Lock, Plus, FolderPlus, Folder } from 'lucide-react'
+import { Save, X, Plus, FolderPlus, Folder } from 'lucide-react'
 import {
   Toolbar as ToolbarComponent,
   ToolbarSeparator,
@@ -101,7 +101,7 @@ export default observer(function Toolbar() {
 
       <div className="flex items-center gap-2 ml-auto">
         <ToolbarButton onClick={handleLock} title={t('lockDatabase')}>
-          <Lock size={TOOLBAR_ICON_SIZE} />
+          <X size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </div>
     </ToolbarComponent>

@@ -14,12 +14,14 @@ const storage = new LocalStore('tinker-code-editor')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_SIDEBAR_MODE = 'sidebarMode'
+const STORAGE_RECENT_DIRECTORIES = 'recentDirectories'
 
 export type SidebarMode = 'explorer' | 'search'
 
 class Store extends BaseStore {
   // FileTree state (inline, tightly coupled)
   rootPath: string = storage.get(STORAGE_ROOT_PATH) || ''
+  recentDirectories: string[] = storage.get(STORAGE_RECENT_DIRECTORIES) || []
   fileTree: ITreeNode[] = []
   watchedDirs = observable.set<string>()
   treeRefreshDirs = observable.set<string>()
@@ -77,12 +79,58 @@ class Store extends BaseStore {
       properties: ['openDirectory'],
     })
     if (!result.canceled && result.filePaths.length > 0) {
-      this.rootPath = result.filePaths[0]
-      storage.set(STORAGE_ROOT_PATH, this.rootPath)
-      this.watchedDirs.clear()
-      this.treeRefreshDirs.clear()
-      await this.loadDirectory(this.rootPath)
+      const path = result.filePaths[0]
+      await this.setRootPath(path)
     }
+  }
+
+  async openRecentDirectory(path: string) {
+    try {
+      await this.setRootPath(path)
+    } catch {
+      this.removeRecentDirectory(path)
+    }
+  }
+
+  closeProject() {
+    if (!this.rootPath) return
+
+    this.rootPath = ''
+    storage.set(STORAGE_ROOT_PATH, '')
+    this.fileTree = []
+    this.unwatch?.()
+    this.unwatch = undefined
+    this.watchedDirs.clear()
+    this.treeRefreshDirs.clear()
+
+    for (const tab of [...this.editor.tabs]) {
+      this.editor.closeTab(tab.id)
+    }
+    for (const tab of [...this.terminal.tabs]) {
+      this.terminal.closeTab(tab.id)
+    }
+  }
+
+  addRecentDirectory(path: string) {
+    this.recentDirectories = [
+      path,
+      ...this.recentDirectories.filter((p) => p !== path),
+    ].slice(0, 10)
+    storage.set(STORAGE_RECENT_DIRECTORIES, this.recentDirectories)
+  }
+
+  removeRecentDirectory(path: string) {
+    this.recentDirectories = this.recentDirectories.filter((p) => p !== path)
+    storage.set(STORAGE_RECENT_DIRECTORIES, this.recentDirectories)
+  }
+
+  private async setRootPath(path: string) {
+    this.rootPath = path
+    storage.set(STORAGE_ROOT_PATH, path)
+    this.addRecentDirectory(path)
+    this.watchedDirs.clear()
+    this.treeRefreshDirs.clear()
+    await this.loadDirectory(path)
   }
 
   async loadDirectory(dirPath: string) {

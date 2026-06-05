@@ -148,6 +148,38 @@ const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
 
 `TextSearchSidebar` is a pure UI component (no MobX). `TextSearch` owns query/options/results; `getTextSearchUIProps` maps it to props. Highlight helpers (`buildSegments`, `byteRangeToColumns`, `getLineText`) are exported from the same module for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
 
+### Welcome
+
+Welcome screen with action buttons and recent files list. Common pattern for plugins that manage a file-based workspace.
+
+```ts
+import Welcome, { type WelcomeAction } from 'share/components/Welcome'
+
+const actions: WelcomeAction[] = [
+  {
+    icon: <Plus size={20} />,
+    label: t('newDatabase'),
+    onClick: handleNewDatabase,
+  },
+  {
+    icon: <FolderOpen size={20} />,
+    label: t('openDatabase'),
+    onClick: handleOpenDatabase,
+  },
+]
+
+<Welcome
+  title={t('welcomeTitle')}
+  description={t('welcomeDescription')}
+  actions={actions}
+  recentFiles={store.recentFiles}
+  onOpenRecent={(path) => store.openDatabase(path, password)}
+  onRemoveRecent={(path) => store.removeRecentFile(path)}
+/>
+```
+
+Context menu labels (`open`, `showInFolder`, `removeFromRecent`) are built-in via the component's `welcome` i18n namespace. The plugin only needs `welcomeTitle` and `welcomeDescription` for the header text, plus i18n for action button labels.
+
 ### Other Components
 
 ```ts
@@ -305,11 +337,11 @@ const dataSource: IFileTreeDataSource = {
 
 **Data source patterns:**
 
-| Source | `readDir` | `createNode` | `renameNode` | `deleteNode` |
-|--------|-----------|-------------|-------------|-------------|
-| Local  | `codeEditor.readDir()` | `tinker.writeFile` | `codeEditor.renameItem` | `tinker.rm` |
-| Remote | `fetch(api/list)` | `fetch(api/create)` | `fetch(api/rename)` | `fetch(api/delete)` |
-| Git    | `git ls-tree` | — | — | — |
+| Source | `readDir`              | `createNode`        | `renameNode`            | `deleteNode`        |
+| ------ | ---------------------- | ------------------- | ----------------------- | ------------------- |
+| Local  | `codeEditor.readDir()` | `tinker.writeFile`  | `codeEditor.renameItem` | `tinker.rm`         |
+| Remote | `fetch(api/list)`      | `fetch(api/create)` | `fetch(api/rename)`     | `fetch(api/delete)` |
+| Git    | `git ls-tree`          | —                   | —                       | —                   |
 
 **File watching:** The shared FileTree does not manage file watching — that's the consumer's job. Use `onExpandChange` to start/stop watching, and `refreshDirs` + `refreshVersion` to trigger re-fetches after file system events.
 

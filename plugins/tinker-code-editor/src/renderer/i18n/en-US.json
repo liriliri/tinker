@@ -1,4 +1,8 @@
 {
+  "welcomeTitle": "Welcome to Code Editor",
+  "welcomeDescription": "Open a folder to start editing your project files.",
+  "openFolder": "Open Folder",
+  "closeProject": "Close Project",
   "noFolderOpened": "Open Folder",
   "openFileToEdit": "Open a file to start editing",
   "cursor": "Ln {{line}}, Col {{col}}",

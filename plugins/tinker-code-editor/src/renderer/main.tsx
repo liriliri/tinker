@@ -16,6 +16,7 @@ import Sidebar from './components/Sidebar'
 import EditorPane from './components/EditorPane'
 import StatusBar from './components/StatusBar'
 import TerminalPanel from './components/TerminalPanel'
+import Welcome from './components/Welcome'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -79,6 +80,10 @@ const App = observer(function App() {
   }
 
   void store.tabDirtyRevision
+
+  if (!store.rootPath) {
+    return <Welcome />
+  }
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden">

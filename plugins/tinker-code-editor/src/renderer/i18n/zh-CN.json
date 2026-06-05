@@ -1,4 +1,8 @@
 {
+  "welcomeTitle": "代码编辑",
+  "welcomeDescription": "打开一个文件夹开始编辑项目文件。",
+  "openFolder": "打开文件夹",
+  "closeProject": "关闭项目",
   "noFolderOpened": "打开文件夹",
   "openFileToEdit": "打开文件开始编辑",
   "cursor": "行 {{line}}, 列 {{col}}",
