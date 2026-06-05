@@ -39,6 +39,7 @@
   width: 48ch;
   background: var(--theme-background-secondary, #f3f3f3);
   padding: 0 1ch;
+  border-left: 1px solid var(--theme-border, #e0e0e0);
   border-right: 1px solid var(--theme-border, #e0e0e0);
   color: transparent !important;
 }

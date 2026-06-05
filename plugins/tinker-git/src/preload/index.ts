@@ -1,5 +1,5 @@
 import { contextBridge } from 'electron'
-import NodeGit from 'nodegit'
+import { exec } from 'dugite'
 import type {
   GitBlameHunk,
   GitBranch,
@@ -9,14 +9,13 @@ import type {
   OpenRepositoryResult,
 } from '../common/types'
 
-let repo: NodeGit.Repository | null = null
 let repoPath = ''
 
-function requireRepo(): NodeGit.Repository {
-  if (!repo) {
+function requireRepo(): string {
+  if (!repoPath) {
     throw new Error('No repository open')
   }
-  return repo
+  return repoPath
 }
 
 function formatRefName(fullName: string): {
@@ -48,200 +47,55 @@ function formatRefName(fullName: string): {
   return { name: fullName, kind: 'local', isRemote: false }
 }
 
-function getSignatureDateMs(signature: NodeGit.Signature): number {
-  const when = signature.when() as {
-    time?: () => number
-    sec?: () => number
-  }
-
-  if (typeof when.time === 'function') {
-    return when.time() * 1000
-  }
-
-  if (typeof when.sec === 'function') {
-    return when.sec() * 1000
-  }
-
-  return 0
-}
-
-async function buildDiffText(commit: NodeGit.Commit): Promise<string> {
-  const parts: string[] = []
-
-  try {
-    const diffs = await commit.getDiff()
-    for (const diff of diffs) {
-      const patches = await diff.patches()
-      for (const patch of patches) {
-        parts.push(
-          `diff --git a/${patch.oldFile().path()} b/${patch.newFile().path()}`
-        )
-        const hunks = await patch.hunks()
-        for (const hunk of hunks) {
-          parts.push(hunk.header().trim())
-          const lines = await hunk.lines()
-          for (const line of lines) {
-            parts.push(
-              String.fromCharCode(line.origin()) + line.content().trimEnd()
-            )
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Failed to build diff:', error)
-  }
-
-  return parts.join('\n')
-}
-
-async function getCommitTree(
-  sha: string,
-  dirPath = ''
-): Promise<Array<{ name: string; path: string; isDirectory: boolean }>> {
-  const currentRepo = requireRepo()
-  const commit = await currentRepo.getCommit(sha)
-  let tree = await commit.getTree()
-
-  if (dirPath) {
-    const entry = await tree.entryByPath(dirPath)
-    if (entry.isTree()) {
-      tree = await currentRepo.getTree(entry.id())
-    } else {
-      return []
-    }
-  }
-
-  const entries = tree.entries()
-  const result: Array<{ name: string; path: string; isDirectory: boolean }> = []
-
-  for (const entry of entries) {
-    result.push({
-      name: entry.name(),
-      path: dirPath ? `${dirPath}/${entry.name()}` : entry.name(),
-      isDirectory: entry.isTree(),
-    })
-  }
-
-  result.sort((a, b) => {
-    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1
-    return a.name.localeCompare(b.name)
-  })
-
-  return result
-}
-
-async function getCommitFileContent(
-  sha: string,
-  filePath: string
-): Promise<string> {
-  const currentRepo = requireRepo()
-  const commit = await currentRepo.getCommit(sha)
-  const tree = await commit.getTree()
-  const entry = await tree.entryByPath(filePath)
-  const blob = await currentRepo.getBlob(entry.id())
-  return blob.content().toString('utf-8')
-}
-
-async function getCommitFileBlame(
-  sha: string,
-  filePath: string
-): Promise<GitBlameHunk[]> {
-  const currentRepo = requireRepo()
-  const oid = NodeGit.Oid.fromString(sha)
-  const blameOpts = new NodeGit.BlameOptions()
-  blameOpts.newestCommit = oid
-  const blame = await NodeGit.Blame.file(currentRepo, filePath, blameOpts)
-  const hunks: GitBlameHunk[] = []
-  const hunkCount = blame.getHunkCount()
-
-  for (let i = 0; i < hunkCount; i++) {
-    const hunk = blame.getHunkByIndex(i)
-    const commitId = hunk.finalCommitId()
-    const sig = hunk.finalSignature()
-    const when = sig.when() as { time?: () => number; sec?: () => number }
-    const date = new Date(
-      (typeof when.time === 'function'
-        ? when.time()
-        : typeof when.sec === 'function'
-        ? when.sec()
-        : 0) * 1000
-    )
-
-    let message = ''
-    try {
-      const commit = await currentRepo.getCommit(commitId)
-      message = commit.message().split('\n')[0]
-    } catch {
-      message = ''
-    }
-
-    hunks.push({
-      sha: commitId.tostrS(),
-      author: sig.name(),
-      message,
-      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        '0'
-      )}-${String(date.getDate()).padStart(2, '0')} ${String(
-        date.getHours()
-      ).padStart(2, '0')}:${String(date.getMinutes()).padStart(
-        2,
-        '0'
-      )}:${String(date.getSeconds()).padStart(2, '0')}`,
-      startLineNumber: hunk.finalStartLineNumber(),
-      lineCount: hunk.linesInHunk(),
-    })
-  }
-
-  return hunks
-}
-
 const gitObj = {
   getRepoPath(): string {
     return repoPath
   },
 
   async openRepository(path: string): Promise<OpenRepositoryResult> {
-    if (repo && repoPath === path) {
-      const head = await repo.getCurrentBranch()
-      return {
-        repoPath,
-        headRef: head.name(),
-      }
+    if (repoPath === path) {
+      const { stdout } = await exec(['rev-parse', '--abbrev-ref', 'HEAD'], path)
+      return { repoPath, headRef: stdout.trim() }
     }
 
-    repo = null
-    repoPath = ''
+    const { exitCode } = await exec(['rev-parse', '--git-dir'], path)
+    if (exitCode !== 0) {
+      throw new Error(`Not a git repository: ${path}`)
+    }
 
-    repo = await NodeGit.Repository.open(path)
     repoPath = path
 
-    const head = await repo.getCurrentBranch()
-    return {
-      repoPath,
-      headRef: head.name(),
-    }
+    const { stdout } = await exec(['rev-parse', '--abbrev-ref', 'HEAD'], path)
+    return { repoPath, headRef: stdout.trim() }
   },
 
   async getBranches(): Promise<GitBranch[]> {
-    const currentRepo = requireRepo()
-    const head = await currentRepo.getCurrentBranch()
-    const headName = head.name()
-    const refNames = await currentRepo.getReferenceNames(
-      NodeGit.Reference.TYPE.ALL
+    const currentPath = requireRepo()
+
+    const { stdout: headOut } = await exec(
+      ['rev-parse', '--abbrev-ref', 'HEAD'],
+      currentPath
     )
+    const headName = `refs/heads/${headOut.trim()}`
+
+    const { stdout } = await exec(
+      [
+        'for-each-ref',
+        '--format=%(refname)%00%(objectname:short=8)%00%(*objectname:short=8)',
+        'refs/heads/',
+        'refs/remotes/',
+        'refs/tags/',
+      ],
+      currentPath
+    )
+
     const branches: GitBranch[] = []
     const seen = new Set<string>()
 
-    for (const fullName of refNames) {
-      if (
-        !fullName.startsWith('refs/heads/') &&
-        !fullName.startsWith('refs/remotes/') &&
-        !fullName.startsWith('refs/tags/')
-      ) {
-        continue
-      }
+    for (const line of stdout.trim().split('\n')) {
+      if (!line) continue
+
+      const [fullName, objSha, peeledSha] = line.split('\0')
 
       if (/^refs\/remotes\/[^/]+\/HEAD$/.test(fullName)) {
         continue
@@ -252,9 +106,7 @@ const gitObj = {
       }
       seen.add(fullName)
 
-      const ref = await currentRepo.getReference(fullName)
-      const resolved = ref.isSymbolic() ? await ref.resolve() : ref
-      const oid = resolved.target()
+      const sha = peeledSha || objSha
       const { name, kind, isRemote } = formatRefName(fullName)
 
       branches.push({
@@ -263,7 +115,7 @@ const gitObj = {
         kind,
         isRemote,
         isHead: fullName === headName,
-        sha: oid.tostrS().slice(0, 7),
+        sha,
       })
     }
 
@@ -288,66 +140,206 @@ const gitObj = {
     limit = 100,
     skip = 0
   ): Promise<GitCommitSummary[]> {
-    const currentRepo = requireRepo()
-    const commit = await currentRepo.getReferenceCommit(refName)
-    const revwalk = currentRepo.createRevWalk()
-    revwalk.sorting(NodeGit.Revwalk.SORT.TIME)
-    revwalk.push(await commit.id())
+    const currentPath = requireRepo()
 
-    for (let i = 0; i < skip; i++) {
-      try {
-        await revwalk.next()
-      } catch (error) {
-        const err = error as { errno?: number }
-        if (err.errno === NodeGit.Error.CODE.ITEROVER) {
-          return []
-        }
-        throw error
-      }
-    }
+    const { stdout } = await exec(
+      [
+        'log',
+        '-z',
+        `--format=%H%n%h%n%an%n%ae%n%at%n%s`,
+        refName,
+        `--max-count=${limit}`,
+        `--skip=${skip}`,
+      ],
+      currentPath
+    )
 
-    const commits = await revwalk.getCommits(limit)
+    const records = stdout.split('\0').filter(Boolean)
+    if (records.length === 0) return []
 
-    return commits.map((item) => {
-      const author = item.author()
-      const message = item.message()
-      const sha = item.sha()
+    return records.map((record) => {
+      const [sha, , author, email, dateStr, summary] = record.split('\n')
       return {
         sha,
-        shortSha: sha.slice(0, 7),
-        summary: message.split('\n')[0],
-        author: author.name(),
-        email: author.email(),
-        date: getSignatureDateMs(author),
+        shortSha: sha.slice(0, 8),
+        summary,
+        author,
+        email,
+        date: parseInt(dateStr, 10) * 1000,
       }
     })
   },
 
   async getCommitDetail(sha: string): Promise<GitCommitDetail> {
-    const currentRepo = requireRepo()
-    const commit = await currentRepo.getCommit(sha)
-    const author = commit.author()
-    const message = commit.message()
-    const summary = message.split('\n')[0]
+    const currentPath = requireRepo()
+
+    const { stdout: metaOut } = await exec(
+      ['show', '--no-patch', '-z', `--format=%H%n%h%n%an%n%ae%n%at%n%s`, sha],
+      currentPath
+    )
+
+    const metaClean = metaOut.replace(/\0$/, '')
+    const [fullSha, , author, email, dateStr, summary] = metaClean.split('\n')
+
+    const { stdout: msgOut } = await exec(
+      ['log', '-1', '--format=%B', sha],
+      currentPath
+    )
+    const message = msgOut.replace(/\n$/, '')
     const body = message.split('\n').slice(1).join('\n').trim()
-    const diff = await buildDiffText(commit)
+
+    let diff = ''
+    try {
+      const { stdout: diffOut } = await exec(
+        ['show', '--format=', '-m', '-p', sha],
+        currentPath
+      )
+      diff = diffOut.trimEnd()
+    } catch {
+      // show may fail for edge cases, return empty diff
+    }
 
     return {
-      sha,
-      shortSha: sha.slice(0, 7),
+      sha: fullSha,
+      shortSha: fullSha.slice(0, 7),
       summary,
       body,
       message,
-      author: author.name(),
-      email: author.email(),
-      date: getSignatureDateMs(author),
+      author,
+      email,
+      date: parseInt(dateStr, 10) * 1000,
       diff,
     }
   },
 
-  getCommitTree,
-  getCommitFileContent,
-  getCommitFileBlame,
+  async getCommitTree(
+    sha: string,
+    dirPath = ''
+  ): Promise<Array<{ name: string; path: string; isDirectory: boolean }>> {
+    const currentPath = requireRepo()
+
+    const target = dirPath ? `${sha}:${dirPath}` : sha
+    const { stdout } = await exec(
+      ['ls-tree', '--full-tree', target],
+      currentPath
+    )
+
+    const output = stdout.trim()
+    if (!output) return []
+
+    const result: Array<{
+      name: string
+      path: string
+      isDirectory: boolean
+    }> = []
+
+    for (const line of output.split('\n')) {
+      if (!line) continue
+      const tabIdx = line.lastIndexOf('\t')
+      if (tabIdx === -1) continue
+
+      const info = line.slice(0, tabIdx)
+      const name = line.slice(tabIdx + 1)
+      const parts = info.split(' ')
+      const type = parts[1] // 'tree' or 'blob'
+
+      result.push({
+        name,
+        path: dirPath ? `${dirPath}/${name}` : name,
+        isDirectory: type === 'tree',
+      })
+    }
+
+    result.sort((a, b) => {
+      if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1
+      return a.name.localeCompare(b.name)
+    })
+
+    return result
+  },
+
+  async getCommitFileContent(sha: string, filePath: string): Promise<string> {
+    const currentPath = requireRepo()
+    const { stdout } = await exec(['show', `${sha}:${filePath}`], currentPath)
+    return stdout.replace(/\n$/, '')
+  },
+
+  async getCommitFileBlame(
+    sha: string,
+    filePath: string
+  ): Promise<GitBlameHunk[]> {
+    const currentPath = requireRepo()
+    const { stdout } = await exec(
+      ['blame', '--porcelain', sha, '--', filePath],
+      currentPath
+    )
+
+    const hunks: GitBlameHunk[] = []
+    const lines = stdout.split('\n')
+
+    let i = 0
+    while (i < lines.length) {
+      const header = lines[i]
+      if (!header || header.startsWith('\t')) {
+        i++
+        continue
+      }
+
+      const headerParts = header.split(' ')
+      if (headerParts.length < 4) {
+        i++
+        continue
+      }
+
+      const hunkSha = headerParts[0]
+      // final-line is headerParts[2], line-count is headerParts[3]
+      const startLine = parseInt(headerParts[2], 10)
+      const lineCount = parseInt(headerParts[3], 10)
+      let authorName = ''
+      let authorTime = 0
+      let summary = ''
+
+      i++
+      // Read metadata lines (no tab prefix)
+      while (i < lines.length && lines[i] && !lines[i].startsWith('\t')) {
+        const metaLine = lines[i]
+        if (metaLine.startsWith('author ')) {
+          authorName = metaLine.slice('author '.length)
+        } else if (metaLine.startsWith('author-time ')) {
+          authorTime = parseInt(metaLine.slice('author-time '.length), 10)
+        } else if (metaLine.startsWith('summary ')) {
+          summary = metaLine.slice('summary '.length)
+        }
+        i++
+      }
+
+      const date = new Date(authorTime * 1000)
+      const dateStr = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(
+        date.getHours()
+      ).padStart(2, '0')}:${String(date.getMinutes()).padStart(
+        2,
+        '0'
+      )}:${String(date.getSeconds()).padStart(2, '0')}`
+
+      hunks.push({
+        sha: hunkSha,
+        author: authorName,
+        message: summary,
+        date: dateStr,
+        startLineNumber: startLine,
+        lineCount,
+      })
+
+      // Skip content lines (tab-prefixed) for this hunk
+      while (i < lines.length && lines[i] && lines[i].startsWith('\t')) {
+        i++
+      }
+    }
+
+    return hunks
+  },
 }
 
 contextBridge.exposeInMainWorld('git', gitObj)

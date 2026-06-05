@@ -18,7 +18,7 @@ const WATCH_EVENTS = new Set<FileWatchEventType>([
 let watcher: FSWatcher | null = null
 let watchSession = 0
 let pendingEvents: IFileWatchEvent[] = []
-let flushDebounced: ReturnType<typeof debounce> | null = null
+let flushDebounced: (() => void) | null = null
 
 interface IDirEntry {
   name: string
@@ -74,7 +74,6 @@ const codeEditorObj = {
     onChange: (events: IFileWatchEvent[]) => void
   ): () => void {
     const session = ++watchSession
-    flushDebounced?.cancel()
     flushDebounced = null
     pendingEvents = []
     void watcher?.close()
@@ -83,7 +82,6 @@ const codeEditorObj = {
     if (paths.length === 0) {
       return () => {
         watchSession++
-        flushDebounced?.cancel()
         flushDebounced = null
         pendingEvents = []
         void watcher?.close()
@@ -127,7 +125,6 @@ const codeEditorObj = {
 
     return () => {
       watchSession++
-      flushDebounced?.cancel()
       flushDebounced = null
       pendingEvents = []
       void watcher?.close()

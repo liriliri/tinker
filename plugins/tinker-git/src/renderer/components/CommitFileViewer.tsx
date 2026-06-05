@@ -10,6 +10,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { GitCommit } from 'lucide-react'
+import { BINARY_EXTS } from 'share/lib/fileType'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
@@ -63,64 +64,9 @@ function getLanguage(filePath: string): string {
   return LANGUAGE_MAP[ext] || 'plaintext'
 }
 
-const BINARY_EXTENSIONS = new Set([
-  'png',
-  'jpg',
-  'jpeg',
-  'gif',
-  'bmp',
-  'ico',
-  'webp',
-  'tiff',
-  'tif',
-  'svg',
-  'ttf',
-  'otf',
-  'woff',
-  'woff2',
-  'eot',
-  'zip',
-  'tar',
-  'gz',
-  'bz2',
-  'xz',
-  '7z',
-  'rar',
-  'exe',
-  'dll',
-  'so',
-  'dylib',
-  'wasm',
-  'pdf',
-  'class',
-  'pyc',
-  'o',
-  'a',
-  'lib',
-  'mp3',
-  'mp4',
-  'wav',
-  'avi',
-  'mov',
-  'mkv',
-  'ogg',
-  'ogv',
-  'webm',
-  'flv',
-  'db',
-  'sqlite',
-  'sqlite3',
-  'doc',
-  'docx',
-  'xls',
-  'xlsx',
-  'ppt',
-  'pptx',
-])
-
 function isBinaryFile(filePath: string): boolean {
   const ext = filePath.split('.').pop()?.toLowerCase() || ''
-  return BINARY_EXTENSIONS.has(ext)
+  return BINARY_EXTS.has(ext)
 }
 
 export default observer(function CommitFileViewer() {
