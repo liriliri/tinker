@@ -6,6 +6,7 @@
   "closeTabsToRight": "Close Tabs to the Right",
   "openRepo": "Open Repository",
   "dropRepoHere": "Drop a repository folder here or click to select",
+  "notAGitRepo": "Not a Git repository",
   "selectBranchHint": "Select a branch to view history",
   "selectCommitHint": "Select a commit to view details",
   "branches": "Branches",

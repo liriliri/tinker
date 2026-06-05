@@ -234,26 +234,18 @@ class Store extends BaseStore {
     runInAction(() => {
       tab.loading = true
       tab.setError(null)
-      tab.repoPath = path
-      this.updateTabTitle(tab.id, repoDirName(path))
-      this.updateWindowTitle()
     })
 
     try {
-      await this.refreshBranches(tab)
+      await this.refreshBranches(tab, path)
+      runInAction(() => {
+        this.updateTabTitle(tab.id, repoDirName(path))
+        this.updateWindowTitle()
+      })
     } catch (err) {
       console.error('Failed to open repository:', err)
       runInAction(() => {
-        tab.setError(String(err))
-        tab.repoPath = ''
-        tab.branches = []
-        tab.commits = []
-        tab.selectedBranch = null
-        tab.selectedCommit = null
-        tab.commitDetail = null
-        tab.editorContent = ''
-        this.updateTabTitle(tab.id, '')
-        this.updateWindowTitle()
+        tab.setError('NOT_A_GIT_REPO')
       })
     } finally {
       runInAction(() => {
@@ -262,14 +254,14 @@ class Store extends BaseStore {
     }
   }
 
-  async refreshBranches(tab: RepoTab = this.activeTab!) {
-    if (!tab?.repoPath) return
+  async refreshBranches(tab: RepoTab = this.activeTab!, repoPath?: string) {
+    if (!repoPath && !tab?.repoPath) return
 
     tab.loading = true
     tab.setError(null)
 
     try {
-      await tab.syncPreloadRepo()
+      await tab.syncPreloadRepo(repoPath)
       const branches = await git.getBranches()
       tab.branches = branches
 
@@ -291,7 +283,7 @@ class Store extends BaseStore {
       }
     } catch (err) {
       console.error('Failed to load branches:', err)
-      tab.setError(String(err))
+      throw err
     } finally {
       tab.loading = false
     }

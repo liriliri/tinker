@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import {
@@ -6,6 +7,7 @@ import {
   Separator,
   useDefaultLayout,
 } from 'react-resizable-panels'
+import toast from 'react-hot-toast'
 import { ToasterProvider } from 'share/components/Toaster'
 import FolderOpen from 'share/components/FolderOpen'
 import { tw } from 'share/theme'
@@ -82,24 +84,31 @@ const RepoPanels = observer(function RepoPanels() {
   )
 })
 
+const ErrorToast = observer(function ErrorToast() {
+  const { t } = useTranslation()
+
+  useEffect(() => {
+    if (store.error) {
+      const msg =
+        store.error === 'NOT_A_GIT_REPO' ? t('notAGitRepo') : store.error
+      toast.error(msg)
+    }
+  }, [store.error, t])
+
+  return null
+})
+
 const App = observer(function App() {
   const { t } = useTranslation()
 
   return (
     <ToasterProvider>
+      <ErrorToast />
       <div
         className={`h-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
       >
         <TabBar />
         <Toolbar />
-
-        {store.error && (
-          <div
-            className={`px-4 py-2 text-sm border-b shrink-0 ${tw.border} text-red-500`}
-          >
-            {store.error}
-          </div>
-        )}
 
         {!store.repoPath ? (
           <FolderOpen

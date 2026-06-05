@@ -6,6 +6,7 @@
   "closeTabsToRight": "关闭右侧标签页",
   "openRepo": "打开仓库",
   "dropRepoHere": "将仓库文件夹拖放到此处，或点击选择",
+  "notAGitRepo": "不是 Git 仓库",
   "selectBranchHint": "选择分支以查看历史",
   "selectCommitHint": "选择提交以查看详情",
   "branches": "分支",

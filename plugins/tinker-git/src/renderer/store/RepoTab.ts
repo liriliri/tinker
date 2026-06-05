@@ -48,10 +48,12 @@ class RepoTab {
     this.error = msg
   }
 
-  async syncPreloadRepo() {
-    if (!this.repoPath) return
-    if (git.getRepoPath() === this.repoPath) return
-    await git.openRepository(this.repoPath)
+  async syncPreloadRepo(path?: string) {
+    const targetPath = path || this.repoPath
+    if (!targetPath) return
+    if (!path && git.getRepoPath() === targetPath) return
+    await git.openRepository(targetPath)
+    this.repoPath = targetPath
   }
 
   async selectBranch(branch: GitBranch) {
