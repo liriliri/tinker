@@ -188,6 +188,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-markdown-live',
+    name: 'Markdown Live',
+    description: 'A WYSIWYG markdown editor with live editing',
+    icon: 'tinker-markdown-live.png',
+    locales: {
+      'zh-CN': {
+        name: 'Markdown 实时编辑',
+        description: '所见即所得的 Markdown 编辑器',
+      },
+    },
+  },
+  {
     id: 'tinker-nes',
     name: 'NES',
     description: 'Play NES ROMs with save state support',
