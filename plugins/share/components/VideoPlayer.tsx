@@ -45,8 +45,6 @@ import {
   ListVideo,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import evalCss from 'licia/evalCss'
-import once from 'licia/once'
 import { addI18nNamespace } from '../lib/i18n'
 
 const I18N_NS = 'videoPlayer'
@@ -94,60 +92,6 @@ addI18nNamespace(I18N_NS, {
 
 const SEEK_TIME = 10
 const ICON_SIZE = 18
-
-const injectStyles = once(() =>
-  evalCss(`
-.media-default-skin {
-  border-radius: 0;
-  --media-color-primary: #1f2937;
-  --media-surface-background-color: rgba(240, 241, 242, 0.85);
-  --media-surface-inner-border-color: rgba(224, 224, 224, 0.5);
-  --media-surface-outer-border-color: rgba(224, 224, 224, 0.3);
-  --media-surface-shadow-color: rgba(0, 0, 0, 0.08);
-  --media-border-color: rgba(224, 224, 224, 0.5);
-}
-.media-default-skin .media-slider__fill {
-  color: #0fc25e;
-}
-.dark .media-default-skin {
-  --media-color-primary: #e5e7eb;
-  --media-surface-background-color: rgba(48, 49, 51, 0.85);
-  --media-surface-inner-border-color: rgba(74, 74, 74, 0.5);
-  --media-surface-outer-border-color: rgba(74, 74, 74, 0.3);
-  --media-surface-shadow-color: rgba(0, 0, 0, 0.3);
-  --media-border-color: rgba(74, 74, 74, 0.5);
-}
-.media-controls--compact {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  align-items: center;
-  gap: 4px;
-  padding: 4px !important;
-}
-.media-controls--compact > * {
-  display: contents;
-}
-.media-controls--compact .media-button--play {
-  flex-shrink: 0;
-  order: -1;
-}
-.media-controls--compact .media-time-controls {
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-  overflow: hidden;
-  width: 0;
-  order: 0;
-}
-.media-controls--compact .media-button--fullscreen {
-  flex-shrink: 0;
-  order: 1;
-}
-.media-controls--compact .media-slider {
-  flex: 1 1 0;
-  min-width: 0;
-}
-`)
-)
 
 export interface VideoPlayerProps extends PropsWithChildren {
   className?: string
@@ -224,8 +168,6 @@ export default function VideoPlayer(props: VideoPlayerProps) {
     onTogglePlaylist,
     ...rest
   } = props
-
-  injectStyles()
 
   const { t } = useTranslation(I18N_NS)
 
