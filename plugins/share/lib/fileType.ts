@@ -184,3 +184,57 @@ export function getFileCategory(filePath: string): FileCategory {
   }
   return 'other'
 }
+
+/**
+ * Maps file extensions to Monaco editor language identifiers.
+ */
+const LANGUAGE_MAP: Record<string, string> = {
+  js: 'javascript',
+  jsx: 'javascript',
+  mjs: 'javascript',
+  cjs: 'javascript',
+  ts: 'typescript',
+  tsx: 'typescript',
+  json: 'json',
+  jsonc: 'json',
+  html: 'html',
+  htm: 'html',
+  css: 'css',
+  scss: 'scss',
+  less: 'less',
+  md: 'markdown',
+  markdown: 'markdown',
+  py: 'python',
+  rb: 'ruby',
+  go: 'go',
+  rs: 'rust',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  cc: 'cpp',
+  h: 'c',
+  hpp: 'cpp',
+  sh: 'shell',
+  bash: 'shell',
+  zsh: 'shell',
+  yaml: 'yaml',
+  yml: 'yaml',
+  xml: 'xml',
+  sql: 'sql',
+  swift: 'swift',
+  kt: 'kotlin',
+  dart: 'dart',
+  lua: 'lua',
+  toml: 'ini',
+  ini: 'ini',
+  vue: 'html',
+  svelte: 'html',
+  php: 'php',
+  pl: 'perl',
+  r: 'r',
+}
+
+export function getLanguage(filePath: string): string {
+  const ext = getFileExt(filePath)
+  return LANGUAGE_MAP[ext] || 'plaintext'
+}

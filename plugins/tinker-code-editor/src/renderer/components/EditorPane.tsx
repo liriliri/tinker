@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useCallback } from 'react'
 import type { editor } from 'monaco-editor'
 import store from '../store'
-import { getLanguage } from '../lib/util'
+import { getLanguage } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 
 type MonacoApi = typeof import('monaco-editor')

@@ -7,7 +7,7 @@ import { File } from 'lucide-react'
 import { tw } from 'share/theme'
 import { byteRangeToColumns, getLineText } from 'share/lib/textSearch'
 import store from '../store'
-import { getLanguage } from '../lib/language'
+import { getLanguage } from 'share/lib/fileType'
 
 type MonacoApi = typeof import('monaco-editor')
 
