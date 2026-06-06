@@ -18,7 +18,9 @@ for (const file of jsFiles) {
 
   try {
     const code = await fs.readFile(file, 'utf8')
-    const result = await minify(code, { mangle: true, compress: true })
+    const result = await minify(code, {
+      compress: { pure_getters: false },
+    })
     if (!result.code) continue
     const newSize = Buffer.byteLength(result.code)
     if (newSize < stat.size) {
