@@ -1,6 +1,6 @@
 import { Editor, loader } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { tw } from 'share/theme'
@@ -11,6 +11,7 @@ import {
 } from 'share/components/Toolbar'
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS } from 'share/lib/fileType'
+import { useBlameDecorations } from '../../../../share/hooks/useBlameDecorations'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
@@ -72,149 +73,19 @@ function isBinaryFile(filePath: string): boolean {
 export default observer(function CommitFileViewer() {
   const { t } = useTranslation()
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
-  const decorationIdsRef = useRef<string[]>([])
-  const highlightDecoIdsRef = useRef<string[]>([])
 
-  // Apply blame decorations (before content for text, className for highlight)
-  const applyBlameDecorations = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor || !monacoApi) return
-
-    decorationIdsRef.current = editor.deltaDecorations(
-      decorationIdsRef.current,
-      []
-    )
-
-    if (!store.showingBlame || store.blameLineAnnotations.length === 0) {
-      return
-    }
-
-    const annotations = store.blameLineAnnotations
-    const highlightedSha = store.highlightedBlameSha
-
-    const decorations: MonacoEditor.IModelDeltaDecoration[] = []
-    for (const a of annotations) {
-      const base = {
-        range: new monacoApi!.Range(a.lineNumber, 1, a.lineNumber, 1),
-      }
-      const hl = highlightedSha && a.sha === highlightedSha
-      if (a.isLeader) {
-        decorations.push({
-          ...base,
-          options: {
-            showIfCollapsed: true,
-            before: {
-              content: a.text,
-              inlineClassName: hl
-                ? 'blame-before blame-before--msg blame-before--hl'
-                : 'blame-before blame-before--msg',
-            },
-          },
-        })
-        decorations.push({
-          ...base,
-          options: {
-            showIfCollapsed: true,
-            before: {
-              content: a.date,
-              inlineClassName: hl
-                ? 'blame-before blame-before--date blame-before--hl'
-                : 'blame-before blame-before--date',
-            },
-          },
-        })
-      } else {
-        decorations.push({
-          ...base,
-          options: {
-            showIfCollapsed: true,
-            before: {
-              content: '\u00a0',
-              inlineClassName: hl
-                ? 'blame-before blame-before--compact blame-before--hl'
-                : 'blame-before blame-before--compact',
-            },
-          },
-        })
-      }
-    }
-
-    decorationIdsRef.current = editor.deltaDecorations(
-      decorationIdsRef.current,
-      decorations
-    )
+  const handleHighlightClick = useCallback((sha: string) => {
+    store.setHighlightedBlameSha(sha)
   }, [])
 
-  // Apply highlight decorations for selected SHA
-  const applyHighlightDecorations = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor || !monacoApi) return
-
-    highlightDecoIdsRef.current = editor.deltaDecorations(
-      highlightDecoIdsRef.current,
-      []
-    )
-
-    const sha = store.highlightedBlameSha
-    if (!sha || !store.showingBlame) return
-
-    const lines = store.blameLineAnnotations.filter((a) => a.sha === sha)
-    if (lines.length === 0) return
-
-    const decos: MonacoEditor.IModelDeltaDecoration[] = lines.map((a) => ({
-      range: new monacoApi!.Range(a.lineNumber, 1, a.lineNumber, 1),
-      options: {
-        description: 'git-blame-highlight',
-        isWholeLine: true,
-        className: 'blame-line-highlight',
-      },
-    }))
-
-    highlightDecoIdsRef.current = editor.deltaDecorations(
-      highlightDecoIdsRef.current,
-      decos
-    )
-  }, [])
-
-  // Apply decorations when blame or file changes
-  useEffect(() => {
-    applyBlameDecorations()
-    applyHighlightDecorations()
-    return () => {
-      const editor = editorRef.current
-      if (editor) {
-        editor.deltaDecorations(decorationIdsRef.current, [])
-        editor.deltaDecorations(highlightDecoIdsRef.current, [])
-        decorationIdsRef.current = []
-        highlightDecoIdsRef.current = []
-      }
-    }
-  }, [applyBlameDecorations, applyHighlightDecorations, store.showingBlame, store.blameLineAnnotations, store.fileContent])
-
-  // Mouse click handler — detect clicks on lines and toggle highlight for matching SHA
-  useEffect(() => {
-    const editor = editorRef.current
-    if (!editor) return
-
-    const disposable = editor.onMouseDown((e) => {
-      if (!e.target.position || !store.showingBlame) return
-      const lineNumber = e.target.position.lineNumber
-      const annotation = store.blameLineAnnotations.find(
-        (a) => a.lineNumber === lineNumber
-      )
-      if (annotation) {
-        store.setHighlightedBlameSha(annotation.sha)
-      }
-    })
-
-    return () => disposable.dispose()
-  }, [store.showingBlame])
-
-  // Apply highlight when highlightedSha changes (also re-apply blame for gutter highlight)
-  useEffect(() => {
-    applyBlameDecorations()
-    applyHighlightDecorations()
-  }, [store.highlightedBlameSha, applyBlameDecorations, applyHighlightDecorations])
+  useBlameDecorations({
+    editorRef,
+    monacoApi,
+    annotations: store.blameLineAnnotations,
+    highlightedSha: store.highlightedBlameSha,
+    showBlame: store.showingBlame,
+    onHighlightClick: handleHighlightClick,
+  })
 
   if (!store.selectedFilePath) {
     return <CenteredMessage>{t('selectFileToView')}</CenteredMessage>
@@ -243,7 +114,6 @@ export default observer(function CommitFileViewer() {
       // Language services set markers asynchronously — clear once after delay
       setTimeout(clearMarkers, 600)
     }
-    applyBlameDecorations()
   }
 
   return (

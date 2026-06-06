@@ -1,11 +1,16 @@
 import { Editor, loader } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from '../lib/util'
+import { useBlameDecorations } from '../../../../share/hooks/useBlameDecorations'
 
+type MonacoApi = typeof import('monaco-editor')
+
+let monacoApi: MonacoApi | null = null
 loader.init().then((monaco) => {
+  monacoApi = monaco as MonacoApi
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
@@ -22,18 +27,34 @@ interface EditorPaneProps {
 
 export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   const tab = store.tabs.find((t) => t.id === tabId)
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
   useEffect(() => {
     return () => store.unregisterEditor(tabId)
   }, [tabId])
 
+  const handleHighlightClick = useCallback((sha: string) => {
+    store.setHighlightedBlameSha(sha)
+  }, [])
+
+  useBlameDecorations({
+    editorRef,
+    monacoApi,
+    annotations: tab?.blameLineAnnotations ?? [],
+    highlightedSha: tab?.highlightedBlameSha ?? null,
+    showBlame: (tab?.showingBlame ?? false) && tab?.id === store.activeTabId,
+    onHighlightClick: handleHighlightClick,
+  })
+
   if (!tab) return null
 
   const handleChange = (value: string | undefined) => {
+    if (tab.showingBlame) return
     store.updateContent(tabId, value || '')
   }
 
   const handleMount = (instance: editor.IStandaloneCodeEditor) => {
+    editorRef.current = instance
     store.registerEditor(tabId, instance)
     const updateCursor = () => {
       const position = instance.getPosition()
@@ -53,7 +74,8 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
       onMount={handleMount}
       theme={store.isDark ? 'vs-dark' : 'vs-light'}
       options={{
-        minimap: { enabled: true },
+        readOnly: tab.showingBlame,
+        minimap: { enabled: !tab.showingBlame },
         fontSize: 13,
         lineNumbers: 'on',
         scrollBeyondLastLine: false,
@@ -61,6 +83,13 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
         tabSize: 2,
         wordWrap: 'off',
         renderWhitespace: 'selection',
+        ...(tab.showingBlame
+          ? {
+              guides: { indentation: false },
+              occurrencesHighlight: 'off',
+              glyphMargin: false,
+            }
+          : {}),
       }}
     />
   )

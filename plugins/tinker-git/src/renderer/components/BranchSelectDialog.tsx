@@ -7,7 +7,7 @@ import trim from 'licia/trim'
 import Dialog from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
-import type { GitBranch, GitRefKind } from '../../common/types'
+import type { GitBranch, GitRefKind } from 'share/types/git'
 import { formatRefLabel } from '../lib/util'
 import store from '../store'
 

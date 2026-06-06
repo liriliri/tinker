@@ -6,6 +6,11 @@ import * as path from 'path'
 import { homedir } from 'os'
 import normalizePath from 'licia/normalizePath'
 import type { IFileWatchEvent, FileWatchEventType } from '../common/types'
+import {
+  findGitRepoRoot,
+  openRepository,
+  getCommitFileBlame,
+} from '../../../share/preload/git'
 
 const WATCH_EVENTS = new Set<FileWatchEventType>([
   'add',
@@ -135,6 +140,15 @@ const codeEditorObj = {
 
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
 
+const gitObj = {
+  findGitRepoRoot,
+  openRepository,
+  getCommitFileBlame,
+}
+
+contextBridge.exposeInMainWorld('git', gitObj)
+
 declare global {
   const codeEditor: typeof codeEditorObj
+  const git: typeof gitObj
 }

@@ -284,6 +284,22 @@ class Store extends BaseStore {
     return this.editor.selectSearchMatch(match)
   }
 
+  get showingBlame() {
+    return this.editor.showingBlame
+  }
+  get loadingBlame() {
+    return this.editor.loadingBlame
+  }
+  get blameLineAnnotations() {
+    return this.editor.blameLineAnnotations
+  }
+  get highlightedBlameSha() {
+    return this.editor.highlightedBlameSha
+  }
+  toggleBlame = () => this.editor.toggleBlame()
+  setHighlightedBlameSha = (sha: string | null) =>
+    this.editor.setHighlightedBlameSha(sha)
+
   // ---- Terminal proxies ----
 
   get terminalOpen() {

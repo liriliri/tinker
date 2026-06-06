@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import uuid from 'licia/uuid'
 import last from 'licia/last'
 import normalizePath from 'licia/normalizePath'
@@ -27,6 +27,26 @@ class Editor {
 
   constructor() {
     makeAutoObservable(this)
+  }
+
+  get activeTab(): EditorTab | undefined {
+    return this.tabs.find((t) => t.id === this.activeTabId)
+  }
+
+  get showingBlame() {
+    return this.activeTab?.showingBlame ?? false
+  }
+
+  get loadingBlame() {
+    return this.activeTab?.loadingBlame ?? false
+  }
+
+  get blameLineAnnotations() {
+    return this.activeTab?.blameLineAnnotations ?? []
+  }
+
+  get highlightedBlameSha() {
+    return this.activeTab?.highlightedBlameSha ?? null
   }
 
   get tabDirtyRevision(): string {
@@ -184,6 +204,43 @@ class Editor {
       inst.setPosition({ lineNumber, column: 1 })
     }
     inst.focus()
+  }
+
+  setHighlightedBlameSha(sha: string | null) {
+    const tab = this.activeTab
+    if (!tab) return
+    tab.highlightedBlameSha = tab.highlightedBlameSha === sha ? null : sha
+  }
+
+  async toggleBlame() {
+    const tab = this.activeTab
+    if (!tab) return
+
+    if (tab.showingBlame) {
+      tab.showingBlame = false
+      return
+    }
+
+    tab.loadingBlame = true
+    try {
+      const repoRoot = await git.findGitRepoRoot(tab.filePath)
+      if (!repoRoot) {
+        throw new Error('Not in a git repository')
+      }
+
+      await git.openRepository(repoRoot)
+      const hunks = await git.getCommitFileBlame('HEAD', tab.filePath)
+      runInAction(() => {
+        tab.blameHunks = hunks
+        tab.showingBlame = true
+      })
+    } catch (err) {
+      console.error('Failed to load blame:', err)
+    } finally {
+      runInAction(() => {
+        tab.loadingBlame = false
+      })
+    }
   }
 }
 

@@ -5,7 +5,7 @@ import type {
   GitBranch,
   GitCommitSummary,
   GitCommitDetail,
-} from '../../common/types'
+} from 'share/types/git'
 
 const COMMITS_PAGE_SIZE = 50
 

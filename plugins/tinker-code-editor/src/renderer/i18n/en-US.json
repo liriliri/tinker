@@ -22,5 +22,7 @@
   "showInFolder": "Reveal in File Manager",
   "openInIntegratedTerminal": "Open in Integrated Terminal",
   "copyPath": "Copy Path",
-  "copyRelativePath": "Copy Relative Path"
+  "copyRelativePath": "Copy Relative Path",
+  "blame": "Blame",
+  "blameHide": "Hide Blame"
 }
