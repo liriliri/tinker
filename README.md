@@ -287,6 +287,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/code_editor.png"/></th>
       <th><img src="https://tinker.liriliri.io/system_monitor.png"/></th>
     </tr>
+    <tr>
+      <th>Text Search</th>
+      <th>Git</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/text_search.png"/></th>
+      <th><img src="https://tinker.liriliri.io/git.png"/></th>
+    </tr>
   </tbody>
 </table>
 
