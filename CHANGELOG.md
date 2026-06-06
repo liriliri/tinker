@@ -1,3 +1,9 @@
+## v1.18.0 (6 Jun 2026)
+
+* feat: add git
+* feat(code-editor): git blame
+* fix(music-player): random order
+
 ## v1.17.0 (30 May 2026)
 
 * feat: add system monitor
