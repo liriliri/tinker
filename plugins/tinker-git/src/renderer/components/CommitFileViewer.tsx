@@ -226,6 +226,23 @@ export default observer(function CommitFileViewer() {
 
   function handleEditorMount(editor: MonacoEditor.IStandaloneCodeEditor) {
     editorRef.current = editor
+    // Suppress language diagnostics for read-only commit viewer
+    const model = editor.getModel()
+    if (model && monacoApi) {
+      const clearMarkers = () => {
+        if (model.isDisposed() || !monacoApi) return
+        const markers = monacoApi.editor.getModelMarkers({
+          resource: model.uri,
+        })
+        if (markers.length === 0) return
+        const owners = new Set(markers.map((m) => m.owner))
+        for (const owner of owners) {
+          monacoApi.editor.setModelMarkers(model, owner, [])
+        }
+      }
+      // Language services set markers asynchronously — clear once after delay
+      setTimeout(clearMarkers, 600)
+    }
     applyBlameDecorations()
   }
 
@@ -266,6 +283,10 @@ export default observer(function CommitFileViewer() {
             tabSize: 2,
             wordWrap: 'off',
             renderWhitespace: 'selection',
+            guides: {
+              indentation: false,
+            },
+            occurrencesHighlight: 'off',
           }}
         />
       </div>
