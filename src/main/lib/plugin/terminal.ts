@@ -101,11 +101,18 @@ export function init() {
     ) => {
       killSession(sessionId)
 
+      const env = {
+        ...process.env,
+        LANG: process.env.LANG || 'en_US.UTF-8',
+        LC_ALL: process.env.LC_ALL || process.env.LANG || 'en_US.UTF-8',
+      }
+
       const proc = pty.spawn(shell || defaultShell, [], {
         name: 'xterm-256color',
         cols,
         rows,
         cwd: cwd || homedir(),
+        env,
       })
 
       const webContents = event.sender

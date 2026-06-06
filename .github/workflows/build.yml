@@ -45,6 +45,7 @@ jobs:
         npm i
         npm run init
         npm run build
+        npm run minify
         npm run pack
       env:
         GITHUB_TOKEN: ${{ github.token }}
