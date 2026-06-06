@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
-    "dugite": "^3.2.2",
     "ssh2": "^1.17.0",
     "systeminformation": "^5.30.7"
   },

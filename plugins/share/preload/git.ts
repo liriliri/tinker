@@ -1,6 +1,30 @@
-import { exec } from 'dugite'
+import { execFile } from 'child_process'
 import path from 'path'
 import fs from 'fs'
+
+function exec(
+  args: string[],
+  cwd: string
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      'git',
+      args,
+      { cwd, encoding: 'utf8' as BufferEncoding, maxBuffer: 100 * 1024 * 1024 },
+      (err, stdout, stderr) => {
+        if (!err || typeof err.code === 'number') {
+          resolve({
+            stdout: stdout || '',
+            stderr: stderr || '',
+            exitCode: typeof err?.code === 'number' ? err.code : 0,
+          })
+          return
+        }
+        reject(err)
+      }
+    )
+  })
+}
 import type {
   GitBlameHunk,
   GitBranch,
