@@ -223,13 +223,13 @@ class Editor {
 
     tab.loadingBlame = true
     try {
-      const repoRoot = await git.findGitRepoRoot(tab.filePath)
+      const repoRoot = await codeEditor.findGitRepoRoot(tab.filePath)
       if (!repoRoot) {
         throw new Error('Not in a git repository')
       }
 
-      await git.openRepository(repoRoot)
-      const hunks = await git.getCommitFileBlame('HEAD', tab.filePath)
+      await codeEditor.openRepository(repoRoot)
+      const hunks = await codeEditor.getCommitFileBlame('HEAD', tab.filePath)
       runInAction(() => {
         tab.blameHunks = hunks
         tab.showingBlame = true

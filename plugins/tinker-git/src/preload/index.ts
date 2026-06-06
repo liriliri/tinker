@@ -8,7 +8,7 @@ import {
   getCommitTree,
   getCommitFileContent,
   getCommitFileBlame,
-} from '../../../share/preload/git'
+} from 'share/preload/git'
 
 const gitObj = {
   getRepoPath,

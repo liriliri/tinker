@@ -5,9 +5,9 @@ import {
   listDir,
   readFile,
   writeFile,
-} from '../../../share/tools/fileSystemImpl'
-import { exec } from '../../../share/tools/shellImpl'
-import { webFetch, webSearch } from '../../../share/tools/webImpl'
+} from 'share/tools/fileSystemImpl'
+import { exec } from 'share/tools/shellImpl'
+import { webFetch, webSearch } from 'share/tools/webImpl'
 
 // ---------------------------------------------------------------------------
 // contextBridge

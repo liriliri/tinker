@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from '../lib/util'
-import { useBlameDecorations } from '../../../../share/hooks/useBlameDecorations'
+import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 
 type MonacoApi = typeof import('monaco-editor')
 

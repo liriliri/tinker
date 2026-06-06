@@ -10,7 +10,7 @@ import {
   findGitRepoRoot,
   openRepository,
   getCommitFileBlame,
-} from '../../../share/preload/git'
+} from 'share/preload/git'
 
 const WATCH_EVENTS = new Set<FileWatchEventType>([
   'add',
@@ -136,19 +136,15 @@ const codeEditorObj = {
       watcher = null
     }
   },
-}
 
-contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
-
-const gitObj = {
+  // Git
   findGitRepoRoot,
   openRepository,
   getCommitFileBlame,
 }
 
-contextBridge.exposeInMainWorld('git', gitObj)
+contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
 
 declare global {
   const codeEditor: typeof codeEditorObj
-  const git: typeof gitObj
 }

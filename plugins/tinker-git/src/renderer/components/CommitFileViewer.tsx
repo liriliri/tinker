@@ -11,7 +11,7 @@ import {
 } from 'share/components/Toolbar'
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS } from 'share/lib/fileType'
-import { useBlameDecorations } from '../../../../share/hooks/useBlameDecorations'
+import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
