@@ -6,7 +6,7 @@ import {
   getDefaultShell,
   getAvailableShells,
   TerminalSession,
-} from 'share/lib/terminal'
+} from 'share/preload/terminal'
 
 interface SSHConfig {
   host: string
