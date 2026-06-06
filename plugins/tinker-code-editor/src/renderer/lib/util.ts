@@ -1,3 +1,5 @@
+import { getFileExt } from 'share/lib/fileType'
+
 const LANGUAGE_MAP: Record<string, string> = {
   js: 'javascript',
   jsx: 'javascript',
@@ -37,6 +39,6 @@ const LANGUAGE_MAP: Record<string, string> = {
 }
 
 export function getLanguage(filePath: string): string {
-  const ext = filePath.split('.').pop()?.toLowerCase() || ''
+  const ext = getFileExt(filePath)
   return LANGUAGE_MAP[ext] || 'plaintext'
 }

@@ -10,7 +10,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { GitCommit } from 'lucide-react'
-import { BINARY_EXTS } from 'share/lib/fileType'
+import { BINARY_EXTS, getFileExt } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
@@ -61,12 +61,12 @@ const LANGUAGE_MAP: Record<string, string> = {
 }
 
 function getLanguage(filePath: string): string {
-  const ext = filePath.split('.').pop()?.toLowerCase() || ''
+  const ext = getFileExt(filePath)
   return LANGUAGE_MAP[ext] || 'plaintext'
 }
 
 function isBinaryFile(filePath: string): boolean {
-  const ext = filePath.split('.').pop()?.toLowerCase() || ''
+  const ext = getFileExt(filePath)
   return BINARY_EXTS.has(ext)
 }
 

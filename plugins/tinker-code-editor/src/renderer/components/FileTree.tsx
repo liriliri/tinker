@@ -6,7 +6,7 @@ import { FileText } from 'lucide-react'
 import FileTree from 'share/components/FileTree'
 import type { IFileTreeDataSource, ITreeNode } from 'share/components/FileTree'
 import { getFileIcon } from 'share/lib/util'
-import { CODE_EXTS } from 'share/lib/fileType'
+import { CODE_EXTS, getFileExt } from 'share/lib/fileType'
 import { tw } from 'share/theme'
 import { relativePath } from '../lib/path'
 import store from '../store'
@@ -14,8 +14,7 @@ import store from '../store'
 const iconSize = 14
 
 function isCodeFile(name: string): boolean {
-  const ext = name.split('.').pop()?.toLowerCase() || ''
-  return CODE_EXTS.has(ext)
+  return CODE_EXTS.has(getFileExt(name))
 }
 
 function FileIcon({ node }: { node: ITreeNode }) {

@@ -156,6 +156,11 @@ export const BINARY_EXTS = new Set([
   'pptx',
 ])
 
+export function getFileExt(filePath: string): string {
+  const { ext } = splitPath(filePath)
+  return ext ? ext.slice(1).toLowerCase() : ''
+}
+
 export function getMimeTypeFromPath(filePath: string): string {
   const { ext } = splitPath(filePath)
   if (!ext) return ''
