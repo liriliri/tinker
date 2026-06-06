@@ -15,7 +15,19 @@ const config = {
   directories: {
     output: `../release/${pkg.version}`,
   },
-  files: ['main', 'preload', 'renderer', 'plugins'],
+  files: [
+    'main',
+    'preload',
+    'renderer',
+    'plugins',
+
+    '!node_modules/**/*.{map,ts,md,flow,yml,yaml,cs,gyp,gypi,h,c,html}',
+    '!node_modules/**/*LICENSE*',
+    '!node_modules/**/*license*',
+    '!node_modules/**/*eslint*',
+    '!node_modules/**/*test*',
+    '!node_modules/**/.vscode',
+  ],
   asarUnpack: ['node_modules/npm/**'],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: [
