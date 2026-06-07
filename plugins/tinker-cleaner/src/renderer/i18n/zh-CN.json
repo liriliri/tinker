@@ -19,7 +19,6 @@
   "categoryAll": "全部",
   "categorySystem": "系统",
   "categoryUserCache": "用户缓存",
-  "categoryBrowser": "浏览器",
   "categoryDevTools": "开发工具",
   "categoryApp": "应用程序",
   "ruleSysTmp": "系统临时文件",
@@ -36,9 +35,6 @@
   "ruleSandboxMediaAnalysis": "媒体分析缓存",
   "ruleSandboxAppStore": "App Store 缓存",
   "ruleXcodeDocCache": "Xcode 文档缓存",
-  "ruleChromeCache": "Chrome 缓存",
-  "ruleChromeAppSupport": "Chrome 应用数据",
-  "rulePuppeteer": "Puppeteer 缓存",
   "ruleNpmCacache": "npm 缓存",
   "ruleNpmNpx": "npx 缓存",
   "ruleYarnCache": "Yarn 缓存",
@@ -50,8 +46,6 @@
   "ruleHomebrew": "Homebrew 缓存",
   "ruleVscodeCachedData": "VS Code 缓存数据",
   "ruleVscodeCache": "VS Code 缓存",
-  "ruleChromeServiceWorker": "Chrome Service Worker 缓存",
-  "ruleEdgeServiceWorker": "Edge Service Worker 缓存",
   "ruleSteamHtmlCache": "Steam 网页缓存",
   "ruleSteamCodeCache": "Steam 代码缓存"
 }

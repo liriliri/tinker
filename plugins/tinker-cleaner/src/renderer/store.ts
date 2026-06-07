@@ -145,9 +145,7 @@ class Store extends BaseStore {
     runInAction(() => {
       this.scanning = false
       this.currentScanPath = ''
-      this.selectedRules = new Set(
-        this.rules.filter((r) => r.size > 0).map((r) => r.id)
-      )
+      this.selectedRules = new Set()
       this.view = 'result'
     })
   }

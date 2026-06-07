@@ -1,1 +1,1 @@
-export type Category = 'system' | 'userCache' | 'browser' | 'devTools' | 'app'
+export type Category = 'system' | 'userCache' | 'devTools' | 'app'

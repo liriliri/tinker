@@ -19,7 +19,6 @@
   "categoryAll": "All",
   "categorySystem": "System",
   "categoryUserCache": "User Cache",
-  "categoryBrowser": "Browser",
   "categoryDevTools": "Dev Tools",
   "categoryApp": "Applications",
   "ruleSysTmp": "System Temp Files",
@@ -36,9 +35,6 @@
   "ruleSandboxMediaAnalysis": "Media Analysis Cache",
   "ruleSandboxAppStore": "App Store Cache",
   "ruleXcodeDocCache": "Xcode Documentation Cache",
-  "ruleChromeCache": "Chrome Cache",
-  "ruleChromeAppSupport": "Chrome App Data",
-  "rulePuppeteer": "Puppeteer Cache",
   "ruleNpmCacache": "npm Cache",
   "ruleNpmNpx": "npx Cache",
   "ruleYarnCache": "Yarn Cache",
@@ -50,8 +46,6 @@
   "ruleHomebrew": "Homebrew Cache",
   "ruleVscodeCachedData": "VS Code Cached Data",
   "ruleVscodeCache": "VS Code Cache",
-  "ruleChromeServiceWorker": "Chrome Service Worker Cache",
-  "ruleEdgeServiceWorker": "Edge Service Worker Cache",
   "ruleSteamHtmlCache": "Steam HTML Cache",
   "ruleSteamCodeCache": "Steam Code Cache"
 }

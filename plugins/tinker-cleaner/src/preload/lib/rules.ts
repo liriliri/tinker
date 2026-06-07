@@ -101,26 +101,6 @@ const macRules: RuleDef[] = [
     pathTemplate: '~/Library/Developer/Xcode/DocumentationCache',
   },
 
-  // Browser
-  {
-    id: 'chrome-cache',
-    category: 'browser',
-    nameKey: 'ruleChromeCache',
-    pathTemplate: '~/Library/Caches/Google/Chrome',
-  },
-  {
-    id: 'chrome-app-support',
-    category: 'browser',
-    nameKey: 'ruleChromeAppSupport',
-    pathTemplate: '~/Library/Application Support/Google/Chrome',
-  },
-  {
-    id: 'puppeteer',
-    category: 'browser',
-    nameKey: 'rulePuppeteer',
-    pathTemplate: '~/.cache/puppeteer',
-  },
-
   // Dev tools
   {
     id: 'npm-cacache',
@@ -205,22 +185,6 @@ const winRules: RuleDef[] = [
     category: 'system',
     nameKey: 'ruleSysLog',
     pathTemplate: '%WINDIR%\\Logs',
-  },
-
-  // Browser
-  {
-    id: 'win-chrome-service-worker',
-    category: 'browser',
-    nameKey: 'ruleChromeServiceWorker',
-    pathTemplate:
-      '%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Service Worker\\CacheStorage',
-  },
-  {
-    id: 'win-edge-service-worker',
-    category: 'browser',
-    nameKey: 'ruleEdgeServiceWorker',
-    pathTemplate:
-      '%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Service Worker\\CacheStorage',
   },
 
   // App
