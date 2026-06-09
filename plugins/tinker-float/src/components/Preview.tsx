@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { tw } from 'share/theme'
 import Webview from 'share/components/Webview'
 import VideoPlayer from 'share/components/VideoPlayer'
-
+import ImageViewer from 'share/components/ImageViewer'
 import store from '../store'
 
 const { Provider, Container } = createPlayer({
@@ -81,19 +81,10 @@ export default observer(function Preview() {
 
   if (store.contentType === 'image') {
     return (
-      <div className="flex-1 flex items-center justify-center overflow-auto p-4">
-        <img
+      <div className="flex-1 overflow-hidden">
+        <ImageViewer
           src={store.imageDataUrl}
-          className="max-w-full max-h-full object-contain"
-          onLoad={(e) => {
-            const img = e.currentTarget
-            if (
-              img.naturalWidth !== store.imageNaturalWidth ||
-              img.naturalHeight !== store.imageNaturalHeight
-            ) {
-              store.setImageNaturalSize(img.naturalWidth, img.naturalHeight)
-            }
-          }}
+          onLoad={store.setImageNaturalSize}
         />
       </div>
     )

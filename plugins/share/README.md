@@ -128,6 +128,21 @@ import VideoPlayer from 'share/components/VideoPlayer'
 
 Wrap inside the player's `Provider` and `Container` from `createPlayer`. Requires `videojs` vendor scripts.
 
+### ImageViewer
+
+```ts
+import ImageViewer from 'share/components/ImageViewer'
+
+<ImageViewer
+  src={imageSrc}
+  fit="contain"
+  fitArea={0.8}
+  onLoad={(width, height) => {}}
+/>
+```
+
+Interactive image viewer with wheel zoom, drag pan, double-click reset, and a context menu for rotating the image. Supports `contain` or `cover` fit modes.
+
 ### TextSearch
 
 ```ts
@@ -187,6 +202,7 @@ import CopyButton from 'share/components/CopyButton'
 import FileOpen from 'share/components/FileOpen'
 import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
+import ImageViewer from 'share/components/ImageViewer'
 import Tooltip from 'share/components/Tooltip'
 import NavList from 'share/components/NavList'
 import Tree from 'share/components/Tree'

@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import i18n from 'i18next'
 import fileUrl from 'licia/fileUrl'
 import isUrl from 'licia/isUrl'
 import LocalStore from 'licia/LocalStore'
@@ -142,15 +143,12 @@ class Store extends BaseStore {
 
   async openFile() {
     const result = await tinker.showOpenDialog({
-      title: 'Open File',
+      title: i18n.t('openFile'),
       filters: [
         {
           name: 'All Supported',
           extensions: [...IMAGE_EXTS, ...TEXT_EXTS, ...VIDEO_EXTS],
         },
-        { name: 'Images', extensions: [...IMAGE_EXTS] },
-        { name: 'Video', extensions: [...VIDEO_EXTS] },
-        { name: 'Text', extensions: [...TEXT_EXTS] },
       ],
       properties: ['openFile'],
     })
@@ -197,6 +195,7 @@ class Store extends BaseStore {
   }
 
   setImageNaturalSize(w: number, h: number) {
+    if (w === this.imageNaturalWidth && h === this.imageNaturalHeight) return
     this.imageNaturalWidth = w
     this.imageNaturalHeight = h
     this.applyAspectRatio(w, h)

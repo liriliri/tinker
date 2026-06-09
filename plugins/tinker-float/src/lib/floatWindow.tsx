@@ -1,7 +1,12 @@
+import i18n from 'i18next'
 import toast from 'react-hot-toast'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import FloatWindow from '../components/FloatWindow'
 import store from '../store'
+
+function showLoadError() {
+  toast.error(i18n.t('loadFailed'))
+}
 
 export function launchFloatWindow() {
   const width = store.windowWidth
@@ -31,7 +36,7 @@ export function launchFloatWindow() {
         webviewSrc={urlSrc}
         onWebviewError={() => {
           _popup.close()
-          toast.error(`Unable to load ${urlSrc}`)
+          showLoadError()
         }}
         onWebviewReady={() => {
           if (webviewTimeout) clearTimeout(webviewTimeout)
@@ -44,7 +49,7 @@ export function launchFloatWindow() {
   if (store.contentType === 'url') {
     webviewTimeout = setTimeout(() => {
       popup.close()
-      toast.error(`Unable to load ${urlSrc}`)
+      showLoadError()
     }, 15000)
   }
 
