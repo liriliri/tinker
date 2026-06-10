@@ -20,7 +20,7 @@ export default observer(function TerminalPanel() {
   return (
     <div className="flex flex-col h-full">
       <div
-        className={`relative flex items-center h-10 min-h-[40px] -mt-px ${tw.bg.secondary}`}
+        className={`relative flex items-center h-10 min-h-[40px] ${tw.bg.secondary}`}
       >
         <div className="flex-1 min-w-0 h-full">
           <TabBar

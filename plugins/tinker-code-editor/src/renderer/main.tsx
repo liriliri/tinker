@@ -115,7 +115,7 @@ const App = observer(function App() {
                   <div className="flex flex-col h-full">
                     {store.tabs.length > 0 && (
                       <div
-                        className={`relative flex items-center h-10 min-h-[40px] ${tw.bg.secondary}`}
+                        className={`relative flex items-center h-10 min-h-[40px] mt-px ${tw.bg.secondary}`}
                       >
                         <div className="flex-1 min-w-0 h-full">
                           <TabBar
@@ -140,7 +140,7 @@ const App = observer(function App() {
                         </div>
                         <button
                           onClick={() => store.toggleBlame()}
-                          className={`w-7 h-7 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
+                          className={`w-7 h-7 ml-1 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
                             store.showingBlame
                               ? `opacity-100 ${tw.primary.text}`
                               : ''

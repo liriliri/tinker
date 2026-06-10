@@ -20,6 +20,7 @@ export interface IFileTreeDataSource {
 export interface FileTreeProps {
   nodes: ITreeNode[]
   dataSource: IFileTreeDataSource
+  iconSize?: number
   onOpenFile?: (path: string, name: string) => void
   renderIcon?: (node: ITreeNode, expanded: boolean) => React.ReactNode | null
   getContextMenu?: (node: ITreeNode) => MenuItemConstructorOptions[]
@@ -27,4 +28,5 @@ export interface FileTreeProps {
   refreshDirs?: Set<string>
   refreshVersion?: number
   onRefreshChildren?: (parentPath: string) => void
+  activeFilePath?: string
 }

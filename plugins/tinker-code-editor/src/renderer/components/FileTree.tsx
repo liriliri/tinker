@@ -1,59 +1,14 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import normalizePath from 'licia/normalizePath'
 import { useTranslation } from 'react-i18next'
-import { FileText } from 'lucide-react'
 import FileTree from 'share/components/FileTree'
 import type { IFileTreeDataSource, ITreeNode } from 'share/components/FileTree'
-import { getFileIcon } from 'share/lib/util'
-import { CODE_EXTS, getFileExt } from 'share/lib/fileType'
-import { tw } from 'share/theme'
+import FileIcon from 'share/components/FileIcon'
 import { relativePath } from '../lib/path'
 import store from '../store'
 
-const iconSize = 14
-
-function isCodeFile(name: string): boolean {
-  return CODE_EXTS.has(getFileExt(name))
-}
-
-function FileIcon({ node }: { node: ITreeNode }) {
-  const [icon, setIcon] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    if (node.isDirectory || isCodeFile(node.name)) return
-    getFileIcon(node.path).then((i) => {
-      if (i) setIcon(i)
-    })
-  }, [node.path, node.name, node.isDirectory])
-
-  if (isCodeFile(node.name)) {
-    return (
-      <FileText
-        size={iconSize}
-        className={`${tw.text.tertiary} flex-shrink-0 ml-0.5`}
-      />
-    )
-  }
-
-  if (icon) {
-    return (
-      <img
-        src={icon}
-        alt=""
-        className="flex-shrink-0 ml-0.5"
-        style={{ width: iconSize, height: iconSize }}
-      />
-    )
-  }
-
-  return (
-    <span
-      className="flex-shrink-0 ml-0.5"
-      style={{ width: iconSize, height: iconSize }}
-    />
-  )
-}
+const ICON_SIZE = 16
 
 const localFileDataSource: IFileTreeDataSource = {
   readDir: async (path: string) => {
@@ -86,6 +41,10 @@ const localFileDataSource: IFileTreeDataSource = {
 
 export default observer(function CodeEditorFileTree() {
   const { t } = useTranslation()
+
+  const activeFilePath = store.activeTabId
+    ? store.tabs.find((tab) => tab.id === store.activeTabId)?.filePath
+    : undefined
 
   const getContextMenu = useCallback(
     (node: ITreeNode) => [
@@ -130,15 +89,28 @@ export default observer(function CodeEditorFileTree() {
     <FileTree
       nodes={store.fileTree}
       dataSource={localFileDataSource}
+      iconSize={ICON_SIZE}
       onOpenFile={(path, name) => {
         void store.openFile(path, name)
       }}
-      renderIcon={(node) => <FileIcon node={node} />}
+      renderIcon={(node) => {
+        if (node.isDirectory) return null
+        return (
+          <FileIcon
+            name={node.name}
+            path={node.path}
+            isDark={store.isDark}
+            size={ICON_SIZE}
+            className="ml-0.5 flex-shrink-0"
+          />
+        )
+      }}
       onExpandChange={handleExpandChange}
       refreshDirs={store.treeRefreshDirs}
       refreshVersion={store.treeRefreshVersion}
       getContextMenu={getContextMenu}
       onRefreshChildren={handleRefreshChildren}
+      activeFilePath={activeFilePath}
     />
   )
 })

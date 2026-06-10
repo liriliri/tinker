@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
-import { FileText } from 'lucide-react'
 import type {
   ITreeNode,
   IFileTreeDataSource,
 } from 'share/components/FileTree/types'
 import FileTree from 'share/components/FileTree'
+import FileIcon from 'share/components/FileIcon'
 import { tw } from 'share/theme'
 import store from '../store'
+
+const ICON_SIZE = 16
 
 const commitDataSource: IFileTreeDataSource = {
   async readDir(path: string): Promise<ITreeNode[]> {
@@ -48,16 +50,20 @@ export default observer(function CommitFileTree() {
       <FileTree
         nodes={store.treeNodes}
         dataSource={commitDataSource}
+        iconSize={ICON_SIZE}
         onOpenFile={(path) => store.openFile(path)}
         renderIcon={(node) => {
           if (node.isDirectory) return null
           return (
-            <FileText
-              size={14}
-              className={`${tw.text.tertiary} flex-shrink-0 ml-0.5`}
+            <FileIcon
+              name={node.name}
+              isDark={store.isDark}
+              size={ICON_SIZE}
+              className="ml-0.5 flex-shrink-0"
             />
           )
         }}
+        activeFilePath={store.selectedFilePath}
       />
     </div>
   )

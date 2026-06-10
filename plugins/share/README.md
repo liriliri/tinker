@@ -195,6 +195,21 @@ const actions: WelcomeAction[] = [
 
 Context menu labels (`open`, `showInFolder`, `removeFromRecent`) are built-in via the component's `welcome` i18n namespace. The plugin only needs `welcomeTitle` and `welcomeDescription` for the header text, plus i18n for action button labels.
 
+### FileIcon
+
+VS Code Seti-style file icon component. Automatically resolves the correct icon from filename/extension and supports dark/light themes. CSS and font are injected globally on first render.
+
+```ts
+import FileIcon from 'share/components/FileIcon'
+
+<FileIcon name="app.tsx" isDark={store.isDark} className="ml-0.5 flex-shrink-0" />
+<FileIcon name="package.json" isDark={store.isDark} size={18} />
+```
+
+**Props:** `name` (filename or path), `isDark` (theme state from store), `size?` (default 16), `className?`
+
+**Icon resolution order:** 1) exact filename match (e.g. `package.json`), 2) extension match (e.g. `tsx`), 3) default file icon.
+
 ### Other Components
 
 ```ts
@@ -344,6 +359,7 @@ const dataSource: IFileTreeDataSource = {
 **Key properties:**
 
 - `nodes` — root-level tree nodes
+- `iconSize?` — icon size for chevrons, folders, and file placeholders (default 14)
 - `dataSource` — adapter providing `readDir` plus optional `createNode`/`renameNode`/`deleteNode`. CRUD methods control which built-in menu items appear.
 - `onOpenFile` — called when a file node is clicked
 - `getContextMenu` — returns custom menu items, appended between built-in create and rename/delete groups

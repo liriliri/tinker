@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { X, Loader2, Plus } from 'lucide-react'
-import { tw } from 'share/theme'
+import { tw, THEME_COLORS } from 'share/theme'
 
 const DRAG_THRESHOLD = 5
 
@@ -197,6 +197,7 @@ function Tab({
                 ? 'border-l-transparent dark:border-l-transparent'
                 : ''
             }`}
+            style={{ borderTopColor: THEME_COLORS.primary }}
           />
           <div
             className={`pointer-events-none absolute bottom-0 left-0 right-0 h-px ${tw.bg.secondary}`}

@@ -25,13 +25,13 @@ interface TreeNodeItemProps {
   onRefreshParent: (parentPath: string) => void
   onOpenFile?: (path: string, name: string) => void
   renderIcon?: FileTreeProps['renderIcon']
+  iconSize: number
   onExpandChange?: (path: string, expanded: boolean) => void
   getContextMenu?: (node: ITreeNode) => MenuItemConstructorOptions[]
   refreshDirs?: Set<string>
   refreshVersion?: number
+  activeFilePath?: string
 }
-
-const iconSize = 14
 
 function buildContextMenu(
   node: ITreeNode,
@@ -109,10 +109,12 @@ function TreeNodeItem({
   onRefreshParent,
   onOpenFile,
   renderIcon,
+  iconSize,
   onExpandChange,
   getContextMenu,
   refreshDirs,
   refreshVersion,
+  activeFilePath,
 }: TreeNodeItemProps) {
   const { t } = useTranslation(FILE_TREE_NS)
   const [expanded, setExpanded] = useState(false)
@@ -220,7 +222,9 @@ function TreeNodeItem({
   return (
     <div>
       <div
-        className={`flex items-center h-6 cursor-pointer select-none ${tw.hover}`}
+        className={`flex items-center h-6 cursor-pointer select-none ${
+          activeFilePath && node.path === activeFilePath ? tw.active : tw.hover
+        }`}
         style={{ paddingLeft: depth * 12 + 4 }}
         onClick={handleToggle}
         onContextMenu={handleContextMenu}
@@ -317,10 +321,12 @@ function TreeNodeItem({
               onRefreshParent={onRefreshParent}
               onOpenFile={onOpenFile}
               renderIcon={renderIcon}
+              iconSize={iconSize}
               onExpandChange={onExpandChange}
               getContextMenu={getContextMenu}
               refreshDirs={refreshDirs}
               refreshVersion={refreshVersion}
+              activeFilePath={activeFilePath}
             />
           ))}
         </div>
@@ -332,6 +338,7 @@ function TreeNodeItem({
 export default function FileTree({
   nodes,
   dataSource,
+  iconSize = 14,
   onOpenFile,
   renderIcon,
   getContextMenu,
@@ -339,6 +346,7 @@ export default function FileTree({
   refreshDirs,
   refreshVersion,
   onRefreshChildren,
+  activeFilePath,
 }: FileTreeProps) {
   const [creatingIn, setCreatingIn] = useState<{
     parentPath: string
@@ -373,10 +381,12 @@ export default function FileTree({
           onRefreshParent={handleRefreshParent}
           onOpenFile={onOpenFile}
           renderIcon={renderIcon}
+          iconSize={iconSize}
           onExpandChange={onExpandChange}
           getContextMenu={getContextMenu}
           refreshDirs={refreshDirs}
           refreshVersion={refreshVersion}
+          activeFilePath={activeFilePath}
         />
       ))}
     </div>
