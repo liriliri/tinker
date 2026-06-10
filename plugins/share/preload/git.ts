@@ -1,6 +1,7 @@
 import { execFile } from 'child_process'
 import path from 'path'
 import fs from 'fs'
+import mime from 'licia/mime'
 
 function exec(
   args: string[],
@@ -18,6 +19,31 @@ function exec(
             stderr: stderr || '',
             exitCode: typeof err?.code === 'number' ? err.code : 0,
           })
+          return
+        }
+        reject(err)
+      }
+    )
+  })
+}
+
+function execRaw(
+  args: string[],
+  cwd: string,
+  options?: { maxBuffer?: number }
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      'git',
+      args,
+      {
+        cwd,
+        encoding: null,
+        maxBuffer: options?.maxBuffer ?? 100 * 1024 * 1024,
+      },
+      (err, stdout) => {
+        if (!err || typeof err.code === 'number') {
+          resolve((stdout || Buffer.alloc(0)) as Buffer)
           return
         }
         reject(err)
@@ -302,6 +328,18 @@ export async function getCommitFileContent(
   const currentPath = requireRepo()
   const { stdout } = await exec(['show', `${sha}:${filePath}`], currentPath)
   return stdout.replace(/\n$/, '')
+}
+
+export async function getCommitFileContentBinary(
+  sha: string,
+  filePath: string
+): Promise<string> {
+  const currentPath = requireRepo()
+  const ext = path.extname(filePath).slice(1).toLowerCase()
+  const mimeType = (mime(ext) as string) || 'application/octet-stream'
+  const buffer = await execRaw(['show', `${sha}:${filePath}`], currentPath)
+  const base64 = buffer.toString('base64')
+  return `data:${mimeType};base64,${base64}`
 }
 
 function formatBlameDate(authorTime: number): string {

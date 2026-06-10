@@ -7,8 +7,8 @@ import Checkbox from 'share/components/Checkbox'
 import store from '../store'
 import Section, { SettingItem } from './Section'
 
-const MAC_SHORTCUTS = ['Option+Space', 'Ctrl+Ctrl']
-const WIN_SHORTCUTS = ['Alt+Space', 'Ctrl+Ctrl']
+const MAC_SHORTCUTS = ['Option+Space', 'Ctrl+Space', 'Ctrl+Ctrl']
+const SHORTCUTS = ['Alt+Space', 'Ctrl+Space', 'Ctrl+Ctrl']
 const IS_MAC = navigator.platform.toUpperCase().includes('MAC')
 
 export default observer(function WindowSection() {
@@ -16,7 +16,7 @@ export default observer(function WindowSection() {
 
   const shortcutOptions = useMemo(
     () =>
-      (IS_MAC ? MAC_SHORTCUTS : WIN_SHORTCUTS).map((s) => ({
+      (IS_MAC ? MAC_SHORTCUTS : SHORTCUTS).map((s) => ({
         label: s,
         value: s,
       })),

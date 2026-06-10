@@ -5,6 +5,7 @@ import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
+import ImageViewer from 'share/components/ImageViewer'
 
 type MonacoApi = typeof import('monaco-editor')
 
@@ -47,6 +48,14 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   })
 
   if (!tab) return null
+
+  if (tab.category === 'image') {
+    return (
+      <div className="w-full h-full">
+        <ImageViewer src={tab.content} />
+      </div>
+    )
+  }
 
   const handleChange = (value: string | undefined) => {
     if (tab.showingBlame) return

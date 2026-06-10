@@ -1,6 +1,7 @@
 import { contextBridge } from 'electron'
 import { watch, type FSWatcher } from 'chokidar'
 import debounce from 'licia/debounce'
+import mime from 'licia/mime'
 import * as fs from 'fs'
 import * as path from 'path'
 import { homedir } from 'os'
@@ -11,6 +12,8 @@ import {
   openRepository,
   getCommitFileBlame,
 } from 'share/preload/git'
+
+const SKIP_ENTRIES = new Set(['.DS_Store', 'Thumbs.db', '.git'])
 
 const WATCH_EVENTS = new Set<FileWatchEventType>([
   'add',
@@ -41,6 +44,7 @@ const codeEditorObj = {
     const result: IDirEntry[] = []
 
     for (const entry of entries) {
+      if (SKIP_ENTRIES.has(entry.name)) continue
       result.push({
         name: entry.name,
         path: path.join(dirPath, entry.name),
@@ -135,6 +139,14 @@ const codeEditorObj = {
       void watcher?.close()
       watcher = null
     }
+  },
+
+  async readFileBinary(filePath: string): Promise<string> {
+    const ext = path.extname(filePath).slice(1).toLowerCase()
+    const mimeType = (mime(ext) as string) || 'application/octet-stream'
+    const buffer = await fs.promises.readFile(filePath)
+    const base64 = buffer.toString('base64')
+    return `data:${mimeType};base64,${base64}`
   },
 
   // Git

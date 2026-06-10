@@ -2,8 +2,8 @@ import durationFormat from 'licia/durationFormat'
 import dateFormat from 'licia/dateFormat'
 import compact from 'licia/compact'
 import splitPath from 'licia/splitPath'
-import contain from 'licia/contain'
 import isWindows from 'licia/isWindows'
+import { EXECUTABLE_EXTS } from './fileType'
 
 const sep = isWindows ? '\\' : '/'
 
@@ -83,13 +83,12 @@ export async function resolveSavePath(filePath: string): Promise<string> {
 
 const fileIconCache = new Map<string, Promise<string | undefined>>()
 
-const EXECUTABLE_EXTS = ['.app', '.exe', '.msi', '.dmg', '.appimage']
-
 function getFileIconCacheKey(filePath: string): string {
   const { ext } = splitPath(filePath)
   const lowerExt = ext.toLowerCase()
+  const extKey = lowerExt.replace(/^\./, '')
 
-  if (!lowerExt || contain(EXECUTABLE_EXTS, lowerExt)) {
+  if (!extKey || EXECUTABLE_EXTS.has(extKey)) {
     return filePath
   }
 

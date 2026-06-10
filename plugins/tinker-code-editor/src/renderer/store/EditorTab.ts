@@ -2,11 +2,14 @@ import { makeAutoObservable } from 'mobx'
 import type { GitBlameHunk } from 'share/types/git'
 import type { BlameLineAnnotation } from 'share/hooks/useBlameDecorations'
 
+export type TabCategory = 'text' | 'image'
+
 class EditorTab {
   id: string
   title: string
   filePath: string
   content: string
+  category: TabCategory
   isDirty: boolean
 
   // blame state
@@ -15,11 +18,18 @@ class EditorTab {
   loadingBlame = false
   highlightedBlameSha: string | null = null
 
-  constructor(id: string, title: string, filePath: string, content: string) {
+  constructor(
+    id: string,
+    title: string,
+    filePath: string,
+    content: string,
+    category: TabCategory = 'text'
+  ) {
     this.id = id
     this.title = title
     this.filePath = filePath
     this.content = content
+    this.category = category
     this.isDirty = false
     makeAutoObservable(this)
   }

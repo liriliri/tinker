@@ -84,7 +84,7 @@ export default observer(function Preview() {
       <div className="flex-1 overflow-hidden">
         <ImageViewer
           src={store.imageDataUrl}
-          onLoad={store.setImageNaturalSize}
+          onLoad={(w, h) => store.setImageNaturalSize(w, h)}
         />
       </div>
     )

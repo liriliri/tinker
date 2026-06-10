@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import type { ITreeNode } from 'share/components/FileTree/types'
+import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
 import type {
   GitBlameHunk,
   GitBranch,
@@ -31,6 +32,7 @@ class RepoTab {
   treeNodes: ITreeNode[] = []
   selectedFilePath = ''
   fileContent = ''
+  fileCategory: 'text' | 'image' = 'text'
   loadingFileContent = false
 
   // Blame state
@@ -179,12 +181,18 @@ class RepoTab {
     this.showingBlame = false
     this.blameHunks = []
 
+    const ext = getFileExt(filePath)
+    const isImage = IMAGE_EXTS.has(ext)
+    this.fileCategory = isImage ? 'image' : 'text'
+
     try {
       await this.syncPreloadRepo()
-      const content = await git.getCommitFileContent(
-        this.selectedCommit.sha,
-        filePath
-      )
+      const content = isImage
+        ? await git.getCommitFileContentBinary(
+            this.selectedCommit.sha,
+            filePath
+          )
+        : await git.getCommitFileContent(this.selectedCommit.sha, filePath)
       runInAction(() => {
         this.fileContent = content
       })

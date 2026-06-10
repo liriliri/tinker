@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
-import { File, GitCommit } from 'lucide-react'
+import { File, GitCommit, Image } from 'lucide-react'
 import {
   Panel,
   Group,
@@ -74,12 +74,16 @@ const App = observer(function App() {
       { type: 'separator' },
       {
         label: t('save'),
+        enabled: tab.category !== 'image',
         click: () => store.saveFile(tabId),
       },
     ])
   }
 
   void store.tabDirtyRevision
+
+  const activeTab = store.tabs.find((t) => t.id === store.activeTabId)
+  const isActiveImageTab = activeTab?.category === 'image'
 
   if (!store.rootPath) {
     return <Welcome />
@@ -127,7 +131,9 @@ const App = observer(function App() {
                             onMove={(from, to) => store.moveTab(from, to)}
                             onContextMenu={handleContextMenu}
                             renderIcon={(tab) =>
-                              tab.isDirty ? (
+                              tab.category === 'image' ? (
+                                <Image size={14} className={tw.text.tertiary} />
+                              ) : tab.isDirty ? (
                                 <span
                                   className={`inline-block w-1.5 h-1.5 rounded-full ${tw.primary.bg}`}
                                   aria-hidden
@@ -138,19 +144,21 @@ const App = observer(function App() {
                             }
                           />
                         </div>
-                        <button
-                          onClick={() => store.toggleBlame()}
-                          className={`w-7 h-7 ml-1 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
-                            store.showingBlame
-                              ? `opacity-100 ${tw.primary.text}`
-                              : ''
-                          }`}
-                          title={
-                            store.showingBlame ? t('blameHide') : t('blame')
-                          }
-                        >
-                          <GitCommit size={14} />
-                        </button>
+                        {!isActiveImageTab && (
+                          <button
+                            onClick={() => store.toggleBlame()}
+                            className={`w-7 h-7 ml-1 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
+                              store.showingBlame
+                                ? `opacity-100 ${tw.primary.text}`
+                                : ''
+                            }`}
+                            title={
+                              store.showingBlame ? t('blameHide') : t('blame')
+                            }
+                          >
+                            <GitCommit size={14} />
+                          </button>
+                        )}
                         <div
                           className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
                         />

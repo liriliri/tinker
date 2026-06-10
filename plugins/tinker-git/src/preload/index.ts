@@ -7,6 +7,7 @@ import {
   getCommitDetail,
   getCommitTree,
   getCommitFileContent,
+  getCommitFileContentBinary,
   getCommitFileBlame,
 } from 'share/preload/git'
 
@@ -18,6 +19,7 @@ const gitObj = {
   getCommitDetail,
   getCommitTree,
   getCommitFileContent,
+  getCommitFileContentBinary,
   getCommitFileBlame,
 }
 

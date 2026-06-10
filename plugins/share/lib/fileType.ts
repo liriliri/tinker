@@ -156,6 +156,8 @@ export const BINARY_EXTS = new Set([
   'pptx',
 ])
 
+export const EXECUTABLE_EXTS = new Set(['app', 'exe', 'msi', 'dmg', 'appimage'])
+
 export function getFileExt(filePath: string): string {
   const { ext } = splitPath(filePath)
   return ext ? ext.slice(1).toLowerCase() : ''

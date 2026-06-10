@@ -91,6 +91,10 @@ class Store extends BaseStore {
     return this.activeTab?.fileContent ?? ''
   }
 
+  get fileCategory() {
+    return this.activeTab?.fileCategory ?? 'text'
+  }
+
   get loadingFileContent() {
     return this.activeTab?.loadingFileContent ?? false
   }

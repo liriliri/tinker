@@ -6,6 +6,7 @@ import {
   byteRangeToColumns,
   type TextSearchActiveMatch,
 } from 'share/lib/textSearch'
+import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import EditorTab from './EditorTab'
 
@@ -60,9 +61,15 @@ class Editor {
       return existing.id
     }
 
+    const ext = getFileExt(filePath)
+    const isImage = IMAGE_EXTS.has(ext)
+
     try {
-      const content = (await tinker.readFile(filePath, 'utf-8')) as string
-      const tab = new EditorTab(uuid(), fileName, filePath, content)
+      const content = isImage
+        ? await codeEditor.readFileBinary(filePath)
+        : ((await tinker.readFile(filePath, 'utf-8')) as string)
+      const category = isImage ? 'image' : 'text'
+      const tab = new EditorTab(uuid(), fileName, filePath, content, category)
       this.tabs.push(tab)
       this.activeTabId = tab.id
       return tab.id
@@ -77,7 +84,10 @@ class Editor {
     if (!tab || tab.isDirty) return
 
     try {
-      tab.content = (await tinker.readFile(filePath, 'utf-8')) as string
+      tab.content =
+        tab.category === 'image'
+          ? await codeEditor.readFileBinary(filePath)
+          : ((await tinker.readFile(filePath, 'utf-8')) as string)
     } catch {
       // ignore read errors
     }
@@ -101,7 +111,7 @@ class Editor {
   async saveFile(tabId?: string) {
     const id = tabId || this.activeTabId
     const tab = this.tabs.find((t) => t.id === id)
-    if (!tab) return
+    if (!tab || tab.category === 'image') return
 
     try {
       await tinker.writeFile(tab.filePath, tab.content, 'utf-8')

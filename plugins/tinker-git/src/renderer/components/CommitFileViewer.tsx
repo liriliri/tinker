@@ -12,6 +12,7 @@ import {
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS, getFileExt, getLanguage } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
+import ImageViewer from 'share/components/ImageViewer'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
@@ -51,6 +52,22 @@ export default observer(function CommitFileViewer() {
   const fileName =
     store.selectedFilePath.split('/').pop() || store.selectedFilePath
   const binary = isBinaryFile(store.selectedFilePath)
+  const isImage = store.fileCategory === 'image'
+
+  if (isImage) {
+    return (
+      <div className="h-full w-full flex flex-col min-w-0">
+        <Toolbar>
+          <span className={`text-xs font-mono ${tw.text.secondary}`}>
+            {fileName}
+          </span>
+        </Toolbar>
+        <div className="flex-1 min-h-0">
+          <ImageViewer src={store.fileContent} />
+        </div>
+      </div>
+    )
+  }
 
   function handleEditorMount(editor: MonacoEditor.IStandaloneCodeEditor) {
     editorRef.current = editor
