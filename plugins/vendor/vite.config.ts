@@ -66,6 +66,12 @@ export const shareExternal = ['systeminformation']
 
 export const shareDeps = keys(globals)
 
+export const shareGlobals: Record<string, string> = {
+  'share/components/FileIcon': 'ShareFileIcon',
+}
+
+const shareComponentsDir = path.resolve(__dirname, '../share/components')
+
 const globalsExports: Record<string, string[]> = {
   'lucide-react': keys(lucide),
   '@xterm/xterm': ['Terminal'],
@@ -78,11 +84,26 @@ function moduleKeys(id: string) {
 }
 
 export function globalsExternalPlugin(): Plugin {
+  const hasShareGlobals = Object.keys(shareGlobals).length > 0
+
   return {
     name: 'plugin-globals-external',
     enforce: 'pre' as const,
     resolveId(source: string, importer: string | undefined) {
       if (importer && /\.worker\.[jt]sx?$/.test(importer)) return null
+
+      // Share component paths have been aliased by vite:resolve at this point
+      if (hasShareGlobals) {
+        const normalized = source.replace(/\/+/g, '/')
+        if (normalized.startsWith(shareComponentsDir)) {
+          const baseName = path.basename(source).replace(/\.(tsx?|jsx?)$/, '')
+          const key = `share/components/${baseName}`
+          const globalName = shareGlobals[key]
+          if (globalName) {
+            return `\0virtual:share-${globalName}`
+          }
+        }
+      }
 
       if (globals[source]) {
         return source
@@ -93,6 +114,12 @@ export function globalsExternalPlugin(): Plugin {
       return null
     },
     load(id: string) {
+      // Virtual modules for share components
+      if (id.startsWith('\0virtual:share-')) {
+        const globalName = id.slice('\0virtual:share-'.length)
+        return `const m = globalThis.${globalName};\nexport default m;`
+      }
+
       for (const [key, globalName] of Object.entries(globals)) {
         if (key.endsWith('/') && id.startsWith(key)) {
           const mod = id.slice(key.length)
@@ -123,7 +150,8 @@ function createConfig(
   name: string,
   globalsName: string,
   external: string[] = [],
-  outDir = 'dist'
+  outDir = 'dist',
+  entry?: string
 ): UserConfig {
   const _globals: Record<string, string> = {}
   for (const ext of external) {
@@ -151,7 +179,7 @@ function createConfig(
       outDir,
       emptyOutDir: false,
       lib: {
-        entry: path.resolve(__dirname, `${name}.ts`),
+        entry: path.resolve(__dirname, entry || `${name}.ts`),
         name: globalsName,
         fileName: () => `${name}.js`,
         formats: ['iife'],
@@ -180,6 +208,7 @@ export default defineConfig(({ mode }) => {
       'react',
       'react-dom',
       'use-sync-external-store/shim',
+      'react/jsx-runtime',
     ])
   }
 
@@ -201,11 +230,18 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'aggrid') {
-    return createConfig('aggrid', 'PluginVendorAgGrid', ['react', 'react-dom'])
+    return createConfig('aggrid', 'PluginVendorAgGrid', [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+    ])
   }
 
   if (target === 'lucide') {
-    return createConfig('lucide', 'PluginVendorLucide', ['react'])
+    return createConfig('lucide', 'PluginVendorLucide', [
+      'react',
+      'react/jsx-runtime',
+    ])
   }
 
   if (target === 'licia') {
@@ -217,7 +253,10 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'hexeditor') {
-    return createConfig('hexeditor', 'PluginVendorHexEditor', ['react'])
+    return createConfig('hexeditor', 'PluginVendorHexEditor', [
+      'react',
+      'react/jsx-runtime',
+    ])
   }
 
   if (target === 'wavesurfer') {
@@ -231,23 +270,29 @@ export default defineConfig(({ mode }) => {
   if (target === 'resizablepanels') {
     return createConfig('resizablepanels', 'PluginVendorResizablePanels', [
       'react',
+      'react/jsx-runtime',
     ])
   }
 
   if (target === 'syntaxhighlighter') {
     return createConfig('syntaxhighlighter', 'PluginVendorSyntaxHighlighter', [
       'react',
+      'react/jsx-runtime',
     ])
   }
 
   if (target === 'markdown') {
-    return createConfig('markdown', 'PluginVendorMarkdown', ['react'])
+    return createConfig('markdown', 'PluginVendorMarkdown', [
+      'react',
+      'react/jsx-runtime',
+    ])
   }
 
   if (target === 'headlessui') {
     return createConfig('headlessui', 'PluginVendorHeadlessui', [
       'react',
       'react-dom',
+      'react/jsx-runtime',
     ])
   }
 
@@ -255,18 +300,23 @@ export default defineConfig(({ mode }) => {
     return createConfig('hottoast', 'PluginVendorHottoast', [
       'react',
       'react-dom',
+      'react/jsx-runtime',
     ])
   }
 
   if (target === 'tiptap') {
-    return createConfig('tiptap', 'PluginVendorTiptap', ['react', 'react-dom'])
+    return createConfig('tiptap', 'PluginVendorTiptap', [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+    ])
   }
 
   if (target === 'videojs') {
     return createConfig(
       'videojs',
       'PluginVendorVideojs',
-      ['react', 'react-dom'],
+      ['react', 'react-dom', 'react/jsx-runtime'],
       'dist/videojs'
     )
   }
@@ -285,6 +335,7 @@ export default defineConfig(({ mode }) => {
       'use-sync-external-store/shim',
       'use-sync-external-store/shim/with-selector',
       'use-sync-external-store/with-selector',
+      'react/jsx-runtime',
     ])
   }
 
@@ -298,6 +349,16 @@ export default defineConfig(({ mode }) => {
       'PluginVendorCodeMirror',
       [],
       'dist/codemirror'
+    )
+  }
+
+  if (target === 'share:fileicon') {
+    return createConfig(
+      'fileicon',
+      'PluginVendorFileIcon',
+      ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'],
+      'dist/share',
+      'share/fileicon.ts'
     )
   }
 

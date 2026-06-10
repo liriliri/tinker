@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:share:fileicon",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --config vite.config.ts --mode react",
     "build:mobx": "vite build --config vite.config.ts --mode mobx",
@@ -26,7 +26,8 @@
     "build:cryptojs": "vite build --config vite.config.ts --mode cryptojs",
     "build:prettier": "vite build --config vite.config.ts --mode prettier",
     "build:xterm": "vite build --config vite.config.ts --mode xterm",
-    "build:codemirror": "vite build --config vite.config.ts --mode codemirror"
+    "build:codemirror": "vite build --config vite.config.ts --mode codemirror",
+    "build:share:fileicon": "vite build --config vite.config.ts --mode share:fileicon"
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
