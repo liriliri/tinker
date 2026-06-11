@@ -281,6 +281,8 @@ import {
 import {
   isDiskNodeDirectory,
   mediaDurationFormat,
+  formatTimeAgo,
+  formatRelativeDate,
   openImageFile,
   fileExists,
   resolveSavePath,
@@ -289,6 +291,9 @@ import {
   getFileCategory,
 } from 'share/lib/util'
 ```
+
+- `formatTimeAgo(dateMs, locale?, style?)` — relative time via `Intl.RelativeTimeFormat` (e.g. "3 days ago"; use `narrow` in compact gutters).
+- `formatRelativeDate(dateMs, locale?, titleFormat?)` — `{ label, title }` for timeago display with absolute datetime tooltip.
 
 ### Popup Window
 
@@ -376,6 +381,13 @@ const dataSource: IFileTreeDataSource = {
 | Git    | `git ls-tree`          | —                   | —                       | —                   |
 
 **File watching:** The shared FileTree does not manage file watching — that's the consumer's job. Use `onExpandChange` to start/stop watching, and `refreshDirs` + `refreshVersion` to trigger re-fetches after file system events.
+
+## Git Preload (`share/preload/git.ts`)
+
+Exposed to advanced plugins via preload `contextBridge` as `git`.
+
+- `searchCommits(ref, query, skip?, limit?, author?)` — `query` matches commit message or SHA; `author` filters by author name.
+- `getAuthors(ref)` — uses `git shortlog -s -n`; load lazily in UI.
 
 ## When To Update This File
 

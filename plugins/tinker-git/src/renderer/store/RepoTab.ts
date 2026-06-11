@@ -1,6 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import type { ITreeNode } from 'share/components/FileTree/types'
 import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
+import debounce from 'licia/debounce'
+import naturalSort from 'licia/naturalSort'
 import type {
   GitBlameHunk,
   GitBranch,
@@ -9,6 +11,7 @@ import type {
 } from 'share/types/git'
 
 const COMMITS_PAGE_SIZE = 50
+const SEARCH_DEBOUNCE_MS = 300
 
 class RepoTab {
   id: string
@@ -35,6 +38,21 @@ class RepoTab {
   fileCategory: 'text' | 'image' = 'text'
   loadingFileContent = false
 
+  // Search state
+  commitSearchQuery = ''
+  commitAuthorFilter = ''
+  authors: string[] = []
+  loadingAuthors = false
+  searching = false
+  searchSkip = 0
+  loadingMoreSearch = false
+
+  private browseCommitsCache: {
+    commits: GitCommitSummary[]
+    hasMore: boolean
+    selectedCommit: GitCommitSummary | null
+  } | null = null
+
   // Blame state
   blameHunks: GitBlameHunk[] = []
   showingBlame = false
@@ -44,10 +62,133 @@ class RepoTab {
   constructor(id: string) {
     this.id = id
     makeAutoObservable(this)
+    this._doSearch = debounce(this._search.bind(this), SEARCH_DEBOUNCE_MS)
+  }
+
+  private searchRequestId = 0
+  private authorsLoadId = 0
+  private authorsBranch = ''
+  private _doSearch: (query: string) => void
+
+  private doSearch(query: string) {
+    this._doSearch(query)
+  }
+
+  private async _search(query: string) {
+    if (!this.selectedBranch) return
+
+    const requestId = ++this.searchRequestId
+
+    if (!query.trim() && !this.commitAuthorFilter.trim()) {
+      this.searchSkip = 0
+      if (this.browseCommitsCache) {
+        runInAction(() => {
+          this.commits = this.browseCommitsCache!.commits
+          this.hasMoreCommits = this.browseCommitsCache!.hasMore
+          this.selectedCommit = this.browseCommitsCache!.selectedCommit
+          this.commitDetail = null
+          this.editorContent = ''
+        })
+        if (this.selectedCommit) {
+          await this.selectCommit(this.selectedCommit)
+        }
+        this.browseCommitsCache = null
+        return
+      }
+      await this.loadCommits(this.selectedBranch.fullName)
+      return
+    }
+
+    if (!this.browseCommitsCache) {
+      this.browseCommitsCache = {
+        commits: [...this.commits],
+        hasMore: this.hasMoreCommits,
+        selectedCommit: this.selectedCommit,
+      }
+    }
+
+    this.searching = true
+    this.setError(null)
+
+    try {
+      await this.syncPreloadRepo()
+      const { commits: results, hasMore } = await git.searchCommits(
+        this.selectedBranch.fullName,
+        query,
+        0,
+        COMMITS_PAGE_SIZE,
+        this.commitAuthorFilter.trim() || undefined
+      )
+      if (requestId !== this.searchRequestId) return
+      runInAction(() => {
+        this.searchSkip = results.length
+        this.commits = results
+        this.hasMoreCommits = hasMore
+        if (results.length === 0) {
+          this.selectedCommit = null
+          this.commitDetail = null
+          this.editorContent = ''
+        }
+      })
+      if (requestId === this.searchRequestId && results.length > 0) {
+        await this.selectCommit(results[0])
+      }
+    } catch (err) {
+      if (requestId !== this.searchRequestId) return
+      console.error('Failed to search commits:', err)
+      this.setError(String(err))
+    } finally {
+      if (requestId === this.searchRequestId) {
+        this.searching = false
+      }
+    }
   }
 
   setError(msg: string | null) {
     this.error = msg
+  }
+
+  setCommitSearchQuery(query: string) {
+    this.commitSearchQuery = query
+    this.doSearch(query)
+  }
+
+  setCommitAuthorFilter(author: string) {
+    this.commitAuthorFilter = author
+    this.doSearch(this.commitSearchQuery)
+  }
+
+  async ensureAuthorsLoaded() {
+    if (!this.selectedBranch) return
+    if (
+      this.authors.length > 0 &&
+      this.authorsBranch === this.selectedBranch.fullName
+    ) {
+      return
+    }
+
+    const loadId = ++this.authorsLoadId
+    const branchName = this.selectedBranch.fullName
+
+    this.loadingAuthors = true
+    try {
+      await this.syncPreloadRepo()
+      const authors = await git.getAuthors(branchName)
+      if (loadId !== this.authorsLoadId) return
+      runInAction(() => {
+        this.authors = naturalSort(authors)
+        this.authorsBranch = branchName
+      })
+    } catch (err) {
+      if (loadId !== this.authorsLoadId) return
+      console.error('Failed to load authors:', err)
+    } finally {
+      if (loadId === this.authorsLoadId) {
+        runInAction(() => {
+          this.loadingAuthors = false
+        })
+      }
+    }
   }
 
   async syncPreloadRepo(path?: string) {
@@ -59,17 +200,28 @@ class RepoTab {
   }
 
   async selectBranch(branch: GitBranch) {
+    this.searchRequestId++
+    this.authorsLoadId++
     this.setBrowsingFiles(false)
     this.selectedBranch = branch
     this.selectedCommit = null
     this.commitDetail = null
     this.editorContent = ''
+    this.commitAuthorFilter = ''
+    this.commitSearchQuery = ''
+    this.browseCommitsCache = null
+    this.searchSkip = 0
+    this.authors = []
+    this.authorsBranch = ''
+    this.loadingAuthors = false
     await this.loadCommits(branch.fullName)
   }
 
   async loadCommits(refName: string) {
     this.loadingCommits = true
     this.hasMoreCommits = false
+    this.browseCommitsCache = null
+    this.searchSkip = 0
     this.setError(null)
 
     try {
@@ -90,9 +242,18 @@ class RepoTab {
     } finally {
       this.loadingCommits = false
     }
+    await this.ensureAuthorsLoaded()
   }
 
   async loadMoreCommits() {
+    const searching =
+      this.commitSearchQuery.trim() !== '' ||
+      this.commitAuthorFilter.trim() !== ''
+    if (searching) {
+      this.loadMoreSearchResults()
+      return
+    }
+
     if (
       !this.selectedBranch ||
       !this.hasMoreCommits ||
@@ -126,6 +287,43 @@ class RepoTab {
     }
   }
 
+  private async loadMoreSearchResults() {
+    if (
+      !this.selectedBranch ||
+      !this.hasMoreCommits ||
+      this.loadingMoreSearch ||
+      this.searching
+    ) {
+      return
+    }
+
+    this.loadingMoreSearch = true
+    this.setError(null)
+
+    try {
+      await this.syncPreloadRepo()
+      const { commits, hasMore } = await git.searchCommits(
+        this.selectedBranch.fullName,
+        this.commitSearchQuery,
+        this.searchSkip,
+        COMMITS_PAGE_SIZE,
+        this.commitAuthorFilter.trim() || undefined
+      )
+      runInAction(() => {
+        this.commits.push(...commits)
+        this.searchSkip += commits.length
+        this.hasMoreCommits = hasMore
+      })
+    } catch (err) {
+      console.error('Failed to load more search results:', err)
+      this.setError(String(err))
+    } finally {
+      runInAction(() => {
+        this.loadingMoreSearch = false
+      })
+    }
+  }
+
   async selectCommit(commit: GitCommitSummary) {
     this.selectedCommit = commit
     this.loadingDetail = true
@@ -152,6 +350,9 @@ class RepoTab {
 
   async setBrowsingFiles(on: boolean) {
     this.browsingFiles = on
+    this.commitSearchQuery = ''
+    this.browseCommitsCache = null
+    this.searchSkip = 0
     if (!on) {
       this.selectedFilePath = ''
       this.fileContent = ''
@@ -213,7 +414,7 @@ class RepoTab {
     isLeader: boolean
     sha: string
     text: string
-    date: string
+    dateMs: number
   }> {
     if (this.blameHunks.length === 0) return []
 
@@ -222,7 +423,7 @@ class RepoTab {
       isLeader: boolean
       sha: string
       text: string
-      date: string
+      dateMs: number
     }> = []
 
     for (const hunk of this.blameHunks) {
@@ -230,7 +431,6 @@ class RepoTab {
         hunk.message.length > 32
           ? hunk.message.slice(0, 32) + '\u2026'
           : hunk.message
-      const dateShort = hunk.date.slice(0, 10).replace(/-/g, '')
       const text = `\u00A0${hunk.author}\u00A0${shortMsg}\u00A0`
 
       annotations.push({
@@ -238,7 +438,7 @@ class RepoTab {
         isLeader: true,
         sha: hunk.sha,
         text,
-        date: dateShort,
+        dateMs: hunk.dateMs,
       })
 
       for (let i = 1; i < hunk.lineCount; i++) {
@@ -247,7 +447,7 @@ class RepoTab {
           isLeader: false,
           sha: hunk.sha,
           text: '',
-          date: '',
+          dateMs: 0,
         })
       }
     }

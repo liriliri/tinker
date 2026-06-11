@@ -14,6 +14,7 @@ export interface SelectProps<T = string> {
   disabled?: boolean
   className?: string
   title?: string
+  onFocus?: () => void
 }
 
 export default function Select<T extends string | number = string>({
@@ -23,6 +24,7 @@ export default function Select<T extends string | number = string>({
   disabled = false,
   className = '',
   title,
+  onFocus,
 }: SelectProps<T>) {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value
@@ -39,6 +41,7 @@ export default function Select<T extends string | number = string>({
       <select
         value={String(value)}
         onChange={handleChange}
+        onFocus={onFocus}
         disabled={disabled}
         className={`w-full h-full appearance-none text-xs pl-2 pr-6 py-1 ${tw.bg.select} border ${tw.gray.border600} rounded cursor-pointer focus:outline-none ${tw.primary.focusBorder} ${tw.text.primary} disabled:opacity-50 disabled:cursor-not-allowed`}
         title={title}

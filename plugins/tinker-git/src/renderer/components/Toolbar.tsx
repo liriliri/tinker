@@ -5,9 +5,12 @@ import { FolderOpen, GitBranch } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
+  ToolbarSearch,
   ToolbarSeparator,
+  ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import Select from 'share/components/Select'
 import { formatRefLabel } from '../lib/util'
 import BranchSelectDialog from './BranchSelectDialog'
 import store from '../store'
@@ -59,6 +62,33 @@ export default observer(function ToolbarComponent() {
                 : t('branches')}
             </span>
           </ToolbarButton>
+          <ToolbarSpacer />
+          <ToolbarSearch
+            value={store.commitSearchQuery}
+            onChange={(value) => store.setCommitSearchQuery(value)}
+            placeholder={t('searchCommits')}
+            className="ml-0"
+          />
+          <Select
+            value={store.commitAuthorFilter}
+            onChange={(value) => store.setCommitAuthorFilter(value)}
+            onFocus={() => void store.ensureAuthorsLoaded()}
+            options={[
+              {
+                label:
+                  store.loadingAuthors && store.authors.length === 0
+                    ? t('loading')
+                    : t('allAuthors'),
+                value: '',
+              },
+              ...store.authors.map((author) => ({
+                label: author,
+                value: author,
+              })),
+            ]}
+            title={t('filterByAuthor')}
+            className="max-w-32 min-w-0"
+          />
         </>
       )}
 

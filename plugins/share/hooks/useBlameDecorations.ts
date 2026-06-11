@@ -7,6 +7,7 @@ export interface BlameLineAnnotation {
   sha: string
   text: string
   date: string
+  dateTitle?: string
 }
 
 interface UseBlameDecorationsOptions {
@@ -66,6 +67,7 @@ export function useBlameDecorations({
           ...base,
           options: {
             showIfCollapsed: true,
+            hoverMessage: a.dateTitle,
             before: {
               content: a.date,
               inlineClassName: hl

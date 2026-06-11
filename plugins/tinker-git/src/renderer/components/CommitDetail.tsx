@@ -11,7 +11,7 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { formatCommitListDate } from '../lib/util'
+import { formatRelativeDate } from 'share/lib/util'
 import { isDiffTextUnrenderable } from '../lib/diffLimits'
 import {
   parseCommitDiff,
@@ -145,7 +145,7 @@ const CommitDiffBlockView = observer(function CommitDiffBlockView({
 })
 
 export default observer(function CommitDetail() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const commit = store.selectedCommit
   const detail = store.commitDetail
   const [collapsedBlocks, setCollapsedBlocks] = useState<
@@ -187,8 +187,9 @@ export default observer(function CommitDetail() {
     return <CenteredMessage>{t('selectCommitHint')}</CenteredMessage>
   }
 
-  const { label: dateLabel, title: dateTitle } = formatCommitListDate(
-    commit.date
+  const { label: dateLabel, title: dateTitle } = formatRelativeDate(
+    commit.date,
+    i18n.language
   )
 
   const handleCopySha = async () => {
@@ -222,7 +223,7 @@ export default observer(function CommitDetail() {
           {commit.shortSha}
         </span>
         <span
-          className={`text-xs shrink-0 tabular-nums ${tw.text.secondary}`}
+          className={`text-xs shrink-0 ${tw.text.secondary}`}
           title={dateTitle}
         >
           {dateLabel}

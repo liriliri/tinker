@@ -1,6 +1,6 @@
 import { Editor, loader } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { tw } from 'share/theme'
@@ -11,6 +11,7 @@ import {
 } from 'share/components/Toolbar'
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS, getFileExt, getLanguage } from 'share/lib/fileType'
+import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import ImageViewer from 'share/components/ImageViewer'
 import CenteredMessage from './CenteredMessage'
@@ -29,8 +30,26 @@ function isBinaryFile(filePath: string): boolean {
 }
 
 export default observer(function CommitFileViewer() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
+
+  const blameAnnotations = useMemo(
+    () =>
+      store.blameLineAnnotations.map((annotation) => {
+        if (!annotation.isLeader || !annotation.dateMs) {
+          return { ...annotation, date: '', dateTitle: undefined }
+        }
+
+        const { title } = formatRelativeDate(annotation.dateMs, i18n.language)
+
+        return {
+          ...annotation,
+          date: formatTimeAgo(annotation.dateMs, i18n.language, 'narrow'),
+          dateTitle: title,
+        }
+      }),
+    [store.blameLineAnnotations, i18n.language]
+  )
 
   const handleHighlightClick = useCallback((sha: string) => {
     store.setHighlightedBlameSha(sha)
@@ -39,7 +58,7 @@ export default observer(function CommitFileViewer() {
   useBlameDecorations({
     editorRef,
     monacoApi,
-    annotations: store.blameLineAnnotations,
+    annotations: blameAnnotations,
     highlightedSha: store.highlightedBlameSha,
     showBlame: store.showingBlame,
     onHighlightClick: handleHighlightClick,

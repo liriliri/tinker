@@ -19,9 +19,9 @@
   text-overflow: ellipsis;
 }
 
-// Date — fixed 10ch, right-aligned
+// Date — fixed 12ch, right-aligned
 .blame-before--date {
-  width: 10ch;
+  width: 12ch;
   background: var(--theme-background-secondary, #f3f3f3);
   padding-right: 1ch;
   border-right: 1px solid var(--theme-border, #e0e0e0);
@@ -30,9 +30,9 @@
   text-align: right;
 }
 
-// Compact lines — 48ch total, same as msg+date
+// Compact lines — 50ch total, same as msg+date
 .blame-before--compact {
-  width: 48ch;
+  width: 50ch;
   background: var(--theme-background-secondary, #f3f3f3);
   padding: 0 1ch;
   border-left: 1px solid var(--theme-border, #e0e0e0);

@@ -116,3 +116,69 @@ export function mediaDurationFormat(seconds: number) {
 
   return durationFormat(Math.round(seconds * 1000), 'mm:ss')
 }
+
+const RELATIVE_UNIT_THRESHOLDS: [
+  Intl.RelativeTimeFormatUnit,
+  number,
+  number
+][] = [
+  ['year', 24 * 60 * 60 * 1000 * (365 * 2 - 1), 24 * 60 * 60 * 1000 * 365],
+  ['month', (24 * 60 * 60 * 1000 * 365) / 12, (24 * 60 * 60 * 1000 * 365) / 12],
+  ['week', 24 * 60 * 60 * 1000 * 7, 24 * 60 * 60 * 1000 * 7],
+  ['day', 24 * 60 * 60 * 1000, 24 * 60 * 60 * 1000],
+  ['hour', 60 * 60 * 1000, 60 * 60 * 1000],
+  ['minute', 60 * 1000, 60 * 1000],
+  ['second', 1000, 1000],
+]
+
+const relativeTimeFormatCache = new Map<string, Intl.RelativeTimeFormat>()
+
+function getRelativeTimeFormat(
+  locale?: string,
+  style: Intl.RelativeTimeFormatStyle = 'long'
+): Intl.RelativeTimeFormat {
+  const key = `${locale || 'default'}:${style}`
+  let formatter = relativeTimeFormatCache.get(key)
+  if (!formatter) {
+    formatter = new Intl.RelativeTimeFormat(locale, {
+      localeMatcher: 'best fit',
+      numeric: style === 'long' ? 'auto' : 'always',
+      style,
+    })
+    relativeTimeFormatCache.set(key, formatter)
+  }
+  return formatter
+}
+
+export function formatTimeAgo(
+  dateMs: number,
+  locale?: string,
+  style: Intl.RelativeTimeFormatStyle = 'long'
+): string {
+  const elapsed = dateMs - Date.now()
+  if (!Number.isFinite(elapsed)) return ''
+
+  const formatter = getRelativeTimeFormat(locale, style)
+
+  for (const [unit, threshold, divisor] of RELATIVE_UNIT_THRESHOLDS) {
+    const elapsedAbs = Math.abs(elapsed)
+    if (elapsedAbs >= threshold || threshold === 1000) {
+      return formatter.format(Math.trunc(elapsed / divisor), unit)
+    }
+  }
+
+  return ''
+}
+
+export function formatRelativeDate(
+  dateMs: number,
+  locale?: string,
+  titleFormat = 'yyyy-mm-dd HH:MM:ss'
+): { label: string; title: string } {
+  const date = new Date(dateMs)
+
+  return {
+    label: formatTimeAgo(dateMs, locale),
+    title: dateFormat(date, titleFormat),
+  }
+}

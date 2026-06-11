@@ -33,7 +33,7 @@ export interface GitBlameHunk {
   sha: string
   author: string
   message: string
-  date: string
+  dateMs: number
   startLineNumber: number
   lineCount: number
 }

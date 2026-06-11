@@ -1,10 +1,12 @@
 import { Editor, loader } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
+import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
 import ImageViewer from 'share/components/ImageViewer'
 
 type MonacoApi = typeof import('monaco-editor')
@@ -27,8 +29,30 @@ interface EditorPaneProps {
 }
 
 export default observer(function EditorPane({ tabId }: EditorPaneProps) {
+  const { i18n } = useTranslation()
   const tab = store.tabs.find((t) => t.id === tabId)
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+
+  const blameAnnotations = useMemo(
+    () =>
+      (tab?.blameLineAnnotations ?? []).map((annotation) => {
+        if (!annotation.isLeader || !annotation.dateMs) {
+          return { ...annotation, date: '', dateTitle: undefined }
+        }
+
+        const { title } = formatRelativeDate(annotation.dateMs, i18n.language)
+
+        return {
+          lineNumber: annotation.lineNumber,
+          isLeader: annotation.isLeader,
+          sha: annotation.sha,
+          text: annotation.text,
+          date: formatTimeAgo(annotation.dateMs, i18n.language, 'narrow'),
+          dateTitle: title,
+        }
+      }),
+    [tab?.blameLineAnnotations, i18n.language]
+  )
 
   useEffect(() => {
     return () => store.unregisterEditor(tabId)
@@ -41,7 +65,7 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   useBlameDecorations({
     editorRef,
     monacoApi,
-    annotations: tab?.blameLineAnnotations ?? [],
+    annotations: blameAnnotations,
     highlightedSha: tab?.highlightedBlameSha ?? null,
     showBlame: (tab?.showingBlame ?? false) && tab?.id === store.activeTabId,
     onHighlightClick: handleHighlightClick,

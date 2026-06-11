@@ -1,8 +1,14 @@
 import { makeAutoObservable } from 'mobx'
 import type { GitBlameHunk } from 'share/types/git'
-import type { BlameLineAnnotation } from 'share/hooks/useBlameDecorations'
-
 export type TabCategory = 'text' | 'image'
+
+interface BlameAnnotationSource {
+  lineNumber: number
+  isLeader: boolean
+  sha: string
+  text: string
+  dateMs: number
+}
 
 class EditorTab {
   id: string
@@ -34,17 +40,16 @@ class EditorTab {
     makeAutoObservable(this)
   }
 
-  get blameLineAnnotations(): BlameLineAnnotation[] {
+  get blameLineAnnotations(): BlameAnnotationSource[] {
     if (this.blameHunks.length === 0) return []
 
-    const annotations: BlameLineAnnotation[] = []
+    const annotations: BlameAnnotationSource[] = []
 
     for (const hunk of this.blameHunks) {
       const shortMsg =
         hunk.message.length > 32
           ? hunk.message.slice(0, 32) + '\u2026'
           : hunk.message
-      const dateShort = hunk.date.slice(0, 10).replace(/-/g, '')
       const text = `\u00A0${hunk.author}\u00A0${shortMsg}\u00A0`
 
       annotations.push({
@@ -52,7 +57,7 @@ class EditorTab {
         isLeader: true,
         sha: hunk.sha,
         text,
-        date: dateShort,
+        dateMs: hunk.dateMs,
       })
 
       for (let i = 1; i < hunk.lineCount; i++) {
@@ -61,7 +66,7 @@ class EditorTab {
           isLeader: false,
           sha: hunk.sha,
           text: '',
-          date: '',
+          dateMs: 0,
         })
       }
     }

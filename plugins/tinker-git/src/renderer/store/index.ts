@@ -75,6 +75,30 @@ class Store extends BaseStore {
     return this.activeTab?.error ?? null
   }
 
+  get commitSearchQuery() {
+    return this.activeTab?.commitSearchQuery ?? ''
+  }
+
+  get searching() {
+    return this.activeTab?.searching ?? false
+  }
+
+  get commitAuthorFilter() {
+    return this.activeTab?.commitAuthorFilter ?? ''
+  }
+
+  get authors() {
+    return this.activeTab?.authors ?? []
+  }
+
+  get loadingAuthors() {
+    return this.activeTab?.loadingAuthors ?? false
+  }
+
+  get loadingMoreSearch() {
+    return this.activeTab?.loadingMoreSearch ?? false
+  }
+
   get browsingFiles() {
     return this.activeTab?.browsingFiles ?? false
   }
@@ -134,6 +158,18 @@ class Store extends BaseStore {
 
   loadMoreCommits() {
     return this.activeTab?.loadMoreCommits()
+  }
+
+  setCommitSearchQuery(query: string) {
+    this.activeTab?.setCommitSearchQuery(query)
+  }
+
+  setCommitAuthorFilter(author: string) {
+    this.activeTab?.setCommitAuthorFilter(author)
+  }
+
+  ensureAuthorsLoaded() {
+    return this.activeTab?.ensureAuthorsLoaded()
   }
 
   async setBrowsingFiles(on: boolean) {

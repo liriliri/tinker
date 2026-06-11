@@ -11,7 +11,11 @@ function exec(
     execFile(
       'git',
       args,
-      { cwd, encoding: 'utf8' as BufferEncoding, maxBuffer: 100 * 1024 * 1024 },
+      {
+        cwd,
+        encoding: 'utf8' as BufferEncoding,
+        maxBuffer: 100 * 1024 * 1024,
+      },
       (err, stdout, stderr) => {
         if (!err || typeof err.code === 'number') {
           resolve({
@@ -205,25 +209,17 @@ export async function getBranches(): Promise<GitBranch[]> {
   })
 }
 
-export async function getCommits(
-  refName: string,
-  limit = 100,
-  skip = 0
-): Promise<GitCommitSummary[]> {
-  const currentPath = requireRepo()
+const COMMIT_LOG_FORMAT = '%H%n%h%n%an%n%ae%n%at%n%s'
 
-  const { stdout } = await exec(
-    [
-      'log',
-      '-z',
-      `--format=%H%n%h%n%an%n%ae%n%at%n%s`,
-      refName,
-      `--max-count=${limit}`,
-      `--skip=${skip}`,
-    ],
-    currentPath
-  )
+function isShaLike(query: string): boolean {
+  return /^[0-9a-f]{4,40}$/i.test(query)
+}
 
+function matchesAuthor(author: string, filter: string): boolean {
+  return author.toLowerCase().includes(filter.toLowerCase())
+}
+
+function parseCommitLogRecords(stdout: string): GitCommitSummary[] {
   const records = stdout.split('\0').filter(Boolean)
   if (records.length === 0) return []
 
@@ -238,6 +234,178 @@ export async function getCommits(
       date: parseInt(dateStr, 10) * 1000,
     }
   })
+}
+
+export async function getCommits(
+  refName: string,
+  limit = 100,
+  skip = 0
+): Promise<GitCommitSummary[]> {
+  return getCommitsInternal(refName, limit, skip)
+}
+
+export async function searchCommits(
+  refName: string,
+  query: string,
+  skip = 0,
+  limit = 50,
+  author?: string
+): Promise<{ commits: GitCommitSummary[]; hasMore: boolean }> {
+  const currentPath = requireRepo()
+  const trimmedQuery = query.trim()
+  const trimmedAuthor = author?.trim() || ''
+
+  if (!trimmedQuery && !trimmedAuthor) {
+    return { commits: [], hasMore: false }
+  }
+
+  if (trimmedQuery && isShaLike(trimmedQuery)) {
+    const shaResult = await searchCommitsBySha(
+      currentPath,
+      refName,
+      trimmedQuery,
+      trimmedAuthor
+    )
+    if (shaResult) {
+      return shaResult
+    }
+  }
+
+  const fetchLimit = limit + 1
+  const args = [
+    'log',
+    '-z',
+    `--format=${COMMIT_LOG_FORMAT}`,
+    '--use-mailmap',
+    `--skip=${skip}`,
+    `-n${fetchLimit}`,
+  ]
+
+  if (trimmedAuthor) {
+    args.push(`--author=${trimmedAuthor}`, '-i')
+  }
+
+  if (trimmedQuery) {
+    args.push(`--grep=${trimmedQuery}`, '-i', '--extended-regexp')
+  }
+
+  args.push(refName)
+
+  const { stdout } = await exec(args, currentPath)
+  const all = parseCommitLogRecords(stdout)
+  const hasMore = all.length > limit
+
+  return {
+    commits: hasMore ? all.slice(0, limit) : all,
+    hasMore,
+  }
+}
+
+async function searchCommitsBySha(
+  currentPath: string,
+  refName: string,
+  query: string,
+  author?: string
+): Promise<{ commits: GitCommitSummary[]; hasMore: boolean } | null> {
+  const { exitCode, stdout: shaOut } = await exec(
+    ['rev-parse', '--verify', '--quiet', `${query}^{commit}`],
+    currentPath
+  )
+  if (exitCode !== 0) return null
+
+  const sha = shaOut.trim()
+  const { exitCode: onBranch } = await exec(
+    ['merge-base', '--is-ancestor', sha, refName],
+    currentPath
+  )
+  if (onBranch !== 0) {
+    return { commits: [], hasMore: false }
+  }
+
+  const { stdout } = await exec(
+    [
+      'log',
+      '-z',
+      `--format=${COMMIT_LOG_FORMAT}`,
+      '--use-mailmap',
+      '-1',
+      '--no-walk',
+      sha,
+    ],
+    currentPath
+  )
+
+  let commits = parseCommitLogRecords(stdout)
+  if (author) {
+    commits = commits.filter((commit) => matchesAuthor(commit.author, author))
+  }
+
+  return {
+    commits,
+    hasMore: false,
+  }
+}
+
+function parseShortlogAuthors(stdout: string): string[] {
+  if (!stdout.trim()) return []
+
+  return stdout
+    .trim()
+    .split('\n')
+    .map((line) => {
+      const tab = line.indexOf('\t')
+      if (tab !== -1) return line.slice(tab + 1).trim()
+      return line.replace(/^\s*\d+\s+/, '').trim()
+    })
+    .filter(Boolean)
+}
+
+export async function getAuthors(refName: string): Promise<string[]> {
+  const currentPath = requireRepo()
+
+  const { stdout, exitCode } = await exec(
+    ['shortlog', '-s', '-n', refName],
+    currentPath
+  )
+  if (exitCode === 0) {
+    const authors = parseShortlogAuthors(stdout)
+    if (authors.length > 0) return authors
+  }
+
+  const { stdout: logOut, exitCode: logExitCode } = await exec(
+    ['log', '--format=%aN', refName],
+    currentPath
+  )
+  if (logExitCode !== 0 || !logOut.trim()) return []
+
+  const seen = new Set<string>()
+  return logOut
+    .trim()
+    .split('\n')
+    .filter((name) => name && !seen.has(name) && seen.add(name))
+}
+
+async function getCommitsInternal(
+  refName: string,
+  limit: number,
+  skip: number
+): Promise<GitCommitSummary[]> {
+  const currentPath = requireRepo()
+
+  const { stdout } = await exec(
+    [
+      'log',
+      '-z',
+      `--format=${COMMIT_LOG_FORMAT}`,
+      '--use-mailmap',
+      refName,
+      `--max-count=${limit}`,
+      `--skip=${skip}`,
+    ],
+    currentPath
+  )
+
+  return parseCommitLogRecords(stdout)
 }
 
 export async function getCommitDetail(sha: string): Promise<GitCommitDetail> {
@@ -342,22 +510,10 @@ export async function getCommitFileContentBinary(
   return `data:${mimeType};base64,${base64}`
 }
 
-function formatBlameDate(authorTime: number): string {
-  const date = new Date(authorTime * 1000)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    '0'
-  )}-${String(date.getDate()).padStart(2, '0')} ${String(
-    date.getHours()
-  ).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(
-    date.getSeconds()
-  ).padStart(2, '0')}`
-}
-
 interface BlameMetaCache {
   author: string
   summary: string
-  date: string
+  dateMs: number
 }
 
 function parseBlamePorcelain(stdout: string): GitBlameHunk[] {
@@ -405,20 +561,20 @@ function parseBlamePorcelain(stdout: string): GitBlameHunk[] {
       i++
     }
 
-    let dateStr = ''
+    let dateMs = 0
     if (authorTime > 0) {
-      dateStr = formatBlameDate(authorTime)
+      dateMs = authorTime * 1000
       metaCache.set(hunkSha, {
         author: authorName,
         summary,
-        date: dateStr,
+        dateMs,
       })
     } else {
       const cached = metaCache.get(hunkSha)
       if (cached) {
         authorName = cached.author
         summary = cached.summary
-        dateStr = cached.date
+        dateMs = cached.dateMs
       }
     }
 
@@ -426,7 +582,7 @@ function parseBlamePorcelain(stdout: string): GitBlameHunk[] {
       sha: hunkSha,
       author: authorName,
       message: summary,
-      date: dateStr,
+      dateMs,
       startLineNumber: startLine,
       lineCount: 1,
     }
