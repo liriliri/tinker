@@ -43,3 +43,48 @@ export interface CommitTreeEntry {
   path: string
   isDirectory: boolean
 }
+
+export type GitWorkingTreeGroup = 'merge' | 'staged' | 'changes' | 'untracked'
+
+export type GitWorkingTreeStatus =
+  | 'index-modified'
+  | 'index-added'
+  | 'index-deleted'
+  | 'index-renamed'
+  | 'index-copied'
+  | 'modified'
+  | 'deleted'
+  | 'untracked'
+  | 'intent-to-add'
+  | 'intent-to-rename'
+  | 'type-changed'
+  | 'conflict'
+
+export interface GitWorkingTreeFile {
+  id: string
+  path: string
+  renameFrom?: string
+  status: GitWorkingTreeStatus
+  group: GitWorkingTreeGroup
+  statusLetter: string
+}
+
+export interface GitCheckoutInfo {
+  isDetached: boolean
+  branchName: string | null
+  shortSha: string
+  sha: string
+  summary: string | null
+}
+
+export interface GitWorkingTreeStatusResult {
+  checkout: GitCheckoutInfo
+  files: GitWorkingTreeFile[]
+}
+
+export interface GitWorkingTreeFileDiffContent {
+  original: string
+  modified: string
+  isBinary: boolean
+  isTooLarge: boolean
+}

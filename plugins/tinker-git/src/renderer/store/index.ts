@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import Repo from './Repo'
+import Repo, { type GitViewMode } from './Repo'
 import { repoDirName } from '../lib/util'
 
 class Store extends BaseStore {
@@ -8,6 +8,7 @@ class Store extends BaseStore {
   activeTabId = ''
 
   private nextId = 1
+  private workingTreeUnwatch: (() => void) | undefined
 
   constructor() {
     super()
@@ -139,6 +140,58 @@ class Store extends BaseStore {
     return this.activeTab?.highlightedBlameSha ?? null
   }
 
+  get viewMode(): GitViewMode {
+    return this.activeTab?.viewMode ?? 'history'
+  }
+
+  get checkoutInfo() {
+    return this.activeTab?.checkoutInfo ?? null
+  }
+
+  get workingTreeFiles() {
+    return this.activeTab?.workingTreeFiles ?? []
+  }
+
+  get selectedWorkingTreeFile() {
+    return this.activeTab?.selectedWorkingTreeFile ?? null
+  }
+
+  get workingTreeDiffContent() {
+    return this.activeTab?.workingTreeDiffContent ?? null
+  }
+
+  get loadingWorkingTree() {
+    return this.activeTab?.loadingWorkingTree ?? false
+  }
+
+  get loadingWorkingTreeDiff() {
+    return this.activeTab?.loadingWorkingTreeDiff ?? false
+  }
+
+  get commitMessage() {
+    return this.activeTab?.commitMessage ?? ''
+  }
+
+  get hasStagedChanges() {
+    return this.activeTab?.hasStagedChanges ?? false
+  }
+
+  get committing() {
+    return this.activeTab?.committing ?? false
+  }
+
+  get workingTreeMutating() {
+    return this.activeTab?.workingTreeMutating ?? false
+  }
+
+  setCommitMessage(message: string) {
+    this.activeTab?.setCommitMessage(message)
+  }
+
+  commitWorkingTree() {
+    return this.activeTab?.commitWorkingTree()
+  }
+
   setHighlightedBlameSha(sha: string | null) {
     return this.activeTab?.setHighlightedBlameSha(sha)
   }
@@ -182,6 +235,76 @@ class Store extends BaseStore {
 
   async toggleBlame() {
     return this.activeTab?.toggleBlame()
+  }
+
+  async setViewMode(mode: GitViewMode) {
+    await this.activeTab?.setViewMode(mode)
+    this.syncWorkingTreeWatcher()
+  }
+
+  private syncWorkingTreeWatcher() {
+    this.workingTreeUnwatch?.()
+    this.workingTreeUnwatch = undefined
+
+    const tab = this.activeTab
+    if (!tab || tab.viewMode !== 'workingTree' || !tab.repoPath) {
+      return
+    }
+
+    const tabId = tab.id
+    const repoPath = tab.repoPath
+
+    this.workingTreeUnwatch = git.watchWorkingTree(repoPath, () => {
+      const active = this.activeTab
+      if (
+        !active ||
+        active.id !== tabId ||
+        active.viewMode !== 'workingTree' ||
+        active.repoPath !== repoPath
+      ) {
+        return
+      }
+      if (active.workingTreeMutating || active.workingTreeRefreshing) return
+
+      void active.refreshWorkingTree({
+        showLoading: false,
+        reloadDiff: true,
+      })
+    })
+  }
+
+  refreshWorkingTree(options?: Parameters<Repo['refreshWorkingTree']>[0]) {
+    return this.activeTab?.refreshWorkingTree(options)
+  }
+
+  selectWorkingTreeFile(file: Parameters<Repo['selectWorkingTreeFile']>[0]) {
+    return this.activeTab?.selectWorkingTreeFile(file)
+  }
+
+  stageWorkingTreeFile(file: Parameters<Repo['stageWorkingTreeFile']>[0]) {
+    return this.activeTab?.stageWorkingTreeFile(file)
+  }
+
+  unstageWorkingTreeFile(file: Parameters<Repo['unstageWorkingTreeFile']>[0]) {
+    return this.activeTab?.unstageWorkingTreeFile(file)
+  }
+
+  discardWorkingTreeFile(file: Parameters<Repo['discardWorkingTreeFile']>[0]) {
+    return this.activeTab?.discardWorkingTreeFile(file)
+  }
+
+  stageWorkingTreeGroup(group: Parameters<Repo['stageWorkingTreeGroup']>[0]) {
+    return this.activeTab?.stageWorkingTreeGroup(group)
+  }
+
+  unstageWorkingTreeGroup() {
+    return this.activeTab?.unstageWorkingTreeGroup()
+  }
+
+  discardWorkingTreeGroup(
+    group: Parameters<Repo['discardWorkingTreeGroup']>[0]
+  ) {
+    return this.activeTab?.discardWorkingTreeGroup(group)
   }
 
   private updateWindowTitle() {
@@ -229,6 +352,7 @@ class Store extends BaseStore {
       void tab.syncPreloadRepo()
     }
     this.updateWindowTitle()
+    this.syncWorkingTreeWatcher()
   }
 
   moveTab(fromIndex: number, toIndex: number) {
@@ -282,6 +406,7 @@ class Store extends BaseStore {
         this.updateTabTitle(tab.id, repoDirName(path))
         this.updateWindowTitle()
       })
+      this.syncWorkingTreeWatcher()
     } catch (err) {
       console.error('Failed to open repository:', err)
       runInAction(() => {

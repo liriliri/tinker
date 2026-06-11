@@ -9,6 +9,7 @@ import {
 } from 'react-resizable-panels'
 import toast from 'react-hot-toast'
 import { ToasterProvider } from 'share/components/Toaster'
+import { ConfirmProvider } from 'share/components/Confirm'
 import FolderOpen from 'share/components/FolderOpen'
 import { tw } from 'share/theme'
 import renderApp from 'share/lib/renderApp'
@@ -19,6 +20,8 @@ import CommitList from './components/CommitList'
 import CommitDetail from './components/CommitDetail'
 import CommitFileTree from './components/CommitFileTree'
 import CommitFileViewer from './components/CommitFileViewer'
+import WorkingTreeSidebar from './components/WorkingTreeSidebar'
+import WorkingTreeDiffViewer from './components/WorkingTreeDiffViewer'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -38,6 +41,36 @@ const RepoPanels = observer(function RepoPanels() {
     id: 'tinker-git-files-layout',
     storage: localStorage,
   })
+
+  const {
+    defaultLayout: workingTreeLayout,
+    onLayoutChange: onWorkingTreeLayoutChange,
+  } = useDefaultLayout({
+    panelIds: ['workingTreeSidebar', 'workingTreeDiff'],
+    id: 'tinker-git-working-tree-layout',
+    storage: localStorage,
+  })
+
+  if (store.viewMode === 'workingTree') {
+    return (
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <Group
+          orientation="horizontal"
+          className="h-full"
+          defaultLayout={workingTreeLayout}
+          onLayoutChange={onWorkingTreeLayoutChange}
+        >
+          <Panel id="workingTreeSidebar" defaultSize="28%" minSize="20%">
+            <WorkingTreeSidebar />
+          </Panel>
+          <Separator />
+          <Panel id="workingTreeDiff" minSize="55%">
+            <WorkingTreeDiffViewer />
+          </Panel>
+        </Group>
+      </div>
+    )
+  }
 
   if (store.browsingFiles) {
     return (
@@ -103,23 +136,25 @@ const App = observer(function App() {
 
   return (
     <ToasterProvider>
-      <ErrorToast />
-      <div
-        className={`h-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
-      >
-        <TabBar />
-        <Toolbar />
+      <ConfirmProvider>
+        <ErrorToast />
+        <div
+          className={`h-screen flex flex-col overflow-hidden ${tw.bg.primary}`}
+        >
+          <TabBar />
+          <Toolbar />
 
-        {!store.repoPath ? (
-          <FolderOpen
-            onOpenFolder={(path) => store.openRepository(path)}
-            openTitle={t('openRepo')}
-            dropTitle={t('dropRepoHere')}
-          />
-        ) : (
-          <RepoPanels />
-        )}
-      </div>
+          {!store.repoPath ? (
+            <FolderOpen
+              onOpenFolder={(path) => store.openRepository(path)}
+              openTitle={t('openRepo')}
+              dropTitle={t('dropRepoHere')}
+            />
+          ) : (
+            <RepoPanels />
+          )}
+        </div>
+      </ConfirmProvider>
     </ToasterProvider>
   )
 })

@@ -11,7 +11,18 @@ import {
   getCommitFileContent,
   getCommitFileContentBinary,
   getCommitFileBlame,
+  getCheckoutInfo,
+  getWorkingTreeStatus,
+  getWorkingTreeFileDiffContent,
+  stageFile,
+  unstageFile,
+  discardFile,
+  stageFiles,
+  unstageAllFiles,
+  discardFiles,
+  commitStaged,
 } from 'share/preload/git'
+import { watchWorkingTree } from './workingTreeWatch'
 
 const gitObj = {
   getRepoPath,
@@ -25,6 +36,17 @@ const gitObj = {
   getCommitFileContent,
   getCommitFileContentBinary,
   getCommitFileBlame,
+  getCheckoutInfo,
+  getWorkingTreeStatus,
+  getWorkingTreeFileDiffContent,
+  stageFile,
+  unstageFile,
+  discardFile,
+  stageFiles,
+  unstageAllFiles,
+  discardFiles,
+  commitStaged,
+  watchWorkingTree,
 }
 
 contextBridge.exposeInMainWorld('git', gitObj)

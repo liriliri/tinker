@@ -6,9 +6,20 @@ import naturalSort from 'licia/naturalSort'
 import type {
   GitBlameHunk,
   GitBranch,
+  GitCheckoutInfo,
   GitCommitSummary,
   GitCommitDetail,
+  GitWorkingTreeFile,
+  GitWorkingTreeFileDiffContent,
 } from 'share/types/git'
+import {
+  fileBelongsToDisplayGroup,
+  resolveWorkingTreeSelection,
+  type RefreshWorkingTreeOptions,
+  type WorkingTreeDisplayGroup,
+} from '../lib/workingTree'
+
+export type GitViewMode = 'history' | 'workingTree'
 
 const COMMITS_PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300
@@ -58,6 +69,26 @@ class Repo {
   showingBlame = false
   loadingBlame = false
   highlightedBlameSha: string | null = null
+
+  // View mode
+  viewMode: GitViewMode = 'history'
+
+  // Working tree state
+  checkoutInfo: GitCheckoutInfo | null = null
+  workingTreeFiles: GitWorkingTreeFile[] = []
+  selectedWorkingTreeFile: GitWorkingTreeFile | null = null
+  workingTreeDiffContent: GitWorkingTreeFileDiffContent | null = null
+  loadingWorkingTree = false
+  loadingWorkingTreeDiff = false
+  workingTreeMutating = false
+  workingTreeRefreshing = false
+  private workingTreeDiffLoadId = 0
+  commitMessage = ''
+  committing = false
+
+  get hasStagedChanges(): boolean {
+    return this.workingTreeFiles.some((file) => file.group === 'staged')
+  }
 
   constructor(id: string) {
     this.id = id
@@ -483,6 +514,318 @@ class Repo {
         this.loadingBlame = false
       })
     }
+  }
+
+  async setViewMode(mode: GitViewMode) {
+    if (this.viewMode === mode) return
+
+    this.viewMode = mode
+
+    if (mode === 'history') {
+      this.selectedWorkingTreeFile = null
+      this.workingTreeDiffContent = null
+      return
+    }
+
+    this.setBrowsingFiles(false)
+    await this.refreshWorkingTree()
+  }
+
+  async refreshWorkingTree(options: RefreshWorkingTreeOptions = {}) {
+    if (!this.repoPath) return
+
+    const showLoading = options.showLoading ?? true
+    if (!showLoading && this.workingTreeRefreshing) return
+
+    if (showLoading) {
+      this.loadingWorkingTree = true
+    } else {
+      this.workingTreeRefreshing = true
+    }
+    this.setError(null)
+
+    try {
+      await this.syncPreloadRepo()
+      const result = await git.getWorkingTreeStatus()
+      const selectionBeforeResolve = this.selectedWorkingTreeFile
+      const nextSelected = resolveWorkingTreeSelection(
+        result.files,
+        selectionBeforeResolve,
+        options
+      )
+
+      runInAction(() => {
+        this.checkoutInfo = result.checkout
+        this.workingTreeFiles = result.files
+        this.selectedWorkingTreeFile = nextSelected
+        if (!nextSelected) {
+          this.workingTreeDiffContent = null
+        }
+      })
+
+      if (nextSelected) {
+        const reloadDiff =
+          options.reloadDiff ||
+          !selectionBeforeResolve ||
+          selectionBeforeResolve.id !== nextSelected.id ||
+          selectionBeforeResolve.group !== nextSelected.group
+
+        if (reloadDiff) {
+          await this.loadWorkingTreeDiff(nextSelected, {
+            showLoading: showLoading && !this.workingTreeDiffContent,
+          })
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load working tree status:', err)
+      runInAction(() => {
+        this.setError(String(err))
+        if (showLoading) {
+          this.workingTreeFiles = []
+          this.checkoutInfo = null
+          this.selectedWorkingTreeFile = null
+          this.workingTreeDiffContent = null
+        }
+      })
+    } finally {
+      runInAction(() => {
+        if (showLoading) {
+          this.loadingWorkingTree = false
+        } else {
+          this.workingTreeRefreshing = false
+        }
+      })
+    }
+  }
+
+  async selectWorkingTreeFile(file: GitWorkingTreeFile) {
+    const sameFile = this.selectedWorkingTreeFile?.id === file.id
+    this.selectedWorkingTreeFile = file
+
+    if (
+      sameFile &&
+      this.workingTreeDiffContent &&
+      !this.loadingWorkingTreeDiff
+    ) {
+      return
+    }
+
+    await this.loadWorkingTreeDiff(file)
+  }
+
+  private async loadWorkingTreeDiff(
+    file: GitWorkingTreeFile,
+    options: { showLoading?: boolean } = {}
+  ) {
+    const showLoading = options.showLoading ?? true
+    const loadId = ++this.workingTreeDiffLoadId
+
+    if (showLoading) {
+      this.loadingWorkingTreeDiff = true
+    }
+    this.setError(null)
+
+    try {
+      await this.syncPreloadRepo()
+      const diff = await git.getWorkingTreeFileDiffContent(
+        file.path,
+        file.group,
+        file.status,
+        file.renameFrom
+      )
+      if (loadId !== this.workingTreeDiffLoadId) return
+
+      runInAction(() => {
+        this.workingTreeDiffContent = diff
+      })
+    } catch (err) {
+      if (loadId !== this.workingTreeDiffLoadId) return
+
+      console.error('Failed to load working tree diff:', err)
+      runInAction(() => {
+        this.setError(String(err))
+        if (showLoading) {
+          this.workingTreeDiffContent = null
+        }
+      })
+    } finally {
+      if (loadId === this.workingTreeDiffLoadId && showLoading) {
+        runInAction(() => {
+          this.loadingWorkingTreeDiff = false
+        })
+      }
+    }
+  }
+
+  private async withWorkingTreeMutation<T>(fn: () => Promise<T>): Promise<T> {
+    this.workingTreeMutating = true
+    try {
+      return await fn()
+    } finally {
+      this.workingTreeMutating = false
+    }
+  }
+
+  async stageWorkingTreeFile(file: GitWorkingTreeFile) {
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        await git.stageFile(file.path)
+        const wasSelected = this.selectedWorkingTreeFile?.path === file.path
+        await this.refreshWorkingTree({
+          showLoading: false,
+          ...(wasSelected
+            ? { selectPath: file.path, selectGroup: 'staged' as const }
+            : {}),
+        })
+      } catch (err) {
+        console.error('Failed to stage file:', err)
+        this.setError(String(err))
+      }
+    })
+  }
+
+  async unstageWorkingTreeFile(file: GitWorkingTreeFile) {
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        await git.unstageFile(file.path)
+        const wasSelected = this.selectedWorkingTreeFile?.path === file.path
+        await this.refreshWorkingTree({
+          showLoading: false,
+          ...(wasSelected
+            ? { selectPath: file.path, selectGroup: 'changes' as const }
+            : {}),
+        })
+      } catch (err) {
+        console.error('Failed to unstage file:', err)
+        this.setError(String(err))
+      }
+    })
+  }
+
+  async discardWorkingTreeFile(file: GitWorkingTreeFile) {
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        await git.discardFile(file.path, file.group)
+        const wasSelected = this.selectedWorkingTreeFile?.path === file.path
+        await this.refreshWorkingTree({
+          showLoading: false,
+          ...(wasSelected ? { selectPath: file.path } : {}),
+        })
+      } catch (err) {
+        console.error('Failed to discard file:', err)
+        this.setError(String(err))
+      }
+    })
+  }
+
+  private getWorkingTreeGroupPaths(group: WorkingTreeDisplayGroup): string[] {
+    return this.workingTreeFiles
+      .filter((file) => fileBelongsToDisplayGroup(file, group))
+      .map((file) => file.path)
+  }
+
+  async stageWorkingTreeGroup(group: WorkingTreeDisplayGroup) {
+    const paths = this.getWorkingTreeGroupPaths(group)
+    if (paths.length === 0) return
+
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        await git.stageFiles(paths)
+        await this.refreshWorkingTree({ showLoading: false })
+      } catch (err) {
+        console.error('Failed to stage group:', err)
+        this.setError(String(err))
+      }
+    })
+  }
+
+  async unstageWorkingTreeGroup() {
+    if (!this.hasStagedChanges) return
+
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        await git.unstageAllFiles()
+        await this.refreshWorkingTree({ showLoading: false })
+      } catch (err) {
+        console.error('Failed to unstage group:', err)
+        this.setError(String(err))
+      }
+    })
+  }
+
+  setCommitMessage(message: string) {
+    this.commitMessage = message
+  }
+
+  async commitWorkingTree() {
+    const message = this.commitMessage.trim()
+    if (!message || !this.hasStagedChanges || this.committing) return
+
+    return this.withWorkingTreeMutation(async () => {
+      this.committing = true
+      try {
+        await this.syncPreloadRepo()
+        await git.commitStaged(message)
+        runInAction(() => {
+          this.commitMessage = ''
+        })
+        await this.refreshWorkingTree({ showLoading: false })
+        if (this.selectedBranch) {
+          await this.loadCommits(this.selectedBranch.fullName)
+        }
+      } catch (err) {
+        console.error('Failed to commit:', err)
+        this.setError(String(err))
+      } finally {
+        runInAction(() => {
+          this.committing = false
+        })
+      }
+    })
+  }
+
+  async discardWorkingTreeGroup(group: WorkingTreeDisplayGroup) {
+    const paths = this.getWorkingTreeGroupPaths(group)
+    if (paths.length === 0) return
+
+    return this.withWorkingTreeMutation(async () => {
+      try {
+        await this.syncPreloadRepo()
+        if (group === 'changes') {
+          const trackedPaths = this.workingTreeFiles
+            .filter((file) => file.group === 'changes')
+            .map((file) => file.path)
+          const untrackedPaths = this.workingTreeFiles
+            .filter((file) => file.group === 'untracked')
+            .map((file) => file.path)
+          if (trackedPaths.length > 0) {
+            await git.discardFiles(trackedPaths, 'changes')
+          }
+          if (untrackedPaths.length > 0) {
+            await git.discardFiles(untrackedPaths, 'untracked')
+          }
+        } else {
+          await git.discardFiles(paths, group)
+        }
+        const wasSelected =
+          this.selectedWorkingTreeFile != null &&
+          fileBelongsToDisplayGroup(this.selectedWorkingTreeFile, group)
+        await this.refreshWorkingTree({
+          showLoading: false,
+          ...(wasSelected
+            ? { selectPath: this.selectedWorkingTreeFile!.path }
+            : {}),
+        })
+      } catch (err) {
+        console.error('Failed to discard group:', err)
+        this.setError(String(err))
+      }
+    })
   }
 }
 

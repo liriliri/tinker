@@ -388,6 +388,12 @@ Exposed to advanced plugins via preload `contextBridge` as `git`.
 
 - `searchCommits(ref, query, skip?, limit?, author?)` — `query` matches commit message or SHA; `author` filters by author name.
 - `getAuthors(ref)` — uses `git shortlog -s -n`; load lazily in UI.
+- `getCheckoutInfo()` — current branch or detached HEAD commit.
+- `getWorkingTreeStatus()` — staged/changes/untracked groups via `git status -z --ignore-submodules`.
+- `getWorkingTreeFileDiffContent(path, group, status, renameFrom?)` — original/modified file content for Monaco diff view.
+- `stageFile(path)` / `unstageFile(path)` / `discardFile(path, group)` — stage, unstage, or discard a file.
+- `stageFiles(paths)` / `unstageAllFiles()` / `discardFiles(paths, group)` — batch working tree operations.
+- `commitStaged(message)` — commit staged changes with the given message.
 
 ## When To Update This File
 
