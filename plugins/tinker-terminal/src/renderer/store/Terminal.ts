@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
 import type { ILayoutNode, SplitDirection } from '../types'
 
-class TerminalTab {
+class Terminal {
   id: string
   title: string
   layout: ILayoutNode
@@ -132,4 +132,4 @@ function removePaneImpl(
   return { ...node, first, second }
 }
 
-export default TerminalTab
+export default Terminal

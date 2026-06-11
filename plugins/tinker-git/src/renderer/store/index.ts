@@ -1,10 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/BaseStore'
-import RepoTab from './RepoTab'
+import Repo from './Repo'
 import { repoDirName } from '../lib/util'
 
 class Store extends BaseStore {
-  tabs: RepoTab[] = []
+  tabs: Repo[] = []
   activeTabId = ''
 
   private nextId = 1
@@ -15,11 +15,11 @@ class Store extends BaseStore {
     this.addTab()
   }
 
-  private getTab(id: string): RepoTab | undefined {
+  private getTab(id: string): Repo | undefined {
     return this.tabs.find((t) => t.id === id)
   }
 
-  get activeTab(): RepoTab | undefined {
+  get activeTab(): Repo | undefined {
     return this.getTab(this.activeTabId)
   }
 
@@ -148,11 +148,11 @@ class Store extends BaseStore {
     if (tab) tab.title = title
   }
 
-  selectBranch(branch: Parameters<RepoTab['selectBranch']>[0]) {
+  selectBranch(branch: Parameters<Repo['selectBranch']>[0]) {
     return this.activeTab?.selectBranch(branch)
   }
 
-  selectCommit(commit: Parameters<RepoTab['selectCommit']>[0]) {
+  selectCommit(commit: Parameters<Repo['selectCommit']>[0]) {
     return this.activeTab?.selectCommit(commit)
   }
 
@@ -191,7 +191,7 @@ class Store extends BaseStore {
 
   addTab(afterTabId?: string) {
     const id = `tab-${this.nextId++}`
-    const tab = new RepoTab(id)
+    const tab = new Repo(id)
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
       if (index !== -1) {
@@ -294,7 +294,7 @@ class Store extends BaseStore {
     }
   }
 
-  async refreshBranches(tab: RepoTab = this.activeTab!, repoPath?: string) {
+  async refreshBranches(tab: Repo = this.activeTab!, repoPath?: string) {
     if (!repoPath && !tab?.repoPath) return
 
     tab.loading = true

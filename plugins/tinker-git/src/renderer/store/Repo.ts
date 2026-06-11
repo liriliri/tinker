@@ -13,7 +13,7 @@ import type {
 const COMMITS_PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300
 
-class RepoTab {
+class Repo {
   id: string
   title = ''
   repoPath = ''
@@ -486,4 +486,4 @@ class RepoTab {
   }
 }
 
-export default RepoTab
+export default Repo

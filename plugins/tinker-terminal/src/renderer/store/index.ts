@@ -10,14 +10,14 @@ import {
   ISessionConfig,
 } from '../lib/db'
 import type { ILayoutNode, SplitDirection } from '../types'
-import TerminalTab from './TerminalTab'
+import Terminal from './Terminal'
 import { getTerminalSession } from 'share/components/Terminal'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 
 class Store extends BaseStore {
-  tabs: TerminalTab[] = []
+  tabs: Terminal[] = []
   activeTabId = ''
   activePaneId = ''
   paneTitles: Record<string, string> = {}
@@ -51,7 +51,7 @@ class Store extends BaseStore {
     this.tabCounter++
     const paneId = uuid()
     const id = uuid()
-    const tab = new TerminalTab(id, `Terminal ${this.tabCounter}`, paneId)
+    const tab = new Terminal(id, `Terminal ${this.tabCounter}`, paneId)
 
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
@@ -179,15 +179,15 @@ class Store extends BaseStore {
   }
 
   async setDualColumns() {
-    await this.applyLayout(2, TerminalTab.dualColumnsLayout)
+    await this.applyLayout(2, Terminal.dualColumnsLayout)
   }
 
   async setTripleColumns() {
-    await this.applyLayout(3, TerminalTab.tripleColumnsLayout)
+    await this.applyLayout(3, Terminal.tripleColumnsLayout)
   }
 
   async setGrid() {
-    await this.applyLayout(4, TerminalTab.gridLayout)
+    await this.applyLayout(4, Terminal.gridLayout)
   }
 
   private async applyLayout(
@@ -299,7 +299,7 @@ class Store extends BaseStore {
     this.tabCounter++
     const paneId = uuid()
     const id = uuid()
-    const tab = new TerminalTab(id, config.name, paneId)
+    const tab = new Terminal(id, config.name, paneId)
 
     if (config.type === 'ssh') {
       this.pendingSSHConfig[paneId] = config

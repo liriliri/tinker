@@ -4,12 +4,12 @@ import { tw } from 'share/theme'
 import { useTranslation } from 'react-i18next'
 import TabBar from 'share/components/TabBar'
 import store from '../store'
-import BrowserTab from '../store/BrowserTab'
+import Browser from '../store/Browser'
 
 export default observer(function BrowserTabBar() {
   const { t } = useTranslation()
 
-  const renderIcon = (tab: BrowserTab) => {
+  const renderIcon = (tab: Browser) => {
     if (tab.favicon) {
       return <img src={tab.favicon} className="w-4 h-4" alt="" />
     }

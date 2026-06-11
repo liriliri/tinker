@@ -6,7 +6,7 @@ import contain from 'licia/contain'
 import startWith from 'licia/startWith'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import BrowserTab from './BrowserTab'
+import Browser from './Browser'
 import type { ISite } from '../types'
 import { getAllFavicons, saveFavicon, removeFavicon } from '../lib/db'
 
@@ -22,7 +22,7 @@ const STORAGE_DEVTOOLS_POSITION = 'devToolsPosition'
 type DevToolsPosition = (typeof DEVTOOLS_POSITIONS)[number]
 
 class Store extends BaseStore {
-  tabs: BrowserTab[] = []
+  tabs: Browser[] = []
   activeTabId = ''
   addressBarValue = ''
   addressBarFocused = false
@@ -128,7 +128,7 @@ class Store extends BaseStore {
     }
   }
 
-  private getTab(id: string): BrowserTab | undefined {
+  private getTab(id: string): Browser | undefined {
     return this.tabs.find((t) => t.id === id)
   }
 
@@ -137,7 +137,7 @@ class Store extends BaseStore {
     return tab ? this.webviewRefs.get(tab.id) : undefined
   }
 
-  get activeTab(): BrowserTab | undefined {
+  get activeTab(): Browser | undefined {
     return this.getTab(this.activeTabId)
   }
 
@@ -147,7 +147,7 @@ class Store extends BaseStore {
 
   addTab(url: string = NEW_TAB_URL, afterTabId?: string) {
     const id = `tab-${this.nextId++}`
-    const tab = new BrowserTab(id, url)
+    const tab = new Browser(id, url)
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
       if (index !== -1) {
@@ -231,7 +231,7 @@ class Store extends BaseStore {
     this.commitNavigation(tab, url)
   }
 
-  private commitNavigation(tab: BrowserTab, url: string) {
+  private commitNavigation(tab: Browser, url: string) {
     tab.url = url
     this.addressBarValue = url
     this.addressBarFocused = false

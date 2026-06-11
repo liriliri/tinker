@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 
-class BrowserTab {
+class Browser {
   id: string
   url = ''
   title = ''
@@ -37,4 +37,4 @@ class BrowserTab {
   }
 }
 
-export default BrowserTab
+export default Browser
