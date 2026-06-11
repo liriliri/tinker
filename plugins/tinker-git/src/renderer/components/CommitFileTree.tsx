@@ -13,28 +13,10 @@ const ICON_SIZE = 16
 const commitDataSource: IFileTreeDataSource = {
   async readDir(path: string): Promise<ITreeNode[]> {
     const commit = store.selectedCommit
-    console.log('[CommitFileTree] readDir called:', {
-      path,
-      hasCommit: !!commit,
-      sha: commit?.sha,
-    })
-    if (!commit) {
-      console.warn('[CommitFileTree] readDir: no selected commit')
-      return []
-    }
+    if (!commit) return []
     try {
-      const result = await git.getCommitTree(commit.sha, path)
-      console.log('[CommitFileTree] readDir result:', {
-        path,
-        count: result.length,
-        items: result.map((r) => ({
-          name: r.name,
-          isDirectory: r.isDirectory,
-        })),
-      })
-      return result
-    } catch (err) {
-      console.error('[CommitFileTree] readDir error:', err)
+      return await git.getCommitTree(commit.sha, path)
+    } catch {
       return []
     }
   },

@@ -7,7 +7,7 @@ const MAX_DIFF_BUFFER_SIZE = 70_000_000
 const MAX_REASONABLE_DIFF_SIZE = MAX_DIFF_BUFFER_SIZE / 16
 
 /** Skip rendering when any single diff line exceeds this length. */
-export const MAX_CHARACTERS_PER_LINE = 5000
+const MAX_CHARACTERS_PER_LINE = 5000
 
 function getUtf8ByteLength(text: string): number {
   return new TextEncoder().encode(text).length

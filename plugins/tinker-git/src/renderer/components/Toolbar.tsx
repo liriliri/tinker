@@ -36,13 +36,19 @@ export default observer(function ToolbarComponent() {
           <ToolbarButton
             onClick={() => setShowBranchDialog(true)}
             title={t('branches')}
-            className="flex items-center gap-1.5 max-w-48 min-w-0"
+            className="flex items-center gap-1.5 max-w-32 min-w-0"
           >
             <GitBranch size={14} className="shrink-0" />
             <span className="truncate font-mono">
               {store.selectedCommit.shortSha}
             </span>
           </ToolbarButton>
+          <div className="flex-1 min-w-0 truncate text-xs">
+            {store.selectedCommit.summary}
+          </div>
+          <div className="w-28 shrink-0 truncate text-xs text-right">
+            {store.selectedCommit.author}
+          </div>
         </>
       )}
 
@@ -87,7 +93,7 @@ export default observer(function ToolbarComponent() {
               })),
             ]}
             title={t('filterByAuthor')}
-            className="max-w-32 min-w-0"
+            className="w-28 shrink-0"
           />
         </>
       )}
