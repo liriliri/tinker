@@ -54,21 +54,21 @@ export default observer(function ToolbarComponent() {
         <ToolbarButtonGroup>
           <ToolbarButton
             variant="toggle"
-            active={store.viewMode === 'history'}
-            onClick={() => void store.setViewMode('history')}
-            title={t('historyMode')}
-            className={`rounded-none rounded-l border-r ${tw.border}`}
-          >
-            <GitCommit size={TOOLBAR_ICON_SIZE} />
-          </ToolbarButton>
-          <ToolbarButton
-            variant="toggle"
             active={store.viewMode === 'workingTree'}
             onClick={() => void store.setViewMode('workingTree')}
             title={t('workingTreeMode')}
-            className="rounded-none rounded-r"
+            className={`rounded-none rounded-l border-r ${tw.border}`}
           >
             <GitCompare size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+          <ToolbarButton
+            variant="toggle"
+            active={store.viewMode === 'history'}
+            onClick={() => void store.setViewMode('history')}
+            title={t('historyMode')}
+            className="rounded-none rounded-r"
+          >
+            <GitCommit size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
         </ToolbarButtonGroup>
       )}

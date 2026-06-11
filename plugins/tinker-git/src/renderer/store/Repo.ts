@@ -71,7 +71,7 @@ class Repo {
   highlightedBlameSha: string | null = null
 
   // View mode
-  viewMode: GitViewMode = 'history'
+  viewMode: GitViewMode = 'workingTree'
 
   // Working tree state
   checkoutInfo: GitCheckoutInfo | null = null

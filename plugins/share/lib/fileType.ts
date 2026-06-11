@@ -189,11 +189,11 @@ export function getFileCategory(filePath: string): FileCategory {
 
 export const LANGUAGE_MAP: Record<string, string> = {
   js: 'javascript',
-  jsx: 'javascriptreact',
+  jsx: 'javascript',
   mjs: 'javascript',
   cjs: 'javascript',
   ts: 'typescript',
-  tsx: 'typescriptreact',
+  tsx: 'typescript',
   json: 'json',
   jsonc: 'jsonc',
   html: 'html',

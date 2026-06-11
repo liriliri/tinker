@@ -141,7 +141,7 @@ class Store extends BaseStore {
   }
 
   get viewMode(): GitViewMode {
-    return this.activeTab?.viewMode ?? 'history'
+    return this.activeTab?.viewMode ?? 'workingTree'
   }
 
   get checkoutInfo() {
