@@ -1,8 +1,10 @@
 import type {
+  GitCheckoutInfo,
   GitWorkingTreeFile,
   GitWorkingTreeGroup,
   GitWorkingTreeStatus,
-} from 'share/types/git'
+} from '../types/git'
+import { joinPath } from './util'
 
 export interface WorkingTreeGroupSection {
   group: WorkingTreeDisplayGroup
@@ -80,6 +82,27 @@ export function isNewWorkingTreeFile(file: GitWorkingTreeFile): boolean {
     file.group === 'untracked' ||
     file.status === 'index-added' ||
     file.status === 'intent-to-add'
+  )
+}
+
+export function isRenameWorkingTreeFile(file: GitWorkingTreeFile): boolean {
+  return (
+    file.status === 'index-renamed' ||
+    file.status === 'intent-to-rename' ||
+    file.status === 'index-copied'
+  )
+}
+
+export function workingTreeFilePathLabel(file: GitWorkingTreeFile): string {
+  return file.renameFrom ? `${file.renameFrom} → ${file.path}` : file.path
+}
+
+export function findWorkingTreeFile(
+  files: GitWorkingTreeFile[],
+  target: Pick<GitWorkingTreeFile, 'path' | 'group'>
+): GitWorkingTreeFile | undefined {
+  return files.find(
+    (file) => file.path === target.path && file.group === target.group
   )
 }
 
@@ -190,5 +213,86 @@ export function getWorkingTreeFileActions(
       return UNSTAGED_FILE_ACTIONS
     default:
       return []
+  }
+}
+
+export interface WorkingTreeUIState {
+  workingTreeFiles: GitWorkingTreeFile[]
+  selectedWorkingTreeFileId: string | null
+  loadingWorkingTree: boolean
+  commitMessage: string
+  branchName: string | null
+  hasStagedChanges: boolean
+  committing: boolean
+  workingTreeMutating: boolean
+  isDark: boolean
+}
+
+export interface WorkingTreeUIActions {
+  onCommitMessageChange: (message: string) => void
+  onCommit: () => void | Promise<void>
+  onSelectFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  onStageFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  onUnstageFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  onDiscardFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  onRevealFile: (file: GitWorkingTreeFile) => void
+  onStageGroup: (group: WorkingTreeDisplayGroup) => void | Promise<void>
+  onUnstageGroup: () => void | Promise<void>
+  onDiscardGroup: (group: WorkingTreeDisplayGroup) => void | Promise<void>
+}
+
+export interface WorkingTreeController {
+  workingTreeFiles: GitWorkingTreeFile[]
+  selectedWorkingTreeFile: GitWorkingTreeFile | null
+  loadingWorkingTree: boolean
+  commitMessage: string
+  hasStagedChanges: boolean
+  committing: boolean
+  workingTreeMutating: boolean
+  isDark: boolean
+  repoPath: string
+  checkoutInfo: GitCheckoutInfo | null
+  setCommitMessage: (message: string) => void
+  commitWorkingTree: () => void | Promise<void>
+  selectWorkingTreeFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  stageWorkingTreeFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  unstageWorkingTreeFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  discardWorkingTreeFile: (file: GitWorkingTreeFile) => void | Promise<void>
+  stageWorkingTreeGroup: (
+    group: WorkingTreeDisplayGroup
+  ) => void | Promise<void>
+  unstageWorkingTreeGroup: () => void | Promise<void>
+  discardWorkingTreeGroup: (
+    group: WorkingTreeDisplayGroup
+  ) => void | Promise<void>
+}
+
+/** Map a MobX controller to plain UI props. Call inside an observer. */
+export function getWorkingTreeUIProps(
+  source: WorkingTreeController
+): WorkingTreeUIState & WorkingTreeUIActions {
+  return {
+    workingTreeFiles: source.workingTreeFiles,
+    selectedWorkingTreeFileId: source.selectedWorkingTreeFile?.id ?? null,
+    loadingWorkingTree: source.loadingWorkingTree,
+    commitMessage: source.commitMessage,
+    branchName: source.checkoutInfo?.branchName || null,
+    hasStagedChanges: source.hasStagedChanges,
+    committing: source.committing,
+    workingTreeMutating: source.workingTreeMutating,
+    isDark: source.isDark,
+    onCommitMessageChange: (message) => source.setCommitMessage(message),
+    onCommit: () => source.commitWorkingTree(),
+    onSelectFile: (file) => source.selectWorkingTreeFile(file),
+    onStageFile: (file) => source.stageWorkingTreeFile(file),
+    onUnstageFile: (file) => source.unstageWorkingTreeFile(file),
+    onDiscardFile: (file) => source.discardWorkingTreeFile(file),
+    onRevealFile: (file) => {
+      if (!source.repoPath) return
+      tinker.showItemInPath(joinPath(source.repoPath, file.path))
+    },
+    onStageGroup: (group) => source.stageWorkingTreeGroup(group),
+    onUnstageGroup: () => source.unstageWorkingTreeGroup(),
+    onDiscardGroup: (group) => source.discardWorkingTreeGroup(group),
   }
 }

@@ -24,4 +24,5 @@ export {
   unstageAllFiles,
   discardFiles,
   commitStaged,
+  watchWorkingTree,
 } from './git/index'

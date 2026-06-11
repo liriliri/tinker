@@ -21,8 +21,8 @@ import {
   unstageAllFiles,
   discardFiles,
   commitStaged,
+  watchWorkingTree,
 } from 'share/preload/git'
-import { watchWorkingTree } from './workingTreeWatch'
 
 const gitObj = {
   getRepoPath,

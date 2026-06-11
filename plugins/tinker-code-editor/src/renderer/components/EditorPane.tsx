@@ -8,6 +8,7 @@ import { getLanguage } from 'share/lib/fileType'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
 import ImageViewer from 'share/components/ImageViewer'
+import GitDiffPane from './GitDiffPane'
 
 type MonacoApi = typeof import('monaco-editor')
 
@@ -72,6 +73,10 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
   })
 
   if (!tab) return null
+
+  if (tab.category === 'gitDiff') {
+    return <GitDiffPane tabId={tabId} />
+  }
 
   if (tab.category === 'image') {
     return (

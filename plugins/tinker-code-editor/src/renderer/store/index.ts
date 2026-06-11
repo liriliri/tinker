@@ -9,6 +9,7 @@ import last from 'licia/last'
 import { parentDir } from '../lib/path'
 import Terminal from './Terminal'
 import Editor from './Editor'
+import WorkingTree from './WorkingTree'
 
 const storage = new LocalStore('tinker-code-editor')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
@@ -16,7 +17,7 @@ const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_SIDEBAR_MODE = 'sidebarMode'
 const STORAGE_RECENT_DIRECTORIES = 'recentDirectories'
 
-export type SidebarMode = 'explorer' | 'search'
+export type SidebarMode = 'explorer' | 'search' | 'git'
 
 class Store extends BaseStore {
   // FileTree state (inline, tightly coupled)
@@ -33,6 +34,7 @@ class Store extends BaseStore {
   terminal: Terminal
   editor: Editor
   textSearch: TextSearch
+  workingTree: WorkingTree
 
   // Layout state
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
@@ -48,14 +50,23 @@ class Store extends BaseStore {
       storageNamespace: 'tinker-code-editor-search',
       initialRootDir: storage.get(STORAGE_ROOT_PATH) || '',
     })
+    this.workingTree = new WorkingTree({
+      getIsDark: () => this.isDark,
+      onOpenGitDiff: (file, repoPath) =>
+        this.editor.openGitDiff(file, repoPath),
+      onWorkingTreeRefreshed: (files, repoPath) =>
+        this.editor.refreshOpenGitDiffTabs(files, repoPath),
+    })
 
     makeAutoObservable(this, {
       textSearch: false,
+      workingTree: false,
     })
 
     if (this.rootPath) {
       this.loadDirectory(this.rootPath)
       this.textSearch.setRootDir(this.rootPath)
+      void this.workingTree.onProjectRootChanged(this.rootPath)
     }
     this.terminal.initIfOpen()
 
@@ -64,6 +75,15 @@ class Store extends BaseStore {
       () => this.rootPath,
       (rootPath) => {
         this.textSearch.setRootDir(rootPath)
+        void this.workingTree.onProjectRootChanged(rootPath)
+      }
+    )
+    reaction(
+      () => this.sidebarMode,
+      (mode) => {
+        if (mode === 'git' && this.workingTree.isGitRepo) {
+          void this.workingTree.refreshWorkingTree()
+        }
       }
     )
     reaction(
@@ -109,6 +129,8 @@ class Store extends BaseStore {
     for (const tab of [...this.terminal.tabs]) {
       this.terminal.closeTab(tab.id)
     }
+    this.workingTree.dispose()
+    this.workingTree.reset()
   }
 
   addRecentDirectory(path: string) {

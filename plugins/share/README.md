@@ -163,6 +163,19 @@ const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
 
 `TextSearchSidebar` is a pure UI component (no MobX). `TextSearch` owns query/options/results; `getTextSearchUIProps` maps it to props. Highlight helpers (`buildSegments`, `byteRangeToColumns`, `getLineText`) are exported from the same module for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
 
+### WorkingTree
+
+```ts
+import WorkingTreeSidebar, {
+  getWorkingTreeUIProps,
+} from 'share/components/WorkingTree'
+
+// Call getWorkingTreeUIProps inside an observer — it reads MobX state.
+;<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
+```
+
+`WorkingTreeSidebar` is a pure UI component (no MobX). Implement `WorkingTreeController` on your store (or pass a compatible object) and map it with `getWorkingTreeUIProps`. Utility helpers (`groupWorkingTreeFiles`, `fileDisplayName`, `isNewWorkingTreeFile`, etc.) are exported from `share/lib/workingTree`.
+
 ### Welcome
 
 Welcome screen with action buttons and recent files list. Common pattern for plugins that manage a file-based workspace.

@@ -18,5 +18,8 @@
   "copyPath": "Copy Path",
   "copyRelativePath": "Copy Relative Path",
   "blame": "Blame",
-  "blameHide": "Hide Blame"
+  "blameHide": "Hide Blame",
+  "notAGitRepo": "Not a Git repository",
+  "loadingGitRepo": "Loading...",
+  "gitDiff": "Git Diff"
 }

@@ -79,10 +79,21 @@ function parseGitStatusZ(raw: string): RawFileStatus[] {
     i++
 
     if (entry.x === 'R' || entry.y === 'R' || entry.x === 'C') {
-      const renameEnd = raw.indexOf('\0', i)
-      if (renameEnd === -1) break
-      entry.rename = raw.substring(i, renameEnd)
-      i = renameEnd + 1
+      const newPathEnd = raw.indexOf('\0', i)
+      if (newPathEnd === -1) break
+      const oldPathEnd = raw.indexOf('\0', newPathEnd + 1)
+      if (oldPathEnd === -1) break
+      // git status -z lists renamed entries as NEW\0OLD
+      entry.path = raw.substring(i, newPathEnd)
+      entry.rename = raw.substring(newPathEnd + 1, oldPathEnd)
+      i = oldPathEnd + 1
+
+      if (entry.path.endsWith('/')) {
+        continue
+      }
+
+      result.push(entry)
+      continue
     }
 
     const pathEnd = raw.indexOf('\0', i)
@@ -337,9 +348,16 @@ export async function getWorkingTreeFileDiffContent(
       } else if (status === 'index-deleted') {
         original = await readGitShow(`HEAD:${filePath}`, currentPath)
         modified = ''
-      } else if (status === 'index-renamed' && renameFrom) {
-        original = await readGitShow(`HEAD:${renameFrom}`, currentPath)
-        modified = await readGitShow(`:${filePath}`, currentPath)
+      } else if (
+        (status === 'index-renamed' || status === 'index-copied') &&
+        renameFrom
+      ) {
+        original =
+          (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
+          (await readDiskFile(currentPath, renameFrom))
+        modified =
+          (await readGitShow(`:${filePath}`, currentPath)) ??
+          (await readDiskFile(currentPath, filePath))
       } else {
         original = await readGitShow(`HEAD:${filePath}`, currentPath)
         modified = await readGitShow(`:${filePath}`, currentPath)
@@ -349,6 +367,14 @@ export async function getWorkingTreeFileDiffContent(
       if (status === 'deleted') {
         original = await readGitShow(`:${filePath}`, currentPath)
         modified = ''
+      } else if (status === 'intent-to-rename' && renameFrom) {
+        original =
+          (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
+          (await readGitShow(`:${renameFrom}`, currentPath)) ??
+          (await readDiskFile(currentPath, renameFrom))
+        modified =
+          (await readDiskFile(currentPath, filePath)) ??
+          (await readGitShow(`:${filePath}`, currentPath))
       } else {
         original = await readGitShow(`:${filePath}`, currentPath)
         if (original === null) {

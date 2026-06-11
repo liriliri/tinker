@@ -7,6 +7,7 @@ import {
   FolderOpen,
   Search,
   FileText,
+  GitBranch,
   X,
   Terminal,
 } from 'lucide-react'
@@ -23,6 +24,7 @@ export default observer(function StatusBarComponent() {
 
   const explorerActive = store.sidebarOpen && store.sidebarMode === 'explorer'
   const searchActive = store.sidebarOpen && store.sidebarMode === 'search'
+  const gitActive = store.sidebarOpen && store.sidebarMode === 'git'
 
   return (
     <StatusBar>
@@ -50,6 +52,12 @@ export default observer(function StatusBarComponent() {
         className={className(searchActive && tw.primary.text)}
       >
         <Search size={14} />
+      </StatusBarItem>
+      <StatusBarItem
+        onClick={() => store.setSidebarMode('git')}
+        className={className(gitActive && tw.primary.text)}
+      >
+        <GitBranch size={14} />
       </StatusBarItem>
       <StatusBarSpacer />
       {store.activeTabId && (

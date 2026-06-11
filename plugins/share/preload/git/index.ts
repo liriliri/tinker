@@ -39,3 +39,5 @@ export {
   discardFiles,
   commitStaged,
 } from './operations'
+
+export { watchWorkingTree } from './workingTreeWatch'

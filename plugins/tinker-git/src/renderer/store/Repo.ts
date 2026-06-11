@@ -17,7 +17,7 @@ import {
   resolveWorkingTreeSelection,
   type RefreshWorkingTreeOptions,
   type WorkingTreeDisplayGroup,
-} from '../lib/workingTree'
+} from 'share/lib/workingTree'
 
 export type GitViewMode = 'history' | 'workingTree'
 

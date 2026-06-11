@@ -1,36 +1,49 @@
 import { type KeyboardEvent } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import type { GitWorkingTreeFile } from 'share/types/git'
-import FileIcon from 'share/components/FileIcon'
-import { confirm } from 'share/components/Confirm'
-import { joinPath } from 'share/lib/util'
-import { tw } from 'share/theme'
+import type { GitWorkingTreeFile } from '../../types/git'
+import FileIcon from '../FileIcon'
+import { confirm } from '../Confirm'
+import { tw } from '../../theme'
 import {
   statusLetterClass,
   fileDisplayName,
   fileDirectoryName,
   getWorkingTreeFileActions,
   type WorkingTreeActionId,
-} from '../lib/workingTree'
-import WorkingTreeActionButtons from './WorkingTreeActionButtons'
-import store from '../store'
+} from '../../lib/workingTree'
+import ActionButtons from './ActionButtons'
+import { useWorkingTreeContext } from './context'
+import { WORKING_TREE_NS } from './i18n'
 
-export interface WorkingTreeFileRowProps {
+export interface FileRowProps {
   file: GitWorkingTreeFile
 }
 
-export default observer(function WorkingTreeFileRow({
-  file,
-}: WorkingTreeFileRowProps) {
-  const { t } = useTranslation()
-  const selected = store.selectedWorkingTreeFile?.id === file.id
+export default function FileRow({ file }: FileRowProps) {
+  const { t } = useTranslation(WORKING_TREE_NS)
+  const {
+    selectedWorkingTreeFileId,
+    isDark,
+    revealTitleKey,
+    revealIcon,
+    onSelectFile,
+    onStageFile,
+    onUnstageFile,
+    onDiscardFile,
+    onRevealFile,
+  } = useWorkingTreeContext()
+
+  const selected = selectedWorkingTreeFileId === file.id
   const name = fileDisplayName(file)
   const directory = fileDirectoryName(file)
-  const actions = getWorkingTreeFileActions(file)
+  const actions = getWorkingTreeFileActions(file).map((action) =>
+    action.id === 'reveal' && revealTitleKey
+      ? { ...action, titleKey: revealTitleKey }
+      : action
+  )
 
   const handleSelect = () => {
-    void store.selectWorkingTreeFile(file)
+    void onSelectFile(file)
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -42,8 +55,7 @@ export default observer(function WorkingTreeFileRow({
 
   const handleAction = async (actionId: WorkingTreeActionId) => {
     if (actionId === 'reveal') {
-      if (!store.repoPath) return
-      tinker.showItemInPath(joinPath(store.repoPath, file.path))
+      onRevealFile(file)
       return
     }
 
@@ -54,17 +66,17 @@ export default observer(function WorkingTreeFileRow({
         confirmText: t('discard'),
       })
       if (!confirmed) return
-      await store.discardWorkingTreeFile(file)
+      await onDiscardFile(file)
       return
     }
 
     if (actionId === 'stage') {
-      await store.stageWorkingTreeFile(file)
+      await onStageFile(file)
       return
     }
 
     if (actionId === 'unstage') {
-      await store.unstageWorkingTreeFile(file)
+      await onUnstageFile(file)
     }
   }
 
@@ -79,12 +91,7 @@ export default observer(function WorkingTreeFileRow({
       onKeyDown={handleKeyDown}
     >
       <div className="flex flex-1 items-center gap-1.5 min-w-0">
-        <FileIcon
-          name={name}
-          isDark={store.isDark}
-          size={16}
-          className="shrink-0"
-        />
+        <FileIcon name={name} isDark={isDark} size={16} className="shrink-0" />
         <span className="min-w-0 flex-1 truncate" title={file.path}>
           <span className={tw.text.primary}>{name}</span>
           {directory && (
@@ -102,8 +109,12 @@ export default observer(function WorkingTreeFileRow({
         >
           {file.statusLetter}
         </span>
-        <WorkingTreeActionButtons actions={actions} onAction={handleAction} />
+        <ActionButtons
+          actions={actions}
+          onAction={handleAction}
+          revealIcon={revealIcon}
+        />
       </div>
     </div>
   )
-})
+}

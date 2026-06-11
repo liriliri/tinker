@@ -6,7 +6,10 @@ import {
   byteRangeToColumns,
   type TextSearchActiveMatch,
 } from 'share/lib/textSearch'
+import { joinPath } from 'share/lib/util'
+import { findWorkingTreeFile } from 'share/lib/workingTree'
 import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
+import type { GitWorkingTreeFile } from 'share/types/git'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import EditorTab from './EditorTab'
 
@@ -24,6 +27,7 @@ class Editor {
   private editorInstances: Map<string, MonacoEditor.IStandaloneCodeEditor> =
     new Map()
   private pendingReveals: Map<string, RevealTarget> = new Map()
+  private gitDiffLoadIds = new Map<string, number>()
   recentlySavedPaths = new Map<string, number>()
 
   constructor() {
@@ -52,6 +56,87 @@ class Editor {
 
   get tabDirtyRevision(): string {
     return this.tabs.map((t) => `${t.id}:${t.isDirty ? 1 : 0}`).join('|')
+  }
+
+  async openGitDiff(
+    file: GitWorkingTreeFile,
+    repoPath: string
+  ): Promise<string | null> {
+    let tab = this.tabs.find((item) => item.category === 'gitDiff')
+    if (!tab) {
+      tab = new EditorTab(uuid(), 'Git Diff', '', '', 'gitDiff')
+      this.tabs.push(tab)
+    }
+
+    this.activeTabId = tab.id
+    await this.loadGitDiff(tab, file, repoPath)
+    return tab.id
+  }
+
+  refreshOpenGitDiffTabs(files: GitWorkingTreeFile[], repoPath: string) {
+    const tab = this.tabs.find((item) => item.category === 'gitDiff')
+    if (!tab?.gitFile) return
+
+    const file = findWorkingTreeFile(files, tab.gitFile)
+    if (!file) {
+      this.closeTab(tab.id)
+      return
+    }
+
+    void this.loadGitDiff(tab, file, repoPath, { force: true })
+  }
+
+  private async loadGitDiff(
+    tab: EditorTab,
+    file: GitWorkingTreeFile,
+    repoPath: string,
+    options: { force?: boolean } = {}
+  ) {
+    const loadId = (this.gitDiffLoadIds.get(tab.id) ?? 0) + 1
+    this.gitDiffLoadIds.set(tab.id, loadId)
+
+    const sameFile =
+      !options.force &&
+      tab.gitFile?.id === file.id &&
+      tab.diffContent &&
+      !tab.loadingDiff
+
+    tab.gitFile = file
+    tab.filePath = joinPath(repoPath, file.path)
+
+    if (sameFile) return
+
+    tab.diffContent = null
+    tab.loadingDiff = true
+    try {
+      if (codeEditor.getRepoPath() !== repoPath) {
+        await codeEditor.openRepository(repoPath)
+      }
+      const diff = await codeEditor.getWorkingTreeFileDiffContent(
+        file.path,
+        file.group,
+        file.status,
+        file.renameFrom
+      )
+      if (this.gitDiffLoadIds.get(tab.id) !== loadId) return
+
+      runInAction(() => {
+        tab.diffContent = diff
+      })
+    } catch (err) {
+      if (this.gitDiffLoadIds.get(tab.id) !== loadId) return
+
+      console.error('Failed to load git diff:', err)
+      runInAction(() => {
+        tab.diffContent = null
+      })
+    } finally {
+      if (this.gitDiffLoadIds.get(tab.id) === loadId) {
+        runInAction(() => {
+          tab.loadingDiff = false
+        })
+      }
+    }
   }
 
   async openFile(filePath: string, fileName: string): Promise<string | null> {
@@ -111,7 +196,7 @@ class Editor {
   async saveFile(tabId?: string) {
     const id = tabId || this.activeTabId
     const tab = this.tabs.find((t) => t.id === id)
-    if (!tab || tab.category === 'image') return
+    if (!tab || tab.category === 'image' || tab.category === 'gitDiff') return
 
     try {
       await tinker.writeFile(tab.filePath, tab.content, 'utf-8')
@@ -128,6 +213,7 @@ class Editor {
 
     this.tabs.splice(index, 1)
     this.unregisterEditor(id)
+    this.gitDiffLoadIds.delete(id)
 
     if (this.activeTabId === id) {
       if (this.tabs.length > 0) {

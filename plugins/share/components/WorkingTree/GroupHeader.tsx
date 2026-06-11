@@ -1,31 +1,33 @@
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import { confirm } from 'share/components/Confirm'
-import { tw } from 'share/theme'
+import { confirm } from '../Confirm'
+import { tw } from '../../theme'
 import {
   getWorkingTreeGroupActions,
   WORKING_TREE_GROUP_I18N,
   type WorkingTreeActionId,
   type WorkingTreeDisplayGroup,
-} from '../lib/workingTree'
-import WorkingTreeActionButtons from './WorkingTreeActionButtons'
-import store from '../store'
+} from '../../lib/workingTree'
+import ActionButtons from './ActionButtons'
+import { useWorkingTreeContext } from './context'
+import { WORKING_TREE_NS } from './i18n'
 
-export interface WorkingTreeGroupHeaderProps {
+export interface GroupHeaderProps {
   group: WorkingTreeDisplayGroup
   fileCount: number
   collapsed: boolean
   onToggle: () => void
 }
 
-export default observer(function WorkingTreeGroupHeader({
+export default function GroupHeader({
   group,
   fileCount,
   collapsed,
   onToggle,
-}: WorkingTreeGroupHeaderProps) {
-  const { t } = useTranslation()
+}: GroupHeaderProps) {
+  const { t } = useTranslation(WORKING_TREE_NS)
+  const { onStageGroup, onUnstageGroup, onDiscardGroup } =
+    useWorkingTreeContext()
   const actions = getWorkingTreeGroupActions(group)
 
   const handleAction = async (actionId: WorkingTreeActionId) => {
@@ -39,17 +41,17 @@ export default observer(function WorkingTreeGroupHeader({
         confirmText: t('discard'),
       })
       if (!confirmed) return
-      await store.discardWorkingTreeGroup(group)
+      await onDiscardGroup(group)
       return
     }
 
     if (actionId === 'stage') {
-      await store.stageWorkingTreeGroup(group)
+      await onStageGroup(group)
       return
     }
 
     if (actionId === 'unstage') {
-      await store.unstageWorkingTreeGroup()
+      await onUnstageGroup()
     }
   }
 
@@ -76,8 +78,8 @@ export default observer(function WorkingTreeGroupHeader({
         >
           {fileCount}
         </span>
-        <WorkingTreeActionButtons actions={actions} onAction={handleAction} />
+        <ActionButtons actions={actions} onAction={handleAction} />
       </div>
     </div>
   )
-})
+}

@@ -1,6 +1,11 @@
 import { makeAutoObservable } from 'mobx'
-import type { GitBlameHunk } from 'share/types/git'
-export type TabCategory = 'text' | 'image'
+import type {
+  GitBlameHunk,
+  GitWorkingTreeFile,
+  GitWorkingTreeFileDiffContent,
+} from 'share/types/git'
+
+export type TabCategory = 'text' | 'image' | 'gitDiff'
 
 interface BlameAnnotationSource {
   lineNumber: number
@@ -23,6 +28,11 @@ class EditorTab {
   showingBlame = false
   loadingBlame = false
   highlightedBlameSha: string | null = null
+
+  // git diff state
+  gitFile: GitWorkingTreeFile | null = null
+  diffContent: GitWorkingTreeFileDiffContent | null = null
+  loadingDiff = false
 
   constructor(
     id: string,

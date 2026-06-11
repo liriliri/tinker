@@ -1,20 +1,32 @@
 import { type KeyboardEvent } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Check } from 'lucide-react'
-import { tw } from 'share/theme'
-import { getCommitShortcutLabel, isCommitShortcutKey } from '../lib/workingTree'
-import store from '../store'
+import { tw } from '../../theme'
+import {
+  getCommitShortcutLabel,
+  isCommitShortcutKey,
+} from '../../lib/workingTree'
+import { useWorkingTreeContext } from './context'
+import { WORKING_TREE_NS } from './i18n'
 
-export default observer(function WorkingTreeCommitBox() {
-  const { t } = useTranslation()
-  const branchName = store.checkoutInfo?.branchName
+export default function CommitBox() {
+  const { t } = useTranslation(WORKING_TREE_NS)
+  const {
+    commitMessage,
+    branchName,
+    hasStagedChanges,
+    committing,
+    workingTreeMutating,
+    onCommitMessageChange,
+    onCommit,
+  } = useWorkingTreeContext()
+
   const shortcut = getCommitShortcutLabel()
   const canCommit =
-    store.hasStagedChanges &&
-    store.commitMessage.trim().length > 0 &&
-    !store.committing &&
-    !store.workingTreeMutating
+    hasStagedChanges &&
+    commitMessage.trim().length > 0 &&
+    !committing &&
+    !workingTreeMutating
 
   const placeholder = branchName
     ? t('commitMessagePlaceholderBranch', {
@@ -28,7 +40,7 @@ export default observer(function WorkingTreeCommitBox() {
 
     event.preventDefault()
     if (!canCommit) return
-    void store.commitWorkingTree()
+    void onCommit()
   }
 
   return (
@@ -36,12 +48,12 @@ export default observer(function WorkingTreeCommitBox() {
       className={`shrink-0 border-b p-2 space-y-2 ${tw.border} ${tw.bg.secondary}`}
     >
       <textarea
-        value={store.commitMessage}
-        onChange={(event) => store.setCommitMessage(event.target.value)}
+        value={commitMessage}
+        onChange={(event) => onCommitMessageChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={3}
-        disabled={store.committing}
+        disabled={committing}
         className={`w-full resize-none px-2 py-1.5 text-xs rounded border ${tw.border} ${tw.bg.input} ${tw.text.primary} placeholder:${tw.text.tertiary} focus:outline-none focus:ring-1 ${tw.primary.focusRing} disabled:opacity-60`}
       />
       <button
@@ -50,11 +62,11 @@ export default observer(function WorkingTreeCommitBox() {
           canCommit ? `${tw.primary.bg} ${tw.primary.bgHover}` : tw.secondary.bg
         }`}
         disabled={!canCommit}
-        onClick={() => void store.commitWorkingTree()}
+        onClick={() => void onCommit()}
       >
         <Check size={14} />
-        {store.committing ? t('committing') : t('commit')}
+        {committing ? t('committing') : t('commit')}
       </button>
     </div>
   )
-})
+}

@@ -70,9 +70,18 @@ export function getRepoPath(): string {
 }
 
 export function findGitRepoRoot(filePath: string): string | null {
-  let dir = path.dirname(filePath)
+  let dir = path.resolve(filePath)
+
+  try {
+    if (fs.statSync(dir).isFile()) {
+      dir = path.dirname(dir)
+    }
+  } catch {
+    // Path may not exist; still treat the given path as a directory candidate.
+  }
+
   const root = path.parse(dir).root
-  while (dir !== root) {
+  while (true) {
     const gitPath = path.join(dir, '.git')
     try {
       if (fs.existsSync(gitPath)) {
@@ -81,6 +90,7 @@ export function findGitRepoRoot(filePath: string): string | null {
     } catch {
       // ignore fs errors
     }
+    if (dir === root) break
     dir = path.dirname(dir)
   }
   return null

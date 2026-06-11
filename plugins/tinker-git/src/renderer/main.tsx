@@ -20,7 +20,9 @@ import CommitList from './components/CommitList'
 import CommitDetail from './components/CommitDetail'
 import CommitFileTree from './components/CommitFileTree'
 import CommitFileViewer from './components/CommitFileViewer'
-import WorkingTreeSidebar from './components/WorkingTreeSidebar'
+import WorkingTreeSidebar, {
+  getWorkingTreeUIProps,
+} from 'share/components/WorkingTree'
 import WorkingTreeDiffViewer from './components/WorkingTreeDiffViewer'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -61,7 +63,7 @@ const RepoPanels = observer(function RepoPanels() {
           onLayoutChange={onWorkingTreeLayoutChange}
         >
           <Panel id="workingTreeSidebar" defaultSize="28%" minSize="20%">
-            <WorkingTreeSidebar />
+            <WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
           </Panel>
           <Separator />
           <Panel id="workingTreeDiff" minSize="55%">

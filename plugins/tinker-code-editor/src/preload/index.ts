@@ -10,7 +10,18 @@ import type { IFileWatchEvent, FileWatchEventType } from '../common/types'
 import {
   findGitRepoRoot,
   openRepository,
+  getRepoPath,
   getCommitFileBlame,
+  getWorkingTreeStatus,
+  getWorkingTreeFileDiffContent,
+  stageFile,
+  unstageFile,
+  discardFile,
+  stageFiles,
+  unstageAllFiles,
+  discardFiles,
+  commitStaged,
+  watchWorkingTree,
 } from 'share/preload/git'
 
 const SKIP_ENTRIES = new Set(['.DS_Store', 'Thumbs.db', '.git'])
@@ -152,7 +163,18 @@ const codeEditorObj = {
   // Git
   findGitRepoRoot,
   openRepository,
+  getRepoPath,
   getCommitFileBlame,
+  getWorkingTreeStatus,
+  getWorkingTreeFileDiffContent,
+  stageFile,
+  unstageFile,
+  discardFile,
+  stageFiles,
+  unstageAllFiles,
+  discardFiles,
+  commitStaged,
+  watchWorkingTree,
 }
 
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
