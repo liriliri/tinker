@@ -22,7 +22,7 @@ import { formatRefLabel } from '../lib/util'
 import BranchSelectDialog from './BranchSelectDialog'
 import store from '../store'
 
-const TOOLBAR_BRANCH_WIDTH_CLASS = 'w-40 max-w-40 min-w-0 shrink-0'
+const TOOLBAR_BRANCH_WIDTH_CLASS = 'max-w-40 min-w-0 shrink-0'
 const TOOLBAR_BRANCH_INNER_CLASS = `flex items-center gap-1.5 ${TOOLBAR_BRANCH_WIDTH_CLASS}`
 
 function ToolbarBranchContent({ label }: { label: string }) {

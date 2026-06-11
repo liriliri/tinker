@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import isWindows from 'licia/isWindows'
 import { tw, THEME_COLORS } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
-import type { TerminalSession } from '../lib/terminal'
+import type { TerminalSession } from '../types/terminal'
 
 function formatPathForShell(path: string): string {
   if (isWindows) {

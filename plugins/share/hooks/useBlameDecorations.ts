@@ -67,7 +67,7 @@ export function useBlameDecorations({
           ...base,
           options: {
             showIfCollapsed: true,
-            hoverMessage: a.dateTitle,
+            hoverMessage: a.dateTitle ? { value: a.dateTitle } : undefined,
             before: {
               content: a.date,
               inlineClassName: hl

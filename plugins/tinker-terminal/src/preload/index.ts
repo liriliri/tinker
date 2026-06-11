@@ -2,11 +2,8 @@ import { contextBridge } from 'electron'
 import { readFileSync } from 'fs'
 import { Client, ClientChannel } from 'ssh2'
 import { homedir } from 'os'
-import {
-  getDefaultShell,
-  getAvailableShells,
-  TerminalSession,
-} from 'share/preload/terminal'
+import { getDefaultShell, getAvailableShells } from 'share/preload/terminal'
+import type { TerminalSession } from 'share/types/terminal'
 
 interface SSHConfig {
   host: string

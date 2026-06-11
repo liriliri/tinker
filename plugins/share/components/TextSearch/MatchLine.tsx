@@ -30,7 +30,7 @@ export default function MatchLine({ filePath, result }: MatchLineProps) {
 
   const handleClick = () => {
     onActiveMatchKeyChange(key)
-    onSelectMatch?.({ path: filePath, ...result })
+    onSelectMatch?.({ ...result, path: filePath })
   }
 
   const handleContextMenu = (e: React.MouseEvent) => {
