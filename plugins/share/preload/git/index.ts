@@ -5,18 +5,32 @@ export {
   getRepoPath,
   findGitRepoRoot,
   openRepository,
-  getBranches,
+} from './core'
+
+export { getBranches } from './refs'
+
+export {
   getCommits,
   searchCommits,
   getAuthors,
   getCommitDetail,
+} from './commits'
+
+export {
   getCommitTree,
   getCommitFileContent,
   getCommitFileContentBinary,
-  getCommitFileBlame,
+} from './tree'
+
+export { getCommitFileBlame } from './blame'
+
+export {
   getCheckoutInfo,
   getWorkingTreeStatus,
   getWorkingTreeFileDiffContent,
+} from './status'
+
+export {
   stageFile,
   unstageFile,
   discardFile,
@@ -24,4 +38,4 @@ export {
   unstageAllFiles,
   discardFiles,
   commitStaged,
-} from './git/index'
+} from './operations'
