@@ -1,16 +1,21 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
-import { getTerminalSession } from 'share/components/Terminal'
-import type { ILayoutNode, SplitDirection } from '../../common/types'
-import { parentDir } from '../lib/path'
+import normalizePath from 'licia/normalizePath'
+import { getTerminalSession } from '../components/Terminal'
+import type { ILayoutNode, SplitDirection } from '../types/terminalLayout'
 import TerminalTab from './TerminalTab'
 
-const storage = new LocalStore('tinker-code-editor')
 const STORAGE_TERMINAL_OPEN = 'terminalOpen'
 
+function parentDir(filePath: string): string {
+  const normalized = normalizePath(filePath)
+  const i = normalized.lastIndexOf('/')
+  return i > 0 ? normalized.substring(0, i) : normalized
+}
+
 class Terminal {
-  terminalOpen: boolean = storage.get(STORAGE_TERMINAL_OPEN) ?? false
+  terminalOpen: boolean
   tabs: TerminalTab[] = []
   activeTabId = ''
   activePaneId = ''
@@ -18,10 +23,13 @@ class Terminal {
   pendingCwd: Record<string, string> = {}
   onDestroyPane?: (id: string) => void
   private tabCounter = 0
+  private storage: LocalStore
 
   private getRootPath: () => string
 
-  constructor(getRootPath: () => string) {
+  constructor(storageKey: string, getRootPath: () => string) {
+    this.storage = new LocalStore(storageKey)
+    this.terminalOpen = this.storage.get(STORAGE_TERMINAL_OPEN) ?? false
     this.getRootPath = getRootPath
     makeAutoObservable(this, {
       onDestroyPane: false,
@@ -37,7 +45,7 @@ class Terminal {
 
   toggle() {
     this.terminalOpen = !this.terminalOpen
-    storage.set(STORAGE_TERMINAL_OPEN, this.terminalOpen)
+    this.storage.set(STORAGE_TERMINAL_OPEN, this.terminalOpen)
     if (this.terminalOpen && this.tabs.length === 0) {
       this.addTab()
     }
@@ -45,7 +53,7 @@ class Terminal {
 
   open() {
     this.terminalOpen = true
-    storage.set(STORAGE_TERMINAL_OPEN, true)
+    this.storage.set(STORAGE_TERMINAL_OPEN, true)
   }
 
   addTab(cwd?: string) {
@@ -77,7 +85,7 @@ class Terminal {
       this.activeTabId = ''
       this.activePaneId = ''
       this.terminalOpen = false
-      storage.set(STORAGE_TERMINAL_OPEN, false)
+      this.storage.set(STORAGE_TERMINAL_OPEN, false)
       return
     }
 
@@ -107,6 +115,14 @@ class Terminal {
       if (!paneIds.includes(this.activePaneId)) {
         this.activePaneId = paneIds[0]
       }
+      this.syncActiveTabTitle(tab)
+    }
+  }
+
+  private syncActiveTabTitle(tab: TerminalTab) {
+    const title = this.paneTitles[this.activePaneId]
+    if (title) {
+      tab.title = title
     }
   }
 
@@ -125,9 +141,10 @@ class Terminal {
     if (this.paneTitles[paneId] === title) return
     this.paneTitles[paneId] = title
 
-    if (paneId === this.activePaneId) {
-      const tab = this.tabs.find((t) => t.id === this.activeTabId)
-      if (tab) {
+    const tab = this.tabs.find((t) => t.id === this.activeTabId)
+    if (tab && tab.collectPaneIds().includes(paneId)) {
+      const paneIds = tab.collectPaneIds()
+      if (paneIds.length === 1 || paneId === this.activePaneId) {
         tab.title = title
       }
     }

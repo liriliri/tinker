@@ -42,5 +42,6 @@
   "historyMode": "Commit History",
   "workingTreeMode": "Working Tree",
   "selectChangeToView": "Select a change to preview",
-  "refreshChanges": "Refresh changes"
+  "refreshChanges": "Refresh changes",
+  "toggleTerminal": "Toggle Terminal"
 }

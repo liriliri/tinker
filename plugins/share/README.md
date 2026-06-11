@@ -330,6 +330,26 @@ import { getDefaultShell, getAvailableShells } from 'share/lib/terminal' // prel
 
 Use `<Terminal createSession={(cols, rows) => …} />`. Return `tinker.createTerminal({ cols, rows, cwd?, shell? })` for a local PTY, or any `TerminalSession` (e.g. SSH via preload). `getTerminalSession(paneId)` looks up the active session. Dropping files or folders pastes shell-quoted paths. See `plugins/api-types/tinker.d.ts` for `tinker.Terminal`.
 
+### Terminal Panel
+
+Multi-tab, split-pane terminal panel for embedding in editor-style plugins:
+
+```ts
+import Terminal from 'share/store/Terminal'
+import { TerminalPanel } from 'share/components/TerminalPanel'
+
+// In plugin store constructor:
+this.terminal = new Terminal('my-plugin', () => this.rootPath)
+this.terminal.initIfOpen()
+
+// In layout (e.g. bottom panel):
+{store.terminalOpen && (
+  <TerminalPanel terminal={store.terminal} isDark={store.isDark} />
+)}
+```
+
+`Terminal` persists open/closed state per plugin (`storageKey`). Expose store methods via thin proxies (`toggleTerminal`, `addTerminalTab`, `splitPane`, etc.) or call `store.terminal` directly. Use `openInDirectory(path, isDirectory)` to open a new tab at a path. Split layout types live in `share/types/terminalLayout.ts`.
+
 ### FileTree
 
 ```ts

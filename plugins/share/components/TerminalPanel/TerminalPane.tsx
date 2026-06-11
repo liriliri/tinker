@@ -1,65 +1,70 @@
 import type { MenuItemConstructorOptions } from 'electron'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import SharedTerminal, { destroyTerminal } from 'share/components/Terminal'
-import store from '../store'
+import SharedTerminal, { destroyTerminal } from '../Terminal'
+import { useTerminalPanel } from './context'
+import { I18N_NS } from './i18n'
 
 export { destroyTerminal as destroyPane }
 
-interface TerminalProps {
+interface TerminalPaneProps {
   paneId: string
 }
 
-export default function Terminal({ paneId }: TerminalProps) {
-  const { t } = useTranslation()
+export default function TerminalPane({ paneId }: TerminalPaneProps) {
+  const { t } = useTranslation(I18N_NS)
+  const { terminal, isDark } = useTerminalPanel()
 
   const createSession = useCallback(
     (cols: number, rows: number) => {
-      const pendingCwd = store.pendingCwd[paneId]
+      const pendingCwd = terminal.pendingCwd[paneId]
       if (pendingCwd) {
-        delete store.pendingCwd[paneId]
+        delete terminal.pendingCwd[paneId]
       }
       return tinker.createTerminal({
         cols,
         rows,
-        cwd: pendingCwd || store.rootPath || undefined,
+        cwd: pendingCwd || terminal.rootPath || undefined,
       })
     },
-    [paneId]
+    [paneId, terminal]
   )
 
-  const handleTitleChange = useCallback((id: string, title: string) => {
-    store.setPaneTitle(id, title)
-  }, [])
+  const handleTitleChange = useCallback(
+    (id: string, title: string) => {
+      terminal.setPaneTitle(id, title)
+    },
+    [terminal]
+  )
 
   const handleFocus = useCallback(() => {
-    store.setActivePane(paneId)
-  }, [paneId])
+    terminal.setActivePane(paneId)
+  }, [paneId, terminal])
 
   const extraContextMenuItems = useCallback(
     (): MenuItemConstructorOptions[] => [
       {
         label: t('splitVertical'),
-        click: () => store.splitPane(paneId, 'horizontal'),
+        click: () => terminal.splitPane(paneId, 'horizontal'),
       },
       {
         label: t('splitHorizontal'),
-        click: () => store.splitPane(paneId, 'vertical'),
+        click: () => terminal.splitPane(paneId, 'vertical'),
       },
       { type: 'separator' },
       {
         label: t('closePane'),
-        click: () => store.closePane(paneId),
+        click: () => terminal.closePane(paneId),
       },
     ],
-    [paneId, t]
+    [paneId, t, terminal]
   )
 
   return (
     <SharedTerminal
       id={paneId}
       createSession={createSession}
-      isDark={store.isDark}
+      isDark={isDark}
       onTitleChange={handleTitleChange}
       onFocus={handleFocus}
       extraContextMenuItems={extraContextMenuItems}

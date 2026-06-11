@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect, type ReactNode } from 'react'
+import { observer } from 'mobx-react-lite'
 import { X, Loader2, Plus } from 'lucide-react'
 import { tw, THEME_COLORS } from 'share/theme'
 
@@ -264,7 +265,7 @@ export interface TabBarProps<T extends IBaseTab> {
   hideFirstBorder?: boolean
 }
 
-export default function TabBar<T extends IBaseTab>({
+export default observer(function TabBar<T extends IBaseTab>({
   tabs,
   activeTabId,
   onAddTab,
@@ -334,4 +335,4 @@ export default function TabBar<T extends IBaseTab>({
       />
     </div>
   )
-}
+})

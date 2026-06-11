@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
-import type { ILayoutNode, SplitDirection } from '../../common/types'
+import type { ILayoutNode, SplitDirection } from '../types/terminalLayout'
 
 class TerminalTab {
   id: string

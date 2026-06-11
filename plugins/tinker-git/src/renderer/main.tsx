@@ -24,6 +24,7 @@ import WorkingTreeSidebar, {
   getWorkingTreeUIProps,
 } from 'share/components/WorkingTree'
 import WorkingTreeDiffViewer from './components/WorkingTreeDiffViewer'
+import { TerminalPanel } from 'share/components/TerminalPanel'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -55,7 +56,7 @@ const RepoPanels = observer(function RepoPanels() {
 
   if (store.viewMode === 'workingTree') {
     return (
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="h-full min-h-0 overflow-hidden">
         <Group
           orientation="horizontal"
           className="h-full"
@@ -76,7 +77,7 @@ const RepoPanels = observer(function RepoPanels() {
 
   if (store.browsingFiles) {
     return (
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="h-full min-h-0 overflow-hidden">
         <Group
           orientation="horizontal"
           className="h-full"
@@ -96,7 +97,7 @@ const RepoPanels = observer(function RepoPanels() {
   }
 
   return (
-    <div className="flex-1 min-h-0 overflow-hidden">
+    <div className="h-full min-h-0 overflow-hidden">
       <Group
         orientation="horizontal"
         className="h-full"
@@ -135,6 +136,24 @@ const ErrorToast = observer(function ErrorToast() {
 
 const App = observer(function App() {
   const { t } = useTranslation()
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    panelIds: ['main', 'terminal'],
+    id: 'tinker-git-terminal-layout',
+    storage: localStorage,
+  })
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === '`') {
+        e.preventDefault()
+        if (store.repoPath) {
+          store.toggleTerminal()
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <ToasterProvider>
@@ -153,7 +172,27 @@ const App = observer(function App() {
               dropTitle={t('dropRepoHere')}
             />
           ) : (
-            <RepoPanels />
+            <Group
+              orientation="vertical"
+              className="flex-1 min-h-0"
+              defaultLayout={defaultLayout}
+              onLayoutChange={onLayoutChange}
+            >
+              <Panel id="main" minSize={200}>
+                <div className="h-full flex flex-col min-h-0 overflow-hidden">
+                  <RepoPanels />
+                </div>
+              </Panel>
+              {store.terminalOpen && <Separator />}
+              {store.terminalOpen && (
+                <Panel id="terminal" defaultSize={200} minSize={100}>
+                  <TerminalPanel
+                    terminal={store.terminal}
+                    isDark={store.isDark}
+                  />
+                </Panel>
+              )}
+            </Group>
           )}
         </div>
       </ConfirmProvider>

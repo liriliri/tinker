@@ -16,7 +16,7 @@ import store from './store'
 import Sidebar from './components/Sidebar'
 import EditorPane from './components/EditorPane'
 import StatusBar from './components/StatusBar'
-import TerminalPanel from './components/TerminalPanel'
+import { TerminalPanel } from 'share/components/TerminalPanel'
 import Welcome from './components/Welcome'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -212,7 +212,10 @@ const App = observer(function App() {
                   {store.terminalOpen && <Separator />}
                   {store.terminalOpen && (
                     <Panel id="terminal" defaultSize={200} minSize={100}>
-                      <TerminalPanel />
+                      <TerminalPanel
+                        terminal={store.terminal}
+                        isDark={store.isDark}
+                      />
                     </Panel>
                   )}
                 </Group>

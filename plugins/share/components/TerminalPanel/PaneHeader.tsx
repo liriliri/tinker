@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { X, Columns2 } from 'lucide-react'
-import { tw } from 'share/theme'
+import { tw } from '../../theme'
 import { useTranslation } from 'react-i18next'
-import store from '../store'
+import { useTerminalPanel } from './context'
+import { I18N_NS } from './i18n'
 
 interface PaneHeaderProps {
   paneId: string
@@ -13,17 +14,18 @@ export default observer(function PaneHeader({
   paneId,
   paneIndex,
 }: PaneHeaderProps) {
-  const title = store.paneTitles[paneId] || `Terminal ${paneIndex}`
-  const { t } = useTranslation()
-  const isActive = store.activePaneId === paneId
+  const { terminal } = useTerminalPanel()
+  const title = terminal.paneTitles[paneId] || `Terminal ${paneIndex}`
+  const { t } = useTranslation(I18N_NS)
+  const isActive = terminal.activePaneId === paneId
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation()
-    store.closePane(paneId)
+    terminal.closePane(paneId)
   }
 
   const handleFocus = () => {
-    store.setActivePane(paneId)
+    terminal.setActivePane(paneId)
   }
 
   return (
@@ -47,7 +49,7 @@ export default observer(function PaneHeader({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            store.splitPane(paneId, 'horizontal')
+            terminal.splitPane(paneId, 'horizontal')
           }}
           className="w-4 h-4 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all"
           title={t('splitVertical')}
@@ -57,7 +59,7 @@ export default observer(function PaneHeader({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            store.splitPane(paneId, 'vertical')
+            terminal.splitPane(paneId, 'vertical')
           }}
           className="w-4 h-4 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all"
           title={t('splitHorizontal')}

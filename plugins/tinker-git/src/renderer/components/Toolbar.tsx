@@ -7,6 +7,7 @@ import {
   GitCommit,
   GitCompare,
   RotateCw,
+  Terminal,
 } from 'lucide-react'
 import {
   Toolbar,
@@ -49,6 +50,17 @@ export default observer(function ToolbarComponent() {
       >
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
+
+      {store.repoPath && (
+        <ToolbarButton
+          variant="toggle"
+          active={store.terminalOpen}
+          onClick={() => store.toggleTerminal()}
+          title={t('toggleTerminal')}
+        >
+          <Terminal size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      )}
 
       {store.repoPath && (
         <ToolbarButtonGroup>

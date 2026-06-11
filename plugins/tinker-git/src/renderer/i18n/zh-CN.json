@@ -42,5 +42,6 @@
   "historyMode": "提交历史",
   "workingTreeMode": "工作区",
   "selectChangeToView": "选择变更以预览",
-  "refreshChanges": "刷新变更"
+  "refreshChanges": "刷新变更",
+  "toggleTerminal": "切换终端"
 }

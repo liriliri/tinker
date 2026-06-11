@@ -7,7 +7,8 @@ import type { IFileWatchEvent } from '../../common/types'
 import normalizePath from 'licia/normalizePath'
 import last from 'licia/last'
 import { parentDir } from '../lib/path'
-import Terminal from './Terminal'
+import Terminal from 'share/store/Terminal'
+import type { SplitDirection } from 'share/types/terminalLayout'
 import Editor from './Editor'
 import WorkingTree from './WorkingTree'
 
@@ -44,7 +45,7 @@ class Store extends BaseStore {
   constructor() {
     super()
 
-    this.terminal = new Terminal(() => this.rootPath)
+    this.terminal = new Terminal('tinker-code-editor', () => this.rootPath)
     this.editor = new Editor()
     this.textSearch = new TextSearch({
       storageNamespace: 'tinker-code-editor-search',
@@ -364,10 +365,8 @@ class Store extends BaseStore {
   setActivePane = (paneId: string) => this.terminal.setActivePane(paneId)
   setPaneTitle = (paneId: string, title: string) =>
     this.terminal.setPaneTitle(paneId, title)
-  splitPane = (
-    paneId: string,
-    direction: Parameters<Terminal['splitPane']>[1]
-  ) => this.terminal.splitPane(paneId, direction)
+  splitPane = (paneId: string, direction: SplitDirection) =>
+    this.terminal.splitPane(paneId, direction)
   closePane = (paneId: string) => this.terminal.closePane(paneId)
   setDualColumns = () => this.terminal.setDualColumns()
   setTripleColumns = () => this.terminal.setTripleColumns()

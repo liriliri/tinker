@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Panel, Group, Separator } from 'react-resizable-panels'
-import type { ILayoutNode } from '../../common/types'
-import Terminal from './Terminal'
+import type { ILayoutNode } from '../../types/terminalLayout'
+import TerminalPane from './TerminalPane'
 import PaneHeader from './PaneHeader'
 
 interface LayoutProps {
@@ -22,7 +22,7 @@ const LayoutNode = observer(function LayoutNode({
           <PaneHeader paneId={node.paneId} paneIndex={paneIndex} />
         )}
         <div className="flex-1 overflow-hidden">
-          <Terminal paneId={node.paneId} />
+          <TerminalPane paneId={node.paneId} />
         </div>
       </div>
     )
