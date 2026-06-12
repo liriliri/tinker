@@ -19,7 +19,7 @@ const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_SIDEBAR_MODE = 'sidebarMode'
 const STORAGE_RECENT_DIRECTORIES = 'recentDirectories'
 
-export type SidebarMode = 'explorer' | 'search' | 'git'
+type SidebarMode = 'explorer' | 'search' | 'git'
 
 class Store extends BaseStore {
   // FileTree state (inline, tightly coupled)
@@ -400,10 +400,6 @@ class Store extends BaseStore {
       this.sidebarOpen = true
       storage.set(STORAGE_SIDEBAR_OPEN, true)
     }
-  }
-
-  toggleSidebarMode() {
-    this.setSidebarMode(this.sidebarMode === 'explorer' ? 'search' : 'explorer')
   }
 
   openQuickOpen = () => this.quickOpen.show()

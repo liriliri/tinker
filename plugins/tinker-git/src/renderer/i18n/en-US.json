@@ -31,7 +31,6 @@
   "diffTooLargeHint": "You can try to show it anyway, but performance may be negatively impacted.",
   "showDiff": "Show diff",
   "diffUnrenderable": "The diff is too large to be displayed.",
-  "binaryDiffNotSupported": "Binary file diff is not supported.",
   "copySuccess": "Copied successfully",
   "copyFailed": "Copy failed",
   "clickToCopy": "Click to copy",

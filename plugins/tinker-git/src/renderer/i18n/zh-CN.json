@@ -31,7 +31,6 @@
   "diffTooLargeHint": "仍可尝试显示，但可能会影响性能。",
   "showDiff": "显示差异",
   "diffUnrenderable": "差异过大，无法显示。",
-  "binaryDiffNotSupported": "不支持显示二进制文件差异。",
   "copySuccess": "复制成功",
   "copyFailed": "复制失败",
   "clickToCopy": "点击复制",
