@@ -9,6 +9,7 @@
   "save": "Save",
   "showInFolder": "Reveal in File Manager",
   "openInIntegratedTerminal": "Open in Integrated Terminal",
+  "findInFolder": "Find in Folder...",
   "copyPath": "Copy Path",
   "copyRelativePath": "Copy Relative Path",
   "blame": "Blame",

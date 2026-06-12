@@ -6,7 +6,7 @@ import type { ITreeNode } from 'share/components/FileTree'
 import type { IFileWatchEvent } from '../../common/types'
 import normalizePath from 'licia/normalizePath'
 import last from 'licia/last'
-import { parentDir } from '../lib/path'
+import { parentDir, relativePath } from '../lib/path'
 import Terminal from 'share/store/Terminal'
 import type { SplitDirection } from 'share/types/terminalLayout'
 import Editor from './Editor'
@@ -301,11 +301,10 @@ class Store extends BaseStore {
     inst: Parameters<Editor['registerEditor']>[1]
   ) => this.editor.registerEditor(tabId, inst)
   unregisterEditor = (tabId: string) => this.editor.unregisterEditor(tabId)
-  selectSearchMatch(
+  selectSearchMatch = (
     match: Parameters<Editor['selectSearchMatch']>[0]
-  ): ReturnType<Editor['selectSearchMatch']> {
-    return this.editor.selectSearchMatch(match)
-  }
+  ): ReturnType<Editor['selectSearchMatch']> =>
+    this.editor.selectSearchMatch(match)
 
   get showingBlame() {
     return this.editor.showingBlame
@@ -392,6 +391,13 @@ class Store extends BaseStore {
 
   toggleSidebarMode() {
     this.setSidebarMode(this.sidebarMode === 'explorer' ? 'search' : 'explorer')
+  }
+
+  findInFolder = (dirPath: string) => {
+    if (!this.rootPath) return
+    const rel = relativePath(this.rootPath, dirPath)
+    this.textSearch.setIncludes(rel && rel !== '.' ? `./${rel}` : '')
+    this.setSidebarMode('search')
   }
 }
 

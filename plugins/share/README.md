@@ -161,7 +161,7 @@ const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
 />
 ```
 
-`TextSearchSidebar` is a pure UI component (no MobX). `TextSearch` owns query/options/results; `getTextSearchUIProps` maps it to props. Highlight helpers (`buildSegments`, `byteRangeToColumns`, `getLineText`) are exported from the same module for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
+`TextSearchSidebar` is a pure UI component (no MobX). `TextSearch` owns query/options/results; `getTextSearchUIProps` maps it to props. Include/exclude patterns are passed to `tinker.searchText` as raw strings and parsed in `preload/lib/ripgrep.ts` (VS Code–compatible glob handling). Highlight helpers (`buildSegments`, `byteRangeToColumns`, `getLineText`) are exported from the same module for rendering matches in your own editor. Add `@use '../../share/styles/textSearch.scss'` to `index.scss` for highlight classes.
 
 ### WorkingTree
 

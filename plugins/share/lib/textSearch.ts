@@ -38,7 +38,6 @@ export interface TextSearchUIState {
   wholeWord: boolean
   regex: boolean
   maxResults: number
-  showInclude: boolean
   groups: TextSearchFileGroup[]
   collapsed: Record<string, boolean>
   searching: boolean
@@ -56,7 +55,6 @@ export interface TextSearchUIActions {
   onWholeWordChange: (value: boolean) => void
   onRegexChange: (value: boolean) => void
   onMaxResultsChange: (value: number) => void
-  onShowIncludeChange: (value: boolean) => void
   onActiveMatchKeyChange: (key: string) => void
   onClear: () => void
   onToggleCollapse: (path: string) => void
@@ -77,7 +75,6 @@ const STORAGE_CASE_SENSITIVE = 'caseSensitive'
 const STORAGE_WHOLE_WORD = 'wholeWord'
 const STORAGE_REGEX = 'regex'
 const STORAGE_MAX_RESULTS = 'maxResults'
-const STORAGE_SHOW_INCLUDE = 'showInclude'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
@@ -95,7 +92,6 @@ export function getTextSearchUIProps(
     wholeWord: search.wholeWord,
     regex: search.regex,
     maxResults: search.maxResults,
-    showInclude: search.showInclude,
     groups: search.groups,
     collapsed: Object.fromEntries(search.collapsed),
     searching: search.searching,
@@ -110,7 +106,6 @@ export function getTextSearchUIProps(
     onWholeWordChange: (value) => search.setWholeWord(value),
     onRegexChange: (value) => search.setRegex(value),
     onMaxResultsChange: (value) => search.setMaxResults(value),
-    onShowIncludeChange: (value) => search.setShowInclude(value),
     onActiveMatchKeyChange: (key) => search.setActiveMatchKey(key),
     onClear: () => search.clear(),
     onToggleCollapse: (path) => search.toggleCollapse(path),
@@ -217,7 +212,6 @@ export default class TextSearch {
   wholeWord: boolean = false
   regex: boolean = false
   maxResults: number = 1000
-  showInclude: boolean = false
 
   groups: TextSearchFileGroup[] = []
   collapsed: Map<string, boolean> = new Map()
@@ -251,7 +245,6 @@ export default class TextSearch {
       this.wholeWord = storage.get(STORAGE_WHOLE_WORD) === true
       this.regex = storage.get(STORAGE_REGEX) === true
       this.maxResults = storage.get(STORAGE_MAX_RESULTS) || 1000
-      this.showInclude = storage.get(STORAGE_SHOW_INCLUDE) === true
     } else if (opts.initialRootDir) {
       this.rootDir = opts.initialRootDir
     }
@@ -331,11 +324,6 @@ export default class TextSearch {
     this.debounceSearch()
   }
 
-  setShowInclude(value: boolean) {
-    this.showInclude = value
-    this.storage?.set(STORAGE_SHOW_INCLUDE, value)
-  }
-
   setActiveMatchKey(key: string) {
     this.activeMatchKey = key
   }
@@ -392,7 +380,8 @@ export default class TextSearch {
 
     const options: tinker.SearchTextOptions = {
       dirs: [this.rootDir],
-      globs: this.buildGlobs(),
+      includes: this.includes,
+      excludes: this.excludes,
       caseSensitive: this.caseSensitive,
       wholeWord: this.wholeWord,
       regex: this.regex,
@@ -452,17 +441,5 @@ export default class TextSearch {
       this.groups[idx].matches.push(m)
     }
     this.totalMatches++
-  }
-
-  private buildGlobs(): string[] {
-    const parse = (s: string) =>
-      s
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean)
-    return [
-      ...parse(this.includes),
-      ...parse(this.excludes).map((g) => '!' + g),
-    ]
   }
 }

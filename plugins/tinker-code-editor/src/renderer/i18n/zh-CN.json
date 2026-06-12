@@ -9,6 +9,7 @@
   "save": "保存",
   "showInFolder": "在文件管理器中显示",
   "openInIntegratedTerminal": "在集成终端中打开",
+  "findInFolder": "在文件夹中查找...",
   "copyPath": "复制路径",
   "copyRelativePath": "复制相对路径",
   "blame": "按行查看",

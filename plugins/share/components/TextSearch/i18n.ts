@@ -10,7 +10,6 @@ const enUS = {
   caseSensitive: 'Match Case',
   wholeWord: 'Match Whole Word',
   regex: 'Use Regular Expression',
-  toggleSearchDetails: 'Toggle Search Details',
   maxResults: 'Max results',
   clear: 'Clear',
 
@@ -35,7 +34,6 @@ const zhCN = {
   caseSensitive: '区分大小写',
   wholeWord: '全词匹配',
   regex: '使用正则表达式',
-  toggleSearchDetails: '切换搜索详情',
   maxResults: '最大结果数',
   clear: '清除',
 

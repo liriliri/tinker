@@ -57,6 +57,15 @@ export default observer(function CodeEditorFileTree() {
         click: () =>
           store.openInIntegratedTerminal(node.path, node.isDirectory),
       },
+      ...(node.isDirectory
+        ? [
+            { type: 'separator' as const },
+            {
+              label: t('findInFolder'),
+              click: () => store.findInFolder(node.path),
+            },
+          ]
+        : []),
       { type: 'separator' as const },
       {
         label: t('copyPath'),

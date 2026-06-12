@@ -296,7 +296,11 @@ declare global {
       dirs?: string[]
       /** Filter by file extensions (without dot), e.g. ['ts', 'tsx'] */
       exts?: string[]
-      /** Extra ripgrep glob patterns. Prefix with `!` to exclude. */
+      /** Include pattern string (VS Code search viewlet format) */
+      includes?: string
+      /** Exclude pattern string */
+      excludes?: string
+      /** Legacy ripgrep glob patterns. Prefer includes/excludes. */
       globs?: string[]
       /** Case-sensitive match. Default: false */
       caseSensitive?: boolean

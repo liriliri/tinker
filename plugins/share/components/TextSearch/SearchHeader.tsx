@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight, Eraser, FolderOpen } from 'lucide-react'
+import { Eraser, FolderOpen } from 'lucide-react'
 import className from 'licia/className'
 import { tw } from '../../theme'
 import { LoadingCircle } from '../Loading'
@@ -26,7 +26,6 @@ export default function SearchHeader() {
     totalFiles,
     truncated,
     maxResults,
-    showInclude,
     caseSensitive,
     wholeWord,
     regex,
@@ -34,7 +33,6 @@ export default function SearchHeader() {
     onPickFolder,
     onMaxResultsChange,
     onClear,
-    onShowIncludeChange,
     onQueryChange,
     onCaseSensitiveChange,
     onWholeWordChange,
@@ -82,19 +80,6 @@ export default function SearchHeader() {
         <ToolbarButton onClick={() => onClear()} title={t('clear')}>
           <Eraser size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
-        <ToolbarSeparator />
-        <ToolbarButton
-          variant="toggle"
-          active={showInclude}
-          onClick={() => onShowIncludeChange(!showInclude)}
-          title={t('toggleSearchDetails')}
-        >
-          {showInclude ? (
-            <ChevronDown size={TOOLBAR_ICON_SIZE} />
-          ) : (
-            <ChevronRight size={TOOLBAR_ICON_SIZE} />
-          )}
-        </ToolbarButton>
       </Toolbar>
 
       <div className={`${tw.bg.secondary} border-b ${tw.border}`}>
@@ -132,7 +117,7 @@ export default function SearchHeader() {
             </div>
           </div>
 
-          {showInclude && <IncludeExcludePanel />}
+          <IncludeExcludePanel />
         </div>
 
         <div
