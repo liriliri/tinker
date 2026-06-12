@@ -18,6 +18,7 @@ import EditorPane from './components/EditorPane'
 import StatusBar from './components/StatusBar'
 import { TerminalPanel } from 'share/components/TerminalPanel'
 import Welcome from './components/Welcome'
+import QuickOpen from './components/QuickOpen'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -47,6 +48,10 @@ const App = observer(function App() {
       if ((e.metaKey || e.ctrlKey) && e.key === '`') {
         e.preventDefault()
         store.toggleTerminal()
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'p') {
+        e.preventDefault()
+        store.openQuickOpen()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -93,6 +98,7 @@ const App = observer(function App() {
 
   return (
     <ConfirmProvider>
+      <QuickOpen />
       <div className="relative h-full flex flex-col overflow-hidden">
         <div
           className={`absolute top-0 left-0 right-0 h-px z-20 ${tw.bg.border}`}

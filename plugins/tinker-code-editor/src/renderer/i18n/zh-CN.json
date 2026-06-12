@@ -16,5 +16,8 @@
   "blameHide": "隐藏按行查看",
   "notAGitRepo": "不是 Git 仓库",
   "loadingGitRepo": "加载中...",
-  "gitDiff": "Git 差异"
+  "gitDiff": "Git 差异",
+  "quickOpenPlaceholder": "转到文件...",
+  "quickOpenSearching": "搜索中...",
+  "quickOpenNoResults": "没有匹配的结果"
 }

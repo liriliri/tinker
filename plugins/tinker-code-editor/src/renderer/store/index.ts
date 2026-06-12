@@ -10,6 +10,7 @@ import { parentDir, relativePath } from '../lib/path'
 import Terminal from 'share/store/Terminal'
 import type { SplitDirection } from 'share/types/terminalLayout'
 import Editor from './Editor'
+import QuickOpen from './QuickOpen'
 import WorkingTree from './WorkingTree'
 
 const storage = new LocalStore('tinker-code-editor')
@@ -34,6 +35,7 @@ class Store extends BaseStore {
   // Sub-stores
   terminal: Terminal
   editor: Editor
+  quickOpen: QuickOpen
   textSearch: TextSearch
   workingTree: WorkingTree
 
@@ -47,6 +49,15 @@ class Store extends BaseStore {
 
     this.terminal = new Terminal('tinker-code-editor', () => this.rootPath)
     this.editor = new Editor()
+    this.quickOpen = new QuickOpen({
+      getRootPath: () => this.rootPath,
+      getOpenTabPaths: () =>
+        this.editor.tabs
+          .filter((tab) => tab.category !== 'gitDiff' && tab.filePath)
+          .map((tab) => tab.filePath),
+      onOpenFile: (filePath, fileName) =>
+        this.editor.openFile(filePath, fileName),
+    })
     this.textSearch = new TextSearch({
       storageNamespace: 'tinker-code-editor-search',
       initialRootDir: storage.get(STORAGE_ROOT_PATH) || '',
@@ -60,6 +71,7 @@ class Store extends BaseStore {
     })
 
     makeAutoObservable(this, {
+      quickOpen: false,
       textSearch: false,
       workingTree: false,
     })
@@ -132,6 +144,7 @@ class Store extends BaseStore {
     }
     this.workingTree.dispose()
     this.workingTree.reset()
+    this.quickOpen.hide()
   }
 
   addRecentDirectory(path: string) {
@@ -392,6 +405,8 @@ class Store extends BaseStore {
   toggleSidebarMode() {
     this.setSidebarMode(this.sidebarMode === 'explorer' ? 'search' : 'explorer')
   }
+
+  openQuickOpen = () => this.quickOpen.show()
 
   findInFolder = (dirPath: string) => {
     if (!this.rootPath) return

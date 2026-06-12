@@ -16,5 +16,8 @@
   "blameHide": "Hide Blame",
   "notAGitRepo": "Not a Git repository",
   "loadingGitRepo": "Loading...",
-  "gitDiff": "Git Diff"
+  "gitDiff": "Git Diff",
+  "quickOpenPlaceholder": "Go to File...",
+  "quickOpenSearching": "Searching...",
+  "quickOpenNoResults": "No matching results"
 }
