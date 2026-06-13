@@ -180,6 +180,12 @@ class Store extends BaseStore {
   closeRunningPlugin(id: string) {
     return main.closePlugin(id, true)
   }
+  async closeAllRunningPlugins() {
+    const ids = Object.keys(this.runningPlugins)
+    for (const id of ids) {
+      await main.closePlugin(id, true)
+    }
+  }
   private onPluginClosed() {
     preload.setTitle(pkg.productName)
     main.preparePluginView()

@@ -17,6 +17,7 @@ import each from 'licia/each'
 import contain from 'licia/contain'
 import trim from 'licia/trim'
 import toNum from 'licia/toNum'
+import debounce from 'licia/debounce'
 import { BrowserWindow, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
@@ -267,7 +268,6 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
       if (isMainWin) {
         window.sendTo('main', 'pluginClosed', id)
       }
-      notifyRunningPluginsChanged()
       return
     }
   }
@@ -290,12 +290,9 @@ export function getRunningPlugins() {
   }))
 }
 
-function notifyRunningPluginsChanged() {
-  const plugins = getRunningPlugins()
-  setImmediate(() => {
-    window.sendTo('main', 'runningPluginsChanged', plugins)
-  })
-}
+const notifyRunningPluginsChanged = debounce(function () {
+  window.sendTo('main', 'runningPluginsChanged', getRunningPlugins())
+}, 1000)
 
 export function isPluginRunning(id: string, backgroundOnly?: boolean) {
   const entry = pluginViews[id]

@@ -74,16 +74,57 @@ $pin-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 :global(.luna-icon-list-icon) img.running {
   transform-origin: center center;
-  animation: running-breathe 2.4s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+  animation: running-breathe 3.2s linear infinite;
 }
 
 @keyframes running-breathe {
   0%,
   100% {
     transform: scale(1);
+    opacity: 0.6;
+    filter: brightness(0.7);
+  }
+
+  12.5% {
+    transform: scale(1.009);
+    opacity: 0.66;
+    filter: brightness(0.77);
+  }
+
+  25% {
+    transform: scale(1.03);
+    opacity: 0.8;
+    filter: brightness(0.85);
+  }
+
+  37.5% {
+    transform: scale(1.051);
+    opacity: 0.94;
+    filter: brightness(0.93);
   }
 
   50% {
     transform: scale(1.06);
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+
+  62.5% {
+    transform: scale(1.051);
+    opacity: 0.94;
+    filter: brightness(0.93);
+  }
+
+  75% {
+    transform: scale(1.03);
+    opacity: 0.8;
+    filter: brightness(0.85);
+  }
+
+  87.5% {
+    transform: scale(1.009);
+    opacity: 0.66;
+    filter: brightness(0.77);
   }
 }

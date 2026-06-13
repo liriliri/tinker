@@ -5,6 +5,7 @@ import { t } from 'common/util'
 import { useCallback, useEffect, useRef } from 'react'
 import store from '../store'
 import fileUrl from 'licia/fileUrl'
+import isEmpty from 'licia/isEmpty'
 import contextMenu from 'share/renderer/lib/contextMenu'
 
 export default observer(function Titlebar() {
@@ -103,17 +104,25 @@ export default observer(function Titlebar() {
         )
       }
     } else {
-      template.push(
-        {
-          label: t('refresh'),
-          click() {
-            store.refresh(true)
-          },
+      template.push({
+        label: t('refresh'),
+        click() {
+          store.refresh(true)
         },
-        {
-          type: 'separator',
-        }
-      )
+      })
+      if (!isEmpty(store.runningPlugins)) {
+        template.push({
+          label: t('closeAllPlugins'),
+          click() {
+            void store.closeAllRunningPlugins().then(() => {
+              inputRef.current?.focus()
+            })
+          },
+        })
+      }
+      template.push({
+        type: 'separator',
+      })
     }
 
     template.push(
