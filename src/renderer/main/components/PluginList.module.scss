@@ -1,3 +1,14 @@
+$pin-path: 'M648.728381 130.779429a73.142857 73.142857 0 0 1 22.674286 15.433142l191.561143 191.756191a73.142857 73.142857 0 0 1-22.137905 118.564571l-67.876572 30.061715-127.341714 127.488-10.093714 140.239238a73.142857 73.142857 0 0 1-124.684191 46.445714l-123.66019-123.782095-210.724572 211.699809-51.833904-51.614476 210.846476-211.821714-127.926857-128.024381a73.142857 73.142857 0 0 1 46.299428-124.635429l144.237715-10.776381 125.074285-125.220571 29.379048-67.779048a73.142857 73.142857 0 0 1 96.207238-38.034285z';
+$pin-view-box: '105 111 778 798';
+$pin-badge-size: 11px;
+$pin-badge-offset: 7px;
+$pin-badge-protrude: 12%;
+$pin-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='#{$pin-view-box}'%3E%3Cpath fill='%23000' d='#{$pin-path}'/%3E%3C/svg%3E");
+$pin-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='#{$pin-view-box}'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2.5' vector-effect='non-scaling-stroke' stroke-linejoin='round' stroke-linecap='round' d='#{$pin-path}'/%3E%3C/svg%3E");
+
+.pinned {
+}
+
 .container {
   position: absolute;
   top: 50px;
@@ -22,4 +33,38 @@
   justify-content: center;
   font-size: 20px;
   opacity: 0.5;
+}
+
+:global(.luna-icon-list-icon):has(.pinned) {
+  position: relative;
+  overflow: visible;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: $pin-badge-offset;
+    right: $pin-badge-offset;
+    width: $pin-badge-size;
+    height: $pin-badge-size;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transform: translate($pin-badge-protrude, -$pin-badge-protrude);
+    pointer-events: none;
+  }
+
+  &::before {
+    background-color: var(--color-bg-container);
+    mask: $pin-stroke-mask no-repeat center / contain;
+    -webkit-mask: $pin-stroke-mask no-repeat center / contain;
+    z-index: 1;
+  }
+
+  &::after {
+    background-color: var(--color-primary);
+    mask: $pin-mask no-repeat center / contain;
+    -webkit-mask: $pin-mask no-repeat center / contain;
+    z-index: 2;
+  }
 }

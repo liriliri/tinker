@@ -25,6 +25,7 @@ export default observer(function PluginList() {
       borderRadius: borderRadius + 'px',
       ...(plugin.marketplace ? { opacity: 0.6 } : {}),
     },
+    className: store.isPluginPinned(plugin.id) ? Style.pinned : undefined,
   }))
   const appIcons = map(store.visibleApps, (app) => ({
     app,
