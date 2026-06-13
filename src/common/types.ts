@@ -57,10 +57,11 @@ export type IpcGetPlugins = (force?: boolean) => Promise<IPlugin[]>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string, destroy?: boolean) => void
 export type IpcDetachPlugin = (id: string) => void
-export type IpcIsPluginRunning = (
-  id: string,
-  backgroundOnly?: boolean
-) => boolean
+export interface IRunningPlugin {
+  id: string
+  background: boolean
+}
+export type IpcGetRunningPlugins = () => IRunningPlugin[]
 export type IpcReopenPlugin = IpcDetachPlugin
 export type IpcTogglePluginDevtools = IpcDetachPlugin
 export type IpcShowPluginContextMenu = (

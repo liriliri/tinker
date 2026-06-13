@@ -1,4 +1,4 @@
-import { IApp, IPlugin, IPluginStates } from 'common/types'
+import { IApp, IPlugin, IPluginStates, IRunningPlugin } from 'common/types'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
 import contain from 'licia/contain'
@@ -28,6 +28,7 @@ class Store extends BaseStore {
   pluginStates: IPluginStates = {}
   installingPlugins: Set<string> = new Set()
   showMarketplace: boolean = true
+  runningPlugins: Record<string, { background: boolean }> = {}
   constructor() {
     super()
 
@@ -39,6 +40,7 @@ class Store extends BaseStore {
       pluginStates: observable,
       installingPlugins: observable,
       showMarketplace: observable,
+      runningPlugins: observable,
       setFilter: action,
       hidePlugin: action,
       unhidePlugin: action,
@@ -48,10 +50,12 @@ class Store extends BaseStore {
       unsetPluginAutoDetach: action,
       setPluginRunInBackground: action,
       unsetPluginRunInBackground: action,
+      setRunningPlugins: action,
     })
 
     this.loadCache()
     this.loadPluginStates()
+    this.loadRunningPlugins()
     main.preparePluginView()
     this.refresh()
     this.bindEvent()
@@ -120,9 +124,9 @@ class Store extends BaseStore {
     )
     if (!confirmed) return
 
-    const running = await main.isPluginRunning(plugin.id)
+    const running = this.isPluginRunning(plugin.id)
     if (running) {
-      main.closePlugin(plugin.id, true)
+      await main.closePlugin(plugin.id, true)
     }
     if (this.plugin?.id === plugin.id) {
       this.closePlugin()
@@ -172,6 +176,9 @@ class Store extends BaseStore {
       return
     }
     main.closePlugin(this.plugin.id)
+  }
+  closeRunningPlugin(id: string) {
+    return main.closePlugin(id, true)
   }
   private onPluginClosed() {
     preload.setTitle(pkg.productName)
@@ -253,15 +260,28 @@ class Store extends BaseStore {
     }
     setMainStore('pluginStates', this.pluginStates)
   }
-  async unsetPluginRunInBackground(id: string) {
+  unsetPluginRunInBackground(id: string) {
     const state = { ...this.pluginStates[id] }
     delete state.runInBackground
     this.pluginStates = { ...this.pluginStates, [id]: state }
     setMainStore('pluginStates', this.pluginStates)
-    const running = await main.isPluginRunning(id, true)
-    if (running) {
+    if (this.isPluginRunning(id, true)) {
       main.closePlugin(id, true)
     }
+  }
+  isPluginRunning(id: string, backgroundOnly?: boolean) {
+    const entry = this.runningPlugins[id]
+    if (!entry) {
+      return false
+    }
+    return backgroundOnly ? entry.background : true
+  }
+  setRunningPlugins(plugins: IRunningPlugin[]) {
+    const next: Record<string, { background: boolean }> = {}
+    for (const plugin of plugins) {
+      next[plugin.id] = { background: plugin.background }
+    }
+    this.runningPlugins = next
   }
   isPluginRunInBackground(id: string) {
     return !!this.pluginStates[id]?.runInBackground
@@ -331,11 +351,22 @@ class Store extends BaseStore {
       })
     }
   }
+  private async loadRunningPlugins() {
+    const plugins = await main.getRunningPlugins()
+    runInAction(() => {
+      this.setRunningPlugins(plugins)
+    })
+  }
   private bindEvent() {
     main.on('updatePluginTitle', (title: string) => {
       if (this.plugin) {
         runInAction(() => (this.filter = title))
       }
+    })
+    main.on('runningPluginsChanged', (plugins: IRunningPlugin[]) => {
+      runInAction(() => {
+        this.setRunningPlugins(plugins)
+      })
     })
     main.on('pluginClosed', (id: string) => {
       if (this.plugin?.id === id) {

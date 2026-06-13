@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useMemo } from 'react'
 import store from '../store'
 import LunaIconList from 'luna-icon-list/react'
 import LunaScrollbar from 'luna-scrollbar/react'
@@ -13,31 +14,48 @@ import concat from 'licia/concat'
 import isEmpty from 'licia/isEmpty'
 import { IPlugin } from 'common/types'
 
-export default observer(function PluginList() {
-  const pluginIcons = map(store.visiblePlugins, (plugin) => ({
-    plugin,
-    src: fileUrl(plugin.icon),
-    name: store.installingPlugins.has(plugin.id)
-      ? t('installingPlugin')
-      : plugin.name,
-    title: plugin.description,
-    style: {
-      borderRadius: borderRadius + 'px',
-      ...(plugin.marketplace ? { opacity: 0.6 } : {}),
-    },
-    className: store.isPluginPinned(plugin.id) ? Style.pinned : undefined,
-  }))
-  const appIcons = map(store.visibleApps, (app) => ({
-    app,
-    src: fileUrl(app.icon),
-    name: app.name,
-    style: {
-      borderRadius: borderRadius + 'px',
-    },
-  }))
-  const icons = concat(pluginIcons, appIcons)
+function getPluginClassName(plugin: IPlugin) {
+  return [
+    store.isPluginPinned(plugin.id) && Style.pinned,
+    store.isPluginRunning(plugin.id) && Style.running,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
 
-  async function onContextMenu(e: PointerEvent, data: any) {
+export default observer(function PluginList() {
+  const icons = useMemo(() => {
+    const pluginIcons = map(store.visiblePlugins, (plugin) => ({
+      plugin,
+      src: fileUrl(plugin.icon),
+      name: store.installingPlugins.has(plugin.id)
+        ? t('installingPlugin')
+        : plugin.name,
+      title: plugin.description,
+      style: {
+        borderRadius: borderRadius + 'px',
+        ...(plugin.marketplace ? { opacity: 0.6 } : {}),
+      },
+      className: getPluginClassName(plugin) || undefined,
+    }))
+    const appIcons = map(store.visibleApps, (app) => ({
+      app,
+      src: fileUrl(app.icon),
+      name: app.name,
+      style: {
+        borderRadius: borderRadius + 'px',
+      },
+    }))
+    return concat(pluginIcons, appIcons)
+  }, [
+    store.visiblePlugins,
+    store.visibleApps,
+    store.installingPlugins,
+    store.runningPlugins,
+    store.pluginStates,
+  ])
+
+  function onContextMenu(e: PointerEvent, data: any) {
     const template: any[] = []
 
     if (data.plugin) {
@@ -56,7 +74,7 @@ export default observer(function PluginList() {
 
       const autoDetach = store.isPluginAutoDetach(plugin.id)
       const runInBackground = store.isPluginRunInBackground(plugin.id)
-      const running = await main.isPluginRunning(plugin.id)
+      const running = store.isPluginRunning(plugin.id)
       template.push({
         label: t('open'),
         click() {
@@ -75,7 +93,7 @@ export default observer(function PluginList() {
         template.push({
           label: t('close'),
           click() {
-            main.closePlugin(plugin.id, true)
+            store.closeRunningPlugin(plugin.id)
           },
         })
       }

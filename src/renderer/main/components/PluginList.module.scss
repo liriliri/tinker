@@ -9,6 +9,9 @@ $pin-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 .pinned {
 }
 
+.running {
+}
+
 .container {
   position: absolute;
   top: 50px;
@@ -66,5 +69,21 @@ $pin-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     mask: $pin-mask no-repeat center / contain;
     -webkit-mask: $pin-mask no-repeat center / contain;
     z-index: 2;
+  }
+}
+
+:global(.luna-icon-list-icon) img.running {
+  transform-origin: center center;
+  animation: running-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes running-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
   }
 }

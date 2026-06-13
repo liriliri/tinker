@@ -34,7 +34,7 @@ import {
   importPluginData,
   clearPluginData,
   preparePluginView,
-  isPluginRunning,
+  getRunningPlugins,
 } from './view'
 
 export {
@@ -90,7 +90,7 @@ export function init() {
   handleEvent('importPluginData', importPluginData)
   handleEvent('clearPluginData', clearPluginData)
   handleEvent('preparePluginView', preparePluginView)
-  handleEvent('isPluginRunning', isPluginRunning)
+  handleEvent('getRunningPlugins', getRunningPlugins)
   handleEvent('captureScreen', captureScreen)
   handleEvent('pluginGetFileIcon', getFileIcon)
   ipcMain.handle('showPluginNotification', (event, body: string) => {

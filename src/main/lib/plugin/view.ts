@@ -173,6 +173,7 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
         () => targetWin.webContents.send('updatePluginTitle', title),
         100
       )
+      notifyRunningPluginsChanged()
       return true
     }
     win.show()
@@ -212,6 +213,7 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
     pluginView.webContents.loadURL(`plugin://${id}/${entry}`)
   }
 
+  notifyRunningPluginsChanged()
   return true
 }
 
@@ -265,6 +267,7 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
       if (isMainWin) {
         window.sendTo('main', 'pluginClosed', id)
       }
+      notifyRunningPluginsChanged()
       return
     }
   }
@@ -277,6 +280,21 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   } else if (isMainWin) {
     window.sendTo('main', 'pluginClosed', id)
   }
+  notifyRunningPluginsChanged()
+}
+
+export function getRunningPlugins() {
+  return Object.keys(pluginViews).map((id) => ({
+    id,
+    background: !pluginViews[id].win,
+  }))
+}
+
+function notifyRunningPluginsChanged() {
+  const plugins = getRunningPlugins()
+  setImmediate(() => {
+    window.sendTo('main', 'runningPluginsChanged', plugins)
+  })
 }
 
 export function isPluginRunning(id: string, backgroundOnly?: boolean) {
