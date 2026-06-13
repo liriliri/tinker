@@ -1,5 +1,6 @@
 import normalizePath from 'licia/normalizePath'
 import ltrim from 'licia/ltrim'
+import splitPath from 'licia/splitPath'
 
 export function relativePath(root: string, filePath: string): string {
   const rootNorm = normalizePath(root)
@@ -12,7 +13,6 @@ export function relativePath(root: string, filePath: string): string {
 }
 
 export function parentDir(filePath: string): string {
-  const normalized = normalizePath(filePath)
-  const i = normalized.lastIndexOf('/')
-  return i > 0 ? normalized.substring(0, i) : normalized
+  const { dir } = splitPath(filePath)
+  return dir || filePath
 }

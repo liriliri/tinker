@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import truncate from 'licia/truncate'
 import type {
   GitBlameHunk,
   GitWorkingTreeFile,
@@ -56,10 +57,10 @@ class EditorTab {
     const annotations: BlameAnnotationSource[] = []
 
     for (const hunk of this.blameHunks) {
-      const shortMsg =
-        hunk.message.length > 32
-          ? hunk.message.slice(0, 32) + '\u2026'
-          : hunk.message
+      const shortMsg = truncate(hunk.message, 32, {
+        ellipsis: '\u2026',
+        separator: '',
+      })
       const text = `\u00A0${hunk.author}\u00A0${shortMsg}\u00A0`
 
       annotations.push({

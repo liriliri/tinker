@@ -408,6 +408,9 @@ class Store extends BaseStore {
 
     try {
       await this.refreshBranches(tab, path)
+      if (tab.viewMode === 'workingTree') {
+        await tab.refreshWorkingTree()
+      }
       runInAction(() => {
         this.updateTabTitle(tab.id, repoDirName(path))
         this.updateWindowTitle()

@@ -1,32 +1,24 @@
+import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMemo } from 'react'
 import { tw } from '../../theme'
 import className from 'licia/className'
-import { buildSegments } from '../../lib/textSearch'
+import type { TextSearchSegment } from '../../lib/textSearch'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './i18n'
+import { TEXT_SEARCH_ROW_HEIGHT } from './rows'
 
 interface MatchLineProps {
   filePath: string
   result: tinker.SearchTextResult
+  segments: TextSearchSegment[]
+  isActive: boolean
 }
 
-export default function MatchLine({ filePath, result }: MatchLineProps) {
+function MatchLine({ filePath, result, segments, isActive }: MatchLineProps) {
   const { t } = useTranslation(TEXT_SEARCH_NS)
-  const {
-    activeMatchKey,
-    onSelectMatch,
-    onActiveMatchKeyChange,
-    onCopyPath,
-    onShowInFolder,
-  } = useTextSearchContext()
+  const { onSelectMatch, onActiveMatchKeyChange, onCopyPath, onShowInFolder } =
+    useTextSearchContext()
   const key = `${filePath}:${result.lineNumber}`
-  const isActive = activeMatchKey === key
-
-  const segments = useMemo(
-    () => buildSegments(result.text, result.submatches),
-    [result.text, result.submatches]
-  )
 
   const handleClick = () => {
     onActiveMatchKeyChange(key)
@@ -60,10 +52,14 @@ export default function MatchLine({ filePath, result }: MatchLineProps) {
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       className={className(
-        'flex items-center py-0.5 cursor-pointer text-xs',
+        'flex items-center cursor-pointer text-xs',
         isActive ? tw.active : tw.hover
       )}
-      style={{ paddingLeft: 30, paddingRight: 8 }}
+      style={{
+        height: TEXT_SEARCH_ROW_HEIGHT,
+        paddingLeft: 30,
+        paddingRight: 8,
+      }}
     >
       <span
         className={`shrink-0 mr-2 tabular-nums ${tw.text.tertiary} text-[11px]`}
@@ -75,16 +71,20 @@ export default function MatchLine({ filePath, result }: MatchLineProps) {
         className={`truncate font-mono ${tw.text.primary}`}
         title={result.text.trim()}
       >
-        {segments.map((seg, idx) =>
-          seg.matched ? (
-            <span key={idx} className="tts-match-inline rounded-sm">
-              {seg.text}
-            </span>
-          ) : (
-            <span key={idx}>{seg.text}</span>
-          )
-        )}
+        {segments.length === 1 && !segments[0].matched
+          ? segments[0].text
+          : segments.map((seg, idx) =>
+              seg.matched ? (
+                <span key={idx} className="tts-match-inline rounded-sm">
+                  {seg.text}
+                </span>
+              ) : (
+                <span key={idx}>{seg.text}</span>
+              )
+            )}
       </span>
     </div>
   )
 }
+
+export default memo(MatchLine)

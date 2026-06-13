@@ -9,6 +9,7 @@ import {
   ToolbarButton,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import splitPath from 'licia/splitPath'
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS, getFileExt, getLanguage } from 'share/lib/fileType'
 import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
@@ -68,8 +69,8 @@ export default observer(function CommitFileViewer() {
     return <CenteredMessage>{t('selectFileToView')}</CenteredMessage>
   }
 
-  const fileName =
-    store.selectedFilePath.split('/').pop() || store.selectedFilePath
+  const { name: baseName, ext } = splitPath(store.selectedFilePath)
+  const fileName = baseName + ext || store.selectedFilePath
   const binary = isBinaryFile(store.selectedFilePath)
   const isImage = store.fileCategory === 'image'
 

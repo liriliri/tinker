@@ -429,6 +429,7 @@ export default class TextSearch {
     this.totalMatches = 0
     this.totalFiles = 0
     this.truncated = false
+    this.collapsed.clear()
   }
 
   private addMatch(m: tinker.SearchTextResult) {

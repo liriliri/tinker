@@ -14,6 +14,7 @@ import {
   ToolbarButton,
   ToolbarButtonGroup,
   ToolbarSearch,
+  ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
@@ -50,17 +51,6 @@ export default observer(function ToolbarComponent() {
       >
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
-
-      {store.repoPath && (
-        <ToolbarButton
-          variant="toggle"
-          active={store.terminalOpen}
-          onClick={() => store.toggleTerminal()}
-          title={t('toggleTerminal')}
-        >
-          <Terminal size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      )}
 
       {store.repoPath && (
         <ToolbarButtonGroup>
@@ -188,6 +178,20 @@ export default observer(function ToolbarComponent() {
             />
           </>
         )}
+
+      {store.repoPath && (
+        <>
+          <ToolbarSeparator />
+          <ToolbarButton
+            variant="toggle"
+            active={store.terminalOpen}
+            onClick={() => store.toggleTerminal()}
+            title={t('toggleTerminal')}
+          >
+            <Terminal size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+        </>
+      )}
 
       <BranchSelectDialog
         open={showBranchDialog}
