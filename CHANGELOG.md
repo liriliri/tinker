@@ -1,3 +1,10 @@
+## v1.18.1 (14 Jun 2026)
+
+* feat(code-editor): use vscode file icon
+* feat(git): workspace
+* fix(cleaner): remove browser
+* fix: text search ui
+
 ## v1.18.0 (6 Jun 2026)
 
 * feat: add git
