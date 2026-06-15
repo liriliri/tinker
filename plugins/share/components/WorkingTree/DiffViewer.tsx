@@ -45,7 +45,7 @@ export interface WorkingTreeDiffViewerProps {
   loading: boolean
   isDark: boolean
   emptyState?: React.ReactNode
-  headerVariant?: 'toolbar' | 'bar'
+  headerVariant?: 'toolbar' | 'bar' | 'none'
 }
 
 export default function WorkingTreeDiffViewer({
@@ -67,7 +67,7 @@ export default function WorkingTreeDiffViewer({
   const pathLabel = workingTreeFilePathLabel(file)
 
   const header =
-    headerVariant === 'toolbar' ? (
+    headerVariant === 'none' ? null : headerVariant === 'toolbar' ? (
       <Toolbar className="min-w-0 overflow-hidden gap-2">
         <span
           className={`text-xs font-mono truncate min-w-0 flex-1 ${tw.text.primary}`}

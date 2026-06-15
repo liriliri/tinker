@@ -6,7 +6,6 @@
   "cursor": "行 {{line}}, 列 {{col}}",
   "closeTab": "关闭",
   "closeOtherTabs": "关闭其他",
-  "save": "保存",
   "showInFolder": "在文件管理器中显示",
   "openInIntegratedTerminal": "在集成终端中打开",
   "findInFolder": "在文件夹中查找...",

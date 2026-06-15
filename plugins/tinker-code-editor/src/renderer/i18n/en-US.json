@@ -6,7 +6,6 @@
   "cursor": "Ln {{line}}, Col {{col}}",
   "closeTab": "Close",
   "closeOtherTabs": "Close Others",
-  "save": "Save",
   "showInFolder": "Reveal in File Manager",
   "openInIntegratedTerminal": "Open in Integrated Terminal",
   "findInFolder": "Find in Folder...",

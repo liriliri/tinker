@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
+import copy from 'licia/copy'
 import normalizePath from 'licia/normalizePath'
 import { useTranslation } from 'react-i18next'
 import FileTree from 'share/components/FileTree'
@@ -69,14 +70,11 @@ export default observer(function CodeEditorFileTree() {
       { type: 'separator' as const },
       {
         label: t('copyPath'),
-        click: () => navigator.clipboard.writeText(node.path),
+        click: () => copy(node.path),
       },
       {
         label: t('copyRelativePath'),
-        click: () =>
-          navigator.clipboard.writeText(
-            relativePath(store.rootPath, node.path)
-          ),
+        click: () => copy(relativePath(store.rootPath, node.path)),
       },
     ],
     [t]

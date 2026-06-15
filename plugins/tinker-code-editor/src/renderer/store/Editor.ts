@@ -7,7 +7,7 @@ import {
   type TextSearchActiveMatch,
 } from 'share/lib/textSearch'
 import { joinPath } from 'share/lib/util'
-import { findWorkingTreeFile } from 'share/lib/workingTree'
+import { fileDisplayName, findWorkingTreeFile } from 'share/lib/workingTree'
 import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
 import type { GitWorkingTreeFile } from 'share/types/git'
 import type { editor as MonacoEditor } from 'monaco-editor'
@@ -103,6 +103,7 @@ class Editor {
 
     tab.gitFile = file
     tab.filePath = joinPath(repoPath, file.path)
+    tab.title = fileDisplayName(file)
 
     if (sameFile) return
 

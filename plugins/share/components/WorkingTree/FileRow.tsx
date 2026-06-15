@@ -100,20 +100,20 @@ export default function FileRow({ file }: FileRowProps) {
         </span>
       </div>
 
-      <div className="shrink-0 flex items-center justify-end h-5 pr-0.5">
+      <div className="shrink-0 flex items-center justify-end gap-0.5 h-5 pr-0.5">
+        <ActionButtons
+          actions={actions}
+          onAction={handleAction}
+          revealIcon={revealIcon}
+        />
         <span
-          className={`w-4 text-right font-mono font-semibold group-hover:hidden ${statusLetterClass(
+          className={`w-4 text-right font-mono font-semibold ${statusLetterClass(
             file.status
           )}`}
           aria-hidden
         >
           {file.statusLetter}
         </span>
-        <ActionButtons
-          actions={actions}
-          onAction={handleAction}
-          revealIcon={revealIcon}
-        />
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
+import copy from 'licia/copy'
 import { File, GitBranch, GitCommit, Image } from 'lucide-react'
 import {
   Panel,
@@ -19,6 +20,7 @@ import StatusBar from './components/StatusBar'
 import { TerminalPanel } from 'share/components/TerminalPanel'
 import Welcome from './components/Welcome'
 import QuickOpen from './components/QuickOpen'
+import { relativePath } from './lib/path'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -79,9 +81,12 @@ const App = observer(function App() {
       },
       { type: 'separator' },
       {
-        label: t('save'),
-        enabled: tab.category === 'text',
-        click: () => store.saveFile(tabId),
+        label: t('copyPath'),
+        click: () => copy(tab.filePath),
+      },
+      {
+        label: t('copyRelativePath'),
+        click: () => copy(relativePath(store.rootPath, tab.filePath)),
       },
     ])
   }
@@ -135,11 +140,6 @@ const App = observer(function App() {
                               tabs={store.tabs}
                               activeTabId={store.activeTabId}
                               hideFirstBorder
-                              getTitle={(tab) =>
-                                tab.category === 'gitDiff'
-                                  ? t('gitDiff')
-                                  : tab.title
-                              }
                               onClose={(id) => store.closeTab(id)}
                               onActivate={(id) => store.setActiveTab(id)}
                               onMove={(from, to) => store.moveTab(from, to)}

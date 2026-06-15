@@ -16,7 +16,7 @@ export default observer(function GitDiffPane({ tabId }: GitDiffPaneProps) {
       diffContent={tab.diffContent}
       loading={tab.loadingDiff}
       isDark={store.isDark}
-      headerVariant="bar"
+      headerVariant="none"
     />
   )
 })
