@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
 import Checkbox from 'share/components/Checkbox'
 import store from '../store'
@@ -20,10 +19,7 @@ export default observer(function PluginSection() {
         </SettingItem>
       </Section>
       <Section title="NPM">
-        <div className="flex items-center justify-between px-3 py-2 gap-3">
-          <label className={`text-sm shrink-0 ${tw.text.primary}`}>
-            {t('registry')}
-          </label>
+        <SettingItem label={t('registry')}>
           <TextInput
             value={store.npmRegistry}
             onChange={(e) => (store.npmRegistry = e.target.value)}
@@ -36,7 +32,7 @@ export default observer(function PluginSection() {
             placeholder="https://registry.npmmirror.com"
             className="flex-1 text-sm"
           />
-        </div>
+        </SettingItem>
       </Section>
     </>
   )
