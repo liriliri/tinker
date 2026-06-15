@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import isMac from 'licia/isMac'
 import { tw } from 'share/theme'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -72,8 +73,6 @@ interface ShortcutInputProps {
   placeholder?: string
 }
 
-const IS_MAC = navigator.platform.toUpperCase().includes('MAC')
-
 function getModifierName(code: string): string {
   switch (code) {
     case 'MetaLeft':
@@ -84,7 +83,7 @@ function getModifierName(code: string): string {
       return 'Ctrl'
     case 'AltLeft':
     case 'AltRight':
-      return IS_MAC ? 'Option' : 'Alt'
+      return isMac ? 'Option' : 'Alt'
     case 'ShiftLeft':
     case 'ShiftRight':
       return 'Shift'
@@ -142,7 +141,7 @@ export default function ShortcutInput({
       const keys: string[] = []
       if (e.metaKey) keys.push('Command')
       if (e.ctrlKey) keys.push('Ctrl')
-      if (e.altKey) keys.push(IS_MAC ? 'Option' : 'Alt')
+      if (e.altKey) keys.push(isMac ? 'Option' : 'Alt')
       if (e.shiftKey) keys.push('Shift')
 
       if (!isModifierKey) {
