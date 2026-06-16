@@ -197,9 +197,14 @@ const dataSource: IFileTreeDataSource = {
 
 <FileTree
   nodes={tree}
+  rootPath={rootPath}
   dataSource={dataSource}
   onOpenFile={(path, name) => openFile(path, name)}
+  getRootContextMenu={() => [/* optional blank-area menu items */]}
 />
+```
+
+Pass `rootPath` to enable a blank-area context menu with built-in New File / New Folder actions at the project root.
 ```
 
 File watching is the consumer's responsibility — use `onExpandChange`, `refreshDirs`, and `refreshVersion`.

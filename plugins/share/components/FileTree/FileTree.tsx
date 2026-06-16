@@ -338,16 +338,19 @@ function TreeNodeItem({
 export default function FileTree({
   nodes,
   dataSource,
+  rootPath,
   iconSize = 14,
   onOpenFile,
   renderIcon,
   getContextMenu,
+  getRootContextMenu,
   onExpandChange,
   refreshDirs,
   refreshVersion,
   onRefreshChildren,
   activeFilePath,
 }: FileTreeProps) {
+  const { t } = useTranslation(FILE_TREE_NS)
   const [creatingIn, setCreatingIn] = useState<{
     parentPath: string
     type: 'file' | 'directory'
@@ -363,8 +366,63 @@ export default function FileTree({
     onRefreshChildren?.(parentPath)
   }
 
+  const handleEmptyContextMenu = (e: React.MouseEvent) => {
+    if (!rootPath || !dataSource.createNode) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const items: MenuItemConstructorOptions[] = [
+      {
+        label: t('newFile'),
+        click: () => setCreatingIn({ parentPath: rootPath, type: 'file' }),
+      },
+      {
+        label: t('newFolder'),
+        click: () => setCreatingIn({ parentPath: rootPath, type: 'directory' }),
+      },
+    ]
+
+    const customItems = getRootContextMenu?.()
+    if (customItems && customItems.length > 0) {
+      items.push({ type: 'separator' }, ...customItems)
+    }
+
+    tinker.showContextMenu(e.clientX, e.clientY, items)
+  }
+
+  const handleRootCreateSubmit = async (name: string) => {
+    if (!creatingIn || creatingIn.parentPath !== rootPath) return
+    await dataSource.createNode?.(creatingIn.parentPath, name, creatingIn.type)
+    handleCancelAction()
+    handleRefreshParent(rootPath)
+  }
+
+  const isCreatingAtRoot = !!rootPath && creatingIn?.parentPath === rootPath
+
   return (
-    <div className="py-1">
+    <div className="min-h-full" onContextMenu={handleEmptyContextMenu}>
+      {isCreatingAtRoot && (
+        <div className="flex items-center h-6" style={{ paddingLeft: 4 }}>
+          <span style={{ width: iconSize }} className="flex-shrink-0" />
+          {creatingIn!.type === 'file' ? (
+            <span
+              className="flex-shrink-0 ml-0.5"
+              style={{ width: iconSize, height: iconSize }}
+            />
+          ) : (
+            <Folder
+              size={iconSize}
+              style={{ color: THEME_COLORS.primary }}
+              className="flex-shrink-0 ml-0.5"
+            />
+          )}
+          <InlineInput
+            onSubmit={handleRootCreateSubmit}
+            onCancel={handleCancelAction}
+          />
+        </div>
+      )}
       {nodes.map((node) => (
         <TreeNodeItem
           key={node.path}

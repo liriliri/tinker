@@ -80,6 +80,25 @@ export default observer(function CodeEditorFileTree() {
     [t]
   )
 
+  const getRootContextMenu = useCallback(() => {
+    if (!store.rootPath) return []
+
+    return [
+      {
+        label: t('showInFolder'),
+        click: () => tinker.showItemInPath(store.rootPath),
+      },
+      {
+        label: t('openInIntegratedTerminal'),
+        click: () => store.openInIntegratedTerminal(store.rootPath, true),
+      },
+      {
+        label: t('findInFolder'),
+        click: () => store.findInFolder(store.rootPath),
+      },
+    ]
+  }, [t])
+
   const handleExpandChange = useCallback((path: string, expanded: boolean) => {
     store.setDirExpanded(path, expanded)
   }, [])
@@ -95,6 +114,7 @@ export default observer(function CodeEditorFileTree() {
   return (
     <FileTree
       nodes={store.fileTree}
+      rootPath={store.rootPath}
       dataSource={localFileDataSource}
       iconSize={ICON_SIZE}
       onOpenFile={(path, name) => {
@@ -116,6 +136,7 @@ export default observer(function CodeEditorFileTree() {
       refreshDirs={store.treeRefreshDirs}
       refreshVersion={store.treeRefreshVersion}
       getContextMenu={getContextMenu}
+      getRootContextMenu={getRootContextMenu}
       onRefreshChildren={handleRefreshChildren}
       activeFilePath={activeFilePath}
     />
