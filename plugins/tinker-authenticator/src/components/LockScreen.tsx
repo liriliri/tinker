@@ -28,7 +28,7 @@ export default observer(function LockScreen() {
 
   return (
     <div
-      className={`h-screen flex flex-col items-center justify-center gap-6 transition-colors ${tw.bg.primary}`}
+      className={`h-screen flex flex-col items-center justify-center gap-6 transition-colors ${tw.bg.secondary}`}
     >
       <div className="flex flex-col items-center gap-2">
         <Lock size={40} className={tw.text.tertiary} />

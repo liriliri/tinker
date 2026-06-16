@@ -36,8 +36,6 @@ interface Props {
   cursor: { line: number; col: number }
   onChange: (val: string) => void
   onMount: OnMount
-  borderTop?: boolean
-  borderLeft?: boolean
 }
 
 const EditorPanel = observer(function EditorPanel({
@@ -47,8 +45,6 @@ const EditorPanel = observer(function EditorPanel({
   cursor,
   onChange,
   onMount,
-  borderTop,
-  borderLeft,
 }: Props) {
   const { t } = useTranslation()
 
@@ -77,11 +73,7 @@ const EditorPanel = observer(function EditorPanel({
   }
 
   return (
-    <div
-      className={`h-full flex flex-col overflow-hidden ${
-        borderTop ? `border-t ${tw.border}` : ''
-      } ${borderLeft ? `border-l ${tw.border}` : ''}`}
-    >
+    <div className="h-full flex flex-col overflow-hidden">
       <Toolbar>
         <ToolbarLabel>{label}</ToolbarLabel>
         <ToolbarSeparator />

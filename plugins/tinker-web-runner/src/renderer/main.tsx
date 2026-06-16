@@ -1,7 +1,12 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { OnMount } from '@monaco-editor/react'
-import { Panel, Group, useDefaultLayout } from 'react-resizable-panels'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import { WebviewHandle } from 'share/components/Webview'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -75,30 +80,34 @@ const App = observer(function App() {
         onLayoutChange={onInnerLayoutChange}
       >
         {store.showHtml && (
-          <Panel id="html" minSize={80}>
-            <EditorPanel
-              language="html"
-              label="HTML"
-              value={store.html}
-              cursor={store.htmlCursor}
-              onChange={(val) => store.setHtml(val)}
-              onMount={createEditorMount('html')}
-            />
-          </Panel>
+          <>
+            <Panel id="html" minSize={80}>
+              <EditorPanel
+                language="html"
+                label="HTML"
+                value={store.html}
+                cursor={store.htmlCursor}
+                onChange={(val) => store.setHtml(val)}
+                onMount={createEditorMount('html')}
+              />
+            </Panel>
+            {(store.showCss || store.showJs) && <Separator />}
+          </>
         )}
         {store.showCss && (
-          <Panel id="css" minSize={80}>
-            <EditorPanel
-              language="css"
-              label="CSS"
-              value={store.css}
-              cursor={store.cssCursor}
-              onChange={(val) => store.setCss(val)}
-              onMount={createEditorMount('css')}
-              borderTop={isHorizontal && store.showHtml}
-              borderLeft={!isHorizontal && store.showHtml}
-            />
-          </Panel>
+          <>
+            <Panel id="css" minSize={80}>
+              <EditorPanel
+                language="css"
+                label="CSS"
+                value={store.css}
+                cursor={store.cssCursor}
+                onChange={(val) => store.setCss(val)}
+                onMount={createEditorMount('css')}
+              />
+            </Panel>
+            {store.showJs && <Separator />}
+          </>
         )}
         {store.showJs && (
           <Panel id="javascript" minSize={80}>
@@ -109,8 +118,6 @@ const App = observer(function App() {
               cursor={store.jsCursor}
               onChange={(val) => store.setJs(val)}
               onMount={createEditorMount('js')}
-              borderTop={isHorizontal && (store.showHtml || store.showCss)}
-              borderLeft={!isHorizontal && (store.showHtml || store.showCss)}
             />
           </Panel>
         )}
@@ -134,8 +141,19 @@ const App = observer(function App() {
         defaultLayout={outerLayout}
         onLayoutChange={onOuterLayoutChange}
       >
-        {previewBefore ? previewPanel : editorPanel}
-        {previewBefore ? editorPanel : previewPanel}
+        {previewBefore ? (
+          <>
+            {previewPanel}
+            <Separator />
+            {editorPanel}
+          </>
+        ) : (
+          <>
+            {editorPanel}
+            <Separator />
+            {previewPanel}
+          </>
+        )}
       </Group>
     </div>
   )
