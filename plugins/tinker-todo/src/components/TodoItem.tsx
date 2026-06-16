@@ -99,6 +99,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
         todo.completed && 'opacity-60'
       )}
       onContextMenu={handleContextMenu}
+      onDoubleClick={() => setIsEditing(true)}
     >
       <div className="flex items-center gap-2.5">
         <button

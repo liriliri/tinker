@@ -200,6 +200,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-meme',
+    name: 'Meme',
+    description: 'Search and browse memes',
+    icon: 'tinker-meme.png',
+    locales: {
+      'zh-CN': {
+        name: '表情包',
+        description: '搜索表情包',
+      },
+    },
+  },
+  {
     id: 'tinker-nes',
     name: 'NES',
     description: 'Play NES ROMs with save state support',

@@ -15,6 +15,7 @@ import type {
 } from 'share/types/git'
 import {
   fileBelongsToDisplayGroup,
+  getWorkingTreeDiscardBatches,
   resolveWorkingTreeSelection,
   type RefreshWorkingTreeOptions,
   type WorkingTreeDisplayGroup,
@@ -606,6 +607,8 @@ class Repo {
     if (
       sameFile &&
       this.workingTreeDiffContent &&
+      (this.workingTreeDiffContent.original ||
+        this.workingTreeDiffContent.modified) &&
       !this.loadingWorkingTreeDiff
     ) {
       return
@@ -709,7 +712,7 @@ class Repo {
     return this.withWorkingTreeMutation(async () => {
       try {
         await this.syncPreloadRepo()
-        await git.discardFile(file.path, file.group)
+        await git.discardFile(file.path, file.group, file.status)
         const wasSelected = this.selectedWorkingTreeFile?.path === file.path
         await this.refreshWorkingTree({
           showLoading: false,
@@ -791,27 +794,14 @@ class Repo {
   }
 
   async discardWorkingTreeGroup(group: WorkingTreeDisplayGroup) {
-    const paths = this.getWorkingTreeGroupPaths(group)
-    if (paths.length === 0) return
+    const batches = getWorkingTreeDiscardBatches(this.workingTreeFiles, group)
+    if (batches.length === 0) return
 
     return this.withWorkingTreeMutation(async () => {
       try {
         await this.syncPreloadRepo()
-        if (group === 'changes') {
-          const trackedPaths = this.workingTreeFiles
-            .filter((file) => file.group === 'changes')
-            .map((file) => file.path)
-          const untrackedPaths = this.workingTreeFiles
-            .filter((file) => file.group === 'untracked')
-            .map((file) => file.path)
-          if (trackedPaths.length > 0) {
-            await git.discardFiles(trackedPaths, 'changes')
-          }
-          if (untrackedPaths.length > 0) {
-            await git.discardFiles(untrackedPaths, 'untracked')
-          }
-        } else {
-          await git.discardFiles(paths, group)
+        for (const batch of batches) {
+          await git.discardFiles(batch.paths, batch.group, batch.status)
         }
         const wasSelected =
           this.selectedWorkingTreeFile != null &&

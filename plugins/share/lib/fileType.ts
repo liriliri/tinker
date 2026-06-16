@@ -248,6 +248,8 @@ export const LANGUAGE_MAP: Record<string, string> = {
   tf: 'terraform',
   tex: 'latex',
   dockerfile: 'dockerfile',
+  diff: 'diff',
+  patch: 'diff',
 }
 
 export function getLanguage(filePath: string): string {

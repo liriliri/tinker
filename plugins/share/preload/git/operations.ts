@@ -1,4 +1,4 @@
-import type { GitWorkingTreeGroup } from '../../types/git'
+import type { GitWorkingTreeGroup, GitWorkingTreeStatus } from '../../types/git'
 import { exec, requireRepo } from './core'
 
 async function execGitOrThrow(args: string[], cwd: string): Promise<void> {
@@ -26,9 +26,15 @@ export async function unstageFile(filePath: string): Promise<void> {
 
 export async function discardFile(
   filePath: string,
-  group: GitWorkingTreeGroup
+  group: GitWorkingTreeGroup,
+  status?: GitWorkingTreeStatus
 ): Promise<void> {
   const currentPath = requireRepo()
+
+  if (status === 'submodule-dirty') {
+    await execGitOrThrow(['submodule', 'update', '--', filePath], currentPath)
+    return
+  }
 
   if (group === 'untracked') {
     await execGitOrThrow(['clean', '-f', '--', filePath], currentPath)
@@ -57,10 +63,19 @@ export async function unstageAllFiles(): Promise<void> {
 
 export async function discardFiles(
   filePaths: string[],
-  group: GitWorkingTreeGroup
+  group: GitWorkingTreeGroup,
+  status?: GitWorkingTreeStatus
 ): Promise<void> {
   if (filePaths.length === 0) return
   const currentPath = requireRepo()
+
+  if (status === 'submodule-dirty') {
+    await execGitOrThrow(
+      ['submodule', 'update', '--', ...filePaths],
+      currentPath
+    )
+    return
+  }
 
   if (group === 'untracked') {
     await execGitOrThrow(['clean', '-f', '--', ...filePaths], currentPath)

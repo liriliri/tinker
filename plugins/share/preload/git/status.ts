@@ -63,6 +63,7 @@ interface RawFileStatus {
   y: string
   path: string
   rename?: string
+  isSubmodule?: boolean
 }
 
 function parseGitStatusZ(raw: string): RawFileStatus[] {
@@ -89,7 +90,8 @@ function parseGitStatusZ(raw: string): RawFileStatus[] {
       i = oldPathEnd + 1
 
       if (entry.path.endsWith('/')) {
-        continue
+        entry.path = entry.path.slice(0, -1)
+        entry.isSubmodule = true
       }
 
       result.push(entry)
@@ -103,7 +105,8 @@ function parseGitStatusZ(raw: string): RawFileStatus[] {
     i = pathEnd + 1
 
     if (entry.path.endsWith('/')) {
-      continue
+      entry.path = entry.path.slice(0, -1)
+      entry.isSubmodule = true
     }
 
     result.push(entry)
@@ -134,6 +137,8 @@ function statusLetterFor(status: GitWorkingTreeStatus): string {
       return 'U'
     case 'conflict':
       return '!'
+    case 'submodule-dirty':
+      return 'S'
     default:
       return '?'
   }
@@ -150,10 +155,88 @@ function pushWorkingTreeFile(
   })
 }
 
-function mapStatusEntries(entries: RawFileStatus[]): GitWorkingTreeFile[] {
+function parseGitlinkPaths(stdout: string): Set<string> {
+  const paths = new Set<string>()
+  for (const line of stdout.split('\n')) {
+    if (!line) continue
+    const tabIndex = line.indexOf('\t')
+    if (tabIndex === -1) continue
+    if (line.startsWith('160000 ')) {
+      paths.add(line.slice(tabIndex + 1))
+    }
+  }
+  return paths
+}
+
+function collectGitlinkCandidates(entries: RawFileStatus[]): string[] {
+  const paths = new Set<string>()
+  for (const raw of entries) {
+    if (raw.isSubmodule) continue
+    if (raw.x === 'M' || raw.y === 'M') {
+      paths.add(raw.path)
+    }
+  }
+  return [...paths]
+}
+
+async function loadGitlinkPaths(
+  entries: RawFileStatus[],
+  cwd: string
+): Promise<Set<string>> {
+  const candidates = collectGitlinkCandidates(entries)
+  if (candidates.length === 0) return new Set()
+
+  const { exitCode, stdout } = await exec(
+    ['ls-files', '-s', '--', ...candidates],
+    cwd
+  )
+  if (exitCode !== 0 || !stdout) return new Set()
+  return parseGitlinkPaths(stdout)
+}
+
+function pushSubmoduleStatusFiles(
+  files: GitWorkingTreeFile[],
+  raw: RawFileStatus
+) {
+  const xy = raw.x + raw.y
+  if (xy === ' M') {
+    pushWorkingTreeFile(files, {
+      path: raw.path,
+      status: 'submodule-dirty',
+      group: 'changes',
+    })
+  } else if (xy === 'M ') {
+    pushWorkingTreeFile(files, {
+      path: raw.path,
+      status: 'submodule-dirty',
+      group: 'staged',
+    })
+  } else if (xy === 'MM') {
+    pushWorkingTreeFile(files, {
+      path: raw.path,
+      status: 'submodule-dirty',
+      group: 'staged',
+    })
+    pushWorkingTreeFile(files, {
+      path: raw.path,
+      status: 'submodule-dirty',
+      group: 'changes',
+    })
+  }
+}
+
+function mapStatusEntries(
+  entries: RawFileStatus[],
+  gitlinkPaths: Set<string>
+): GitWorkingTreeFile[] {
   const files: GitWorkingTreeFile[] = []
 
   for (const raw of entries) {
+    if (raw.isSubmodule || gitlinkPaths.has(raw.path)) {
+      pushSubmoduleStatusFiles(files, raw)
+      continue
+    }
+
     const xy = raw.x + raw.y
 
     switch (xy) {
@@ -320,12 +403,30 @@ export async function getWorkingTreeStatus(): Promise<GitWorkingTreeStatusResult
 
   const [checkout, statusOut] = await Promise.all([
     getCheckoutInfo(),
-    exec(['status', '-z', '-uall', '--ignore-submodules'], currentPath),
+    exec(['status', '-z', '-uall'], currentPath),
   ])
 
-  const files = mapStatusEntries(parseGitStatusZ(statusOut.stdout))
+  const entries = parseGitStatusZ(statusOut.stdout)
+  const gitlinkPaths = await loadGitlinkPaths(entries, currentPath)
+  const files = mapStatusEntries(entries, gitlinkPaths)
 
   return { checkout, files }
+}
+
+async function getSubmoduleDiffContent(
+  filePath: string,
+  group: GitWorkingTreeGroup,
+  cwd: string
+): Promise<{ original: string | null; modified: string | null }> {
+  const diffArgs =
+    group === 'staged'
+      ? ['diff', '--cached', '--', filePath]
+      : ['diff', '--', filePath]
+  const diffOutput = await exec(diffArgs, cwd)
+  if (diffOutput.exitCode === 0 && diffOutput.stdout) {
+    return { original: '', modified: normalizeGitStdout(diffOutput.stdout) }
+  }
+  return { original: null, modified: null }
 }
 
 // ── diff content ─────────────────────────────────────────────────
@@ -340,60 +441,70 @@ export async function getWorkingTreeFileDiffContent(
   let original: string | null = null
   let modified: string | null = null
 
-  switch (group) {
-    case 'staged':
-      if (status === 'index-added') {
-        original = ''
-        modified = await readGitShow(`:${filePath}`, currentPath)
-      } else if (status === 'index-deleted') {
-        original = await readGitShow(`HEAD:${filePath}`, currentPath)
-        modified = ''
-      } else if (
-        (status === 'index-renamed' || status === 'index-copied') &&
-        renameFrom
-      ) {
-        original =
-          (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
-          (await readDiskFile(currentPath, renameFrom))
-        modified =
-          (await readGitShow(`:${filePath}`, currentPath)) ??
-          (await readDiskFile(currentPath, filePath))
-      } else {
-        original = await readGitShow(`HEAD:${filePath}`, currentPath)
-        modified = await readGitShow(`:${filePath}`, currentPath)
-      }
-      break
-    case 'changes':
-      if (status === 'deleted') {
-        original = await readGitShow(`:${filePath}`, currentPath)
-        modified = ''
-      } else if (status === 'intent-to-rename' && renameFrom) {
-        original =
-          (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
-          (await readGitShow(`:${renameFrom}`, currentPath)) ??
-          (await readDiskFile(currentPath, renameFrom))
-        modified =
-          (await readDiskFile(currentPath, filePath)) ??
-          (await readGitShow(`:${filePath}`, currentPath))
-      } else {
-        original = await readGitShow(`:${filePath}`, currentPath)
-        if (original === null) {
+  if (status === 'submodule-dirty') {
+    const submoduleDiff = await getSubmoduleDiffContent(
+      filePath,
+      group,
+      currentPath
+    )
+    original = submoduleDiff.original
+    modified = submoduleDiff.modified
+  } else {
+    switch (group) {
+      case 'staged':
+        if (status === 'index-added') {
+          original = ''
+          modified = await readGitShow(`:${filePath}`, currentPath)
+        } else if (status === 'index-deleted') {
           original = await readGitShow(`HEAD:${filePath}`, currentPath)
+          modified = ''
+        } else if (
+          (status === 'index-renamed' || status === 'index-copied') &&
+          renameFrom
+        ) {
+          original =
+            (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
+            (await readDiskFile(currentPath, renameFrom))
+          modified =
+            (await readGitShow(`:${filePath}`, currentPath)) ??
+            (await readDiskFile(currentPath, filePath))
+        } else {
+          original = await readGitShow(`HEAD:${filePath}`, currentPath)
+          modified = await readGitShow(`:${filePath}`, currentPath)
         }
+        break
+      case 'changes':
+        if (status === 'deleted') {
+          original = await readGitShow(`:${filePath}`, currentPath)
+          modified = ''
+        } else if (status === 'intent-to-rename' && renameFrom) {
+          original =
+            (await readGitShow(`HEAD:${renameFrom}`, currentPath)) ??
+            (await readGitShow(`:${renameFrom}`, currentPath)) ??
+            (await readDiskFile(currentPath, renameFrom))
+          modified =
+            (await readDiskFile(currentPath, filePath)) ??
+            (await readGitShow(`:${filePath}`, currentPath))
+        } else {
+          original = await readGitShow(`:${filePath}`, currentPath)
+          if (original === null) {
+            original = await readGitShow(`HEAD:${filePath}`, currentPath)
+          }
+          modified = await readDiskFile(currentPath, filePath)
+        }
+        break
+      case 'untracked':
+        original = ''
         modified = await readDiskFile(currentPath, filePath)
-      }
-      break
-    case 'untracked':
-      original = ''
-      modified = await readDiskFile(currentPath, filePath)
-      break
-    case 'merge':
-      original =
-        (await readGitShow(`:2:${filePath}`, currentPath)) ??
-        (await readGitShow(`:1:${filePath}`, currentPath)) ??
-        (await readGitShow(`HEAD:${filePath}`, currentPath))
-      modified = await readDiskFile(currentPath, filePath)
-      break
+        break
+      case 'merge':
+        original =
+          (await readGitShow(`:2:${filePath}`, currentPath)) ??
+          (await readGitShow(`:1:${filePath}`, currentPath)) ??
+          (await readGitShow(`HEAD:${filePath}`, currentPath))
+        modified = await readDiskFile(currentPath, filePath)
+        break
+    }
   }
 
   const originalText = original ?? ''

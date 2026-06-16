@@ -1,11 +1,15 @@
 import { Editor, DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import type { Monaco } from '@monaco-editor/react'
 import { getLanguage } from '../../lib/fileType'
 import {
-  fileDisplayName,
+  configureMonacoEditor,
+  READ_ONLY_EDITOR_OPTIONS,
+} from '../../lib/monaco'
+import {
   isNewWorkingTreeFile,
   isRenameWorkingTreeFile,
+  isSubmoduleWorkingTreeFile,
+  statusLetterClass,
   workingTreeFilePathLabel,
 } from '../../lib/workingTree'
 import type {
@@ -13,31 +17,9 @@ import type {
   GitWorkingTreeFileDiffContent,
 } from '../../types/git'
 import { tw } from '../../theme'
-import { Toolbar, ToolbarSeparator } from '../Toolbar'
+import { Toolbar } from '../Toolbar'
 import CenteredMessage from './CenteredMessage'
 import { WORKING_TREE_NS } from './i18n'
-
-const DIFF_EDITOR_OPTIONS = {
-  readOnly: true,
-  minimap: { enabled: false },
-  fontSize: 13,
-  lineNumbers: 'on' as const,
-  scrollBeyondLastLine: false,
-  automaticLayout: true,
-  wordWrap: 'off' as const,
-}
-
-function disableMonacoValidation(monaco: Monaco) {
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
-
-  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
-}
 
 export interface WorkingTreeDiffViewerProps {
   file: GitWorkingTreeFile | null
@@ -46,6 +28,33 @@ export interface WorkingTreeDiffViewerProps {
   isDark: boolean
   emptyState?: React.ReactNode
   headerVariant?: 'toolbar' | 'bar' | 'none'
+}
+
+function DiffViewerHeaderLabels({
+  file,
+  pathLabel,
+}: {
+  file: GitWorkingTreeFile
+  pathLabel: string
+}) {
+  return (
+    <>
+      <span
+        className={`text-xs font-mono truncate min-w-0 flex-1 ${tw.text.primary}`}
+        title={pathLabel}
+      >
+        {pathLabel}
+      </span>
+      <span
+        className={`text-xs shrink-0 font-mono font-semibold ${statusLetterClass(
+          file.status
+        )}`}
+        title={file.status}
+      >
+        {file.statusLetter}
+      </span>
+    </>
+  )
 }
 
 export default function WorkingTreeDiffViewer({
@@ -62,55 +71,22 @@ export default function WorkingTreeDiffViewer({
     return emptyState
   }
 
-  const language = getLanguage(file.path)
+  const language = isSubmoduleWorkingTreeFile(file)
+    ? getLanguage(`${file.path}.diff`)
+    : getLanguage(file.path)
   const theme = isDark ? 'vs-dark' : 'vs-light'
   const pathLabel = workingTreeFilePathLabel(file)
 
   const header =
     headerVariant === 'none' ? null : headerVariant === 'toolbar' ? (
       <Toolbar className="min-w-0 overflow-hidden gap-2">
-        <span
-          className={`text-xs font-mono truncate min-w-0 flex-1 ${tw.text.primary}`}
-          title={file.path}
-        >
-          {fileDisplayName(file)}
-        </span>
-        <span
-          className={`text-xs shrink-0 truncate max-w-[40%] ${tw.text.secondary}`}
-          title={pathLabel}
-        >
-          {pathLabel}
-        </span>
-        <ToolbarSeparator />
-        <span
-          className={`text-xs shrink-0 font-mono ${tw.text.secondary}`}
-          title={file.status}
-        >
-          {file.statusLetter}
-        </span>
+        <DiffViewerHeaderLabels file={file} pathLabel={pathLabel} />
       </Toolbar>
     ) : (
       <div
         className={`flex items-center gap-2 px-3 py-1.5 min-w-0 border-b ${tw.border} ${tw.bg.secondary}`}
       >
-        <span
-          className={`text-xs font-mono truncate min-w-0 flex-1 ${tw.text.primary}`}
-          title={file.path}
-        >
-          {fileDisplayName(file)}
-        </span>
-        <span
-          className={`text-xs shrink-0 truncate max-w-[40%] ${tw.text.secondary}`}
-          title={pathLabel}
-        >
-          {pathLabel}
-        </span>
-        <span
-          className={`text-xs shrink-0 font-mono ${tw.text.secondary}`}
-          title={file.status}
-        >
-          {file.statusLetter}
-        </span>
+        <DiffViewerHeaderLabels file={file} pathLabel={pathLabel} />
       </div>
     )
 
@@ -127,7 +103,7 @@ export default function WorkingTreeDiffViewer({
     if (diffContent.isBinary) {
       return <CenteredMessage>{t('binaryDiffNotSupported')}</CenteredMessage>
     }
-    if (isNewWorkingTreeFile(file)) {
+    if (isNewWorkingTreeFile(file) || isSubmoduleWorkingTreeFile(file)) {
       return (
         <div className="flex-1 min-h-0">
           <Editor
@@ -135,8 +111,8 @@ export default function WorkingTreeDiffViewer({
             value={diffContent.modified}
             language={language}
             theme={theme}
-            beforeMount={disableMonacoValidation}
-            options={DIFF_EDITOR_OPTIONS}
+            beforeMount={configureMonacoEditor}
+            options={READ_ONLY_EDITOR_OPTIONS}
           />
         </div>
       )
@@ -156,9 +132,9 @@ export default function WorkingTreeDiffViewer({
           modified={diffContent.modified}
           language={language}
           theme={theme}
-          beforeMount={disableMonacoValidation}
+          beforeMount={configureMonacoEditor}
           options={{
-            ...DIFF_EDITOR_OPTIONS,
+            ...READ_ONLY_EDITOR_OPTIONS,
             renderSideBySide: true,
             enableSplitViewResizing: true,
             renderOverviewRuler: true,

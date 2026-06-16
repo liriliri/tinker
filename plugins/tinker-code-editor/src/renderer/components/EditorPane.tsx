@@ -1,29 +1,17 @@
-import { Editor, loader } from '@monaco-editor/react'
+import { Editor } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { editor } from 'monaco-editor'
 import store from '../store'
 import { getLanguage } from 'share/lib/fileType'
+import { getMonacoApi, initMonacoApi } from 'share/lib/monaco'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
 import ImageViewer from 'share/components/ImageViewer'
 import GitDiffPane from './GitDiffPane'
 
-type MonacoApi = typeof import('monaco-editor')
-
-let monacoApi: MonacoApi | null = null
-loader.init().then((monaco) => {
-  monacoApi = monaco as MonacoApi
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
-  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
-})
+initMonacoApi()
 
 interface EditorPaneProps {
   tabId: string
@@ -65,7 +53,7 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
 
   useBlameDecorations({
     editorRef,
-    monacoApi,
+    monacoApi: getMonacoApi(),
     annotations: blameAnnotations,
     highlightedSha: tab?.highlightedBlameSha ?? null,
     showBlame: (tab?.showingBlame ?? false) && tab?.id === store.activeTabId,

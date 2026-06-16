@@ -1,5 +1,6 @@
 import { type KeyboardEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { FolderGit2 } from 'lucide-react'
 import type { GitWorkingTreeFile } from '../../types/git'
 import FileIcon from '../FileIcon'
 import { confirm } from '../Confirm'
@@ -9,6 +10,7 @@ import {
   fileDisplayName,
   fileDirectoryName,
   getWorkingTreeFileActions,
+  isSubmoduleWorkingTreeFile,
   type WorkingTreeActionId,
 } from '../../lib/workingTree'
 import ActionButtons from './ActionButtons'
@@ -91,7 +93,16 @@ export default function FileRow({ file }: FileRowProps) {
       onKeyDown={handleKeyDown}
     >
       <div className="flex flex-1 items-center gap-1.5 min-w-0">
-        <FileIcon name={name} isDark={isDark} size={16} className="shrink-0" />
+        {isSubmoduleWorkingTreeFile(file) ? (
+          <FolderGit2 size={16} className={`shrink-0 ${tw.text.secondary}`} />
+        ) : (
+          <FileIcon
+            name={name}
+            isDark={isDark}
+            size={16}
+            className="shrink-0"
+          />
+        )}
         <span className="min-w-0 flex-1 truncate" title={file.path}>
           <span className={tw.text.primary}>{name}</span>
           {directory && (

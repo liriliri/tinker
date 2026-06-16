@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import type { GitCheckoutInfo, GitWorkingTreeFile } from 'share/types/git'
 import {
   fileBelongsToDisplayGroup,
+  getWorkingTreeDiscardBatches,
   resolveWorkingTreeSelection,
   type RefreshWorkingTreeOptions,
   type WorkingTreeDisplayGroup,
@@ -241,7 +242,7 @@ class WorkingTree {
     return this.withWorkingTreeMutation(async () => {
       try {
         await this.syncPreloadRepo()
-        await codeEditor.discardFile(file.path, file.group)
+        await codeEditor.discardFile(file.path, file.group, file.status)
         const wasSelected = this.selectedWorkingTreeFile?.path === file.path
         await this.refreshWorkingTree({
           showLoading: false,
@@ -312,27 +313,14 @@ class WorkingTree {
   }
 
   async discardWorkingTreeGroup(group: WorkingTreeDisplayGroup) {
-    const paths = this.getWorkingTreeGroupPaths(group)
-    if (paths.length === 0) return
+    const batches = getWorkingTreeDiscardBatches(this.workingTreeFiles, group)
+    if (batches.length === 0) return
 
     return this.withWorkingTreeMutation(async () => {
       try {
         await this.syncPreloadRepo()
-        if (group === 'changes') {
-          const trackedPaths = this.workingTreeFiles
-            .filter((file) => file.group === 'changes')
-            .map((file) => file.path)
-          const untrackedPaths = this.workingTreeFiles
-            .filter((file) => file.group === 'untracked')
-            .map((file) => file.path)
-          if (trackedPaths.length > 0) {
-            await codeEditor.discardFiles(trackedPaths, 'changes')
-          }
-          if (untrackedPaths.length > 0) {
-            await codeEditor.discardFiles(untrackedPaths, 'untracked')
-          }
-        } else {
-          await codeEditor.discardFiles(paths, group)
+        for (const batch of batches) {
+          await codeEditor.discardFiles(batch.paths, batch.group, batch.status)
         }
         const wasSelected =
           this.selectedWorkingTreeFile != null &&

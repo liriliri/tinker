@@ -59,6 +59,7 @@ export type GitWorkingTreeStatus =
   | 'intent-to-rename'
   | 'type-changed'
   | 'conflict'
+  | 'submodule-dirty'
 
 export interface GitWorkingTreeFile {
   id: string

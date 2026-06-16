@@ -116,17 +116,103 @@ export function fileBelongsToDisplayGroup(
   return file.group === displayGroup
 }
 
+export function isSubmoduleWorkingTreeFile(
+  file: Pick<GitWorkingTreeFile, 'status'>
+): boolean {
+  return file.status === 'submodule-dirty'
+}
+
+export interface WorkingTreeDiscardBatch {
+  paths: string[]
+  group: GitWorkingTreeGroup
+  status?: GitWorkingTreeStatus
+}
+
+export function getWorkingTreeDiscardBatches(
+  files: GitWorkingTreeFile[],
+  group: WorkingTreeDisplayGroup
+): WorkingTreeDiscardBatch[] {
+  if (group === 'changes') {
+    const sectionFiles = files.filter(
+      (file) => file.group === 'changes' || file.group === 'untracked'
+    )
+    const batches: WorkingTreeDiscardBatch[] = []
+    const submodulePaths = sectionFiles
+      .filter(isSubmoduleWorkingTreeFile)
+      .map((file) => file.path)
+    const trackedPaths = sectionFiles
+      .filter(
+        (file) => file.group === 'changes' && !isSubmoduleWorkingTreeFile(file)
+      )
+      .map((file) => file.path)
+    const untrackedPaths = sectionFiles
+      .filter((file) => file.group === 'untracked')
+      .map((file) => file.path)
+
+    if (submodulePaths.length > 0) {
+      batches.push({
+        paths: submodulePaths,
+        group: 'changes',
+        status: 'submodule-dirty',
+      })
+    }
+    if (trackedPaths.length > 0) {
+      batches.push({ paths: trackedPaths, group: 'changes' })
+    }
+    if (untrackedPaths.length > 0) {
+      batches.push({ paths: untrackedPaths, group: 'untracked' })
+    }
+    return batches
+  }
+
+  if (group === 'staged') {
+    const stagedFiles = files.filter((file) => file.group === 'staged')
+    const batches: WorkingTreeDiscardBatch[] = []
+    const submodulePaths = stagedFiles
+      .filter(isSubmoduleWorkingTreeFile)
+      .map((file) => file.path)
+    const regularPaths = stagedFiles
+      .filter((file) => !isSubmoduleWorkingTreeFile(file))
+      .map((file) => file.path)
+
+    if (submodulePaths.length > 0) {
+      batches.push({
+        paths: submodulePaths,
+        group: 'staged',
+        status: 'submodule-dirty',
+      })
+    }
+    if (regularPaths.length > 0) {
+      batches.push({ paths: regularPaths, group: 'staged' })
+    }
+    return batches
+  }
+
+  const paths = files
+    .filter((file) => fileBelongsToDisplayGroup(file, group))
+    .map((file) => file.path)
+  return paths.length > 0 ? [{ paths, group }] : []
+}
+
+function compareWorkingTreeFiles(
+  a: GitWorkingTreeFile,
+  b: GitWorkingTreeFile
+): number {
+  const aIsSubmodule = isSubmoduleWorkingTreeFile(a)
+  const bIsSubmodule = isSubmoduleWorkingTreeFile(b)
+  if (aIsSubmodule !== bIsSubmodule) {
+    return aIsSubmodule ? -1 : 1
+  }
+  return a.path.localeCompare(b.path)
+}
+
 export function groupWorkingTreeFiles(
   files: GitWorkingTreeFile[]
 ): WorkingTreeGroupSection[] {
   return WORKING_TREE_DISPLAY_GROUPS.map((group) => {
-    const sectionFiles = files.filter((file) =>
-      fileBelongsToDisplayGroup(file, group)
-    )
-
-    if (group === 'changes') {
-      sectionFiles.sort((a, b) => a.path.localeCompare(b.path))
-    }
+    const sectionFiles = files
+      .filter((file) => fileBelongsToDisplayGroup(file, group))
+      .sort(compareWorkingTreeFiles)
 
     return { group, files: sectionFiles }
   }).filter((section) => section.files.length > 0)
@@ -151,6 +237,8 @@ export function statusLetterClass(status: GitWorkingTreeStatus): string {
       return 'text-purple-600 dark:text-purple-400'
     case 'conflict':
       return 'text-red-600 dark:text-red-400'
+    case 'submodule-dirty':
+      return 'text-blue-600 dark:text-blue-400'
     default:
       return 'text-gray-500 dark:text-gray-400'
   }
@@ -201,6 +289,16 @@ const UNSTAGED_FILE_ACTIONS: WorkingTreeFileAction[] = [
 export function getWorkingTreeFileActions(
   file: GitWorkingTreeFile
 ): WorkingTreeFileAction[] {
+  if (isSubmoduleWorkingTreeFile(file)) {
+    switch (file.group) {
+      case 'staged':
+        return [{ id: 'unstage', titleKey: 'unstage' }]
+      case 'changes':
+        return [{ id: 'discard', titleKey: 'discard' }]
+      default:
+        return []
+    }
+  }
   switch (file.group) {
     case 'staged':
       return [

@@ -1,4 +1,4 @@
-import { Editor, loader } from '@monaco-editor/react'
+import { Editor } from '@monaco-editor/react'
 import { observer } from 'mobx-react-lite'
 import { useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,17 +13,13 @@ import splitPath from 'licia/splitPath'
 import { GitCommit } from 'lucide-react'
 import { BINARY_EXTS, getFileExt, getLanguage } from 'share/lib/fileType'
 import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
+import { getMonacoApi, initMonacoApi } from 'share/lib/monaco'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import ImageViewer from 'share/components/ImageViewer'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
-type MonacoApi = typeof import('monaco-editor')
-
-let monacoApi: MonacoApi | null = null
-loader.init().then((m) => {
-  monacoApi = m as MonacoApi
-})
+initMonacoApi()
 
 function isBinaryFile(filePath: string): boolean {
   const ext = getFileExt(filePath)
@@ -58,7 +54,7 @@ export default observer(function CommitFileViewer() {
 
   useBlameDecorations({
     editorRef,
-    monacoApi,
+    monacoApi: getMonacoApi(),
     annotations: blameAnnotations,
     highlightedSha: store.highlightedBlameSha,
     showBlame: store.showingBlame,
@@ -93,16 +89,17 @@ export default observer(function CommitFileViewer() {
     editorRef.current = editor
     // Suppress language diagnostics for read-only commit viewer
     const model = editor.getModel()
-    if (model && monacoApi) {
+    if (model && getMonacoApi()) {
       const clearMarkers = () => {
-        if (model.isDisposed() || !monacoApi) return
-        const markers = monacoApi.editor.getModelMarkers({
+        const monaco = getMonacoApi()
+        if (model.isDisposed() || !monaco) return
+        const markers = monaco.editor.getModelMarkers({
           resource: model.uri,
         })
         if (markers.length === 0) return
         const owners = new Set(markers.map((m) => m.owner))
         for (const owner of owners) {
-          monacoApi.editor.setModelMarkers(model, owner, [])
+          monaco.editor.setModelMarkers(model, owner, [])
         }
       }
       // Language services set markers asynchronously — clear once after delay
