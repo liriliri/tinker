@@ -8,6 +8,7 @@ export interface IFileEntry {
 
 export type SortMethod = 'name' | 'size' | 'mtime'
 export type SortOrder = 'asc' | 'desc'
+export type ViewMode = 'list' | 'grid'
 
 export interface IDriveInfo {
   label: string

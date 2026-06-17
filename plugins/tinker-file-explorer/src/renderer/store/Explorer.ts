@@ -4,7 +4,7 @@ import pluck from 'licia/pluck'
 import type { IFileEntry, SortMethod, SortOrder } from '../../common/types'
 import { sortEntries } from '../lib/util'
 
-class ExplorerTab {
+class Explorer {
   id: string
   title: string
   path: string
@@ -128,4 +128,4 @@ class ExplorerTab {
   }
 }
 
-export default ExplorerTab
+export default Explorer

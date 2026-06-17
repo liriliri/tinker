@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useEffect, useMemo, useCallback, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import type {
@@ -8,53 +8,46 @@ import type {
   RowClickedEvent,
   RowDoubleClickedEvent,
   RowClassParams,
+  CellContextMenuEvent,
 } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import fileSize from 'licia/fileSize'
 import dateFormat from 'licia/dateFormat'
-import { Folder } from 'lucide-react'
 import { tw } from 'share/theme'
 import Grid from 'share/components/Grid'
-import { getFileIcon } from 'share/lib/util'
-import type { IFileEntry } from '../../common/types'
-import type ExplorerTab from '../store/ExplorerTab'
+import type { IFileEntry, SortMethod } from '../../common/types'
+import type Explorer from '../store/Explorer'
 import store from '../store'
+import FileEntryIcon from './FileEntryIcon'
+import { showEntryContextMenu, showBlankContextMenu } from '../lib/contextMenu'
+import { useSelectAll } from '../hooks/useSelectAll'
 
 interface FileListProps {
-  tab: ExplorerTab
+  tab: Explorer
 }
+
+const SORT_FIELD_MAP: Record<string, SortMethod> = {
+  name: 'name',
+  size: 'size',
+  mtimeMs: 'mtime',
+}
+
+const SORT_METHOD_FIELD: Record<SortMethod, string> = {
+  name: 'name',
+  size: 'size',
+  mtime: 'mtimeMs',
+}
+
+const keepRowOrder = () => 0
 
 const NameCell = observer(function NameCell({
   data,
 }: ICellRendererParams<IFileEntry>) {
-  const [icon, setIcon] = useState<string | undefined>()
-
-  useEffect(() => {
-    if (!data || data.isDirectory) {
-      setIcon(undefined)
-      return
-    }
-
-    let active = true
-    getFileIcon(data.path).then((result) => {
-      if (active) setIcon(result)
-    })
-    return () => {
-      active = false
-    }
-  }, [data?.path, data?.isDirectory])
-
   if (!data) return null
 
   return (
     <div className="flex items-center gap-2 min-w-0">
-      {data.isDirectory ? (
-        <Folder size={16} className={`shrink-0 ${tw.primary.text}`} />
-      ) : icon ? (
-        <img src={icon} alt="" className="w-4 h-4 shrink-0 object-contain" />
-      ) : (
-        <span className="w-4 h-4 shrink-0" />
-      )}
+      <FileEntryIcon path={data.path} isDirectory={data.isDirectory} />
       <span className="truncate">{data.name}</span>
     </div>
   )
@@ -72,7 +65,8 @@ export default observer(function FileList({ tab }: FileListProps) {
         headerName: t('colName'),
         flex: 2,
         minWidth: 180,
-        sortable: false,
+        sortable: true,
+        comparator: keepRowOrder,
         cellRenderer: NameCell,
       },
       {
@@ -80,7 +74,8 @@ export default observer(function FileList({ tab }: FileListProps) {
         headerName: t('colSize'),
         width: 110,
         minWidth: 90,
-        sortable: false,
+        sortable: true,
+        comparator: keepRowOrder,
         cellStyle: { textAlign: 'right' },
         valueFormatter: (params) => {
           if (!params.data?.isDirectory && params.value != null) {
@@ -92,9 +87,11 @@ export default observer(function FileList({ tab }: FileListProps) {
       {
         field: 'mtimeMs',
         headerName: t('colModified'),
-        width: 160,
-        minWidth: 140,
-        sortable: false,
+        width: 180,
+        minWidth: 160,
+        sortable: true,
+        comparator: keepRowOrder,
+        cellClass: 'font-mono tabular-nums',
         cellStyle: { textAlign: 'right' },
         valueFormatter: (params) =>
           params.value
@@ -109,6 +106,21 @@ export default observer(function FileList({ tab }: FileListProps) {
     (params: GetRowIdParams<IFileEntry>) => params.data.path,
     []
   )
+
+  const onSortChanged = useCallback(() => {
+    const columnState = gridRef.current?.api.getColumnState()
+    const sortedColumn = columnState?.find((col) => col.sort != null)
+
+    if (sortedColumn) {
+      const method = SORT_FIELD_MAP[sortedColumn.colId]
+      if (method) {
+        tab.setSort(method, sortedColumn.sort === 'asc' ? 'asc' : 'desc')
+      }
+      return
+    }
+
+    tab.setSort('name', 'asc')
+  }, [tab])
 
   const onRowClicked = useCallback(
     (event: RowClickedEvent<IFileEntry>) => {
@@ -136,6 +148,33 @@ export default observer(function FileList({ tab }: FileListProps) {
     [tab.id]
   )
 
+  const onCellContextMenu = useCallback(
+    (event: CellContextMenuEvent<IFileEntry>) => {
+      const mouseEvent = event.event as MouseEvent | undefined
+      if (!mouseEvent || !event.data) return
+
+      showEntryContextMenu(mouseEvent, tab, event.data.path, t, {
+        onTrash: (paths) => {
+          void store.trashPaths(tab.id, paths)
+        },
+        onRename: (path, newName) => store.renameEntry(tab.id, path, newName),
+      })
+    },
+    [tab, t]
+  )
+
+  const onContainerContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (target.closest('.ag-row') || target.closest('.ag-header')) return
+
+      showBlankContextMenu(event.nativeEvent, tab, t, (name) =>
+        store.createFolder(tab.id, name)
+      )
+    },
+    [tab.id, t]
+  )
+
   const getRowClass = useCallback(
     (params: RowClassParams<IFileEntry>) => {
       if (params.data && tab.selectedPaths.includes(params.data.path)) {
@@ -149,6 +188,19 @@ export default observer(function FileList({ tab }: FileListProps) {
   useEffect(() => {
     gridRef.current?.api?.redrawRows()
   }, [tab.selectedPaths])
+
+  useEffect(() => {
+    const api = gridRef.current?.api
+    if (!api) return
+
+    const columnState = api.getColumnState()
+    const sortField = SORT_METHOD_FIELD[tab.sortMethod]
+    const updatedState = columnState.map((col) => ({
+      ...col,
+      sort: col.colId === sortField ? tab.sortOrder : null,
+    }))
+    api.applyColumnState({ state: updatedState })
+  }, [tab.sortMethod, tab.sortOrder])
 
   useEffect(() => {
     if (tab.loading) return
@@ -169,19 +221,7 @@ export default observer(function FileList({ tab }: FileListProps) {
     })
   }, [tab.path, tab.loading])
 
-  useEffect(() => {
-    if (store.activeTabId !== tab.id) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
-        e.preventDefault()
-        tab.selectAll()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [tab, store.activeTabId])
+  useSelectAll(tab, store.activeTabId === tab.id)
 
   const localeText = useMemo(
     () => ({
@@ -201,7 +241,11 @@ export default observer(function FileList({ tab }: FileListProps) {
   }
 
   return (
-    <div ref={containerRef} className="h-full">
+    <div
+      ref={containerRef}
+      className="h-full"
+      onContextMenu={onContainerContextMenu}
+    >
       <Grid<IFileEntry>
         ref={gridRef}
         isDark={store.isDark}
@@ -211,6 +255,9 @@ export default observer(function FileList({ tab }: FileListProps) {
         loading={tab.loading}
         onRowClicked={onRowClicked}
         onRowDoubleClicked={onRowDoubleClicked}
+        onCellContextMenu={onCellContextMenu}
+        onSortChanged={onSortChanged}
+        preventDefaultOnContextMenu={true}
         getRowClass={getRowClass}
         animateRows={false}
         enableCellTextSelection={false}

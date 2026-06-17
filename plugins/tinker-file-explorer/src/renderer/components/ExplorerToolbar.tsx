@@ -5,22 +5,24 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
-  FolderPlus,
+  LayoutGrid,
+  List,
   RotateCw,
 } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
+  ToolbarButtonGroup,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { prompt } from 'share/components/Prompt'
-import type ExplorerTab from '../store/ExplorerTab'
+import { tw } from 'share/theme'
+import type Explorer from '../store/Explorer'
 import store from '../store'
 import PathBreadcrumb from './PathBreadcrumb'
 
 interface ExplorerToolbarProps {
-  tab: ExplorerTab
+  tab: Explorer
 }
 
 export default observer(function ExplorerToolbar({
@@ -28,16 +30,6 @@ export default observer(function ExplorerToolbar({
 }: ExplorerToolbarProps) {
   const { t } = useTranslation()
   const [editingPath, setEditingPath] = useState(false)
-
-  const handleCreateFolder = async () => {
-    const name = await prompt({
-      title: t('newFolder'),
-      message: t('newFolderPrompt'),
-      placeholder: t('newFolderPlaceholder'),
-    })
-    if (!name?.trim()) return
-    await store.createFolder(tab.id, name.trim())
-  }
 
   return (
     <Toolbar>
@@ -107,12 +99,26 @@ export default observer(function ExplorerToolbar({
           />
         )}
       </div>
-      <ToolbarButton
-        title={t('newFolder')}
-        onClick={() => void handleCreateFolder()}
-      >
-        <FolderPlus size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      <ToolbarButtonGroup>
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'list'}
+          onClick={() => store.setViewMode('list')}
+          title={t('viewList')}
+          className={`rounded-none rounded-l border-r ${tw.border}`}
+        >
+          <List size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+        <ToolbarButton
+          variant="toggle"
+          active={store.viewMode === 'grid'}
+          onClick={() => store.setViewMode('grid')}
+          title={t('viewGrid')}
+          className="rounded-none rounded-r"
+        >
+          <LayoutGrid size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </ToolbarButtonGroup>
     </Toolbar>
   )
 })

@@ -1,10 +1,12 @@
 import { observer } from 'mobx-react-lite'
-import type ExplorerTab from '../store/ExplorerTab'
+import type Explorer from '../store/Explorer'
 import ExplorerToolbar from './ExplorerToolbar'
 import FileList from './FileList'
+import FileGrid from './FileGrid'
+import store from '../store'
 
 interface ExplorerPaneProps {
-  tab: ExplorerTab
+  tab: Explorer
 }
 
 export default observer(function ExplorerPane({ tab }: ExplorerPaneProps) {
@@ -12,7 +14,11 @@ export default observer(function ExplorerPane({ tab }: ExplorerPaneProps) {
     <div className="flex flex-col h-full min-h-0">
       <ExplorerToolbar tab={tab} />
       <div className="flex-1 min-h-0 overflow-hidden">
-        <FileList tab={tab} />
+        {store.viewMode === 'list' ? (
+          <FileList tab={tab} />
+        ) : (
+          <FileGrid tab={tab} />
+        )}
       </div>
     </div>
   )

@@ -174,6 +174,28 @@ const fileExplorerObj = {
     await fs.promises.mkdir(dirPath)
   },
 
+  async renamePath(oldPath: string, newPath: string): Promise<void> {
+    await fs.promises.rename(oldPath, newPath)
+  },
+
+  async trashPaths(
+    paths: string[]
+  ): Promise<{ deleted: number; errors: string[] }> {
+    let deleted = 0
+    const errors: string[] = []
+
+    for (const filePath of paths) {
+      try {
+        await shell.trashItem(filePath)
+        deleted++
+      } catch {
+        errors.push(filePath)
+      }
+    }
+
+    return { deleted, errors }
+  },
+
   async openPath(filePath: string): Promise<void> {
     await shell.openPath(filePath)
   },

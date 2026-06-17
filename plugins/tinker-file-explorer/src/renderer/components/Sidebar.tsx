@@ -49,8 +49,8 @@ export default observer(function Sidebar() {
             return (
               <span
                 className={className(
-                  'text-xs font-medium uppercase tracking-wide',
-                  tw.text.tertiary
+                  'text-sm flex-1 truncate',
+                  tw.text.primary
                 )}
               >
                 {node.label}

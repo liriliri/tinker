@@ -19,7 +19,6 @@
   "goUp": "Up",
   "refresh": "Refresh",
   "newFolder": "New Folder",
-  "newFolderPrompt": "Enter a name for the new folder",
   "newFolderPlaceholder": "Folder name",
   "pathPlaceholder": "Path",
   "pathEllipsis": "Show parent folders",
@@ -27,5 +26,11 @@
   "closeOtherTabs": "Close Others",
   "copyPath": "Copy Path",
   "itemCount": "{{count}} items",
-  "selectedCount": "{{count}} selected"
+  "selectedCount": "{{count}} selected",
+  "viewList": "List view",
+  "viewGrid": "Grid view",
+  "delete": "Delete",
+  "rename": "Rename",
+  "renamePlaceholder": "Name",
+  "sortBy": "Sort by"
 }

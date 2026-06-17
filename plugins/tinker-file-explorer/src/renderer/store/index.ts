@@ -3,11 +3,12 @@ import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import pluck from 'licia/pluck'
 import BaseStore from 'share/BaseStore'
-import type { IFavoritePlace } from '../../common/types'
-import ExplorerTab from './ExplorerTab'
+import type { IFavoritePlace, ViewMode } from '../../common/types'
+import Explorer from './Explorer'
 
 const storage = new LocalStore('tinker-file-explorer')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_VIEW_MODE = 'viewMode'
 const DRIVE_REFRESH_INTERVAL = 5000
 
 const SHORTCUT_KEYS = [
@@ -21,9 +22,10 @@ const SHORTCUT_KEYS = [
 ] as const
 
 class Store extends BaseStore {
-  tabs: ExplorerTab[] = []
+  tabs: Explorer[] = []
   activeTabId = ''
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
+  viewMode: ViewMode = storage.get(STORAGE_VIEW_MODE) ?? 'list'
   places: IFavoritePlace[] = []
   placesLoading = false
   pathInput = ''
@@ -36,7 +38,7 @@ class Store extends BaseStore {
     void this.init()
   }
 
-  get activeTab(): ExplorerTab | undefined {
+  get activeTab(): Explorer | undefined {
     return this.tabs.find((tab) => tab.id === this.activeTabId)
   }
 
@@ -119,7 +121,7 @@ class Store extends BaseStore {
 
   addTab(path: string, activate = true) {
     const title = fileExplorer.basename(path) || path
-    const tab = new ExplorerTab(uuid(), path, title)
+    const tab = new Explorer(uuid(), path, title)
     tab.pushHistory(path)
     this.tabs.push(tab)
     if (activate) {
@@ -164,6 +166,11 @@ class Store extends BaseStore {
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setViewMode(mode: ViewMode) {
+    this.viewMode = mode
+    storage.set(STORAGE_VIEW_MODE, mode)
   }
 
   openPath(path: string, newTab = false) {
@@ -271,6 +278,44 @@ class Store extends BaseStore {
       return
     }
     await fileExplorer.openPath(entryPath)
+  }
+
+  async trashPaths(tabId: string, paths: string[]) {
+    if (paths.length === 0) return
+
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab) return
+
+    await fileExplorer.trashPaths(paths)
+
+    runInAction(() => {
+      tab.selectedPaths = tab.selectedPaths.filter(
+        (path) => !paths.includes(path)
+      )
+    })
+
+    await this.refreshTab(tabId)
+  }
+
+  async renameEntry(tabId: string, oldPath: string, newName: string) {
+    const name = newName.trim()
+    if (!name || name.includes('/') || name.includes('\\')) return
+
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab) return
+
+    const newPath = fileExplorer.joinPath(fileExplorer.dirname(oldPath), name)
+    if (newPath === oldPath) return
+
+    await fileExplorer.renamePath(oldPath, newPath)
+
+    runInAction(() => {
+      tab.selectedPaths = tab.selectedPaths.map((path) =>
+        path === oldPath ? newPath : path
+      )
+    })
+
+    await this.refreshTab(tabId)
   }
 }
 
