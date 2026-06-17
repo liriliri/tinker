@@ -7,12 +7,15 @@ import {
   ArrowUp,
   LayoutGrid,
   List,
+  PanelRight,
+  PanelRightClose,
   RotateCw,
 } from 'lucide-react'
 import {
   Toolbar,
   ToolbarButton,
   ToolbarButtonGroup,
+  ToolbarSearch,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
@@ -99,6 +102,13 @@ export default observer(function ExplorerToolbar({
           />
         )}
       </div>
+      <ToolbarSearch
+        value={tab.filterText}
+        onChange={(value) => tab.setFilterText(value)}
+        placeholder={t('filterPlaceholder')}
+        shortcut="f"
+        className="!w-32 shrink-0"
+      />
       <ToolbarButtonGroup>
         <ToolbarButton
           variant="toggle"
@@ -119,6 +129,16 @@ export default observer(function ExplorerToolbar({
           <LayoutGrid size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </ToolbarButtonGroup>
+      <ToolbarButton
+        onClick={() => store.setShowPreview(!store.showPreview)}
+        title={t('preview')}
+      >
+        {store.showPreview ? (
+          <PanelRightClose size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <PanelRight size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
     </Toolbar>
   )
 })

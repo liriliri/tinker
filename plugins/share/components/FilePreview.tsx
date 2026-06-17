@@ -6,6 +6,7 @@ import { createPlayer } from '@videojs/react'
 import { Video, videoFeatures } from '@videojs/react/video'
 import { useTranslation } from 'react-i18next'
 import VideoPlayer from './VideoPlayer'
+import ImageViewer from './ImageViewer'
 import { tw } from '../theme'
 import { getFileCategory } from '../lib/fileType'
 import { getFileIcon } from '../lib/util'
@@ -109,20 +110,26 @@ export default function FilePreview({ path }: FilePreviewProps) {
     <div
       className={`w-[280px] border-l ${tw.border} flex flex-col overflow-hidden`}
     >
-      <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {isImage && !imgFailed ? (
-          <img
+          <ImageViewer
             src={url}
-            alt={name}
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full"
+            fitArea={0.9}
             onError={() => setImgFailed(true)}
           />
         ) : isVideo ? (
-          <VideoPreview src={url} />
-        ) : icon ? (
-          <img src={icon} alt="" className="w-16 h-16" />
+          <div className="flex items-center justify-center h-full p-4 overflow-hidden">
+            <VideoPreview src={url} />
+          </div>
         ) : (
-          <div className="w-16 h-16" />
+          <div className="flex items-center justify-center h-full p-4">
+            {icon ? (
+              <img src={icon} alt="" className="w-16 h-16" />
+            ) : (
+              <div className="w-16 h-16" />
+            )}
+          </div>
         )}
       </div>
       <div

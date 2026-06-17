@@ -1,3 +1,4 @@
+import clamp from 'licia/clamp'
 import type { TreeNodeData } from 'share/components/Tree'
 import type {
   IFileEntry,
@@ -5,6 +6,15 @@ import type {
   SortMethod,
   SortOrder,
 } from '../../common/types'
+
+export function filterEntries(
+  entries: IFileEntry[],
+  query: string
+): IFileEntry[] {
+  const trimmed = query.trim().toLowerCase()
+  if (!trimmed) return entries
+  return entries.filter((entry) => entry.name.toLowerCase().includes(trimmed))
+}
 
 export function sortEntries(
   entries: IFileEntry[],
@@ -46,9 +56,22 @@ export function buildSidebarTree(
   t: (key: string) => string
 ): SidebarNodeData[] {
   const shortcuts = places.filter((place) => place.group === 'shortcuts')
+  const custom = places.filter((place) => place.group === 'custom')
   const drives = places.filter((place) => place.group === 'drives')
 
-  return [
+  const sections: SidebarNodeData[] = [
+    {
+      id: 'section-custom',
+      label: t('custom'),
+      kind: 'section',
+      children: custom.map((place) => ({
+        id: place.id,
+        label: place.label,
+        kind: 'place',
+        path: place.path,
+        placeGroup: place.group,
+      })),
+    },
     {
       id: 'section-shortcuts',
       label: t('shortcuts'),
@@ -62,19 +85,22 @@ export function buildSidebarTree(
         labelKey: place.label,
       })),
     },
-    {
-      id: 'section-drives',
-      label: t('drives'),
-      kind: 'section',
-      children: drives.map((place) => ({
-        id: place.id,
-        label: place.label,
-        kind: 'place',
-        path: place.path,
-        placeGroup: place.group,
-      })),
-    },
   ]
+
+  sections.push({
+    id: 'section-drives',
+    label: t('drives'),
+    kind: 'section',
+    children: drives.map((place) => ({
+      id: place.id,
+      label: place.label,
+      kind: 'place',
+      path: place.path,
+      placeGroup: place.group,
+    })),
+  })
+
+  return sections
 }
 
 export interface PathBreadcrumbItem {
@@ -126,7 +152,7 @@ export function getVisiblePathBreadcrumbs(
   items: PathBreadcrumbItem[],
   startIndex: number
 ): { ellipsisPath: string | null; visible: PathBreadcrumbItem[] } {
-  const start = Math.max(0, Math.min(startIndex, items.length - 1))
+  const start = clamp(startIndex, 0, items.length - 1)
   if (start === 0) {
     return { ellipsisPath: null, visible: items }
   }

@@ -127,7 +127,7 @@ export default observer(function FileList({ tab }: FileListProps) {
       if (!event.data) return
 
       const mouseEvent = event.event as MouseEvent | undefined
-      const index = tab.sortedEntries.findIndex(
+      const index = tab.visibleEntries.findIndex(
         (entry) => entry.path === event.data!.path
       )
       if (index < 0) return
@@ -154,6 +154,10 @@ export default observer(function FileList({ tab }: FileListProps) {
       if (!mouseEvent || !event.data) return
 
       showEntryContextMenu(mouseEvent, tab, event.data.path, t, {
+        onCopy: () => store.copySelection(tab.id),
+        onCut: () => store.cutSelection(tab.id),
+        onOpenInTerminal: (path, isDir) =>
+          store.openInIntegratedTerminal(path, isDir),
         onTrash: (paths) => {
           void store.trashPaths(tab.id, paths)
         },
@@ -168,11 +172,16 @@ export default observer(function FileList({ tab }: FileListProps) {
       const target = event.target as HTMLElement
       if (target.closest('.ag-row') || target.closest('.ag-header')) return
 
-      showBlankContextMenu(event.nativeEvent, tab, t, (name) =>
-        store.createFolder(tab.id, name)
-      )
+      showBlankContextMenu(event.nativeEvent, tab, t, {
+        canPaste: store.hasClipboard && store.canPasteTo(tab.path),
+        onPaste: () => {
+          void store.pasteClipboard(tab.id)
+        },
+        onOpenInTerminal: () => store.openInIntegratedTerminal(tab.path, true),
+        onCreateFolder: (name) => store.createFolder(tab.id, name),
+      })
     },
-    [tab.id, t]
+    [tab.id, tab.path, t]
   )
 
   const getRowClass = useCallback(
@@ -223,11 +232,13 @@ export default observer(function FileList({ tab }: FileListProps) {
 
   useSelectAll(tab, store.activeTabId === tab.id)
 
+  const emptyMessage = tab.isFiltering ? t('noFilterResults') : t('emptyFolder')
+
   const localeText = useMemo(
     () => ({
-      noRowsToShow: t('emptyFolder'),
+      noRowsToShow: emptyMessage,
     }),
-    [t]
+    [emptyMessage]
   )
 
   if (tab.error) {
@@ -250,7 +261,7 @@ export default observer(function FileList({ tab }: FileListProps) {
         ref={gridRef}
         isDark={store.isDark}
         columnDefs={columnDefs}
-        rowData={tab.sortedEntries}
+        rowData={tab.visibleEntries}
         getRowId={getRowId}
         loading={tab.loading}
         onRowClicked={onRowClicked}
@@ -263,7 +274,7 @@ export default observer(function FileList({ tab }: FileListProps) {
         enableCellTextSelection={false}
         suppressCellFocus={true}
         localeText={localeText}
-        overlayNoRowsTemplate={`<span>${t('emptyFolder')}</span>`}
+        overlayNoRowsTemplate={`<span>${emptyMessage}</span>`}
       />
     </div>
   )

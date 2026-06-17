@@ -119,7 +119,7 @@ import WorkingTreeSidebar, {
   getWorkingTreeUIProps,
 } from 'share/components/WorkingTree'
 
-<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
+;<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
 ```
 
 Implement `WorkingTreeController` on your store. Helpers in `share/lib/workingTree`.
@@ -149,7 +149,7 @@ const actions: WelcomeAction[] = [
 ```ts
 import FileIcon from 'share/components/FileIcon'
 
-<FileIcon name="app.tsx" isDark={store.isDark} size={18} />
+;<FileIcon name="app.tsx" isDark={store.isDark} size={18} />
 ```
 
 ### Terminal
@@ -159,7 +159,9 @@ import Terminal, { getTerminalSession } from 'share/components/Terminal'
 ```
 
 ```ts
-<Terminal createSession={(cols, rows) => tinker.createTerminal({ cols, rows })} />
+<Terminal
+  createSession={(cols, rows) => tinker.createTerminal({ cols, rows })}
+/>
 ```
 
 ### TerminalPanel
@@ -175,9 +177,11 @@ this.terminal = new Terminal('my-plugin', () => this.rootPath)
 this.terminal.initIfOpen()
 
 // In layout:
-{store.terminalOpen && (
-  <TerminalPanel terminal={store.terminal} isDark={store.isDark} />
-)}
+{
+  store.terminalOpen && (
+    <TerminalPanel terminal={store.terminal} isDark={store.isDark} />
+  )
+}
 ```
 
 ### FileTree
@@ -205,9 +209,20 @@ const dataSource: IFileTreeDataSource = {
 ```
 
 Pass `rootPath` to enable a blank-area context menu with built-in New File / New Folder actions at the project root.
-```
+
+````
 
 File watching is the consumer's responsibility — use `onExpandChange`, `refreshDirs`, and `refreshVersion`.
+
+### FilePreview
+
+Side panel file preview with metadata. Images use `ImageViewer` (zoom, pan, rotate via context menu). Videos require the videojs vendor script.
+
+```ts
+import FilePreview from 'share/components/FilePreview'
+
+<FilePreview path={selectedFilePath} />
+````
 
 ### Other Components
 
@@ -217,12 +232,13 @@ import FileOpen from 'share/components/FileOpen'
 import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageViewer from 'share/components/ImageViewer'
+import FilePreview from 'share/components/FilePreview'
 import Tooltip from 'share/components/Tooltip'
 import NavList from 'share/components/NavList'
 import Tree from 'share/components/Tree'
 import Grid from 'share/components/Grid'
-import HexEditor from 'share/components/HexEditor'    // requires react-hex-editor vendor
-import VideoPlayer from 'share/components/VideoPlayer'  // requires videojs vendor
+import HexEditor from 'share/components/HexEditor' // requires react-hex-editor vendor
+import VideoPlayer from 'share/components/VideoPlayer' // requires videojs vendor
 ```
 
 ## Hooks
@@ -298,6 +314,7 @@ Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?`, `resizabl
 ## Git Preload (`share/preload/git.ts`)
 
 Exposed via preload `contextBridge` as `git`:
+
 - `searchCommits(ref, query, skip?, limit?, author?)`
 - `getAuthors(ref)` / `getCheckoutInfo()` / `getWorkingTreeStatus()`
 - `getWorkingTreeFileDiffContent(path, group, status, renameFrom?)`

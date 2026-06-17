@@ -19,5 +19,13 @@ export interface IFavoritePlace {
   id: string
   label: string
   path: string
-  group: 'shortcuts' | 'drives'
+  group: 'shortcuts' | 'drives' | 'custom'
+}
+
+export type ClipboardMode = 'copy' | 'cut'
+
+export interface IClipboardItem {
+  path: string
+  name: string
+  isDirectory: boolean
 }

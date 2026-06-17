@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getFileIcon } from 'share/lib/util'
-import DirectoryIcon from '../../assets/directory.svg?react'
+import DirectoryIcon from '../assets/directory.svg?react'
 
 interface FileEntryIconProps {
   path: string

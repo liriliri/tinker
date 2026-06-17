@@ -4,8 +4,18 @@ import type { SortMethod } from '../../common/types'
 import type Explorer from '../store/Explorer'
 
 interface EntryContextMenuHandlers {
+  onCopy: () => void
+  onCut: () => void
+  onOpenInTerminal: (path: string, isDirectory: boolean) => void
   onTrash: (paths: string[]) => void
   onRename: (path: string, newName: string) => Promise<void>
+}
+
+interface BlankContextMenuOptions {
+  canPaste: boolean
+  onPaste: () => void
+  onOpenInTerminal: () => void
+  onCreateFolder: (name: string) => Promise<void>
 }
 
 const SORT_OPTIONS: Array<{ method: SortMethod; labelKey: string }> = [
@@ -51,15 +61,30 @@ export function showBlankContextMenu(
   event: MouseEvent,
   tab: Explorer,
   t: (key: string) => string,
-  onCreateFolder: (name: string) => Promise<void>
+  options: BlankContextMenuOptions
 ) {
   event.preventDefault()
 
   tinker.showContextMenu(event.clientX, event.clientY, [
     {
+      label: t('showInFolder'),
+      click: () => tinker.showItemInPath(tab.path),
+    },
+    {
+      label: t('openInIntegratedTerminal'),
+      click: () => options.onOpenInTerminal(),
+    },
+    { type: 'separator' },
+    {
+      label: t('paste'),
+      enabled: options.canPaste,
+      click: () => options.onPaste(),
+    },
+    { type: 'separator' },
+    {
       label: t('newFolder'),
       click: () => {
-        void requestCreateFolder(t, onCreateFolder)
+        void requestCreateFolder(t, options.onCreateFolder)
       },
     },
     { type: 'separator' },
@@ -81,7 +106,7 @@ export function showEntryContextMenu(
 
   let paths = tab.selectedPaths
   if (!paths.includes(clickedPath)) {
-    const index = tab.sortedEntries.findIndex(
+    const index = tab.visibleEntries.findIndex(
       (entry) => entry.path === clickedPath
     )
     if (index < 0) return
@@ -92,6 +117,27 @@ export function showEntryContextMenu(
   if (paths.length === 0) return
 
   tinker.showContextMenu(event.clientX, event.clientY, [
+    {
+      label: t('showInFolder'),
+      click: () => tinker.showItemInPath(clickedPath),
+    },
+    {
+      label: t('openInIntegratedTerminal'),
+      click: () => {
+        const entry = tab.entries.find((e) => e.path === clickedPath)
+        handlers.onOpenInTerminal(clickedPath, entry?.isDirectory ?? false)
+      },
+    },
+    { type: 'separator' },
+    {
+      label: t('copy'),
+      click: () => handlers.onCopy(),
+    },
+    {
+      label: t('cut'),
+      click: () => handlers.onCut(),
+    },
+    { type: 'separator' },
     {
       label: t('rename'),
       enabled: paths.length === 1,

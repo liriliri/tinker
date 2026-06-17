@@ -2,13 +2,23 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import pluck from 'licia/pluck'
+import isEmpty from 'licia/isEmpty'
 import BaseStore from 'share/BaseStore'
-import type { IFavoritePlace, ViewMode } from '../../common/types'
+import Terminal from 'share/store/Terminal'
+import type { SplitDirection } from 'share/types/terminalLayout'
+import type {
+  IFavoritePlace,
+  ViewMode,
+  IClipboardItem,
+  ClipboardMode,
+} from '../../common/types'
 import Explorer from './Explorer'
 
 const storage = new LocalStore('tinker-file-explorer')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_VIEW_MODE = 'viewMode'
+const STORAGE_SHOW_PREVIEW = 'showPreview'
+const STORAGE_CUSTOM_PLACES = 'customPlaces'
 const DRIVE_REFRESH_INTERVAL = 5000
 
 const SHORTCUT_KEYS = [
@@ -22,19 +32,27 @@ const SHORTCUT_KEYS = [
 ] as const
 
 class Store extends BaseStore {
+  terminal: Terminal
   tabs: Explorer[] = []
   activeTabId = ''
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
   viewMode: ViewMode = storage.get(STORAGE_VIEW_MODE) ?? 'list'
+  showPreview: boolean = storage.get(STORAGE_SHOW_PREVIEW) === true
   places: IFavoritePlace[] = []
+  customPlaces: IFavoritePlace[] = storage.get(STORAGE_CUSTOM_PLACES) ?? []
   placesLoading = false
   pathInput = ''
+  clipboardItems: IClipboardItem[] = []
+  clipboardMode: ClipboardMode | null = null
   private driveRefreshTimer?: ReturnType<typeof setInterval>
   private lastDrivePaths = ''
 
   constructor() {
     super()
-    makeAutoObservable(this)
+    this.terminal = new Terminal('tinker-file-explorer', () =>
+      this.activeTab?.path ? this.activeTab.path : fileExplorer.getHomedir()
+    )
+    makeAutoObservable(this, { terminal: false })
     void this.init()
   }
 
@@ -42,11 +60,81 @@ class Store extends BaseStore {
     return this.tabs.find((tab) => tab.id === this.activeTabId)
   }
 
+  get hasClipboard(): boolean {
+    return this.clipboardItems.length > 0
+  }
+
+  private buildClipboardItems(
+    tab: Explorer,
+    paths: string[]
+  ): IClipboardItem[] {
+    return paths.map((entryPath) => {
+      const entry = tab.entries.find((item) => item.path === entryPath)
+      return {
+        path: entryPath,
+        name: entry?.name ?? fileExplorer.basename(entryPath),
+        isDirectory: entry?.isDirectory ?? false,
+      }
+    })
+  }
+
+  canPasteTo(destDir: string): boolean {
+    if (!this.hasClipboard) return false
+
+    for (const item of this.clipboardItems) {
+      if (item.isDirectory && fileExplorer.isPathInside(item.path, destDir)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  copySelection(tabId: string) {
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab || isEmpty(tab.selectedPaths)) return
+
+    this.clipboardItems = this.buildClipboardItems(tab, tab.selectedPaths)
+    this.clipboardMode = 'copy'
+  }
+
+  cutSelection(tabId: string) {
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab || isEmpty(tab.selectedPaths)) return
+
+    this.clipboardItems = this.buildClipboardItems(tab, tab.selectedPaths)
+    this.clipboardMode = 'cut'
+  }
+
+  clearClipboard() {
+    this.clipboardItems = []
+    this.clipboardMode = null
+  }
+
+  async pasteClipboard(tabId: string) {
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab || !this.clipboardMode || isEmpty(this.clipboardItems)) return
+    if (!this.canPasteTo(tab.path)) return
+
+    const paths = this.clipboardItems.map((item) => item.path)
+    const mode = this.clipboardMode
+
+    if (mode === 'copy') {
+      await fileExplorer.copyPaths(paths, tab.path)
+    } else {
+      await fileExplorer.movePaths(paths, tab.path)
+      this.clearClipboard()
+    }
+
+    await this.refreshTab(tabId)
+  }
+
   private async init() {
     await this.loadPlaces()
     this.startDriveRefresh()
     const home = fileExplorer.getHomedir()
     this.addTab(home)
+    this.terminal.initIfOpen()
   }
 
   private startDriveRefresh() {
@@ -73,7 +161,7 @@ class Store extends BaseStore {
       }))
 
       runInAction(() => {
-        this.places = [...shortcuts, ...drivePlaces]
+        this.places = [...shortcuts, ...this.customPlaces, ...drivePlaces]
       })
     } catch {
       // ignore refresh errors
@@ -114,9 +202,43 @@ class Store extends BaseStore {
     }
 
     runInAction(() => {
-      this.places = places
+      this.places = [...places, ...this.customPlaces]
       this.placesLoading = false
     })
+  }
+
+  addCustomPlace(label: string, path: string) {
+    const place: IFavoritePlace = {
+      id: uuid(),
+      label,
+      path,
+      group: 'custom',
+    }
+    this.customPlaces.push(place)
+    this.places.push(place)
+    this.persistCustomPlaces()
+    return place
+  }
+
+  editCustomPlace(id: string, label: string, path: string) {
+    const index = this.customPlaces.findIndex((p) => p.id === id)
+    if (index === -1) return
+    this.customPlaces[index] = { ...this.customPlaces[index], label, path }
+    const placesIndex = this.places.findIndex((p) => p.id === id)
+    if (placesIndex !== -1) {
+      this.places[placesIndex] = { ...this.places[placesIndex], label, path }
+    }
+    this.persistCustomPlaces()
+  }
+
+  removeCustomPlace(id: string) {
+    this.customPlaces = this.customPlaces.filter((p) => p.id !== id)
+    this.places = this.places.filter((p) => p.id !== id)
+    this.persistCustomPlaces()
+  }
+
+  private persistCustomPlaces() {
+    storage.set(STORAGE_CUSTOM_PLACES, this.customPlaces.slice())
   }
 
   addTab(path: string, activate = true) {
@@ -168,9 +290,65 @@ class Store extends BaseStore {
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
+  // ---- Terminal proxies ----
+
+  get terminalOpen() {
+    return this.terminal.terminalOpen
+  }
+  set terminalOpen(v) {
+    this.terminal.terminalOpen = v
+  }
+  get terminalTabs() {
+    return this.terminal.tabs
+  }
+  get activeTerminalTabId() {
+    return this.terminal.activeTabId
+  }
+  get activePaneId() {
+    return this.terminal.activePaneId
+  }
+  set activePaneId(v) {
+    this.terminal.activePaneId = v
+  }
+  get paneTitles() {
+    return this.terminal.paneTitles
+  }
+  get pendingCwd() {
+    return this.terminal.pendingCwd
+  }
+  get onDestroyPane() {
+    return this.terminal.onDestroyPane
+  }
+  set onDestroyPane(v) {
+    this.terminal.onDestroyPane = v
+  }
+
+  toggleTerminal = () => this.terminal.toggle()
+  addTerminalTab = (cwd?: string) => this.terminal.addTab(cwd)
+  openInIntegratedTerminal = (path: string, isDir: boolean) =>
+    this.terminal.openInDirectory(path, isDir)
+  closeTerminalTab = (id: string) => this.terminal.closeTab(id)
+  setActiveTerminalTab = (id: string) => this.terminal.setActiveTab(id)
+  setActivePane = (paneId: string) => this.terminal.setActivePane(paneId)
+  setPaneTitle = (paneId: string, title: string) =>
+    this.terminal.setPaneTitle(paneId, title)
+  splitPane = (paneId: string, direction: SplitDirection) =>
+    this.terminal.splitPane(paneId, direction)
+  closePane = (paneId: string) => this.terminal.closePane(paneId)
+  setDualColumns = () => this.terminal.setDualColumns()
+  setTripleColumns = () => this.terminal.setTripleColumns()
+  setGrid = () => this.terminal.setGrid()
+  moveTerminalTab = (from: number, to: number) =>
+    this.terminal.moveTab(from, to)
+
   setViewMode(mode: ViewMode) {
     this.viewMode = mode
     storage.set(STORAGE_VIEW_MODE, mode)
+  }
+
+  setShowPreview(value: boolean) {
+    this.showPreview = value
+    storage.set(STORAGE_SHOW_PREVIEW, value)
   }
 
   openPath(path: string, newTab = false) {
@@ -191,6 +369,7 @@ class Store extends BaseStore {
     tab.path = path
     tab.title = fileExplorer.basename(path) || path
     tab.clearSelection()
+    tab.clearFilter()
     this.pathInput = path
     await this.loadTabDir(tabId, path, false)
   }
@@ -281,7 +460,7 @@ class Store extends BaseStore {
   }
 
   async trashPaths(tabId: string, paths: string[]) {
-    if (paths.length === 0) return
+    if (isEmpty(paths)) return
 
     const tab = this.tabs.find((t) => t.id === tabId)
     if (!tab) return

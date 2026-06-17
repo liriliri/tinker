@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { PanelLeft, PanelLeftClose } from 'lucide-react'
+import { PanelLeft, PanelLeftClose, Terminal } from 'lucide-react'
 import {
   StatusBar,
   StatusBarItem,
@@ -25,7 +25,12 @@ export default observer(function StatusBarComponent() {
       {tab && (
         <>
           <StatusBarItem clickable={false}>
-            {t('itemCount', { count: tab.entries.length })}
+            {tab.isFiltering
+              ? t('filteredItemCount', {
+                  visible: tab.visibleEntries.length,
+                  total: tab.entries.length,
+                })
+              : t('itemCount', { count: tab.entries.length })}
           </StatusBarItem>
           {tab.selectedPaths.length > 0 && (
             <StatusBarItem clickable={false}>
@@ -34,6 +39,9 @@ export default observer(function StatusBarComponent() {
           )}
         </>
       )}
+      <StatusBarItem onClick={() => store.toggleTerminal()}>
+        <Terminal size={14} />
+      </StatusBarItem>
     </StatusBar>
   )
 })

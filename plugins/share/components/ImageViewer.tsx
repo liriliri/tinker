@@ -32,6 +32,8 @@ export interface ImageViewerProps {
   fitArea?: number
   /** Called when image loads with natural dimensions */
   onLoad?: (naturalWidth: number, naturalHeight: number) => void
+  /** Called when image fails to load */
+  onError?: () => void
   /** Show zoom ratio indicator while scaling */
   showRatio?: boolean
 }
@@ -75,6 +77,7 @@ export default function ImageViewer({
   fit = 'contain',
   fitArea = 0.8,
   onLoad,
+  onError,
   showRatio = true,
 }: ImageViewerProps) {
   const { t } = useTranslation(I18N_NS)
@@ -414,6 +417,7 @@ export default function ImageViewer({
           opacity: 0,
         }}
         onLoad={handleLoad}
+        onError={() => onError?.()}
       />
       {showRatio && (
         <div

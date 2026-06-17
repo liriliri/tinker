@@ -121,6 +121,10 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
   const handleContextMenu = useCallback(
     (event: React.MouseEvent, clickedPath: string) => {
       showEntryContextMenu(event.nativeEvent, tab, clickedPath, t, {
+        onCopy: () => store.copySelection(tab.id),
+        onCut: () => store.cutSelection(tab.id),
+        onOpenInTerminal: (path, isDir) =>
+          store.openInIntegratedTerminal(path, isDir),
         onTrash: (paths) => {
           void store.trashPaths(tab.id, paths)
         },
@@ -135,9 +139,14 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
       const target = event.target as HTMLElement
       if (target.closest('[data-file-entry]')) return
 
-      showBlankContextMenu(event.nativeEvent, tab, t, (name) =>
-        store.createFolder(tab.id, name)
-      )
+      showBlankContextMenu(event.nativeEvent, tab, t, {
+        canPaste: store.hasClipboard && store.canPasteTo(tab.path),
+        onPaste: () => {
+          void store.pasteClipboard(tab.id)
+        },
+        onOpenInTerminal: () => store.openInIntegratedTerminal(tab.path, true),
+        onCreateFolder: (name) => store.createFolder(tab.id, name),
+      })
     },
     [tab, t]
   )
@@ -148,7 +157,7 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
 
     const updateLayout = () => {
       const containerWidth = container.clientWidth
-      const itemCount = tab.sortedEntries.length
+      const itemCount = tab.visibleEntries.length
       const columnCount = Math.max(
         1,
         Math.floor(containerWidth / (ITEM_SIZE + GAP))
@@ -187,7 +196,7 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
     const observer = new ResizeObserver(updateLayout)
     observer.observe(container)
     return () => observer.disconnect()
-  }, [tab.sortedEntries.length])
+  }, [tab.visibleEntries.length])
 
   useEffect(() => {
     if (tab.loading) return
@@ -204,7 +213,7 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
   if (tab.error) {
     return (
       <div
-        className={`flex items-center justify-center h-full text-sm px-4 text-center ${tw.bg.primary} ${tw.text.tertiary}`}
+        className={`flex items-center justify-center h-full text-sm px-4 text-center ${tw.text.tertiary}`}
       >
         {tab.error}
       </div>
@@ -214,7 +223,7 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
   return (
     <div
       ref={containerRef}
-      className={`h-full overflow-y-auto overflow-x-hidden relative py-2 ${tw.bg.primary}`}
+      className="h-full overflow-y-auto overflow-x-hidden relative py-2"
       onContextMenu={handleBlankContextMenu}
     >
       {tab.loading && (
@@ -222,15 +231,15 @@ export default observer(function FileGrid({ tab }: FileGridProps) {
           <LoadingCircle />
         </div>
       )}
-      {!tab.loading && tab.sortedEntries.length === 0 ? (
+      {!tab.loading && tab.visibleEntries.length === 0 ? (
         <div
-          className={`flex items-center justify-center h-full text-sm ${tw.bg.primary} ${tw.text.tertiary}`}
+          className={`flex items-center justify-center h-full text-sm ${tw.text.tertiary}`}
         >
-          {t('emptyFolder')}
+          {tab.isFiltering ? t('noFilterResults') : t('emptyFolder')}
         </div>
       ) : (
         <div style={layout.style}>
-          {tab.sortedEntries.map((entry, index) => (
+          {tab.visibleEntries.map((entry, index) => (
             <GridItem
               key={entry.path}
               entry={entry}

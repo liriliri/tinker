@@ -1,102 +1,138 @@
 import { contextBridge, shell } from 'electron'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
+import si from 'systeminformation'
 import * as fs from 'fs'
 import * as path from 'path'
-import { homedir, platform } from 'os'
+import { homedir } from 'os'
+import isMac from 'licia/isMac'
+import isWindows from 'licia/isWindows'
 import normalizePath from 'licia/normalizePath'
 import type { IFileEntry, IDriveInfo } from '../common/types'
 
-const execFileAsync = promisify(execFile)
-
 const SKIP_ENTRIES = new Set(['.DS_Store', 'Thumbs.db'])
 
-const SKIP_MOUNT_PREFIXES = [
-  '/dev',
-  '/private/var/folders',
-  '/private/tmp',
-  '/System/Volumes/Preboot',
-  '/System/Volumes/VM',
-  '/System/Volumes/xarts',
-  '/System/Volumes/iSCPreboot',
-  '/System/Volumes/Hardware',
-  '/System/Volumes/Update',
-  '/System/Volumes/Recovery',
-  '/System/Volumes/Update/mnt1',
-  '/boot',
-]
-
-const SKIP_FILESYSTEM_RE =
-  /^(devfs|map |fdesc|autofs|tmpfs|vm\.|com\.apple|proc|sysfs|efivarfs)/
-
-function formatDriveLabel(mountPath: string): string {
-  const os = platform()
-  const normalized = normalizePath(mountPath)
-
-  if (os === 'darwin' && normalized === '/') {
-    return 'Macintosh HD'
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.promises.access(filePath)
+    return true
+  } catch {
+    return false
   }
-
-  if (normalized.startsWith('/Volumes/')) {
-    return normalized.slice('/Volumes/'.length) || normalized
-  }
-
-  if (normalized === '/') {
-    return '/'
-  }
-
-  const base = path.basename(normalized)
-  return base || normalized
 }
 
-async function getUnixDrives(): Promise<IDriveInfo[]> {
-  const drives: IDriveInfo[] = []
-  const seen = new Set<string>()
+async function findAvailableName(
+  dirPath: string,
+  name: string,
+  excludePath?: string
+): Promise<string> {
+  const ext = path.extname(name)
+  const base = ext ? path.basename(name, ext) : name
 
-  try {
-    const { stdout } = await execFileAsync('df', ['-Pl'], { encoding: 'utf8' })
-    const lines = stdout.trim().split('\n').slice(1)
+  let candidate = name
+  let index = 1
 
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/)
-      if (parts.length < 6) continue
-
-      const filesystem = parts[0]
-      const mountPath = parts[parts.length - 1]
-
-      if (SKIP_FILESYSTEM_RE.test(filesystem)) continue
-      if (SKIP_MOUNT_PREFIXES.some((prefix) => mountPath.startsWith(prefix))) {
-        continue
-      }
-      if (
-        mountPath.startsWith('/System/Volumes/') &&
-        mountPath !== '/System/Volumes/Data'
-      ) {
-        continue
-      }
-
-      const normalized = normalizePath(mountPath)
-      if (seen.has(normalized)) continue
-      seen.add(normalized)
-
-      drives.push({
-        label: formatDriveLabel(mountPath),
-        path: mountPath,
-      })
+  while (true) {
+    const candidatePath = path.join(dirPath, candidate)
+    if (
+      excludePath &&
+      normalizePath(candidatePath) === normalizePath(excludePath)
+    ) {
+      return candidate
     }
-  } catch {
-    // fall through to fallback
+    if (!(await pathExists(candidatePath))) {
+      return candidate
+    }
+    candidate = ext ? `${base} (${index})${ext}` : `${base} (${index})`
+    index++
   }
+}
 
-  if (drives.length === 0) {
-    drives.push({
-      label: platform() === 'darwin' ? 'Macintosh HD' : '/',
-      path: '/',
+async function copyEntry(
+  sourcePath: string,
+  destinationPath: string,
+  isDirectory: boolean
+): Promise<void> {
+  if (isDirectory) {
+    if (typeof fs.promises.cp === 'function') {
+      await fs.promises.cp(sourcePath, destinationPath, {
+        recursive: true,
+        errorOnExist: true,
+      })
+      return
+    }
+
+    await fs.promises.mkdir(destinationPath, { recursive: true })
+    const entries = await fs.promises.readdir(sourcePath, {
+      withFileTypes: true,
     })
+
+    for (const entry of entries) {
+      const src = path.join(sourcePath, entry.name)
+      const dest = path.join(destinationPath, entry.name)
+      await copyEntry(src, dest, entry.isDirectory())
+    }
+    return
   }
 
-  drives.sort((a, b) => a.label.localeCompare(b.label))
-  return drives
+  await fs.promises.copyFile(sourcePath, destinationPath)
+}
+
+async function moveEntry(
+  sourcePath: string,
+  destinationPath: string,
+  isDirectory: boolean
+): Promise<void> {
+  try {
+    await fs.promises.rename(sourcePath, destinationPath)
+  } catch (err: unknown) {
+    const error = err as NodeJS.ErrnoException
+    if (error.code !== 'EXDEV') throw err
+
+    await copyEntry(sourcePath, destinationPath, isDirectory)
+    await fs.promises.rm(sourcePath, { recursive: isDirectory, force: true })
+  }
+}
+
+async function transferPaths(
+  paths: string[],
+  destDir: string,
+  operation: 'copy' | 'move'
+): Promise<{ processed: number; errors: string[] }> {
+  let processed = 0
+  const errors: string[] = []
+
+  for (const sourcePath of paths) {
+    try {
+      const stat = await fs.promises.stat(sourcePath)
+      const normalizedDest = normalizePath(destDir)
+      const name = path.basename(sourcePath)
+      const availableName = await findAvailableName(
+        normalizedDest,
+        name,
+        operation === 'move' ? sourcePath : undefined
+      )
+      const targetPath = path.join(normalizedDest, availableName)
+
+      if (
+        operation === 'move' &&
+        normalizePath(sourcePath) === normalizePath(targetPath)
+      ) {
+        processed++
+        continue
+      }
+
+      if (operation === 'copy') {
+        await copyEntry(sourcePath, targetPath, stat.isDirectory())
+      } else {
+        await moveEntry(sourcePath, targetPath, stat.isDirectory())
+      }
+
+      processed++
+    } catch {
+      errors.push(sourcePath)
+    }
+  }
+
+  return { processed, errors }
 }
 
 const fileExplorerObj = {
@@ -150,24 +186,70 @@ const fileExplorerObj = {
   },
 
   async getVolumes(): Promise<IDriveInfo[]> {
-    if (platform() === 'win32') {
-      const drives: IDriveInfo[] = []
+    const fsSizeData = await si.fsSize()
+    const drives: IDriveInfo[] = []
+    const seen = new Set<string>()
 
-      for (let code = 65; code <= 90; code++) {
-        const letter = String.fromCharCode(code)
-        const drivePath = `${letter}:\\`
-        try {
-          await fs.promises.access(drivePath)
-          drives.push({ label: `${letter}:`, path: drivePath })
-        } catch {
-          // drive not mounted
-        }
+    for (const disk of fsSizeData) {
+      if (disk.size <= 0) continue
+
+      const mount = normalizePath(disk.mount)
+      if (seen.has(mount)) continue
+
+      if (isMac) {
+        if (mount.startsWith('/System/Volumes/')) continue
+        if (mount.startsWith('/private/')) continue
+        if (mount === '/dev') continue
+        if (mount !== '/' && !mount.startsWith('/Volumes/')) continue
+      } else if (isWindows) {
+        if (!/^[A-Z]:$/i.test(mount)) continue
+      } else {
+        if (
+          mount.startsWith('/snap') ||
+          mount.startsWith('/boot') ||
+          mount.startsWith('/proc') ||
+          mount.startsWith('/dev') ||
+          mount.startsWith('/sys') ||
+          mount.startsWith('/run') ||
+          mount.startsWith('/tmp') ||
+          mount.startsWith('/var')
+        )
+          continue
+        if (
+          mount !== '/' &&
+          !mount.startsWith('/mnt/') &&
+          !mount.startsWith('/media/')
+        )
+          continue
       }
 
-      return drives
+      seen.add(mount)
+
+      let label: string
+      if (isMac && mount === '/') {
+        label = 'Macintosh HD'
+      } else if (mount.startsWith('/Volumes/')) {
+        label = mount.slice('/Volumes/'.length) || mount
+      } else if (isWindows) {
+        label = mount
+      } else if (mount === '/') {
+        label = '/'
+      } else {
+        label = path.basename(mount) || mount
+      }
+
+      drives.push({ label, path: mount })
     }
 
-    return getUnixDrives()
+    if (drives.length === 0) {
+      drives.push({
+        label: isMac ? 'Macintosh HD' : '/',
+        path: '/',
+      })
+    }
+
+    drives.sort((a, b) => a.label.localeCompare(b.label))
+    return drives
   },
 
   async createDir(dirPath: string): Promise<void> {
@@ -198,6 +280,30 @@ const fileExplorerObj = {
 
   async openPath(filePath: string): Promise<void> {
     await shell.openPath(filePath)
+  },
+
+  isPathInside(parentPath: string, childPath: string): boolean {
+    const parent = normalizePath(parentPath)
+    const child = normalizePath(childPath)
+
+    if (parent === child) return true
+
+    const prefix = parent.endsWith(path.sep) ? parent : `${parent}${path.sep}`
+    return child.startsWith(prefix)
+  },
+
+  async copyPaths(
+    paths: string[],
+    destDir: string
+  ): Promise<{ processed: number; errors: string[] }> {
+    return transferPaths(paths, destDir, 'copy')
+  },
+
+  async movePaths(
+    paths: string[],
+    destDir: string
+  ): Promise<{ processed: number; errors: string[] }> {
+    return transferPaths(paths, destDir, 'move')
   },
 }
 

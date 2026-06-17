@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import last from 'licia/last'
 import pluck from 'licia/pluck'
 import type { IFileEntry, SortMethod, SortOrder } from '../../common/types'
-import { sortEntries } from '../lib/util'
+import { filterEntries, sortEntries } from '../lib/util'
 
 class Explorer {
   id: string
@@ -17,6 +17,7 @@ class Explorer {
   historyIndex = -1
   sortMethod: SortMethod = 'name'
   sortOrder: SortOrder = 'asc'
+  filterText = ''
 
   constructor(id: string, path: string, title?: string) {
     this.id = id
@@ -27,6 +28,14 @@ class Explorer {
 
   get sortedEntries(): IFileEntry[] {
     return sortEntries(this.entries, this.sortMethod, this.sortOrder)
+  }
+
+  get visibleEntries(): IFileEntry[] {
+    return filterEntries(this.sortedEntries, this.filterText)
+  }
+
+  get isFiltering(): boolean {
+    return this.filterText.trim().length > 0
   }
 
   get canGoBack(): boolean {
@@ -40,6 +49,25 @@ class Explorer {
   get canGoUp(): boolean {
     const parent = fileExplorer.dirname(this.path)
     return parent !== this.path
+  }
+
+  get previewPath(): string | null {
+    for (let i = this.selectedPaths.length - 1; i >= 0; i--) {
+      const path = this.selectedPaths[i]
+      const entry = this.entries.find((item) => item.path === path)
+      if (entry && !entry.isDirectory) {
+        return path
+      }
+    }
+    return null
+  }
+
+  setFilterText(text: string) {
+    this.filterText = text
+  }
+
+  clearFilter() {
+    this.filterText = ''
   }
 
   setSort(method: SortMethod, order?: SortOrder) {
@@ -75,11 +103,11 @@ class Explorer {
   selectRange(startIndex: number, endIndex: number) {
     const from = Math.min(startIndex, endIndex)
     const to = Math.max(startIndex, endIndex)
-    this.selectedPaths = pluck(this.sortedEntries.slice(from, to + 1), 'path')
+    this.selectedPaths = pluck(this.visibleEntries.slice(from, to + 1), 'path')
   }
 
   selectAll() {
-    this.selectedPaths = pluck(this.sortedEntries, 'path')
+    this.selectedPaths = pluck(this.visibleEntries, 'path')
   }
 
   handleRowSelect(
