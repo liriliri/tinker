@@ -76,3 +76,63 @@ export function buildSidebarTree(
     },
   ]
 }
+
+export interface PathBreadcrumbItem {
+  name: string
+  path: string
+}
+
+const WIN_DRIVE_RE = /^([A-Za-z]:)(?:[/\\]|$)/
+
+export function buildPathBreadcrumbs(filePath: string): PathBreadcrumbItem[] {
+  if (!filePath) return []
+
+  const items: PathBreadcrumbItem[] = []
+
+  if (WIN_DRIVE_RE.test(filePath)) {
+    const match = WIN_DRIVE_RE.exec(filePath)!
+    const driveRoot = `${match[1]}\\`
+    const rest = filePath.slice(match[0].length)
+    const parts = rest.split(/[/\\]/).filter(Boolean)
+
+    items.push({ name: match[1], path: driveRoot })
+    let current = driveRoot
+    for (const part of parts) {
+      current = fileExplorer.joinPath(current, part)
+      items.push({ name: part, path: current })
+    }
+  } else if (filePath.startsWith('/')) {
+    const parts = filePath.split('/').filter(Boolean)
+
+    items.push({ name: '/', path: '/' })
+    let current = '/'
+    for (const part of parts) {
+      current = fileExplorer.joinPath(current, part)
+      items.push({ name: part, path: current })
+    }
+  } else {
+    const parts = filePath.split(/[/\\]/).filter(Boolean)
+    let current = ''
+    for (let i = 0; i < parts.length; i++) {
+      current = i === 0 ? parts[i] : fileExplorer.joinPath(current, parts[i])
+      items.push({ name: parts[i], path: current })
+    }
+  }
+
+  return items
+}
+
+export function getVisiblePathBreadcrumbs(
+  items: PathBreadcrumbItem[],
+  startIndex: number
+): { ellipsisPath: string | null; visible: PathBreadcrumbItem[] } {
+  const start = Math.max(0, Math.min(startIndex, items.length - 1))
+  if (start === 0) {
+    return { ellipsisPath: null, visible: items }
+  }
+
+  return {
+    ellipsisPath: items[start - 1]?.path ?? null,
+    visible: items.slice(start),
+  }
+}

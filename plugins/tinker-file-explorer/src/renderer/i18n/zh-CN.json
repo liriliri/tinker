@@ -22,6 +22,7 @@
   "newFolderPrompt": "输入新文件夹名称",
   "newFolderPlaceholder": "文件夹名称",
   "pathPlaceholder": "路径",
+  "pathEllipsis": "显示上级目录",
   "closeTab": "关闭",
   "closeOtherTabs": "关闭其他",
   "copyPath": "复制路径",

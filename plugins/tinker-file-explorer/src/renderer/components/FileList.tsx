@@ -63,6 +63,7 @@ const NameCell = observer(function NameCell({
 export default observer(function FileList({ tab }: FileListProps) {
   const { t } = useTranslation()
   const gridRef = useRef<AgGridReact<IFileEntry>>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const columnDefs: ColDef<IFileEntry>[] = useMemo(
     () => [
@@ -150,6 +151,25 @@ export default observer(function FileList({ tab }: FileListProps) {
   }, [tab.selectedPaths])
 
   useEffect(() => {
+    if (tab.loading) return
+
+    requestAnimationFrame(() => {
+      const api = gridRef.current?.api
+      if (!api) return
+
+      if (api.getDisplayedRowCount() > 0) {
+        api.ensureIndexVisible(0, 'top')
+        return
+      }
+
+      const viewport = containerRef.current?.querySelector('.ag-body-viewport')
+      if (viewport instanceof HTMLElement) {
+        viewport.scrollTop = 0
+      }
+    })
+  }, [tab.path, tab.loading])
+
+  useEffect(() => {
     if (store.activeTabId !== tab.id) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -181,21 +201,23 @@ export default observer(function FileList({ tab }: FileListProps) {
   }
 
   return (
-    <Grid<IFileEntry>
-      ref={gridRef}
-      isDark={store.isDark}
-      columnDefs={columnDefs}
-      rowData={tab.sortedEntries}
-      getRowId={getRowId}
-      loading={tab.loading}
-      onRowClicked={onRowClicked}
-      onRowDoubleClicked={onRowDoubleClicked}
-      getRowClass={getRowClass}
-      animateRows={false}
-      enableCellTextSelection={false}
-      suppressCellFocus={true}
-      localeText={localeText}
-      overlayNoRowsTemplate={`<span>${t('emptyFolder')}</span>`}
-    />
+    <div ref={containerRef} className="h-full">
+      <Grid<IFileEntry>
+        ref={gridRef}
+        isDark={store.isDark}
+        columnDefs={columnDefs}
+        rowData={tab.sortedEntries}
+        getRowId={getRowId}
+        loading={tab.loading}
+        onRowClicked={onRowClicked}
+        onRowDoubleClicked={onRowDoubleClicked}
+        getRowClass={getRowClass}
+        animateRows={false}
+        enableCellTextSelection={false}
+        suppressCellFocus={true}
+        localeText={localeText}
+        overlayNoRowsTemplate={`<span>${t('emptyFolder')}</span>`}
+      />
+    </div>
   )
 })
