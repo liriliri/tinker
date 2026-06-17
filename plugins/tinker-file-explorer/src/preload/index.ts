@@ -1,6 +1,6 @@
 import { contextBridge, shell } from 'electron'
 import si from 'systeminformation'
-import * as fs from 'fs'
+import fs from 'fs-extra'
 import * as path from 'path'
 import { homedir } from 'os'
 import isMac from 'licia/isMac'
@@ -9,15 +9,6 @@ import normalizePath from 'licia/normalizePath'
 import type { IFileEntry, IDriveInfo } from '../common/types'
 
 const SKIP_ENTRIES = new Set(['.DS_Store', 'Thumbs.db'])
-
-async function pathExists(filePath: string): Promise<boolean> {
-  try {
-    await fs.promises.access(filePath)
-    return true
-  } catch {
-    return false
-  }
-}
 
 async function findAvailableName(
   dirPath: string,
@@ -38,57 +29,11 @@ async function findAvailableName(
     ) {
       return candidate
     }
-    if (!(await pathExists(candidatePath))) {
+    if (!(await fs.pathExists(candidatePath))) {
       return candidate
     }
     candidate = ext ? `${base} (${index})${ext}` : `${base} (${index})`
     index++
-  }
-}
-
-async function copyEntry(
-  sourcePath: string,
-  destinationPath: string,
-  isDirectory: boolean
-): Promise<void> {
-  if (isDirectory) {
-    if (typeof fs.promises.cp === 'function') {
-      await fs.promises.cp(sourcePath, destinationPath, {
-        recursive: true,
-        errorOnExist: true,
-      })
-      return
-    }
-
-    await fs.promises.mkdir(destinationPath, { recursive: true })
-    const entries = await fs.promises.readdir(sourcePath, {
-      withFileTypes: true,
-    })
-
-    for (const entry of entries) {
-      const src = path.join(sourcePath, entry.name)
-      const dest = path.join(destinationPath, entry.name)
-      await copyEntry(src, dest, entry.isDirectory())
-    }
-    return
-  }
-
-  await fs.promises.copyFile(sourcePath, destinationPath)
-}
-
-async function moveEntry(
-  sourcePath: string,
-  destinationPath: string,
-  isDirectory: boolean
-): Promise<void> {
-  try {
-    await fs.promises.rename(sourcePath, destinationPath)
-  } catch (err: unknown) {
-    const error = err as NodeJS.ErrnoException
-    if (error.code !== 'EXDEV') throw err
-
-    await copyEntry(sourcePath, destinationPath, isDirectory)
-    await fs.promises.rm(sourcePath, { recursive: isDirectory, force: true })
   }
 }
 
@@ -102,7 +47,6 @@ async function transferPaths(
 
   for (const sourcePath of paths) {
     try {
-      const stat = await fs.promises.stat(sourcePath)
       const normalizedDest = normalizePath(destDir)
       const name = path.basename(sourcePath)
       const availableName = await findAvailableName(
@@ -121,9 +65,9 @@ async function transferPaths(
       }
 
       if (operation === 'copy') {
-        await copyEntry(sourcePath, targetPath, stat.isDirectory())
+        await fs.copy(sourcePath, targetPath)
       } else {
-        await moveEntry(sourcePath, targetPath, stat.isDirectory())
+        await fs.move(sourcePath, targetPath)
       }
 
       processed++
@@ -253,7 +197,7 @@ const fileExplorerObj = {
   },
 
   async createDir(dirPath: string): Promise<void> {
-    await fs.promises.mkdir(dirPath)
+    await fs.ensureDir(dirPath)
   },
 
   async renamePath(oldPath: string, newPath: string): Promise<void> {
