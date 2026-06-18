@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "description": "Local music player for TINKER",
   "scripts": {
-    "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
+    "dev:renderer": "vite build --watch --config ../vite.config.ts",
+    "dev:preload": "vite build --watch --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
   },
   "tinker": {
     "name": "Music Player",
     "description": "Play local music files with playlist management",
-    "main": "dist/index.html",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {

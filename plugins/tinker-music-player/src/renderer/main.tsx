@@ -9,8 +9,10 @@ import MusicToolbar from './components/Toolbar'
 import ListToolbar from './components/ListToolbar'
 import LocalToolbar from './components/LocalToolbar'
 import AddToSheetModal from './components/AddToSheetModal'
+import ScanDirsModal from './components/ScanDirsModal'
 import MusicDetail from './components/MusicDetail'
 import { PromptProvider } from 'share/components/Prompt'
+import { ToasterProvider } from 'share/components/Toaster'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
 import './index.scss'
@@ -31,24 +33,27 @@ const MainContent = observer(function MainContent() {
 
 const App = observer(function App() {
   return (
-    <PromptProvider>
-      <div className="relative flex flex-col h-screen overflow-hidden">
-        <MusicToolbar />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <div className="flex-1 overflow-hidden flex flex-col">
-            {store.activeTab === 'local' ? <LocalToolbar /> : <ListToolbar />}
-            <div className="flex-1 overflow-hidden">
-              <MainContent />
+    <ToasterProvider>
+      <PromptProvider>
+        <div className="relative flex flex-col h-screen overflow-hidden">
+          <MusicToolbar />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {store.activeTab === 'local' ? <LocalToolbar /> : <ListToolbar />}
+              <div className="flex-1 overflow-hidden">
+                <MainContent />
+              </div>
             </div>
           </div>
+          <PlayerBar />
+          <PlayQueue />
         </div>
-        <PlayerBar />
-        <PlayQueue />
-      </div>
-      <MusicDetail />
-      <AddToSheetModal />
-    </PromptProvider>
+        <MusicDetail />
+        <AddToSheetModal />
+        <ScanDirsModal />
+      </PromptProvider>
+    </ToasterProvider>
   )
 })
 

@@ -71,7 +71,7 @@ export default function Dialog({
 
   return (
     <Transition appear show={open} as={Fragment}>
-      <HeadlessDialog as="div" className="relative z-50" onClose={onClose}>
+      <HeadlessDialog as="div" className="relative z-[100]" onClose={onClose}>
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-200"

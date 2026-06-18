@@ -29,5 +29,12 @@
   "clearAll": "清空",
   "noLyric": "暂无歌词",
   "miniMode": "迷你模式",
-  "floatLyric": "悬浮歌词"
+  "floatLyric": "悬浮歌词",
+  "fileNotFound": "文件不存在",
+  "scanLocalMusic": "扫描本地音乐",
+  "addScanDir": "添加文件夹",
+  "scanDirPath": "文件夹",
+  "removeScanDir": "移除文件夹",
+  "emptyScanDirs": "尚未添加文件夹",
+  "scan": "扫描"
 }

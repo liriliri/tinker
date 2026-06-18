@@ -29,5 +29,12 @@
   "clearAll": "Clear",
   "noLyric": "No lyrics available",
   "miniMode": "Mini Mode",
-  "floatLyric": "Float Lyric"
+  "floatLyric": "Float Lyric",
+  "fileNotFound": "File not found",
+  "scanLocalMusic": "Scan Local Music",
+  "addScanDir": "Add Folder",
+  "scanDirPath": "Folder",
+  "removeScanDir": "Remove Folder",
+  "emptyScanDirs": "No folders added yet.",
+  "scan": "Scan"
 }

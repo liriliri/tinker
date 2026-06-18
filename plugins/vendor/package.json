@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
+    "glob": "^13.0.6",
     "ssh2": "^1.17.0",
     "systeminformation": "^5.30.7"
   },

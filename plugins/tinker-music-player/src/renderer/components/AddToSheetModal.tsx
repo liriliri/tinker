@@ -17,8 +17,8 @@ const AddToSheetModal = observer(() => {
 
   return (
     <Dialog open={isOpen} onClose={() => store.hideAddToSheet()}>
-      <div className="fixed inset-0 bg-black/30 z-50" aria-hidden="true" />
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black/30 z-[100]" aria-hidden="true" />
+      <div className="fixed inset-0 flex items-center justify-center z-[100]">
         <Dialog.Panel
           className={`${tw.bg.primary} border ${tw.border} rounded-lg shadow-xl w-72 max-h-96 flex flex-col overflow-hidden`}
         >

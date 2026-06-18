@@ -4,8 +4,13 @@ import LocalStore from 'licia/LocalStore'
 import randomItem from 'licia/randomItem'
 import debounce from 'licia/debounce'
 import splitPath from 'licia/splitPath'
+import normalizePath from 'licia/normalizePath'
 import uuid from 'licia/uuid'
+import i18n from 'i18next'
+import toast from 'react-hot-toast'
+import { fileExists } from 'share/lib/util'
 import audio from './lib/audio'
+import { cancelTranscode, resolvePlaybackUrl } from './lib/playback'
 import {
   LyricLine,
   parseLrc,
@@ -28,6 +33,11 @@ import {
 } from './lib/db'
 
 import { AUDIO_EXTS } from 'share/lib/fileType'
+import {
+  isPathUnderScanDirs,
+  findTrackByPath,
+  normalizeScanDir,
+} from './lib/scanPath'
 import { PlayMode, SideTab } from './types'
 
 interface FileSearchResult {
@@ -44,6 +54,8 @@ const STORAGE_VOLUME = 'volume'
 const STORAGE_PLAY_MODE = 'playMode'
 const STORAGE_CURRENT_TRACK_ID = 'currentTrackId'
 const STORAGE_PLAY_QUEUE_IDS = 'playQueueIds'
+const STORAGE_SCAN_DIRS = 'scanDirs'
+const STORAGE_SCAN_DIR_CHECKED = 'scanDirChecked'
 
 class Store extends BaseStore {
   tracks: Track[] = []
@@ -68,6 +80,11 @@ class Store extends BaseStore {
   lyricLines: LyricLine[] = []
   miniModeWindow: Window | null = null
   floatLyricWindow: Window | null = null
+  showScanDialog: boolean = false
+  scanDirs: string[] = []
+  scanDirChecked: string[] = []
+  isScanning: boolean = false
+  private playbackGeneration = 0
 
   constructor() {
     super()
@@ -80,6 +97,18 @@ class Store extends BaseStore {
   private loadStorage() {
     this.volume = storage.get<number>(STORAGE_VOLUME) ?? 0.8
     this.playMode = storage.get<PlayMode>(STORAGE_PLAY_MODE) || 'sequence'
+    const rawDirs = storage.get<string[]>(STORAGE_SCAN_DIRS) ?? []
+    const rawChecked = storage.get<string[]>(STORAGE_SCAN_DIR_CHECKED) ?? []
+    this.scanDirs = rawDirs.map(normalizeScanDir)
+    this.scanDirChecked = rawChecked
+      .map(normalizeScanDir)
+      .filter((dir) => this.scanDirs.includes(dir))
+    if (
+      JSON.stringify(rawDirs) !== JSON.stringify(this.scanDirs) ||
+      JSON.stringify(rawChecked) !== JSON.stringify(this.scanDirChecked)
+    ) {
+      this.persistScanDirs()
+    }
     audio.setVolume(this.volume)
   }
 
@@ -415,18 +444,19 @@ class Store extends BaseStore {
   async addFiles(filePaths: string[]) {
     const newTracks: Track[] = []
     for (const filePath of filePaths) {
-      if (this.tracks.some((t) => t.path === filePath)) continue
-      const baseName = splitPath(filePath).name
+      if (findTrackByPath(this.tracks, filePath)) continue
+      const normalizedPath = normalizePath(filePath)
+      const baseName = splitPath(normalizedPath).name
       const track: Track = {
         id: uuid(),
         title: baseName,
         artist: '',
         album: '',
         duration: 0,
-        path: filePath,
+        path: normalizedPath,
       }
       try {
-        const info = await tinker.getMediaInfo(filePath)
+        const info = await tinker.getMediaInfo(normalizedPath)
         if (info.metadata?.title) track.title = info.metadata.title
         if (info.metadata?.artist) track.artist = info.metadata.artist
         if (info.metadata?.album) track.album = info.metadata.album
@@ -466,11 +496,11 @@ class Store extends BaseStore {
     }
   }
 
-  removeTrack(id: string) {
+  async removeTrack(id: string) {
     const index = this.tracks.findIndex((t) => t.id === id)
     if (index === -1) return
     this.tracks.splice(index, 1)
-    dbRemoveTrack(id)
+    await dbRemoveTrack(id)
 
     // Remove from play queue
     const queueIdx = this.playQueue.findIndex((t) => t.id === id)
@@ -509,6 +539,7 @@ class Store extends BaseStore {
     const queueIdx = this.playQueue.findIndex((t) => t.id === id)
     if (queueIdx === -1) return
     if (queueIdx === this.currentIndex) {
+      cancelTranscode()
       audio.pause()
       this.currentIndex = -1
     } else if (queueIdx < this.currentIndex) {
@@ -519,6 +550,7 @@ class Store extends BaseStore {
   }
 
   clearPlayQueue() {
+    cancelTranscode()
     audio.stop()
     this.currentIndex = -1
     this.currentTime = 0
@@ -565,7 +597,9 @@ class Store extends BaseStore {
         if (audio.paused && !audio.duration) {
           const track = this.currentTrack
           if (track) {
-            await audio.play(`file://${track.path}`)
+            if (!(await this.ensureTrackFileExists(track))) return
+            const src = await resolvePlaybackUrl(track.path)
+            await audio.play(src)
           }
         } else {
           await audio.play()
@@ -615,11 +649,35 @@ class Store extends BaseStore {
     await this.startPlayback(track)
   }
 
+  private async ensureTrackFileExists(track: Track): Promise<boolean> {
+    if (await fileExists(track.path)) return true
+    toast.error(i18n.t('fileNotFound'))
+    return false
+  }
+
   private async startPlayback(track: Track) {
+    const gen = ++this.playbackGeneration
+    cancelTranscode()
+
+    if (!(await this.ensureTrackFileExists(track))) {
+      runInAction(() => {
+        this.isPlaying = false
+      })
+      return
+    }
+
     storage.set(STORAGE_CURRENT_TRACK_ID, track.id)
     this.loadLyrics(track)
+
     try {
-      await audio.play(`file://${track.path}`)
+      const src = await resolvePlaybackUrl(track.path)
+
+      if (gen !== this.playbackGeneration) return
+
+      await audio.play(src)
+
+      if (gen !== this.playbackGeneration) return
+
       runInAction(() => {
         const existIdx = this.recentTracks.findIndex((t) => t.id === track.id)
         if (existIdx !== -1) this.recentTracks.splice(existIdx, 1)
@@ -630,7 +688,10 @@ class Store extends BaseStore {
       })
       addRecentTrack(track)
     } catch {
-      // error handled by audio.onError
+      if (gen !== this.playbackGeneration) return
+      runInAction(() => {
+        this.isPlaying = false
+      })
     }
   }
 
@@ -662,6 +723,76 @@ class Store extends BaseStore {
 
   hideMusicDetail() {
     this.showMusicDetail = false
+  }
+
+  showScanDialogView() {
+    this.showScanDialog = true
+  }
+
+  hideScanDialog() {
+    this.showScanDialog = false
+  }
+
+  addScanDir(path: string) {
+    const dir = normalizeScanDir(path)
+    if (this.scanDirs.includes(dir)) return
+    this.scanDirs = [...this.scanDirs, dir]
+    if (!this.scanDirChecked.includes(dir)) {
+      this.scanDirChecked = [...this.scanDirChecked, dir]
+    }
+    this.persistScanDirs()
+  }
+
+  removeScanDir(path: string) {
+    this.scanDirs = this.scanDirs.filter((dir) => dir !== path)
+    this.scanDirChecked = this.scanDirChecked.filter((dir) => dir !== path)
+    this.persistScanDirs()
+  }
+
+  toggleScanDirChecked(path: string) {
+    if (this.scanDirChecked.includes(path)) {
+      this.scanDirChecked = this.scanDirChecked.filter((dir) => dir !== path)
+    } else {
+      this.scanDirChecked = [...this.scanDirChecked, path]
+    }
+    this.persistScanDirs()
+  }
+
+  private persistScanDirs() {
+    storage.set(STORAGE_SCAN_DIRS, this.scanDirs)
+    storage.set(STORAGE_SCAN_DIR_CHECKED, this.scanDirChecked)
+  }
+
+  async scanLocalMusic(checkedDirs: string[]) {
+    const dirs = [...checkedDirs]
+    if (dirs.length === 0) return
+
+    runInAction(() => {
+      this.isScanning = true
+    })
+
+    try {
+      const filePaths = await musicPlayer.scanAudioFiles(dirs)
+      const scannedPaths = new Set(filePaths.map((file) => normalizePath(file)))
+
+      const toRemove = this.tracks.filter(
+        (track) =>
+          isPathUnderScanDirs(track.path, dirs) &&
+          !scannedPaths.has(normalizePath(track.path))
+      )
+      for (const track of toRemove) {
+        await this.removeTrack(track.id)
+      }
+
+      const pathsToAdd = filePaths.filter(
+        (file) => !findTrackByPath(this.tracks, file)
+      )
+      await this.addFiles(pathsToAdd)
+    } finally {
+      runInAction(() => {
+        this.isScanning = false
+      })
+    }
   }
 
   private async loadLyrics(track: Track) {

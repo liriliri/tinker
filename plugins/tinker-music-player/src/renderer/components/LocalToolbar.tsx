@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, FolderSearch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Toolbar,
@@ -30,6 +30,12 @@ const LocalToolbar = observer(() => {
     <Toolbar>
       <ToolbarButton onClick={handleImport} title={t('import')}>
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => store.showScanDialogView()}
+        title={t('scanLocalMusic')}
+      >
+        <FolderSearch size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSpacer />
       <ToolbarSearch

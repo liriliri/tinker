@@ -1,3 +1,5 @@
+import { AUDIO_EXTS } from 'share/lib/fileType'
+
 export const AUDIO_DIALOG_OPTIONS = {
   properties: ['openFile', 'multiSelections'] as (
     | 'openFile'
@@ -6,7 +8,7 @@ export const AUDIO_DIALOG_OPTIONS = {
   filters: [
     {
       name: 'Audio Files',
-      extensions: ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac', 'wma'],
+      extensions: [...AUDIO_EXTS],
     },
   ],
 }
