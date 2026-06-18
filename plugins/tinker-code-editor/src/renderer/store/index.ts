@@ -166,6 +166,12 @@ class Store extends BaseStore {
     this.addRecentDirectory(path)
     this.watchedDirs.clear()
     this.treeRefreshDirs.clear()
+    if (this.terminal.terminalOpen) {
+      for (const tab of [...this.terminal.tabs]) {
+        this.terminal.closeTab(tab.id)
+      }
+      this.terminal.openInDirectory(path, true)
+    }
     await this.loadDirectory(path)
   }
 

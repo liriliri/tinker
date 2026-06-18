@@ -96,6 +96,7 @@ const App = observer(function App() {
   const activeTab = store.tabs.find((t) => t.id === store.activeTabId)
   const isActiveImageTab = activeTab?.category === 'image'
   const isActiveGitDiffTab = activeTab?.category === 'gitDiff'
+  const isAtGitRoot = store.workingTree.repoPath === store.rootPath
 
   if (!store.rootPath) {
     return <Welcome />
@@ -169,21 +170,25 @@ const App = observer(function App() {
                               }
                             />
                           </div>
-                          {!isActiveImageTab && !isActiveGitDiffTab && (
-                            <button
-                              onClick={() => store.toggleBlame()}
-                              className={`w-7 h-7 ml-1 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
-                                store.showingBlame
-                                  ? `opacity-100 ${tw.primary.text}`
-                                  : ''
-                              }`}
-                              title={
-                                store.showingBlame ? t('blameHide') : t('blame')
-                              }
-                            >
-                              <GitCommit size={14} />
-                            </button>
-                          )}
+                          {!isActiveImageTab &&
+                            !isActiveGitDiffTab &&
+                            isAtGitRoot && (
+                              <button
+                                onClick={() => store.toggleBlame()}
+                                className={`w-7 h-7 ml-1 mr-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
+                                  store.showingBlame
+                                    ? `opacity-100 ${tw.primary.text}`
+                                    : ''
+                                }`}
+                                title={
+                                  store.showingBlame
+                                    ? t('blameHide')
+                                    : t('blame')
+                                }
+                              >
+                                <GitCommit size={14} />
+                              </button>
+                            )}
                           <div
                             className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}
                           />
