@@ -194,6 +194,8 @@ export const LANGUAGE_MAP: Record<string, string> = {
   cjs: 'javascript',
   ts: 'typescript',
   tsx: 'typescript',
+  mts: 'typescript',
+  cts: 'typescript',
   json: 'json',
   jsonc: 'jsonc',
   html: 'html',

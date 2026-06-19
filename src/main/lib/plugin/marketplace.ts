@@ -8,6 +8,18 @@ export interface IMarketplacePlugin {
 
 export const marketplacePlugins: IMarketplacePlugin[] = [
   {
+    id: 'tinker-2048',
+    name: '2048',
+    description: 'Join the numbers and get to the 2048 tile!',
+    icon: 'tinker-2048.png',
+    locales: {
+      'zh-CN': {
+        name: '2048',
+        description: '合并数字，冲向 2048 方块！',
+      },
+    },
+  },
+  {
     id: 'tinker-agent-notification',
     name: 'Agent Notification',
     description: 'Configure notification sounds for coding agents',

@@ -7,3 +7,6 @@
 [submodule "tinker-plugins"]
 	path = tinker-plugins
 	url = https://github.com/liriliri/tinker-plugins.git
+[submodule "tinker-games"]
+	path = tinker-games
+	url = https://github.com/liriliri/tinker-games.git

@@ -1,3 +1,11 @@
+## v1.19.0 (19 Jun 2026)
+
+* feat: add file explorer
+* feat: custom shortcut [#8](https://github.com/liriliri/tinker/issues/8)
+* feat(git): worktree submodule support
+* feat(music-player): folder scan
+* fix(code-editor): file watch
+
 ## v1.18.1 (14 Jun 2026)
 
 * feat(code-editor): use vscode file icon
