@@ -212,6 +212,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-mbti-test',
+    name: 'MBTI Test',
+    description: 'MBTI personality type test',
+    icon: 'tinker-mbti-test.png',
+    locales: {
+      'zh-CN': {
+        name: 'MBTI 人格测试',
+        description: 'MBTI 十六型人格测试工具',
+      },
+    },
+  },
+  {
     id: 'tinker-meme',
     name: 'Meme',
     description: 'Search and browse memes',
