@@ -224,6 +224,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-minesweeper',
+    name: 'Minesweeper',
+    description: 'Clear the minefield without detonating a bomb!',
+    icon: 'tinker-minesweeper.png',
+    locales: {
+      'zh-CN': {
+        name: '扫雷',
+        description: '避开地雷，清空所有安全格子！',
+      },
+    },
+  },
+  {
     id: 'tinker-meme',
     name: 'Meme',
     description: 'Search and browse memes',

@@ -302,6 +302,10 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
 
 Official non-built-in plugins are maintained at [tinker-plugins](https://github.com/liriliri/tinker-plugins). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-whois`.
 
+## Official Games
+
+Official game plugins are maintained at [tinker-games](https://github.com/liriliri/tinker-games). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-minesweeper`.
+
 ## Third-party Plugins
 
 You can find a selection of high-quality third-party tools already packaged [here](https://github.com/liriliri/tinker-third-party). To add them to TINKER, simply install the corresponding [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-drawio`.
