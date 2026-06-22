@@ -72,6 +72,12 @@ import toast from 'react-hot-toast'
 
 Wrap `App.tsx` with providers. Use `toast` directly for toasts.
 
+### ScanDirsModal
+
+```ts
+import ScanDirsModal from 'share/components/ScanDirsModal'
+```
+
 ### Form
 
 ```ts

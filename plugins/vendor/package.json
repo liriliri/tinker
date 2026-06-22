@@ -30,9 +30,7 @@
     "build:share:fileicon": "vite build --mode share:fileicon"
   },
   "dependencies": {
-    "exifr": "^7.1.3",
     "glob": "^13.0.6",
-    "image-size": "^2.0.2",
     "ssh2": "^1.17.0",
     "systeminformation": "^5.30.7"
   },

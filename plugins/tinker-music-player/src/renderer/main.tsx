@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import PlayerBar from './components/PlayerBar'
 import Playlist from './components/Playlist'
 import RecentPlaylist from './components/RecentPlaylist'
@@ -9,10 +10,10 @@ import MusicToolbar from './components/Toolbar'
 import ListToolbar from './components/ListToolbar'
 import LocalToolbar from './components/LocalToolbar'
 import AddToSheetModal from './components/AddToSheetModal'
-import ScanDirsModal from './components/ScanDirsModal'
 import MusicDetail from './components/MusicDetail'
 import { PromptProvider } from 'share/components/Prompt'
 import { ToasterProvider } from 'share/components/Toaster'
+import ScanDirsModal from 'share/components/ScanDirsModal'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
 import './index.scss'
@@ -32,6 +33,8 @@ const MainContent = observer(function MainContent() {
 })
 
 const App = observer(function App() {
+  const { t } = useTranslation()
+
   return (
     <ToasterProvider>
       <PromptProvider>
@@ -51,7 +54,19 @@ const App = observer(function App() {
         </div>
         <MusicDetail />
         <AddToSheetModal />
-        <ScanDirsModal />
+        <ScanDirsModal
+          open={store.showScanDialog}
+          isDark={store.isDark}
+          isScanning={store.isScanning}
+          scanDirs={store.scanDirs}
+          scanDirChecked={store.scanDirChecked}
+          title={t('scanLocalMusic')}
+          onClose={() => store.hideScanDialog()}
+          onAddDir={(dir) => store.addScanDir(dir)}
+          onRemoveDir={(dir) => store.removeScanDir(dir)}
+          onToggleChecked={(dir) => store.toggleScanDirChecked(dir)}
+          onScan={(dirs) => store.scanLocalMusic(dirs)}
+        />
       </PromptProvider>
     </ToasterProvider>
   )

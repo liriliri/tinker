@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import type {
@@ -8,15 +7,48 @@ import type {
 } from 'ag-grid-community'
 import { FolderPlus, Trash2 } from 'lucide-react'
 import contain from 'licia/contain'
-import { tw } from 'share/theme'
-import Dialog, { DialogButton } from 'share/components/Dialog'
-import Grid from 'share/components/Grid'
-import Checkbox from 'share/components/Checkbox'
-import store from '../store'
+import { tw } from '../theme'
+import { addI18nNamespace } from '../lib/i18n'
+import Dialog, { DialogButton } from './Dialog'
+import Grid from './Grid'
+import Checkbox from './Checkbox'
+
+const I18N_NS = 'scanDirsModal'
+
+addI18nNamespace(I18N_NS, {
+  'en-US': {
+    addScanDir: 'Add Folder',
+    scanDirPath: 'Folder',
+    removeScanDir: 'Remove Folder',
+    emptyScanDirs: 'No folders',
+    scan: 'Scan',
+  },
+  'zh-CN': {
+    addScanDir: '添加文件夹',
+    scanDirPath: '文件夹',
+    removeScanDir: '移除文件夹',
+    emptyScanDirs: '暂无文件夹',
+    scan: '扫描',
+  },
+})
 
 interface ScanDirRow {
   path: string
   checked: boolean
+}
+
+export interface ScanDirsModalProps {
+  open: boolean
+  isDark: boolean
+  isScanning: boolean
+  scanDirs: string[]
+  scanDirChecked: string[]
+  title: string
+  onClose: () => void
+  onAddDir: (dir: string) => void
+  onRemoveDir: (dir: string) => void
+  onToggleChecked: (dir: string) => void
+  onScan: (checkedDirs: string[]) => void | Promise<void>
 }
 
 interface CheckboxCellProps extends ICellRendererParams<ScanDirRow> {
@@ -37,7 +69,7 @@ function CheckboxCell({ data, onToggle }: CheckboxCellProps) {
 }
 
 function DeleteCell({ data, onRemove }: DeleteCellProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(I18N_NS)
   if (!data) return null
   return (
     <button
@@ -50,43 +82,56 @@ function DeleteCell({ data, onRemove }: DeleteCellProps) {
   )
 }
 
-const ScanDirsModal = observer(function ScanDirsModal() {
-  const { t } = useTranslation()
-  const isOpen = store.showScanDialog
-
-  const handleClose = () => {
-    store.hideScanDialog()
-  }
+export default function ScanDirsModal({
+  open,
+  isDark,
+  isScanning,
+  scanDirs,
+  scanDirChecked,
+  title,
+  onClose,
+  onAddDir,
+  onRemoveDir,
+  onToggleChecked,
+  onScan,
+}: ScanDirsModalProps) {
+  const { t } = useTranslation(I18N_NS)
 
   const handleAddDir = async () => {
     const result = await tinker.showOpenDialog({
-      title: t('scanLocalPhotos'),
+      title,
       properties: ['openDirectory', 'createDirectory'],
     })
     if (result.canceled || result.filePaths.length === 0) return
-    store.addScanDir(result.filePaths[0])
+    onAddDir(result.filePaths[0])
   }
 
-  const handleRemoveDir = useCallback((dir: string) => {
-    store.removeScanDir(dir)
-  }, [])
+  const handleRemoveDir = useCallback(
+    (dir: string) => {
+      onRemoveDir(dir)
+    },
+    [onRemoveDir]
+  )
 
-  const toggleChecked = useCallback((dir: string) => {
-    store.toggleScanDirChecked(dir)
-  }, [])
+  const toggleChecked = useCallback(
+    (dir: string) => {
+      onToggleChecked(dir)
+    },
+    [onToggleChecked]
+  )
 
   const handleScan = async () => {
-    store.hideScanDialog()
-    await store.scanLocalPhotos(store.scanDirChecked)
+    onClose()
+    await onScan(scanDirChecked)
   }
 
   const rowData = useMemo<ScanDirRow[]>(
     () =>
-      store.scanDirs.map((path) => ({
+      scanDirs.map((path) => ({
         path,
-        checked: contain(store.scanDirChecked, path),
+        checked: contain(scanDirChecked, path),
       })),
-    [store.scanDirs, store.scanDirChecked]
+    [scanDirs, scanDirChecked]
   )
 
   const columnDefs = useMemo<ColDef<ScanDirRow>[]>(
@@ -137,16 +182,16 @@ const ScanDirsModal = observer(function ScanDirsModal() {
 
   return (
     <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      title={t('scanLocalPhotos')}
+      open={open}
+      onClose={onClose}
+      title={title}
       showClose
       className="w-[520px] max-w-full"
     >
       <div className="flex flex-col">
         <div className={`h-[280px] border rounded ${tw.border}`}>
           <Grid<ScanDirRow>
-            isDark={store.isDark}
+            isDark={isDark}
             columnDefs={columnDefs}
             rowData={rowData}
             getRowId={getRowId}
@@ -169,7 +214,7 @@ const ScanDirsModal = observer(function ScanDirsModal() {
           </DialogButton>
           <DialogButton
             onClick={handleScan}
-            disabled={store.isScanning || store.scanDirChecked.length === 0}
+            disabled={isScanning || scanDirChecked.length === 0}
           >
             {t('scan')}
           </DialogButton>
@@ -177,6 +222,4 @@ const ScanDirsModal = observer(function ScanDirsModal() {
       </div>
     </Dialog>
   )
-})
-
-export default ScanDirsModal
+}
