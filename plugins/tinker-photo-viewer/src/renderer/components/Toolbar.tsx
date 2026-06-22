@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
-import { FolderOpen, FolderSearch, ListX, PanelRight } from 'lucide-react'
+import { FolderOpen, FolderSearch, ListX } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Toolbar,
@@ -70,13 +70,6 @@ const PhotoToolbar = observer(function PhotoToolbar() {
       >
         <FolderSearch size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={handleClearList}
-        disabled={store.photos.length === 0 || store.isScanning}
-        title={t('clearList')}
-      >
-        <ListX size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
 
       <ToolbarSpacer />
 
@@ -84,14 +77,13 @@ const PhotoToolbar = observer(function PhotoToolbar() {
         {t('photoCount', { count: store.photos.length })}
       </span>
 
-      {store.viewerOpen && (
-        <ToolbarButton
-          onClick={() => store.toggleInfoPanel()}
-          title={t('toggleInfoPanel')}
-        >
-          <PanelRight size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      )}
+      <ToolbarButton
+        onClick={handleClearList}
+        disabled={store.photos.length === 0 || store.isScanning}
+        title={t('clearList')}
+      >
+        <ListX size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
     </Toolbar>
   )
 })

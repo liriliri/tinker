@@ -1,5 +1,3 @@
-import type { PhotoExif } from '../common/types'
-
 export interface Photo {
   id: string
   path: string
@@ -11,7 +9,6 @@ export interface Photo {
   updatedAt: number
   dateSection: string
   format: string
-  exif?: PhotoExif
 }
 
 export interface PhotoSection {

@@ -4,6 +4,9 @@ declare global {
     readPhotoMeta(
       filePath: string
     ): Promise<import('../common/types').PhotoMeta>
+    readPhotoExif(
+      filePath: string
+    ): Promise<import('../common/types').PhotoExif | undefined>
     getThumbnailUrl(
       filePath: string
     ): Promise<import('../common/types').ThumbnailResult>

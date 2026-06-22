@@ -37,7 +37,7 @@ const MasonrySection = observer(function MasonrySection({
   if (photos.length === 0 || containerWidth <= 0) return null
 
   return (
-    <div className="relative px-2 py-2" style={{ height: totalHeight }}>
+    <div className="relative py-2 pl-2" style={{ height: totalHeight }}>
       {photos.map((photo) => {
         const layout = layoutMap.get(photo.id)
         if (!layout) return null

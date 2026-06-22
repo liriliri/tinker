@@ -53,7 +53,6 @@ class Store extends BaseStore {
   isScanning: boolean = false
   viewerOpen: boolean = false
   viewerIndex: number = 0
-  showInfoPanel: boolean = true
 
   private searchFileTask: tinker.SearchFileTask | null = null
 
@@ -90,11 +89,12 @@ class Store extends BaseStore {
     const sectionMap = new Map<string, Photo[]>()
 
     for (const photo of this.photos) {
-      const existing = sectionMap.get(photo.dateSection)
+      const sectionKey = toDateSection(photo.createdAt)
+      const existing = sectionMap.get(sectionKey)
       if (existing) {
         existing.push(photo)
       } else {
-        sectionMap.set(photo.dateSection, [photo])
+        sectionMap.set(sectionKey, [photo])
       }
     }
 
@@ -234,7 +234,6 @@ class Store extends BaseStore {
       updatedAt: meta.updatedAt,
       dateSection: toDateSection(meta.createdAt),
       format: meta.format,
-      exif: meta.exif,
     }
   }
 
@@ -287,8 +286,7 @@ class Store extends BaseStore {
         changed = true
       }
 
-      if (takenAt && !photo.exif?.takenAt) {
-        photo.exif = { ...photo.exif, takenAt }
+      if (takenAt && photo.createdAt === photo.updatedAt) {
         photo.createdAt = takenAt
         photo.dateSection = toDateSection(takenAt)
         changed = true
@@ -389,10 +387,6 @@ class Store extends BaseStore {
 
   showNextPhoto() {
     this.setViewerIndex(this.viewerIndex + 1)
-  }
-
-  toggleInfoPanel() {
-    this.showInfoPanel = !this.showInfoPanel
   }
 
   async ensurePhotoExists(photo: Photo): Promise<boolean> {

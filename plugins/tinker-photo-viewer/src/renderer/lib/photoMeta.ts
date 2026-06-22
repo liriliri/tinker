@@ -1,48 +1,166 @@
 import type { PhotoExif } from '../../common/types'
 import fileSize from 'licia/fileSize'
-import some from 'licia/some'
-import values from 'licia/values'
 
-interface FormattedExif {
-  camera?: string
-  iso?: string
-  aperture?: string
+export interface FormattedExif {
+  zone?: string
+  focalLength35mm?: number
+  focalLength?: number
+  iso?: number
   shutterSpeed?: string
-  focalLength?: string
+  aperture?: string
+  maxAperture?: number
+  camera?: string
+  lens?: string
+  lensMake?: string
+  software?: string
+  artist?: string
+  copyright?: string
+  dateTime?: string
+  colorSpace?: string
+  rating?: number
+  exposureMode?: string
+  exposureProgram?: string
+  meteringMode?: string
+  whiteBalance?: string
+  whiteBalanceBias?: number
+  wbShiftAB?: string
+  wbShiftGM?: string
+  flash?: string
+  flashMeteringMode?: string
+  lightSource?: string
+  sceneCaptureType?: string
+  exposureBias?: string
+  brightnessValue?: string
+  shutterSpeedValue?: number
+  apertureValue?: string
+  sensingMethod?: string
+  focalPlaneXResolution?: number
+  focalPlaneYResolution?: number
+  gps?: {
+    latitude: string
+    longitude: string
+    altitude?: string
+  }
 }
 
-export function formatExposureTime(value?: number): string | undefined {
-  if (value === undefined || Number.isNaN(value)) return undefined
-  if (value >= 1) return `${value.toFixed(value >= 10 ? 0 : 1)}s`
-  const denominator = Math.round(1 / value)
+export function formatExposureTime(
+  value?: number,
+  fallback?: number
+): string | undefined {
+  const exposureTime = value ?? fallback
+  if (exposureTime === undefined || Number.isNaN(exposureTime)) return undefined
+  if (exposureTime >= 1) {
+    return `${exposureTime.toFixed(exposureTime >= 10 ? 0 : 1)}s`
+  }
+  const denominator = Math.round(1 / exposureTime)
   return denominator > 0 ? `1/${denominator}s` : undefined
 }
 
 export function formatAperture(value?: number): string | undefined {
   if (value === undefined || Number.isNaN(value)) return undefined
-  const rounded = Number(value.toFixed(1))
-  return `f/${rounded}`
+  return `f/${Number(value.toFixed(1))}`
 }
 
-export function formatFocalLength(value?: number): string | undefined {
-  if (value === undefined || Number.isNaN(value)) return undefined
-  const rounded = Math.round(value)
-  return `${rounded}mm`
-}
-
-export function formatExifData(exif?: PhotoExif): FormattedExif | null {
+export function formatExifData(
+  exif?: PhotoExif,
+  locale = 'en-US'
+): FormattedExif | null {
   if (!exif) return null
 
+  const shutterSpeed = formatExposureTime(
+    exif.exposureTime,
+    exif.shutterSpeedValue
+  )
+  const aperture = formatAperture(exif.aperture)
+  const lens =
+    exif.lensMake && exif.lensModel?.includes(exif.lensMake)
+      ? exif.lensModel
+      : exif.lensModel
+  const dateTime =
+    exif.takenAt !== undefined
+      ? new Intl.DateTimeFormat(locale, {
+          dateStyle: 'short',
+          timeStyle: 'medium',
+        }).format(new Date(exif.takenAt))
+      : undefined
+
+  const gps = exif.gps
+    ? {
+        latitude: formatGpsCoordinate(
+          exif.gps.latitude,
+          exif.gps.latitudeRef || (exif.gps.latitude >= 0 ? 'N' : 'S')
+        ),
+        longitude: formatGpsCoordinate(
+          exif.gps.longitude,
+          exif.gps.longitudeRef || (exif.gps.longitude >= 0 ? 'E' : 'W')
+        ),
+        altitude:
+          exif.gps.altitude !== undefined
+            ? `${exif.gps.altitudeAboveSeaLevel === false ? '-' : ''}${
+                exif.gps.altitude
+              }`
+            : undefined,
+      }
+    : undefined
+
   const formatted: FormattedExif = {
+    zone: exif.offsetTime,
+    focalLength35mm: exif.focalLength35mm,
+    focalLength:
+      exif.focalLength !== undefined ? Math.round(exif.focalLength) : undefined,
+    iso: exif.iso,
+    shutterSpeed,
+    aperture,
+    maxAperture: exif.maxApertureValue,
     camera: exif.camera,
-    iso: exif.iso !== undefined ? String(exif.iso) : undefined,
-    aperture: formatAperture(exif.aperture),
-    shutterSpeed: formatExposureTime(exif.exposureTime),
-    focalLength: formatFocalLength(exif.focalLength),
+    lens,
+    lensMake: exif.lensMake,
+    software: exif.software,
+    artist: exif.artist,
+    copyright: exif.copyright,
+    dateTime,
+    colorSpace: exif.colorSpace,
+    rating: exif.rating,
+    exposureMode: exif.exposureMode,
+    exposureProgram: exif.exposureProgram,
+    meteringMode: exif.meteringMode,
+    whiteBalance: exif.whiteBalance,
+    whiteBalanceBias: exif.whiteBalanceBias,
+    wbShiftAB: exif.wbShiftAB,
+    wbShiftGM: exif.wbShiftGM,
+    flash: exif.flash,
+    flashMeteringMode: exif.flashMeteringMode,
+    lightSource: exif.lightSource,
+    sceneCaptureType: exif.sceneCaptureType,
+    exposureBias:
+      exif.exposureCompensation !== undefined
+        ? `${exif.exposureCompensation} EV`
+        : undefined,
+    brightnessValue:
+      exif.brightnessValue !== undefined
+        ? `${exif.brightnessValue.toFixed(1)} EV`
+        : undefined,
+    shutterSpeedValue: exif.shutterSpeedValue,
+    apertureValue:
+      exif.apertureValue !== undefined
+        ? `${exif.apertureValue.toFixed(1)} EV`
+        : undefined,
+    sensingMethod: exif.sensingMethod,
+    focalPlaneXResolution: exif.focalPlaneXResolution
+      ? Math.round(exif.focalPlaneXResolution)
+      : undefined,
+    focalPlaneYResolution: exif.focalPlaneYResolution
+      ? Math.round(exif.focalPlaneYResolution)
+      : undefined,
+    gps,
   }
 
-  const hasData = some(values(formatted), Boolean)
-  return hasData ? formatted : null
+  return formatted
+}
+
+function formatGpsCoordinate(value: number, ref: string): string {
+  const absolute = Math.abs(value)
+  return `${absolute.toFixed(6)}° ${ref}`
 }
 
 export function formatFileSize(bytes: number): string {
@@ -52,4 +170,8 @@ export function formatFileSize(bytes: number): string {
 export function formatMegapixels(width: number, height: number): string | null {
   if (!width || !height) return null
   return `${Math.floor((width * height) / 1_000_000)} MP`
+}
+
+export function formatFileSizeMb(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`
 }

@@ -116,7 +116,7 @@ const PhotoViewer = observer(function PhotoViewer() {
         )}
       </div>
 
-      {store.showInfoPanel && <PhotoInfoPanel photo={currentPhoto} />}
+      <PhotoInfoPanel photo={currentPhoto} />
     </div>
   )
 })

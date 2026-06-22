@@ -25,5 +25,5 @@ export function isPathUnderScanDirs(filePath: string, dirs: string[]): boolean {
 }
 
 export function toDateSection(timestamp: number): string {
-  return dateFormat(new Date(timestamp), 'yyyy-mm-dd')
+  return dateFormat(new Date(timestamp), 'yyyy-mm')
 }

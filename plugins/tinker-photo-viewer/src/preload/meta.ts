@@ -3,7 +3,7 @@ import splitPath from 'licia/splitPath'
 import normalizePath from 'licia/normalizePath'
 import { imageSize } from 'image-size'
 import type { PhotoMeta } from '../common/types'
-import { readExifFromFile } from './exif'
+import { extractTakenAtFromFile } from './exif'
 
 const META_READ_BYTES = 512 * 1024
 
@@ -43,8 +43,8 @@ export async function readPhotoMeta(filePath: string): Promise<PhotoMeta> {
       // unsupported or incomplete header
     }
   }
-  const exif = await readExifFromFile(normalizedPath)
-  const createdAt = exif?.takenAt ?? fileStats.mtimeMs
+  const takenAt = await extractTakenAtFromFile(normalizedPath)
+  const createdAt = takenAt ?? fileStats.mtimeMs
 
   return {
     path: normalizedPath,
@@ -54,6 +54,5 @@ export async function readPhotoMeta(filePath: string): Promise<PhotoMeta> {
     createdAt,
     updatedAt: fileStats.mtimeMs,
     format: format.toUpperCase() || 'UNKNOWN',
-    exif,
   }
 }

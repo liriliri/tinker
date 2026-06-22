@@ -7,14 +7,13 @@ import store from '../store'
 import MasonrySection from './MasonrySection'
 
 function formatSectionLabel(label: string): string {
-  const [year, month, day] = label.split('-').map(Number)
-  if (!year || !month || !day) return label
+  const [year, month] = label.split('-').map(Number)
+  if (!year || !month) return label
 
   return new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
-  }).format(new Date(year, month - 1, day))
+  }).format(new Date(year, month - 1, 1))
 }
 
 const PhotoGallery = observer(function PhotoGallery() {
@@ -44,7 +43,7 @@ const PhotoGallery = observer(function PhotoGallery() {
       {sections.map((section) => (
         <section key={section.id}>
           <h2
-            className={`sticky top-0 z-20 border-b px-3 py-2.5 text-sm font-semibold tracking-wide backdrop-blur-md ${tw.border} ${tw.bg.primary} ${tw.text.primary}`}
+            className={`sticky top-0 z-20 px-3 py-2.5 text-sm font-semibold tracking-wide backdrop-blur-md ${tw.bg.primary} ${tw.text.primary}`}
           >
             {formatSectionLabel(section.label)}
           </h2>

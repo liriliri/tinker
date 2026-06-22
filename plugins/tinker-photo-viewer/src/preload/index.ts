@@ -1,5 +1,11 @@
 import { contextBridge } from 'electron'
-import type { PhotoMeta, PreviewResult, ThumbnailResult } from '../common/types'
+import type {
+  PhotoMeta,
+  PhotoExif,
+  PreviewResult,
+  ThumbnailResult,
+} from '../common/types'
+import { readExifFromFile } from './exif'
 import { readPhotoMeta } from './meta'
 import { getPreviewResult } from './preview'
 import { scanPhotoFiles } from './scan'
@@ -13,6 +19,10 @@ const photoViewerObj = {
 
   async readPhotoMeta(filePath: string): Promise<PhotoMeta> {
     return readPhotoMeta(filePath)
+  },
+
+  async readPhotoExif(filePath: string): Promise<PhotoExif | undefined> {
+    return readExifFromFile(filePath)
   },
 
   async getThumbnailUrl(filePath: string): Promise<ThumbnailResult> {

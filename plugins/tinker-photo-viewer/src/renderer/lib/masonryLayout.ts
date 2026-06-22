@@ -3,7 +3,7 @@ import min from 'licia/min'
 import type { Photo } from '../types'
 
 const GUTTER = 4
-const HORIZONTAL_PADDING = 16
+const HORIZONTAL_PADDING_LEFT = 8
 const TARGET_COLUMN_WIDTH = 250
 const MIN_COLUMN_WIDTH = 200
 const MAX_COLUMNS = 8
@@ -26,7 +26,7 @@ export interface MasonryItemLayout {
 export function getMasonryColumnConfig(
   containerWidth: number
 ): MasonryColumnConfig {
-  const availableWidth = Math.max(0, containerWidth - HORIZONTAL_PADDING)
+  const availableWidth = Math.max(0, containerWidth - HORIZONTAL_PADDING_LEFT)
 
   if (availableWidth <= 0) {
     return { columnCount: 2, columnWidth: 120, gutter: GUTTER }
