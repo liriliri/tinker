@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import { useContainerWidth } from '../hooks/useContainerWidth'
 import store from '../store'
@@ -18,11 +19,8 @@ function formatSectionLabel(label: string): string {
 
 const PhotoGallery = observer(function PhotoGallery() {
   const { t } = useTranslation()
-  const [scrollRoot, setScrollRoot] = useState<HTMLDivElement | null>(null)
-  const containerWidth = useContainerWidth(scrollRoot)
-  const handleScrollRef = useCallback((node: HTMLDivElement | null) => {
-    setScrollRoot(node)
-  }, [])
+  const [scrollViewport, setScrollViewport] = useState<HTMLElement | null>(null)
+  const containerWidth = useContainerWidth(scrollViewport)
   const sections = store.photoSections
 
   if (store.photos.length === 0) {
@@ -36,26 +34,28 @@ const PhotoGallery = observer(function PhotoGallery() {
   }
 
   return (
-    <div
-      ref={handleScrollRef}
-      className="h-full overflow-y-auto overflow-anchor-auto pb-6"
+    <OverlayScrollbars
+      className="h-full w-full"
+      onViewportChange={setScrollViewport}
     >
-      {sections.map((section) => (
-        <section key={section.id}>
-          <h2
-            className={`sticky top-0 z-20 px-3 py-2.5 text-sm font-semibold tracking-wide backdrop-blur-md ${tw.bg.primary} ${tw.text.primary}`}
-          >
-            {formatSectionLabel(section.label)}
-          </h2>
-          <MasonrySection
-            photos={section.photos}
-            containerWidth={containerWidth}
-            scrollRoot={scrollRoot}
-            onOpen={(item) => store.openViewer(item)}
-          />
-        </section>
-      ))}
-    </div>
+      <div className="overflow-anchor-auto pb-6">
+        {sections.map((section) => (
+          <section key={section.id}>
+            <h2
+              className={`sticky top-0 z-20 px-3 py-2.5 text-sm font-semibold tracking-wide backdrop-blur-md ${tw.bg.primary} ${tw.text.primary}`}
+            >
+              {formatSectionLabel(section.label)}
+            </h2>
+            <MasonrySection
+              photos={section.photos}
+              containerWidth={containerWidth}
+              scrollRoot={scrollViewport}
+              onOpen={(item) => store.openViewer(item)}
+            />
+          </section>
+        ))}
+      </div>
+    </OverlayScrollbars>
   )
 })
 

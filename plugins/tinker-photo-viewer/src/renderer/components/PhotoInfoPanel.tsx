@@ -9,10 +9,9 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import isStrBlank from 'licia/isStrBlank'
-import {
-  OverlayScrollbarsComponent,
-  type OverlayScrollbarsComponentRef,
-} from 'overlayscrollbars-react'
+import OverlayScrollbars, {
+  type OverlayScrollbarsRef,
+} from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import type { PhotoExif } from '../../common/types'
 import {
@@ -90,7 +89,7 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
   photo,
 }: PhotoInfoPanelProps) {
   const { t, i18n } = useTranslation()
-  const scrollRef = useRef<OverlayScrollbarsComponentRef>(null)
+  const scrollRef = useRef<OverlayScrollbarsRef>(null)
   const [exif, setExif] = useState<PhotoExif | undefined>()
 
   useEffect(() => {
@@ -149,18 +148,7 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
     <aside
       className={`flex h-full w-80 shrink-0 flex-col border-l ${tw.border} ${tw.bg.tertiary}`}
     >
-      <OverlayScrollbarsComponent
-        ref={scrollRef}
-        defer
-        className="min-h-0 flex-1"
-        options={{
-          scrollbars: {
-            autoHide: 'leave',
-            autoHideDelay: 400,
-            theme: 'os-theme-tinker',
-          },
-        }}
-      >
+      <OverlayScrollbars ref={scrollRef} defer className="min-h-0 flex-1">
         <div className="px-4 py-4">
           <div className={`text-sm divide-y ${tw.divide}`}>
             <InfoSection title={t('basicInfo')} className="pb-2">
@@ -325,7 +313,7 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
             ) : null}
           </div>
         </div>
-      </OverlayScrollbarsComponent>
+      </OverlayScrollbars>
 
       <div className={`shrink-0 border-t p-3 ${tw.border}`}>
         <button

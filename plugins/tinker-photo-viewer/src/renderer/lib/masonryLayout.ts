@@ -64,7 +64,7 @@ export function layoutMasonryItems(
   for (const photo of photos) {
     const height = columnWidth / getPhotoAspectRatio(photo)
     const columnIndex = columnHeights.indexOf(min(...columnHeights))
-    const left = columnIndex * (columnWidth + gutter)
+    const left = HORIZONTAL_PADDING_LEFT + columnIndex * (columnWidth + gutter)
     const top = columnHeights[columnIndex]
 
     layouts.push({

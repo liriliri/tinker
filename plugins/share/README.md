@@ -18,7 +18,7 @@ Tinker plugins should reuse shared UI, store, and AI logic instead of rebuilding
 @config "../tailwind.config.js";
 ```
 
-Third-party style overrides live in `share/styles/`. For OverlayScrollbars, import `share/styles/overlayscrollbars.scss` and set `scrollbars.theme: 'os-theme-tinker'`.
+Third-party style overrides live in `share/styles/`. For OverlayScrollbars, import `share/styles/overlayscrollbars.scss` and use `share/components/OverlayScrollbars`.
 
 ## Theme
 
@@ -86,6 +86,26 @@ import ScanDirsModal from 'share/components/ScanDirsModal'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
 import Slider from 'share/components/Slider'
+```
+
+### OverlayScrollbars
+
+Import `share/styles/overlayscrollbars.scss` in plugin `index.scss`, then:
+
+```ts
+import OverlayScrollbars, {
+  type OverlayScrollbarsRef,
+} from 'share/components/OverlayScrollbars'
+
+const scrollRef = useRef<OverlayScrollbarsRef>(null)
+
+<OverlayScrollbars
+  ref={scrollRef}
+  className="h-full"
+  onViewportChange={setScrollViewport}
+>
+  {children}
+</OverlayScrollbars>
 ```
 
 ### AiChat
