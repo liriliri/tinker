@@ -23,7 +23,7 @@ const ViewerBlurBackground = memo(function ViewerBlurBackground({
   }, [getThumbnailUrl])
 
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-black/80">
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-black">
       {src && (
         <img
           src={src}

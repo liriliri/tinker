@@ -68,7 +68,7 @@ export default function PhotoViewer<T extends PhotoViewerItem>({
   if (!open || !currentItem) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex overflow-hidden">
+    <div className="fixed inset-0 z-50 flex overflow-hidden bg-black">
       <div
         ref={viewerAreaRef}
         className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"

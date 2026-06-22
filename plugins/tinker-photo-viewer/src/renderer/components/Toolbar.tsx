@@ -53,7 +53,6 @@ const PhotoToolbar = observer(function PhotoToolbar() {
     const confirmed = await confirm({
       title: t('clearList'),
       message: t('clearListConfirm'),
-      confirmText: t('clearList'),
     })
     if (!confirmed) return
 
