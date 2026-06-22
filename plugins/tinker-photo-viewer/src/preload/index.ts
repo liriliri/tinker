@@ -6,10 +6,11 @@ import type {
   ThumbnailResult,
 } from '../common/types'
 import { readExifFromFile } from './exif'
+import { buildPreviewResult, buildThumbnailResult } from './imageProcessor'
 import { readPhotoMeta } from './meta'
-import { getPreviewResult } from './preview'
+import { resolvePreviewRequest } from './preview'
 import { scanPhotoFiles } from './scan'
-import { getThumbnailResult } from './thumbnail'
+import { resolveThumbnailCache } from './thumbnail'
 
 const photoViewerObj = {
   async scanPhotoFiles(dirs: string[]) {
@@ -25,12 +26,24 @@ const photoViewerObj = {
     return readExifFromFile(filePath)
   },
 
-  async getThumbnailUrl(filePath: string): Promise<ThumbnailResult> {
-    return getThumbnailResult(filePath)
+  async resolveThumbnailCache(filePath: string) {
+    return resolveThumbnailCache(filePath)
   },
 
-  async getPreviewUrl(filePath: string): Promise<PreviewResult> {
-    return getPreviewResult(filePath)
+  async buildThumbnailResult(
+    filePath: string,
+    cachePath: string,
+    readTakenAt: boolean
+  ): Promise<ThumbnailResult> {
+    return buildThumbnailResult(filePath, cachePath, readTakenAt)
+  },
+
+  async resolvePreviewRequest(filePath: string) {
+    return resolvePreviewRequest(filePath)
+  },
+
+  async buildPreviewResult(cachePath: string): Promise<PreviewResult> {
+    return buildPreviewResult(cachePath)
   },
 }
 

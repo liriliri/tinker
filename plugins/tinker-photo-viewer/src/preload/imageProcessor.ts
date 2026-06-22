@@ -1,16 +1,13 @@
 import { readFile } from 'fs/promises'
 import { imageSize } from 'image-size'
+import fileUrl from 'licia/fileUrl'
+import normalizePath from 'licia/normalizePath'
+import type { PreviewResult, ThumbnailResult } from '../common/types'
 import { extractTakenAtFromFile } from './exif'
-import { buildJpegScaleArgs, runFfmpeg } from './ffmpegImage'
 
 export interface ImageDimensions {
   width: number
   height: number
-}
-
-export interface ThumbnailOutput {
-  dimensions: ImageDimensions | null
-  takenAt?: number
 }
 
 async function readJpegDimensions(
@@ -25,47 +22,38 @@ async function readJpegDimensions(
   }
 }
 
-export async function createImageThumbnail(
+export async function getCachedThumbnailDimensions(
+  cachePath: string
+): Promise<ImageDimensions | null> {
+  return readJpegDimensions(cachePath)
+}
+
+export async function buildThumbnailResult(
   sourcePath: string,
   cachePath: string,
-  maxWidth: number,
-  jpegQuality: number
-): Promise<ThumbnailOutput> {
-  const takenAt = await extractTakenAtFromFile(sourcePath)
-
-  await runFfmpeg(
-    buildJpegScaleArgs(sourcePath, cachePath, maxWidth, jpegQuality)
-  )
+  readTakenAt: boolean
+): Promise<ThumbnailResult> {
+  const dimensions = await getCachedThumbnailDimensions(cachePath)
+  const takenAt = readTakenAt
+    ? await extractTakenAtFromFile(sourcePath)
+    : undefined
 
   return {
-    dimensions: await readJpegDimensions(cachePath),
+    url: fileUrl(normalizePath(cachePath)),
+    width: dimensions?.width ?? 0,
+    height: dimensions?.height ?? 0,
     takenAt,
   }
 }
 
-export async function createImagePreview(
-  sourcePath: string,
-  cachePath: string,
-  maxWidth: number,
-  jpegQuality: number
-): Promise<ThumbnailOutput> {
-  await runFfmpeg(
-    buildJpegScaleArgs(sourcePath, cachePath, maxWidth, jpegQuality)
-  )
+export async function buildPreviewResult(
+  cachePath: string
+): Promise<PreviewResult> {
+  const dimensions = await getCachedThumbnailDimensions(cachePath)
 
   return {
-    dimensions: await readJpegDimensions(cachePath),
-  }
-}
-
-export async function getCachedThumbnailDimensions(
-  cachePath: string
-): Promise<ImageDimensions | null> {
-  try {
-    const buffer = await readFile(cachePath)
-    const { width, height } = imageSize(buffer)
-    return width > 0 && height > 0 ? { width, height } : null
-  } catch {
-    return null
+    url: fileUrl(normalizePath(cachePath)),
+    width: dimensions?.width ?? 0,
+    height: dimensions?.height ?? 0,
   }
 }

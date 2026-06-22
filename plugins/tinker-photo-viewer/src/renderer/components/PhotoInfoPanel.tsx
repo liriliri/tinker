@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Children, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Camera, Circle, Clock, Sun } from 'lucide-react'
+import isStrBlank from 'licia/isStrBlank'
 import { tw } from 'share/theme'
 import type { PhotoExif } from '../../common/types'
 import {
@@ -16,50 +16,61 @@ interface PhotoInfoPanelProps {
   photo: Photo
 }
 
+function hasDisplayValue(value: unknown): boolean {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') return !isStrBlank(value)
+  if (typeof value === 'number') return !Number.isNaN(value)
+  return true
+}
+
 interface InfoRowProps {
   label: string
-  value: string
+  value: unknown
   ellipsis?: boolean
 }
 
-function SectionTitle({ children }: { children: string }) {
-  return (
-    <h4 className={`mb-2 text-sm font-medium ${tw.text.primary}`}>
-      {children}
-    </h4>
-  )
-}
-
 function InfoRow({ label, value, ellipsis = false }: InfoRowProps) {
+  if (!hasDisplayValue(value)) return null
+
+  const text = String(value)
+
   return (
-    <div className="flex justify-between gap-4 text-sm">
-      <span className={`shrink-0 ${tw.text.secondary}`}>{label}</span>
+    <div className="flex justify-between py-1.5">
+      <span className={tw.text.secondary}>{label}</span>
       {ellipsis ? (
         <span
-          className={`min-w-0 flex-1 truncate text-right ${tw.text.primary}`}
-          title={value}
+          className={`ml-4 min-w-0 max-w-[55%] truncate text-right ${tw.text.primary}`}
+          title={text}
         >
-          {value}
+          {text}
         </span>
       ) : (
-        <span className={`min-w-0 text-right ${tw.text.primary}`}>{value}</span>
+        <span className={tw.text.primary}>{text}</span>
       )}
     </div>
   )
 }
 
-interface ExifChipProps {
-  icon: ReactNode
-  value: string
+interface InfoSectionProps {
+  title: string
+  children: ReactNode
+  className?: string
 }
 
-function ExifChip({ icon, value }: ExifChipProps) {
+function InfoSection({
+  title,
+  children,
+  className = 'py-2',
+}: InfoSectionProps) {
+  const items = Children.toArray(children).filter(Boolean)
+  if (items.length === 0) return null
+
   return (
-    <div
-      className={`flex h-6 items-center gap-2 rounded-md border px-2 ${tw.border} ${tw.bg.secondary}`}
-    >
-      <span className={tw.text.tertiary}>{icon}</span>
-      <span className={`text-xs ${tw.text.primary}`}>{value}</span>
+    <div className={className}>
+      <h4 className={`mb-1 text-sm font-semibold ${tw.primary.text}`}>
+        {title}
+      </h4>
+      {items}
     </div>
   )
 }
@@ -107,284 +118,191 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
     return formatMegapixels(photo.width, photo.height)
   }, [photo.width, photo.height])
 
-  const hasCaptureParams = Boolean(
-    exifData?.shutterSpeed ||
-      exifData?.iso ||
-      exifData?.aperture ||
-      exifData?.exposureBias ||
-      exifData?.focalLength35mm
-  )
+  const dimensions =
+    photo.width > 0 && photo.height > 0
+      ? `${photo.width}×${photo.height}`
+      : null
 
-  const hasDeviceInfo = Boolean(exifData?.camera || exifData?.lens)
-
-  const hasCaptureMode = Boolean(
-    exifData?.exposureMode ||
-      exifData?.exposureProgram ||
-      exifData?.meteringMode ||
-      exifData?.whiteBalance ||
-      exifData?.lightSource ||
-      exifData?.flash
-  )
-
-  const hasTechnicalParams = Boolean(
-    exifData?.brightnessValue ||
-      exifData?.shutterSpeedValue ||
-      exifData?.apertureValue ||
-      exifData?.sensingMethod ||
-      exifData?.focalPlaneXResolution ||
-      exifData?.focalPlaneYResolution
-  )
+  const focalPlaneResolution = useMemo(() => {
+    if (!exifData) return null
+    const { focalPlaneXResolution: x, focalPlaneYResolution: y } = exifData
+    if (x && y) return `${x} × ${y}`
+    if (x) return String(x)
+    if (y) return String(y)
+    return null
+  }, [exifData])
 
   return (
     <aside
       className={`flex h-full w-80 shrink-0 flex-col border-l ${tw.border} ${tw.bg.tertiary}`}
     >
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        <div className="space-y-4">
-          <section>
-            <SectionTitle>{t('basicInfo')}</SectionTitle>
-            <div className="space-y-1">
-              <InfoRow label={t('fileName')} value={photo.title} ellipsis />
-              <InfoRow label={t('format')} value={photo.format} />
-              {photo.width > 0 && photo.height > 0 ? (
+        <div className={`text-sm divide-y ${tw.divide}`}>
+          <InfoSection title={t('basicInfo')} className="pb-2">
+            <InfoRow label={t('fileName')} value={photo.title} ellipsis />
+            <InfoRow label={t('format')} value={photo.format} />
+            <InfoRow label={t('dimensions')} value={dimensions} />
+            <InfoRow
+              label={t('fileSize')}
+              value={photo.size > 0 ? formatFileSizeMb(photo.size) : null}
+            />
+            <InfoRow label={t('megapixels')} value={megapixels} />
+            <InfoRow label={t('dateTaken')} value={dateTakenLabel} />
+            <InfoRow label={t('colorSpace')} value={exifData?.colorSpace} />
+            <InfoRow
+              label={t('rating')}
+              value={
+                exifData?.rating && exifData.rating > 0
+                  ? '★'.repeat(exifData.rating)
+                  : null
+              }
+            />
+            <InfoRow label={t('timeZone')} value={exifData?.zone} />
+            <InfoRow label={t('artist')} value={exifData?.artist} />
+            <InfoRow label={t('copyright')} value={exifData?.copyright} />
+            <InfoRow label={t('software')} value={exifData?.software} />
+          </InfoSection>
+
+          {exifData ? (
+            <>
+              <InfoSection title={t('captureParameters')}>
                 <InfoRow
-                  label={t('dimensions')}
-                  value={`${photo.width} × ${photo.height}`}
+                  label={t('focalLengthEquivalent')}
+                  value={
+                    exifData.focalLength35mm
+                      ? `${exifData.focalLength35mm}mm`
+                      : null
+                  }
                 />
-              ) : null}
-              <InfoRow
-                label={t('fileSize')}
-                value={formatFileSizeMb(photo.size)}
-              />
-              {megapixels ? (
-                <InfoRow label={t('megapixels')} value={megapixels} />
-              ) : null}
-              <InfoRow label={t('dateTaken')} value={dateTakenLabel} />
-              {exifData?.colorSpace ? (
-                <InfoRow label={t('colorSpace')} value={exifData.colorSpace} />
-              ) : null}
-              {exifData?.rating && exifData.rating > 0 ? (
+                <InfoRow label={t('aperture')} value={exifData.aperture} />
                 <InfoRow
-                  label={t('rating')}
-                  value={'★'.repeat(exifData.rating)}
+                  label={t('shutterSpeed')}
+                  value={exifData.shutterSpeed}
                 />
-              ) : null}
-              {exifData?.zone ? (
-                <InfoRow label={t('timeZone')} value={exifData.zone} />
-              ) : null}
-              {exifData?.artist ? (
-                <InfoRow label={t('artist')} value={exifData.artist} />
-              ) : null}
-              {exifData?.copyright ? (
-                <InfoRow label={t('copyright')} value={exifData.copyright} />
-              ) : null}
-              {exifData?.software ? (
-                <InfoRow label={t('software')} value={exifData.software} />
-              ) : null}
-            </div>
+                <InfoRow label={t('iso')} value={exifData.iso} />
+                <InfoRow
+                  label={t('exposureCompensation')}
+                  value={exifData.exposureBias}
+                />
+              </InfoSection>
 
-            {hasCaptureParams && exifData ? (
-              <div className="mt-3">
-                <SectionTitle>{t('captureParameters')}</SectionTitle>
-                <div className="grid grid-cols-2 gap-2">
-                  {exifData.focalLength35mm ? (
-                    <ExifChip
-                      icon={<Camera size={14} />}
-                      value={`${exifData.focalLength35mm}mm`}
-                    />
-                  ) : null}
-                  {exifData.aperture ? (
-                    <ExifChip
-                      icon={<Circle size={14} />}
-                      value={exifData.aperture}
-                    />
-                  ) : null}
-                  {exifData.shutterSpeed ? (
-                    <ExifChip
-                      icon={<Clock size={14} />}
-                      value={exifData.shutterSpeed}
-                    />
-                  ) : null}
-                  {exifData.iso ? (
-                    <ExifChip
-                      icon={<span className="text-[10px]">ISO</span>}
-                      value={String(exifData.iso)}
-                    />
-                  ) : null}
-                  {exifData.exposureBias ? (
-                    <ExifChip
-                      icon={<Sun size={14} />}
-                      value={exifData.exposureBias}
-                    />
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
-          </section>
+              <InfoSection title={t('deviceInfo')}>
+                <InfoRow label={t('camera')} value={exifData.camera} />
+                <InfoRow label={t('lens')} value={exifData.lens} />
+                <InfoRow
+                  label={t('lensMake')}
+                  value={
+                    exifData.lensMake &&
+                    exifData.lens &&
+                    !exifData.lens.includes(exifData.lensMake)
+                      ? exifData.lensMake
+                      : null
+                  }
+                />
+                <InfoRow
+                  label={t('focalLengthActual')}
+                  value={
+                    exifData.focalLength ? `${exifData.focalLength}mm` : null
+                  }
+                />
+                <InfoRow
+                  label={t('focalLengthEquivalent')}
+                  value={
+                    exifData.focalLength35mm
+                      ? `${exifData.focalLength35mm}mm`
+                      : null
+                  }
+                />
+                <InfoRow
+                  label={t('maxAperture')}
+                  value={
+                    exifData.maxAperture ? `f/${exifData.maxAperture}` : null
+                  }
+                />
+              </InfoSection>
 
-          {hasDeviceInfo && exifData ? (
-            <section>
-              <SectionTitle>{t('deviceInfo')}</SectionTitle>
-              <div className="space-y-1">
-                {exifData.camera ? (
-                  <InfoRow label={t('camera')} value={exifData.camera} />
-                ) : null}
-                {exifData.lens ? (
-                  <InfoRow label={t('lens')} value={exifData.lens} />
-                ) : null}
-                {exifData.lensMake &&
-                exifData.lens &&
-                !exifData.lens.includes(exifData.lensMake) ? (
-                  <InfoRow label={t('lensMake')} value={exifData.lensMake} />
-                ) : null}
-                {exifData.focalLength ? (
-                  <InfoRow
-                    label={t('focalLengthActual')}
-                    value={`${exifData.focalLength}mm`}
-                  />
-                ) : null}
-                {exifData.focalLength35mm ? (
-                  <InfoRow
-                    label={t('focalLengthEquivalent')}
-                    value={`${exifData.focalLength35mm}mm`}
-                  />
-                ) : null}
-                {exifData.maxAperture ? (
-                  <InfoRow
-                    label={t('maxAperture')}
-                    value={`f/${exifData.maxAperture}`}
-                  />
-                ) : null}
-              </div>
-            </section>
-          ) : null}
+              <InfoSection title={t('captureMode')}>
+                <InfoRow
+                  label={t('exposureProgram')}
+                  value={exifData.exposureProgram}
+                />
+                <InfoRow
+                  label={t('exposureMode')}
+                  value={exifData.exposureMode}
+                />
+                <InfoRow
+                  label={t('meteringMode')}
+                  value={exifData.meteringMode}
+                />
+                <InfoRow
+                  label={t('whiteBalance')}
+                  value={exifData.whiteBalance}
+                />
+                <InfoRow
+                  label={t('whiteBalanceBias')}
+                  value={
+                    exifData.whiteBalanceBias !== undefined
+                      ? `${exifData.whiteBalanceBias} Mired`
+                      : null
+                  }
+                />
+                <InfoRow label={t('wbShiftAB')} value={exifData.wbShiftAB} />
+                <InfoRow label={t('wbShiftGM')} value={exifData.wbShiftGM} />
+                <InfoRow label={t('flash')} value={exifData.flash} />
+                <InfoRow
+                  label={t('lightSource')}
+                  value={exifData.lightSource}
+                />
+                <InfoRow
+                  label={t('sceneCaptureType')}
+                  value={exifData.sceneCaptureType}
+                />
+                <InfoRow
+                  label={t('flashMeteringMode')}
+                  value={exifData.flashMeteringMode}
+                />
+              </InfoSection>
 
-          {hasCaptureMode && exifData ? (
-            <section>
-              <SectionTitle>{t('captureMode')}</SectionTitle>
-              <div className="space-y-1">
-                {exifData.exposureProgram ? (
-                  <InfoRow
-                    label={t('exposureProgram')}
-                    value={exifData.exposureProgram}
-                  />
-                ) : null}
-                {exifData.exposureMode ? (
-                  <InfoRow
-                    label={t('exposureMode')}
-                    value={exifData.exposureMode}
-                  />
-                ) : null}
-                {exifData.meteringMode ? (
-                  <InfoRow
-                    label={t('meteringMode')}
-                    value={exifData.meteringMode}
-                  />
-                ) : null}
-                {exifData.whiteBalance ? (
-                  <InfoRow
-                    label={t('whiteBalance')}
-                    value={exifData.whiteBalance}
-                  />
-                ) : null}
-                {exifData.whiteBalanceBias !== undefined ? (
-                  <InfoRow
-                    label={t('whiteBalanceBias')}
-                    value={`${exifData.whiteBalanceBias} Mired`}
-                  />
-                ) : null}
-                {exifData.wbShiftAB ? (
-                  <InfoRow label={t('wbShiftAB')} value={exifData.wbShiftAB} />
-                ) : null}
-                {exifData.wbShiftGM ? (
-                  <InfoRow label={t('wbShiftGM')} value={exifData.wbShiftGM} />
-                ) : null}
-                {exifData.flash ? (
-                  <InfoRow label={t('flash')} value={exifData.flash} />
-                ) : null}
-                {exifData.lightSource ? (
-                  <InfoRow
-                    label={t('lightSource')}
-                    value={exifData.lightSource}
-                  />
-                ) : null}
-                {exifData.sceneCaptureType ? (
-                  <InfoRow
-                    label={t('sceneCaptureType')}
-                    value={exifData.sceneCaptureType}
-                  />
-                ) : null}
-                {exifData.flashMeteringMode ? (
-                  <InfoRow
-                    label={t('flashMeteringMode')}
-                    value={exifData.flashMeteringMode}
-                  />
-                ) : null}
-              </div>
-            </section>
-          ) : null}
-
-          {exifData?.gps ? (
-            <section>
-              <SectionTitle>{t('location')}</SectionTitle>
-              <div className="space-y-1">
+              <InfoSection title={t('location')}>
                 <InfoRow
                   label={t('gpsLatitude')}
-                  value={exifData.gps.latitude}
+                  value={exifData.gps?.latitude}
                 />
                 <InfoRow
                   label={t('gpsLongitude')}
-                  value={exifData.gps.longitude}
+                  value={exifData.gps?.longitude}
                 />
-                {exifData.gps.altitude ? (
-                  <InfoRow
-                    label={t('gpsAltitude')}
-                    value={`${exifData.gps.altitude}m`}
-                  />
-                ) : null}
-              </div>
-            </section>
-          ) : null}
+                <InfoRow
+                  label={t('gpsAltitude')}
+                  value={
+                    exifData.gps?.altitude ? `${exifData.gps.altitude}m` : null
+                  }
+                />
+              </InfoSection>
 
-          {hasTechnicalParams && exifData ? (
-            <section>
-              <SectionTitle>{t('technicalParameters')}</SectionTitle>
-              <div className="space-y-1">
-                {exifData.brightnessValue ? (
-                  <InfoRow
-                    label={t('brightnessValue')}
-                    value={exifData.brightnessValue}
-                  />
-                ) : null}
-                {exifData.shutterSpeedValue !== undefined ? (
-                  <InfoRow
-                    label={t('shutterSpeedValue')}
-                    value={String(exifData.shutterSpeedValue)}
-                  />
-                ) : null}
-                {exifData.apertureValue ? (
-                  <InfoRow
-                    label={t('apertureValue')}
-                    value={exifData.apertureValue}
-                  />
-                ) : null}
-                {exifData.sensingMethod ? (
-                  <InfoRow
-                    label={t('sensingMethod')}
-                    value={exifData.sensingMethod}
-                  />
-                ) : null}
-                {exifData.focalPlaneXResolution ||
-                exifData.focalPlaneYResolution ? (
-                  <InfoRow
-                    label={t('focalPlaneResolution')}
-                    value={`${
-                      exifData.focalPlaneXResolution ?? t('notAvailable')
-                    } × ${exifData.focalPlaneYResolution ?? t('notAvailable')}`}
-                  />
-                ) : null}
-              </div>
-            </section>
+              <InfoSection title={t('technicalParameters')} className="pt-2">
+                <InfoRow
+                  label={t('brightnessValue')}
+                  value={exifData.brightnessValue}
+                />
+                <InfoRow
+                  label={t('shutterSpeedValue')}
+                  value={exifData.shutterSpeedValue}
+                />
+                <InfoRow
+                  label={t('apertureValue')}
+                  value={exifData.apertureValue}
+                />
+                <InfoRow
+                  label={t('sensingMethod')}
+                  value={exifData.sensingMethod}
+                />
+                <InfoRow
+                  label={t('focalPlaneResolution')}
+                  value={focalPlaneResolution}
+                />
+              </InfoSection>
+            </>
           ) : null}
         </div>
       </div>

@@ -6,14 +6,8 @@ import fileUrl from 'licia/fileUrl'
 import md5 from 'licia/md5'
 import normalizePath from 'licia/normalizePath'
 import splitPath from 'licia/splitPath'
-import type { PreviewResult } from '../common/types'
-import {
-  createImagePreview,
-  getCachedThumbnailDimensions,
-} from './imageProcessor'
 
 const PREVIEW_MAX_WIDTH = 2560
-const PREVIEW_JPEG_QUALITY = 88
 const CACHE_DIR = join(tmpdir(), 'tinker-photo-viewer-previews')
 
 const NATIVE_PREVIEW_FORMATS = new Set([
@@ -26,17 +20,6 @@ const NATIVE_PREVIEW_FORMATS = new Set([
 ])
 
 const CONVERT_PREVIEW_FORMATS = new Set(['tiff', 'tif', 'bmp', 'svg'])
-
-let queue: Promise<void> = Promise.resolve()
-
-function enqueue<T>(task: () => Promise<T>): Promise<T> {
-  const run = queue.then(task, task)
-  queue = run.then(
-    () => undefined,
-    () => undefined
-  )
-  return run
-}
 
 function needsPreviewConversion(format: string): boolean {
   const normalized = format.toLowerCase()
@@ -60,41 +43,28 @@ async function getCachePath(sourcePath: string): Promise<string> {
   return join(CACHE_DIR, `${key}.jpg`)
 }
 
-export async function getPreviewResult(
+export type PreviewRequest =
+  | { kind: 'native'; url: string }
+  | { kind: 'convert'; cachePath: string; exists: boolean }
+
+export async function resolvePreviewRequest(
   sourcePath: string
-): Promise<PreviewResult> {
+): Promise<PreviewRequest> {
   const normalizedPath = normalizePath(sourcePath)
   const { ext } = splitPath(normalizedPath)
   const format = ext ? ext.slice(1).toLowerCase() : ''
 
   if (!needsPreviewConversion(format)) {
     return {
+      kind: 'native',
       url: toFileUrl(normalizedPath),
-      width: 0,
-      height: 0,
     }
   }
 
-  return enqueue(async () => {
-    const cachePath = await getCachePath(normalizedPath)
-    let dimensions = existsSync(cachePath)
-      ? await getCachedThumbnailDimensions(cachePath)
-      : null
-
-    if (!dimensions) {
-      const result = await createImagePreview(
-        normalizedPath,
-        cachePath,
-        PREVIEW_MAX_WIDTH,
-        PREVIEW_JPEG_QUALITY
-      )
-      dimensions = result.dimensions
-    }
-
-    return {
-      url: toFileUrl(cachePath),
-      width: dimensions?.width ?? 0,
-      height: dimensions?.height ?? 0,
-    }
-  })
+  const cachePath = await getCachePath(normalizedPath)
+  return {
+    kind: 'convert',
+    cachePath,
+    exists: existsSync(cachePath),
+  }
 }

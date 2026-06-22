@@ -7,11 +7,22 @@ declare global {
     readPhotoExif(
       filePath: string
     ): Promise<import('../common/types').PhotoExif | undefined>
-    getThumbnailUrl(
+    resolveThumbnailCache(
       filePath: string
+    ): Promise<{ cachePath: string; exists: boolean }>
+    buildThumbnailResult(
+      filePath: string,
+      cachePath: string,
+      readTakenAt: boolean
     ): Promise<import('../common/types').ThumbnailResult>
-    getPreviewUrl(
+    resolvePreviewRequest(
       filePath: string
+    ): Promise<
+      | { kind: 'native'; url: string }
+      | { kind: 'convert'; cachePath: string; exists: boolean }
+    >
+    buildPreviewResult(
+      cachePath: string
     ): Promise<import('../common/types').PreviewResult>
   }
 }

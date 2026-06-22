@@ -1,7 +1,3 @@
-declare const _tinker: {
-  runFFmpeg(args: string[]): { promise: Promise<void>; taskId: string }
-}
-
 const JPEG_QV_MIN = 2
 const JPEG_QV_MAX = 31
 
@@ -30,9 +26,4 @@ export function buildJpegScaleArgs(
     '-y',
     outputPath,
   ]
-}
-
-export async function runFfmpeg(args: string[]): Promise<void> {
-  const { promise } = _tinker.runFFmpeg(args)
-  await promise
 }
