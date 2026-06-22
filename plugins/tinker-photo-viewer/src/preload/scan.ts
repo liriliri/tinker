@@ -5,8 +5,7 @@ import startWith from 'licia/startWith'
 import unique from 'licia/unique'
 import { IMAGE_EXTS } from 'share/lib/fileType'
 
-const HEIC_EXTS = ['heic', 'heif']
-const GLOB_EXTENSIONS = [...IMAGE_EXTS, ...HEIC_EXTS].join(',')
+const GLOB_EXTENSIONS = [...IMAGE_EXTS].join(',')
 
 export function removeSubdirectories(paths: string[]): string[] {
   const normalized = paths.map((path) => rtrim(normalizePath(path), '/'))

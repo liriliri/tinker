@@ -5,7 +5,7 @@ export const IMAGE_DIALOG_OPTIONS = {
   filters: [
     {
       name: 'Images',
-      extensions: [...IMAGE_EXTS, 'heic', 'heif'],
+      extensions: [...IMAGE_EXTS],
     },
   ],
   properties: ['openFile', 'multiSelections'] as (

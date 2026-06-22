@@ -7,7 +7,7 @@ import md5 from 'licia/md5'
 import normalizePath from 'licia/normalizePath'
 import type { ThumbnailResult } from '../common/types'
 import {
-  createSharpThumbnail,
+  createImageThumbnail,
   getCachedThumbnailDimensions,
   type ImageDimensions,
 } from './imageProcessor'
@@ -48,7 +48,7 @@ export async function getThumbnailResult(
     if (existsSync(cachePath)) {
       dimensions = await getCachedThumbnailDimensions(cachePath)
     } else {
-      const result = await createSharpThumbnail(
+      const result = await createImageThumbnail(
         normalizedPath,
         cachePath,
         THUMB_MAX_WIDTH,

@@ -1,9 +1,9 @@
 import { open, stat } from 'fs/promises'
 import splitPath from 'licia/splitPath'
 import normalizePath from 'licia/normalizePath'
+import { imageSize } from 'image-size'
 import type { PhotoMeta } from '../common/types'
-import { parseExifBuffer, readExifFromSharp } from './exif'
-import { readImageSize } from './imageSize'
+import { readExifFromFile } from './exif'
 
 const META_READ_BYTES = 512 * 1024
 
@@ -21,21 +21,6 @@ async function readFileHeader(
   }
 }
 
-async function resolveExif(
-  filePath: string,
-  headerBuffer: Buffer
-): Promise<PhotoMeta['exif']> {
-  const fromHeader = parseExifBuffer(headerBuffer)
-  if (fromHeader?.takenAt) return fromHeader
-
-  const fromSharp = await readExifFromSharp(filePath)
-  if (fromSharp) {
-    return { ...fromHeader, ...fromSharp }
-  }
-
-  return fromHeader
-}
-
 export async function readPhotoMeta(filePath: string): Promise<PhotoMeta> {
   const normalizedPath = normalizePath(filePath)
   const { ext } = splitPath(normalizedPath)
@@ -49,8 +34,16 @@ export async function readPhotoMeta(filePath: string): Promise<PhotoMeta> {
     headerBuffer = Buffer.alloc(0)
   }
 
-  const dimensions = readImageSize(headerBuffer, format)
-  const exif = await resolveExif(normalizedPath, headerBuffer)
+  let dimensions: { width: number; height: number } | null = null
+  if (headerBuffer.length) {
+    try {
+      const { width, height } = imageSize(headerBuffer)
+      if (width > 0 && height > 0) dimensions = { width, height }
+    } catch {
+      // unsupported or incomplete header
+    }
+  }
+  const exif = await readExifFromFile(normalizedPath)
   const createdAt = exif?.takenAt ?? fileStats.mtimeMs
 
   return {

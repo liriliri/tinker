@@ -140,7 +140,7 @@ class Store extends BaseStore {
     })
 
     try {
-      const exts = [...IMAGE_EXTS, 'heic', 'heif']
+      const exts = [...IMAGE_EXTS]
       const task = tinker.searchFile(query, {
         exts,
         maxResults: 20,

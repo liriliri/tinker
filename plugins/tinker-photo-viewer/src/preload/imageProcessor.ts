@@ -1,82 +1,11 @@
 import { readFile } from 'fs/promises'
-import heicConvert from 'heic-convert'
-import splitPath from 'licia/splitPath'
-import sharp, { type Metadata } from 'sharp'
-import { extractTakenAt } from './exif'
-
-const HEIC_FORMATS = new Set(['heic', 'heif', 'hif'])
-
-export function isHeicFormat(format: string): boolean {
-  return HEIC_FORMATS.has(format.toLowerCase())
-}
-
-async function convertHeicToJpeg(heicBuffer: Buffer): Promise<Buffer> {
-  const jpegBuffer = await heicConvert({
-    buffer: heicBuffer,
-    format: 'JPEG',
-    quality: 0.95,
-  })
-
-  return Buffer.from(jpegBuffer)
-}
-
-export async function preprocessImageBuffer(
-  buffer: Buffer,
-  format: string
-): Promise<Buffer> {
-  if (isHeicFormat(format)) {
-    return convertHeicToJpeg(buffer)
-  }
-
-  return buffer
-}
-
-export async function readProcessedImageBuffer(
-  filePath: string,
-  format: string
-): Promise<Buffer> {
-  const rawBuffer = await readFile(filePath)
-  return preprocessImageBuffer(rawBuffer, format)
-}
+import { imageSize } from 'image-size'
+import { extractTakenAtFromFile } from './exif'
+import { buildJpegScaleArgs, runFfmpeg } from './ffmpegImage'
 
 export interface ImageDimensions {
   width: number
   height: number
-}
-
-function normalizeDimensions(metadata: Metadata): ImageDimensions | null {
-  if (!metadata.width || !metadata.height) {
-    return null
-  }
-
-  let { width, height } = metadata
-  const { orientation } = metadata
-  if (
-    orientation === 5 ||
-    orientation === 6 ||
-    orientation === 7 ||
-    orientation === 8
-  ) {
-    ;[width, height] = [height, width]
-  }
-
-  return { width, height }
-}
-
-export async function getImageDimensions(
-  imageBuffer: Buffer
-): Promise<ImageDimensions | null> {
-  const metadata = await sharp(imageBuffer).rotate().metadata()
-  return normalizeDimensions(metadata)
-}
-
-export async function getImageDimensionsFromPath(
-  filePath: string
-): Promise<ImageDimensions | null> {
-  const { ext } = splitPath(filePath)
-  const format = ext ? ext.slice(1).toLowerCase() : ''
-  const imageBuffer = await readProcessedImageBuffer(filePath, format)
-  return getImageDimensions(imageBuffer)
 }
 
 export interface ThumbnailOutput {
@@ -84,51 +13,48 @@ export interface ThumbnailOutput {
   takenAt?: number
 }
 
-export async function createSharpThumbnail(
+async function readJpegDimensions(
+  filePath: string
+): Promise<ImageDimensions | null> {
+  try {
+    const buffer = await readFile(filePath)
+    const { width, height } = imageSize(buffer)
+    return width > 0 && height > 0 ? { width, height } : null
+  } catch {
+    return null
+  }
+}
+
+export async function createImageThumbnail(
   sourcePath: string,
   cachePath: string,
   maxWidth: number,
   jpegQuality: number
 ): Promise<ThumbnailOutput> {
-  const { ext } = splitPath(sourcePath)
-  const format = ext ? ext.slice(1).toLowerCase() : ''
-  const imageBuffer = await readProcessedImageBuffer(sourcePath, format)
-  const takenAt = extractTakenAt(imageBuffer)
+  const takenAt = await extractTakenAtFromFile(sourcePath)
 
-  const pipeline = sharp(imageBuffer).rotate()
-  const metadata = await pipeline.metadata()
-  await pipeline
-    .clone()
-    .resize(maxWidth, null, { withoutEnlargement: true })
-    .jpeg({ quality: jpegQuality })
-    .toFile(cachePath)
+  await runFfmpeg(
+    buildJpegScaleArgs(sourcePath, cachePath, maxWidth, jpegQuality)
+  )
 
   return {
-    dimensions: normalizeDimensions(metadata),
+    dimensions: await readJpegDimensions(cachePath),
     takenAt,
   }
 }
 
-export async function createSharpPreview(
+export async function createImagePreview(
   sourcePath: string,
   cachePath: string,
   maxWidth: number,
   jpegQuality: number
 ): Promise<ThumbnailOutput> {
-  const { ext } = splitPath(sourcePath)
-  const format = ext ? ext.slice(1).toLowerCase() : ''
-  const imageBuffer = await readProcessedImageBuffer(sourcePath, format)
-
-  const pipeline = sharp(imageBuffer).rotate()
-  const metadata = await pipeline.metadata()
-  await pipeline
-    .clone()
-    .resize(maxWidth, null, { withoutEnlargement: true })
-    .jpeg({ quality: jpegQuality })
-    .toFile(cachePath)
+  await runFfmpeg(
+    buildJpegScaleArgs(sourcePath, cachePath, maxWidth, jpegQuality)
+  )
 
   return {
-    dimensions: normalizeDimensions(metadata),
+    dimensions: await readJpegDimensions(cachePath),
   }
 }
 
@@ -137,7 +63,8 @@ export async function getCachedThumbnailDimensions(
 ): Promise<ImageDimensions | null> {
   try {
     const buffer = await readFile(cachePath)
-    return getImageDimensions(buffer)
+    const { width, height } = imageSize(buffer)
+    return width > 0 && height > 0 ? { width, height } : null
   } catch {
     return null
   }

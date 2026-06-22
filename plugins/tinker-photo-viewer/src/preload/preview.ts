@@ -8,9 +8,8 @@ import normalizePath from 'licia/normalizePath'
 import splitPath from 'licia/splitPath'
 import type { PreviewResult } from '../common/types'
 import {
-  createSharpPreview,
+  createImagePreview,
   getCachedThumbnailDimensions,
-  isHeicFormat,
 } from './imageProcessor'
 
 const PREVIEW_MAX_WIDTH = 2560
@@ -42,7 +41,6 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
 function needsPreviewConversion(format: string): boolean {
   const normalized = format.toLowerCase()
   return (
-    isHeicFormat(normalized) ||
     CONVERT_PREVIEW_FORMATS.has(normalized) ||
     !NATIVE_PREVIEW_FORMATS.has(normalized)
   )
@@ -84,7 +82,7 @@ export async function getPreviewResult(
       : null
 
     if (!dimensions) {
-      const result = await createSharpPreview(
+      const result = await createImagePreview(
         normalizedPath,
         cachePath,
         PREVIEW_MAX_WIDTH,
