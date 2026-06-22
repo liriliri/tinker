@@ -18,6 +18,8 @@ Tinker plugins should reuse shared UI, store, and AI logic instead of rebuilding
 @config "../tailwind.config.js";
 ```
 
+Third-party style overrides live in `share/styles/`. For OverlayScrollbars, import `share/styles/overlayscrollbars.scss` and set `scrollbars.theme: 'os-theme-tinker'`.
+
 ## Theme
 
 ```ts

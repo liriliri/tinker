@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import PhotoViewer from 'share/components/PhotoViewer'
 import { getPhotoPreview, prefetchPhotoPreview } from '../lib/preview'
@@ -26,6 +26,16 @@ const PhotoViewerApp = observer(function PhotoViewerApp() {
     prefetchPhotoPreview(photo.path)
   }, [])
 
+  const labels = useMemo(
+    () => ({
+      closeViewer: t('closeViewer'),
+      prevPhoto: t('prevPhoto'),
+      nextPhoto: t('nextPhoto'),
+      previewLoadFailed: t('previewLoadFailed'),
+    }),
+    [t]
+  )
+
   return (
     <PhotoViewer
       open={store.viewerOpen}
@@ -33,12 +43,7 @@ const PhotoViewerApp = observer(function PhotoViewerApp() {
       currentIndex={store.viewerIndex}
       onClose={() => store.closeViewer()}
       onIndexChange={(index) => store.setViewerIndex(index)}
-      labels={{
-        closeViewer: t('closeViewer'),
-        prevPhoto: t('prevPhoto'),
-        nextPhoto: t('nextPhoto'),
-        previewLoadFailed: t('previewLoadFailed'),
-      }}
+      labels={labels}
       getThumbnailUrl={getThumbnailUrl}
       getPreviewUrl={getPreviewUrl}
       prefetchPreview={prefetchPreview}

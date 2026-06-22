@@ -1,5 +1,7 @@
 {
   "import": "导入",
+  "openImage": "打开图片",
+  "imageFiles": "图片",
   "search": "搜索",
   "scanLocalPhotos": "扫描文件夹",
   "clearList": "清空列表",

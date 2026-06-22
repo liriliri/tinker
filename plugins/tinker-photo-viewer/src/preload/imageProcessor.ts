@@ -5,7 +5,7 @@ import normalizePath from 'licia/normalizePath'
 import type { PreviewResult, ThumbnailResult } from '../common/types'
 import { extractTakenAtFromFile } from './exif'
 
-export interface ImageDimensions {
+interface ImageDimensions {
   width: number
   height: number
 }
@@ -22,7 +22,7 @@ async function readJpegDimensions(
   }
 }
 
-export async function getCachedThumbnailDimensions(
+async function getCachedThumbnailDimensions(
   cachePath: string
 ): Promise<ImageDimensions | null> {
   return readJpegDimensions(cachePath)

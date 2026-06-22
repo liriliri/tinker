@@ -1,0 +1,14 @@
+/* OverlayScrollbars theme — matches native scrollbar in share/base.scss */
+.os-theme-tinker {
+  --os-size: 6px;
+  --os-padding-perpendicular: 0;
+  --os-padding-axis: 0;
+  --os-handle-border-radius: 2px;
+  --os-handle-interactive-area-offset: 2px;
+  --os-handle-bg: rgba(128, 128, 128, 0.6);
+  --os-handle-bg-hover: rgba(128, 128, 128, 0.8);
+  --os-handle-bg-active: rgba(128, 128, 128, 0.9);
+  --os-track-bg: transparent;
+  --os-track-bg-hover: transparent;
+  --os-track-bg-active: transparent;
+}

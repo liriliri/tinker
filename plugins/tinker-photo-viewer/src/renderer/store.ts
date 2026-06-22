@@ -381,14 +381,6 @@ class Store extends BaseStore {
     this.viewerIndex = index
   }
 
-  showPrevPhoto() {
-    this.setViewerIndex(this.viewerIndex - 1)
-  }
-
-  showNextPhoto() {
-    this.setViewerIndex(this.viewerIndex + 1)
-  }
-
   async ensurePhotoExists(photo: Photo): Promise<boolean> {
     if (await fileExists(photo.path)) return true
     toast.error(i18n.t('fileNotFound'))

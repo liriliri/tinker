@@ -11,7 +11,7 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { confirm } from 'share/components/Confirm'
-import { IMAGE_DIALOG_OPTIONS } from '../lib/util'
+import { IMAGE_EXTS } from 'share/lib/fileType'
 import store from '../store'
 
 const PhotoToolbar = observer(function PhotoToolbar() {
@@ -28,7 +28,16 @@ const PhotoToolbar = observer(function PhotoToolbar() {
   )
 
   const handleImport = async () => {
-    const result = await tinker.showOpenDialog(IMAGE_DIALOG_OPTIONS)
+    const result = await tinker.showOpenDialog({
+      title: t('openImage'),
+      filters: [
+        {
+          name: t('imageFiles'),
+          extensions: [...IMAGE_EXTS],
+        },
+      ],
+      properties: ['openFile', 'multiSelections'],
+    })
     if (!result.canceled && result.filePaths.length > 0) {
       await store.addFiles(result.filePaths)
     }

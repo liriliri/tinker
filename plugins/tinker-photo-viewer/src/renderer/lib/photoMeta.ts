@@ -1,7 +1,7 @@
 import type { PhotoExif } from '../../common/types'
 import fileSize from 'licia/fileSize'
 
-export interface FormattedExif {
+interface FormattedExif {
   zone?: string
   focalLength35mm?: number
   focalLength?: number
@@ -15,7 +15,6 @@ export interface FormattedExif {
   software?: string
   artist?: string
   copyright?: string
-  dateTime?: string
   colorSpace?: string
   rating?: number
   exposureMode?: string
@@ -43,7 +42,7 @@ export interface FormattedExif {
   }
 }
 
-export function formatExposureTime(
+function formatExposureTime(
   value?: number,
   fallback?: number
 ): string | undefined {
@@ -56,15 +55,12 @@ export function formatExposureTime(
   return denominator > 0 ? `1/${denominator}s` : undefined
 }
 
-export function formatAperture(value?: number): string | undefined {
+function formatAperture(value?: number): string | undefined {
   if (value === undefined || Number.isNaN(value)) return undefined
   return `f/${Number(value.toFixed(1))}`
 }
 
-export function formatExifData(
-  exif?: PhotoExif,
-  locale = 'en-US'
-): FormattedExif | null {
+export function formatExifData(exif?: PhotoExif): FormattedExif | null {
   if (!exif) return null
 
   const shutterSpeed = formatExposureTime(
@@ -76,14 +72,6 @@ export function formatExifData(
     exif.lensMake && exif.lensModel?.includes(exif.lensMake)
       ? exif.lensModel
       : exif.lensModel
-  const dateTime =
-    exif.takenAt !== undefined
-      ? new Intl.DateTimeFormat(locale, {
-          dateStyle: 'short',
-          timeStyle: 'medium',
-        }).format(new Date(exif.takenAt))
-      : undefined
-
   const gps = exif.gps
     ? {
         latitude: formatGpsCoordinate(
@@ -118,7 +106,6 @@ export function formatExifData(
     software: exif.software,
     artist: exif.artist,
     copyright: exif.copyright,
-    dateTime,
     colorSpace: exif.colorSpace,
     rating: exif.rating,
     exposureMode: exif.exposureMode,

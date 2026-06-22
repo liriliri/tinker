@@ -14,8 +14,7 @@ import { resolveThumbnailCache } from './thumbnail'
 
 const photoViewerObj = {
   async scanPhotoFiles(dirs: string[]) {
-    const files = await scanPhotoFiles([...dirs])
-    return [...files]
+    return scanPhotoFiles(dirs)
   },
 
   async readPhotoMeta(filePath: string): Promise<PhotoMeta> {

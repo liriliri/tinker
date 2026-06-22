@@ -115,10 +115,7 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
     scrollRef.current?.osInstance()?.elements().viewport.scrollTo({ top: 0 })
   }, [photo.path])
 
-  const exifData = useMemo(
-    () => formatExifData(exif, i18n.language),
-    [exif, i18n.language]
-  )
+  const exifData = useMemo(() => formatExifData(exif), [exif])
 
   const dateTakenLabel = useMemo(
     () =>
@@ -160,6 +157,7 @@ const PhotoInfoPanel = observer(function PhotoInfoPanel({
           scrollbars: {
             autoHide: 'leave',
             autoHideDelay: 400,
+            theme: 'os-theme-tinker',
           },
         }}
       >

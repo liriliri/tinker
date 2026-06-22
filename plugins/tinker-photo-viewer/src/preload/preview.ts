@@ -43,7 +43,7 @@ async function getCachePath(sourcePath: string): Promise<string> {
   return join(CACHE_DIR, `${key}.jpg`)
 }
 
-export type PreviewRequest =
+type PreviewRequest =
   | { kind: 'native'; url: string }
   | { kind: 'convert'; cachePath: string; exists: boolean }
 

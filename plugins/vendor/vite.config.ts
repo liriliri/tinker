@@ -78,7 +78,10 @@ const globalsExports: Record<string, string[]> = {
   '@xterm/xterm': ['Terminal'],
   '@xterm/addon-fit': ['FitAddon'],
   codemirror: [],
-  'overlayscrollbars-react': ['OverlayScrollbarsComponent', 'useOverlayScrollbars'],
+  'overlayscrollbars-react': [
+    'OverlayScrollbarsComponent',
+    'useOverlayScrollbars',
+  ],
 }
 
 function moduleKeys(id: string) {

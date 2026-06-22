@@ -23,9 +23,7 @@ export interface MasonryItemLayout {
   height: number
 }
 
-export function getMasonryColumnConfig(
-  containerWidth: number
-): MasonryColumnConfig {
+function getMasonryColumnConfig(containerWidth: number): MasonryColumnConfig {
   const availableWidth = Math.max(0, containerWidth - HORIZONTAL_PADDING_LEFT)
 
   if (availableWidth <= 0) {

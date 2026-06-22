@@ -1,5 +1,7 @@
 {
   "import": "Import",
+  "openImage": "Open Image",
+  "imageFiles": "Images",
   "search": "Search",
   "scanLocalPhotos": "Scan Folders",
   "clearList": "Clear List",

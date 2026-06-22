@@ -7,7 +7,7 @@ import { IMAGE_EXTS } from 'share/lib/fileType'
 
 const GLOB_EXTENSIONS = [...IMAGE_EXTS].join(',')
 
-export function removeSubdirectories(paths: string[]): string[] {
+function removeSubdirectories(paths: string[]): string[] {
   const normalized = paths.map((path) => rtrim(normalizePath(path), '/'))
   const result = [...normalized]
 
