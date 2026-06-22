@@ -6,14 +6,14 @@ import {
   computeFitRect,
   type ImageRect,
   zoomRectAtPivot,
-} from '../lib/viewerLayout'
+} from '../../lib/viewerLayout'
 
 const MIN_RATIO = 0.05
 const MAX_RATIO = 20
 const WHEEL_INTERVAL = 50
 const IMAGE_TRANSITION = 'all 0.3s'
 
-interface ZoomPanImageProps {
+export interface ZoomPanImageProps {
   src: string
   alt: string
   className?: string
@@ -252,7 +252,8 @@ export default function ZoomPanImage({
       if (!naturalWidth || !naturalHeight) return
 
       const container = containerRef.current
-      const { width: cw, height: ch } = container.getBoundingClientRect()
+      const containerRect = container.getBoundingClientRect()
+      const { width: cw, height: ch } = containerRect
       const fitRatio = computeFitRatio(
         naturalWidth,
         naturalHeight,
@@ -260,17 +261,13 @@ export default function ZoomPanImage({
         ch,
         fitArea
       )
-      const containerRect = container.getBoundingClientRect()
       const pointerX = event.clientX - containerRect.left
       const pointerY = event.clientY - containerRect.top
       const isAtFit = Math.abs(ratio - fitRatio) < 0.01
-      const isAtActual = Math.abs(ratio - 1) < 0.01
 
       transitionEnabled.current = true
       if (isAtFit) {
         zoomTo(1, { x: pointerX, y: pointerY })
-      } else if (isAtActual) {
-        reset()
       } else {
         reset()
       }
@@ -346,7 +343,6 @@ export default function ZoomPanImage({
         className={`absolute max-w-none select-none transition-opacity duration-300 ${
           highResLoaded ? 'opacity-100' : 'opacity-0'
         }`}
-        style={{ maxWidth: 'none' }}
         onLoad={handleLoad}
         onError={() => onError?.()}
       />

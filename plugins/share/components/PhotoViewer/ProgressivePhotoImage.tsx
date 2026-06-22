@@ -1,4 +1,4 @@
-import { ImageOff, Loader2 } from 'lucide-react'
+import { ImageOff } from 'lucide-react'
 import {
   memo,
   useCallback,
@@ -7,24 +7,25 @@ import {
   useRef,
   useState,
 } from 'react'
-import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
-import { getPhotoPreview } from '../lib/preview'
-import { getPhotoThumbnail } from '../lib/thumbnail'
+import { LoadingCircle } from '../Loading'
+import { tw } from '../../theme'
 import ZoomPanImage from './ZoomPanImage'
 
-interface ProgressivePhotoImageProps {
-  path: string
+export interface ProgressivePhotoImageProps {
   alt: string
+  loadFailedLabel: string
+  getThumbnailUrl: () => Promise<string | null>
+  getPreviewUrl: () => Promise<string | null>
 }
 
 const loadedThumbnailSet = new Set<string>()
 
 const ProgressivePhotoImage = memo(function ProgressivePhotoImage({
-  path,
   alt,
+  loadFailedLabel,
+  getThumbnailUrl,
+  getPreviewUrl,
 }: ProgressivePhotoImageProps) {
-  const { t } = useTranslation()
   const thumbnailRef = useRef<HTMLImageElement>(null)
   const [thumbnailSrc, setThumbnailSrc] = useState<string | null>(null)
   const [isThumbnailLoaded, setIsThumbnailLoaded] = useState(false)
@@ -43,15 +44,15 @@ const ProgressivePhotoImage = memo(function ProgressivePhotoImage({
 
     let cancelled = false
 
-    getPhotoThumbnail(path).then((result) => {
-      if (cancelled || !result?.url) return
-      setThumbnailSrc(result.url)
+    void getThumbnailUrl().then((url) => {
+      if (cancelled || !url) return
+      setThumbnailSrc(url)
     })
 
-    getPhotoPreview(path).then((result) => {
+    void getPreviewUrl().then((url) => {
       if (cancelled) return
-      if (result?.url) {
-        setPreviewSrc(result.url)
+      if (url) {
+        setPreviewSrc(url)
         setHighResLoaded(true)
       } else {
         setFailed(true)
@@ -61,7 +62,7 @@ const ProgressivePhotoImage = memo(function ProgressivePhotoImage({
     return () => {
       cancelled = true
     }
-  }, [path])
+  }, [getPreviewUrl, getThumbnailUrl])
 
   useLayoutEffect(() => {
     if (!thumbnailSrc) {
@@ -128,7 +129,7 @@ const ProgressivePhotoImage = memo(function ProgressivePhotoImage({
 
       {showLoading && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <Loader2 size={28} className="animate-spin text-white/70" />
+          <LoadingCircle className="!text-white/70 h-7 w-7" />
         </div>
       )}
 
@@ -137,9 +138,7 @@ const ProgressivePhotoImage = memo(function ProgressivePhotoImage({
           className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${tw.text.tertiary}`}
         >
           <ImageOff size={32} className="text-white/60" />
-          <span className="text-sm text-white/70">
-            {t('previewLoadFailed')}
-          </span>
+          <span className="text-sm text-white/70">{loadFailedLabel}</span>
         </div>
       )}
     </div>

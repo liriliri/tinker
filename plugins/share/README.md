@@ -228,7 +228,26 @@ Side panel file preview with metadata. Images use `ImageViewer` (zoom, pan, rota
 import FilePreview from 'share/components/FilePreview'
 
 <FilePreview path={selectedFilePath} />
-````
+```
+
+### PhotoViewer
+
+Full-screen photo viewer. Items need `id`, `title`, `width`, `height`; image URLs via `getThumbnailUrl` / `getPreviewUrl`. Optional `renderSidebar`, `prefetchPreview`.
+
+```ts
+import PhotoViewer from 'share/components/PhotoViewer'
+
+<PhotoViewer
+  open={open}
+  items={photos}
+  currentIndex={index}
+  onClose={onClose}
+  onIndexChange={setIndex}
+  labels={labels}
+  getThumbnailUrl={getThumbnailUrl}
+  getPreviewUrl={getPreviewUrl}
+/>
+```
 
 ### Other Components
 
@@ -238,6 +257,7 @@ import FileOpen from 'share/components/FileOpen'
 import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageViewer from 'share/components/ImageViewer'
+import PhotoViewer from 'share/components/PhotoViewer'
 import FilePreview from 'share/components/FilePreview'
 import Tooltip from 'share/components/Tooltip'
 import NavList from 'share/components/NavList'
@@ -251,6 +271,7 @@ import VideoPlayer from 'share/components/VideoPlayer' // requires videojs vendo
 
 ```ts
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
+import { useInView } from 'share/hooks/useInView'
 ```
 
 ## Agent

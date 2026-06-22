@@ -1,5 +1,36 @@
 import clamp from 'licia/clamp'
 
+const VIEWER_THUMB_HEIGHT = 48
+const VIEWER_THUMB_MIN_WIDTH = 32
+
+export function getImageAspectRatio(width: number, height: number): number {
+  return width > 0 && height > 0 ? width / height : 1
+}
+
+export function getViewerThumbWidth(width: number, height: number): number {
+  return Math.max(
+    VIEWER_THUMB_HEIGHT * getImageAspectRatio(width, height),
+    VIEWER_THUMB_MIN_WIDTH
+  )
+}
+
+export function clampHoverPreviewX(
+  anchorRect: DOMRect,
+  boundsRect: DOMRect,
+  previewWidth: number
+): number {
+  const centerX = anchorRect.left + anchorRect.width / 2
+  const halfWidth = previewWidth / 2
+  const minX = boundsRect.left + halfWidth
+  const maxX = boundsRect.right - halfWidth
+
+  if (minX > maxX) {
+    return boundsRect.left + boundsRect.width / 2
+  }
+
+  return clamp(centerX, minX, maxX)
+}
+
 export interface ImageRect {
   left: number
   top: number

@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { ImageOff } from 'lucide-react'
 import { tw } from 'share/theme'
-import { useInView } from '../hooks/useInView'
+import { useInView } from 'share/hooks/useInView'
 import { usePhotoThumbnail } from '../hooks/usePhotoThumbnail'
 
 interface LazyPhotoImageProps {

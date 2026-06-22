@@ -60,6 +60,7 @@ const globals: Record<string, string> = {
   '@xterm/xterm': 'xterm',
   '@xterm/addon-fit': 'xtermAddonFit',
   codemirror: 'CodeMirror',
+  'overlayscrollbars-react': 'overlayscrollbarsReact',
 }
 
 export const shareExternal = ['systeminformation']
@@ -77,6 +78,7 @@ const globalsExports: Record<string, string[]> = {
   '@xterm/xterm': ['Terminal'],
   '@xterm/addon-fit': ['FitAddon'],
   codemirror: [],
+  'overlayscrollbars-react': ['OverlayScrollbarsComponent', 'useOverlayScrollbars'],
 }
 
 function moduleKeys(id: string) {
@@ -349,6 +351,15 @@ export default defineConfig(({ mode }) => {
       'PluginVendorCodeMirror',
       [],
       'dist/codemirror'
+    )
+  }
+
+  if (target === 'overlayscrollbars') {
+    return createConfig(
+      'overlayscrollbars',
+      'PluginVendorOverlayscrollbars',
+      ['react', 'react-dom', 'react/jsx-runtime'],
+      'dist/overlayscrollbars'
     )
   }
 

@@ -46,3 +46,12 @@ html.dark {
     background: rgba(128, 128, 128, 0.8);
   }
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
