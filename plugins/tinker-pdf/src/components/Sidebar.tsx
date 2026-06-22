@@ -162,7 +162,7 @@ export default observer(function Sidebar() {
         style={{
           display: store.sidebarView === 'outline' ? 'flex' : 'none',
         }}
-        className="flex-1 flex-col overflow-hidden"
+        className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden"
       >
         <Outline />
       </div>

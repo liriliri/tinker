@@ -9,6 +9,7 @@ import {
   ToolbarSearch,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { prompt } from 'share/components/Prompt'
 import store from '../store'
 import SessionTree from './SessionTree'
@@ -52,9 +53,12 @@ export default observer(function Sidebar() {
           <PanelLeftClose size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </Toolbar>
-      <div className={`flex-1 overflow-y-auto border-r ${tw.border}`}>
+      <OverlayScrollbars
+        defer
+        className={`min-h-0 flex-1 border-r ${tw.border}`}
+      >
         <SessionTree filter={filter} />
-      </div>
+      </OverlayScrollbars>
     </div>
   )
 })

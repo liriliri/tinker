@@ -19,7 +19,9 @@ export default observer(function Sidebar() {
         marginLeft: isVisible ? 0 : -224,
       }}
     >
-      <Outline />
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <Outline />
+      </div>
     </div>
   )
 })

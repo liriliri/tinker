@@ -138,15 +138,7 @@ export default function Tree<T extends TreeNodeData = TreeNodeData>({
   const nodes = Array.isArray(data) ? data : [data]
 
   return (
-    <div
-      className={className(
-        'flex-1 overflow-y-auto overflow-x-hidden',
-        customClassName
-      )}
-      style={{
-        scrollbarWidth: 'thin',
-      }}
-    >
+    <div className={customClassName}>
       {nodes.map((node, index) => (
         <TreeNode
           key={node.id || index}

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import className from 'licia/className'
 import { Folder, HardDrive, Star } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import Tree from 'share/components/Tree'
 import type { MenuItemConstructorOptions } from 'electron'
@@ -96,49 +97,50 @@ export default observer(function Sidebar() {
 
   return (
     <div className={`h-full overflow-hidden flex flex-col ${tw.bg.tertiary}`}>
-      <div className="flex-1 overflow-hidden" onMouseDown={handleMouseDown}>
-        <Tree<SidebarNodeData>
-          data={treeData}
-          activeNodeId={activePlaceId}
-          onNodeClick={handleNodeClick}
-          menu={getMenu}
-          renderLabel={(node, isActive) => {
-            if (node.kind === 'section') {
+      <OverlayScrollbars defer className="min-h-0 flex-1">
+        <div onMouseDown={handleMouseDown}>
+          <Tree<SidebarNodeData>
+            data={treeData}
+            activeNodeId={activePlaceId}
+            onNodeClick={handleNodeClick}
+            menu={getMenu}
+            renderLabel={(node, isActive) => {
+              if (node.kind === 'section') {
+                return (
+                  <span
+                    className={className(
+                      'text-xs flex-1 truncate font-medium opacity-60',
+                      tw.text.primary
+                    )}
+                  >
+                    {node.label}
+                  </span>
+                )
+              }
+
+              let Icon = Folder
+              if (node.placeGroup === 'drives') Icon = HardDrive
+              else if (node.placeGroup === 'custom') Icon = Star
+
               return (
-                <span
-                  className={className(
-                    'text-xs flex-1 truncate font-medium opacity-60',
-                    tw.text.primary
-                  )}
-                >
-                  {node.label}
-                </span>
+                <>
+                  <Icon size={16} className="flex-shrink-0 mr-1 opacity-70" />
+                  <span
+                    className={className(
+                      'text-sm flex-1 truncate',
+                      isActive ? 'font-medium' : tw.text.primary
+                    )}
+                    title={node.path}
+                  >
+                    {node.label}
+                  </span>
+                </>
               )
-            }
-
-            let Icon = Folder
-            if (node.placeGroup === 'drives') Icon = HardDrive
-            else if (node.placeGroup === 'custom') Icon = Star
-
-            return (
-              <>
-                <Icon size={16} className="flex-shrink-0 mr-1 opacity-70" />
-                <span
-                  className={className(
-                    'text-sm flex-1 truncate',
-                    isActive ? 'font-medium' : tw.text.primary
-                  )}
-                  title={node.path}
-                >
-                  {node.label}
-                </span>
-              </>
-            )
-          }}
-          emptyText={t('noDrives')}
-          className="h-full"
-        />
-      </div>
+            }}
+            emptyText={t('noDrives')}
+          />
+        </div>
+      </OverlayScrollbars>
 
       <CustomPlaceDialog
         open={dialogOpen}

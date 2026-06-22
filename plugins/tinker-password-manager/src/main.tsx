@@ -57,7 +57,9 @@ const App = observer(function App() {
                 >
                   {/* Left Panel - Groups */}
                   <Panel id="left" minSize={200}>
-                    <div className={`h-full ${tw.bg.tertiary} overflow-hidden`}>
+                    <div
+                      className={`h-full ${tw.bg.tertiary} overflow-y-auto overflow-x-hidden`}
+                    >
                       <GroupTree />
                     </div>
                   </Panel>

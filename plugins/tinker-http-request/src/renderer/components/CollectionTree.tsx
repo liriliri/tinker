@@ -208,24 +208,41 @@ export default observer(function CollectionTree() {
           <Plus size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </Toolbar>
-      <Tree<CollectionNodeData>
-        data={treeData}
-        activeNodeId={store.selectedItemId}
-        onNodeClick={handleNodeClick}
-        renderLabel={(node, isActive) => {
-          if (node.nodeType === 'request') {
-            const method = node.method || 'GET'
-            const colorClass = METHOD_COLORS[method] || tw.text.tertiary
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <Tree<CollectionNodeData>
+          data={treeData}
+          activeNodeId={store.selectedItemId}
+          onNodeClick={handleNodeClick}
+          renderLabel={(node, isActive) => {
+            if (node.nodeType === 'request') {
+              const method = node.method || 'GET'
+              const colorClass = METHOD_COLORS[method] || tw.text.tertiary
+              return (
+                <>
+                  <span
+                    className={className(
+                      'text-[10px] font-bold mr-1.5 flex-shrink-0',
+                      colorClass
+                    )}
+                  >
+                    {method}
+                  </span>
+                  <span
+                    className={className(
+                      'text-sm truncate',
+                      isActive ? 'font-medium' : tw.text.primary
+                    )}
+                    title={node.label}
+                  >
+                    {node.label}
+                  </span>
+                </>
+              )
+            }
+
             return (
               <>
-                <span
-                  className={className(
-                    'text-[10px] font-bold mr-1.5 flex-shrink-0',
-                    colorClass
-                  )}
-                >
-                  {method}
-                </span>
+                <Folder size={14} className="flex-shrink-0 mr-1.5" />
                 <span
                   className={className(
                     'text-sm truncate',
@@ -237,26 +254,11 @@ export default observer(function CollectionTree() {
                 </span>
               </>
             )
-          }
-
-          return (
-            <>
-              <Folder size={14} className="flex-shrink-0 mr-1.5" />
-              <span
-                className={className(
-                  'text-sm truncate',
-                  isActive ? 'font-medium' : tw.text.primary
-                )}
-                title={node.label}
-              >
-                {node.label}
-              </span>
-            </>
-          )
-        }}
-        menu={buildMenu}
-        emptyText={t('noCollections')}
-      />
+          }}
+          menu={buildMenu}
+          emptyText={t('noCollections')}
+        />
+      </div>
     </div>
   )
 })
