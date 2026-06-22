@@ -2,6 +2,7 @@ import average from 'licia/average'
 import base64 from 'licia/base64'
 import camelCase from 'licia/camelCase'
 import capitalize from 'licia/capitalize'
+import chunk from 'licia/chunk'
 import clamp from 'licia/clamp'
 import className from 'licia/className'
 import compact from 'licia/compact'
@@ -47,8 +48,10 @@ import lowerCase from 'licia/lowerCase'
 import lpad from 'licia/lpad'
 import ltrim from 'licia/ltrim'
 import map from 'licia/map'
+import max from 'licia/max'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
+import min from 'licia/min'
 import naturalSort from 'licia/naturalSort'
 import normalizePath from 'licia/normalizePath'
 import once from 'licia/once'
@@ -61,6 +64,7 @@ import remove from 'licia/remove'
 import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
 import snakeCase from 'licia/snakeCase'
+import some from 'licia/some'
 import sortBy from 'licia/sortBy'
 import splitPath from 'licia/splitPath'
 import startWith from 'licia/startWith'
@@ -70,15 +74,18 @@ import toNum from 'licia/toNum'
 import trim from 'licia/trim'
 import truncate from 'licia/truncate'
 import unescape from 'licia/unescape'
+import unique from 'licia/unique'
 import upperCase from 'licia/upperCase'
 import upperFirst from 'licia/upperFirst'
 import uuid from 'licia/uuid'
+import values from 'licia/values'
 
 const licia = {
   average,
   base64,
   camelCase,
   capitalize,
+  chunk,
   clamp,
   className,
   compact,
@@ -124,8 +131,10 @@ const licia = {
   lpad,
   ltrim,
   map,
+  max,
   md5,
   mime,
+  min,
   naturalSort,
   normalizePath,
   once,
@@ -138,6 +147,7 @@ const licia = {
   rtrim,
   shuffle,
   snakeCase,
+  some,
   sortBy,
   splitPath,
   startWith,
@@ -147,9 +157,11 @@ const licia = {
   trim,
   truncate,
   unescape,
+  unique,
   upperCase,
   upperFirst,
   uuid,
+  values,
 }
 
 const g = globalThis as Record<string, unknown>
@@ -160,6 +172,7 @@ export {
   base64,
   camelCase,
   capitalize,
+  chunk,
   clamp,
   className,
   compact,
@@ -205,8 +218,10 @@ export {
   lpad,
   ltrim,
   map,
+  max,
   md5,
   mime,
+  min,
   naturalSort,
   normalizePath,
   once,
@@ -219,6 +234,7 @@ export {
   rtrim,
   shuffle,
   snakeCase,
+  some,
   sortBy,
   splitPath,
   startWith,
@@ -228,7 +244,9 @@ export {
   trim,
   truncate,
   unescape,
+  unique,
   upperCase,
   upperFirst,
   uuid,
+  values,
 }
