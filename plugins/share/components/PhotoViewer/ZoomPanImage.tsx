@@ -4,27 +4,27 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import {
   computeFitRatio,
   computeFitRect,
+  VIEWER_IMAGE_FIT_AREA,
   type ImageRect,
   zoomRectAtPivot,
-} from '../../lib/viewerLayout'
+} from './viewerLayout'
 
 const MIN_RATIO = 0.05
 const MAX_RATIO = 20
-const WHEEL_INTERVAL = 50
-const IMAGE_TRANSITION = 'all 0.3s'
+const ANIMATION_DURATION = 300
+const WHEEL_ZOOM_SENSITIVITY = 0.0008
 
-export interface ZoomPanImageProps {
+interface ZoomPanImageProps {
   src: string
   alt: string
   className?: string
   fitArea?: number
-  highResLoaded?: boolean
   enableZoom?: boolean
   enablePan?: boolean
   showRatio?: boolean
-  onLoad?: () => void
+  naturalWidthHint?: number
+  naturalHeightHint?: number
   onError?: () => void
-  onZoomChange?: (isZoomed: boolean) => void
 }
 
 interface ImageTransform {
@@ -43,49 +43,133 @@ function createEmptyTransform(): ImageTransform {
   }
 }
 
+function setCanvasBackingStore(
+  canvas: HTMLCanvasElement,
+  cssWidth: number,
+  cssHeight: number,
+  devicePixelRatio: number
+): CanvasRenderingContext2D | null {
+  const ctx = canvas.getContext('2d', { alpha: true })
+  if (!ctx) return null
+
+  const pixelWidth = Math.max(1, Math.round(cssWidth * devicePixelRatio))
+  const pixelHeight = Math.max(1, Math.round(cssHeight * devicePixelRatio))
+
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth
+    canvas.height = pixelHeight
+  }
+
+  canvas.style.width = `${cssWidth}px`
+  canvas.style.height = `${cssHeight}px`
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0)
+
+  return ctx
+}
+
+function lerpRect(from: ImageRect, to: ImageRect, progress: number): ImageRect {
+  const t = clamp(progress, 0, 1)
+  return {
+    left: from.left + (to.left - from.left) * t,
+    top: from.top + (to.top - from.top) * t,
+    width: from.width + (to.width - from.width) * t,
+    height: from.height + (to.height - from.height) * t,
+  }
+}
+
 export default function ZoomPanImage({
   src,
   alt,
   className = '',
-  fitArea = 0.9,
-  highResLoaded = true,
+  fitArea = VIEWER_IMAGE_FIT_AREA,
   enableZoom = true,
   enablePan = true,
   showRatio = true,
-  onLoad,
+  naturalWidthHint = 0,
+  naturalHeightHint = 0,
   onError,
-  onZoomChange,
 }: ZoomPanImageProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const imgRef = useRef<HTMLImageElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const imageRef = useRef<ImageBitmap | null>(null)
   const ratioElRef = useRef<HTMLDivElement>(null)
   const ratioTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const transform = useRef<ImageTransform>(createEmptyTransform())
   const isLoaded = useRef(false)
-  const transitionEnabled = useRef(false)
-  const isWheeling = useRef(false)
+  const enableZoomRef = useRef(enableZoom)
+  enableZoomRef.current = enableZoom
   const fitRatioRef = useRef(1)
+  const rafId = useRef<number | null>(null)
+  const animationId = useRef<number | null>(null)
+  const cssSize = useRef({ width: 0, height: 0 })
+  const loadGeneration = useRef(0)
 
-  const applyRender = useCallback(() => {
-    const img = imgRef.current
-    if (!img) return
+  const paint = useCallback(() => {
+    const canvas = canvasRef.current
+    const image = imageRef.current
+    if (!canvas || !image) return
 
-    const { rect } = transform.current
-    img.style.transition = transitionEnabled.current ? IMAGE_TRANSITION : 'none'
-    img.style.width = `${rect.width}px`
-    img.style.height = `${rect.height}px`
-    img.style.left = `${rect.left}px`
-    img.style.top = `${rect.top}px`
-    img.style.transform = ''
+    const { width, height } = cssSize.current
+    if (!width || !height) return
+
+    const ctx = setCanvasBackingStore(
+      canvas,
+      width,
+      height,
+      window.devicePixelRatio || 1
+    )
+    if (!ctx) return
+
+    const { rect, naturalWidth, naturalHeight } = transform.current
+    ctx.clearRect(0, 0, width, height)
+
+    if (!rect.width || !rect.height) return
+
+    const clipLeft = Math.max(0, rect.left)
+    const clipTop = Math.max(0, rect.top)
+    const clipRight = Math.min(width, rect.left + rect.width)
+    const clipBottom = Math.min(height, rect.top + rect.height)
+    const clipWidth = clipRight - clipLeft
+    const clipHeight = clipBottom - clipTop
+
+    if (clipWidth <= 0 || clipHeight <= 0) return
+
+    const srcX = ((clipLeft - rect.left) / rect.width) * naturalWidth
+    const srcY = ((clipTop - rect.top) / rect.height) * naturalHeight
+    const srcWidth = (clipWidth / rect.width) * naturalWidth
+    const srcHeight = (clipHeight / rect.height) * naturalHeight
+
+    ctx.save()
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(
+      image,
+      srcX,
+      srcY,
+      srcWidth,
+      srcHeight,
+      clipLeft,
+      clipTop,
+      clipWidth,
+      clipHeight
+    )
+    ctx.restore()
   }, [])
 
-  const notifyZoom = useCallback(() => {
-    if (!onZoomChange || !isLoaded.current) return
-    const { ratio } = transform.current
-    const fitRatio = fitRatioRef.current
-    const isZoomed = Math.abs(ratio - fitRatio) > 0.01
-    onZoomChange(isZoomed)
-  }, [onZoomChange])
+  const schedulePaint = useCallback(() => {
+    if (rafId.current !== null) return
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null
+      paint()
+    })
+  }, [paint])
+
+  const stopAnimation = useCallback(() => {
+    if (animationId.current !== null) {
+      cancelAnimationFrame(animationId.current)
+      animationId.current = null
+    }
+  }, [])
 
   const showRatioPopup = useCallback(
     (ratio: number) => {
@@ -112,6 +196,7 @@ export default function ZoomPanImage({
     const { width: cw, height: ch } = container.getBoundingClientRect()
     if (!cw || !ch) return
 
+    cssSize.current = { width: cw, height: ch }
     const rect = computeFitRect(naturalWidth, naturalHeight, cw, ch, fitArea)
     fitRatioRef.current = rect.width / naturalWidth
 
@@ -121,85 +206,137 @@ export default function ZoomPanImage({
       ratio: fitRatioRef.current,
     }
 
-    transitionEnabled.current = false
-    applyRender()
-    notifyZoom()
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        transitionEnabled.current = true
-      }, 0)
-    })
-  }, [applyRender, fitArea, notifyZoom])
+    schedulePaint()
+  }, [fitArea, schedulePaint])
 
-  const debouncedReset = useRef(debounce(() => reset(), 20))
+  const resetRef = useRef(reset)
+  resetRef.current = reset
+  const debouncedReset = useRef(debounce(() => resetRef.current(), 20))
+
+  const animateToRect = useCallback(
+    (targetRect: ImageRect, onComplete?: () => void) => {
+      stopAnimation()
+      const startRect = { ...transform.current.rect }
+      const startTime = performance.now()
+
+      const step = (now: number) => {
+        const progress = clamp((now - startTime) / ANIMATION_DURATION, 0, 1)
+        const eased = 1 - (1 - progress) ** 3
+        transform.current.rect = lerpRect(startRect, targetRect, eased)
+        schedulePaint()
+
+        if (progress < 1) {
+          animationId.current = requestAnimationFrame(step)
+          return
+        }
+
+        animationId.current = null
+        onComplete?.()
+      }
+
+      animationId.current = requestAnimationFrame(step)
+    },
+    [schedulePaint, stopAnimation]
+  )
 
   const zoomTo = useCallback(
-    (ratio: number, pivot?: { x: number; y: number }) => {
+    (ratio: number, pivot?: { x: number; y: number }, animated = false) => {
       const data = transform.current
       const { naturalWidth, naturalHeight } = data
       if (!naturalWidth || !naturalHeight || !data.rect.width) return
 
       const nextRatio = clamp(ratio, MIN_RATIO, MAX_RATIO)
-      data.rect = zoomRectAtPivot(
+      const nextRect = zoomRectAtPivot(
         data.rect,
         naturalWidth,
         naturalHeight,
         nextRatio,
         pivot
       )
-      data.ratio = nextRatio
 
-      applyRender()
-      showRatioPopup(nextRatio)
-      notifyZoom()
+      const applyTransform = (nextRect: ImageRect, nextRatio: number) => {
+        data.rect = nextRect
+        data.ratio = nextRatio
+        schedulePaint()
+        showRatioPopup(nextRatio)
+      }
+
+      if (animated) {
+        animateToRect(nextRect, () => applyTransform(nextRect, nextRatio))
+        return
+      }
+
+      applyTransform(nextRect, nextRatio)
     },
-    [applyRender, notifyZoom, showRatioPopup]
+    [animateToRect, schedulePaint, showRatioPopup]
   )
 
-  const zoom = useCallback(
-    (delta: number, pivot?: { x: number; y: number }) => {
+  const zoomByFactor = useCallback(
+    (factor: number, pivot: { x: number; y: number }) => {
       const { rect, naturalWidth } = transform.current
       if (!rect.width || !naturalWidth) return
 
-      const factor = delta < 0 ? 1 / (1 - delta) : 1 + delta
       zoomTo((rect.width * factor) / naturalWidth, pivot)
     },
     [zoomTo]
   )
 
+  const zoomByFactorRef = useRef(zoomByFactor)
+  zoomByFactorRef.current = zoomByFactor
+
   const applyLoadedDimensions = useCallback(
     (naturalWidth: number, naturalHeight: number) => {
-      transform.current.naturalWidth = naturalWidth
-      transform.current.naturalHeight = naturalHeight
+      const prev = transform.current
+      const hadLayout =
+        prev.naturalWidth > 0 && prev.naturalHeight > 0 && prev.rect.width > 0
+      const dimensionsMatch =
+        Math.abs(prev.naturalWidth - naturalWidth) <= 1 &&
+        Math.abs(prev.naturalHeight - naturalHeight) <= 1
+
+      prev.naturalWidth = naturalWidth
+      prev.naturalHeight = naturalHeight
       isLoaded.current = true
-      reset()
-      onLoad?.()
+
+      if (hadLayout && dimensionsMatch) {
+        fitRatioRef.current = prev.rect.width / naturalWidth
+        prev.ratio = fitRatioRef.current
+      } else {
+        reset()
+      }
+
+      paint()
     },
-    [onLoad, reset]
+    [paint, reset]
   )
 
-  const handleWheel = useCallback(
-    (event: React.WheelEvent) => {
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const onWheel = (event: WheelEvent) => {
       event.preventDefault()
-      if (!enableZoom || isWheeling.current || !isLoaded.current) return
+      if (!enableZoomRef.current || !isLoaded.current) return
 
-      isWheeling.current = true
-      setTimeout(() => {
-        isWheeling.current = false
-      }, WHEEL_INTERVAL)
+      stopAnimation()
 
-      const container = containerRef.current
-      if (!container) return
+      let delta = event.deltaY
+      if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+        delta *= 16
+      } else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+        delta *= container.clientHeight
+      }
 
-      const delta = event.deltaY > 0 ? 1 : -1
+      const factor = Math.exp(-delta * WHEEL_ZOOM_SENSITIVITY)
       const rect = container.getBoundingClientRect()
-      zoom(-delta * 0.1, {
+      zoomByFactorRef.current(factor, {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       })
-    },
-    [enableZoom, zoom]
-  )
+    }
+
+    container.addEventListener('wheel', onWheel, { passive: false })
+    return () => container.removeEventListener('wheel', onWheel)
+  }, [stopAnimation])
 
   const isDragging = useRef(false)
   const dragStart = useRef({ x: 0, y: 0 })
@@ -208,17 +345,16 @@ export default function ZoomPanImage({
   const handlePointerDown = useCallback(
     (event: React.PointerEvent) => {
       if (!enablePan || event.button !== 0 || !isLoaded.current) return
+      stopAnimation()
       isDragging.current = true
       dragStart.current = { x: event.clientX, y: event.clientY }
       dragOrigin.current = {
         left: transform.current.rect.left,
         top: transform.current.rect.top,
       }
-      transitionEnabled.current = false
-      applyRender()
       containerRef.current?.setPointerCapture(event.pointerId)
     },
-    [applyRender, enablePan]
+    [enablePan, stopAnimation]
   )
 
   const handlePointerMove = useCallback(
@@ -228,21 +364,16 @@ export default function ZoomPanImage({
         dragOrigin.current.left + (event.clientX - dragStart.current.x)
       transform.current.rect.top =
         dragOrigin.current.top + (event.clientY - dragStart.current.y)
-      applyRender()
+      schedulePaint()
     },
-    [applyRender]
+    [schedulePaint]
   )
 
-  const handlePointerUp = useCallback(
-    (event: React.PointerEvent) => {
-      if (!isDragging.current) return
-      isDragging.current = false
-      containerRef.current?.releasePointerCapture(event.pointerId)
-      transitionEnabled.current = true
-      applyRender()
-    },
-    [applyRender]
-  )
+  const handlePointerUp = useCallback((event: React.PointerEvent) => {
+    if (!isDragging.current) return
+    isDragging.current = false
+    containerRef.current?.releasePointerCapture(event.pointerId)
+  }, [])
 
   const handleDoubleClick = useCallback(
     (event: React.MouseEvent) => {
@@ -265,22 +396,54 @@ export default function ZoomPanImage({
       const pointerY = event.clientY - containerRect.top
       const isAtFit = Math.abs(ratio - fitRatio) < 0.01
 
-      transitionEnabled.current = true
       if (isAtFit) {
-        zoomTo(1, { x: pointerX, y: pointerY })
+        zoomTo(1, { x: pointerX, y: pointerY }, true)
       } else {
-        reset()
+        const targetRect = computeFitRect(
+          naturalWidth,
+          naturalHeight,
+          cw,
+          ch,
+          fitArea
+        )
+        animateToRect(targetRect, () => {
+          fitRatioRef.current = targetRect.width / naturalWidth
+          transform.current = {
+            ...transform.current,
+            rect: targetRect,
+            ratio: fitRatioRef.current,
+          }
+        })
       }
     },
-    [enableZoom, fitArea, reset, zoomTo]
+    [animateToRect, enableZoom, fitArea, zoomTo]
   )
 
-  const handleLoad = useCallback(
-    (event: React.SyntheticEvent<HTMLImageElement>) => {
-      const img = event.currentTarget
-      applyLoadedDimensions(img.naturalWidth, img.naturalHeight)
+  const loadImage = useCallback(
+    async (imageSrc: string, generation: number) => {
+      const img = new Image()
+      img.decoding = 'async'
+      img.alt = alt
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Image load failed'))
+        img.src = imageSrc
+      })
+
+      if (generation !== loadGeneration.current) return
+
+      const bitmap = await createImageBitmap(img)
+      if (generation !== loadGeneration.current) {
+        bitmap.close()
+        return
+      }
+
+      imageRef.current?.close()
+      imageRef.current = bitmap
+      applyLoadedDimensions(bitmap.width, bitmap.height)
     },
-    [applyLoadedDimensions]
+    [alt, applyLoadedDimensions]
   )
 
   const prevSrc = useRef<string | undefined>(undefined)
@@ -290,31 +453,55 @@ export default function ZoomPanImage({
     prevSrc.current = src
 
     if (isSrcChange) {
-      isLoaded.current = false
-      transform.current = createEmptyTransform()
-      transitionEnabled.current = false
-      const img = imgRef.current
-      if (img) {
-        img.style.width = ''
-        img.style.height = ''
-        img.style.left = ''
-        img.style.top = ''
-        img.style.transform = ''
-        img.style.transition = ''
-      }
+      loadGeneration.current += 1
+      stopAnimation()
     }
 
-    const img = imgRef.current
-    if (img?.complete && img.naturalWidth) {
-      applyLoadedDimensions(img.naturalWidth, img.naturalHeight)
+    const generation = loadGeneration.current
+    void loadImage(src, generation).catch(() => {
+      if (generation === loadGeneration.current) {
+        onError?.()
+      }
+    })
+  }, [src, loadImage, onError, stopAnimation])
+
+  useLayoutEffect(() => {
+    if (
+      !isLoaded.current &&
+      naturalWidthHint > 0 &&
+      naturalHeightHint > 0 &&
+      containerRef.current
+    ) {
+      const { width: cw, height: ch } =
+        containerRef.current.getBoundingClientRect()
+      if (cw && ch) {
+        cssSize.current = { width: cw, height: ch }
+        const rect = computeFitRect(
+          naturalWidthHint,
+          naturalHeightHint,
+          cw,
+          ch,
+          fitArea
+        )
+        transform.current = {
+          ...transform.current,
+          naturalWidth: naturalWidthHint,
+          naturalHeight: naturalHeightHint,
+          rect,
+          ratio: rect.width / naturalWidthHint,
+        }
+        schedulePaint()
+      }
     }
-  }, [src, applyLoadedDimensions])
+  }, [fitArea, naturalHeightHint, naturalWidthHint, schedulePaint])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     const observer = new ResizeObserver(() => {
+      const { width, height } = container.getBoundingClientRect()
+      cssSize.current = { width, height }
       if (!isLoaded.current) return
       debouncedReset.current()
     })
@@ -322,29 +509,30 @@ export default function ZoomPanImage({
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current)
+      stopAnimation()
+      imageRef.current?.close()
+      imageRef.current = null
+    }
+  }, [stopAnimation])
+
   return (
     <div
       ref={containerRef}
       className={`relative h-full w-full touch-none overflow-hidden ${className}`}
-      onWheel={handleWheel}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onDoubleClick={handleDoubleClick}
     >
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        draggable={false}
-        decoding="async"
-        loading="eager"
-        className={`absolute max-w-none select-none transition-opacity duration-300 ${
-          highResLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        onLoad={handleLoad}
-        onError={() => onError?.()}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 h-full w-full select-none"
+        aria-label={alt}
+        role="img"
       />
       {showRatio && (
         <div

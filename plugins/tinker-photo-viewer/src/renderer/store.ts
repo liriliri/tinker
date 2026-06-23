@@ -26,9 +26,8 @@ import {
   isPathUnderScanDirs,
   normalizeScanDir,
   toDateSection,
-} from './lib/scanPath'
-import { clearPhotoPreviewCache } from './lib/preview'
-import { clearPhotoThumbnailCache } from './lib/thumbnail'
+} from './lib/util'
+import { clearPhotoPreviewCache, clearPhotoThumbnailCache } from './lib/image'
 import type { Photo, PhotoSection } from './types'
 
 interface FileSearchResult {

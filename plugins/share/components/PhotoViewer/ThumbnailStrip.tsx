@@ -7,7 +7,7 @@ import {
   type RefObject,
 } from 'react'
 import { useInView } from '../../hooks/useInView'
-import { getViewerThumbWidth } from '../../lib/viewerLayout'
+import { getViewerThumbWidth } from './viewerLayout'
 import ThumbnailHoverPreview from './ThumbnailHoverPreview'
 import type { PhotoViewerItem } from './types'
 

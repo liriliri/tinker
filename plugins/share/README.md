@@ -254,7 +254,7 @@ import FilePreview from 'share/components/FilePreview'
 
 ### PhotoViewer
 
-Full-screen photo viewer. Items need `id`, `title`, `width`, `height`; image URLs via `getThumbnailUrl` / `getPreviewUrl`. Optional `renderSidebar`, `prefetchPreview`.
+Full-screen photo viewer. Items need `id`, `title`, `width`, `height`; image URLs via `getThumbnailUrl` / `getPreviewUrl`. Preview zoom/pan uses Canvas 2D rendering. Optional `renderSidebar`, `prefetchPreview`.
 
 ```ts
 import PhotoViewer from 'share/components/PhotoViewer'

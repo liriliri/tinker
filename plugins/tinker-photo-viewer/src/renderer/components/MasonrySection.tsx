@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
-import { layoutMasonryItems } from '../lib/masonryLayout'
+import { layoutMasonryItems } from '../lib/masonry'
 import type { Photo } from '../types'
 import PhotoGridItem from './PhotoGridItem'
 

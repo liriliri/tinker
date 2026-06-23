@@ -4,18 +4,9 @@ import { useTranslation } from 'react-i18next'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import { useContainerWidth } from '../hooks/useContainerWidth'
+import { formatSectionLabel } from '../lib/util'
 import store from '../store'
 import MasonrySection from './MasonrySection'
-
-function formatSectionLabel(label: string): string {
-  const [year, month] = label.split('-').map(Number)
-  if (!year || !month) return label
-
-  return new Intl.DateTimeFormat(undefined, {
-    year: 'numeric',
-    month: 'long',
-  }).format(new Date(year, month - 1, 1))
-}
 
 const PhotoGallery = observer(function PhotoGallery() {
   const { t } = useTranslation()

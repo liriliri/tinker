@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getPhotoThumbnail } from '../lib/thumbnail'
+import { getPhotoThumbnail } from '../lib/image'
 import store from '../store'
 
 export function usePhotoThumbnail(path: string, enabled = true) {

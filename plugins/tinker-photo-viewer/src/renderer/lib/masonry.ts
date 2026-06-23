@@ -15,7 +15,7 @@ interface MasonryColumnConfig {
   gutter: number
 }
 
-export interface MasonryItemLayout {
+interface MasonryItemLayout {
   photoId: string
   left: number
   top: number

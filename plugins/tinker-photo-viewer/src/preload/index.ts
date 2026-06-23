@@ -5,12 +5,14 @@ import type {
   PreviewResult,
   ThumbnailResult,
 } from '../common/types'
-import { readExifFromFile } from './exif'
-import { buildPreviewResult, buildThumbnailResult } from './imageProcessor'
-import { readPhotoMeta } from './meta'
-import { resolvePreviewRequest } from './preview'
+import {
+  buildPreviewResult,
+  buildThumbnailResult,
+  resolvePreviewRequest,
+  resolveThumbnailCache,
+} from './image'
+import { readExifFromFile, readPhotoMeta } from './photo'
 import { scanPhotoFiles } from './scan'
-import { resolveThumbnailCache } from './thumbnail'
 
 const photoViewerObj = {
   async scanPhotoFiles(dirs: string[]) {
@@ -47,3 +49,7 @@ const photoViewerObj = {
 }
 
 contextBridge.exposeInMainWorld('photoViewer', photoViewerObj)
+
+declare global {
+  const photoViewer: typeof photoViewerObj
+}

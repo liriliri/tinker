@@ -2,8 +2,11 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import PhotoViewer from 'share/components/PhotoViewer'
-import { getPhotoPreview, prefetchPhotoPreview } from '../lib/preview'
-import { getPhotoThumbnail } from '../lib/thumbnail'
+import {
+  getPhotoPreview,
+  getPhotoThumbnail,
+  prefetchPhotoPreview,
+} from '../lib/image'
 import store from '../store'
 import PhotoInfoPanel from './PhotoInfoPanel'
 

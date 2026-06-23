@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { clampHoverPreviewX, getImageAspectRatio } from '../../lib/viewerLayout'
+import { clampHoverPreviewX, getImageAspectRatio } from './viewerLayout'
 import type { PhotoViewerItem } from './types'
 
 const PREVIEW_WIDTH = 320

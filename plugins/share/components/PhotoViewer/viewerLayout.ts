@@ -2,6 +2,7 @@ import clamp from 'licia/clamp'
 
 const VIEWER_THUMB_HEIGHT = 48
 const VIEWER_THUMB_MIN_WIDTH = 32
+export const VIEWER_IMAGE_FIT_AREA = 0.9
 
 export function getImageAspectRatio(width: number, height: number): number {
   return width > 0 && height > 0 ? width / height : 1

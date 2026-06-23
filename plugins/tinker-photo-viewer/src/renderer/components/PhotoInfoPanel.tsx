@@ -14,11 +14,7 @@ import OverlayScrollbars, {
 } from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import type { PhotoExif } from '../../common/types'
-import {
-  formatExifData,
-  formatFileSizeMb,
-  formatMegapixels,
-} from '../lib/photoMeta'
+import { formatExifData, formatFileSizeMb, formatMegapixels } from '../lib/util'
 import store from '../store'
 import type { Photo } from '../types'
 

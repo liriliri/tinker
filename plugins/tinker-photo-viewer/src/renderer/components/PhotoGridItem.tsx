@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { tw } from 'share/theme'
-import { formatFileSize } from '../lib/photoMeta'
+import { formatFileSize } from '../lib/util'
 import type { Photo } from '../types'
 import LazyPhotoImage from './LazyPhotoImage'
 
@@ -24,6 +24,7 @@ const PhotoGridItem = observer(function PhotoGridItem({
       <LazyPhotoImage path={photo.path} alt={photo.title} root={scrollRoot} />
 
       <div className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {/* Do not change: inline gradient renders correctly; Tailwind classes do not match here */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{

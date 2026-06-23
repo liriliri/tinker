@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import ProgressivePhotoImage from './ProgressivePhotoImage'
 import ThumbnailStrip from './ThumbnailStrip'
 import type { PhotoViewerItem, PhotoViewerProps } from './types'
 import ViewerBlurBackground from './ViewerBlurBackground'
+import ViewerPhotoImage from './ViewerPhotoImage'
 
 const NAV_BTN_CLASS =
   'absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white opacity-0 pointer-events-none transition-opacity duration-200 hover:bg-black/70 group-hover:pointer-events-auto group-hover:opacity-100 disabled:group-hover:opacity-30'
@@ -51,19 +51,12 @@ export default function PhotoViewer<T extends PhotoViewerItem>({
 
     for (const offset of [-1, 0, 1]) {
       const item = items[currentIndex + offset]
-      if (item) prefetchPreview?.(item)
+      if (item) {
+        prefetchPreview?.(item)
+        void getThumbnailUrl(item)
+      }
     }
-  }, [currentIndex, items, open, prefetchPreview])
-
-  const loadThumbnail = useCallback(
-    () => getThumbnailUrl(currentItem),
-    [currentItem, getThumbnailUrl]
-  )
-
-  const loadPreview = useCallback(
-    () => getPreviewUrl(currentItem),
-    [currentItem, getPreviewUrl]
-  )
+  }, [currentIndex, getThumbnailUrl, items, open, prefetchPreview])
 
   if (!open || !currentItem) return null
 
@@ -73,7 +66,10 @@ export default function PhotoViewer<T extends PhotoViewerItem>({
         ref={viewerAreaRef}
         className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
       >
-        <ViewerBlurBackground getThumbnailUrl={loadThumbnail} />
+        <ViewerBlurBackground
+          item={currentItem}
+          getThumbnailUrl={getThumbnailUrl}
+        />
         <div className="group relative min-h-0 flex-1">
           <button
             type="button"
@@ -93,12 +89,10 @@ export default function PhotoViewer<T extends PhotoViewerItem>({
             <ChevronLeft size={24} />
           </button>
 
-          <ProgressivePhotoImage
-            key={currentItem.id}
-            alt={currentItem.title}
+          <ViewerPhotoImage
+            item={currentItem}
             loadFailedLabel={labels.previewLoadFailed}
-            getThumbnailUrl={loadThumbnail}
-            getPreviewUrl={loadPreview}
+            getPreviewUrl={getPreviewUrl}
           />
 
           <button

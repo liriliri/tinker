@@ -1,5 +1,55 @@
-import type { PhotoExif } from '../../common/types'
+import dateFormat from 'licia/dateFormat'
 import fileSize from 'licia/fileSize'
+import normalizePath from 'licia/normalizePath'
+import rtrim from 'licia/rtrim'
+import startWith from 'licia/startWith'
+import type { PhotoExif } from '../../common/types'
+import type { Photo } from '../types'
+
+let queue: Promise<void> = Promise.resolve()
+
+export function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const run = queue.then(task, task)
+  queue = run.then(
+    () => undefined,
+    () => undefined
+  )
+  return run
+}
+
+export function normalizeScanDir(dir: string): string {
+  return rtrim(normalizePath(dir), '/')
+}
+
+export function findPhotoByPath(
+  photos: Photo[],
+  filePath: string
+): Photo | undefined {
+  const key = normalizePath(filePath)
+  return photos.find((photo) => normalizePath(photo.path) === key)
+}
+
+export function isPathUnderScanDirs(filePath: string, dirs: string[]): boolean {
+  if (dirs.length === 0) return false
+  const normalized = normalizePath(filePath)
+  return dirs.some(
+    (dir) => normalized === dir || startWith(normalized, `${dir}/`)
+  )
+}
+
+export function toDateSection(timestamp: number): string {
+  return dateFormat(new Date(timestamp), 'yyyy-mm')
+}
+
+export function formatSectionLabel(label: string): string {
+  const [year, month] = label.split('-').map(Number)
+  if (!year || !month) return label
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'long',
+  }).format(new Date(year, month - 1, 1))
+}
 
 interface FormattedExif {
   zone?: string
@@ -58,6 +108,11 @@ function formatExposureTime(
 function formatAperture(value?: number): string | undefined {
   if (value === undefined || Number.isNaN(value)) return undefined
   return `f/${Number(value.toFixed(1))}`
+}
+
+function formatGpsCoordinate(value: number, ref: string): string {
+  const absolute = Math.abs(value)
+  return `${absolute.toFixed(6)}° ${ref}`
 }
 
 export function formatExifData(exif?: PhotoExif): FormattedExif | null {
@@ -143,11 +198,6 @@ export function formatExifData(exif?: PhotoExif): FormattedExif | null {
   }
 
   return formatted
-}
-
-function formatGpsCoordinate(value: number, ref: string): string {
-  const absolute = Math.abs(value)
-  return `${absolute.toFixed(6)}° ${ref}`
 }
 
 export function formatFileSize(bytes: number): string {
