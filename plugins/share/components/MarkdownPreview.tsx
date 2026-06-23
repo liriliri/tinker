@@ -1,54 +1,28 @@
-import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import * as prismStyles from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
-import { tw } from 'share/theme'
-import store from '../store'
+import rehypeRaw from 'rehype-raw'
+import { tw } from '../theme'
+
+export interface MarkdownPreviewProps {
+  content: string
+  isDark: boolean
+  /** Treat single newlines as hard breaks. Off by default for GitHub-compatible rendering. */
+  breaks?: boolean
+  scrollPercent?: number
+  onScrollPercentChange?: (percent: number) => void
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function omitNode<T extends { node?: unknown }>({ node, ...rest }: T) {
   return rest
 }
 
-export default observer(function MarkdownPreview() {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const maxScroll = scrollHeight - clientHeight
-      const scrollPercent = maxScroll > 0 ? scrollTop / maxScroll : 0
-
-      if (Math.abs(store.scrollPercent - scrollPercent) > 0.001) {
-        store.setScrollPercent(scrollPercent)
-      }
-    }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const { scrollHeight, clientHeight } = container
-    const maxScroll = scrollHeight - clientHeight
-    if (maxScroll <= 0) return
-
-    const currentPercent = container.scrollTop / maxScroll
-    if (Math.abs(currentPercent - store.scrollPercent) > 0.001) {
-      container.scrollTop = maxScroll * store.scrollPercent
-    }
-  }, [store.scrollPercent])
-
-  const components = useMemo<Components>(
+function useMarkdownComponents(isDark: boolean): Components {
+  return useMemo<Components>(
     () => ({
       h1: (props) => (
         <h1
@@ -142,7 +116,7 @@ export default observer(function MarkdownPreview() {
       ),
       img: (props) => (
         <img
-          className="max-w-full rounded my-2"
+          className="inline max-w-full align-middle rounded"
           alt={props.alt}
           {...omitNode(props)}
         />
@@ -173,7 +147,7 @@ export default observer(function MarkdownPreview() {
         }
         return (
           <SyntaxHighlighter
-            style={store.isDark ? prismStyles.oneDark : prismStyles.oneLight}
+            style={isDark ? prismStyles.oneDark : prismStyles.oneLight}
             language={match?.[1] || 'text'}
             PreTag="div"
             customStyle={{
@@ -187,20 +161,74 @@ export default observer(function MarkdownPreview() {
         )
       },
     }),
-    [store.isDark]
+    [isDark]
   )
+}
+
+export default function MarkdownPreview({
+  content,
+  isDark,
+  breaks = false,
+  scrollPercent,
+  onScrollPercentChange,
+}: MarkdownPreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const components = useMarkdownComponents(isDark)
+  const remarkPlugins = useMemo(
+    () => (breaks ? [remarkGfm, remarkBreaks] : [remarkGfm]),
+    [breaks]
+  )
+  const syncScroll =
+    scrollPercent !== undefined && onScrollPercentChange !== undefined
+
+  useEffect(() => {
+    if (!syncScroll) return
+
+    const container = containerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const maxScroll = scrollHeight - clientHeight
+      const nextPercent = maxScroll > 0 ? scrollTop / maxScroll : 0
+
+      if (Math.abs(scrollPercent - nextPercent) > 0.001) {
+        onScrollPercentChange(nextPercent)
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [syncScroll, scrollPercent, onScrollPercentChange])
+
+  useEffect(() => {
+    if (!syncScroll) return
+
+    const container = containerRef.current
+    if (!container) return
+
+    const { scrollHeight, clientHeight } = container
+    const maxScroll = scrollHeight - clientHeight
+    if (maxScroll <= 0) return
+
+    const currentPercent = container.scrollTop / maxScroll
+    if (Math.abs(currentPercent - scrollPercent) > 0.001) {
+      container.scrollTop = maxScroll * scrollPercent
+    }
+  }, [syncScroll, scrollPercent, content])
 
   return (
     <div
       ref={containerRef}
-      className={`h-full w-full overflow-auto p-6 text-sm ${tw.bg.primary}`}
+      className={`h-full w-full overflow-auto p-6 text-sm ${tw.bg.primary} [&_img]:inline [&_img]:max-w-full [&_img]:align-middle`}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={[rehypeRaw]}
         components={components}
       >
-        {store.markdownInput}
+        {content}
       </ReactMarkdown>
     </div>
   )
-})
+}

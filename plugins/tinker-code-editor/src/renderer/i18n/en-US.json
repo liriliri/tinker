@@ -13,6 +13,8 @@
   "copyRelativePath": "Copy Relative Path",
   "blame": "Blame",
   "blameHide": "Hide Blame",
+  "markdownPreview": "Markdown Preview",
+  "markdownPreviewHide": "Hide Markdown Preview",
   "notAGitRepo": "Not a Git repository",
   "loadingGitRepo": "Loading...",
   "gitDiff": "Git Diff",

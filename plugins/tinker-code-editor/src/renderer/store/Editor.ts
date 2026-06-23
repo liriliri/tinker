@@ -54,6 +54,10 @@ class Editor {
     return this.activeTab?.highlightedBlameSha ?? null
   }
 
+  get showingMarkdownPreview() {
+    return this.activeTab?.showingMarkdownPreview ?? false
+  }
+
   get tabDirtyRevision(): string {
     return this.tabs.map((t) => `${t.id}:${t.isDirty ? 1 : 0}`).join('|')
   }
@@ -307,6 +311,32 @@ class Editor {
     const tab = this.activeTab
     if (!tab) return
     tab.highlightedBlameSha = tab.highlightedBlameSha === sha ? null : sha
+  }
+
+  toggleMarkdownPreview() {
+    const tab = this.activeTab
+    if (!tab) return
+
+    if (!tab.showingMarkdownPreview) {
+      const inst = this.editorInstances.get(tab.id)
+      if (inst) {
+        const scrollHeight = inst.getScrollHeight()
+        const visibleHeight = inst.getLayoutInfo().height
+        const maxScroll = scrollHeight - visibleHeight
+        tab.markdownScrollPercent =
+          maxScroll > 0 ? inst.getScrollTop() / maxScroll : 0
+      }
+    }
+
+    tab.showingMarkdownPreview = !tab.showingMarkdownPreview
+  }
+
+  setMarkdownScrollPercent(tabId: string, percent: number) {
+    const tab = this.tabs.find((item) => item.id === tabId)
+    if (!tab) return
+    if (Math.abs(tab.markdownScrollPercent - percent) > 0.001) {
+      tab.markdownScrollPercent = percent
+    }
   }
 
   async toggleBlame() {

@@ -11,7 +11,7 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `aggrid.js` | `ag-grid-community`, `ag-grid-react` |
 | `monaco/monaco.js` | `@monaco-editor/react` |
 | `syntaxhighlighter.js` | `react-syntax-highlighter`, `react-syntax-highlighter/dist/esm/styles/prism` |
-| `markdown.js` | `react-markdown`, `remark-gfm`, `remark-breaks` |
+| `markdown.js` | `react-markdown`, `remark-gfm`, `remark-breaks`, `rehype-raw` |
 | `mathjs.js` | `mathjs` |
 | `idb.js` | `idb` |
 | `zxing.js` | `@zxing/library` |

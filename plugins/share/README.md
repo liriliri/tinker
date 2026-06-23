@@ -271,6 +271,23 @@ import PhotoViewer from 'share/components/PhotoViewer'
 />
 ```
 
+### MarkdownPreview
+
+Markdown renderer with GFM support and syntax highlighting. Requires `markdown.js` and `syntaxhighlighter.js` vendor scripts.
+
+```ts
+import MarkdownPreview from 'share/components/MarkdownPreview'
+
+<MarkdownPreview
+  content={markdown}
+  isDark={isDark}
+  scrollPercent={scrollPercent}
+  onScrollPercentChange={setScrollPercent}
+/>
+```
+
+`scrollPercent` and `onScrollPercentChange` are optional. When both are provided, the preview syncs scroll position with a paired editor.
+
 ### Other Components
 
 ```ts
@@ -279,6 +296,7 @@ import FileOpen from 'share/components/FileOpen'
 import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageViewer from 'share/components/ImageViewer'
+import MarkdownPreview from 'share/components/MarkdownPreview' // requires markdown + syntaxhighlighter vendor
 import PhotoViewer from 'share/components/PhotoViewer'
 import FilePreview from 'share/components/FilePreview'
 import Tooltip from 'share/components/Tooltip'

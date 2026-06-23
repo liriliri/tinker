@@ -30,6 +30,10 @@ class EditorTab {
   loadingBlame = false
   highlightedBlameSha: string | null = null
 
+  // markdown preview state
+  showingMarkdownPreview = false
+  markdownScrollPercent = 0
+
   // git diff state
   gitFile: GitWorkingTreeFile | null = null
   diffContent: GitWorkingTreeFileDiffContent | null = null

@@ -13,6 +13,8 @@
   "copyRelativePath": "复制相对路径",
   "blame": "按行查看",
   "blameHide": "隐藏按行查看",
+  "markdownPreview": "Markdown 预览",
+  "markdownPreviewHide": "隐藏 Markdown 预览",
   "notAGitRepo": "不是 Git 仓库",
   "loadingGitRepo": "加载中...",
   "gitDiff": "Git 差异",

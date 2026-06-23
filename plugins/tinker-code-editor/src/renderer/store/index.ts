@@ -340,6 +340,12 @@ class Store extends BaseStore {
   toggleBlame = () => this.editor.toggleBlame()
   setHighlightedBlameSha = (sha: string | null) =>
     this.editor.setHighlightedBlameSha(sha)
+  get showingMarkdownPreview() {
+    return this.editor.showingMarkdownPreview
+  }
+  toggleMarkdownPreview = () => this.editor.toggleMarkdownPreview()
+  setMarkdownScrollPercent = (tabId: string, percent: number) =>
+    this.editor.setMarkdownScrollPercent(tabId, percent)
 
   // ---- Terminal proxies ----
 

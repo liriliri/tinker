@@ -4,7 +4,7 @@ import endWith from 'licia/endWith'
 import className from 'licia/className'
 import { tw } from 'share/theme'
 import MarkdownEditor from './components/MarkdownEditor'
-import MarkdownPreview from './components/MarkdownPreview'
+import MarkdownPreview from 'share/components/MarkdownPreview'
 import Toolbar from './components/Toolbar'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
@@ -73,7 +73,13 @@ const App = observer(function App() {
         {/* Preview Panel */}
         {(store.viewMode === 'split' || store.viewMode === 'preview') && (
           <div className="flex-1 min-w-0">
-            <MarkdownPreview />
+            <MarkdownPreview
+              content={store.markdownInput}
+              isDark={store.isDark}
+              breaks
+              scrollPercent={store.scrollPercent}
+              onScrollPercentChange={store.setScrollPercent}
+            />
           </div>
         )}
       </div>

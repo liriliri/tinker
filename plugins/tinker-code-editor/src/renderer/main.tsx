@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import copy from 'licia/copy'
-import { File, GitBranch, GitCommit, Image } from 'lucide-react'
+import { File, GitBranch, GitCommit, Image, Eye } from 'lucide-react'
 import {
   Panel,
   Group,
@@ -21,6 +21,7 @@ import { TerminalPanel } from 'share/components/TerminalPanel'
 import Welcome from './components/Welcome'
 import QuickOpen from './components/QuickOpen'
 import { relativePath } from './lib/path'
+import { getLanguage } from 'share/lib/fileType'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -96,6 +97,9 @@ const App = observer(function App() {
   const activeTab = store.tabs.find((t) => t.id === store.activeTabId)
   const isActiveImageTab = activeTab?.category === 'image'
   const isActiveGitDiffTab = activeTab?.category === 'gitDiff'
+  const isActiveMarkdownTab =
+    activeTab?.category === 'text' &&
+    getLanguage(activeTab.filePath) === 'markdown'
   const isAtGitRoot = store.workingTree.repoPath === store.rootPath
 
   if (!store.rootPath) {
@@ -170,6 +174,25 @@ const App = observer(function App() {
                               }
                             />
                           </div>
+                          {!isActiveImageTab &&
+                            !isActiveGitDiffTab &&
+                            isActiveMarkdownTab && (
+                              <button
+                                onClick={() => store.toggleMarkdownPreview()}
+                                className={`w-7 h-7 ml-1 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all ${
+                                  store.showingMarkdownPreview
+                                    ? `opacity-100 ${tw.primary.text}`
+                                    : ''
+                                }`}
+                                title={
+                                  store.showingMarkdownPreview
+                                    ? t('markdownPreviewHide')
+                                    : t('markdownPreview')
+                                }
+                              >
+                                <Eye size={14} />
+                              </button>
+                            )}
                           {!isActiveImageTab &&
                             !isActiveGitDiffTab &&
                             isAtGitRoot && (

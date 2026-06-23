@@ -34,6 +34,7 @@ const globals: Record<string, string> = {
   'react-markdown': 'ReactMarkdown',
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
+  'rehype-raw': 'rehypeRaw',
   '@headlessui/react': 'headlessui',
   'react-hot-toast': 'reactHotToast',
   'react-resizable-panels': 'reactResizablePanels',
