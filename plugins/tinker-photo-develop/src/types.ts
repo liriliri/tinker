@@ -16,14 +16,29 @@ export type {
 export { getDefaultCurves } from './types/curves'
 export { getDefaultHslAdjustments, MIXER_CHANNELS } from './types/hsl'
 
-export type { EffectsAdjustmentKey } from './types/effects'
+export type SharpeningAdjustmentKey = 'sharpness' | 'sharpnessThreshold'
 
-export type { DetailsAdjustmentKey } from './types/details'
+export type NoiseReductionAdjustmentKey =
+  | 'lumaNoiseReduction'
+  | 'colorNoiseReduction'
+
+export type DetailsAdjustmentKey =
+  | SharpeningAdjustmentKey
+  | NoiseReductionAdjustmentKey
+
+export type VignetteAdjustmentKey =
+  | 'vignetteAmount'
+  | 'vignetteMidpoint'
+  | 'vignetteRoundness'
+  | 'vignetteFeather'
+
+export type GrainAdjustmentKey = 'grainAmount' | 'grainSize' | 'grainRoughness'
+
+export type EffectsAdjustmentKey = VignetteAdjustmentKey | GrainAdjustmentKey
 
 import { getDefaultCurves, type Curves } from './types/curves'
-import type { DetailsAdjustmentKey } from './types/details'
-import type { EffectsAdjustmentKey } from './types/effects'
-import { getDefaultHslAdjustments, type HslAdjustments } from './types/hsl'
+import type { HslAdjustments } from './types/hsl'
+import { getDefaultHslAdjustments } from './types/hsl'
 
 export type BasicAdjustmentKey =
   | 'exposure'

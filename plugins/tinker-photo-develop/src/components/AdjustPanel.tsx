@@ -3,12 +3,14 @@ import type { ComponentType } from 'react'
 import { useTranslation } from 'react-i18next'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import AdjustSection from './AdjustSection'
+import HistogramChart from './HistogramChart'
 import BasicAdjustments from './BasicAdjustments'
 import ColorAdjustments from './ColorAdjustments'
 import ColorMixerAdjustments from './ColorMixerAdjustments'
 import CurveAdjustments from './CurveAdjustments'
 import DetailsAdjustments from './DetailsAdjustments'
 import EffectsAdjustments from './EffectsAdjustments'
+import store from '../store'
 import type { AdjustSectionId } from '../types/adjustSections'
 
 const ADJUST_SECTIONS: {
@@ -29,6 +31,7 @@ const AdjustPanel = observer(function AdjustPanel() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
+      {store.hasImage && <HistogramChart />}
       <OverlayScrollbars defer className="min-h-0 flex-1">
         <div className="pb-1">
           {ADJUST_SECTIONS.map(({ id, titleKey, Content }) => (

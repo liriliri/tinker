@@ -21,6 +21,7 @@ import extend from 'licia/extend'
 import escape from 'licia/escape'
 import escapeRegExp from 'licia/escapeRegExp'
 import evalCss from 'licia/evalCss'
+import easing from 'licia/easing'
 import fileSize from 'licia/fileSize'
 import fileUrl from 'licia/fileUrl'
 import filter from 'licia/filter'
@@ -111,6 +112,7 @@ const licia = {
   escape,
   escapeRegExp,
   evalCss,
+  easing,
   fileSize,
   fileUrl,
   filter,
@@ -205,6 +207,7 @@ export {
   escape,
   escapeRegExp,
   evalCss,
+  easing,
   fileSize,
   fileUrl,
   filter,

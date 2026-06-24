@@ -1,30 +1,31 @@
 import {
-  cloneAdjustments,
-  createDefaultAdjustments,
-  hasNonDefaultAdjustments,
-} from './lib/adjustments'
-import {
   canRedoAdjustmentHistory,
   canUndoAdjustmentHistory,
+  cloneAdjustments,
   createAdjustmentHistory,
+  createDefaultAdjustments,
+  hasNonDefaultAdjustments,
   pushAdjustmentHistory,
   redoAdjustmentHistory,
   undoAdjustmentHistory,
-} from './lib/adjustmentHistory'
+} from './lib/adjustments'
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import i18n from 'i18next'
+import dateFormat from 'licia/dateFormat'
+import each from 'licia/each'
+import isBool from 'licia/isBool'
 import isErr from 'licia/isErr'
+import isObj from 'licia/isObj'
+import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import toStr from 'licia/toStr'
 import toast from 'react-hot-toast'
 import BaseStore from 'share/BaseStore'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
-import { openImageFile } from 'share/lib/util'
+import { openImageFile, resolveSavePath } from 'share/lib/util'
 import { WebGLRenderer } from './lib/renderer'
-import {
-  loadSectionOpenState,
-  saveSectionOpenState,
-} from './lib/adjustSections'
+import { createFilterAdjustments, PHOTO_FILTERS } from './lib/filters'
+import { runWhenIdle } from './lib/idle'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 import type {
   Adjustments,
@@ -33,27 +34,41 @@ import type {
   MixerChannel,
   ScalarAdjustmentKey,
 } from './types'
-import type { AdjustSectionId, SectionOpenState } from './types/adjustSections'
+import {
+  ADJUST_SECTION_IDS,
+  DEFAULT_SECTION_OPEN,
+  type AdjustSectionId,
+  type SectionOpenState,
+} from './types/adjustSections'
+
+const storage = new LocalStore('tinker-photo-develop')
+const STORAGE_SECTION_OPEN = 'sectionOpen'
+const STORAGE_OVERWRITE = 'overwriteOriginal'
 
 class Store extends BaseStore {
   image: ImageInfo | null = null
   adjustments: Adjustments = createDefaultAdjustments()
-  sectionOpen: SectionOpenState = loadSectionOpenState()
+  sectionOpen: SectionOpenState
   previewVersion: number = 0
   isLoading: boolean = false
   isSaved: boolean = false
+  overwriteOriginal: boolean = false
   adjustmentHistory: Adjustments[] = []
   historyIndex: number = 0
+  activeFilterId: string | null = null
 
   private renderer: WebGLRenderer | null = null
   private renderFrame: number | null = null
   private isApplyingHistory = false
+  private isApplyingFilter = false
   private historyCommitTimer: ReturnType<typeof setTimeout> | null = null
   private readonly historyDebounceMs = 500
   private jpegExifSegment: Uint8Array | null = null
 
   constructor() {
     super()
+    this.sectionOpen = this.loadSectionOpenState()
+    this.overwriteOriginal = this.loadOverwriteOriginal()
     makeAutoObservable(this)
     this.resetHistory(createDefaultAdjustments())
     this.bindEvent()
@@ -108,6 +123,8 @@ class Store extends BaseStore {
         }
         this.resetHistory(createDefaultAdjustments())
         this.isSaved = false
+        this.activeFilterId = null
+        this.resetFilterPreviewCache()
       })
 
       if (loadResult.downscaled) {
@@ -166,8 +183,117 @@ class Store extends BaseStore {
   }
 
   resetAdjustments() {
+    this.activeFilterId = null
     this.resetHistory(createDefaultAdjustments())
     this.scheduleRender()
+  }
+
+  applyFilter(filterId: string) {
+    const adjustments =
+      filterId === 'original'
+        ? createDefaultAdjustments()
+        : createFilterAdjustments(filterId)
+
+    this.isApplyingFilter = true
+    this.activeFilterId = filterId === 'original' ? null : filterId
+    this.adjustments = cloneAdjustments(adjustments)
+    this.cancelPendingHistoryCommit()
+    this.pushHistory(adjustments)
+    this.isApplyingFilter = false
+    this.isSaved = false
+    this.scheduleRender()
+  }
+
+  private filterPreviewQueue: Promise<void> = Promise.resolve()
+  private filterPreviewCacheKey = ''
+  private filterPreviewCache = new Map<string, string>()
+
+  private getFilterPreviewCacheKey() {
+    if (!this.image) return ''
+    return `${this.image.fileName}:${this.image.width}x${this.image.height}`
+  }
+
+  private resetFilterPreviewCache() {
+    this.filterPreviewCacheKey = ''
+    this.filterPreviewCache.clear()
+    this.filterPreviewQueue = Promise.resolve()
+  }
+
+  getFilterPreview(filterId: string) {
+    if (this.filterPreviewCacheKey !== this.getFilterPreviewCacheKey()) {
+      return undefined
+    }
+
+    return this.filterPreviewCache.get(filterId)
+  }
+
+  async generateAllFilterPreviews(
+    maxWidth = 96,
+    onPreview?: (filterId: string, url: string) => void
+  ): Promise<Record<string, string>> {
+    if (!this.renderer?.hasImage || this.isLoading) {
+      return {}
+    }
+
+    const previews: Record<string, string> = {}
+
+    for (const filter of PHOTO_FILTERS) {
+      const url = await this.generateFilterPreview(filter.id, maxWidth)
+      if (!url) continue
+
+      previews[filter.id] = url
+      onPreview?.(filter.id, url)
+    }
+
+    return previews
+  }
+
+  generateFilterPreview(filterId: string, maxWidth = 96): Promise<string> {
+    if (!this.renderer?.hasImage) {
+      return Promise.resolve('')
+    }
+
+    const cacheKey = this.getFilterPreviewCacheKey()
+    if (this.filterPreviewCacheKey !== cacheKey) {
+      this.filterPreviewCache.clear()
+      this.filterPreviewCacheKey = cacheKey
+    }
+
+    const cached = this.filterPreviewCache.get(filterId)
+    if (cached) {
+      return Promise.resolve(cached)
+    }
+
+    const task = this.filterPreviewQueue.then(() =>
+      runWhenIdle(() => {
+        if (!this.renderer?.hasImage || this.isLoading) {
+          return ''
+        }
+
+        const hit = this.filterPreviewCache.get(filterId)
+        if (hit) {
+          return hit
+        }
+
+        const savedAdjustments = cloneAdjustments(this.adjustments)
+        const adjustments = createFilterAdjustments(filterId)
+        const url = this.renderer.renderThumbnail(adjustments, maxWidth)
+        this.renderer.render(savedAdjustments)
+
+        if (url) {
+          this.filterPreviewCache.set(filterId, url)
+        }
+
+        return url
+      })
+    )
+
+    this.filterPreviewQueue = task.then(
+      () => undefined,
+      () => undefined
+    )
+
+    return task
   }
 
   undo() {
@@ -200,6 +326,7 @@ class Store extends BaseStore {
     this.adjustments = cloneAdjustments(
       this.adjustmentHistory[this.historyIndex]
     )
+    this.activeFilterId = null
     this.isApplyingHistory = false
     this.isSaved = false
     this.scheduleRender()
@@ -223,7 +350,8 @@ class Store extends BaseStore {
   }
 
   private applyAdjustmentsChange() {
-    if (this.isApplyingHistory) return
+    if (this.isApplyingHistory || this.isApplyingFilter) return
+    this.activeFilterId = null
     this.isSaved = false
     this.scheduleHistoryCommit()
     this.scheduleRender()
@@ -244,12 +372,45 @@ class Store extends BaseStore {
   }
 
   setSectionOpen(sectionId: AdjustSectionId, open: boolean) {
-    if (this.sectionOpen[sectionId] === open) {
-      return
-    }
+    if (this.sectionOpen[sectionId] === open) return
 
     this.sectionOpen = { ...this.sectionOpen, [sectionId]: open }
-    saveSectionOpenState(this.sectionOpen)
+    this.saveSectionOpenState()
+  }
+
+  setOverwriteOriginal(overwrite: boolean) {
+    this.overwriteOriginal = overwrite
+    storage.set(STORAGE_OVERWRITE, String(overwrite))
+  }
+
+  private loadOverwriteOriginal(): boolean {
+    const saved = storage.get(STORAGE_OVERWRITE)
+    return saved === 'true'
+  }
+
+  private loadSectionOpenState(): SectionOpenState {
+    const saved = storage.get(STORAGE_SECTION_OPEN) as
+      | Partial<SectionOpenState>
+      | undefined
+
+    if (!isObj(saved)) {
+      return { ...DEFAULT_SECTION_OPEN }
+    }
+
+    const next = { ...DEFAULT_SECTION_OPEN }
+    const stored = saved as Partial<SectionOpenState>
+
+    each(ADJUST_SECTION_IDS, (id) => {
+      if (isBool(stored[id])) {
+        next[id] = stored[id]
+      }
+    })
+
+    return next
+  }
+
+  private saveSectionOpenState() {
+    storage.set(STORAGE_SECTION_OPEN, this.sectionOpen)
   }
 
   scheduleRender() {
@@ -276,21 +437,27 @@ class Store extends BaseStore {
     if (!this.image || !this.renderer?.hasImage) return
 
     try {
-      const result = await tinker.showSaveDialog({
-        defaultPath: this.getEditedFileName(this.image.fileName),
-        filters: [
-          {
-            name: i18n.t('imageFiles'),
-            extensions: ['png', 'jpg', 'jpeg', 'webp'],
-          },
-        ],
-      })
+      let savePath: string
 
-      if (result.canceled || !result.filePath) {
-        return
+      if (this.overwriteOriginal && this.image.filePath) {
+        savePath = this.image.filePath
+      } else {
+        const result = await tinker.showSaveDialog({
+          defaultPath: this.getDefaultSavePath(),
+          filters: [
+            {
+              name: i18n.t('imageFiles'),
+              extensions: ['png', 'jpg', 'jpeg', 'webp'],
+            },
+          ],
+        })
+
+        if (result.canceled || !result.filePath) {
+          return
+        }
+
+        savePath = await resolveSavePath(result.filePath)
       }
-
-      const savePath = result.filePath
       const ext = getFileExt(savePath) || 'png'
       const mimeType = getMimeTypeFromPath(savePath) || 'image/png'
 
@@ -319,10 +486,19 @@ class Store extends BaseStore {
     }
   }
 
-  private getEditedFileName(fileName: string): string {
-    const { name, ext } = splitPath(fileName)
+  private getDefaultSavePath(): string {
+    if (!this.image) return `image-${dateFormat('yyyymmddHH')}.png`
+
+    const { name, ext } = splitPath(this.image.fileName)
     const stem = ext ? name.slice(0, -ext.length) : name
-    return `${stem}-edited${ext}`
+    const fileName = `${stem}-${dateFormat('yyyymmddHH')}${ext || '.png'}`
+
+    if (this.image.filePath) {
+      const { dir } = splitPath(this.image.filePath)
+      return `${dir}${fileName}`
+    }
+
+    return fileName
   }
 
   get hasImage() {

@@ -6,6 +6,7 @@ import ImageOpen from 'share/components/ImageOpen'
 import store from './store'
 import Toolbar from './components/Toolbar'
 import ImagePreview from './components/ImagePreview'
+import FilterBar from './components/FilterBar'
 import AdjustPanel from './components/AdjustPanel'
 import { ToasterProvider } from 'share/components/Toaster'
 import renderApp from 'share/lib/renderApp'
@@ -97,9 +98,11 @@ const App = observer(function App() {
               </div>
             )}
 
-            <div className="flex-1">
+            <div className="flex-1 min-h-0">
               <ImagePreview />
             </div>
+
+            <FilterBar />
           </div>
 
           {store.hasImage && (

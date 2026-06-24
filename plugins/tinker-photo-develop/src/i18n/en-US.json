@@ -1,6 +1,7 @@
 {
   "openImage": "Open Image",
   "saveImage": "Save Image",
+  "overwriteOriginal": "Overwrite",
   "imageFiles": "Images",
   "openTitle": "Drop image here or click to open",
   "supportedFormats": "Supports PNG, JPG, WebP, GIF, BMP",
@@ -54,5 +55,23 @@
   "undo": "Undo",
   "redo": "Redo",
   "imageDownscaled": "Image downscaled from {{originalWidth}}×{{originalHeight}} to {{width}}×{{height}} for preview",
-  "imageLoadFailed": "Failed to load image: {{message}}"
+  "imageLoadFailed": "Failed to load image: {{message}}",
+  "filters": "Filters",
+  "filterOriginal": "Original",
+  "filterSepia": "Sepia",
+  "filterClarendon": "Clarendon",
+  "filterSkyline": "Skyline",
+  "filterLoFi": "Lo-Fi",
+  "filterLark": "Lark",
+  "filterReyes": "Reyes",
+  "filterSlumber": "Slumber",
+  "filterLudwig": "Ludwig",
+  "filterMayfair": "Mayfair",
+  "filterHudson": "Hudson",
+  "filterValencia": "Valencia",
+  "filterXPro2": "X-Pro II",
+  "filterInkwell": "Inkwell",
+  "filterKelvin": "Kelvin",
+  "filterBrannan": "Brannan",
+  "filterSutro": "Sutro"
 }

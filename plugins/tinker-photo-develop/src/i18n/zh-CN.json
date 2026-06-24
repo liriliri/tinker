@@ -1,6 +1,7 @@
 {
   "openImage": "打开图片",
   "saveImage": "保存图片",
+  "overwriteOriginal": "覆盖原图",
   "imageFiles": "图片",
   "openTitle": "拖放图片到此处，或点击打开",
   "supportedFormats": "支持 PNG、JPG、WebP、GIF、BMP",
@@ -54,5 +55,23 @@
   "undo": "撤销",
   "redo": "重做",
   "imageDownscaled": "图片已从 {{originalWidth}}×{{originalHeight}} 缩小至 {{width}}×{{height}} 用于预览",
-  "imageLoadFailed": "加载图片失败：{{message}}"
+  "imageLoadFailed": "加载图片失败：{{message}}",
+  "filters": "滤镜",
+  "filterOriginal": "原图",
+  "filterSepia": "怀旧",
+  "filterClarendon": "鲜明",
+  "filterSkyline": "鲜艳",
+  "filterLoFi": "低保真",
+  "filterLark": "清新",
+  "filterReyes": "褪色",
+  "filterSlumber": "慵懒",
+  "filterLudwig": "轻柔",
+  "filterMayfair": "雅致",
+  "filterHudson": "清凉",
+  "filterValencia": "暖阳",
+  "filterXPro2": "胶片",
+  "filterInkwell": "墨韵",
+  "filterKelvin": "暖光",
+  "filterBrannan": "褐紫",
+  "filterSutro": "烟郁"
 }

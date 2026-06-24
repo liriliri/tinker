@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen, Redo, RotateCcw, Save, Undo } from 'lucide-react'
+import Checkbox from 'share/components/Checkbox'
 import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
+  ToolbarLabel,
 } from 'share/components/Toolbar'
 import store from '../store'
 
@@ -57,13 +59,27 @@ const ToolbarComponent = observer(function ToolbarComponent() {
 
       <ToolbarButton
         onClick={handleSaveImage}
-        disabled={!store.hasImage}
+        disabled={!store.hasImage || !store.hasAdjustments || store.isSaved}
         title={t('saveImage')}
       >
         <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
+      <Checkbox
+        checked={store.overwriteOriginal}
+        onChange={(checked) => store.setOverwriteOriginal(checked)}
+        disabled={!store.hasImage || !store.image?.filePath}
+      >
+        {t('overwriteOriginal')}
+      </Checkbox>
+
       <ToolbarSpacer />
+
+      {store.hasImage && store.image && (
+        <ToolbarLabel className="tabular-nums">
+          {`${store.image.width} × ${store.image.height}`}
+        </ToolbarLabel>
+      )}
 
       <ToolbarButton
         onClick={() => store.resetAdjustments()}

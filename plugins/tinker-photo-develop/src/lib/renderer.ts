@@ -1,7 +1,6 @@
 import type { Adjustments } from '../types'
-import { isRgbCurveModeActive } from './adjustments'
 import { toGpuAdjustments } from './adjustmentScales'
-import { buildCurveLut } from './curves'
+import { buildCurveLut, isRgbCurvesActive } from './curves'
 import {
   computeWorkingDimensions,
   getRasterSourceSize,
@@ -64,6 +63,35 @@ function assertNoGlError(gl: WebGLRenderingContext, message: string) {
   const error = gl.getError()
   if (error === gl.NO_ERROR) return
   throw new Error(`${message} (WebGL error ${error})`)
+}
+
+function needsBlurredTexture(adjustments: Adjustments): boolean {
+  return adjustments.shadows !== 0 || adjustments.blacks !== 0
+}
+
+function needsSharpnessBlurTexture(adjustments: Adjustments): boolean {
+  return adjustments.sharpness !== 0
+}
+
+function createTextureFromSource(
+  gl: WebGLRenderingContext,
+  source: RasterImageSource
+): WebGLTexture {
+  const texture = gl.createTexture()
+  if (!texture) {
+    throw new Error('Failed to create texture')
+  }
+
+  gl.activeTexture(gl.TEXTURE0)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source)
+  assertNoGlError(gl, 'Failed to upload texture')
+
+  return texture
 }
 
 function createSharpnessBlurredCanvas(
@@ -161,6 +189,7 @@ export class WebGLRenderer {
   private texture: WebGLTexture | null = null
   private blurredTexture: WebGLTexture | null = null
   private sharpnessBlurTexture: WebGLTexture | null = null
+  private imageSource: RasterImageSource | null = null
   private positionBuffer: WebGLBuffer
   private texCoordBuffer: WebGLBuffer
   private exposureLocation: WebGLUniformLocation
@@ -389,74 +418,10 @@ export class WebGLRenderer {
 
       this.disposeTextures()
 
-      const texture = gl.createTexture()
-      if (!texture) {
-        throw new Error('Failed to create texture')
-      }
-
-      gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, texture)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        source
-      )
-      assertNoGlError(gl, 'Failed to upload image texture')
-
-      const blurredCanvas = createBlurredCanvas(source)
-      const blurredTexture = gl.createTexture()
-      if (!blurredTexture) {
-        throw new Error('Failed to create blurred texture')
-      }
-
-      gl.activeTexture(gl.TEXTURE1)
-      gl.bindTexture(gl.TEXTURE_2D, blurredTexture)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        blurredCanvas
-      )
-      assertNoGlError(gl, 'Failed to upload blurred texture')
-
-      const sharpnessBlurCanvas = createSharpnessBlurredCanvas(source)
-      const sharpnessBlurTexture = gl.createTexture()
-      if (!sharpnessBlurTexture) {
-        throw new Error('Failed to create sharpness blur texture')
-      }
-
-      gl.activeTexture(gl.TEXTURE6)
-      gl.bindTexture(gl.TEXTURE_2D, sharpnessBlurTexture)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        sharpnessBlurCanvas
-      )
-      assertNoGlError(gl, 'Failed to upload sharpness blur texture')
+      const texture = createTextureFromSource(gl, source)
 
       this.texture = texture
-      this.blurredTexture = blurredTexture
-      this.sharpnessBlurTexture = sharpnessBlurTexture
+      this.imageSource = source
       this.imageWidth = working.width
       this.imageHeight = working.height
       this.canvas.width = this.imageWidth
@@ -474,26 +439,56 @@ export class WebGLRenderer {
     }
   }
 
-  render(adjustments: Adjustments) {
-    if (!this.texture || !this.blurredTexture || !this.sharpnessBlurTexture) {
-      return
+  private ensureBlurredTexture() {
+    if (this.blurredTexture || !this.imageSource) return
+
+    const blurredCanvas = createBlurredCanvas(this.imageSource)
+    this.blurredTexture = createTextureFromSource(this.gl, blurredCanvas)
+  }
+
+  private ensureSharpnessBlurTexture() {
+    if (this.sharpnessBlurTexture || !this.imageSource) return
+
+    const sharpnessBlurCanvas = createSharpnessBlurredCanvas(this.imageSource)
+    this.sharpnessBlurTexture = createTextureFromSource(
+      this.gl,
+      sharpnessBlurCanvas
+    )
+  }
+
+  render(
+    adjustments: Adjustments,
+    outputSize?: { width: number; height: number }
+  ) {
+    const { gl, program, texture } = this
+    if (!texture) return
+
+    if (needsBlurredTexture(adjustments)) {
+      this.ensureBlurredTexture()
+    }
+    if (needsSharpnessBlurTexture(adjustments)) {
+      this.ensureSharpnessBlurTexture()
     }
 
+    const blurredTexture = this.blurredTexture ?? texture
+    const sharpnessBlurTexture = this.sharpnessBlurTexture ?? texture
+
     const gpu = toGpuAdjustments(adjustments, this.imageWidth, this.imageHeight)
-    const { gl } = this
     const { curves } = adjustments
+    const viewportWidth = outputSize?.width ?? this.imageWidth
+    const viewportHeight = outputSize?.height ?? this.imageHeight
 
     updateLutTexture(gl, this.lumaLutTexture, curves.luma)
     updateLutTexture(gl, this.redLutTexture, curves.red)
     updateLutTexture(gl, this.greenLutTexture, curves.green)
     updateLutTexture(gl, this.blueLutTexture, curves.blue)
 
-    gl.viewport(0, 0, this.imageWidth, this.imageHeight)
-    gl.useProgram(this.program)
+    gl.viewport(0, 0, viewportWidth, viewportHeight)
+    gl.useProgram(program)
     gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, this.texture)
+    gl.bindTexture(gl.TEXTURE_2D, texture)
     gl.activeTexture(gl.TEXTURE1)
-    gl.bindTexture(gl.TEXTURE_2D, this.blurredTexture)
+    gl.bindTexture(gl.TEXTURE_2D, blurredTexture)
     gl.activeTexture(gl.TEXTURE2)
     gl.bindTexture(gl.TEXTURE_2D, this.lumaLutTexture)
     gl.activeTexture(gl.TEXTURE3)
@@ -503,7 +498,7 @@ export class WebGLRenderer {
     gl.activeTexture(gl.TEXTURE5)
     gl.bindTexture(gl.TEXTURE_2D, this.blueLutTexture)
     gl.activeTexture(gl.TEXTURE6)
-    gl.bindTexture(gl.TEXTURE_2D, this.sharpnessBlurTexture)
+    gl.bindTexture(gl.TEXTURE_2D, sharpnessBlurTexture)
     gl.uniform1f(this.exposureLocation, gpu.exposure)
     gl.uniform1f(this.brightnessLocation, gpu.brightness)
     gl.uniform1f(this.contrastLocation, gpu.contrast)
@@ -535,9 +530,34 @@ export class WebGLRenderer {
     gl.uniform1f(this.detailScaleLocation, gpu.detailScale)
     gl.uniform1f(
       this.rgbCurvesActiveLocation,
-      isRgbCurveModeActive(adjustments) ? 1 : 0
+      isRgbCurvesActive(adjustments.curves) ? 1 : 0
     )
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+  }
+
+  renderThumbnail(adjustments: Adjustments, maxWidth: number): string {
+    if (!this.texture || !this.imageWidth || !this.imageHeight) {
+      return ''
+    }
+
+    const width = maxWidth
+    const height = Math.max(
+      1,
+      Math.round((maxWidth * this.imageHeight) / this.imageWidth)
+    )
+    const prevWidth = this.canvas.width
+    const prevHeight = this.canvas.height
+
+    this.canvas.width = width
+    this.canvas.height = height
+    this.render(adjustments, { width, height })
+
+    const url = this.canvas.toDataURL('image/jpeg', 0.82)
+
+    this.canvas.width = prevWidth
+    this.canvas.height = prevHeight
+
+    return url
   }
 
   async exportBlob(
@@ -591,6 +611,7 @@ export class WebGLRenderer {
       this.sharpnessBlurTexture = null
     }
 
+    this.imageSource = null
     this.imageWidth = 0
     this.imageHeight = 0
   }

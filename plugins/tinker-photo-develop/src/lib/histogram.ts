@@ -1,4 +1,5 @@
 import type { CurveChannel } from '../types/curves'
+import { getChannelColor } from './curves'
 
 export interface ChannelHistograms {
   luma: number[]
@@ -196,4 +197,61 @@ export function getChannelHistogram(
 
 export function getHistogramOpacity(isDark: boolean): number {
   return isDark ? 0.15 : 0.6
+}
+
+export const HISTOGRAM_TRANSITION_MS = 500
+
+function lerpChannelData(from: number[], to: number[], t: number): number[] {
+  const result = new Array<number>(from.length)
+  for (let i = 0; i < from.length; i++) {
+    result[i] = from[i] + (to[i] - from[i]) * t
+  }
+  return result
+}
+
+export function lerpChannelHistograms(
+  from: ChannelHistograms,
+  to: ChannelHistograms,
+  t: number
+): ChannelHistograms {
+  return {
+    red: lerpChannelData(from.red, to.red, t),
+    green: lerpChannelData(from.green, to.green, t),
+    blue: lerpChannelData(from.blue, to.blue, t),
+    luma: lerpChannelData(from.luma, to.luma, t),
+  }
+}
+
+export interface RgbHistogramLayer {
+  key: 'red' | 'green' | 'blue'
+  color: string
+  fillPath: string
+  linePath: string
+}
+
+const RGB_HISTOGRAM_CHANNELS = ['red', 'green', 'blue'] as const
+
+export function getRgbHistogramLayers(
+  histogram: ChannelHistograms
+): RgbHistogramLayer[] {
+  const entries = RGB_HISTOGRAM_CHANNELS.map((key) => ({
+    key,
+    color: getChannelColor(key),
+    data: histogram[key],
+  }))
+
+  const globalMax = Math.max(...entries.flatMap((entry) => entry.data), 1e-6)
+  const toY = (value: number) => 255 - (value / globalMax) * 255
+
+  return entries.map(({ key, color, data }) => {
+    const lineCoords = data.map((value, index) => `${index},${toY(value)}`)
+    const fillCoords = lineCoords.join(' ')
+
+    return {
+      key,
+      color,
+      fillPath: `M0,255 L${fillCoords} L255,255 Z`,
+      linePath: `M${lineCoords.join(' L')}`,
+    }
+  })
 }
