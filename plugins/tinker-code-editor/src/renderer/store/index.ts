@@ -308,6 +308,8 @@ class Store extends BaseStore {
     this.editor.openFile(filePath, fileName)
   updateContent = (tabId: string, content: string) =>
     this.editor.updateContent(tabId, content)
+  forceOpenBinaryAsText = (tabId: string) =>
+    this.editor.forceOpenBinaryAsText(tabId)
   saveFile = (tabId?: string) => this.editor.saveFile(tabId)
   closeTab = (id: string) => this.editor.closeTab(id)
   setActiveTab = (id: string) => this.editor.setActiveTab(id)

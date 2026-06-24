@@ -10,6 +10,7 @@ import CenteredMessage from 'share/components/WorkingTree/CenteredMessage'
 import { fileDisplayName } from 'share/lib/workingTree'
 import { joinPath } from 'share/lib/util'
 import { tw } from 'share/theme'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import store from '../store'
 import FileTree from './FileTree'
 
@@ -66,9 +67,9 @@ const GitPanel = observer(function GitPanel() {
 const ExplorerPanel = observer(function ExplorerPanel() {
   return (
     <div className={`relative z-10 h-full flex flex-col ${tw.bg.tertiary}`}>
-      <div className="flex-1 overflow-y-auto">
+      <OverlayScrollbars defer className="min-h-0 flex-1">
         <FileTree />
-      </div>
+      </OverlayScrollbars>
     </div>
   )
 })

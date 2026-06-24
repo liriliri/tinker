@@ -8,7 +8,12 @@ import {
 } from 'share/lib/textSearch'
 import { joinPath } from 'share/lib/util'
 import { fileDisplayName, findWorkingTreeFile } from 'share/lib/workingTree'
-import { IMAGE_EXTS, getFileExt } from 'share/lib/fileType'
+import {
+  IMAGE_EXTS,
+  VIDEO_EXTS,
+  BINARY_EXTS,
+  getFileExt,
+} from 'share/lib/fileType'
 import type { GitWorkingTreeFile } from 'share/types/git'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import EditorTab from './EditorTab'
@@ -153,12 +158,21 @@ class Editor {
 
     const ext = getFileExt(filePath)
     const isImage = IMAGE_EXTS.has(ext)
+    const isVideo = VIDEO_EXTS.has(ext)
+    const isBinary = !isImage && !isVideo && BINARY_EXTS.has(ext)
 
     try {
-      const content = isImage
-        ? await codeEditor.readFileBinary(filePath)
-        : ((await tinker.readFile(filePath, 'utf-8')) as string)
-      const category = isImage ? 'image' : 'text'
+      const content =
+        isImage || isVideo
+          ? filePath
+          : ((await tinker.readFile(filePath, 'utf-8')) as string)
+      const category = isImage
+        ? 'image'
+        : isVideo
+        ? 'video'
+        : isBinary
+        ? 'binary'
+        : 'text'
       const tab = new EditorTab(uuid(), fileName, filePath, content, category)
       this.tabs.push(tab)
       this.activeTabId = tab.id
@@ -171,13 +185,16 @@ class Editor {
   async reloadOpenFile(filePath: string) {
     const normalized = normalizePath(filePath)
     const tab = this.tabs.find((t) => normalizePath(t.filePath) === normalized)
-    if (!tab || tab.isDirty) return
+    if (
+      !tab ||
+      tab.isDirty ||
+      tab.category === 'image' ||
+      tab.category === 'video'
+    )
+      return
 
     try {
-      tab.content =
-        tab.category === 'image'
-          ? await codeEditor.readFileBinary(filePath)
-          : ((await tinker.readFile(filePath, 'utf-8')) as string)
+      tab.content = (await tinker.readFile(filePath, 'utf-8')) as string
     } catch {
       // ignore read errors
     }
@@ -198,10 +215,23 @@ class Editor {
     }
   }
 
+  forceOpenBinaryAsText(tabId: string) {
+    const tab = this.tabs.find((t) => t.id === tabId)
+    if (!tab || tab.category !== 'binary') return
+    tab.category = 'text'
+  }
+
   async saveFile(tabId?: string) {
     const id = tabId || this.activeTabId
     const tab = this.tabs.find((t) => t.id === id)
-    if (!tab || tab.category === 'image' || tab.category === 'gitDiff') return
+    if (
+      !tab ||
+      tab.category === 'image' ||
+      tab.category === 'video' ||
+      tab.category === 'gitDiff' ||
+      tab.category === 'binary'
+    )
+      return
 
     try {
       await tinker.writeFile(tab.filePath, tab.content, 'utf-8')

@@ -20,5 +20,7 @@
   "gitDiff": "Git 差异",
   "quickOpenPlaceholder": "转到文件...",
   "quickOpenSearching": "搜索中...",
-  "quickOpenNoResults": "没有匹配的结果"
+  "quickOpenNoResults": "没有匹配的结果",
+  "binaryNotDisplayed": "此文件为二进制文件或使用了不支持的文本编码，无法显示。",
+  "openAnyway": "仍然打开"
 }

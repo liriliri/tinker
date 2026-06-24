@@ -20,5 +20,7 @@
   "gitDiff": "Git Diff",
   "quickOpenPlaceholder": "Go to File...",
   "quickOpenSearching": "Searching...",
-  "quickOpenNoResults": "No matching results"
+  "quickOpenNoResults": "No matching results",
+  "binaryNotDisplayed": "The file is not displayed because it is either binary or uses an unsupported text encoding.",
+  "openAnyway": "Open Anyway"
 }

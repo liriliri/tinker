@@ -2,7 +2,15 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import copy from 'licia/copy'
-import { File, GitBranch, GitCommit, Image, Eye } from 'lucide-react'
+import {
+  File,
+  FileText,
+  GitBranch,
+  GitCommit,
+  Image,
+  Eye,
+  Video,
+} from 'lucide-react'
 import {
   Panel,
   Group,
@@ -96,6 +104,8 @@ const App = observer(function App() {
 
   const activeTab = store.tabs.find((t) => t.id === store.activeTabId)
   const isActiveImageTab = activeTab?.category === 'image'
+  const isActiveVideoTab = activeTab?.category === 'video'
+  const isActiveBinaryTab = activeTab?.category === 'binary'
   const isActiveGitDiffTab = activeTab?.category === 'gitDiff'
   const isActiveMarkdownTab =
     activeTab?.category === 'text' &&
@@ -109,7 +119,9 @@ const App = observer(function App() {
   return (
     <ConfirmProvider>
       <QuickOpen />
-      <div className="relative h-full flex flex-col overflow-hidden">
+      <div
+        className={`relative h-full flex flex-col overflow-hidden ${tw.bg.primary}`}
+      >
         <div
           className={`absolute top-0 left-0 right-0 h-px z-20 ${tw.bg.border}`}
         />
@@ -160,6 +172,16 @@ const App = observer(function App() {
                                     size={14}
                                     className={tw.text.tertiary}
                                   />
+                                ) : tab.category === 'video' ? (
+                                  <Video
+                                    size={14}
+                                    className={tw.text.tertiary}
+                                  />
+                                ) : tab.category === 'binary' ? (
+                                  <FileText
+                                    size={14}
+                                    className={tw.text.tertiary}
+                                  />
                                 ) : tab.isDirty ? (
                                   <span
                                     className={`inline-block w-1.5 h-1.5 rounded-full ${tw.primary.bg}`}
@@ -175,6 +197,8 @@ const App = observer(function App() {
                             />
                           </div>
                           {!isActiveImageTab &&
+                            !isActiveVideoTab &&
+                            !isActiveBinaryTab &&
                             !isActiveGitDiffTab &&
                             isActiveMarkdownTab && (
                               <button
@@ -194,6 +218,8 @@ const App = observer(function App() {
                               </button>
                             )}
                           {!isActiveImageTab &&
+                            !isActiveVideoTab &&
+                            !isActiveBinaryTab &&
                             !isActiveGitDiffTab &&
                             isAtGitRoot && (
                               <button

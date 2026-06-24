@@ -1,5 +1,7 @@
 @use '../../../share/base.scss';
+@use '../../../share/styles/overlayscrollbars.scss';
 @use '../../../share/styles/resizablepanels.scss';
 @use '../../../share/styles/textSearch.scss';
 @use '../../../share/styles/blame.scss';
+@use '../../../share/styles/videoPlayer.scss';
 @config "../../tailwind.config.js";
