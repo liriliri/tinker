@@ -30,10 +30,13 @@ import findKey from 'licia/findKey'
 import fullscreen from 'licia/fullscreen'
 import has from 'licia/has'
 import isArr from 'licia/isArr'
+import isBool from 'licia/isBool'
 import isDataUrl from 'licia/isDataUrl'
 import isEmpty from 'licia/isEmpty'
 import isEqual from 'licia/isEqual'
+import isErr from 'licia/isErr'
 import isMac from 'licia/isMac'
+import isObj from 'licia/isObj'
 import isStr from 'licia/isStr'
 import isStrBlank from 'licia/isStrBlank'
 import isUndef from 'licia/isUndef'
@@ -49,6 +52,7 @@ import lowerCase from 'licia/lowerCase'
 import lpad from 'licia/lpad'
 import ltrim from 'licia/ltrim'
 import map from 'licia/map'
+import mapObj from 'licia/mapObj'
 import max from 'licia/max'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
@@ -56,8 +60,9 @@ import min from 'licia/min'
 import naturalSort from 'licia/naturalSort'
 import normalizePath from 'licia/normalizePath'
 import once from 'licia/once'
-import pluck from 'licia/pluck'
 import openFile from 'licia/openFile'
+import pluck from 'licia/pluck'
+import precision from 'licia/precision'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
 import randomItem from 'licia/randomItem'
@@ -72,6 +77,7 @@ import startWith from 'licia/startWith'
 import stripHtmlTag from 'licia/stripHtmlTag'
 import sum from 'licia/sum'
 import toNum from 'licia/toNum'
+import toStr from 'licia/toStr'
 import trim from 'licia/trim'
 import truncate from 'licia/truncate'
 import unescape from 'licia/unescape'
@@ -114,10 +120,13 @@ const licia = {
   fullscreen,
   has,
   isArr,
+  isBool,
   isDataUrl,
   isEmpty,
   isEqual,
+  isErr,
   isMac,
+  isObj,
   isStr,
   isStrBlank,
   isUndef,
@@ -133,6 +142,7 @@ const licia = {
   lpad,
   ltrim,
   map,
+  mapObj,
   max,
   md5,
   mime,
@@ -142,6 +152,7 @@ const licia = {
   once,
   openFile,
   pluck,
+  precision,
   query,
   randomBytes,
   randomItem,
@@ -156,6 +167,7 @@ const licia = {
   stripHtmlTag,
   sum,
   toNum,
+  toStr,
   trim,
   truncate,
   unescape,
@@ -202,10 +214,13 @@ export {
   fullscreen,
   has,
   isArr,
+  isBool,
   isDataUrl,
   isEmpty,
   isEqual,
+  isErr,
   isMac,
+  isObj,
   isStr,
   isStrBlank,
   isUndef,
@@ -221,6 +236,7 @@ export {
   lpad,
   ltrim,
   map,
+  mapObj,
   max,
   md5,
   mime,
@@ -230,6 +246,7 @@ export {
   once,
   openFile,
   pluck,
+  precision,
   query,
   randomBytes,
   randomItem,
@@ -244,6 +261,7 @@ export {
   stripHtmlTag,
   sum,
   toNum,
+  toStr,
   trim,
   truncate,
   unescape,

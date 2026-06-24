@@ -1,0 +1,21 @@
+{
+  "name": "tinker-photo-develop",
+  "version": "0.1.0",
+  "description": "Photo Develop Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Photo Develop",
+    "description": "Professional photo development with exposure, tone, color, and curve controls",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "照片调色",
+        "description": "专业照片调色，支持曝光、色调、色彩与曲线调整"
+      }
+    }
+  }
+}

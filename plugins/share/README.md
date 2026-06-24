@@ -365,6 +365,17 @@ import {
 } from 'share/lib/util'
 ```
 
+### EXIF
+
+```ts
+import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
+
+const exifSegment = extractJpegExif(originalBuffer)
+if (exifSegment) {
+  outputBuffer = injectJpegExif(compressedBuffer, exifSegment)
+}
+```
+
 ### Popup Window
 
 ```ts

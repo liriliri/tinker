@@ -1,0 +1,114 @@
+@use '../../share/base.scss';
+@use '../../share/styles/overlayscrollbars.scss';
+@config "../tailwind.config.js";
+
+.temperature-gradient-track {
+  background: linear-gradient(
+    to right,
+    #2d4a74,
+    #4993b1,
+    #8a8a8a,
+    #c7c549,
+    #c7863c
+  ) !important;
+}
+
+.tint-gradient-track {
+  background: linear-gradient(
+    to right,
+    #458d43,
+    #57ce57,
+    #8a8a8a,
+    #9c548a,
+    #be409f
+  ) !important;
+}
+
+.sat-slider-mixer {
+  background: linear-gradient(
+    to right,
+    hsl(var(--hsl-mixer-hue, 0), 0%, 50%),
+    hsl(var(--hsl-mixer-hue, 0), 100%, 50%)
+  ) !important;
+}
+
+.lum-slider-mixer {
+  background: linear-gradient(
+    to right,
+    hsl(var(--hsl-mixer-hue, 0), var(--hsl-mixer-sat, 0%), 0%),
+    hsl(var(--hsl-mixer-hue, 0), var(--hsl-mixer-sat, 0%), 50%),
+    hsl(var(--hsl-mixer-hue, 0), var(--hsl-mixer-sat, 0%), 100%)
+  ) !important;
+}
+
+.hue-slider-reds {
+  background: linear-gradient(
+    to right,
+    hsl(260, 50%, 50%),
+    hsl(0, 50%, 50%),
+    hsl(100, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-oranges {
+  background: linear-gradient(
+    to right,
+    hsl(290, 50%, 50%),
+    hsl(30, 50%, 50%),
+    hsl(130, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-yellows {
+  background: linear-gradient(
+    to right,
+    hsl(320, 50%, 50%),
+    hsl(60, 50%, 50%),
+    hsl(160, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-greens {
+  background: linear-gradient(
+    to right,
+    hsl(20, 50%, 50%),
+    hsl(120, 50%, 50%),
+    hsl(220, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-aquas {
+  background: linear-gradient(
+    to right,
+    hsl(80, 50%, 50%),
+    hsl(180, 50%, 50%),
+    hsl(280, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-blues {
+  background: linear-gradient(
+    to right,
+    hsl(140, 50%, 50%),
+    hsl(240, 50%, 50%),
+    hsl(340, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-purples {
+  background: linear-gradient(
+    to right,
+    hsl(200, 50%, 50%),
+    hsl(300, 50%, 50%),
+    hsl(40, 50%, 50%)
+  ) !important;
+}
+
+.hue-slider-magentas {
+  background: linear-gradient(
+    to right,
+    hsl(240, 50%, 50%),
+    hsl(340, 50%, 50%),
+    hsl(80, 50%, 50%)
+  ) !important;
+}

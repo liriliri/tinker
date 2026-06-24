@@ -15,7 +15,7 @@ import {
   detectImageFormat,
   getFormatExtension,
 } from './lib/compress'
-import { extractJpegExif, injectJpegExif } from './lib/exif'
+import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 
 const STORAGE_QUALITY = 'quality'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
