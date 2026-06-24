@@ -241,6 +241,10 @@ class Store extends BaseStore {
     setMainStore('pluginStates', this.pluginStates)
   }
   isPluginPinned(id: string) {
+    const plugin = this.getPlugin(id)
+    if (plugin?.marketplace) {
+      return false
+    }
     return !!this.pluginStates[id]?.pinned
   }
   setPluginAutoDetach(id: string) {
