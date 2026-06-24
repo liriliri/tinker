@@ -91,7 +91,7 @@ const FilterBar = observer(function FilterBar() {
     >
       <div
         ref={setScrollRoot}
-        className="scrollbar-hide flex gap-2 overflow-x-auto px-3 py-2"
+        className="scrollbar-hide flex gap-2 overflow-x-auto px-3 py-2 justify-center"
       >
         {PHOTO_FILTERS.map((filter) => {
           const isActive =
