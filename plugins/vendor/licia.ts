@@ -17,6 +17,7 @@ import download from 'licia/download'
 import durationFormat from 'licia/durationFormat'
 import each from 'licia/each'
 import endWith from 'licia/endWith'
+import extend from 'licia/extend'
 import escape from 'licia/escape'
 import escapeRegExp from 'licia/escapeRegExp'
 import evalCss from 'licia/evalCss'
@@ -100,6 +101,7 @@ const licia = {
   durationFormat,
   each,
   endWith,
+  extend,
   escape,
   escapeRegExp,
   evalCss,
@@ -187,6 +189,7 @@ export {
   durationFormat,
   each,
   endWith,
+  extend,
   escape,
   escapeRegExp,
   evalCss,
