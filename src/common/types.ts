@@ -72,6 +72,7 @@ export type IpcShowPluginContextMenu = (
 export type IpcGetAttachedPlugin = () => Promise<IPlugin | undefined>
 export type IpcGetApps = (force?: boolean) => Promise<IApp[]>
 export type IpcOpenApp = (path: string) => void
+export type IpcCreatePluginShortcut = (id: string) => Promise<string | void>
 export type IpcGetClipboardFilePaths = () => string[]
 export type IpcExportPluginData = (id: string) => void
 export type IpcImportPluginData = IpcExportPluginData

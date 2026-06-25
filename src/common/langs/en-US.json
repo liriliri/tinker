@@ -37,5 +37,7 @@
   "updatePluginSuccess": "Plugin updated successfully",
   "updatePluginErr": "Failed to update plugin",
   "installCli": "Install Command Line",
-  "installCliSuccess": "Command line installed successfully"
+  "installCliSuccess": "Command line installed successfully",
+  "createShortcut": "Create Shortcut",
+  "createShortcutSuccess": "Shortcut created at {{path}}"
 }

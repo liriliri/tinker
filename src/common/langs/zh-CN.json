@@ -37,5 +37,7 @@
   "updatePluginSuccess": "插件更新成功",
   "updatePluginErr": "插件更新失败",
   "installCli": "安装命令行",
-  "installCliSuccess": "命令行安装成功"
+  "installCliSuccess": "命令行安装成功",
+  "createShortcut": "创建快捷方式",
+  "createShortcutSuccess": "快捷方式已创建：{{path}}"
 }

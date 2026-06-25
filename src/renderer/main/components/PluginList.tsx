@@ -8,6 +8,7 @@ import fileUrl from 'licia/fileUrl'
 import Style from './PluginList.module.scss'
 import { borderRadius } from 'common/theme'
 import contextMenu from 'share/renderer/lib/contextMenu'
+import { notify } from 'share/renderer/lib/util'
 import LunaModal from 'luna-modal'
 import { t } from 'common/util'
 import concat from 'licia/concat'
@@ -105,6 +106,16 @@ export default observer(function PluginList() {
           },
         })
       }
+      template.push({
+        label: t('createShortcut'),
+        click() {
+          main.createPluginShortcut(plugin.id).then((path) => {
+            if (path) {
+              notify(t('createShortcutSuccess', { path }), { icon: 'success' })
+            }
+          })
+        },
+      })
       template.push({ type: 'separator' })
       if (store.isPluginPinned(plugin.id)) {
         template.push({

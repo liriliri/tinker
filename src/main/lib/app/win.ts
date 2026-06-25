@@ -1,4 +1,4 @@
-import { IApp, IpcGetApps } from 'common/types'
+import { IApp, IpcCreatePluginShortcut, IpcGetApps } from 'common/types'
 import trim from 'licia/trim'
 import memoize from 'licia/memoize'
 import fs from 'fs-extra'
@@ -355,3 +355,6 @@ function dedupeApps(list: IApp[]) {
   )
   return deduped
 }
+
+export const createPluginShortcut: IpcCreatePluginShortcut =
+  async function () {}

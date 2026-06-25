@@ -1,4 +1,4 @@
-import { IApp, IpcGetApps } from 'common/types'
+import { IApp, IpcCreatePluginShortcut, IpcGetApps } from 'common/types'
 import path from 'path'
 import fs from 'fs-extra'
 import log from 'share/common/log'
@@ -298,3 +298,6 @@ async function checkIconExists(
 
   return ''
 }
+
+export const createPluginShortcut: IpcCreatePluginShortcut =
+  async function () {}
