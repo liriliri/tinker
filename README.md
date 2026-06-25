@@ -295,6 +295,22 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/text_search.png"/></th>
       <th><img src="https://tinker.liriliri.io/git.png"/></th>
     </tr>
+    <tr>
+      <th>File Explorer</th>
+      <th>Photo Viewer</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/file_explorer.png"/></th>
+      <th><img src="https://tinker.liriliri.io/photo_viewer.png"/></th>
+    </tr>
+    <tr>
+      <th>File Shredder</th>
+      <th>Photo Develop</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/file_shredder.png"/></th>
+      <th><img src="https://tinker.liriliri.io/photo_develop.png"/></th>
+    </tr>
   </tbody>
 </table>
 
