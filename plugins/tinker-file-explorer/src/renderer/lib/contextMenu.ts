@@ -148,7 +148,7 @@ export function showEntryContextMenu(
     { type: 'separator' },
     {
       label: t('delete'),
-      click: () => handlers.onTrash(paths),
+      click: () => handlers.onTrash([...paths]),
     },
   ])
 }
