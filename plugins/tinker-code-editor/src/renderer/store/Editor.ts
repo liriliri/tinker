@@ -159,17 +159,20 @@ class Editor {
     const ext = getFileExt(filePath)
     const isImage = IMAGE_EXTS.has(ext)
     const isVideo = VIDEO_EXTS.has(ext)
-    const isBinary = !isImage && !isVideo && BINARY_EXTS.has(ext)
+    const isPdf = ext === 'pdf'
+    const isBinary = !isImage && !isVideo && !isPdf && BINARY_EXTS.has(ext)
 
     try {
       const content =
-        isImage || isVideo
+        isImage || isVideo || isPdf
           ? filePath
           : ((await tinker.readFile(filePath, 'utf-8')) as string)
       const category = isImage
         ? 'image'
         : isVideo
         ? 'video'
+        : isPdf
+        ? 'pdf'
         : isBinary
         ? 'binary'
         : 'text'
@@ -189,7 +192,8 @@ class Editor {
       !tab ||
       tab.isDirty ||
       tab.category === 'image' ||
-      tab.category === 'video'
+      tab.category === 'video' ||
+      tab.category === 'pdf'
     )
       return
 
@@ -228,6 +232,7 @@ class Editor {
       !tab ||
       tab.category === 'image' ||
       tab.category === 'video' ||
+      tab.category === 'pdf' ||
       tab.category === 'gitDiff' ||
       tab.category === 'binary'
     )

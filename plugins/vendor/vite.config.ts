@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import { defineConfig, UserConfig, type Plugin } from 'vite'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -62,6 +63,7 @@ const globals: Record<string, string> = {
   '@xterm/addon-fit': 'xtermAddonFit',
   codemirror: 'CodeMirror',
   'overlayscrollbars-react': 'overlayscrollbarsReact',
+  'pdfjs-dist': 'pdfjsLib',
 }
 
 export const shareExternal = ['systeminformation']
@@ -79,6 +81,7 @@ const globalsExports: Record<string, string[]> = {
   '@xterm/xterm': ['Terminal'],
   '@xterm/addon-fit': ['FitAddon'],
   codemirror: [],
+  'pdfjs-dist': [],
   'overlayscrollbars-react': [
     'OverlayScrollbarsComponent',
     'useOverlayScrollbars',
@@ -87,6 +90,39 @@ const globalsExports: Record<string, string[]> = {
 
 function moduleKeys(id: string) {
   return keys(require(id)).filter((key) => key !== 'default')
+}
+
+interface BundledAsset {
+  /** npm package subpath passed to require.resolve */
+  resolve: string
+  /** output filename under outDir */
+  fileName: string
+}
+
+interface CreateConfigOptions {
+  external?: string[]
+  outDir?: string
+  entry?: string
+  bundledAssets?: BundledAsset[]
+}
+
+function copyBundledAssetsPlugin(
+  assets: BundledAsset[],
+  outDir: string
+): Plugin {
+  return {
+    name: 'vendor-copy-bundled-assets',
+    closeBundle() {
+      const destDir = path.resolve(__dirname, outDir)
+      fs.mkdirSync(destDir, { recursive: true })
+      for (const { resolve: modulePath, fileName } of assets) {
+        fs.copyFileSync(
+          require.resolve(modulePath),
+          path.join(destDir, fileName)
+        )
+      }
+    },
+  }
 }
 
 export function globalsExternalPlugin(): Plugin {
@@ -155,10 +191,9 @@ export function globalsExternalPlugin(): Plugin {
 function createConfig(
   name: string,
   globalsName: string,
-  external: string[] = [],
-  outDir = 'dist',
-  entry?: string
+  options: CreateConfigOptions = {}
 ): UserConfig {
+  const { external = [], outDir = 'dist', entry, bundledAssets = [] } = options
   const _globals: Record<string, string> = {}
   for (const ext of external) {
     if (globals[ext]) {
@@ -168,6 +203,10 @@ function createConfig(
 
   return {
     root: __dirname,
+    plugins:
+      bundledAssets.length > 0
+        ? [copyBundledAssetsPlugin(bundledAssets, outDir)]
+        : [],
     define: {
       'process.env.NODE_ENV': JSON.stringify('production'),
     },
@@ -210,12 +249,14 @@ export default defineConfig(({ mode }) => {
   const target = process.env.VENDOR_TARGET || mode || 'react'
 
   if (target === 'mobx') {
-    return createConfig('mobx', 'PluginVendorMobx', [
-      'react',
-      'react-dom',
-      'use-sync-external-store/shim',
-      'react/jsx-runtime',
-    ])
+    return createConfig('mobx', 'PluginVendorMobx', {
+      external: [
+        'react',
+        'react-dom',
+        'use-sync-external-store/shim',
+        'react/jsx-runtime',
+      ],
+    })
   }
 
   if (target === 'mathjs') {
@@ -227,27 +268,34 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'monaco') {
-    return createConfig(
-      'monaco',
-      'PluginVendorMonaco',
-      ['react'],
-      'dist/monaco'
-    )
+    return createConfig('monaco', 'PluginVendorMonaco', {
+      external: ['react'],
+      outDir: 'dist/monaco',
+    })
+  }
+
+  if (target === 'pdfjs') {
+    return createConfig('pdfjs', 'PluginVendorPdfjs', {
+      outDir: 'dist/pdfjs',
+      bundledAssets: [
+        {
+          resolve: 'pdfjs-dist/build/pdf.worker.min.mjs',
+          fileName: 'pdf.worker.min.mjs',
+        },
+      ],
+    })
   }
 
   if (target === 'aggrid') {
-    return createConfig('aggrid', 'PluginVendorAgGrid', [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-    ])
+    return createConfig('aggrid', 'PluginVendorAgGrid', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'lucide') {
-    return createConfig('lucide', 'PluginVendorLucide', [
-      'react',
-      'react/jsx-runtime',
-    ])
+    return createConfig('lucide', 'PluginVendorLucide', {
+      external: ['react', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'licia') {
@@ -259,10 +307,9 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'hexeditor') {
-    return createConfig('hexeditor', 'PluginVendorHexEditor', [
-      'react',
-      'react/jsx-runtime',
-    ])
+    return createConfig('hexeditor', 'PluginVendorHexEditor', {
+      external: ['react', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'wavesurfer') {
@@ -274,57 +321,46 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'resizablepanels') {
-    return createConfig('resizablepanels', 'PluginVendorResizablePanels', [
-      'react',
-      'react/jsx-runtime',
-    ])
+    return createConfig('resizablepanels', 'PluginVendorResizablePanels', {
+      external: ['react', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'syntaxhighlighter') {
-    return createConfig('syntaxhighlighter', 'PluginVendorSyntaxHighlighter', [
-      'react',
-      'react/jsx-runtime',
-    ])
+    return createConfig('syntaxhighlighter', 'PluginVendorSyntaxHighlighter', {
+      external: ['react', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'markdown') {
-    return createConfig('markdown', 'PluginVendorMarkdown', [
-      'react',
-      'react/jsx-runtime',
-    ])
+    return createConfig('markdown', 'PluginVendorMarkdown', {
+      external: ['react', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'headlessui') {
-    return createConfig('headlessui', 'PluginVendorHeadlessui', [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-    ])
+    return createConfig('headlessui', 'PluginVendorHeadlessui', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'hottoast') {
-    return createConfig('hottoast', 'PluginVendorHottoast', [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-    ])
+    return createConfig('hottoast', 'PluginVendorHottoast', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'tiptap') {
-    return createConfig('tiptap', 'PluginVendorTiptap', [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-    ])
+    return createConfig('tiptap', 'PluginVendorTiptap', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+    })
   }
 
   if (target === 'videojs') {
-    return createConfig(
-      'videojs',
-      'PluginVendorVideojs',
-      ['react', 'react-dom', 'react/jsx-runtime'],
-      'dist/videojs'
-    )
+    return createConfig('videojs', 'PluginVendorVideojs', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      outDir: 'dist/videojs',
+    })
   }
 
   if (target === 'cryptojs') {
@@ -336,45 +372,40 @@ export default defineConfig(({ mode }) => {
   }
 
   if (target === 'i18next') {
-    return createConfig('i18next', 'PluginVendorI18next', [
-      'react',
-      'use-sync-external-store/shim',
-      'use-sync-external-store/shim/with-selector',
-      'use-sync-external-store/with-selector',
-      'react/jsx-runtime',
-    ])
+    return createConfig('i18next', 'PluginVendorI18next', {
+      external: [
+        'react',
+        'use-sync-external-store/shim',
+        'use-sync-external-store/shim/with-selector',
+        'use-sync-external-store/with-selector',
+        'react/jsx-runtime',
+      ],
+    })
   }
 
   if (target === 'xterm') {
-    return createConfig('xterm', 'PluginVendorXterm', [], 'dist/xterm')
+    return createConfig('xterm', 'PluginVendorXterm', { outDir: 'dist/xterm' })
   }
 
   if (target === 'codemirror') {
-    return createConfig(
-      'codemirror',
-      'PluginVendorCodeMirror',
-      [],
-      'dist/codemirror'
-    )
+    return createConfig('codemirror', 'PluginVendorCodeMirror', {
+      outDir: 'dist/codemirror',
+    })
   }
 
   if (target === 'overlayscrollbars') {
-    return createConfig(
-      'overlayscrollbars',
-      'PluginVendorOverlayscrollbars',
-      ['react', 'react-dom', 'react/jsx-runtime'],
-      'dist/overlayscrollbars'
-    )
+    return createConfig('overlayscrollbars', 'PluginVendorOverlayscrollbars', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      outDir: 'dist/overlayscrollbars',
+    })
   }
 
   if (target === 'share:fileicon') {
-    return createConfig(
-      'fileicon',
-      'PluginVendorFileIcon',
-      ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'],
-      'dist/share',
-      'share/fileicon.ts'
-    )
+    return createConfig('fileicon', 'PluginVendorFileIcon', {
+      external: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'],
+      outDir: 'dist/share',
+      entry: 'share/fileicon.ts',
+    })
   }
 
   return createConfig('react', 'PluginVendorReact')

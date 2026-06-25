@@ -105,6 +105,7 @@ const App = observer(function App() {
   const activeTab = store.tabs.find((t) => t.id === store.activeTabId)
   const isActiveImageTab = activeTab?.category === 'image'
   const isActiveVideoTab = activeTab?.category === 'video'
+  const isActivePdfTab = activeTab?.category === 'pdf'
   const isActiveBinaryTab = activeTab?.category === 'binary'
   const isActiveGitDiffTab = activeTab?.category === 'gitDiff'
   const isActiveMarkdownTab =
@@ -177,6 +178,11 @@ const App = observer(function App() {
                                     size={14}
                                     className={tw.text.tertiary}
                                   />
+                                ) : tab.category === 'pdf' ? (
+                                  <FileText
+                                    size={14}
+                                    className={tw.text.tertiary}
+                                  />
                                 ) : tab.category === 'binary' ? (
                                   <FileText
                                     size={14}
@@ -198,6 +204,7 @@ const App = observer(function App() {
                           </div>
                           {!isActiveImageTab &&
                             !isActiveVideoTab &&
+                            !isActivePdfTab &&
                             !isActiveBinaryTab &&
                             !isActiveGitDiffTab &&
                             isActiveMarkdownTab && (
@@ -219,6 +226,7 @@ const App = observer(function App() {
                             )}
                           {!isActiveImageTab &&
                             !isActiveVideoTab &&
+                            !isActivePdfTab &&
                             !isActiveBinaryTab &&
                             !isActiveGitDiffTab &&
                             isAtGitRoot && (

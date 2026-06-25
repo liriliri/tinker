@@ -6,7 +6,13 @@ import type {
   GitWorkingTreeFileDiffContent,
 } from 'share/types/git'
 
-export type TabCategory = 'text' | 'image' | 'video' | 'gitDiff' | 'binary'
+export type TabCategory =
+  | 'text'
+  | 'image'
+  | 'video'
+  | 'pdf'
+  | 'gitDiff'
+  | 'binary'
 
 interface BlameAnnotationSource {
   lineNumber: number

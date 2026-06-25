@@ -10,6 +10,7 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `resizablepanels.js` | `react-resizable-panels` |
 | `aggrid.js` | `ag-grid-community`, `ag-grid-react` |
 | `monaco/monaco.js` | `@monaco-editor/react` |
+| `pdfjs/pdfjs.js` | `pdfjs-dist` |
 | `syntaxhighlighter.js` | `react-syntax-highlighter`, `react-syntax-highlighter/dist/esm/styles/prism` |
 | `markdown.js` | `react-markdown`, `remark-gfm`, `remark-breaks`, `rehype-raw` |
 | `mathjs.js` | `mathjs` |

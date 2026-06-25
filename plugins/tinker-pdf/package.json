@@ -17,8 +17,5 @@
         "description": "基于 PDF.js 的 PDF 查看器"
       }
     }
-  },
-  "devDependencies": {
-    "pdfjs-dist": "5.4.530"
   }
 }

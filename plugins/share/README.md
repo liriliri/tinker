@@ -297,6 +297,7 @@ import FolderOpen from 'share/components/FolderOpen'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageViewer from 'share/components/ImageViewer'
 import MarkdownPreview from 'share/components/MarkdownPreview' // requires markdown + syntaxhighlighter vendor
+import PdfViewer from 'share/components/PdfViewer' // requires pdfjs vendor
 import PhotoViewer from 'share/components/PhotoViewer'
 import FilePreview from 'share/components/FilePreview'
 import Tooltip from 'share/components/Tooltip'

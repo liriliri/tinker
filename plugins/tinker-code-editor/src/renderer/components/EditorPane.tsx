@@ -20,6 +20,7 @@ import { getMonacoApi, initMonacoApi } from 'share/lib/monaco'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
 import { formatRelativeDate, formatTimeAgo } from 'share/lib/util'
 import ImageViewer from 'share/components/ImageViewer'
+import PdfViewer from 'share/components/PdfViewer'
 import MarkdownPreview from 'share/components/MarkdownPreview'
 import GitDiffPane from './GitDiffPane'
 
@@ -131,6 +132,14 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
             </VideoPlayer>
           </Container>
         </Provider>
+      </div>
+    )
+  }
+
+  if (tab.category === 'pdf') {
+    return (
+      <div className="w-full h-full">
+        <PdfViewer filePath={tab.filePath} />
       </div>
     )
   }

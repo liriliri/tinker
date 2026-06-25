@@ -1,13 +1,14 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:share:fileicon",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:share:fileicon",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --mode react",
     "build:mobx": "vite build --mode mobx",
     "build:mathjs": "vite build --mode mathjs",
     "build:idb": "vite build --mode idb",
     "build:monaco": "vite build --mode monaco",
+    "build:pdfjs": "vite build --mode pdfjs",
     "build:aggrid": "vite build --mode aggrid",
     "build:lucide": "vite build --mode lucide",
     "build:licia": "vite build --mode licia",
@@ -61,6 +62,7 @@
     "monaco-editor": "^0.55.1",
     "overlayscrollbars": "^2.10.0",
     "overlayscrollbars-react": "^0.5.6",
+    "pdfjs-dist": "^5.4.530",
     "prettier": "^3.7.4",
     "react-hex-editor": "0.3.0",
     "react-hot-toast": "^2.6.0",
