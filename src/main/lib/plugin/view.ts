@@ -350,12 +350,12 @@ export function layoutPlugin(id: string) {
   if (win.isFullScreen()) {
     titleBarHeight = 0
   }
-  const bounds = win.contentView.getBounds()
+  const { width, height } = win.getBounds()
   view.setBounds({
-    x: bounds.x,
-    y: bounds.y + titleBarHeight,
-    width: bounds.width,
-    height: bounds.height - titleBarHeight,
+    x: 0,
+    y: titleBarHeight,
+    width,
+    height: height - titleBarHeight,
   })
 }
 
