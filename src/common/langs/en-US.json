@@ -39,5 +39,6 @@
   "installCli": "Install Command Line",
   "installCliSuccess": "Command line installed successfully",
   "createShortcut": "Create Shortcut",
-  "createShortcutSuccess": "Shortcut created at {{path}}"
+  "createShortcutSuccess": "Shortcut created at {{path}}",
+  "createShortcutErr": "Failed to create shortcut"
 }

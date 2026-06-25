@@ -109,11 +109,18 @@ export default observer(function PluginList() {
       template.push({
         label: t('createShortcut'),
         click() {
-          main.createPluginShortcut(plugin.id).then((path) => {
-            if (path) {
-              notify(t('createShortcutSuccess', { path }), { icon: 'success' })
-            }
-          })
+          main
+            .createPluginShortcut(plugin.id)
+            .then((path) => {
+              if (path) {
+                notify(t('createShortcutSuccess', { path }), {
+                  icon: 'success',
+                })
+              }
+            })
+            .catch(() => {
+              notify(t('createShortcutErr'), { icon: 'error' })
+            })
         },
       })
       template.push({ type: 'separator' })

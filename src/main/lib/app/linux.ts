@@ -14,6 +14,11 @@ import { getUserDataPath, resolveResources, sha1 } from 'share/main/lib/util'
 import memoize from 'licia/memoize'
 import contain from 'licia/contain'
 import splitPath from 'licia/splitPath'
+import { app } from 'electron'
+import { isDev } from 'share/common/util'
+import { plugins } from '../plugin/loader'
+import { sanitizeShortcutAppName } from '../util'
+import { exec } from 'child_process'
 
 const logger = log('linuxApp')
 
@@ -162,6 +167,11 @@ async function parseDesktopFile(filePath: string): Promise<IApp | null> {
       return null
     }
 
+    // Filter out Tinker plugin shortcuts (.desktop files we created)
+    if (appInfo['X-Tinker-Plugin']) {
+      return null
+    }
+
     const icon = await extractIcon(appInfo.Icon || '', filePath)
     if (!icon) {
       return null
@@ -299,5 +309,81 @@ async function checkIconExists(
   return ''
 }
 
-export const createPluginShortcut: IpcCreatePluginShortcut =
-  async function () {}
+function getLaunchTargets() {
+  return {
+    electron: process.execPath,
+    cli: isDev()
+      ? path.resolve(app.getAppPath(), 'cli.js')
+      : path.join(process.resourcesPath, 'app.asar', 'main', 'cli.js'),
+  }
+}
+
+export const createPluginShortcut: IpcCreatePluginShortcut = async function (
+  id
+) {
+  const plugin = plugins[id]
+  if (!plugin) {
+    throw new Error(`Plugin not found: ${id}`)
+  }
+
+  const { electron, cli } = getLaunchTargets()
+
+  if (!(await fs.pathExists(electron))) {
+    throw new Error(`Electron binary not found: ${electron}`)
+  }
+  if (!(await fs.pathExists(cli))) {
+    throw new Error(`CLI script not found: ${cli}`)
+  }
+
+  const appName = sanitizeShortcutAppName(plugin.name)
+
+  // ~/.local/share/applications/ is the standard location for user-installed
+  // .desktop files on Linux. It shows in the system app launcher/menu and
+  // avoids locale-dependent desktop directory names (e.g. "桌面" for zh_CN).
+  const applicationsDir = path.join(
+    os.homedir(),
+    '.local',
+    'share',
+    'applications'
+  )
+  await fs.ensureDir(applicationsDir)
+  const shortcutPath = path.join(applicationsDir, `${appName}.desktop`)
+
+  let iconPath = DEFAULT_ICON
+  if (plugin.icon && (await fs.pathExists(plugin.icon))) {
+    const iconDir = path.join(getUserDataPath('data/icons'))
+    await fs.ensureDir(iconDir)
+    const destIconPath = path.join(iconDir, `${id}.png`)
+    await fs.copyFile(plugin.icon, destIconPath)
+    iconPath = destIconPath
+  }
+
+  const execCmd = `env ELECTRON_RUN_AS_NODE=1 "${electron}" "${cli}" open "${id}"`
+
+  const desktopContent = [
+    '[Desktop Entry]',
+    'Type=Application',
+    `Name=${plugin.name}`,
+    `Exec=${execCmd}`,
+    `Icon=${iconPath}`,
+    'Terminal=false',
+    'Categories=Utility;',
+    `X-Tinker-Plugin=${id}`,
+    '',
+  ].join('\n')
+
+  if (await fs.pathExists(shortcutPath)) {
+    await fs.remove(shortcutPath)
+  }
+
+  await fs.writeFile(shortcutPath, desktopContent)
+  await fs.chmod(shortcutPath, 0o755)
+
+  try {
+    exec(`gio set "${shortcutPath}" metadata::trusted true`)
+  } catch {
+    // gio not available, user may need to manually allow launching
+  }
+
+  return shortcutPath
+}
