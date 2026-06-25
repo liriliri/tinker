@@ -62,7 +62,7 @@
     "monaco-editor": "^0.55.1",
     "overlayscrollbars": "^2.10.0",
     "overlayscrollbars-react": "^0.5.6",
-    "pdfjs-dist": "^5.4.530",
+    "pdfjs-dist": "5.4.530",
     "prettier": "^3.7.4",
     "react-hex-editor": "0.3.0",
     "react-hot-toast": "^2.6.0",
