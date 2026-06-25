@@ -1,3 +1,10 @@
+## v1.20.0 (25 Jun 2026)
+
+* feat: add photo viewer
+* feat: add photo develop
+* feat: add file shredder
+* feat: create shortcut
+
 ## v1.19.0 (19 Jun 2026)
 
 * feat: add file explorer
