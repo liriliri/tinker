@@ -19,19 +19,7 @@ export function showWin(plugin: IPlugin) {
     dock.hide()
   })
 
-  win.on('resize', () => {
-    if (win) {
-      const plugin = getAttachedPlugin(win)
-      if (plugin) {
-        layoutPlugin(plugin.id)
-      }
-    }
-  })
-
-  win.on('enter-full-screen', onToggleFullscreen)
-  win.on('leave-full-screen', onToggleFullscreen)
-
-  function onToggleFullscreen() {
+  function onLayout() {
     if (win) {
       const plugin = getAttachedPlugin(win)
       if (plugin) {
@@ -39,6 +27,10 @@ export function showWin(plugin: IPlugin) {
       }
     }
   }
+
+  win.on('resize', onLayout)
+  win.on('enter-full-screen', onLayout)
+  win.on('leave-full-screen', onLayout)
 
   dock.show()
 

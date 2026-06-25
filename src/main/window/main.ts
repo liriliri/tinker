@@ -39,14 +39,18 @@ export function showWin() {
     win = null
   })
 
-  win.on('resize', () => {
+  function onLayout() {
     if (win) {
       const plugin = getAttachedPlugin(win)
       if (plugin) {
         layoutPlugin(plugin.id)
       }
     }
-  })
+  }
+
+  win.on('resize', onLayout)
+  win.on('enter-full-screen', onLayout)
+  win.on('leave-full-screen', onLayout)
 
   win.on('blur', () => {
     if (settingsStore.get('autoHide')) {
@@ -73,20 +77,8 @@ export function showWin() {
     }
   })
 
-  win.on('enter-full-screen', onToggleFullscreen)
-  win.on('leave-full-screen', onToggleFullscreen)
-
   dock.hide()
   window.loadPage(win)
-}
-
-function onToggleFullscreen() {
-  if (win) {
-    const plugin = getAttachedPlugin(win)
-    if (plugin) {
-      layoutPlugin(plugin.id)
-    }
-  }
 }
 
 const initIpc = once(() => {
