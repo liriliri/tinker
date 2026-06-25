@@ -6,9 +6,18 @@ import path from 'path'
 import isWindows from 'licia/isWindows'
 import unique from 'licia/unique'
 import lowerCase from 'licia/lowerCase'
+import os from 'os'
+import { app, shell } from 'electron'
+import { isDev } from 'share/common/util'
 import { getUserDataPath, sha1 } from 'share/main/lib/util'
-import { loadMod } from '../util'
+import {
+  loadMod,
+  pngToIco,
+  sanitizeShortcutAppName,
+  toVbScriptStr,
+} from '../util'
 import { getFileIcon } from '../fileIcon'
+import { plugins } from '../plugin/loader'
 
 type RegistryModule = typeof import('registry-js')
 type RegistryValueEntry = import('registry-js').RegistryValue
@@ -356,5 +365,67 @@ function dedupeApps(list: IApp[]) {
   return deduped
 }
 
-export const createPluginShortcut: IpcCreatePluginShortcut =
-  async function () {}
+function getLaunchTargets() {
+  return {
+    electron: process.execPath,
+    cli: isDev()
+      ? path.resolve(app.getAppPath(), 'cli.js')
+      : path.join(process.resourcesPath, 'app.asar', 'main', 'cli.js'),
+  }
+}
+
+export const createPluginShortcut: IpcCreatePluginShortcut = async function (
+  id
+) {
+  const plugin = plugins[id]
+  if (!plugin) {
+    throw new Error(`Plugin not found: ${id}`)
+  }
+
+  const { electron, cli } = getLaunchTargets()
+
+  if (!(await fs.pathExists(electron))) {
+    throw new Error(`Electron binary not found: ${electron}`)
+  }
+  if (!(await fs.pathExists(cli))) {
+    throw new Error(`CLI script not found: ${cli}`)
+  }
+
+  const appName = sanitizeShortcutAppName(plugin.name)
+  const desktopPath = path.join(os.homedir(), 'Desktop')
+  const shortcutPath = path.join(desktopPath, `${appName}.lnk`)
+
+  let iconPath = electron
+  if (plugin.icon && (await fs.pathExists(plugin.icon))) {
+    const iconDir = path.join(getUserDataPath('data/icons'))
+    await fs.ensureDir(iconDir)
+    const destIcoPath = path.join(iconDir, `${id}.ico`)
+    await pngToIco(plugin.icon, destIcoPath)
+    iconPath = destIcoPath
+  }
+
+  const vbsDir = path.join(getUserDataPath('shortcuts'))
+  await fs.ensureDir(vbsDir)
+  const vbsPath = path.join(vbsDir, `${appName}.vbs`)
+  const cmd = `"${electron}" "${cli}" open "${id}"`
+  const vbsContent = [
+    'Set shell = CreateObject("WScript.Shell")',
+    `shell.Environment("Process")("ELECTRON_RUN_AS_NODE") = "1"`,
+    `shell.Run ${toVbScriptStr(cmd)}, 0, False`,
+  ].join('\r\n')
+  await fs.writeFile(vbsPath, vbsContent)
+
+  if (await fs.pathExists(shortcutPath)) {
+    await fs.remove(shortcutPath)
+  }
+
+  shell.writeShortcutLink(shortcutPath, 'create', {
+    target: 'wscript.exe',
+    args: `//B "${vbsPath}"`,
+    description: plugin.name,
+    icon: iconPath,
+    iconIndex: 0,
+  })
+
+  return shortcutPath
+}

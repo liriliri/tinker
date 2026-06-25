@@ -17,7 +17,7 @@ import pkg from '../../../../package.json'
 import { isDev } from 'share/common/util'
 import { getFileIcon } from '../fileIcon'
 import { plugins } from '../plugin/loader'
-
+import { sanitizeShortcutAppName } from '../util'
 const logger = log('macApp')
 
 const PLUGIN_SHORTCUT_BUNDLE_ID_PREFIX = `${pkg.appId}.plugin.`
@@ -258,10 +258,6 @@ function isPluginShortcutBundleId(bundleId: string) {
 function getPluginShortcutBundleId(pluginId: string) {
   const sanitized = pluginId.replace(/[^a-zA-Z0-9.-]/g, '-')
   return `${PLUGIN_SHORTCUT_BUNDLE_ID_PREFIX}${sanitized}`
-}
-
-function sanitizeShortcutAppName(name: string) {
-  return name.replace(/[/\\:*?"<>|]/g, '-').trim() || 'Tinker Plugin'
 }
 
 function getTinkerAppPath() {
