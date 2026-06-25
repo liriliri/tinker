@@ -297,18 +297,21 @@ exec "${electron}" "${cli}" open "${pluginId}"
 
 async function createShortcutIcns(iconPath: string, destIcnsPath: string) {
   if (endWith(iconPath, '.icns')) {
-    await fs.copy(iconPath, destIcnsPath)
+    await fs.writeFile(destIcnsPath, await fs.readFile(iconPath))
     return
   }
 
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tinker-icon-'))
   const iconsetDir = path.join(tmpDir, 'AppIcon.iconset')
+  const sourceIcon = path.join(tmpDir, 'source.png')
 
   try {
     await fs.mkdir(iconsetDir)
+    await fs.writeFile(sourceIcon, await fs.readFile(iconPath))
+
     for (const [size, filename] of SHORTCUT_ICON_SIZES) {
       const output = path.join(iconsetDir, filename)
-      await exec(`sips -z ${size} ${size} "${iconPath}" --out "${output}"`)
+      await exec(`sips -z ${size} ${size} "${sourceIcon}" --out "${output}"`)
     }
     await exec(`iconutil -c icns "${iconsetDir}" -o "${destIcnsPath}"`)
   } finally {
