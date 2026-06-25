@@ -1,5 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import { PHOTO_FILTERS } from '../lib/filters'
@@ -11,6 +17,7 @@ const FilterBar = observer(function FilterBar() {
   const { t } = useTranslation()
   const [scrollRoot, setScrollRoot] = useState<HTMLDivElement | null>(null)
   const [previews, setPreviews] = useState<Record<string, string>>({})
+  const [overflow, setOverflow] = useState(false)
   const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const previewKeyRef = useRef('')
 
@@ -66,6 +73,20 @@ const FilterBar = observer(function FilterBar() {
     return () => el.removeEventListener('wheel', onWheel)
   }, [scrollRoot])
 
+  useLayoutEffect(() => {
+    const el = scrollRoot
+    if (!el) return
+
+    const check = () => {
+      setOverflow(el.scrollWidth > el.clientWidth)
+    }
+
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    check()
+    return () => ro.disconnect()
+  }, [scrollRoot, previews])
+
   useEffect(() => {
     const activeId = store.activeFilterId ?? 'original'
     itemRefs.current[activeId]?.scrollIntoView({
@@ -91,7 +112,9 @@ const FilterBar = observer(function FilterBar() {
     >
       <div
         ref={setScrollRoot}
-        className="scrollbar-hide flex gap-2 overflow-x-auto px-3 py-2 justify-center"
+        className={`scrollbar-hide flex gap-2 overflow-x-auto px-3 py-2 ${
+          overflow ? '' : 'justify-center'
+        }`}
       >
         {PHOTO_FILTERS.map((filter) => {
           const isActive =
