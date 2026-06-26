@@ -4,6 +4,7 @@ import { Monitor, HardDrive, Volume2, Wifi } from 'lucide-react'
 import { AlertProvider } from 'share/components/Alert'
 import { ToasterProvider } from 'share/components/Toaster'
 import { LoadingCircle } from 'share/components/Loading'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
 import fileSize from 'licia/fileSize'
 import filter from 'licia/filter'
@@ -44,8 +45,8 @@ const App = observer(function App() {
   return (
     <ToasterProvider>
       <AlertProvider>
-        <div
-          className={`h-screen overflow-y-auto ${tw.bg.secondary} transition-colors`}
+        <OverlayScrollbars
+          className={`h-screen ${tw.bg.secondary} transition-colors`}
         >
           <div className="max-w-4xl mx-auto px-4 py-6">
             <InfoSection>
@@ -207,7 +208,7 @@ const App = observer(function App() {
               </InfoSection>
             )}
           </div>
-        </div>
+        </OverlayScrollbars>
       </AlertProvider>
     </ToasterProvider>
   )
