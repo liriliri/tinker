@@ -28,6 +28,7 @@ import filter from 'licia/filter'
 import find from 'licia/find'
 import findIdx from 'licia/findIdx'
 import findKey from 'licia/findKey'
+import flatten from 'licia/flatten'
 import fullscreen from 'licia/fullscreen'
 import has from 'licia/has'
 import isArr from 'licia/isArr'
@@ -37,6 +38,7 @@ import isEmpty from 'licia/isEmpty'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
 import isMac from 'licia/isMac'
+import isNil from 'licia/isNil'
 import isObj from 'licia/isObj'
 import isStr from 'licia/isStr'
 import isStrBlank from 'licia/isStrBlank'
@@ -58,6 +60,7 @@ import max from 'licia/max'
 import md5 from 'licia/md5'
 import mime from 'licia/mime'
 import min from 'licia/min'
+import ms from 'licia/ms'
 import naturalSort from 'licia/naturalSort'
 import normalizePath from 'licia/normalizePath'
 import once from 'licia/once'
@@ -67,6 +70,7 @@ import precision from 'licia/precision'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
 import randomItem from 'licia/randomItem'
+import range from 'licia/range'
 import remove from 'licia/remove'
 import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
@@ -77,6 +81,7 @@ import splitPath from 'licia/splitPath'
 import startWith from 'licia/startWith'
 import stripHtmlTag from 'licia/stripHtmlTag'
 import sum from 'licia/sum'
+import toInt from 'licia/toInt'
 import toNum from 'licia/toNum'
 import toStr from 'licia/toStr'
 import trim from 'licia/trim'
@@ -119,6 +124,7 @@ const licia = {
   find,
   findIdx,
   findKey,
+  flatten,
   fullscreen,
   has,
   isArr,
@@ -128,6 +134,7 @@ const licia = {
   isEqual,
   isErr,
   isMac,
+  isNil,
   isObj,
   isStr,
   isStrBlank,
@@ -149,6 +156,7 @@ const licia = {
   md5,
   mime,
   min,
+  ms,
   naturalSort,
   normalizePath,
   once,
@@ -158,6 +166,7 @@ const licia = {
   query,
   randomBytes,
   randomItem,
+  range,
   remove,
   rtrim,
   shuffle,
@@ -168,6 +177,7 @@ const licia = {
   startWith,
   stripHtmlTag,
   sum,
+  toInt,
   toNum,
   toStr,
   trim,
@@ -214,6 +224,7 @@ export {
   find,
   findIdx,
   findKey,
+  flatten,
   fullscreen,
   has,
   isArr,
@@ -223,6 +234,7 @@ export {
   isEqual,
   isErr,
   isMac,
+  isNil,
   isObj,
   isStr,
   isStrBlank,
@@ -244,6 +256,7 @@ export {
   md5,
   mime,
   min,
+  ms,
   naturalSort,
   normalizePath,
   once,
@@ -253,6 +266,7 @@ export {
   query,
   randomBytes,
   randomItem,
+  range,
   remove,
   rtrim,
   shuffle,
@@ -263,6 +277,7 @@ export {
   startWith,
   stripHtmlTag,
   sum,
+  toInt,
   toNum,
   toStr,
   trim,
