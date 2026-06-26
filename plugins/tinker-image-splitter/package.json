@@ -1,0 +1,22 @@
+{
+  "name": "tinker-image-splitter",
+  "version": "0.1.0",
+  "description": "Image Splitter Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Image Splitter",
+    "description": "Split images into multiple pieces with grid layouts",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "图片分割",
+        "description": "图片分割，支持多种网格切分"
+      }
+    }
+  },
+  "devDependencies": {}
+}

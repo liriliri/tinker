@@ -1,0 +1,18 @@
+{
+  "openImage": "打开图片",
+  "saveSplitImages": "保存分割图片",
+  "openTitle": "拖放图片到此处或点击打开",
+  "supportedFormats": "支持 PNG、JPG、WebP、GIF、BMP",
+  "rows": "行数",
+  "cols": "列数",
+  "previewImageAlt": "分割预览",
+  "preset2x1": "2 列",
+  "preset1x2": "2 行",
+  "preset2x2": "2 × 2",
+  "preset3x3": "九宫格",
+  "preset3x1": "3 列",
+  "preset1x3": "3 行",
+  "preset2x3": "2 × 3",
+  "preset3x2": "3 × 2",
+  "preset4x4": "4 × 4"
+}

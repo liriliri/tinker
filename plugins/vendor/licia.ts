@@ -5,6 +5,7 @@ import capitalize from 'licia/capitalize'
 import chunk from 'licia/chunk'
 import clamp from 'licia/clamp'
 import className from 'licia/className'
+import clone from 'licia/clone'
 import compact from 'licia/compact'
 import contain from 'licia/contain'
 import convertBin from 'licia/convertBin'
@@ -24,6 +25,7 @@ import evalCss from 'licia/evalCss'
 import easing from 'licia/easing'
 import fileSize from 'licia/fileSize'
 import fileUrl from 'licia/fileUrl'
+import fill from 'licia/fill'
 import filter from 'licia/filter'
 import find from 'licia/find'
 import findIdx from 'licia/findIdx'
@@ -101,6 +103,7 @@ const licia = {
   chunk,
   clamp,
   className,
+  clone,
   compact,
   contain,
   convertBin,
@@ -120,6 +123,7 @@ const licia = {
   easing,
   fileSize,
   fileUrl,
+  fill,
   filter,
   find,
   findIdx,
@@ -201,6 +205,7 @@ export {
   chunk,
   clamp,
   className,
+  clone,
   compact,
   contain,
   convertBin,
@@ -220,6 +225,7 @@ export {
   easing,
   fileSize,
   fileUrl,
+  fill,
   filter,
   find,
   findIdx,
