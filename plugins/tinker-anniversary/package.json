@@ -1,0 +1,21 @@
+{
+  "name": "tinker-anniversary",
+  "version": "0.1.0",
+  "description": "Anniversary Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Anniversary",
+    "description": "Track annual anniversaries with calendar view and countdown",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "纪念日",
+        "description": "记录每年纪念日，日历展示并显示倒数天数"
+      }
+    }
+  }
+}

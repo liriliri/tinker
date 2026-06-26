@@ -13,7 +13,7 @@ import {
   getTimePart,
   normalizeDateKey,
 } from './lib/date'
-import { getHolidaysForYearRange } from './lib/holidays'
+import { getHolidaysForYearRange } from 'share/lib/holidays'
 import * as db from './lib/db'
 import i18n from 'i18next'
 

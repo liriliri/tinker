@@ -27,14 +27,5 @@
   "startTime": "Start",
   "endTime": "End",
   "cancel": "Cancel",
-  "save": "Save",
-  "newYear": "New Year's Day",
-  "valentines": "Valentine's Day",
-  "laborDay": "Labor Day",
-  "mothersDay": "Mother's Day",
-  "fathersDay": "Father's Day",
-  "thanksgiving": "Thanksgiving",
-  "qingmingFestival": "Qingming Festival",
-  "christmasEve": "Christmas Eve",
-  "christmas": "Christmas"
+  "save": "Save"
 }

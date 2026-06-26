@@ -16,6 +16,7 @@ import type {
   DayCellContentArg,
 } from '@fullcalendar/core'
 import { useTranslation } from 'react-i18next'
+import { HOLIDAYS_NS } from 'share/lib/holidays'
 import EventDialog, { type EventFormData } from './EventDialog'
 import store from '../store'
 import { getDatePart, getTimePart, normalizeDateKey } from '../lib/date'
@@ -157,7 +158,9 @@ const CalendarView = observer(
     const handleEventContent = (arg: EventContentArg) => {
       if (arg.event.classNames.includes('holiday-event')) {
         return {
-          html: `<div class="fc-event-title">${t(arg.event.title)}</div>`,
+          html: `<div class="fc-event-title">${t(arg.event.title, {
+            ns: HOLIDAYS_NS,
+          })}</div>`,
         }
       }
       return true

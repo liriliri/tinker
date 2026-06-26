@@ -390,6 +390,22 @@ openPopupWindow(
 
 Options: `width`, `height`, `minWidth?`, `minHeight?`, `alwaysOnTop?`, `resizable?`, `webviewTag?`.
 
+### Holidays
+
+Built-in international and Chinese holidays for calendar-style plugins. Requires `calendar.js` vendor (`js-calendar-converter`). Translations register automatically in the `holidays` i18n namespace when this module is imported.
+
+```ts
+import {
+  getHolidaysForYearRange,
+  getHolidayTemplates,
+  getHolidayDateForYear,
+  HOLIDAYS_NS,
+} from 'share/lib/holidays'
+
+const holidays = getHolidaysForYearRange(2026, 2027, 'zh-CN')
+const label = t(holiday.nameKey, { ns: HOLIDAYS_NS })
+```
+
 ## Git Preload (`share/preload/git.ts`)
 
 Exposed via preload `contextBridge` as `git`:

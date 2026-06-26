@@ -1,0 +1,95 @@
+@use '../../share/base.scss';
+@use '../../share/styles/overlayscrollbars.scss';
+@config "../tailwind.config.js";
+
+:root {
+  --fc-border-color: #e0e0e0;
+  --fc-today-bg-color: rgba(15, 194, 94, 0.1);
+  --fc-selected-bg-color: rgba(59, 130, 246, 0.15);
+  --fc-event-bg-color: #0fc25e;
+  --fc-event-border-color: #0fc25e;
+  --fc-event-text-color: #ffffff;
+  --fc-holiday-bg-color: #fb923c;
+  --fc-holiday-border-color: #fb923c;
+  --fc-now-indicator-color: #0fc25e;
+}
+
+.dark {
+  --fc-border-color: #404040;
+  --fc-page-bg-color: #1e1e1e;
+  --fc-today-bg-color: rgba(15, 194, 94, 0.15);
+  --fc-selected-bg-color: rgba(59, 130, 246, 0.2);
+
+  .fc {
+    color: #e0e0e0;
+  }
+
+  .fc-daygrid-day-number,
+  .fc-timegrid-slot-label,
+  .fc-col-header-cell-cushion {
+    color: #e0e0e0;
+  }
+
+  .fc-timegrid-now-indicator-line {
+    border-color: #0fc25e;
+  }
+
+  .fc-lunar-date {
+    color: #666;
+  }
+
+  .fc-popover {
+    background-color: #1e1e1e !important;
+    border-color: #404040;
+  }
+}
+
+.fc-day-selected {
+  background-color: var(--fc-selected-bg-color) !important;
+}
+
+.fc-timeGridDay-view .fc-day-selected {
+  background-color: transparent !important;
+}
+
+.fc-popover {
+  background-color: #ffffff !important;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  .fc-day-selected {
+    background-color: transparent !important;
+  }
+}
+
+.fc-daygrid-day-number {
+  width: 100%;
+  text-align: right;
+}
+
+.fc-event.holiday-event {
+  background-color: var(--fc-holiday-bg-color) !important;
+  border-color: var(--fc-holiday-border-color) !important;
+}
+
+.tinker-day-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  padding: 2px 4px;
+}
+
+.tinker-day-number {
+  line-height: 1;
+  flex: 1;
+  text-align: right;
+}
+
+.tinker-lunar-date {
+  font-size: 10px;
+  color: #999;
+  line-height: 1;
+  text-align: left;
+}

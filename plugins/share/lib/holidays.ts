@@ -1,54 +1,109 @@
 import calendar from 'js-calendar-converter'
 import dateFormat from 'licia/dateFormat'
 import filter from 'licia/filter'
+import { addI18nNamespace } from './i18n'
+
+export const HOLIDAYS_NS = 'holidays'
+
+addI18nNamespace(HOLIDAYS_NS, {
+  'en-US': {
+    newYear: "New Year's Day",
+    valentines: "Valentine's Day",
+    laborDay: 'Labor Day',
+    mothersDay: "Mother's Day",
+    fathersDay: "Father's Day",
+    thanksgiving: 'Thanksgiving',
+    christmasEve: 'Christmas Eve',
+    christmas: 'Christmas',
+    womensDay: "International Women's Day",
+    arborDay: 'Arbor Day',
+    qingmingFestival: 'Qingming Festival',
+    childrensDay: "Children's Day",
+    partyFoundingDay: 'CPC Founding Day',
+    armyDay: 'Army Day',
+    nationalDay: 'National Day',
+    springFestival: 'Spring Festival',
+    lanternFestival: 'Lantern Festival',
+    dragonBoatFestival: 'Dragon Boat Festival',
+    qixiFestival: 'Qixi Festival',
+    midAutumnFestival: 'Mid-Autumn Festival',
+    doubleNinthFestival: 'Double Ninth Festival',
+  },
+  'zh-CN': {
+    newYear: '元旦',
+    valentines: '情人节',
+    laborDay: '劳动节',
+    mothersDay: '母亲节',
+    fathersDay: '父亲节',
+    thanksgiving: '感恩节',
+    christmasEve: '平安夜',
+    christmas: '圣诞节',
+    womensDay: '妇女节',
+    arborDay: '植树节',
+    qingmingFestival: '清明节',
+    childrensDay: '儿童节',
+    partyFoundingDay: '建党节',
+    armyDay: '建军节',
+    nationalDay: '国庆节',
+    springFestival: '春节',
+    lanternFestival: '元宵节',
+    dragonBoatFestival: '端午节',
+    qixiFestival: '七夕节',
+    midAutumnFestival: '中秋节',
+    doubleNinthFestival: '重阳节',
+  },
+})
 
 export type Holiday = {
   id: string
-  nameKey: string // i18n translation key
-  month: number // 1-12
-  day?: number // For fixed date holidays
-  weekOfMonth?: number // For floating holidays (1-5)
-  dayOfWeek?: number // 0=Sunday, 1=Monday, etc.
-  locale?: string // Specific locale (e.g., 'zh-CN')
-  isLunar?: boolean // Whether it's a lunar calendar date
-  lunarMonth?: number // Lunar month (1-12)
-  lunarDay?: number // Lunar day (1-30)
+  nameKey: string
+  month: number
+  day?: number
+  weekOfMonth?: number
+  dayOfWeek?: number
+  locale?: string
+  isLunar?: boolean
+  lunarMonth?: number
+  lunarDay?: number
 }
 
-// Common international holidays
+export type HolidayTemplate = Holiday
+
+export type HolidayInstance = {
+  date: string
+  nameKey: string
+  id: string
+}
+
 export const HOLIDAYS: Holiday[] = [
-  // Fixed date holidays
   { id: 'new-year', nameKey: 'newYear', month: 1, day: 1 },
   { id: 'valentines', nameKey: 'valentines', month: 2, day: 14 },
   { id: 'labor-day', nameKey: 'laborDay', month: 5, day: 1 },
   { id: 'christmas-eve', nameKey: 'christmasEve', month: 12, day: 24 },
   { id: 'christmas', nameKey: 'christmas', month: 12, day: 25 },
-
-  // Floating holidays
   {
     id: 'mothers-day',
     nameKey: 'mothersDay',
     month: 5,
     weekOfMonth: 2,
     dayOfWeek: 0,
-  }, // 2nd Sunday of May
+  },
   {
     id: 'fathers-day',
     nameKey: 'fathersDay',
     month: 6,
     weekOfMonth: 3,
     dayOfWeek: 0,
-  }, // 3rd Sunday of June
+  },
   {
     id: 'thanksgiving',
     nameKey: 'thanksgiving',
     month: 11,
     weekOfMonth: 4,
     dayOfWeek: 4,
-  }, // 4th Thursday of November
+  },
 ]
 
-// Chinese holidays (solar calendar dates)
 export const CHINESE_SOLAR_HOLIDAYS: Holiday[] = [
   { id: 'womens-day', nameKey: 'womensDay', month: 3, day: 8, locale: 'zh-CN' },
   {
@@ -88,7 +143,6 @@ export const CHINESE_SOLAR_HOLIDAYS: Holiday[] = [
   },
 ]
 
-// Chinese holidays (lunar calendar dates)
 export const CHINESE_LUNAR_HOLIDAYS: Holiday[] = [
   {
     id: 'spring-festival',
@@ -146,9 +200,13 @@ export const CHINESE_LUNAR_HOLIDAYS: Holiday[] = [
   },
 ]
 
-/**
- * Convert lunar date to solar date
- */
+const QINGMING_HOLIDAY: Holiday = {
+  id: 'qingming-festival',
+  nameKey: 'qingmingFestival',
+  month: 4,
+  locale: 'zh-CN',
+}
+
 function lunarToSolar(year: number, lunarMonth: number, lunarDay: number) {
   try {
     const result = calendar.lunar2solar(year, lunarMonth, lunarDay)
@@ -164,9 +222,6 @@ function formatHolidayDate(date: Date): string {
   return dateFormat(date, 'yyyy-mm-dd')
 }
 
-/**
- * Calculate the date for a floating holiday (e.g., 2nd Sunday of May)
- */
 function getFloatingHolidayDate(
   year: number,
   month: number,
@@ -175,13 +230,8 @@ function getFloatingHolidayDate(
 ): Date {
   const firstDay = new Date(year, month - 1, 1)
   const firstDayOfWeek = firstDay.getDay()
-
-  // Calculate days to add to get to the first occurrence of the desired day
   let daysToAdd = (dayOfWeek - firstDayOfWeek + 7) % 7
-
-  // Add weeks to get to the desired week
   daysToAdd += (weekOfMonth - 1) * 7
-
   return new Date(year, month - 1, 1 + daysToAdd)
 }
 
@@ -199,80 +249,71 @@ function getQingmingDate(year: number): Date {
   return new Date(year, 3, day)
 }
 
-/**
- * Get all holidays for a given year range
- */
+export function getHolidayTemplates(locale?: string): HolidayTemplate[] {
+  const allHolidays: HolidayTemplate[] = [
+    ...HOLIDAYS,
+    ...CHINESE_SOLAR_HOLIDAYS,
+  ]
+  let templates = locale
+    ? filter(allHolidays, (h) => !h.locale || h.locale === locale)
+    : filter(allHolidays, (h) => !h.locale)
+
+  if (locale === 'zh-CN') {
+    templates = [...templates, ...CHINESE_LUNAR_HOLIDAYS, QINGMING_HOLIDAY]
+  }
+
+  return templates
+}
+
+export function getHolidayDateForYear(
+  holiday: HolidayTemplate,
+  year: number
+): string | null {
+  if (holiday.id === 'qingming-festival') {
+    return formatHolidayDate(getQingmingDate(year))
+  }
+
+  if (holiday.isLunar && holiday.lunarMonth && holiday.lunarDay) {
+    const solarDate = lunarToSolar(year, holiday.lunarMonth, holiday.lunarDay)
+    return solarDate ? formatHolidayDate(solarDate) : null
+  }
+
+  if (holiday.day !== undefined) {
+    return formatHolidayDate(new Date(year, holiday.month - 1, holiday.day))
+  }
+
+  if (holiday.weekOfMonth !== undefined && holiday.dayOfWeek !== undefined) {
+    return formatHolidayDate(
+      getFloatingHolidayDate(
+        year,
+        holiday.month,
+        holiday.weekOfMonth,
+        holiday.dayOfWeek
+      )
+    )
+  }
+
+  return null
+}
+
 export function getHolidaysForYearRange(
   startYear: number,
   endYear: number,
   locale?: string
-): Array<{ date: string; nameKey: string; id: string }> {
-  const result: Array<{ date: string; nameKey: string; id: string }> = []
-
-  // Filter holidays based on locale
-  const allHolidays = [...HOLIDAYS, ...CHINESE_SOLAR_HOLIDAYS]
-  const holidaysToProcess = locale
-    ? filter(allHolidays, (h) => !h.locale || h.locale === locale)
-    : filter(allHolidays, (h) => !h.locale)
+): HolidayInstance[] {
+  const result: HolidayInstance[] = []
+  const templates = getHolidayTemplates(locale)
 
   for (let year = startYear; year <= endYear; year++) {
-    // Process solar calendar holidays
-    for (const holiday of holidaysToProcess) {
-      let date: Date
-
-      if (holiday.day !== undefined) {
-        // Fixed date holiday
-        date = new Date(year, holiday.month - 1, holiday.day)
-      } else if (
-        holiday.weekOfMonth !== undefined &&
-        holiday.dayOfWeek !== undefined
-      ) {
-        // Floating holiday
-        date = getFloatingHolidayDate(
-          year,
-          holiday.month,
-          holiday.weekOfMonth,
-          holiday.dayOfWeek
-        )
-      } else {
-        continue
-      }
+    for (const holiday of templates) {
+      const date = getHolidayDateForYear(holiday, year)
+      if (!date) continue
 
       result.push({
         id: `${holiday.id}-${year}`,
-        date: formatHolidayDate(date),
+        date,
         nameKey: holiday.nameKey,
       })
-    }
-
-    if (locale === 'zh-CN') {
-      const qingmingDate = getQingmingDate(year)
-
-      result.push({
-        id: `qingming-festival-${year}`,
-        date: formatHolidayDate(qingmingDate),
-        nameKey: 'qingmingFestival',
-      })
-    }
-
-    // Process lunar calendar holidays (Chinese only)
-    if (locale === 'zh-CN') {
-      for (const holiday of CHINESE_LUNAR_HOLIDAYS) {
-        if (!holiday.lunarMonth || !holiday.lunarDay) continue
-
-        const solarDate = lunarToSolar(
-          year,
-          holiday.lunarMonth,
-          holiday.lunarDay
-        )
-        if (!solarDate) continue
-
-        result.push({
-          id: `${holiday.id}-${year}`,
-          date: formatHolidayDate(solarDate),
-          nameKey: holiday.nameKey,
-        })
-      }
     }
   }
 
