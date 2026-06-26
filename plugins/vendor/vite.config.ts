@@ -64,6 +64,13 @@ const globals: Record<string, string> = {
   codemirror: 'CodeMirror',
   'overlayscrollbars-react': 'overlayscrollbarsReact',
   'pdfjs-dist': 'pdfjsLib',
+  '@fullcalendar/core': 'fullcalendarCore',
+  '@fullcalendar/react': 'fullcalendarReact',
+  '@fullcalendar/daygrid': 'fullcalendarDaygrid',
+  '@fullcalendar/timegrid': 'fullcalendarTimegrid',
+  '@fullcalendar/interaction': 'fullcalendarInteraction',
+  '@fullcalendar/core/locales/zh-cn': 'fullcalendarLocaleZhcn',
+  'js-calendar-converter': 'jsCalendarConverter',
 }
 
 export const shareExternal = ['systeminformation']
@@ -86,6 +93,23 @@ const globalsExports: Record<string, string[]> = {
     'OverlayScrollbarsComponent',
     'useOverlayScrollbars',
   ],
+  '@fullcalendar/core': [
+    'Calendar',
+    'createPlugin',
+    'formatDate',
+    'formatRange',
+    'globalLocales',
+    'globalPlugins',
+    'sliceEvents',
+    'version',
+    'JsonRequestError',
+  ],
+  '@fullcalendar/react': [],
+  '@fullcalendar/daygrid': [],
+  '@fullcalendar/timegrid': [],
+  '@fullcalendar/interaction': ['Draggable', 'ThirdPartyDraggable'],
+  '@fullcalendar/core/locales/zh-cn': [],
+  'js-calendar-converter': [],
 }
 
 function moduleKeys(id: string) {
@@ -405,6 +429,12 @@ export default defineConfig(({ mode }) => {
       external: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'],
       outDir: 'dist/share',
       entry: 'share/fileicon.ts',
+    })
+  }
+
+  if (target === 'calendar') {
+    return createConfig('calendar', 'PluginVendorCalendar', {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
     })
   }
 

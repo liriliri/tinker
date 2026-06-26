@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:share:fileicon",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:calendar && npm run build:share:fileicon",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --mode react",
     "build:mobx": "vite build --mode mobx",
@@ -29,6 +29,7 @@
     "build:xterm": "vite build --mode xterm",
     "build:codemirror": "vite build --mode codemirror",
     "build:overlayscrollbars": "vite build --mode overlayscrollbars",
+    "build:calendar": "vite build --mode calendar",
     "build:share:fileicon": "vite build --mode share:fileicon"
   },
   "dependencies": {
@@ -37,6 +38,11 @@
     "systeminformation": "^5.30.7"
   },
   "devDependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
     "@headlessui/react": "^2.2.9",
     "@monaco-editor/react": "^4.7.0",
     "@tiptap/core": "^2.11.5",
@@ -57,6 +63,7 @@
     "html-to-image": "^1.11.13",
     "i18next": "^25.8.4",
     "idb": "^8.0.3",
+    "js-calendar-converter": "^0.0.7",
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
     "monaco-editor": "^0.55.1",

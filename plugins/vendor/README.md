@@ -21,5 +21,6 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `tiptap.js` | `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-underline`, `@tiptap/extension-highlight` |
 | `cryptojs.js` | `crypto-js` |
 | `overlayscrollbars/overlayscrollbars.js` | `overlayscrollbars-react` (`OverlayScrollbarsComponent`, `useOverlayScrollbars`) |
+| `calendar.js` | `@fullcalendar/core`, `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`, `js-calendar-converter` |
 
 See `vite.config.ts` for the full mapping of module names to global variable names.
