@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import { LoadingCircle } from 'share/components/Loading'
 import { formatRelativeDate } from 'share/lib/util'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
+import AuthorAvatar from './AuthorAvatar'
 import CenteredMessage from './CenteredMessage'
 import store from '../store'
 
@@ -11,10 +13,10 @@ const SCROLL_THRESHOLD = 80
 
 export default observer(function CommitList() {
   const { t, i18n } = useTranslation()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLElement | null>(null)
 
   const handleScroll = useCallback(() => {
-    const el = scrollRef.current
+    const el = viewportRef.current
     if (
       !el ||
       !store.hasMoreCommits ||
@@ -27,6 +29,19 @@ export default observer(function CommitList() {
       void store.loadMoreCommits()
     }
   }, [])
+
+  const handleViewportChange = useCallback(
+    (viewport: HTMLElement | null) => {
+      if (viewportRef.current) {
+        viewportRef.current.removeEventListener('scroll', handleScroll)
+      }
+      viewportRef.current = viewport
+      if (viewport) {
+        viewport.addEventListener('scroll', handleScroll)
+      }
+    },
+    [handleScroll]
+  )
 
   if (!store.selectedBranch) {
     return <CenteredMessage>{t('selectBranchHint')}</CenteredMessage>
@@ -61,10 +76,10 @@ export default observer(function CommitList() {
           <LoadingCircle className="w-5 h-5" />
         </div>
       )}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto"
-        onScroll={handleScroll}
+      <OverlayScrollbars
+        defer
+        className="flex-1"
+        onViewportChange={handleViewportChange}
       >
         {store.commits.map((commit) => {
           const selected = store.selectedCommit?.sha === commit.sha
@@ -79,22 +94,32 @@ export default observer(function CommitList() {
               onClick={() => store.selectCommit(commit)}
               className={`w-full text-left px-3 py-2 border-b ${tw.border} ${
                 tw.hover
-              } ${selected ? tw.active : ''}`}
+              } ${
+                selected
+                  ? `${tw.active} border-l-2 ${tw.primary.border}`
+                  : 'border-l-2 border-l-transparent'
+              }`}
             >
-              <div
-                className={`flex items-center justify-between gap-2 text-xs ${tw.text.secondary}`}
-              >
-                <span className="truncate">{commit.author}</span>
-                <span className="shrink-0" title={title}>
-                  {label}
-                </span>
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_3.5rem] gap-x-2 items-center mt-1 text-xs">
-                <span className={`truncate ${tw.text.primary}`}>
+              <div className="flex items-center gap-2">
+                <AuthorAvatar name={commit.author} email={commit.email} />
+                <span
+                  className={`truncate text-sm font-medium ${tw.text.primary}`}
+                >
                   {commit.summary}
                 </span>
                 <span
-                  className={`font-mono shrink-0 text-right ${tw.text.secondary}`}
+                  className={`text-xs shrink-0 ml-auto ${tw.text.tertiary}`}
+                  title={title}
+                >
+                  {label}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mt-1.5 ml-7">
+                <span className={`truncate text-xs ${tw.text.secondary}`}>
+                  {commit.author}
+                </span>
+                <span
+                  className={`text-[11px] font-mono shrink-0 ml-2 ${tw.text.tertiary} bg-black/5 dark:bg-white/10 rounded px-1.5 py-px`}
                 >
                   {commit.shortSha}
                 </span>
@@ -112,7 +137,7 @@ export default observer(function CommitList() {
             <LoadingCircle className="w-5 h-5" />
           </div>
         )}
-      </div>
+      </OverlayScrollbars>
     </div>
   )
 })

@@ -204,7 +204,7 @@ export default observer(function CommitDetail() {
 
   return (
     <div className="h-full w-full flex flex-col min-w-0">
-      <Toolbar className="min-w-0 overflow-hidden gap-2">
+      <Toolbar className="min-w-0 overflow-hidden">
         <span className={`text-xs shrink-0 ${tw.text.secondary}`}>
           {commit.author}
         </span>
