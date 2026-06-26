@@ -151,7 +151,7 @@ class Store extends BaseStore {
     this.recentDirectories = [
       path,
       ...this.recentDirectories.filter((p) => p !== path),
-    ].slice(0, 10)
+    ].slice(0, 5)
     storage.set(STORAGE_RECENT_DIRECTORIES, this.recentDirectories)
   }
 
