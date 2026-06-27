@@ -244,7 +244,7 @@ File watching is the consumer's responsibility — use `onExpandChange`, `refres
 
 ### FilePreview
 
-Side panel file preview with metadata. Images use `ImageViewer` (zoom, pan, rotate via context menu). Videos require the videojs vendor script.
+Side panel file preview with metadata. Images use `ImageViewer` (zoom, pan, rotate via context menu). Videos require the videojs vendor script. PDFs require the pdfjs vendor script. Markdown requires the markdown and syntaxhighlighter vendor scripts.
 
 ```ts
 import FilePreview from 'share/components/FilePreview'

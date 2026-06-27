@@ -7,8 +7,10 @@ import { Video, videoFeatures } from '@videojs/react/video'
 import { useTranslation } from 'react-i18next'
 import VideoPlayer from './VideoPlayer'
 import ImageViewer from './ImageViewer'
+import PdfViewer from './PdfViewer'
+import MarkdownPreview from './MarkdownPreview'
 import { tw } from '../theme'
-import { getFileCategory } from '../lib/fileType'
+import { getFileCategory, getFileExt, isMarkdownFile } from '../lib/fileType'
 import { getFileIcon } from '../lib/util'
 import { addI18nNamespace } from '../lib/i18n'
 
@@ -23,6 +25,7 @@ addI18nNamespace(I18N_NS, {
     modified: 'Modified:',
     created: 'Created:',
     lastOpened: 'Last Opened:',
+    loading: 'Loading...',
   },
   'zh-CN': {
     noFileSelected: '选择文件以预览',
@@ -32,6 +35,7 @@ addI18nNamespace(I18N_NS, {
     modified: '修改时间：',
     created: '创建时间：',
     lastOpened: '上次打开：',
+    loading: '加载中...',
   },
 })
 
@@ -54,6 +58,8 @@ export default function FilePreview({ path }: FilePreviewProps) {
   const [icon, setIcon] = useState<string | undefined>(undefined)
   const [fstat, setFstat] = useState<FileStat | undefined>(undefined)
   const [imgFailed, setImgFailed] = useState(false)
+  const [pdfFailed, setPdfFailed] = useState(false)
+  const [mdFailed, setMdFailed] = useState(false)
 
   useEffect(() => {
     if (!path) return
@@ -63,6 +69,8 @@ export default function FilePreview({ path }: FilePreviewProps) {
     } else {
       setIcon(undefined)
       setImgFailed(false)
+      setPdfFailed(false)
+      setMdFailed(false)
       getFileIcon(path).then((result) => {
         if (result) {
           iconCache.set(path, result)
@@ -104,6 +112,8 @@ export default function FilePreview({ path }: FilePreviewProps) {
   const dir = path.replace(/[\\/][^\\/]+$/, '')
   const isImage = getFileCategory(path) === 'image'
   const isVideo = getFileCategory(path) === 'video'
+  const isPdf = getFileExt(path) === 'pdf'
+  const isMarkdown = isMarkdownFile(path)
   const url = fileUrl(path)
 
   return (
@@ -122,6 +132,14 @@ export default function FilePreview({ path }: FilePreviewProps) {
           <div className="flex items-center justify-center h-full p-4 overflow-hidden">
             <VideoPreview src={url} />
           </div>
+        ) : isPdf && !pdfFailed ? (
+          <PdfViewer
+            filePath={path}
+            className="w-full h-full"
+            onLoadError={() => setPdfFailed(true)}
+          />
+        ) : isMarkdown && !mdFailed ? (
+          <MarkdownFilePreview path={path} onError={() => setMdFailed(true)} />
         ) : (
           <div className="flex items-center justify-center h-full p-4">
             {icon ? (
@@ -187,4 +205,63 @@ function VideoPreview({ src }: { src: string }) {
       </Container>
     </Provider>
   )
+}
+
+function MarkdownFilePreview({
+  path,
+  onError,
+}: {
+  path: string
+  onError: () => void
+}) {
+  const { t } = useTranslation(I18N_NS)
+  const [content, setContent] = useState<string | null>(null)
+  const [isDark, setIsDark] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    tinker.getTheme().then((theme) => {
+      if (!cancelled) setIsDark(theme === 'dark')
+    })
+
+    tinker.on('changeTheme', async () => {
+      const theme = await tinker.getTheme()
+      if (!cancelled) setIsDark(theme === 'dark')
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    setContent(null)
+
+    tinker
+      .readFile(path, 'utf-8')
+      .then((data) => {
+        if (!cancelled) setContent(data as string)
+      })
+      .catch(() => {
+        if (!cancelled) onError()
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [path, onError])
+
+  if (content === null) {
+    return (
+      <div
+        className={`flex items-center justify-center h-full text-xs ${tw.text.tertiary}`}
+      >
+        {t('loading')}
+      </div>
+    )
+  }
+
+  return <MarkdownPreview content={content} isDark={isDark} />
 }

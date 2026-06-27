@@ -258,3 +258,7 @@ export function getLanguage(filePath: string): string {
   const ext = getFileExt(filePath)
   return LANGUAGE_MAP[ext] || 'plaintext'
 }
+
+export function isMarkdownFile(filePath: string): boolean {
+  return getLanguage(filePath) === 'markdown'
+}
