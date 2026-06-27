@@ -187,7 +187,7 @@ export default function SessionConfigDialog({
                   value={authType}
                   onChange={(v) => setAuthType(v as SSHAuthType)}
                   options={authTypeOptions}
-                  className="w-full h-[42px]"
+                  className="w-full [&>select]:text-sm [&>select]:px-2.5 [&>select]:py-1.5"
                 />
               </div>
             </div>
@@ -241,7 +241,7 @@ export default function SessionConfigDialog({
                 value={shell}
                 onChange={(v) => setShell(v)}
                 options={shellOptions}
-                className="w-full h-[38px]"
+                className="w-full [&>select]:text-sm [&>select]:px-2.5 [&>select]:py-1.5"
               />
             </div>
 
