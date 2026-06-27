@@ -7,13 +7,23 @@ import type {
   SortOrder,
 } from '../../common/types'
 
+export function isHiddenEntry(name: string): boolean {
+  return name.startsWith('.')
+}
+
 export function filterEntries(
   entries: IFileEntry[],
-  query: string
+  query: string,
+  showHidden = false
 ): IFileEntry[] {
+  let result = entries
+  if (!showHidden) {
+    result = result.filter((entry) => !isHiddenEntry(entry.name))
+  }
+
   const trimmed = query.trim().toLowerCase()
-  if (!trimmed) return entries
-  return entries.filter((entry) => entry.name.toLowerCase().includes(trimmed))
+  if (!trimmed) return result
+  return result.filter((entry) => entry.name.toLowerCase().includes(trimmed))
 }
 
 export function sortEntries(

@@ -51,5 +51,7 @@
   "cancel": "取消",
   "save": "保存",
   "create": "创建",
-  "preview": "预览"
+  "preview": "预览",
+  "showHiddenFiles": "显示隐藏文件",
+  "hideHiddenFiles": "不显示隐藏文件"
 }

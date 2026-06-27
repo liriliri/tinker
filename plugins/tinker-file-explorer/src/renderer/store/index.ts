@@ -13,11 +13,13 @@ import type {
   ClipboardMode,
 } from '../../common/types'
 import Explorer from './Explorer'
+import { isHiddenEntry } from '../lib/util'
 
 const storage = new LocalStore('tinker-file-explorer')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_VIEW_MODE = 'viewMode'
 const STORAGE_SHOW_PREVIEW = 'showPreview'
+const STORAGE_SHOW_HIDDEN = 'showHiddenFiles'
 const STORAGE_CUSTOM_PLACES = 'customPlaces'
 const DRIVE_REFRESH_INTERVAL = 5000
 
@@ -38,6 +40,7 @@ class Store extends BaseStore {
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
   viewMode: ViewMode = storage.get(STORAGE_VIEW_MODE) ?? 'list'
   showPreview: boolean = storage.get(STORAGE_SHOW_PREVIEW) === true
+  showHiddenFiles: boolean = storage.get(STORAGE_SHOW_HIDDEN) === true
   places: IFavoritePlace[] = []
   customPlaces: IFavoritePlace[] = storage.get(STORAGE_CUSTOM_PLACES) ?? []
   placesLoading = false
@@ -244,6 +247,7 @@ class Store extends BaseStore {
   addTab(path: string, activate = true) {
     const title = fileExplorer.basename(path) || path
     const tab = new Explorer(uuid(), path, title)
+    tab.showHiddenFiles = this.showHiddenFiles
     tab.pushHistory(path)
     this.tabs.push(tab)
     if (activate) {
@@ -349,6 +353,24 @@ class Store extends BaseStore {
   setShowPreview(value: boolean) {
     this.showPreview = value
     storage.set(STORAGE_SHOW_PREVIEW, value)
+  }
+
+  setShowHiddenFiles(value: boolean) {
+    this.showHiddenFiles = value
+    storage.set(STORAGE_SHOW_HIDDEN, value)
+
+    for (const tab of this.tabs) {
+      tab.showHiddenFiles = value
+      if (!value) {
+        tab.selectedPaths = tab.selectedPaths.filter(
+          (path) => !isHiddenEntry(fileExplorer.basename(path))
+        )
+      }
+    }
+  }
+
+  toggleShowHiddenFiles() {
+    this.setShowHiddenFiles(!this.showHiddenFiles)
   }
 
   openPath(path: string, newTab = false) {

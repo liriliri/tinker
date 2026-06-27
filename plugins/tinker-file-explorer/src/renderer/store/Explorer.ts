@@ -18,6 +18,7 @@ class Explorer {
   sortMethod: SortMethod = 'name'
   sortOrder: SortOrder = 'asc'
   filterText = ''
+  showHiddenFiles = false
 
   constructor(id: string, path: string, title?: string) {
     this.id = id
@@ -31,7 +32,15 @@ class Explorer {
   }
 
   get visibleEntries(): IFileEntry[] {
-    return filterEntries(this.sortedEntries, this.filterText)
+    return filterEntries(
+      this.sortedEntries,
+      this.filterText,
+      this.showHiddenFiles
+    )
+  }
+
+  get listableEntries(): IFileEntry[] {
+    return filterEntries(this.sortedEntries, '', this.showHiddenFiles)
   }
 
   get isFiltering(): boolean {

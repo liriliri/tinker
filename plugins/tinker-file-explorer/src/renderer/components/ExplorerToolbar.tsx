@@ -7,6 +7,8 @@ import {
   ArrowUp,
   LayoutGrid,
   List,
+  Eye,
+  EyeOff,
   PanelRight,
   PanelRightClose,
   RotateCw,
@@ -109,6 +111,18 @@ export default observer(function ExplorerToolbar({
         shortcut="f"
         className="!w-32 shrink-0"
       />
+      <ToolbarButton
+        onClick={() => store.toggleShowHiddenFiles()}
+        title={
+          store.showHiddenFiles ? t('hideHiddenFiles') : t('showHiddenFiles')
+        }
+      >
+        {store.showHiddenFiles ? (
+          <Eye size={TOOLBAR_ICON_SIZE} />
+        ) : (
+          <EyeOff size={TOOLBAR_ICON_SIZE} />
+        )}
+      </ToolbarButton>
       <ToolbarButtonGroup>
         <ToolbarButton
           variant="toggle"

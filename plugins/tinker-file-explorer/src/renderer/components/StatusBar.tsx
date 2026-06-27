@@ -28,9 +28,9 @@ export default observer(function StatusBarComponent() {
             {tab.isFiltering
               ? t('filteredItemCount', {
                   visible: tab.visibleEntries.length,
-                  total: tab.entries.length,
+                  total: tab.listableEntries.length,
                 })
-              : t('itemCount', { count: tab.entries.length })}
+              : t('itemCount', { count: tab.visibleEntries.length })}
           </StatusBarItem>
           {tab.selectedPaths.length > 0 && (
             <StatusBarItem clickable={false}>

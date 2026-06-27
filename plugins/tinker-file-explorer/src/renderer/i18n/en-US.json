@@ -51,5 +51,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "create": "Create",
-  "preview": "Preview"
+  "preview": "Preview",
+  "showHiddenFiles": "Show hidden files",
+  "hideHiddenFiles": "Hide hidden files"
 }
