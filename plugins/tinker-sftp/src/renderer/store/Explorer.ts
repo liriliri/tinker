@@ -36,7 +36,7 @@ class Explorer {
   }
 
   get title(): string {
-    return `${this.session.username}@${this.session.host}`
+    return `${this.session.name} - ${this.session.username}@${this.session.host}`
   }
 
   get sortedEntries(): IFileEntry[] {

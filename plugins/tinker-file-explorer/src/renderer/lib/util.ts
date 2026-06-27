@@ -1,5 +1,5 @@
-import clamp from 'licia/clamp'
 import type { TreeNodeData } from 'share/components/Tree'
+import type { PathBarItem } from 'share/components/PathBar'
 import type {
   IFileEntry,
   IFavoritePlace,
@@ -113,17 +113,12 @@ export function buildSidebarTree(
   return sections
 }
 
-export interface PathBreadcrumbItem {
-  name: string
-  path: string
-}
-
 const WIN_DRIVE_RE = /^([A-Za-z]:)(?:[/\\]|$)/
 
-export function buildPathBreadcrumbs(filePath: string): PathBreadcrumbItem[] {
+export function buildPathBreadcrumbs(filePath: string): PathBarItem[] {
   if (!filePath) return []
 
-  const items: PathBreadcrumbItem[] = []
+  const items: PathBarItem[] = []
 
   if (WIN_DRIVE_RE.test(filePath)) {
     const match = WIN_DRIVE_RE.exec(filePath)!
@@ -156,19 +151,4 @@ export function buildPathBreadcrumbs(filePath: string): PathBreadcrumbItem[] {
   }
 
   return items
-}
-
-export function getVisiblePathBreadcrumbs(
-  items: PathBreadcrumbItem[],
-  startIndex: number
-): { ellipsisPath: string | null; visible: PathBreadcrumbItem[] } {
-  const start = clamp(startIndex, 0, items.length - 1)
-  if (start === 0) {
-    return { ellipsisPath: null, visible: items }
-  }
-
-  return {
-    ellipsisPath: items[start - 1]?.path ?? null,
-    visible: items.slice(start),
-  }
 }

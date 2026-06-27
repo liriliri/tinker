@@ -23,10 +23,11 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import toast from 'react-hot-toast'
+import PathBar from 'share/components/PathBar'
 import { tw } from 'share/theme'
 import type Explorer from '../store/Explorer'
 import store from '../store'
-import PathBreadcrumb from './PathBreadcrumb'
+import { buildRemotePathBreadcrumbs } from '../lib/util'
 
 interface ExplorerToolbarProps {
   tab: Explorer
@@ -37,6 +38,7 @@ export default observer(function ExplorerToolbar({
 }: ExplorerToolbarProps) {
   const { t } = useTranslation()
   const [editingPath, setEditingPath] = useState(false)
+  const pathItems = buildRemotePathBreadcrumbs(tab.path)
 
   const handleUpload = async () => {
     const result = await tinker.showOpenDialog({
@@ -45,9 +47,9 @@ export default observer(function ExplorerToolbar({
     if (result.canceled || result.filePaths.length === 0) return
 
     try {
-      const count = await store.uploadFiles(tab.id, result.filePaths)
-      if (count > 0) {
-        toast.success(t('uploadSuccess', { count }))
+      const names = await store.uploadFiles(tab.id, result.filePaths)
+      if (names.length > 0) {
+        toast.success(t('uploadSuccess', { name: names.join(', ') }))
       }
     } catch {
       toast.error(t('transferFailed'))
@@ -108,8 +110,9 @@ export default observer(function ExplorerToolbar({
             className="w-full"
           />
         ) : (
-          <PathBreadcrumb
+          <PathBar
             path={tab.path}
+            items={pathItems}
             onNavigate={(path) => void store.navigateTab(tab.id, path)}
             onEdit={() => {
               store.setPathInput(tab.id, tab.path)

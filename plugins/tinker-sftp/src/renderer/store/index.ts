@@ -2,6 +2,8 @@ import { makeAutoObservable, runInAction, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import isEmpty from 'licia/isEmpty'
 import LocalStore from 'licia/LocalStore'
+import toast from 'react-hot-toast'
+import i18next from 'i18next'
 import BaseStore from 'share/BaseStore'
 import {
   getAllFolders,
@@ -424,7 +426,15 @@ class Store extends BaseStore {
     })
     if (result.canceled || !result.filePaths[0]) return 0
 
-    return this.downloadFiles(tabId, result.filePaths[0], entryPaths)
+    const names = await this.downloadFiles(
+      tabId,
+      result.filePaths[0],
+      entryPaths
+    )
+    if (names.length > 0) {
+      toast.success(i18next.t('downloadSuccess', { name: names.join(', ') }))
+    }
+    return names.length
   }
 
   async createDirectory(tabId: string, name: string) {
@@ -467,13 +477,13 @@ class Store extends BaseStore {
     await this.refreshTab(tabId)
   }
 
-  async uploadFiles(tabId: string, localPaths: string[]): Promise<number> {
+  async uploadFiles(tabId: string, localPaths: string[]): Promise<string[]> {
     const tab = this.tabs.find((item) => item.id === tabId)
     if (!tab?.connected || isEmpty(localPaths)) {
-      return 0
+      return []
     }
 
-    let count = 0
+    const names: string[] = []
 
     for (const localPath of localPaths) {
       const name = sftp.basename(localPath)
@@ -491,32 +501,32 @@ class Store extends BaseStore {
         await sftp.upload(tabId, localPath, remoteTarget, transfer.id)
         transfer.status = 'completed'
         transfer.transferred = transfer.total || transfer.transferred
-        count++
+        names.push(name)
       } catch (err) {
         transfer.status = 'failed'
         transfer.error = (err as Error).message
       }
     }
 
-    if (count > 0) {
+    if (names.length > 0) {
       await this.refreshTab(tabId)
     }
-    return count
+    return names
   }
 
   async downloadFiles(
     tabId: string,
     destDir: string,
     entryPaths: string[]
-  ): Promise<number> {
+  ): Promise<string[]> {
     const tab = this.tabs.find((item) => item.id === tabId)
-    if (!tab?.connected || isEmpty(entryPaths)) return 0
+    if (!tab?.connected || isEmpty(entryPaths)) return []
 
-    let count = 0
+    const names: string[] = []
 
     for (const entryPath of entryPaths) {
       const entry = tab.entries.find((item) => item.path === entryPath)
-      if (!entry || entry.isDirectory) continue
+      if (!entry) continue
 
       const localTarget = sftp.joinPath(destDir, entry.name)
       const transfer = this.addTransfer(
@@ -527,22 +537,19 @@ class Store extends BaseStore {
         localTarget
       )
       transfer.status = 'running'
-      if (entry.size > 0) {
-        transfer.total = entry.size
-      }
 
       try {
         await sftp.download(tabId, entryPath, localTarget, transfer.id)
         transfer.status = 'completed'
         transfer.transferred = transfer.total || transfer.transferred
-        count++
+        names.push(entry.name)
       } catch (err) {
         transfer.status = 'failed'
         transfer.error = (err as Error).message
       }
     }
 
-    return count
+    return names
   }
 }
 

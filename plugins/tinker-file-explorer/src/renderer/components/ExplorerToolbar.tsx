@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import truncate from 'licia/truncate'
 import {
   ArrowLeft,
   ArrowRight,
@@ -21,10 +22,11 @@ import {
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
+import PathBar from 'share/components/PathBar'
 import { tw } from 'share/theme'
 import type Explorer from '../store/Explorer'
 import store from '../store'
-import PathBreadcrumb from './PathBreadcrumb'
+import { buildPathBreadcrumbs } from '../lib/util'
 
 interface ExplorerToolbarProps {
   tab: Explorer
@@ -35,6 +37,17 @@ export default observer(function ExplorerToolbar({
 }: ExplorerToolbarProps) {
   const { t } = useTranslation()
   const [editingPath, setEditingPath] = useState(false)
+  const pathItems = useMemo(() => buildPathBreadcrumbs(tab.path), [tab.path])
+  const formatPathSegment = useCallback(
+    (item: { name: string; path: string }) => {
+      const place = store.places.find((entry) => entry.path === item.path)
+      if (place) {
+        return place.group === 'shortcuts' ? t(place.label) : place.label
+      }
+      return truncate(item.name, 28)
+    },
+    [store.places, t]
+  )
 
   return (
     <Toolbar>
@@ -93,9 +106,10 @@ export default observer(function ExplorerToolbar({
             className="w-full"
           />
         ) : (
-          <PathBreadcrumb
+          <PathBar
             path={tab.path}
-            places={store.places}
+            items={pathItems}
+            formatSegment={formatPathSegment}
             onNavigate={(path) => void store.navigateTab(tab.id, path)}
             onEdit={() => {
               store.setPathInput(tab.path)

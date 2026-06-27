@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { Upload, Download } from 'lucide-react'
 import fileSize from 'licia/fileSize'
 import { tw } from 'share/theme'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
@@ -10,6 +11,28 @@ interface TransferItemProps {
   transfer: Transfer
 }
 
+function getStatusText(transfer: Transfer, t: (key: string) => string): string {
+  const isRunning =
+    transfer.status === 'running' || transfer.status === 'pending'
+
+  if (isRunning && transfer.total > 0) {
+    return `${fileSize(transfer.transferred)} / ${fileSize(transfer.total)}`
+  }
+  if (isRunning) {
+    return t('transferInProgress')
+  }
+  if (transfer.status === 'completed' && transfer.total > 0) {
+    return fileSize(transfer.total)
+  }
+  if (transfer.status === 'completed') {
+    return t('transferCompleted')
+  }
+  if (transfer.status === 'failed') {
+    return t('transferFailed')
+  }
+  return ''
+}
+
 const TransferItem = observer(function TransferItem({
   transfer,
 }: TransferItemProps) {
@@ -17,12 +40,15 @@ const TransferItem = observer(function TransferItem({
   const isRunning =
     transfer.status === 'running' || transfer.status === 'pending'
   const isFailed = transfer.status === 'failed'
+  const Icon = transfer.type === 'upload' ? Upload : Download
+  const statusText = getStatusText(transfer, t)
 
   return (
     <div
-      className={`relative overflow-hidden px-2 py-1.5 border-b ${tw.border} ${
+      className={`relative h-10 overflow-hidden border-b ${tw.border} ${
         tw.hover
       } ${isFailed ? 'bg-red-500/5' : ''}`}
+      title={isFailed && transfer.error ? transfer.error : transfer.fileName}
     >
       {isRunning && (
         <div
@@ -30,31 +56,17 @@ const TransferItem = observer(function TransferItem({
           style={{ width: `${transfer.progress}%` }}
         />
       )}
-      <div className="relative z-10 flex items-center w-full">
-        <div className="flex-1 min-w-0 mr-2">
-          <div className={`text-sm font-bold truncate ${tw.text.primary}`}>
-            {transfer.fileName}
-          </div>
-          <div className={`text-xs ${tw.text.secondary}`}>
-            {isRunning && transfer.total > 0 && (
-              <>
-                {fileSize(transfer.transferred)}B / {fileSize(transfer.total)}B
-              </>
-            )}
-            {isRunning && transfer.total <= 0 && t('transferInProgress')}
-            {transfer.status === 'completed' &&
-              transfer.total > 0 &&
-              `${fileSize(transfer.total)}B`}
-            {transfer.status === 'completed' &&
-              transfer.total <= 0 &&
-              t('transferCompleted')}
-            {isFailed && t('transferFailed')}
-          </div>
-          {isFailed && transfer.error && (
-            <div className="text-xs text-red-500 mt-1 break-words">
-              {transfer.error}
-            </div>
-          )}
+      <div className="relative z-10 flex h-full items-center gap-2 px-2">
+        <Icon size={14} className={`shrink-0 ${tw.text.tertiary}`} />
+        <div className={`flex-1 min-w-0 truncate text-sm ${tw.text.primary}`}>
+          {transfer.fileName}
+        </div>
+        <div
+          className={`shrink-0 text-xs whitespace-nowrap ${
+            isFailed ? 'text-red-500' : tw.text.secondary
+          }`}
+        >
+          {statusText}
         </div>
       </div>
     </div>

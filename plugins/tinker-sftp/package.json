@@ -10,7 +10,6 @@
     "build:renderer": "vite build --config ../vite.config.ts",
     "build:preload": "vite build --config ../vite.preload.ts"
   },
-  "embedded": false,
   "tinker": {
     "name": "SFTP",
     "description": "SFTP client for browsing and transferring remote files",

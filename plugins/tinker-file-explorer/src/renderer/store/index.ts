@@ -258,6 +258,11 @@ class Store extends BaseStore {
   }
 
   closeTab(id: string) {
+    if (this.tabs.length <= 1) {
+      window.close()
+      return
+    }
+
     const index = this.tabs.findIndex((tab) => tab.id === id)
     if (index < 0) return
 

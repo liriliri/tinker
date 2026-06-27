@@ -1,8 +1,7 @@
 import { contextBridge } from 'electron'
-import { readFileSync } from 'fs'
+import { readFileSync, statSync, mkdirSync } from 'fs'
 import { homedir } from 'os'
 import * as path from 'path'
-import { statSync } from 'fs'
 import { Client, type SFTPWrapper } from 'ssh2'
 import type {
   IFileEntry,
@@ -123,6 +122,116 @@ async function readRemoteDir(
   return entries
 }
 
+interface RemoteStat {
+  isDirectory(): boolean
+  size: number
+}
+
+async function statRemote(
+  connectionId: string,
+  remotePath: string
+): Promise<RemoteStat> {
+  const { sftp } = getConnection(connectionId)
+  return sftpCallback<RemoteStat>((cb) =>
+    sftp.stat(normalizeRemotePath(remotePath), cb)
+  )
+}
+
+async function calcRemoteSize(
+  connectionId: string,
+  remotePath: string
+): Promise<number> {
+  const stat = await statRemote(connectionId, remotePath)
+  if (!stat.isDirectory()) return stat.size
+
+  let total = 0
+  const entries = await readRemoteDir(connectionId, remotePath)
+  for (const entry of entries) {
+    if (entry.isDirectory) {
+      total += await calcRemoteSize(connectionId, entry.path)
+    } else {
+      total += entry.size
+    }
+  }
+  return total
+}
+
+interface DownloadProgressState {
+  transferred: number
+  total: number
+}
+
+async function downloadRemoteFile(
+  connectionId: string,
+  remotePath: string,
+  localPath: string,
+  transferId: string | undefined,
+  state: DownloadProgressState
+): Promise<void> {
+  const { sftp } = getConnection(connectionId)
+  mkdirSync(path.dirname(localPath), { recursive: true })
+
+  await sftpCallback<void>((cb) =>
+    sftp.fastGet(
+      normalizeRemotePath(remotePath),
+      localPath,
+      {
+        step: (transferred) => {
+          if (!transferId) return
+          emitTransferProgress({
+            transferId,
+            transferred: state.transferred + transferred,
+            total: state.total,
+          })
+        },
+      },
+      cb
+    )
+  )
+
+  const size = statSync(localPath).size
+  state.transferred += size
+  if (transferId) {
+    emitTransferProgress({
+      transferId,
+      transferred: state.transferred,
+      total: state.total,
+    })
+  }
+}
+
+async function downloadRemoteDirectory(
+  connectionId: string,
+  remotePath: string,
+  localPath: string,
+  transferId: string | undefined,
+  state: DownloadProgressState
+): Promise<void> {
+  mkdirSync(localPath, { recursive: true })
+  const entries = await readRemoteDir(connectionId, remotePath)
+
+  for (const entry of entries) {
+    const childLocal = path.join(localPath, entry.name)
+    if (entry.isDirectory) {
+      await downloadRemoteDirectory(
+        connectionId,
+        entry.path,
+        childLocal,
+        transferId,
+        state
+      )
+    } else {
+      await downloadRemoteFile(
+        connectionId,
+        entry.path,
+        childLocal,
+        transferId,
+        state
+      )
+    }
+  }
+}
+
 const sftpObj = {
   basename(filePath: string): string {
     return path.basename(filePath)
@@ -210,25 +319,43 @@ const sftpObj = {
 
   readRemoteDir,
 
+  calcRemoteSize,
+
   async download(
     connectionId: string,
     remotePath: string,
     localPath: string,
     transferId?: string
   ): Promise<void> {
-    const { sftp } = getConnection(connectionId)
-    await sftpCallback<void>((cb) =>
-      sftp.fastGet(
-        normalizeRemotePath(remotePath),
+    getConnection(connectionId)
+    const normalized = normalizeRemotePath(remotePath)
+    const stat = await statRemote(connectionId, normalized)
+    const total = stat.isDirectory()
+      ? await calcRemoteSize(connectionId, normalized)
+      : stat.size
+    const state: DownloadProgressState = { transferred: 0, total }
+
+    if (transferId && total > 0) {
+      emitTransferProgress({ transferId, transferred: 0, total })
+    }
+
+    if (stat.isDirectory()) {
+      await downloadRemoteDirectory(
+        connectionId,
+        normalized,
         localPath,
-        {
-          step: (transferred, _chunk, total) => {
-            if (!transferId) return
-            emitTransferProgress({ transferId, transferred, total })
-          },
-        },
-        cb
+        transferId,
+        state
       )
+      return
+    }
+
+    await downloadRemoteFile(
+      connectionId,
+      normalized,
+      localPath,
+      transferId,
+      state
     )
   },
 

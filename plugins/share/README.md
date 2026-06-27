@@ -242,6 +242,52 @@ Pass `rootPath` to enable a blank-area context menu with built-in New File / New
 
 File watching is the consumer's responsibility — use `onExpandChange`, `refreshDirs`, and `refreshVersion`.
 
+### FileList
+
+File browser with list and grid view modes. Supports multi-select, sorting, context menus, and Ctrl/Cmd+A select-all. Pass `renderIcon` for custom entry icons.
+
+```ts
+import FileList from 'share/components/FileList'
+
+<FileList
+  viewMode={viewMode}
+  isDark={isDark}
+  entries={entries}
+  selectedPaths={selectedPaths}
+  sortMethod={sortMethod}
+  sortOrder={sortOrder}
+  loading={loading}
+  error={error}
+  isFiltering={isFiltering}
+  currentPath={currentPath}
+  selectAllActive={active}
+  onSelectAll={selectAll}
+  renderIcon={(entry) => <FileEntryIcon {...entry} />}
+  onSelect={handleSelect}
+  onActivate={handleActivate}
+  onSort={handleSort}
+  onEntryContextMenu={showEntryMenu}
+  onBlankContextMenu={showBlankMenu}
+/>
+```
+
+### PathBar
+
+Collapsible path breadcrumb bar with ellipsis menu for hidden segments. Pass pre-built segments and an optional `formatSegment` callback for custom labels (e.g. favorite place names). Export `PathBarItem` for building segment lists.
+
+```ts
+import PathBar from 'share/components/PathBar'
+import { buildPathBreadcrumbs } from '../lib/util'
+
+<PathBar
+  path={currentPath}
+  items={buildPathBreadcrumbs(currentPath)}
+  onNavigate={navigate}
+  onEdit={() => setEditingPath(true)}
+  formatSegment={(item) => item.name}
+/>
+```
+
 ### FilePreview
 
 Side panel file preview with metadata. Images use `ImageViewer` (zoom, pan, rotate via context menu). Videos require the videojs vendor script. PDFs require the pdfjs vendor script. Markdown requires the markdown and syntaxhighlighter vendor scripts.
@@ -300,6 +346,8 @@ import MarkdownPreview from 'share/components/MarkdownPreview' // requires markd
 import PdfViewer from 'share/components/PdfViewer' // requires pdfjs vendor
 import PhotoViewer from 'share/components/PhotoViewer'
 import FilePreview from 'share/components/FilePreview'
+import FileList from 'share/components/FileList'
+import PathBar from 'share/components/PathBar'
 import Tooltip from 'share/components/Tooltip'
 import NavList from 'share/components/NavList'
 import Tree from 'share/components/Tree'

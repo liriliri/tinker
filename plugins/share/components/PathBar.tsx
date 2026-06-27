@@ -1,19 +1,50 @@
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import truncate from 'licia/truncate'
-import { tw } from 'share/theme'
-import {
-  buildRemotePathBreadcrumbs,
-  getVisiblePathBreadcrumbs,
-  type PathBreadcrumbItem,
-} from '../lib/util'
+import clamp from 'licia/clamp'
+import { tw } from '../theme'
+import { addI18nNamespace } from '../lib/i18n'
 
-interface PathBreadcrumbProps {
+const I18N_NS = 'pathBar'
+
+addI18nNamespace(I18N_NS, {
+  'en-US': {
+    pathPlaceholder: 'Path',
+    pathEllipsis: 'Show parent folders',
+  },
+  'zh-CN': {
+    pathPlaceholder: '路径',
+    pathEllipsis: '显示上级目录',
+  },
+})
+
+export interface PathBarItem {
+  name: string
   path: string
+}
+
+function getVisiblePathBarItems(
+  items: PathBarItem[],
+  startIndex: number
+): { ellipsisPath: string | null; visible: PathBarItem[] } {
+  const start = clamp(startIndex, 0, items.length - 1)
+  if (start === 0) {
+    return { ellipsisPath: null, visible: items }
+  }
+
+  return {
+    ellipsisPath: items[start - 1]?.path ?? null,
+    visible: items.slice(start),
+  }
+}
+
+export interface PathBarProps {
+  path: string
+  items: PathBarItem[]
   onNavigate: (path: string) => void
   onEdit?: () => void
+  formatSegment?: (item: PathBarItem) => string
 }
 
 const BLANK_MIN_WIDTH = 16
@@ -28,12 +59,15 @@ function getElementWidth(el: Element): number {
   return el.getBoundingClientRect().width
 }
 
-function renderMeasureSegments(segments: PathBreadcrumbItem[]) {
+function renderMeasureSegments(
+  segments: PathBarItem[],
+  formatSegment: (item: PathBarItem) => string
+) {
   return segments.map((item, index) => (
     <Fragment key={item.path}>
       {index > 0 && <ChevronRight size={12} className="shrink-0" />}
       <span data-segment className="shrink-0 whitespace-nowrap px-0.5">
-        {truncate(item.name, 28)}
+        {formatSegment(item)}
       </span>
     </Fragment>
   ))
@@ -89,23 +123,23 @@ function findCollapseStart(
   return Math.max(segmentWidths.length - 1, 0)
 }
 
-export default observer(function PathBreadcrumb({
+export default function PathBar({
   path,
+  items,
   onNavigate,
   onEdit,
-}: PathBreadcrumbProps) {
-  const { t } = useTranslation()
-  const items = buildRemotePathBreadcrumbs(path)
+  formatSegment = (item) => truncate(item.name, 28),
+}: PathBarProps) {
+  const { t } = useTranslation(I18N_NS)
   const containerRef = useRef<HTMLDivElement>(null)
   const measureRef = useRef<HTMLDivElement>(null)
   const [startIndex, setStartIndex] = useState(0)
   const [lastItemMaxWidth, setLastItemMaxWidth] = useState<number>()
 
   const remeasure = useCallback(() => {
-    const segments = buildRemotePathBreadcrumbs(path)
     const container = containerRef.current
     const measure = measureRef.current
-    if (!container || !measure || segments.length === 0) return
+    if (!container || !measure || items.length === 0) return
 
     const containerWidth = container.clientWidth
     if (containerWidth <= BLANK_MIN_WIDTH) return
@@ -137,7 +171,7 @@ export default observer(function PathBreadcrumb({
       ellipsisPrefixWidth,
       nextStart
     )
-    const lastSegmentWidth = segmentWidths[segments.length - 1] ?? 0
+    const lastSegmentWidth = segmentWidths[items.length - 1] ?? 0
 
     setStartIndex(nextStart)
     setLastItemMaxWidth(
@@ -145,11 +179,11 @@ export default observer(function PathBreadcrumb({
         ? Math.max(available - (collapsedWidth - lastSegmentWidth), 48)
         : undefined
     )
-  }, [path])
+  }, [items, formatSegment])
 
   useLayoutEffect(() => {
     remeasure()
-  }, [remeasure, path])
+  }, [remeasure, items])
 
   useLayoutEffect(() => {
     const container = containerRef.current
@@ -160,7 +194,7 @@ export default observer(function PathBreadcrumb({
     return () => observer.disconnect()
   }, [remeasure])
 
-  const { ellipsisPath, visible } = getVisiblePathBreadcrumbs(items, startIndex)
+  const { ellipsisPath, visible } = getVisiblePathBarItems(items, startIndex)
 
   const showEllipsisMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     const hidden = items.slice(0, startIndex)
@@ -170,7 +204,7 @@ export default observer(function PathBreadcrumb({
       event.clientX,
       event.clientY,
       hidden.map((item) => ({
-        label: truncate(item.name, 28),
+        label: formatSegment(item),
         click: () => onNavigate(item.path),
       }))
     )
@@ -190,7 +224,7 @@ export default observer(function PathBreadcrumb({
           data-full-path
           className="inline-flex w-max items-center gap-1 whitespace-nowrap px-2"
         >
-          {renderMeasureSegments(items)}
+          {renderMeasureSegments(items, formatSegment)}
         </div>
         <div
           data-ellipsis-prefix
@@ -244,7 +278,7 @@ export default observer(function PathBreadcrumb({
                 title={item.path}
                 onClick={() => onNavigate(item.path)}
               >
-                {truncate(item.name, 28)}
+                {formatSegment(item)}
               </button>
             </Fragment>
           )
@@ -259,4 +293,4 @@ export default observer(function PathBreadcrumb({
       />
     </div>
   )
-})
+}

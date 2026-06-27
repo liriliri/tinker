@@ -1,4 +1,4 @@
-import clamp from 'licia/clamp'
+import type { PathBarItem } from 'share/components/PathBar'
 import type { IFileEntry, SortMethod, SortOrder } from '../../common/types'
 
 export function isHiddenEntry(name: string): boolean {
@@ -45,21 +45,14 @@ export function sortEntries(
   return [...dirs, ...files]
 }
 
-export interface PathBreadcrumbItem {
-  name: string
-  path: string
-}
-
-export function buildRemotePathBreadcrumbs(
-  filePath: string
-): PathBreadcrumbItem[] {
+export function buildRemotePathBreadcrumbs(filePath: string): PathBarItem[] {
   if (!filePath || filePath === '.') {
     return [{ name: '.', path: '.' }]
   }
 
   const normalized = filePath.replace(/\\/g, '/')
   const parts = normalized.split('/').filter(Boolean)
-  const items: PathBreadcrumbItem[] = []
+  const items: PathBarItem[] = []
 
   if (normalized.startsWith('/')) {
     items.push({ name: '/', path: '/' })
@@ -77,19 +70,4 @@ export function buildRemotePathBreadcrumbs(
   }
 
   return items
-}
-
-export function getVisiblePathBreadcrumbs(
-  items: PathBreadcrumbItem[],
-  startIndex: number
-): { ellipsisPath: string | null; visible: PathBreadcrumbItem[] } {
-  const start = clamp(startIndex, 0, items.length - 1)
-  if (start === 0) {
-    return { ellipsisPath: null, visible: items }
-  }
-
-  return {
-    ellipsisPath: items[start - 1]?.path ?? null,
-    visible: items.slice(start),
-  }
 }

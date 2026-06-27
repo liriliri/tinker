@@ -99,7 +99,7 @@ export default function FilePreview({ path }: FilePreviewProps) {
   if (!path) {
     return (
       <div
-        className={`w-[280px] border-l ${tw.border} flex items-center justify-center`}
+        className={`w-[280px] border-l ${tw.border} ${tw.bg.tertiary} flex items-center justify-center`}
       >
         <span className={`text-xs ${tw.text.tertiary}`}>
           {t('noFileSelected')}
@@ -118,7 +118,7 @@ export default function FilePreview({ path }: FilePreviewProps) {
 
   return (
     <div
-      className={`w-[280px] border-l ${tw.border} flex flex-col overflow-hidden`}
+      className={`w-[280px] border-l ${tw.border} ${tw.bg.tertiary} flex flex-col overflow-hidden`}
     >
       <div className="flex-1 min-h-0 overflow-hidden">
         {isImage && !imgFailed ? (
