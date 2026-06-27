@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { PanelLeftClose, FolderPlus } from 'lucide-react'
+import { FolderPlus } from 'lucide-react'
 import { tw } from 'share/theme'
 import {
   Toolbar,
@@ -25,7 +25,7 @@ export default observer(function Sidebar() {
       placeholder: t('newFolder'),
     })
     if (name) {
-      store.createFolder(name)
+      store.createSessionFolder(name)
     }
   }
 
@@ -33,8 +33,7 @@ export default observer(function Sidebar() {
 
   return (
     <div
-      className={`w-56 h-full flex flex-col ${tw.bg.tertiary}`}
-      style={{ flexShrink: 0 }}
+      className={`w-56 h-full flex flex-col flex-shrink-0 border-r ${tw.border} ${tw.bg.tertiary}`}
     >
       <Toolbar>
         <ToolbarSearch
@@ -46,17 +45,8 @@ export default observer(function Sidebar() {
         <ToolbarButton onClick={handleCreateFolder} title={t('newFolder')}>
           <FolderPlus size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => store.toggleSidebar()}
-          title={t('hideSidebar')}
-        >
-          <PanelLeftClose size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
       </Toolbar>
-      <OverlayScrollbars
-        defer
-        className={`relative min-h-0 flex-1 border-r ${tw.border}`}
-      >
+      <OverlayScrollbars defer className="relative min-h-0 flex-1">
         <div className="absolute inset-0 flex flex-col">
           <SessionTree filter={filter} />
         </div>
