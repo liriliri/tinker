@@ -211,14 +211,14 @@ export default function SessionConfigDialog({
                   {t('privateKey')}
                 </label>
                 <div
-                  className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
+                  className={`flex items-center rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
                 >
                   <input
                     type="text"
                     value={privateKey}
                     onChange={(e) => setPrivateKey(e.target.value)}
                     placeholder="~/.ssh/id_rsa"
-                    className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
+                    className={`flex-1 py-1.5 px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
                   />
                   <button
                     type="button"
