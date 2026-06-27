@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen } from 'lucide-react'
 import { tw } from 'share/theme'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
+import FileInput from 'share/components/FileInput'
 
 interface CustomPlaceDialogProps {
   open: boolean
@@ -77,26 +77,14 @@ export default function CustomPlaceDialog({
           <label className={`text-sm font-medium ${tw.text.secondary}`}>
             {t('placePath')}
           </label>
-          <div
-            className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
-          >
-            <input
-              type="text"
-              value={path}
-              onChange={(e) => setPath(e.target.value)}
-              className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleConfirm()
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleBrowse}
-              className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
-            >
-              <FolderOpen size={16} />
-            </button>
-          </div>
+          <FileInput
+            value={path}
+            onChange={(e) => setPath(e.target.value)}
+            onBrowse={handleBrowse}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleConfirm()
+            }}
+          />
         </div>
 
         <div className="flex justify-end gap-2 pt-1">

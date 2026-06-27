@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen } from 'lucide-react'
 import { tw } from 'share/theme'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
+import FileInput from 'share/components/FileInput'
 import Select from 'share/components/Select'
 import type { SelectOption } from 'share/components/Select'
 import type { ISessionConfig, SessionType, SSHAuthType } from '../lib/db'
@@ -210,24 +210,12 @@ export default function SessionConfigDialog({
                 <label className={`text-sm font-medium ${tw.text.secondary}`}>
                   {t('privateKey')}
                 </label>
-                <div
-                  className={`flex items-center rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
-                >
-                  <input
-                    type="text"
-                    value={privateKey}
-                    onChange={(e) => setPrivateKey(e.target.value)}
-                    placeholder="~/.ssh/id_rsa"
-                    className={`flex-1 py-1.5 px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleBrowseKey}
-                    className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
-                  >
-                    <FolderOpen size={16} />
-                  </button>
-                </div>
+                <FileInput
+                  value={privateKey}
+                  onChange={(e) => setPrivateKey(e.target.value)}
+                  placeholder="~/.ssh/id_rsa"
+                  onBrowse={handleBrowseKey}
+                />
               </div>
             )}
           </>
@@ -249,24 +237,12 @@ export default function SessionConfigDialog({
               <label className={`text-sm font-medium ${tw.text.secondary}`}>
                 {t('workingDirectory')}
               </label>
-              <div
-                className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
-              >
-                <input
-                  type="text"
-                  value={cwd}
-                  onChange={(e) => setCwd(e.target.value)}
-                  placeholder="~"
-                  className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary}`}
-                />
-                <button
-                  type="button"
-                  onClick={handleBrowse}
-                  className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
-                >
-                  <FolderOpen size={16} />
-                </button>
-              </div>
+              <FileInput
+                value={cwd}
+                onChange={(e) => setCwd(e.target.value)}
+                placeholder="~"
+                onBrowse={handleBrowse}
+              />
             </div>
           </>
         )}

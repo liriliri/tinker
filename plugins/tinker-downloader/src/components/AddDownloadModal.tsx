@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen } from 'lucide-react'
 import isUrl from 'licia/isUrl'
 import trim from 'licia/trim'
 import isStrBlank from 'licia/isStrBlank'
 import { tw } from 'share/theme'
 import Dialog, { DialogButton } from 'share/components/Dialog'
+import FileInput from 'share/components/FileInput'
 import store from '../store'
 import { getFileName } from '../lib/url'
 
@@ -112,24 +112,13 @@ export default observer(function AddDownloadModal({
           <label className={`text-sm font-medium ${tw.text.secondary}`}>
             {t('saveDir')}
           </label>
-          <div
-            className={`flex items-center h-8 rounded ${tw.bg.input} ${tw.border} border overflow-hidden`}
-          >
-            <input
-              type="text"
-              value={store.saveDir}
-              readOnly
-              placeholder={t('saveDir')}
-              className={`flex-1 h-full px-3 text-sm outline-none bg-transparent ${tw.text.primary} cursor-default`}
-            />
-            <button
-              type="button"
-              onClick={handleChooseDir}
-              className={`h-full px-2 cursor-pointer transition-colors ${tw.text.secondary} ${tw.hover}`}
-            >
-              <FolderOpen size={16} />
-            </button>
-          </div>
+          <FileInput
+            value={store.saveDir}
+            readOnly
+            placeholder={t('saveDir')}
+            onBrowse={handleChooseDir}
+            inputClassName="cursor-default"
+          />
         </div>
       </div>
       <div className="flex justify-end mt-4">
