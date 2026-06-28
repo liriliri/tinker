@@ -248,6 +248,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-n64',
+    name: 'N64',
+    description: 'Play N64 ROMs with save state support',
+    icon: 'tinker-n64.png',
+    locales: {
+      'zh-CN': {
+        name: 'N64',
+        description: '运行 N64 游戏，支持存档',
+      },
+    },
+  },
+  {
     id: 'tinker-nes',
     name: 'NES',
     description: 'Play NES ROMs with save state support',
