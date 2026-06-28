@@ -200,6 +200,27 @@ async function downloadRemoteFile(
   }
 }
 
+async function deleteRemoteEntry(
+  connectionId: string,
+  remotePath: string
+): Promise<void> {
+  const { sftp } = getConnection(connectionId)
+  const normalized = normalizeRemotePath(remotePath)
+  const stat = await sftpCallback<{ isDirectory(): boolean }>((cb) =>
+    sftp.stat(normalized, cb)
+  )
+
+  if (stat.isDirectory()) {
+    const entries = await readRemoteDir(connectionId, normalized)
+    for (const entry of entries) {
+      await deleteRemoteEntry(connectionId, entry.path)
+    }
+    await sftpCallback<void>((cb) => sftp.rmdir(normalized, cb))
+  } else {
+    await sftpCallback<void>((cb) => sftp.unlink(normalized, cb))
+  }
+}
+
 async function downloadRemoteDirectory(
   connectionId: string,
   remotePath: string,
@@ -397,17 +418,7 @@ const sftpObj = {
   },
 
   async deleteRemote(connectionId: string, remotePath: string): Promise<void> {
-    const { sftp } = getConnection(connectionId)
-    const normalized = normalizeRemotePath(remotePath)
-    const stat = await sftpCallback<{ isDirectory(): boolean }>((cb) =>
-      sftp.stat(normalized, cb)
-    )
-
-    if (stat.isDirectory()) {
-      await sftpCallback<void>((cb) => sftp.rmdir(normalized, cb))
-    } else {
-      await sftpCallback<void>((cb) => sftp.unlink(normalized, cb))
-    }
+    await deleteRemoteEntry(connectionId, remotePath)
   },
 
   async mkdirRemote(connectionId: string, remotePath: string): Promise<void> {
