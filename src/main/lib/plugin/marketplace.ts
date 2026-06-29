@@ -332,6 +332,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-trap-the-cat',
+    name: 'Trap the Cat',
+    description: 'Click dots to trap the cat before it escapes!',
+    icon: 'tinker-trap-the-cat.png',
+    locales: {
+      'zh-CN': {
+        name: '圈小猫',
+        description: '点击圆点围住小猫，别让它跑到边缘！',
+      },
+    },
+  },
+  {
     id: 'tinker-typing-test',
     name: 'Typing Test',
     description: 'Test and improve your typing speed',
