@@ -284,6 +284,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-spider-solitaire',
+    name: 'Spider Solitaire',
+    description: 'Build complete suits from King to Ace in this classic card game.',
+    icon: 'tinker-spider-solitaire.png',
+    locales: {
+      'zh-CN': {
+        name: '蜘蛛纸牌',
+        description: '经典纸牌游戏，凑齐 K 到 A 的同花顺即可获胜。',
+      },
+    },
+  },
+  {
     id: 'tinker-token-usage',
     name: 'Token Usage',
     description: 'Track token usage statistics for AI coding tools',
