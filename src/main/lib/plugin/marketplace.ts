@@ -286,7 +286,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-spider-solitaire',
     name: 'Spider Solitaire',
-    description: 'Build complete suits from King to Ace in this classic card game.',
+    description:
+      'Build complete suits from King to Ace in this classic card game.',
     icon: 'tinker-spider-solitaire.png',
     locales: {
       'zh-CN': {

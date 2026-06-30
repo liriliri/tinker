@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import pdfjsLib from 'pdfjs-dist'
 import LocalStore from 'licia/LocalStore'
+import clamp from 'licia/clamp'
 import dataUrl from 'licia/dataUrl'
 import convertBin from 'licia/convertBin'
 import i18n from 'i18next'
@@ -102,13 +103,10 @@ class Store extends BaseStore {
   }
 
   setScale(scale: number, isUserAction: boolean = false) {
-    // Round to avoid floating point issues
     const newScale = Math.round(scale * 100) / 100
-    if (newScale >= 0.5 && newScale <= 3) {
-      this.scale = newScale
-      if (isUserAction) {
-        this.userHasZoomed = true
-      }
+    this.scale = clamp(newScale, 0.5, 3)
+    if (isUserAction) {
+      this.userHasZoomed = true
     }
   }
 
@@ -122,9 +120,21 @@ class Store extends BaseStore {
     this.setScale(newScale, true)
   }
 
-  resetZoom() {
-    this.scale = 1.0
-    this.userHasZoomed = true
+  async resetZoom() {
+    const fitScale = await this.computeFitScale()
+    this.setScale(fitScale, true)
+  }
+
+  private async computeFitScale(): Promise<number> {
+    if (!this.pdfDoc || this.containerWidth <= 0) return 1.0
+    try {
+      const page = await this.pdfDoc.getPage(1)
+      const viewport = page.getViewport({ scale: 1 })
+      const availableWidth = Math.max(this.containerWidth - 32, 1)
+      return clamp(availableWidth / viewport.width, 0.5, 1.0)
+    } catch {
+      return 1.0
+    }
   }
 
   setContainerWidth(width: number) {
@@ -133,11 +143,6 @@ class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
-  }
-
-  setSidebarOpen(open: boolean) {
-    this.sidebarOpen = open
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 

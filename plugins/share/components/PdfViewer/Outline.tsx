@@ -1,11 +1,11 @@
-import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
+import { tw } from '../../theme'
 import className from 'licia/className'
-import Tree, { TreeNodeData } from 'share/components/Tree'
-import store from '../store'
+import Tree, { TreeNodeData } from '../Tree'
+import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { RefProxy } from 'pdfjs-dist/types/src/display/api'
+import { PDF_VIEWER_NS } from './i18n'
 
 interface OutlineItem extends TreeNodeData {
   title: string
@@ -23,19 +23,31 @@ interface RawOutlineItem {
   items?: RawOutlineItem[]
 }
 
-export default observer(function Outline() {
-  const { t } = useTranslation()
+export interface OutlineProps {
+  pdfDoc: PDFDocumentProxy | null
+  numPages: number
+  onSetCurrentPage: (page: number) => void
+  onSetScrollToPage: (page: number) => void
+}
+
+export default function Outline({
+  pdfDoc,
+  numPages,
+  onSetCurrentPage,
+  onSetScrollToPage,
+}: OutlineProps) {
+  const { t } = useTranslation(PDF_VIEWER_NS)
   const [outline, setOutline] = useState<OutlineItem[] | null>(null)
 
   useEffect(() => {
     const loadOutline = async () => {
-      if (!store.pdfDoc) {
+      if (!pdfDoc) {
         setOutline(null)
         return
       }
 
       try {
-        const outlineData = await store.pdfDoc.getOutline()
+        const outlineData = await pdfDoc.getOutline()
         if (outlineData) {
           const transformOutline = (items: RawOutlineItem[]): OutlineItem[] => {
             return items.map((item, index) => ({
@@ -60,34 +72,34 @@ export default observer(function Outline() {
     }
 
     loadOutline()
-  }, [store.pdfDoc])
+  }, [pdfDoc])
 
   const handleItemClick = async (item: OutlineItem) => {
-    if (!store.pdfDoc || !item.dest) return
+    if (!pdfDoc || !item.dest) return
 
     try {
       let pageNumber: number | null = null
 
       if (typeof item.dest === 'string') {
-        const explicitDest = await store.pdfDoc.getDestination(item.dest)
+        const explicitDest = await pdfDoc.getDestination(item.dest)
         if (Array.isArray(explicitDest) && explicitDest[0]) {
           const pageRef = explicitDest[0]
-          pageNumber = await store.pdfDoc.getPageIndex(pageRef)
+          pageNumber = await pdfDoc.getPageIndex(pageRef)
           pageNumber = pageNumber + 1
         }
       } else if (Array.isArray(item.dest) && item.dest[0]) {
         const pageRef = item.dest[0]
         if (typeof pageRef === 'object') {
-          pageNumber = await store.pdfDoc.getPageIndex(pageRef)
+          pageNumber = await pdfDoc.getPageIndex(pageRef)
           pageNumber = pageNumber + 1
         } else if (typeof pageRef === 'number') {
           pageNumber = pageRef + 1
         }
       }
 
-      if (pageNumber && pageNumber >= 1 && pageNumber <= store.numPages) {
-        store.setCurrentPage(pageNumber)
-        store.scrollToPage = pageNumber
+      if (pageNumber && pageNumber >= 1 && pageNumber <= numPages) {
+        onSetCurrentPage(pageNumber)
+        onSetScrollToPage(pageNumber)
       }
     } catch (error) {
       console.error('Error navigating to destination:', error)
@@ -108,7 +120,7 @@ export default observer(function Outline() {
     </span>
   )
 
-  if (!store.pdfDoc) {
+  if (!pdfDoc) {
     return null
   }
 
@@ -120,4 +132,4 @@ export default observer(function Outline() {
       emptyText={t('noOutline')}
     />
   )
-})
+}

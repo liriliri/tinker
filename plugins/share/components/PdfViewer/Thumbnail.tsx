@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { tw, THEME_COLORS } from 'share/theme'
+import { tw, THEME_COLORS } from '../../theme'
 import className from 'licia/className'
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist'
-import { THUMBNAIL_WIDTH } from '../lib/constants'
+
+const THUMBNAIL_WIDTH = 126
 
 interface ThumbnailProps {
   pageNum: number
@@ -50,7 +51,7 @@ export default function Thumbnail({
       },
       {
         root: null,
-        rootMargin: '200px', // Start loading 200px before entering viewport
+        rootMargin: '200px',
         threshold: 0,
       }
     )
@@ -89,7 +90,6 @@ export default function Thumbnail({
         })
         if (!context) return
 
-        // Render at 2x scale for better quality, then downscale
         const upscaleFactor = 2
         const scaledViewport = page.getViewport({
           scale: thumbnailScale * upscaleFactor,
@@ -181,7 +181,6 @@ export default function Thumbnail({
           </div>
         )}
       </div>
-      {/* Page number overlay */}
       <div
         className={`
           absolute bottom-3 left-1/2 -translate-x-1/2

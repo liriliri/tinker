@@ -2,25 +2,12 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import pdfjsLib from 'pdfjs-dist'
 import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist'
-import { tw } from '../theme'
-import { addI18nNamespace } from '../lib/i18n'
+import { tw } from '../../theme'
+import './i18n'
+import { PDF_VIEWER_NS as I18N_NS } from './i18n'
 
-const I18N_NS = 'pdfViewer'
-
-addI18nNamespace(I18N_NS, {
-  'en-US': {
-    loading: 'Loading...',
-    error: 'Failed to load PDF',
-    page: 'Page {{pageNum}}',
-    rendering: 'Rendering...',
-  },
-  'zh-CN': {
-    loading: '加载中...',
-    error: '无法加载 PDF',
-    page: '第 {{pageNum}} 页',
-    rendering: '渲染中...',
-  },
-})
+export { default as Thumbnail } from './Thumbnail'
+export { default as Outline } from './Outline'
 
 interface PageRenderState {
   rendered: boolean

@@ -317,6 +317,44 @@ import PhotoViewer from 'share/components/PhotoViewer'
 />
 ```
 
+### PdfViewer
+
+PDF renderer. The default export is a controlled viewer that renders pages to canvas with lazy loading, zoom, and keyboard shortcuts. Requires the `pdfjs` vendor script in `index.html`. Also exports `Thumbnail` and `Outline` atoms for plugins that want to build their own sidebar layout.
+
+```ts
+import PdfViewer, { Thumbnail, Outline } from 'share/components/PdfViewer'
+
+<PdfViewer
+  pdfDoc={pdfDoc}
+  loading={isLoading}
+  scale={scale}
+  onScaleChange={(s, isUser) => setScale(s, isUser)}
+  onCurrentPageChange={setCurrentPage}
+  scrollToPage={scrollToPage}
+  enableKeyboardShortcuts
+  onPrevPage={prevPage}
+  onNextPage={nextPage}
+  onZoomIn={zoomIn}
+  onZoomOut={zoomOut}
+  onResetZoom={resetZoom}
+/>
+
+// Build a custom sidebar using the shared atoms:
+<Thumbnail
+  pageNum={1}
+  pdfDoc={pdfDoc}
+  scale={scale}
+  isActive={currentPage === 1}
+  onClick={() => setCurrentPage(1)}
+/>
+<Outline
+  pdfDoc={pdfDoc}
+  numPages={numPages}
+  onSetCurrentPage={setCurrentPage}
+  onSetScrollToPage={(p) => { scrollToPage = p }}
+/>
+```
+
 ### MarkdownPreview
 
 Markdown renderer with GFM support and syntax highlighting. Requires `markdown.js` and `syntaxhighlighter.js` vendor scripts.
