@@ -3,7 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FileText } from 'lucide-react'
 import { tw } from 'share/theme'
-import { formatFileSize } from '../lib/util'
+import {
+  getBookDisplayTitle,
+  getBookReadPercent,
+  getBookTypeLabel,
+} from '../lib/util'
 import type { Book } from '../types'
 import store from '../store'
 
@@ -16,6 +20,9 @@ const BookCard = observer(function BookCard({ book, onOpen }: BookCardProps) {
   const { t } = useTranslation()
   const ref = useRef<HTMLDivElement>(null)
   const [generating, setGenerating] = useState(false)
+  const displayTitle = getBookDisplayTitle(book)
+  const typeLabel = getBookTypeLabel(book.path)
+  const readPercent = getBookReadPercent(book)
 
   useEffect(() => {
     const el = ref.current
@@ -40,7 +47,7 @@ const BookCard = observer(function BookCard({ book, onOpen }: BookCardProps) {
   return (
     <div
       ref={ref}
-      className={`group cursor-pointer rounded-lg ${tw.bg.secondary} ${tw.border} ${tw.hover} transition-colors overflow-hidden`}
+      className="group cursor-pointer"
       onClick={() => onOpen(book)}
       onContextMenu={(e) => {
         e.preventDefault()
@@ -56,11 +63,13 @@ const BookCard = observer(function BookCard({ book, onOpen }: BookCardProps) {
         ])
       }}
     >
-      <div className="relative aspect-[3/4] flex items-center justify-center overflow-hidden">
+      <div
+        className={`relative aspect-[3/4] flex items-center justify-center overflow-hidden rounded-lg ${tw.bg.secondary} ${tw.border} ${tw.hover} transition-colors`}
+      >
         {book.coverDataUrl ? (
           <img
             src={book.coverDataUrl}
-            alt={book.title}
+            alt={displayTitle}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -73,18 +82,23 @@ const BookCard = observer(function BookCard({ book, onOpen }: BookCardProps) {
             )}
           </div>
         )}
+        {typeLabel && (
+          <span className="absolute bottom-1.5 right-1.5 rounded px-1.5 py-1 text-xs font-semibold leading-none bg-black/70 text-white/90">
+            {typeLabel}
+          </span>
+        )}
       </div>
-      <div className="p-2">
+      <div className="pt-2">
         <div
           className={`text-sm font-medium line-clamp-2 ${tw.text.primary}`}
-          title={book.title}
+          title={displayTitle}
         >
-          {book.title}
+          {displayTitle}
         </div>
         <div className={`mt-1 text-xs ${tw.text.tertiary}`}>
-          {book.numPages > 0
-            ? t('pageCount', { count: book.numPages })
-            : formatFileSize(book.fileSize)}
+          {readPercent === null
+            ? t('unread')
+            : t('readProgress', { percent: readPercent })}
         </div>
       </div>
     </div>

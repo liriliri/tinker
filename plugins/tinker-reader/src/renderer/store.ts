@@ -4,6 +4,8 @@ import LocalStore from 'licia/LocalStore'
 import clamp from 'licia/clamp'
 import contain from 'licia/contain'
 import isEqual from 'licia/isEqual'
+import isStrBlank from 'licia/isStrBlank'
+import lowerCase from 'licia/lowerCase'
 import normalizePath from 'licia/normalizePath'
 import uuid from 'licia/uuid'
 import i18n from 'i18next'
@@ -19,6 +21,7 @@ import {
 } from './lib/db'
 import {
   findBookByPath,
+  getBookDisplayTitle,
   isPathUnderScanDirs,
   normalizeScanDir,
 } from './lib/util'
@@ -36,6 +39,7 @@ export type SidebarView = 'thumbnails' | 'outline'
 
 class Store extends BaseStore {
   books: Book[] = []
+  searchQuery: string = ''
   showScanDialog: boolean = false
   scanDirs: string[] = []
   scanDirChecked: string[] = []
@@ -110,6 +114,20 @@ class Store extends BaseStore {
   get currentBook(): Book | null {
     if (!this.currentBookId) return null
     return this.books.find((book) => book.id === this.currentBookId) ?? null
+  }
+
+  get filteredBooks(): Book[] {
+    if (isStrBlank(this.searchQuery)) return this.books
+    const query = lowerCase(this.searchQuery)
+    return this.books.filter(
+      (book) =>
+        lowerCase(getBookDisplayTitle(book)).includes(query) ||
+        lowerCase(book.path).includes(query)
+    )
+  }
+
+  setSearchQuery(query: string) {
+    this.searchQuery = query
   }
 
   get pages(): number[] {
@@ -255,6 +273,7 @@ class Store extends BaseStore {
   async clearAllBooks() {
     runInAction(() => {
       this.books = []
+      this.searchQuery = ''
     })
     this.closeReader()
     await dbClearBooks()
@@ -283,7 +302,6 @@ class Store extends BaseStore {
           this.scrollToPage = target.lastPage
         }
       }
-      this.isLoading = false
     })
 
     if (this.currentBook) {
@@ -305,6 +323,7 @@ class Store extends BaseStore {
         this.numPages = pdfDoc.numPages
         this.currentPage = 1
         this.userHasZoomed = false
+        this.isLoading = false
       })
 
       if (this.currentBook && this.currentBook.numPages !== pdfDoc.numPages) {
@@ -334,6 +353,7 @@ class Store extends BaseStore {
     this.scrollToPage = 0
     this.readerOpen = false
     this.currentBookId = null
+    this.isLoading = false
   }
 
   setCurrentPage(page: number) {

@@ -5,7 +5,7 @@
   "search": "Search",
   "scanLocalPhotos": "Scan Folders",
   "clearList": "Clear List",
-  "clearListConfirm": "Clear the list? Files on disk won't be deleted.",
+  "clearListConfirm": "Disk files will not be deleted.",
   "photoCount": "{{count}} photos",
   "emptyGallery": "No photos",
   "fileNotFound": "File not found",

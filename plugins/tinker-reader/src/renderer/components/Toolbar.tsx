@@ -18,6 +18,7 @@ import {
   Toolbar,
   ToolbarButton,
   ToolbarSpacer,
+  ToolbarSearch,
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
@@ -54,6 +55,15 @@ const ReaderToolbar = observer(function ReaderToolbar() {
     return (
       <Toolbar className="relative">
         <ToolbarButton
+          onClick={() => store.closeReader()}
+          title={t('backToList')}
+        >
+          <ArrowLeft size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <ToolbarButton
           onClick={() => store.toggleSidebar()}
           title={t(store.sidebarOpen ? 'hideSidebar' : 'showSidebar')}
           disabled={!store.pdfDoc}
@@ -63,19 +73,6 @@ const ReaderToolbar = observer(function ReaderToolbar() {
           ) : (
             <PanelLeft size={TOOLBAR_ICON_SIZE} />
           )}
-        </ToolbarButton>
-
-        <ToolbarSeparator />
-
-        <ToolbarButton
-          onClick={() => store.closeReader()}
-          title={t('backToList')}
-        >
-          <ArrowLeft size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-
-        <ToolbarButton onClick={handleImport} title={t('import')}>
-          <FolderOpen size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
 
         <ToolbarSpacer />
@@ -146,6 +143,14 @@ const ReaderToolbar = observer(function ReaderToolbar() {
 
   return (
     <Toolbar>
+      <ToolbarSearch
+        value={store.searchQuery}
+        onChange={(value) => store.setSearchQuery(value)}
+        placeholder={t('search')}
+        shortcut="f"
+        className="!w-40 !ml-0 shrink-0"
+      />
+
       <ToolbarButton onClick={handleImport} title={t('import')}>
         <FolderOpen size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
@@ -159,7 +164,7 @@ const ReaderToolbar = observer(function ReaderToolbar() {
       <ToolbarSpacer />
 
       <span className="text-xs opacity-60 px-2">
-        {t('bookCount', { count: store.books.length })}
+        {t('bookCount', { count: store.filteredBooks.length })}
       </span>
 
       <ToolbarButton

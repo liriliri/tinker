@@ -5,7 +5,7 @@
   "search": "搜索",
   "scanLocalPhotos": "扫描文件夹",
   "clearList": "清空列表",
-  "clearListConfirm": "清空列表？不会删除磁盘文件。",
+  "clearListConfirm": "不会删除磁盘文件。",
   "photoCount": "共 {{count}} 张照片",
   "emptyGallery": "暂无照片",
   "fileNotFound": "文件不存在",

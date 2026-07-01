@@ -399,6 +399,7 @@ export default function PdfViewer({
     )
 
     pageRefs.current.forEach((pageDiv) => observer.observe(pageDiv))
+    void renderPage(1)
 
     return () => observer.disconnect()
   }, [pdfDoc, numPages, pageStates, renderPage])
@@ -511,16 +512,6 @@ export default function PdfViewer({
     if (empty) return <>{empty}</>
 
     return null
-  }
-
-  if (loading) {
-    return (
-      <div
-        className={`flex items-center justify-center ${className} ${tw.text.secondary}`}
-      >
-        {t('loading')}
-      </div>
-    )
   }
 
   return (

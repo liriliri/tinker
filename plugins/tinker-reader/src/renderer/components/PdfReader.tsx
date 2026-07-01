@@ -9,10 +9,10 @@ const PdfReader = observer(function PdfReader() {
   const { t } = useTranslation()
 
   return (
-    <>
+    <div className="flex flex-1 min-h-0 w-full overflow-hidden">
       <Sidebar />
       <PdfViewer
-        className="flex-1"
+        className="flex-1 min-h-0"
         pdfDoc={store.pdfDoc}
         loading={store.isLoading}
         empty={
@@ -37,7 +37,7 @@ const PdfReader = observer(function PdfReader() {
         onResetZoom={() => store.resetZoom()}
         onContainerWidthChange={(width) => store.setContainerWidth(width)}
       />
-    </>
+    </div>
   )
 })
 
