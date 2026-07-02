@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Sparkles } from 'lucide-react'
+import OverlayScrollbars from '../OverlayScrollbars'
 import { tw } from '../../theme'
 import MessageItem, { type MessageItemProps } from './MessageItem'
 import type { ChatMessage } from './types'
@@ -72,7 +73,7 @@ export default function MessageList({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <OverlayScrollbars defer className="flex-1 min-h-0">
       <div ref={innerRef}>
         {messages.map((msg, index) => {
           if (children) {
@@ -90,6 +91,6 @@ export default function MessageList({
         })}
         <div ref={bottomRef} />
       </div>
-    </div>
+    </OverlayScrollbars>
   )
 }
