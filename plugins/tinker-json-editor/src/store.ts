@@ -4,6 +4,8 @@ import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
+import toast from 'react-hot-toast'
+import i18n from 'i18next'
 import BaseStore from 'share/BaseStore'
 
 type EditorMode = 'text' | 'tree'
@@ -23,6 +25,8 @@ class Store extends BaseStore {
   fileVersion: number = 0
   currentFilePath: string | null = null
   savedContent: string = ''
+  hasAI: boolean = false
+  isFixingWithAI: boolean = false
 
   constructor() {
     super()
@@ -30,6 +34,9 @@ class Store extends BaseStore {
     this.loadStorage()
     this.bindEvent()
     this.loadSavedFile()
+    tinker.getAIProviders().then((providers) => {
+      this.hasAI = providers.length > 0
+    })
   }
 
   private bindEvent() {
@@ -278,6 +285,39 @@ class Store extends BaseStore {
   redo() {
     if (this.textEditorInstance) {
       this.textEditorInstance.trigger('keyboard', 'redo', null)
+    }
+  }
+
+  async fixJsonWithAI() {
+    if (this.isEmpty || this.isFixingWithAI) return
+
+    this.isFixingWithAI = true
+    const loadingToast = toast.loading(i18n.t('fixingJson'))
+
+    try {
+      const systemPrompt =
+        'You are a JSON repair tool. Fix the following invalid JSON and return ONLY the corrected JSON without any explanation, markdown formatting, or extra content. Do not wrap it in code blocks.'
+
+      const result = await tinker.callAI({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: this.jsonInput },
+        ],
+      })
+
+      if (!result.success || !result.data?.content) {
+        toast.error(i18n.t('fixJsonFailed'), { id: loadingToast })
+        return
+      }
+
+      const content = (result.data.content as string).trim()
+      JSON.parse(content)
+      this.setJsonInput(content)
+      toast.success(i18n.t('fixJsonSuccess'), { id: loadingToast })
+    } catch (err) {
+      toast.error(i18n.t('fixJsonFailed'), { id: loadingToast })
+    } finally {
+      this.isFixingWithAI = false
     }
   }
 }

@@ -169,8 +169,11 @@ export default observer(function ToolbarComponent() {
 
       {store.jsonError && (
         <div
-          className="text-red-600 dark:text-red-400 ml-1"
+          className={`text-red-600 dark:text-red-400 ml-1 ${
+            store.hasAI ? 'cursor-pointer hover:opacity-80' : ''
+          }`}
           title={store.jsonError}
+          onClick={() => store.hasAI && store.fixJsonWithAI()}
         >
           <AlertCircle size={16} />
         </div>

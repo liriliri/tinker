@@ -13,5 +13,8 @@
   "copy": "复制到剪贴板",
   "paste": "从剪贴板粘贴",
   "clear": "清空",
+  "fixingJson": "正在修复 JSON 格式...",
+  "fixJsonSuccess": "JSON 格式修复成功",
+  "fixJsonFailed": "JSON 格式修复失败",
   "lines": "{{count}} 行"
 }

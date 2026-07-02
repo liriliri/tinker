@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import endWith from 'licia/endWith'
 import { tw } from 'share/theme'
+import { ToasterProvider } from 'share/components/Toaster'
 import TextEditor from './components/TextEditor'
 import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
@@ -51,13 +52,15 @@ const App = observer(function App() {
   }, [])
 
   return (
-    <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
-      <Toolbar />
+    <ToasterProvider>
+      <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
+        <Toolbar />
 
-      <div className={`flex-1 overflow-hidden ${tw.bg.primary}`}>
-        {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
+        <div className={`flex-1 overflow-hidden ${tw.bg.primary}`}>
+          {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
+        </div>
       </div>
-    </div>
+    </ToasterProvider>
   )
 })
 

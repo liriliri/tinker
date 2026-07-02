@@ -13,5 +13,8 @@
   "copy": "Copy to clipboard",
   "paste": "Paste from clipboard",
   "clear": "Clear all",
+  "fixingJson": "Fixing JSON format...",
+  "fixJsonSuccess": "JSON format fixed successfully",
+  "fixJsonFailed": "Failed to fix JSON format",
   "lines": "{{count}} lines"
 }
