@@ -32,6 +32,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-ball-maze',
+    name: 'Ball Maze',
+    description: 'Roll the ball through the maze and find the exit!',
+    icon: 'tinker-ball-maze.png',
+    locales: {
+      'zh-CN': {
+        name: '滚球迷宫',
+        description: '滚动小球穿越迷宫，找到出口！',
+      },
+    },
+  },
+  {
     id: 'tinker-bg-remover',
     name: 'Background Remover',
     description: 'Remove image backgrounds locally with AI',
