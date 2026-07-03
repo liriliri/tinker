@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
 import {
   MessageItem as BaseMessageItem,
   type MessageItemProps as BaseProps,
@@ -28,8 +27,6 @@ export default observer(function MessageItem({
   msg,
   toolMessages = [],
 }: Props) {
-  const { t } = useTranslation()
-
   function openSearchResult(url: string) {
     aiChat.openExternal(url)
   }
@@ -69,9 +66,6 @@ export default observer(function MessageItem({
     msg: msg as BaseChatMessage,
     footer,
     isDark: store.isDark,
-    retryLabel: t('retry'),
-    deleteLabel: t('delete'),
-    errorPrefix: t('errorPrefix'),
     onRetry: () => store.retryLastMessage(),
     onDelete: (id) => store.deleteMessage(id),
   }

@@ -80,6 +80,12 @@ export default observer(function TextSection() {
     }
   }, [editor, store.matches])
 
+  useEffect(() => {
+    if (!editor) return
+    const timer = window.setTimeout(() => editor.refresh(), 0)
+    return () => window.clearTimeout(timer)
+  }, [editor, store.chatOpen])
+
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">
       <div

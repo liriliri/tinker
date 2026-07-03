@@ -238,5 +238,8 @@
       "tip": "This feature is not supported in JavaScript regular expressions.",
       "desc": "This feature is not supported in JavaScript regex."
     }
-  }
+  },
+  "chatTitle": "RegExp Assistant",
+  "chatInputPlaceholder": "Ask about regular expressions...",
+  "chatEmptyHint": "Ask me to help write or debug regex"
 }

@@ -55,9 +55,26 @@ export default function CodeMirrorEditor({
       onEditorReady(editor)
     }
 
+    const refreshEditor = () => {
+      requestAnimationFrame(() => {
+        editor.refresh()
+      })
+    }
+
+    const observer = new ResizeObserver(refreshEditor)
+    const container = editorRef.current
+    observer.observe(container)
+    if (container.parentElement) {
+      observer.observe(container.parentElement)
+    }
+
     return () => {
-      if (cmInstanceRef.current) {
-        cmInstanceRef.current.toTextArea()
+      observer.disconnect()
+      const editor = cmInstanceRef.current
+      if (editor) {
+        if (typeof editor.toTextArea === 'function') {
+          editor.toTextArea()
+        }
         cmInstanceRef.current = null
       }
     }

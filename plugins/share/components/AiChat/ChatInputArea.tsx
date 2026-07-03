@@ -1,0 +1,131 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Settings } from 'lucide-react'
+import Select from '../Select'
+import Dialog, { DialogButton } from '../Dialog'
+import { tw } from '../../theme'
+import ChatInput from './ChatInput'
+import { AI_CHAT_NS } from './i18n'
+
+export interface ChatInputAreaProps {
+  value: string
+  onChange: (value: string) => void
+  onSend: () => void
+  onStop?: () => void
+  isGenerating?: boolean
+  canSend?: boolean
+  placeholder?: string
+  rows?: number
+  hasProviders: boolean
+  selectedCombined: string
+  combinedOptions: Array<{ value: string; label: string }>
+  onModelChange: (value: string) => void
+  systemPrompt?: string
+  onSystemPromptChange?: (value: string) => void
+}
+
+export default function ChatInputArea({
+  value,
+  onChange,
+  onSend,
+  onStop,
+  isGenerating = false,
+  canSend = true,
+  placeholder,
+  rows,
+  hasProviders,
+  selectedCombined,
+  combinedOptions,
+  onModelChange,
+  systemPrompt = '',
+  onSystemPromptChange,
+}: ChatInputAreaProps) {
+  const { t } = useTranslation(AI_CHAT_NS)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [draftPrompt, setDraftPrompt] = useState('')
+
+  function openSettings() {
+    setDraftPrompt(systemPrompt)
+    setSettingsOpen(true)
+  }
+
+  function saveSettings() {
+    onSystemPromptChange?.(draftPrompt)
+    setSettingsOpen(false)
+  }
+
+  const modelSelect = (
+    <>
+      {!hasProviders ? (
+        <Select
+          value=""
+          onChange={() => {}}
+          options={[{ value: '', label: t('noProviders') }]}
+          className="max-w-48"
+          disabled={true}
+        />
+      ) : (
+        <Select
+          value={selectedCombined}
+          onChange={(val) => onModelChange(val as string)}
+          options={combinedOptions}
+          className="max-w-48"
+        />
+      )}
+      {onSystemPromptChange && (
+        <button
+          onClick={openSettings}
+          title={t('settings')}
+          className={`shrink-0 w-6 h-6 rounded flex items-center justify-center ${
+            tw.hover
+          } ${systemPrompt ? tw.primary.text : tw.text.tertiary}`}
+        >
+          <Settings size={12} />
+        </button>
+      )}
+    </>
+  )
+
+  return (
+    <>
+      <ChatInput
+        value={value}
+        onChange={onChange}
+        onSend={onSend}
+        onStop={onStop}
+        isGenerating={isGenerating}
+        canSend={canSend}
+        placeholder={placeholder}
+        rows={rows}
+        extra={modelSelect}
+      />
+
+      {onSystemPromptChange && (
+        <Dialog
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          title={t('systemPrompt')}
+        >
+          <div className="flex flex-col gap-4">
+            <textarea
+              value={draftPrompt}
+              onChange={(e) => setDraftPrompt(e.target.value)}
+              placeholder={t('systemPromptPlaceholder')}
+              rows={6}
+              className={`w-full resize-none rounded border px-3 py-2 text-sm outline-none focus:ring-1 ${tw.bg.input} ${tw.border} ${tw.text.primary} ${tw.primary.focusRing}`}
+            />
+            <div className="flex justify-end gap-2">
+              <DialogButton
+                variant="text"
+                onClick={() => setSettingsOpen(false)}
+              >
+                {t('cancel')}
+              </DialogButton>
+              <DialogButton onClick={saveSettings}>{t('save')}</DialogButton>
+            </div>
+          </div>
+        </Dialog>
+      )}
+    </>
+  )
+}

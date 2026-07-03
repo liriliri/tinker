@@ -1,4 +1,6 @@
 @use '../../share/base.scss';
+@use '../../share/styles/overlayscrollbars.scss';
+@use '../../share/styles/resizablepanels.scss';
 @config "../tailwind.config.js";
 
 /* Regex Expression Highlighting Styles
@@ -292,24 +294,38 @@ html.dark {
 
 /* CodeMirror styles */
 .regexp-editor {
+  height: 40px;
+
   .CodeMirror {
-    height: auto;
+    height: 40px;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 20px;
     background: transparent;
     color: inherit;
   }
 
+  .CodeMirror-scroll {
+    overflow: hidden !important;
+  }
+
+  .CodeMirror-sizer {
+    min-height: 20px !important;
+  }
+
   .CodeMirror-lines {
-    padding: 0;
+    padding: 10px 0;
   }
 
   .CodeMirror-line {
     padding: 0;
+    line-height: 20px;
   }
 
   .CodeMirror-cursor {
-    border-left: 2px solid #409eff;
+    border-left: 1px solid #409eff;
+    height: 18px !important;
+    margin-top: 1px;
   }
 }
 

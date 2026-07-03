@@ -1,26 +1,8 @@
 {
   "newChat": "New Chat",
   "sessions": "Sessions",
-  "clearMessages": "Clear Messages",
   "delete": "Delete",
-  "you": "You",
-  "assistant": "Assistant",
-  "retry": "Retry",
-  "send": "Send",
-  "stop": "Stop",
-  "inputPlaceholder": "Type a message...",
   "sendHint": "Enter to send · Shift+Enter for newline",
-  "emptyHint": "Start a conversation",
-  "noProviders": "No AI providers configured",
-  "errorPrefix": "Error: ",
-  "systemPrompt": "System Prompt",
-  "systemPromptPlaceholder": "Optional system prompt...",
-  "settings": "Settings",
-  "save": "Save",
-  "cancel": "Cancel",
   "deleteSessionConfirm": "Delete this conversation?",
-  "searching": "Searching",
-  "searchedFor": "Searched",
-  "searchResults": "results",
-  "searchFailed": "Search failed"
+  "searchedFor": "Searched"
 }

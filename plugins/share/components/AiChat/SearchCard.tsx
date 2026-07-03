@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, Search } from 'lucide-react'
 import { tw } from '../../theme'
 import type { WebSearchResult } from '../../tools/web'
+import { AI_CHAT_NS } from './i18n'
 
 export interface SearchCardProps {
   query: string
@@ -43,7 +44,7 @@ export default function SearchCard({
   isRunning = false,
   onOpenResult,
 }: SearchCardProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(AI_CHAT_NS)
   const [expanded, setExpanded] = useState(false)
   const count = results.length
   const isError = Boolean(error)

@@ -1,15 +1,5 @@
 {
-  "clearMessages": "清空消息",
-  "delete": "删除",
-  "retry": "重试",
-  "send": "发送",
-  "stop": "停止",
   "inputPlaceholder": "让我帮你完成一些任务…",
   "emptyHint": "开始对话吧",
-  "noProviders": "未配置 AI 提供商",
-  "errorPrefix": "错误：",
-  "searching": "正在搜索",
-  "searchResults": "条结果",
-  "searchFailed": "搜索失败",
   "running": "执行中..."
 }

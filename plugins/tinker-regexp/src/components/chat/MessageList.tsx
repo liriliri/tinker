@@ -1,14 +1,16 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { MessageList as BaseMessageList } from 'share/components/AiChat'
-import type { ChatMessage as BaseChatMessage } from 'share/components/AiChat'
-import store from '../store'
-import type { ChatMessage } from '../types'
+import {
+  MessageList as BaseMessageList,
+  type ChatMessage as BaseChatMessage,
+} from 'share/components/AiChat'
+import chatStore from '../../chatStore'
+import type { ChatMessage } from '../../types/chat'
 import MessageItem from './MessageItem'
 
 export default observer(function MessageList() {
   const { t } = useTranslation()
-  const messages = store.messages
+  const messages = chatStore.messages
 
   const lastMsg = messages[messages.length - 1]
   void (lastMsg?.generating && lastMsg.content)
@@ -33,9 +35,9 @@ export default observer(function MessageList() {
   return (
     <BaseMessageList
       messages={visibleMessages}
-      sessionId={store.sessionLoaded ? 'loaded' : undefined}
-      isDark={store.isDark}
-      emptyHint={t('emptyHint')}
+      sessionId={chatStore.session.id}
+      isDark={chatStore.isDark}
+      emptyHint={t('chatEmptyHint')}
     >
       {(baseMsg) => {
         const originalIndex = indexById.get(baseMsg.id) ?? -1

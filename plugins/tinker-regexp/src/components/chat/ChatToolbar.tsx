@@ -3,22 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { ChatClearButton } from 'share/components/AiChat'
 import { Toolbar, ToolbarSpacer } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
-import store from '../store'
+import chatStore from '../../chatStore'
 
-export default observer(function SessionToolbar() {
+export default observer(function ChatToolbar() {
   const { t } = useTranslation()
 
   return (
     <Toolbar>
-      <span
-        className={`px-2 text-sm font-medium truncate max-w-[180px] ${tw.text.primary}`}
-      >
-        {store.activeSession?.title || t('newChat')}
+      <span className={`px-2 text-sm font-medium ${tw.text.primary}`}>
+        {t('chatTitle')}
       </span>
       <ToolbarSpacer />
       <ChatClearButton
-        onClick={() => store.clearMessages()}
-        disabled={!store.messages.length}
+        onClick={() => chatStore.clearMessages()}
+        disabled={!chatStore.messages.length}
       />
     </Toolbar>
   )

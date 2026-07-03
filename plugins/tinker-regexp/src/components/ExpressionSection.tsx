@@ -49,21 +49,23 @@ export default observer(function ExpressionSection() {
   })
 
   return (
-    <div className={`border-b ${tw.border} ${tw.bg.input}`}>
-      <div className="relative px-6 py-3">
-        <div className="flex items-center gap-2">
-          <span className={`${tw.text.tertiary} text-xl`}>/</span>
-          <div className="flex-1">
+    <div className={`h-10 shrink-0 border-b ${tw.border} ${tw.bg.input}`}>
+      <div className="relative h-full px-6 flex items-center">
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <span className={`${tw.text.tertiary} text-xl leading-none`}>/</span>
+          <div className="flex-1 min-w-0 h-full">
             <CodeMirrorEditor
               value={store.pattern}
               onChange={(val) => store.setPattern(val)}
               singleLine
-              className="regexp-editor"
+              className="regexp-editor h-full"
               placeholder={t('patternPlaceholder')}
               onEditorReady={setEditor}
             />
           </div>
-          <span className={`${tw.text.tertiary} text-xl`}>/{store.flags}</span>
+          <span className={`${tw.text.tertiary} text-xl leading-none shrink-0`}>
+            /{store.flags}
+          </span>
         </div>
       </div>
       <Tooltip

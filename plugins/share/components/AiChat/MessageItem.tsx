@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { RefreshCw, Trash2 } from 'lucide-react'
 import { tw } from '../../theme'
 import CopyButton from '../CopyButton'
 import MarkdownContent from './MarkdownContent'
 import type { ChatMessage } from './types'
+import { AI_CHAT_NS } from './i18n'
 
 /** Typewriter hook: reveals content character-by-character with adaptive speed.
  *  `streaming` should be true while the server is actively sending chunks.
@@ -49,9 +51,6 @@ export interface MessageItemProps {
   /** Extra content rendered below the message bubble (e.g. search cards). */
   footer?: React.ReactNode
   isDark?: boolean
-  retryLabel?: string
-  deleteLabel?: string
-  errorPrefix?: string
   onRetry?: () => void
   onDelete?: (id: string) => void
 }
@@ -61,12 +60,13 @@ export default function MessageItem({
   children,
   footer,
   isDark = false,
-  retryLabel = 'Retry',
-  deleteLabel = 'Delete',
-  errorPrefix = 'Error: ',
   onRetry,
   onDelete,
 }: MessageItemProps) {
+  const { t } = useTranslation(AI_CHAT_NS)
+  const retry = t('retry')
+  const del = t('delete')
+  const errPrefix = t('errorPrefix')
   const isUser = msg.role === 'user'
   const hasTextContent = Boolean(msg.content || msg.error || msg.generating)
 
@@ -97,7 +97,7 @@ export default function MessageItem({
         {hasTextContent &&
           (msg.error ? (
             <div className="text-red-500 dark:text-red-400 text-sm whitespace-pre-wrap break-words">
-              {errorPrefix}
+              {errPrefix}
               {msg.error}
             </div>
           ) : (
@@ -145,7 +145,7 @@ export default function MessageItem({
             {onRetry && (
               <button
                 onClick={onRetry}
-                title={retryLabel}
+                title={retry}
                 className={`p-1 rounded ${tw.hover} ${tw.text.tertiary}`}
               >
                 <RefreshCw size={13} />
@@ -154,7 +154,7 @@ export default function MessageItem({
             {onDelete && (
               <button
                 onClick={() => onDelete(msg.id)}
-                title={deleteLabel}
+                title={del}
                 className={`p-1 rounded ${tw.hover} ${tw.text.tertiary}`}
               >
                 <Trash2 size={13} />

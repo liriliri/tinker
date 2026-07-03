@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next'
 import { ArrowRight, Square } from 'lucide-react'
 import { tw } from '../../theme'
+import { AI_CHAT_NS } from './i18n'
 
 export interface ChatInputProps {
   value: string
@@ -9,8 +11,6 @@ export interface ChatInputProps {
   isGenerating?: boolean
   canSend?: boolean
   placeholder?: string
-  sendLabel?: string
-  stopLabel?: string
   rows?: number
   /** Optional slot rendered to the left of the send button (e.g. model selector) */
   extra?: React.ReactNode
@@ -23,12 +23,14 @@ export default function ChatInput({
   onStop,
   isGenerating = false,
   canSend = true,
-  placeholder = 'Type a message...',
-  sendLabel = 'Send (Enter)',
-  stopLabel = 'Stop',
+  placeholder,
   rows = 3,
   extra,
 }: ChatInputProps) {
+  const { t } = useTranslation(AI_CHAT_NS)
+  const inputPlaceholder = placeholder ?? t('inputPlaceholder')
+  const send = t('sendEnter')
+  const stop = t('stop')
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -45,7 +47,7 @@ export default function ChatInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={inputPlaceholder}
           rows={rows}
           className={`w-full resize-none bg-transparent px-3 pt-3 pb-1 text-sm outline-none ${tw.text.primary}`}
           disabled={isGenerating}
@@ -59,7 +61,7 @@ export default function ChatInput({
           {isGenerating ? (
             <button
               onClick={onStop}
-              title={stopLabel}
+              title={stop}
               className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center ${tw.hover} ${tw.text.secondary}`}
             >
               <Square size={12} fill="currentColor" />
@@ -67,7 +69,7 @@ export default function ChatInput({
           ) : (
             <button
               onClick={onSend}
-              title={sendLabel}
+              title={send}
               disabled={!canSend}
               className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed ${tw.primary.bg} ${tw.primary.bgHover}`}
             >

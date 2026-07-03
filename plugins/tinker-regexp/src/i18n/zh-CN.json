@@ -237,5 +237,8 @@
       "tip": "JavaScript 正则表达式不支持此功能。",
       "desc": "JavaScript 正则表达式不支持此功能。"
     }
-  }
+  },
+  "chatTitle": "正则表达式助手",
+  "chatInputPlaceholder": "询问正则表达式相关问题...",
+  "chatEmptyHint": "我可以帮你编写或调试正则表达式"
 }

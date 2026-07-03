@@ -1,15 +1,5 @@
 {
-  "clearMessages": "Clear Messages",
-  "delete": "Delete",
-  "retry": "Retry",
-  "send": "Send",
-  "stop": "Stop",
   "inputPlaceholder": "Ask me to do something...",
   "emptyHint": "Start a conversation",
-  "noProviders": "No AI providers configured",
-  "errorPrefix": "Error: ",
-  "searching": "Searching",
-  "searchResults": "results",
-  "searchFailed": "Search failed",
   "running": "running..."
 }

@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Sparkles } from 'lucide-react'
 import OverlayScrollbars from '../OverlayScrollbars'
 import { tw } from '../../theme'
 import MessageItem, { type MessageItemProps } from './MessageItem'
 import type { ChatMessage } from './types'
+import { AI_CHAT_NS } from './i18n'
 
 export interface MessageListProps
   extends Omit<MessageItemProps, 'msg' | 'onRetry' | 'children' | 'footer'> {
@@ -18,11 +20,13 @@ export interface MessageListProps
 export default function MessageList({
   messages,
   sessionId,
-  emptyHint = 'Start a conversation',
+  emptyHint,
   onRetryLast,
   children,
   ...itemProps
 }: MessageListProps) {
+  const { t } = useTranslation(AI_CHAT_NS)
+  const hint = emptyHint ?? t('emptyHint')
   const bottomRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const prevSessionId = useRef<string | undefined>(undefined)
@@ -67,7 +71,7 @@ export default function MessageList({
         >
           <Sparkles size={24} className={tw.primary.text} />
         </div>
-        <p className={`text-sm ${tw.text.tertiary}`}>{emptyHint}</p>
+        <p className={`text-sm ${tw.text.tertiary}`}>{hint}</p>
       </div>
     )
   }

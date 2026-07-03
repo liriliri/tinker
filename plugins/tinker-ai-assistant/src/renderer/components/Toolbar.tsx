@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
-import { Eraser, FolderOpen } from 'lucide-react'
+import { FolderOpen } from 'lucide-react'
+import { ChatClearButton } from 'share/components/AiChat'
 import {
   Toolbar,
   ToolbarButton,
@@ -11,7 +11,6 @@ import { tw } from 'share/theme'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
-  const { t } = useTranslation()
   async function selectWorkingDir() {
     const result = await tinker.showOpenDialog({
       properties: ['openDirectory'],
@@ -35,13 +34,10 @@ export default observer(function ToolbarComponent() {
         </span>
       </ToolbarButton>
       <ToolbarSpacer />
-      <ToolbarButton
-        title={t('clearMessages')}
+      <ChatClearButton
         onClick={() => store.clearMessages()}
         disabled={!store.messages.length}
-      >
-        <Eraser size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      />
     </Toolbar>
   )
 })

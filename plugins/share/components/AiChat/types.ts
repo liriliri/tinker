@@ -1,7 +1,1 @@
-export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  generating?: boolean
-  error?: string
-}
+export type { AgentMessage as ChatMessage } from '../../lib/Agent'

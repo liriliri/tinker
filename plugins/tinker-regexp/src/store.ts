@@ -20,11 +20,16 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   matches: Match[] = []
   error: string | null = null
+  hasAI: boolean = false
+  chatOpen: boolean = false
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadStorage()
+    tinker.getAIProviders().then((providers) => {
+      this.hasAI = providers.length > 0
+    })
   }
 
   private loadStorage() {
@@ -106,6 +111,10 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   clearPattern() {
     this.setPattern('')
+  }
+
+  toggleChat() {
+    this.chatOpen = !this.chatOpen
   }
 
   get isEmpty() {

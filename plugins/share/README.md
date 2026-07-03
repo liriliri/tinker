@@ -110,17 +110,20 @@ const scrollRef = useRef<OverlayScrollbarsRef>(null)
 
 ### AiChat
 
+Translations register automatically in the `aiChat` i18n namespace when this module is imported. Plugins should not call this namespace directly; use the components below instead.
+
 ```ts
 import {
   MessageList,
-  ChatInput,
+  ChatInputArea,
+  ChatClearButton,
   MarkdownContent,
   SearchCard,
   type ChatMessage,
 } from 'share/components/AiChat'
 ```
 
-Render-only. Provide `messages`, `send`, `retry`, `delete`, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`.
+Render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
 
 ### TextSearch
 
