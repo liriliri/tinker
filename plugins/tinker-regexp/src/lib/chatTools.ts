@@ -94,14 +94,24 @@ export function isSupportedToolName(name: string | undefined): boolean {
   return !!name && SUPPORTED_TOOL_NAMES.has(name)
 }
 
-export function getToolLabel(name: string): string {
-  const labels: Record<RegexpToolName, string> = {
-    get_regexp: 'Get RegExp',
-    set_regexp: 'Set RegExp',
-    get_test_text: 'Get Test Text',
-    set_test_text: 'Set Test Text',
+export function getToolArgSummary(
+  name: string,
+  args: Record<string, unknown>
+): string {
+  switch (name) {
+    case 'set_regexp': {
+      const pattern = typeof args.pattern === 'string' ? args.pattern : ''
+      const flags = typeof args.flags === 'string' ? args.flags : ''
+      const summary = flags ? `/${pattern}/${flags}` : pattern
+      return summary.length > 60 ? `${summary.slice(0, 60)}…` : summary
+    }
+    case 'set_test_text': {
+      const text = typeof args.text === 'string' ? args.text : ''
+      return text.length > 60 ? `${text.slice(0, 60)}…` : text
+    }
+    default:
+      return ''
   }
-  return labels[name as RegexpToolName] ?? name
 }
 
 function getRegexpState(): string {

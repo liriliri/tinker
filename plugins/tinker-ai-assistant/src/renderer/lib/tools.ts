@@ -54,3 +54,26 @@ export function getToolLabel(name: string): string {
     getFileSystemToolLabel(name)
   )
 }
+
+export function getToolArgSummary(
+  name: string,
+  args: Record<string, unknown>
+): string {
+  switch (name) {
+    case 'exec':
+      return typeof args.command === 'string'
+        ? args.command.slice(0, 60) + (args.command.length > 60 ? '…' : '')
+        : ''
+    case 'read_file':
+    case 'write_file':
+    case 'edit_file':
+    case 'list_dir':
+      return typeof args.path === 'string' ? String(args.path) : ''
+    case 'web_search':
+      return typeof args.query === 'string' ? String(args.query) : ''
+    case 'web_fetch':
+      return typeof args.url === 'string' ? String(args.url) : ''
+    default:
+      return ''
+  }
+}

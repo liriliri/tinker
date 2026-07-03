@@ -57,7 +57,7 @@ export default function SearchCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border text-[11px] ${tw.border} ${tw.bg.secondary}`}
+      className={`overflow-hidden rounded-lg border text-[11px] ${tw.border} ${tw.bg.secondary}`}
     >
       <button
         type="button"
@@ -109,7 +109,7 @@ export default function SearchCard({
               key={index}
               type="button"
               onClick={() => onOpenResult(result.url)}
-              className={`block w-full rounded-lg border px-2.5 py-1.5 text-left transition-colors ${tw.border} ${tw.hover}`}
+              className={`block w-full rounded-md border px-2.5 py-1.5 text-left transition-colors ${tw.border} ${tw.hover}`}
             >
               <div className="flex items-start gap-1.5">
                 <span

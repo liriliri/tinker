@@ -20,6 +20,8 @@ const enUS = {
   searching: 'Searching',
   searchResults: 'results',
   searchFailed: 'Search failed',
+  running: 'Running',
+  toolCall: 'Tool Call',
 }
 
 const zhCN = {
@@ -40,6 +42,8 @@ const zhCN = {
   searching: '正在搜索',
   searchResults: '条结果',
   searchFailed: '搜索失败',
+  running: '运行中',
+  toolCall: '工具调用',
 }
 
 addI18nNamespace(AI_CHAT_NS, { 'en-US': enUS, 'zh-CN': zhCN })

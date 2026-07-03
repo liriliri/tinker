@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import {
   MessageItem as BaseMessageItem,
+  ToolCard,
   type MessageItemProps as BaseProps,
   type ChatMessage as BaseChatMessage,
   SearchCard,
@@ -8,8 +9,11 @@ import {
 } from 'share/components/AiChat'
 import store from '../store'
 import type { ChatMessage } from '../types'
-import { isSupportedToolName } from '../lib/tools'
-import ToolCard from './ToolCard'
+import {
+  getToolArgSummary,
+  getToolLabel,
+  isSupportedToolName,
+} from '../lib/tools'
 
 interface Props {
   msg: ChatMessage
@@ -45,7 +49,11 @@ export default observer(function MessageItem({
 
     return (
       <div className="px-4 py-1">
-        <ToolCard msg={msg} />
+        <ToolCard
+          msg={msg}
+          getToolLabel={getToolLabel}
+          getArgSummary={getToolArgSummary}
+        />
       </div>
     )
   }
@@ -68,7 +76,14 @@ export default observer(function MessageItem({
               )
             }
 
-            return <ToolCard key={toolMsg.id} msg={toolMsg} />
+            return (
+              <ToolCard
+                key={toolMsg.id}
+                msg={toolMsg}
+                getToolLabel={getToolLabel}
+                getArgSummary={getToolArgSummary}
+              />
+            )
           })}
       </>
     ) : undefined

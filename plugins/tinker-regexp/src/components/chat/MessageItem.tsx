@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import {
   MessageItem as BaseMessageItem,
+  ToolCard,
   type MessageItemProps as BaseProps,
   type ChatMessage as BaseChatMessage,
 } from 'share/components/AiChat'
 import chatStore from '../../chatStore'
-import { isSupportedToolName } from '../../lib/chatTools'
+import { isSupportedToolName, getToolArgSummary } from '../../lib/chatTools'
 import type { ChatMessage } from '../../types/chat'
-import ToolCard from './ToolCard'
 
 interface Props {
   msg: ChatMessage
@@ -29,7 +29,7 @@ export default observer(function MessageItem({
 
     return (
       <div className="px-4 py-1">
-        <ToolCard msg={msg} />
+        <ToolCard msg={msg} getArgSummary={getToolArgSummary} />
       </div>
     )
   }
@@ -40,7 +40,11 @@ export default observer(function MessageItem({
         {toolMessages
           .filter((toolMsg) => !shouldHideToolMessage(toolMsg))
           .map((toolMsg) => (
-            <ToolCard key={toolMsg.id} msg={toolMsg} />
+            <ToolCard
+              key={toolMsg.id}
+              msg={toolMsg}
+              getArgSummary={getToolArgSummary}
+            />
           ))}
       </>
     ) : undefined

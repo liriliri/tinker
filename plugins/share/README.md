@@ -119,11 +119,12 @@ import {
   ChatClearButton,
   MarkdownContent,
   SearchCard,
+  ToolCard,
   type ChatMessage,
 } from 'share/components/AiChat'
 ```
 
-Render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
+Render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Use `ToolCard` for generic tool-call results; pass optional `getToolLabel`, `getArgSummary`, or `getToolIcon` for plugin-specific display. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
 
 ### TextSearch
 
