@@ -314,7 +314,7 @@ class Store extends BaseStore {
       JSON.parse(content)
       this.setJsonInput(content)
       toast.success(i18n.t('fixJsonSuccess'), { id: loadingToast })
-    } catch (err) {
+    } catch {
       toast.error(i18n.t('fixJsonFailed'), { id: loadingToast })
     } finally {
       this.isFixingWithAI = false

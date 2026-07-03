@@ -9,6 +9,7 @@ import {
   Search,
   Terminal,
 } from 'lucide-react'
+import isStrBlank from 'licia/isStrBlank'
 import { tw } from '../../theme'
 import type { ToolStatus } from '../../lib/Agent'
 import { AI_CHAT_NS } from './i18n'
@@ -77,6 +78,13 @@ function DefaultToolIcon({ name }: { name: string }) {
   }
 }
 
+export function isToolMessageRenderable(msg: ToolCardMessage): boolean {
+  if (msg.toolStatus === 'running' || msg.generating) return true
+  if (!isStrBlank(msg.error ?? '')) return true
+  if (!isStrBlank(msg.content ?? '')) return true
+  return false
+}
+
 export default function ToolCard({
   msg,
   getToolLabel,
@@ -85,6 +93,10 @@ export default function ToolCard({
 }: ToolCardProps) {
   const { t } = useTranslation(AI_CHAT_NS)
   const [expanded, setExpanded] = useState(false)
+
+  if (!isToolMessageRenderable(msg)) {
+    return null
+  }
 
   const toolName = msg.toolName ?? ''
   const args = msg.toolArgs ?? {}

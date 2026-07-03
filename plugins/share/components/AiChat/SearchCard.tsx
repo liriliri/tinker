@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, Search } from 'lucide-react'
+import isStrBlank from 'licia/isStrBlank'
 import { tw } from '../../theme'
 import type { WebSearchResult } from '../../tools/web'
 import { AI_CHAT_NS } from './i18n'
@@ -35,6 +36,16 @@ export function getSearchCardProps(
     isRunning:
       msg.toolStatus === 'running' || (msg.generating && results.length === 0),
   }
+}
+
+export function isSearchMessageRenderable(msg: SearchToolMessage): boolean {
+  if (msg.toolStatus === 'running' || msg.generating) return true
+  if (!isStrBlank(msg.error ?? '')) return true
+  const results = Array.isArray(msg.data) ? msg.data : []
+  if (results.length > 0) return true
+  const query =
+    typeof msg.toolArgs?.query === 'string' ? msg.toolArgs.query : ''
+  return !isStrBlank(query)
 }
 
 export default function SearchCard({

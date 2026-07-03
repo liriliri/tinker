@@ -1,61 +1,15 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
-import { Agent } from 'share/lib/Agent'
-import * as chatDb from './lib/chatDb'
-import { REGEXP_AGENT_TOOLS } from './lib/chatTools'
-import type { Session, SessionData } from './types/chat'
+import * as chatDb from '../lib/chatDb'
+import {
+  createEmptySession,
+  createSessionFromData,
+  hasSessionContent,
+  serializeSession,
+} from '../lib/chatSession'
+import storage, { STORAGE_MODEL, STORAGE_PROVIDER } from './storage'
 
-const storage = new LocalStore('tinker-regexp-chat')
-
-const STORAGE_PROVIDER = 'provider'
-const STORAGE_MODEL = 'model'
-
-const DEFAULT_SYSTEM_PROMPT =
-  'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.'
-
-function createAgent(initialMessages: SessionData['messages'] = []) {
-  return new Agent({
-    systemPrompt: DEFAULT_SYSTEM_PROMPT,
-    tools: REGEXP_AGENT_TOOLS,
-    initialMessages,
-  })
-}
-
-function createSessionFromData(session: SessionData): Session {
-  return {
-    id: session.id,
-    createdAt: session.createdAt,
-    agent: createAgent(session.messages),
-  }
-}
-
-function serializeSession(session: Session): SessionData {
-  return {
-    id: session.id,
-    messages: session.agent.getMessages(),
-    createdAt: session.createdAt,
-  }
-}
-
-function hasSessionContent(session: SessionData): boolean {
-  return session.messages.some(
-    (message) =>
-      (message.role === 'user' || message.role === 'assistant') &&
-      message.content.trim().length > 0
-  )
-}
-
-function createEmptySession(): Session {
-  return {
-    id: chatDb.SESSION_ID,
-    createdAt: Date.now(),
-    agent: createAgent(),
-  }
-}
-
-class ChatStore extends BaseStore {
-  session: Session = createEmptySession()
+export default class Chat {
+  session = createEmptySession()
 
   providers: tinker.AiProviderInfo[] = []
   selectedProvider: string = ''
@@ -64,7 +18,6 @@ class ChatStore extends BaseStore {
   input: string = ''
 
   constructor() {
-    super()
     makeAutoObservable(this)
     this.loadStorage()
     this.loadDb()
@@ -217,5 +170,3 @@ class ChatStore extends BaseStore {
     this.saveSession()
   }
 }
-
-export default new ChatStore()

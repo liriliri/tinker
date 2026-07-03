@@ -1,15 +1,17 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/BaseStore'
-import type { Match } from './types'
-
-const storage = new LocalStore('tinker-regexp')
-
-const STORAGE_PATTERN = 'pattern'
-const STORAGE_FLAGS = 'flags'
-const STORAGE_TEXT = 'text'
+import type { Match } from '../types'
+import Chat from './Chat'
+import storage, {
+  STORAGE_CHAT_OPEN,
+  STORAGE_FLAGS,
+  STORAGE_PATTERN,
+  STORAGE_TEXT,
+} from './storage'
 
 class Store extends BaseStore {
+  chat: Chat
+
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'
   testText: string = `Tinker RegExp is a regular expression testing tool, inspired by RegExr.
@@ -25,10 +27,20 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   constructor() {
     super()
-    makeAutoObservable(this)
+    this.chat = new Chat()
+    makeAutoObservable(this, { chat: false })
     this.loadStorage()
-    tinker.getAIProviders().then((providers) => {
-      this.hasAI = providers.length > 0
+    void tinker.getAIProviders().then((providers) => {
+      if (providers.length > 0) {
+        this.hasAI = true
+        const savedChatOpen = storage.get(STORAGE_CHAT_OPEN)
+        if (savedChatOpen !== undefined) {
+          this.chatOpen = savedChatOpen === true
+        }
+        return
+      }
+      this.hasAI = false
+      this.chatOpen = false
     })
   }
 
@@ -115,6 +127,9 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   toggleChat() {
     this.chatOpen = !this.chatOpen
+    if (this.hasAI) {
+      storage.set(STORAGE_CHAT_OPEN, this.chatOpen)
+    }
   }
 
   get isEmpty() {

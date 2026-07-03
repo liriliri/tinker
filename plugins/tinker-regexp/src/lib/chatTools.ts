@@ -1,7 +1,9 @@
 import type { AgentTool } from 'share/lib/Agent'
+import { isToolMessageRenderable } from 'share/components/AiChat'
 import regexpStore from '../store'
+import type { ChatMessage } from '../types/chat'
 
-export const GET_REGEXP_TOOL = {
+const GET_REGEXP_TOOL = {
   type: 'function',
   function: {
     name: 'get_regexp',
@@ -14,7 +16,7 @@ export const GET_REGEXP_TOOL = {
   },
 } as const
 
-export const SET_REGEXP_TOOL = {
+const SET_REGEXP_TOOL = {
   type: 'function',
   function: {
     name: 'set_regexp',
@@ -38,7 +40,7 @@ export const SET_REGEXP_TOOL = {
   },
 } as const
 
-export const GET_TEST_TEXT_TOOL = {
+const GET_TEST_TEXT_TOOL = {
   type: 'function',
   function: {
     name: 'get_test_text',
@@ -51,7 +53,7 @@ export const GET_TEST_TEXT_TOOL = {
   },
 } as const
 
-export const SET_TEST_TEXT_TOOL = {
+const SET_TEST_TEXT_TOOL = {
   type: 'function',
   function: {
     name: 'set_test_text',
@@ -77,7 +79,7 @@ const TOOL_DEFINITIONS = [
   SET_TEST_TEXT_TOOL,
 ] as const
 
-export type RegexpToolName =
+type RegexpToolName =
   | 'get_regexp'
   | 'set_regexp'
   | 'get_test_text'
@@ -92,6 +94,15 @@ const SUPPORTED_TOOL_NAMES = new Set<string>([
 
 export function isSupportedToolName(name: string | undefined): boolean {
   return !!name && SUPPORTED_TOOL_NAMES.has(name)
+}
+
+export function getVisibleToolMessages(
+  toolMessages: ChatMessage[]
+): ChatMessage[] {
+  return toolMessages.filter(
+    (toolMsg) =>
+      isSupportedToolName(toolMsg.toolName) && isToolMessageRenderable(toolMsg)
+  )
 }
 
 export function getToolArgSummary(

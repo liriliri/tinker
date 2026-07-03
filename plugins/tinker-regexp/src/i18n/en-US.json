@@ -1,8 +1,4 @@
 {
-  "regexp": "Regular Expression",
-  "pattern": "Pattern",
-  "testString": "Test String",
-  "matches": "Matches",
   "matchCount": "{{count}} match",
   "matchCount_other": "{{count}} matches",
   "noMatches": "No Matches",
@@ -28,14 +24,6 @@
     "s": "single line (dotall)",
     "u": "unicode",
     "y": "sticky"
-  },
-  "flagDescriptions": {
-    "g": "Find all matches",
-    "i": "Ignore case",
-    "m": "^ and $ match line breaks",
-    "s": ". matches newlines",
-    "u": "Unicode mode",
-    "y": "Match from lastIndex only"
   },
   "reference": {
     "dot": {

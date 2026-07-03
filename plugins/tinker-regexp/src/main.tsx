@@ -43,7 +43,7 @@ const App = observer(function App() {
                 <TextSection />
               </div>
             </Panel>
-            {store.chatOpen && (
+            {store.hasAI && store.chatOpen && (
               <>
                 <Separator />
                 <Panel id="chat" minSize={250} defaultSize={360}>

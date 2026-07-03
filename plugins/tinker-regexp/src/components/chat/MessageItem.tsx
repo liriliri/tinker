@@ -5,8 +5,8 @@ import {
   type MessageItemProps as BaseProps,
   type ChatMessage as BaseChatMessage,
 } from 'share/components/AiChat'
-import chatStore from '../../chatStore'
-import { isSupportedToolName, getToolArgSummary } from '../../lib/chatTools'
+import store from '../../store'
+import { getToolArgSummary, getVisibleToolMessages } from '../../lib/chatTools'
 import type { ChatMessage } from '../../types/chat'
 
 interface Props {
@@ -14,47 +14,32 @@ interface Props {
   toolMessages?: ChatMessage[]
 }
 
-function shouldHideToolMessage(msg: ChatMessage): boolean {
-  return msg.role === 'tool' && !isSupportedToolName(msg.toolName)
-}
-
 export default observer(function MessageItem({
   msg,
   toolMessages = [],
 }: Props) {
-  if (msg.role === 'tool') {
-    if (shouldHideToolMessage(msg)) {
-      return null
-    }
-
-    return (
-      <div className="px-4 py-1">
-        <ToolCard msg={msg} getArgSummary={getToolArgSummary} />
-      </div>
-    )
-  }
+  const { chat } = store
+  const visibleToolMessages = getVisibleToolMessages(toolMessages)
 
   const footer =
-    msg.role === 'assistant' && toolMessages.length > 0 ? (
+    msg.role === 'assistant' && visibleToolMessages.length > 0 ? (
       <>
-        {toolMessages
-          .filter((toolMsg) => !shouldHideToolMessage(toolMsg))
-          .map((toolMsg) => (
-            <ToolCard
-              key={toolMsg.id}
-              msg={toolMsg}
-              getArgSummary={getToolArgSummary}
-            />
-          ))}
+        {visibleToolMessages.map((toolMsg) => (
+          <ToolCard
+            key={toolMsg.id}
+            msg={toolMsg}
+            getArgSummary={getToolArgSummary}
+          />
+        ))}
       </>
     ) : undefined
 
   const itemProps: BaseProps = {
     msg: msg as BaseChatMessage,
     footer,
-    isDark: chatStore.isDark,
-    onRetry: () => chatStore.retryLastMessage(),
-    onDelete: (id) => chatStore.deleteMessage(id),
+    isDark: store.isDark,
+    onRetry: () => chat.retryLastMessage(),
+    onDelete: (id) => chat.deleteMessage(id),
   }
 
   return <BaseMessageItem {...itemProps} />

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { Children, isValidElement, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshCw, Trash2 } from 'lucide-react'
+import isStrBlank from 'licia/isStrBlank'
 import { tw } from '../../theme'
 import CopyButton from '../CopyButton'
 import MarkdownContent from './MarkdownContent'
@@ -43,6 +44,15 @@ function useTypewriter(content: string, streaming: boolean): string {
   return content.slice(0, displayedLen)
 }
 
+function hasRenderableContent(node: React.ReactNode): boolean {
+  return Children.toArray(node).some((child) => {
+    if (child == null || child === false) return false
+    if (typeof child === 'string') return !isStrBlank(child)
+    if (typeof child === 'number') return true
+    return isValidElement(child)
+  })
+}
+
 export interface MessageItemProps {
   msg: ChatMessage
   /** Custom content renderer. Replaces the default text/markdown display.
@@ -68,7 +78,10 @@ export default function MessageItem({
   const del = t('delete')
   const errPrefix = t('errorPrefix')
   const isUser = msg.role === 'user'
-  const hasTextContent = Boolean(msg.content || msg.error || msg.generating)
+  const hasVisibleContent = !isStrBlank(msg.content)
+  const hasTextContent = Boolean(
+    hasVisibleContent || msg.error || msg.generating
+  )
 
   const displayedContent = useTypewriter(
     msg.content,
@@ -77,7 +90,7 @@ export default function MessageItem({
   const showCursor =
     !isUser &&
     (Boolean(msg.generating) || displayedContent.length < msg.content.length) &&
-    Boolean(displayedContent)
+    hasVisibleContent
 
   const defaultContent = isUser ? (
     msg.content
@@ -85,9 +98,23 @@ export default function MessageItem({
     <MarkdownContent isDark={isDark}>{displayedContent}</MarkdownContent>
   )
 
+  const hasFooterContent = hasRenderableContent(footer)
+
+  if (!hasTextContent && !hasFooterContent && !children) {
+    return null
+  }
+
+  if (!hasTextContent && hasFooterContent && !children) {
+    return (
+      <div className="px-4 py-1">
+        <div className="flex flex-col gap-1">{footer}</div>
+      </div>
+    )
+  }
+
   return (
     <div
-      className={`group flex gap-2 px-4 py-2 ${
+      className={`group flex gap-2 px-4 py-1.5 ${
         isUser ? 'flex-row-reverse' : ''
       }`}
     >
@@ -108,7 +135,7 @@ export default function MessageItem({
                   : ''
               }`}
             >
-              {msg.generating && !msg.content ? (
+              {msg.generating && !hasVisibleContent ? (
                 <span className="flex h-4 items-center gap-1">
                   <span
                     className={`w-1.5 h-1.5 rounded-full animate-bounce ${tw.primary.bg}`}
@@ -135,7 +162,7 @@ export default function MessageItem({
           ))}
 
         {!msg.generating && !isUser && hasTextContent && (
-          <div className="flex gap-0.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex h-6 items-center gap-0.5 opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto">
             <CopyButton
               text={msg.content}
               variant="toolbar"
@@ -163,7 +190,9 @@ export default function MessageItem({
           </div>
         )}
 
-        {footer && <div className="mt-3 flex flex-col gap-2">{footer}</div>}
+        {hasFooterContent && (
+          <div className="flex flex-col gap-1">{footer}</div>
+        )}
       </div>
     </div>
   )

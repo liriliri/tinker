@@ -306,7 +306,17 @@ html.dark {
   }
 
   .CodeMirror-scroll {
-    overflow: hidden !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .CodeMirror-hscrollbar {
+    display: none !important;
   }
 
   .CodeMirror-sizer {

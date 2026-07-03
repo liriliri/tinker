@@ -2,10 +2,12 @@ import { observer } from 'mobx-react-lite'
 import {
   MessageItem as BaseMessageItem,
   ToolCard,
+  isToolMessageRenderable,
   type MessageItemProps as BaseProps,
   type ChatMessage as BaseChatMessage,
   SearchCard,
   getSearchCardProps,
+  isSearchMessageRenderable,
 } from 'share/components/AiChat'
 import store from '../store'
 import type { ChatMessage } from '../types'
@@ -22,6 +24,16 @@ interface Props {
 
 function shouldHideToolMessage(msg: ChatMessage): boolean {
   return msg.role === 'tool' && !isSupportedToolName(msg.toolName)
+}
+
+function getVisibleToolMessages(toolMessages: ChatMessage[]): ChatMessage[] {
+  return toolMessages.filter((toolMsg) => {
+    if (shouldHideToolMessage(toolMsg)) return false
+    if (toolMsg.toolName === 'web_search') {
+      return isSearchMessageRenderable(toolMsg)
+    }
+    return isToolMessageRenderable(toolMsg)
+  })
 }
 
 export default observer(function MessageItem({
@@ -58,33 +70,33 @@ export default observer(function MessageItem({
     )
   }
 
-  const footer =
-    msg.role === 'assistant' && toolMessages.length > 0 ? (
-      <>
-        {toolMessages
-          .filter((toolMsg) => !shouldHideToolMessage(toolMsg))
-          .map((toolMsg) => {
-            if (toolMsg.toolName === 'web_search') {
-              const searchCardProps = getSearchCardProps(toolMsg)
+  const visibleToolMessages = getVisibleToolMessages(toolMessages)
 
-              return (
-                <SearchCard
-                  key={toolMsg.id}
-                  {...searchCardProps}
-                  onOpenResult={openSearchResult}
-                />
-              )
-            }
+  const footer =
+    msg.role === 'assistant' && visibleToolMessages.length > 0 ? (
+      <>
+        {visibleToolMessages.map((toolMsg) => {
+          if (toolMsg.toolName === 'web_search') {
+            const searchCardProps = getSearchCardProps(toolMsg)
 
             return (
-              <ToolCard
+              <SearchCard
                 key={toolMsg.id}
-                msg={toolMsg}
-                getToolLabel={getToolLabel}
-                getArgSummary={getToolArgSummary}
+                {...searchCardProps}
+                onOpenResult={openSearchResult}
               />
             )
-          })}
+          }
+
+          return (
+            <ToolCard
+              key={toolMsg.id}
+              msg={toolMsg}
+              getToolLabel={getToolLabel}
+              getArgSummary={getToolArgSummary}
+            />
+          )
+        })}
       </>
     ) : undefined
 

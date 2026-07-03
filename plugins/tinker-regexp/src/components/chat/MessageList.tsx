@@ -4,16 +4,19 @@ import {
   MessageList as BaseMessageList,
   type ChatMessage as BaseChatMessage,
 } from 'share/components/AiChat'
-import chatStore from '../../chatStore'
+import store from '../../store'
 import type { ChatMessage } from '../../types/chat'
 import MessageItem from './MessageItem'
 
 export default observer(function MessageList() {
   const { t } = useTranslation()
-  const messages = chatStore.messages
+  const { chat } = store
+  const messages = chat.messages
 
   const lastMsg = messages[messages.length - 1]
-  void (lastMsg?.generating && lastMsg.content)
+  if (lastMsg?.generating) {
+    void lastMsg.content
+  }
 
   const visibleMessages = messages.filter(
     (msg) => msg.role !== 'tool'
@@ -35,8 +38,8 @@ export default observer(function MessageList() {
   return (
     <BaseMessageList
       messages={visibleMessages}
-      sessionId={chatStore.session.id}
-      isDark={chatStore.isDark}
+      sessionId={chat.session.id}
+      isDark={store.isDark}
       emptyHint={t('chatEmptyHint')}
     >
       {(baseMsg) => {

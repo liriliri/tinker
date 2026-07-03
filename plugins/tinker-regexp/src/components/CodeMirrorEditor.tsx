@@ -49,11 +49,30 @@ export default function CodeMirrorEditor({
       })
     }
 
-    cmInstanceRef.current = editor
+    const onWheel = singleLine
+      ? (event: WheelEvent) => {
+          const scrollInfo = editor.getScrollInfo()
+          if (scrollInfo.width <= scrollInfo.clientWidth) return
 
-    if (onEditorReady) {
-      onEditorReady(editor)
+          const delta =
+            Math.abs(event.deltaX) > Math.abs(event.deltaY)
+              ? event.deltaX
+              : event.deltaY
+          if (delta === 0) return
+
+          event.preventDefault()
+          editor.scrollTo(scrollInfo.left + delta, scrollInfo.top)
+        }
+      : null
+
+    if (onWheel) {
+      editor.getWrapperElement().addEventListener('wheel', onWheel, {
+        passive: false,
+      })
     }
+
+    cmInstanceRef.current = editor
+    onEditorReady?.(editor)
 
     const refreshEditor = () => {
       requestAnimationFrame(() => {
@@ -69,14 +88,14 @@ export default function CodeMirrorEditor({
     }
 
     return () => {
-      observer.disconnect()
-      const editor = cmInstanceRef.current
-      if (editor) {
-        if (typeof editor.toTextArea === 'function') {
-          editor.toTextArea()
-        }
-        cmInstanceRef.current = null
+      if (onWheel) {
+        editor.getWrapperElement().removeEventListener('wheel', onWheel)
       }
+      observer.disconnect()
+      if (typeof editor.toTextArea === 'function') {
+        editor.toTextArea()
+      }
+      cmInstanceRef.current = null
     }
   }, [])
 

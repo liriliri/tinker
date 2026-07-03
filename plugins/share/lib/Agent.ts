@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
 import jsonClone from 'licia/jsonClone'
+import isStrBlank from 'licia/isStrBlank'
 
 export interface ToolCall {
   id: string
@@ -66,13 +67,55 @@ function accumulateToolCalls(
   existing: ToolCall[],
   chunkToolCalls: Record<string, unknown>[]
 ): ToolCall[] {
+  const usesStreamIndex = chunkToolCalls.some(
+    (chunk) => typeof chunk.index === 'number'
+  )
+
+  if (!usesStreamIndex) {
+    const result: ToolCall[] = existing.map((tc) => ({
+      ...tc,
+      function: { ...tc.function },
+    }))
+
+    for (const chunk of chunkToolCalls) {
+      const fn = chunk.function as Record<string, unknown> | undefined
+      const id =
+        typeof chunk.id === 'string'
+          ? chunk.id
+          : `call_${result.length}_${Date.now()}`
+      const existingIdx = result.findIndex((tc) => tc.id === id)
+      const prev = existingIdx >= 0 ? result[existingIdx] : undefined
+
+      const toolCall: ToolCall = {
+        id,
+        type: 'function',
+        function: {
+          name:
+            typeof fn?.name === 'string' ? fn.name : prev?.function.name ?? '',
+          arguments:
+            typeof fn?.arguments === 'string'
+              ? fn.arguments
+              : prev?.function.arguments ?? '',
+        },
+      }
+
+      if (existingIdx >= 0) {
+        result[existingIdx] = toolCall
+      } else {
+        result.push(toolCall)
+      }
+    }
+
+    return result
+  }
+
   const result: ToolCall[] = existing.map((tc) => ({
     ...tc,
     function: { ...tc.function },
   }))
 
   for (const chunk of chunkToolCalls) {
-    const idx = typeof chunk.index === 'number' ? chunk.index : 0
+    const idx = chunk.index as number
     if (!result[idx]) {
       result[idx] = {
         id:
@@ -230,10 +273,10 @@ export class Agent {
         if (m.toolCalls && m.toolCalls.length > 0) {
           history.push({
             role: 'assistant',
-            content: m.content || undefined,
+            content: isStrBlank(m.content) ? undefined : m.content,
             toolCalls: m.toolCalls,
           })
-        } else if (m.content) {
+        } else if (!isStrBlank(m.content)) {
           history.push({ role: 'assistant', content: m.content })
         }
       } else if (m.role === 'tool' && m.toolCallId) {
@@ -302,7 +345,11 @@ export class Agent {
 
             if (chunk.done) {
               done = true
-              this.updateMessage(assistantMsgId, { generating: false })
+              const patch: Partial<AgentMessage> = { generating: false }
+              if (isStrBlank(fullContent)) {
+                patch.content = ''
+              }
+              this.updateMessage(assistantMsgId, patch)
               this.streamTask = null
               resolve()
             }
@@ -338,6 +385,23 @@ export class Agent {
     }
 
     this.isGenerating = false
+    this.pruneTrailingEmptyAssistants()
+  }
+
+  private pruneTrailingEmptyAssistants() {
+    while (this.messages.length > 0) {
+      const last = this.messages[this.messages.length - 1]
+      if (
+        last.role === 'assistant' &&
+        !last.generating &&
+        isStrBlank(last.content) &&
+        !last.error
+      ) {
+        this.messages.pop()
+        continue
+      }
+      break
+    }
   }
 
   private async executeToolCall(toolCall: ToolCall): Promise<void> {

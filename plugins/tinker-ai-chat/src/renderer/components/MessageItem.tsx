@@ -5,6 +5,7 @@ import {
   type ChatMessage as BaseChatMessage,
   SearchCard,
   getSearchCardProps,
+  isSearchMessageRenderable,
 } from 'share/components/AiChat'
 import store from '../store'
 import { isSupportedToolName } from '../store'
@@ -20,6 +21,13 @@ function isVisibleToolMessage(msg: ChatMessage): boolean {
     msg.role === 'tool' &&
     isSupportedToolName(msg.toolName) &&
     msg.toolName === 'web_search'
+  )
+}
+
+function getVisibleToolMessages(toolMessages: ChatMessage[]): ChatMessage[] {
+  return toolMessages.filter(
+    (toolMsg) =>
+      isVisibleToolMessage(toolMsg) && isSearchMessageRenderable(toolMsg)
   )
 }
 
@@ -45,10 +53,12 @@ export default observer(function MessageItem({
     )
   }
 
+  const visibleToolMessages = getVisibleToolMessages(toolMessages)
+
   const footer =
-    msg.role === 'assistant' && toolMessages.length > 0 ? (
+    msg.role === 'assistant' && visibleToolMessages.length > 0 ? (
       <>
-        {toolMessages.filter(isVisibleToolMessage).map((toolMsg) => {
+        {visibleToolMessages.map((toolMsg) => {
           const searchCardProps = getSearchCardProps(toolMsg)
 
           return (

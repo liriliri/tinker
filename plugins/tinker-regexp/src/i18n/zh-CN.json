@@ -1,8 +1,4 @@
 {
-  "regexp": "正则表达式",
-  "pattern": "正则表达式",
-  "testString": "测试字符串",
-  "matches": "匹配结果",
   "matchCount": "{{count}} 个匹配",
   "noMatches": "无匹配结果",
   "copy": "复制",
@@ -27,14 +23,6 @@
     "s": "单行 (dotall)",
     "u": "Unicode",
     "y": "粘性"
-  },
-  "flagDescriptions": {
-    "g": "查找所有匹配项",
-    "i": "忽略大小写",
-    "m": "^ 和 $ 匹配行首行尾",
-    "s": ". 匹配换行符",
-    "u": "Unicode 模式",
-    "y": "仅从 lastIndex 开始匹配"
   },
   "reference": {
     "dot": {
