@@ -296,6 +296,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-sudoku',
+    name: 'Sudoku',
+    description: 'Fill the grid so every row, column, and box contains 1–9.',
+    icon: 'tinker-sudoku.png',
+    locales: {
+      'zh-CN': {
+        name: '数独',
+        description: '在九宫格中填入 1–9，使每行、每列、每个宫格都不重复。',
+      },
+    },
+  },
+  {
     id: 'tinker-spider-solitaire',
     name: 'Spider Solitaire',
     description:
