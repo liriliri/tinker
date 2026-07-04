@@ -23,6 +23,13 @@ import {
   commitStaged,
   watchWorkingTree,
 } from 'share/preload/git'
+import {
+  editFile,
+  listDir,
+  readFile,
+  writeFile,
+} from 'share/tools/fileSystemImpl'
+import { exec } from 'share/tools/shellImpl'
 
 const SKIP_ENTRIES = new Set(['.DS_Store', 'Thumbs.db', '.git'])
 
@@ -175,6 +182,12 @@ const codeEditorObj = {
   discardFiles,
   commitStaged,
   watchWorkingTree,
+
+  exec,
+  readFile,
+  writeFile,
+  editFile,
+  listDir,
 }
 
 contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)

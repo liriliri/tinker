@@ -10,6 +10,7 @@ import {
   GitBranch,
   X,
   Terminal,
+  MessageSquare,
 } from 'lucide-react'
 import {
   StatusBar,
@@ -68,6 +69,14 @@ export default observer(function StatusBarComponent() {
       <StatusBarItem onClick={() => store.toggleTerminal()}>
         <Terminal size={14} />
       </StatusBarItem>
+      {store.hasAI && (
+        <StatusBarItem
+          onClick={() => store.toggleChat()}
+          className={className(store.chatOpen && tw.primary.text)}
+        >
+          <MessageSquare size={14} />
+        </StatusBarItem>
+      )}
     </StatusBar>
   )
 })

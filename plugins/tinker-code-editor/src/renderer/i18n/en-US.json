@@ -22,5 +22,8 @@
   "quickOpenSearching": "Searching...",
   "quickOpenNoResults": "No matching results",
   "binaryNotDisplayed": "The file is not displayed because it is either binary or uses an unsupported text encoding.",
-  "openAnyway": "Open Anyway"
+  "openAnyway": "Open Anyway",
+  "chatTitle": "Programming Assistant",
+  "chatInputPlaceholder": "Ask about your code...",
+  "chatEmptyHint": "I can see open files, browse the project, and run shell commands"
 }

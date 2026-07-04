@@ -8,11 +8,20 @@ import normalizePath from 'licia/normalizePath'
 import last from 'licia/last'
 import { parentDir, relativePath } from '../lib/path'
 import TerminalStore from 'share/store/Terminal'
+import {
+  initAiChatAvailability,
+  toggleAiChatOpen,
+} from 'share/lib/aiChat/aiAvailability'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
+import type AiChatStore from 'share/store/AiChat'
 import Editor from './Editor'
 import QuickOpen from './QuickOpen'
 import WorkingTree from './WorkingTree'
+import { buildCodeEditorSystemPrompt, createCodeEditorChat } from '../lib/chat'
+import type { EditorChatContext } from '../lib/chatTools'
 
 const storage = new LocalStore('tinker-code-editor')
+const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_SIDEBAR_MODE = 'sidebarMode'
@@ -37,17 +46,25 @@ class Store extends BaseStore {
   quickOpen: QuickOpen
   textSearch: TextSearch
   workingTree: WorkingTree
+  chat: AiChatStore
 
   // Layout state
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
   sidebarMode: SidebarMode =
     (storage.get(STORAGE_SIDEBAR_MODE) as SidebarMode) || 'explorer'
+  hasAI = false
+  chatOpen = false
 
   constructor() {
     super()
 
     this.terminal = new TerminalStore('tinker-code-editor', () => this.rootPath)
     this.editor = new Editor()
+    this.chat = createCodeEditorChat(
+      chatPrefsStorage,
+      () => this.rootPath,
+      () => this.getEditorChatContext()
+    )
     this.quickOpen = new QuickOpen({
       getRootPath: () => this.rootPath,
       getOpenTabPaths: () =>
@@ -81,6 +98,10 @@ class Store extends BaseStore {
       void this.workingTree.onProjectRootChanged(this.rootPath)
     }
     this.terminal.initIfOpen()
+    void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
+      this.hasAI = hasAI
+      this.chatOpen = chatOpen
+    })
 
     // Keep search rootDir in sync with the project root
     reaction(
@@ -88,6 +109,7 @@ class Store extends BaseStore {
       (rootPath) => {
         this.textSearch.setRootDir(rootPath)
         void this.workingTree.onProjectRootChanged(rootPath)
+        this.chat.setSystemPrompt(buildCodeEditorSystemPrompt(rootPath))
       }
     )
     reaction(
@@ -144,6 +166,8 @@ class Store extends BaseStore {
     this.workingTree.dispose()
     this.workingTree.reset()
     this.quickOpen.hide()
+    this.chatOpen = false
+    this.chat.clearMessages()
   }
 
   addRecentDirectory(path: string) {
@@ -360,6 +384,26 @@ class Store extends BaseStore {
   toggleTerminal = () => this.terminal.toggle()
   openInIntegratedTerminal = (path: string, isDir: boolean) =>
     this.terminal.openInDirectory(path, isDir)
+
+  toggleChat() {
+    if (!this.hasAI || !this.rootPath) return
+    this.chatOpen = toggleAiChatOpen(storage, this.chatOpen)
+  }
+
+  getEditorChatContext(): EditorChatContext {
+    return {
+      rootPath: this.rootPath,
+      cursorLine: this.cursorLine,
+      cursorColumn: this.cursorColumn,
+      tabs: this.editor.tabs.map((tab) => ({
+        filePath: tab.filePath,
+        title: tab.title,
+        isActive: tab.id === this.activeTabId,
+        isDirty: tab.isDirty,
+        category: tab.category,
+      })),
+    }
+  }
 
   // ---- Layout proxies ----
 

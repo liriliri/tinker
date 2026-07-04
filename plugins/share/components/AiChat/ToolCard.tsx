@@ -73,10 +73,6 @@ function DefaultToolIcon({ name }: { name: string }) {
     case 'list_dir':
       return <FolderOpen size={ICON_SIZE} />
     case 'web_fetch':
-    case 'get_page_info':
-    case 'get_page_text':
-    case 'get_page_selection':
-    case 'get_page_metadata':
       return <Globe size={ICON_SIZE} />
     case 'web_search':
       return <Search size={ICON_SIZE} />

@@ -65,13 +65,13 @@ export default function MessageList({
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 select-none">
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 select-none px-4">
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center ${tw.primary.bgFocused}`}
         >
           <Sparkles size={24} className={tw.primary.text} />
         </div>
-        <p className={`text-sm ${tw.text.tertiary}`}>{hint}</p>
+        <p className={`text-sm text-center ${tw.text.tertiary}`}>{hint}</p>
       </div>
     )
   }
