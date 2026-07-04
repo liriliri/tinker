@@ -1,6 +1,11 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import jsonClone from 'licia/jsonClone'
-import type { SessionData } from '../types'
+import type { AgentMessage } from 'share/lib/Agent'
+
+export interface SessionData {
+  messages: AgentMessage[]
+  workingDir: string
+}
 
 interface AiAssistantDB extends DBSchema {
   session: {
@@ -37,4 +42,9 @@ export async function loadSession(): Promise<SessionData | undefined> {
 export async function saveSession(session: SessionData): Promise<void> {
   const db = await getDB()
   await db.put(STORE_NAME, jsonClone(session), SESSION_KEY)
+}
+
+export async function clearSession(): Promise<void> {
+  const db = await getDB()
+  await db.delete(STORE_NAME, SESSION_KEY)
 }

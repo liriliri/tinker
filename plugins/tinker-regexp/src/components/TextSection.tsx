@@ -84,7 +84,7 @@ export default observer(function TextSection() {
     if (!editor) return
     const timer = window.setTimeout(() => editor.refresh(), 0)
     return () => window.clearTimeout(timer)
-  }, [editor, store.chatOpen])
+  }, [editor, store.chatOpen, store.matches, store.testText])
 
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">

@@ -28,10 +28,7 @@ export default observer(function ToolbarComponent() {
         className={`font-mono max-w-[200px] flex items-center gap-1 ${tw.text.secondary}`}
       >
         <FolderOpen size={TOOLBAR_ICON_SIZE} className="shrink-0" />
-        <span className="truncate">
-          {store.workingDir.split('/').filter(Boolean).pop() ??
-            store.workingDir}
-        </span>
+        <span className="truncate">{store.workingDirBasename}</span>
       </ToolbarButton>
       <ToolbarSpacer />
       <ChatClearButton

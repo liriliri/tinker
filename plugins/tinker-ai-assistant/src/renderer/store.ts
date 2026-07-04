@@ -1,13 +1,11 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import i18n from 'i18next'
 import BaseStore from 'share/store/Base'
 import { Agent } from 'share/lib/Agent'
-import type { AgentMessage, AgentTool } from 'share/lib/Agent'
-import { createWebSearchToolResult } from 'share/tools/web'
-import * as db from './lib/db'
-import { TOOLS } from './lib/tools'
-import i18n from 'i18next'
-import type { Session, SessionData } from './types'
+import type { AgentMessage } from 'share/lib/Agent'
+import { buildAssistantTools } from './lib/assistantTools'
+import * as sessionStorage from './lib/sessionStorage'
 
 const storage = new LocalStore('tinker-ai-assistant')
 
@@ -15,116 +13,25 @@ const STORAGE_PROVIDER = 'provider'
 const STORAGE_MODEL = 'model'
 const STORAGE_WORKING_DIR = 'workingDir'
 
-function buildAgentTools(getWorkingDir: () => string): AgentTool[] {
-  return TOOLS.map((toolDef) => {
-    const name = (toolDef as { function: { name: string } }).function.name
-    const tool: AgentTool = {
-      definition: toolDef,
-      execute: async (args) => {
-        const workingDir = getWorkingDir()
-        switch (name) {
-          case 'exec': {
-            const command = typeof args.command === 'string' ? args.command : ''
-            const timeout =
-              typeof args.timeout === 'number' ? args.timeout : undefined
-            return aiAssistant.exec(command, workingDir, timeout)
-          }
-          case 'read_file': {
-            const filePath = typeof args.path === 'string' ? args.path : ''
-            const offset =
-              typeof args.offset === 'number' ? args.offset : undefined
-            const limit =
-              typeof args.limit === 'number' ? args.limit : undefined
-            return aiAssistant.readFile(filePath, workingDir, offset, limit)
-          }
-          case 'write_file': {
-            const filePath = typeof args.path === 'string' ? args.path : ''
-            const content = typeof args.content === 'string' ? args.content : ''
-            return aiAssistant.writeFile(filePath, content, workingDir)
-          }
-          case 'edit_file': {
-            const filePath = typeof args.path === 'string' ? args.path : ''
-            const oldText =
-              typeof args.old_text === 'string' ? args.old_text : ''
-            const newText =
-              typeof args.new_text === 'string' ? args.new_text : ''
-            const replaceAll =
-              typeof args.replace_all === 'boolean' ? args.replace_all : false
-            return aiAssistant.editFile(
-              filePath,
-              oldText,
-              newText,
-              workingDir,
-              replaceAll
-            )
-          }
-          case 'list_dir': {
-            const dirPath = typeof args.path === 'string' ? args.path : '.'
-            const recursive =
-              typeof args.recursive === 'boolean' ? args.recursive : false
-            const maxEntries =
-              typeof args.max_entries === 'number'
-                ? args.max_entries
-                : undefined
-            return aiAssistant.listDir(
-              dirPath,
-              workingDir,
-              recursive,
-              maxEntries
-            )
-          }
-          case 'web_search': {
-            const query = typeof args.query === 'string' ? args.query : ''
-            const results = await aiAssistant.webSearch(query)
-            return createWebSearchToolResult(results)
-          }
-          case 'web_fetch': {
-            const url = typeof args.url === 'string' ? args.url : ''
-            return aiAssistant.webFetch(url)
-          }
-          default:
-            return `Error: Unknown tool "${name}"`
-        }
-      },
-    }
-    return tool
-  })
-}
-
-function createSession(workingDir: string): Session {
-  return {
-    workingDir,
-    agent: createAgent(workingDir),
-  }
+interface Session {
+  agent: Agent
 }
 
 function createAgent(
-  workingDir: string,
-  initialMessages: SessionData['messages'] = []
+  getWorkingDir: () => string,
+  initialMessages: AgentMessage[] = []
 ) {
   return new Agent({
     maxIterations: 3,
-    tools: buildAgentTools(() => workingDir || aiAssistant.getHomeDir()),
+    tools: buildAssistantTools(getWorkingDir),
     initialMessages,
   })
 }
 
-function createSessionFromData(session: SessionData): Session {
-  return {
-    workingDir: session.workingDir,
-    agent: createAgent(session.workingDir, session.messages),
-  }
-}
-
-function serializeSession(session: Session): SessionData {
-  return {
-    workingDir: session.workingDir,
-    messages: session.agent.getMessages(),
-  }
-}
-
 class Store extends BaseStore {
-  session: Session = createSession('')
+  session: Session = {
+    agent: createAgent(() => this.workingDir || aiAssistant.getHomeDir()),
+  }
   sessionLoaded = false
 
   providers: tinker.AiProviderInfo[] = []
@@ -132,37 +39,38 @@ class Store extends BaseStore {
   selectedModel: string = ''
 
   workingDir: string = ''
-
   input: string = ''
 
   constructor() {
     super()
     makeAutoObservable(this)
     this.loadStorage()
-    this.loadDb()
+    void this.loadDb()
   }
 
   private loadStorage() {
     this.selectedProvider = storage.get(STORAGE_PROVIDER) || ''
     this.selectedModel = storage.get(STORAGE_MODEL) || ''
-    const savedWorkingDir: string =
+    this.workingDir =
       storage.get(STORAGE_WORKING_DIR) || aiAssistant.getHomeDir()
-    this.workingDir = savedWorkingDir
   }
 
   private async loadDb() {
     const savedWorkingDir = this.workingDir
     const [savedSession] = await Promise.all([
-      db.loadSession(),
+      sessionStorage.loadSession(),
       this.loadProviders(),
     ])
 
     runInAction(() => {
       this.workingDir = savedWorkingDir
       if (savedSession) {
-        this.session = createSessionFromData(savedSession)
-      } else {
-        this.session = createSession(savedWorkingDir)
+        this.session = {
+          agent: createAgent(
+            () => this.workingDir || aiAssistant.getHomeDir(),
+            savedSession.messages
+          ),
+        }
       }
       this.sessionLoaded = true
     })
@@ -172,23 +80,23 @@ class Store extends BaseStore {
     const providers = await tinker.getAIProviders()
     runInAction(() => {
       this.providers = providers
-      if (providers.length > 0) {
-        const provider = providers.find((p) => p.name === this.selectedProvider)
-        if (!provider) {
-          this.selectedProvider = providers[0].name
-          const firstModel = providers[0].models[0]?.name || ''
-          this.selectedModel = firstModel
-          storage.set(STORAGE_PROVIDER, this.selectedProvider)
-          storage.set(STORAGE_MODEL, this.selectedModel)
-        } else {
-          const hasModel = provider.models.some(
-            (m) => m.name === this.selectedModel
-          )
-          if (!hasModel) {
-            this.selectedModel = provider.models[0]?.name || ''
-            storage.set(STORAGE_MODEL, this.selectedModel)
-          }
-        }
+      if (providers.length === 0) return
+
+      const provider = providers.find((p) => p.name === this.selectedProvider)
+      if (!provider) {
+        this.selectedProvider = providers[0].name
+        this.selectedModel = providers[0].models[0]?.name || ''
+        storage.set(STORAGE_PROVIDER, this.selectedProvider)
+        storage.set(STORAGE_MODEL, this.selectedModel)
+        return
+      }
+
+      const hasModel = provider.models.some(
+        (m) => m.name === this.selectedModel
+      )
+      if (!hasModel) {
+        this.selectedModel = provider.models[0]?.name || ''
+        storage.set(STORAGE_MODEL, this.selectedModel)
       }
     })
   }
@@ -208,7 +116,7 @@ class Store extends BaseStore {
       "You are a helpful AI assistant. You have access to tools to complete tasks on the user's computer.",
       `Current date/time: ${dateStr}`,
       `Platform: ${platform}`,
-      `Working directory: ${this.session.workingDir || this.workingDir}`,
+      `Working directory: ${this.workingDir}`,
     ].join('\n')
   }
 
@@ -243,6 +151,7 @@ class Store extends BaseStore {
 
   get canSend(): boolean {
     return (
+      this.sessionLoaded &&
       this.input.trim().length > 0 &&
       !this.isGenerating &&
       this.providers.length > 0 &&
@@ -251,22 +160,12 @@ class Store extends BaseStore {
     )
   }
 
+  get workingDirBasename(): string {
+    return this.workingDir.split('/').filter(Boolean).pop() ?? this.workingDir
+  }
+
   setInput(val: string) {
     this.input = val
-  }
-
-  setSelectedProvider(name: string) {
-    this.selectedProvider = name
-    storage.set(STORAGE_PROVIDER, name)
-    const provider = this.providers.find((p) => p.name === name)
-    const firstModel = provider?.models[0]?.name || ''
-    this.selectedModel = firstModel
-    storage.set(STORAGE_MODEL, firstModel)
-  }
-
-  setSelectedModel(name: string) {
-    this.selectedModel = name
-    storage.set(STORAGE_MODEL, name)
   }
 
   setSelectedCombined(val: string) {
@@ -284,8 +183,10 @@ class Store extends BaseStore {
     this.workingDir = dir
     storage.set(STORAGE_WORKING_DIR, dir)
     this.session = {
-      workingDir: dir,
-      agent: createAgent(dir, this.session.agent.getMessages()),
+      agent: createAgent(
+        () => this.workingDir || aiAssistant.getHomeDir(),
+        this.session.agent.getMessages()
+      ),
     }
     this.saveSession()
   }
@@ -296,7 +197,10 @@ class Store extends BaseStore {
   }
 
   private saveSession() {
-    db.saveSession(serializeSession(this.session))
+    void sessionStorage.saveSession({
+      messages: this.session.agent.getMessages(),
+      workingDir: this.workingDir,
+    })
   }
 
   async sendMessage() {

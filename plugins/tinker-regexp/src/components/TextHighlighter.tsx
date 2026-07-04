@@ -22,6 +22,9 @@ export default function TextHighlighter({
     if (!editor || !canvasRef.current) return
 
     const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
     const editorWrapper = editor.getWrapperElement()
     const parent = editorWrapper.parentElement
 
@@ -33,7 +36,7 @@ export default function TextHighlighter({
       parent.insertBefore(canvas, editorWrapper)
     }
 
-    const updateCanvas = () => {
+    const updateCanvasSize = () => {
       const scrollInfo = editor.getScrollInfo()
       canvas.width = scrollInfo.clientWidth
       canvas.height = scrollInfo.clientHeight
@@ -47,109 +50,110 @@ export default function TextHighlighter({
       }px`
     }
 
-    updateCanvas()
+    const drawHighlights = () => {
+      updateCanvasSize()
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    editor.on('scroll', updateCanvas)
-    editor.on('refresh', updateCanvas)
+      if (!matches.length) return
 
-    return () => {
-      editor.off('scroll', updateCanvas)
-      editor.off('refresh', updateCanvas)
-    }
-  }, [editor])
+      const doc = editor.getDoc()
+      const scrollInfo = editor.getScrollInfo()
 
-  useEffect(() => {
-    if (!editor || !canvasRef.current) return
+      const topCoords = editor.coordsChar(
+        { left: 0, top: scrollInfo.top },
+        'local'
+      )
+      const bottomCoords = editor.coordsChar(
+        {
+          left: scrollInfo.clientWidth,
+          top: scrollInfo.top + scrollInfo.clientHeight,
+        },
+        'local'
+      )
+      const topIndex = editor.indexFromPos(topCoords)
+      const bottomIndex = editor.indexFromPos(bottomCoords)
 
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+      matches.forEach((match) => {
+        const start = match.index
+        const end = match.index + match.length
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+        if (start > bottomIndex) return
+        if (end < topIndex) return
 
-    if (!matches.length) return
+        const isEmphasis = match === hoverMatch || match === selectedMatch
 
-    const doc = editor.getDoc()
-    const scrollInfo = editor.getScrollInfo()
+        const startPos = doc.posFromIndex(start)
+        const endPos = doc.posFromIndex(Math.max(start, end - 1))
 
-    const topCoords = editor.coordsChar(
-      { left: 0, top: scrollInfo.top },
-      'local'
-    )
-    const bottomCoords = editor.coordsChar(
-      {
-        left: scrollInfo.clientWidth,
-        top: scrollInfo.top + scrollInfo.clientHeight,
-      },
-      'local'
-    )
-    const topIndex = editor.indexFromPos(topCoords)
-    const bottomIndex = editor.indexFromPos(bottomCoords)
-
-    matches.forEach((match) => {
-      const start = match.index
-      const end = match.index + match.length
-
-      if (start > bottomIndex) return
-      if (end < topIndex) return
-
-      const isEmphasis = match === hoverMatch || match === selectedMatch
-
-      const startPos = doc.posFromIndex(start)
-      const endPos = doc.posFromIndex(Math.max(start, end - 1))
-
-      const startRect = editor.charCoords(startPos, 'local')
-      const endRect = editor.charCoords(endPos, 'local')
-
-      if (isEmphasis) {
-        ctx.fillStyle = 'rgba(64, 158, 255, 0.4)'
-      } else {
-        ctx.fillStyle = 'rgba(64, 158, 255, 0.2)'
-      }
-
-      if (startRect.bottom === endRect.bottom) {
-        const top = startRect.top - scrollInfo.top
-        const height = startRect.bottom - startRect.top
-        const width = endRect.right - startRect.left
-        ctx.fillRect(startRect.left, top, width, height)
+        const startRect = editor.charCoords(startPos, 'local')
+        const endRect = editor.charCoords(endPos, 'local')
 
         if (isEmphasis) {
-          ctx.strokeStyle = THEME_COLORS.primary
-          ctx.lineWidth = 2
-          ctx.strokeRect(startRect.left, top, width, height)
-        }
-      } else {
-        const lineHeight = editor.defaultTextHeight()
-        const scrollWidth = scrollInfo.clientWidth
-
-        let top = startRect.top - scrollInfo.top
-        let height = startRect.bottom - startRect.top
-        let width = scrollWidth - startRect.left
-        ctx.fillRect(startRect.left, top, width, height)
-        if (isEmphasis) {
-          ctx.strokeStyle = THEME_COLORS.primary
-          ctx.lineWidth = 2
-          ctx.strokeRect(startRect.left, top, width, height)
+          ctx.fillStyle = 'rgba(64, 158, 255, 0.4)'
+        } else {
+          ctx.fillStyle = 'rgba(64, 158, 255, 0.2)'
         }
 
-        let y = startRect.top
-        while ((y += lineHeight) < endRect.top - 1) {
-          top = y - scrollInfo.top
-          ctx.fillRect(0, top, scrollWidth, height)
+        if (startRect.bottom === endRect.bottom) {
+          const top = startRect.top - scrollInfo.top
+          const height = startRect.bottom - startRect.top
+          const width = endRect.right - startRect.left
+          ctx.fillRect(startRect.left, top, width, height)
+
           if (isEmphasis) {
-            ctx.strokeRect(0, top, scrollWidth, height)
+            ctx.strokeStyle = THEME_COLORS.primary
+            ctx.lineWidth = 2
+            ctx.strokeRect(startRect.left, top, width, height)
+          }
+        } else {
+          const lineHeight = editor.defaultTextHeight()
+          const scrollWidth = scrollInfo.clientWidth
+
+          let top = startRect.top - scrollInfo.top
+          let height = startRect.bottom - startRect.top
+          let width = scrollWidth - startRect.left
+          ctx.fillRect(startRect.left, top, width, height)
+          if (isEmphasis) {
+            ctx.strokeStyle = THEME_COLORS.primary
+            ctx.lineWidth = 2
+            ctx.strokeRect(startRect.left, top, width, height)
+          }
+
+          let y = startRect.top
+          while ((y += lineHeight) < endRect.top - 1) {
+            top = y - scrollInfo.top
+            ctx.fillRect(0, top, scrollWidth, height)
+            if (isEmphasis) {
+              ctx.strokeRect(0, top, scrollWidth, height)
+            }
+          }
+
+          top = endRect.top - scrollInfo.top
+          height = endRect.bottom - endRect.top
+          width = endRect.right
+          ctx.fillRect(0, top, width, height)
+          if (isEmphasis) {
+            ctx.strokeRect(0, top, width, height)
           }
         }
+      })
+    }
 
-        top = endRect.top - scrollInfo.top
-        height = endRect.bottom - endRect.top
-        width = endRect.right
-        ctx.fillRect(0, top, width, height)
-        if (isEmphasis) {
-          ctx.strokeRect(0, top, width, height)
-        }
-      }
+    drawHighlights()
+
+    editor.on('scroll', drawHighlights)
+    editor.on('refresh', drawHighlights)
+
+    const rafId = requestAnimationFrame(() => {
+      editor.refresh()
+      drawHighlights()
     })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      editor.off('scroll', drawHighlights)
+      editor.off('refresh', drawHighlights)
+    }
   }, [editor, matches, hoverMatch, selectedMatch])
 
   return (

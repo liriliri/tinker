@@ -15,6 +15,7 @@ import zhCN from './i18n/zh-CN.json'
 
 const App = observer(function App() {
   const { t } = useTranslation()
+  void store.isGenerating
 
   return (
     <AlertProvider>
