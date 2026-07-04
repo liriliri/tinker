@@ -1,3 +1,10 @@
+## v1.21.0 (4 Jul 2026)
+
+* feat: add anniversary
+* feat: add image splitter
+* feat: add sftp
+* feat: add reader
+
 ## v1.20.0 (25 Jun 2026)
 
 * feat: add photo viewer
