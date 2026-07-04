@@ -1,232 +1,105 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
+import { ChatSession } from 'share/lib/aiChat/chatSession'
+import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/BaseStore'
-import { Agent } from 'share/lib/Agent'
-import type { AgentTool } from 'share/lib/Agent'
-import { WEB_SEARCH_TOOL, createWebSearchToolResult } from 'share/tools/web'
-import * as db from './lib/db'
-import type { Session, SessionData } from './types'
+import { AI_CHAT_AGENT_TOOLS } from './lib/chatTools'
+import { AiChatSessionStorage } from './lib/sessionStorage'
+import type { AiChatPersistedSession } from './lib/sessionStorage'
 
 const storage = new LocalStore('tinker-ai-chat')
 
 const STORAGE_ACTIVE_SESSION = 'activeSessionId'
-const STORAGE_PROVIDER = 'provider'
-const STORAGE_MODEL = 'model'
 
-const WEB_SEARCH_AGENT_TOOL: AgentTool = {
-  definition: WEB_SEARCH_TOOL,
-  execute: async (args) => {
-    const query = typeof args.query === 'string' ? args.query : ''
-    const results = await aiChat.webSearch(query)
-    return createWebSearchToolResult(results)
-  },
-}
-
-const SUPPORTED_TOOL_NAMES = new Set(['web_search'])
-
-export function isSupportedToolName(name: string | undefined): boolean {
-  return !!name && SUPPORTED_TOOL_NAMES.has(name)
-}
-
-function createSession(): Session {
-  const id = uuid()
-  return {
-    id,
-    title: '',
-    systemPrompt: '',
-    createdAt: Date.now(),
-    agent: createAgent(),
-  }
-}
-
-function createAgent(initialMessages: SessionData['messages'] = []) {
-  return new Agent({
-    maxIterations: 3,
-    tools: [WEB_SEARCH_AGENT_TOOL],
-    initialMessages,
-  })
-}
-
-function createSessionFromData(session: SessionData): Session {
-  return {
-    id: session.id,
-    title: session.title,
-    systemPrompt: session.systemPrompt,
-    createdAt: session.createdAt,
-    agent: createAgent(session.messages),
-  }
-}
-
-function serializeSession(session: Session): SessionData {
-  return {
-    id: session.id,
-    title: session.title,
-    messages: session.agent.getMessages(),
-    systemPrompt: session.systemPrompt,
-    createdAt: session.createdAt,
-  }
-}
-
-function hasSessionContent(session: SessionData): boolean {
-  return session.messages.some(
-    (message) =>
-      (message.role === 'user' || message.role === 'assistant') &&
-      message.content.trim().length > 0
-  )
+interface SessionEntry {
+  sessionStorage: AiChatSessionStorage
+  chat: AiChatStore
 }
 
 class Store extends BaseStore {
-  sessions: Session[] = []
+  entries: SessionEntry[] = []
   activeSessionId: string = ''
 
-  providers: tinker.AiProviderInfo[] = []
-  selectedProvider: string = ''
-  selectedModel: string = ''
-
-  input: string = ''
+  private prefsStorage = new LocalStoreChatPrefs(storage)
 
   constructor() {
     super()
     makeAutoObservable(this)
-    this.loadStorage()
-    this.loadDb()
+    void this.loadDb()
   }
 
-  private loadStorage() {
-    this.selectedProvider = storage.get(STORAGE_PROVIDER) || ''
-    this.selectedModel = storage.get(STORAGE_MODEL) || ''
+  private createEntry(sessionId: string): SessionEntry {
+    const sessionStorage = new AiChatSessionStorage(sessionId)
+    const chatSession = new ChatSession({
+      sessionId,
+      tools: AI_CHAT_AGENT_TOOLS,
+      maxIterations: 3,
+    })
+    const chat = new AiChatStore({
+      chatSession,
+      sessionStorage,
+      prefsStorage: this.prefsStorage,
+      systemPromptEditable: true,
+    })
+
+    return { sessionStorage, chat }
+  }
+
+  private createEntryFromSaved(saved: AiChatPersistedSession): SessionEntry {
+    const entry = this.createEntry(saved.id)
+    entry.sessionStorage.title = saved.title
+    return entry
   }
 
   private async loadDb() {
     const savedActiveId: string = storage.get(STORAGE_ACTIVE_SESSION) || ''
-    const [savedSessions] = await Promise.all([
-      db.getAllSessions(),
-      this.loadProviders(),
-    ])
+    const savedSessions = await AiChatSessionStorage.getAllSessions()
 
     runInAction(() => {
       if (savedSessions.length > 0) {
-        this.sessions = savedSessions
+        this.entries = savedSessions
           .sort((a, b) => b.createdAt - a.createdAt)
-          .map(createSessionFromData)
+          .map((saved) => this.createEntryFromSaved(saved))
         this.activeSessionId =
           savedSessions.find((s) => s.id === savedActiveId)?.id ||
           savedSessions[0].id
       } else {
-        const session = createSession()
-        this.sessions = [session]
-        this.activeSessionId = session.id
+        const entry = this.createEntry(uuid())
+        this.entries = [entry]
+        this.activeSessionId = entry.sessionStorage.sessionId
       }
     })
   }
 
-  private async loadProviders() {
-    const providers = await tinker.getAIProviders()
-    runInAction(() => {
-      this.providers = providers
-      if (providers.length > 0) {
-        const provider = providers.find((p) => p.name === this.selectedProvider)
-        if (!provider) {
-          this.selectedProvider = providers[0].name
-          const firstModel = providers[0].models[0]?.name || ''
-          this.selectedModel = firstModel
-          storage.set(STORAGE_PROVIDER, this.selectedProvider)
-          storage.set(STORAGE_MODEL, this.selectedModel)
-        } else {
-          const hasModel = provider.models.some(
-            (m) => m.name === this.selectedModel
-          )
-          if (!hasModel) {
-            this.selectedModel = provider.models[0]?.name || ''
-            storage.set(STORAGE_MODEL, this.selectedModel)
-          }
-        }
-      }
-    })
-  }
-
-  get activeSession(): Session | undefined {
-    return this.sessions.find((s) => s.id === this.activeSessionId)
-  }
-
-  get systemPrompt(): string {
-    return this.activeSession?.systemPrompt || ''
-  }
-
-  get isGenerating(): boolean {
-    return this.activeSession?.agent.isGenerating ?? false
-  }
-
-  get messages() {
-    return this.activeSession?.agent.getMessages() ?? []
-  }
-
-  get currentModels(): tinker.AiModel[] {
-    const provider = this.providers.find(
-      (p) => p.name === this.selectedProvider
-    )
-    return provider?.models || []
-  }
-
-  get combinedOptions(): Array<{ value: string; label: string }> {
-    return this.providers.flatMap((p) =>
-      p.models.map((m) => ({
-        value: `${p.name}:${m.name}`,
-        label: `${p.name}:${m.name}`,
-      }))
+  get activeEntry(): SessionEntry | undefined {
+    return this.entries.find(
+      (entry) => entry.sessionStorage.sessionId === this.activeSessionId
     )
   }
 
-  get selectedCombined(): string {
-    if (!this.selectedProvider || !this.selectedModel) return ''
-    return `${this.selectedProvider}:${this.selectedModel}`
+  get activeChat(): AiChatStore | undefined {
+    return this.activeEntry?.chat
   }
 
-  get canSend(): boolean {
-    return (
-      this.input.trim().length > 0 &&
-      !this.isGenerating &&
-      this.providers.length > 0 &&
-      !!this.selectedProvider &&
-      !!this.selectedModel
-    )
+  get activeTitle(): string {
+    return this.activeEntry?.sessionStorage.title ?? ''
   }
 
-  setInput(val: string) {
-    this.input = val
+  get sessions() {
+    return this.entries.map((entry) => ({
+      id: entry.sessionStorage.sessionId,
+      title: entry.sessionStorage.title,
+    }))
   }
 
-  setSelectedProvider(name: string) {
-    this.selectedProvider = name
-    storage.set(STORAGE_PROVIDER, name)
-    const provider = this.providers.find((p) => p.name === name)
-    const firstModel = provider?.models[0]?.name || ''
-    this.selectedModel = firstModel
-    storage.set(STORAGE_MODEL, firstModel)
-  }
-
-  setSelectedModel(name: string) {
-    this.selectedModel = name
-    storage.set(STORAGE_MODEL, name)
-  }
-
-  setSelectedCombined(val: string) {
-    const idx = val.indexOf(':')
-    if (idx === -1) return
-    const provider = val.slice(0, idx)
-    const model = val.slice(idx + 1)
-    this.selectedProvider = provider
-    storage.set(STORAGE_PROVIDER, provider)
-    this.selectedModel = model
-    storage.set(STORAGE_MODEL, model)
-  }
-
-  setSystemPrompt(val: string) {
-    const session = this.activeSession
-    if (!session) return
-    session.systemPrompt = val
-    this.saveActiveSession()
+  private syncActiveTitle() {
+    const entry = this.activeEntry
+    if (!entry) return
+    const messages = entry.chat.messages
+    const firstUserMessage = messages.find((msg) => msg.role === 'user')
+    entry.sessionStorage.title = firstUserMessage?.content.slice(0, 40) ?? ''
   }
 
   selectSession(id: string) {
@@ -235,115 +108,64 @@ class Store extends BaseStore {
   }
 
   newSession() {
-    const latest = this.sessions[0]
-    if (latest && latest.agent.getMessages().length === 0) {
-      this.selectSession(latest.id)
+    const latest = this.entries[0]
+    if (latest && latest.chat.messages.length === 0) {
+      this.selectSession(latest.sessionStorage.sessionId)
       return
     }
-    const session = createSession()
-    this.sessions.unshift(session)
-    this.activeSessionId = session.id
-    storage.set(STORAGE_ACTIVE_SESSION, session.id)
+    const entry = this.createEntry(uuid())
+    this.entries.unshift(entry)
+    this.activeSessionId = entry.sessionStorage.sessionId
+    storage.set(STORAGE_ACTIVE_SESSION, entry.sessionStorage.sessionId)
   }
 
   deleteSession(id: string) {
-    this.sessions = this.sessions.filter((s) => s.id !== id)
-    db.removeSession(id)
+    this.entries = this.entries.filter(
+      (entry) => entry.sessionStorage.sessionId !== id
+    )
+    void AiChatSessionStorage.removeSession(id)
     if (this.activeSessionId === id) {
-      if (this.sessions.length === 0) {
-        const newSession = createSession()
-        this.sessions = [newSession]
-        this.activeSessionId = newSession.id
+      if (this.entries.length === 0) {
+        const entry = this.createEntry(uuid())
+        this.entries = [entry]
+        this.activeSessionId = entry.sessionStorage.sessionId
       } else {
-        this.activeSessionId = this.sessions[0].id
+        this.activeSessionId = this.entries[0].sessionStorage.sessionId
       }
       storage.set(STORAGE_ACTIVE_SESSION, this.activeSessionId)
     }
   }
 
-  clearMessages() {
-    const session = this.activeSession
-    if (!session) return
-    session.agent.clearMessages()
-    session.title = ''
-    this.saveActiveSession()
-  }
-
-  private saveActiveSession() {
-    const session = this.activeSession
-    if (!session) return
-    const data = serializeSession(session)
-    if (hasSessionContent(data)) {
-      db.putSession(data)
-      return
-    }
-    db.removeSession(session.id)
-  }
-
-  private getActiveAgent(): Agent | undefined {
-    return this.activeSession?.agent
-  }
-
-  private updateActiveSessionTitle() {
-    const session = this.activeSession
-    if (!session) return
-    const messages = session.agent.getMessages()
-    const firstUserMessage = messages.find((msg) => msg.role === 'user')
-    session.title = firstUserMessage?.content.slice(0, 40) ?? ''
+  clearActiveMessages() {
+    const entry = this.activeEntry
+    if (!entry) return
+    entry.chat.clearMessages()
+    entry.sessionStorage.title = ''
   }
 
   async sendMessage() {
-    if (!this.canSend) return
-    const userText = this.input.trim()
-    this.input = ''
-    const agent = this.getActiveAgent()
-    if (!agent) return
-    agent.setProvider(this.selectedProvider)
-    agent.setModel(this.selectedModel)
-    agent.setSystemPrompt(this.systemPrompt)
-    await agent.send(userText)
-    this.updateActiveSessionTitle()
-    this.saveActiveSession()
+    const chat = this.activeChat
+    if (!chat) return
+    await chat.sendMessage()
+    this.syncActiveTitle()
   }
 
   abortGeneration() {
-    this.getActiveAgent()?.abort()
-    this.saveActiveSession()
+    this.activeChat?.abortGeneration()
   }
 
   async retryLastMessage() {
-    const session = this.activeSession
-    if (!session || this.isGenerating) return
-
-    const agent = session.agent
-    const messages = agent.getMessages()
-    let lastUserIdx = -1
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].role === 'user') {
-        lastUserIdx = i
-        break
-      }
-    }
-    if (lastUserIdx === -1) return
-
-    const userContent = messages[lastUserIdx].content
-    agent.setMessages(messages.slice(0, lastUserIdx))
-    this.updateActiveSessionTitle()
-    this.saveActiveSession()
-    agent.setProvider(this.selectedProvider)
-    agent.setModel(this.selectedModel)
-    agent.setSystemPrompt(this.systemPrompt)
-    await agent.send(userContent)
-    this.updateActiveSessionTitle()
-    this.saveActiveSession()
+    const chat = this.activeChat
+    if (!chat) return
+    await chat.retryLastMessage()
+    this.syncActiveTitle()
   }
 
   deleteMessage(id: string) {
-    const session = this.activeSession
-    if (!session) return
-    session.agent.deleteMessage(id)
-    this.updateActiveSessionTitle()
-    this.saveActiveSession()
+    const chat = this.activeChat
+    if (!chat) return
+    chat.deleteMessage(id)
+    this.syncActiveTitle()
   }
 }
 

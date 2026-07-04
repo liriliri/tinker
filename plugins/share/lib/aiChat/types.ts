@@ -6,6 +6,7 @@ export interface SessionData {
   id: string
   messages: AgentMessage[]
   createdAt: number
+  systemPrompt?: string
 }
 
 export interface Session extends Omit<SessionData, 'messages'> {

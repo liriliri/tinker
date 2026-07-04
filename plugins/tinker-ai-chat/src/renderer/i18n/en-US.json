@@ -4,5 +4,7 @@
   "delete": "Delete",
   "sendHint": "Enter to send · Shift+Enter for newline",
   "deleteSessionConfirm": "Delete this conversation?",
-  "searchedFor": "Searched"
+  "searchedFor": "Searched",
+  "chatInputPlaceholder": "Ask anything...",
+  "chatEmptyHint": "Start a conversation or search the web"
 }

@@ -1,12 +1,13 @@
 import type LocalStore from 'licia/LocalStore'
+import aiChatProviders from './providers'
 import { STORAGE_CHAT_OPEN } from './storage'
 
 export async function initAiChatAvailability(storage: LocalStore): Promise<{
   hasAI: boolean
   chatOpen: boolean
 }> {
-  const providers = await tinker.getAIProviders()
-  if (providers.length === 0) {
+  await aiChatProviders.ensureLoaded()
+  if (aiChatProviders.providers.length === 0) {
     return { hasAI: false, chatOpen: false }
   }
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Toolbar, ToolbarSpacer } from '../Toolbar'
 import { tw } from '../../theme'
 import ChatClearButton from './ChatClearButton'
@@ -31,6 +32,9 @@ export interface PluginChatProps {
   onModelChange: (value: string) => void
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
+  systemPrompt?: string
+  onSystemPromptChange?: (value: string) => void
+  renderToolMessage?: (msg: ChatMessage) => ReactNode
 }
 
 interface PluginChatMessageItemProps {
@@ -41,6 +45,7 @@ interface PluginChatMessageItemProps {
   getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
+  renderToolMessage?: (msg: ChatMessage) => ReactNode
 }
 
 function PluginChatMessageItem({
@@ -51,19 +56,24 @@ function PluginChatMessageItem({
   getVisibleToolMessages,
   onRetryLastMessage,
   onDeleteMessage,
+  renderToolMessage,
 }: PluginChatMessageItemProps) {
   const visibleToolMessages = getVisibleToolMessages(toolMessages)
 
   const footer =
     msg.role === 'assistant' && visibleToolMessages.length > 0 ? (
       <>
-        {visibleToolMessages.map((toolMsg) => (
-          <ToolCard
-            key={toolMsg.id}
-            msg={toolMsg}
-            getArgSummary={getToolArgSummary}
-          />
-        ))}
+        {visibleToolMessages.map((toolMsg) =>
+          renderToolMessage ? (
+            <div key={toolMsg.id}>{renderToolMessage(toolMsg)}</div>
+          ) : (
+            <ToolCard
+              key={toolMsg.id}
+              msg={toolMsg}
+              getArgSummary={getToolArgSummary}
+            />
+          )
+        )}
       </>
     ) : undefined
 
@@ -87,6 +97,7 @@ interface PluginChatMessageListProps {
   getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
+  renderToolMessage?: (msg: ChatMessage) => ReactNode
 }
 
 function PluginChatMessageList({
@@ -98,6 +109,7 @@ function PluginChatMessageList({
   getVisibleToolMessages,
   onRetryLastMessage,
   onDeleteMessage,
+  renderToolMessage,
 }: PluginChatMessageListProps) {
   const visibleMessages = messages.filter((msg) => msg.role !== 'tool')
 
@@ -136,6 +148,7 @@ function PluginChatMessageList({
             getVisibleToolMessages={getVisibleToolMessages}
             onRetryLastMessage={onRetryLastMessage}
             onDeleteMessage={onDeleteMessage}
+            renderToolMessage={renderToolMessage}
           />
         )
       }}
@@ -166,6 +179,9 @@ export default function PluginChat({
   onModelChange,
   onRetryLastMessage,
   onDeleteMessage,
+  systemPrompt,
+  onSystemPromptChange,
+  renderToolMessage,
 }: PluginChatProps) {
   return (
     <div className={`h-full flex flex-col overflow-hidden ${tw.bg.primary}`}>
@@ -188,6 +204,7 @@ export default function PluginChat({
         getVisibleToolMessages={getVisibleToolMessages}
         onRetryLastMessage={onRetryLastMessage}
         onDeleteMessage={onDeleteMessage}
+        renderToolMessage={renderToolMessage}
       />
       <ChatInputArea
         value={input}
@@ -201,6 +218,8 @@ export default function PluginChat({
         selectedCombined={selectedCombined}
         combinedOptions={combinedOptions}
         onModelChange={onModelChange}
+        systemPrompt={systemPrompt}
+        onSystemPromptChange={onSystemPromptChange}
       />
     </div>
   )

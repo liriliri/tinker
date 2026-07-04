@@ -4,8 +4,9 @@ import {
   initAiChatAvailability,
   toggleAiChatOpen,
 } from 'share/lib/aiChat/aiAvailability'
-import { createChatDb } from 'share/lib/aiChat/chatDb'
-import { createChatSession } from 'share/lib/aiChat/chatSession'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
+import { ChatSession } from 'share/lib/aiChat/chatSession'
+import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/BaseStore'
 import { REGEXP_AGENT_TOOLS } from './lib/chatTools'
@@ -17,16 +18,20 @@ const STORAGE_PATTERN = 'pattern'
 const STORAGE_FLAGS = 'flags'
 const STORAGE_TEXT = 'text'
 
-const chatDb = createChatDb('tinker-regexp')
-const chatSession = createChatSession({
-  chatDb,
-  systemPrompt:
-    'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+const sessionStorage = new IndexedDbChatStorage('tinker-regexp')
+const chatSession = new ChatSession({
+  sessionId: sessionStorage.sessionId,
   tools: REGEXP_AGENT_TOOLS,
 })
 
 class Store extends BaseStore {
-  chat = new AiChatStore({ storage, chatDb, chatSession })
+  chat = new AiChatStore({
+    chatSession,
+    sessionStorage,
+    prefsStorage: new LocalStoreChatPrefs(storage),
+    initialSystemPrompt:
+      'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+  })
 
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'

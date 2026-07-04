@@ -4,5 +4,7 @@
   "delete": "删除",
   "sendHint": "Enter 发送 · Shift+Enter 换行",
   "deleteSessionConfirm": "删除这个对话？",
-  "searchedFor": "已搜索"
+  "searchedFor": "已搜索",
+  "chatInputPlaceholder": "随便问点什么...",
+  "chatEmptyHint": "开始对话，或使用网页搜索"
 }

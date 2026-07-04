@@ -10,8 +10,9 @@ import {
   initAiChatAvailability,
   toggleAiChatOpen,
 } from 'share/lib/aiChat/aiAvailability'
-import { createChatDb } from 'share/lib/aiChat/chatDb'
-import { createChatSession } from 'share/lib/aiChat/chatSession'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
+import { ChatSession } from 'share/lib/aiChat/chatSession'
+import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/BaseStore'
 import { JSON_AGENT_TOOLS } from './lib/chatTools'
@@ -24,16 +25,20 @@ const STORAGE_CONTENT = 'tinker-json-editor-content'
 const STORAGE_MODE = 'tinker-json-editor-mode'
 const STORAGE_FILE_PATH = 'file-path'
 
-const chatDb = createChatDb('tinker-json-editor')
-const chatSession = createChatSession({
-  chatDb,
-  systemPrompt:
-    'You are a JSON assistant. Help the user edit, format, transform, and understand JSON data. You have tools to read and update the editor content. Use tools only when you need current JSON values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+const sessionStorage = new IndexedDbChatStorage('tinker-json-editor')
+const chatSession = new ChatSession({
+  sessionId: sessionStorage.sessionId,
   tools: JSON_AGENT_TOOLS,
 })
 
 class Store extends BaseStore {
-  chat = new AiChatStore({ storage, chatDb, chatSession })
+  chat = new AiChatStore({
+    chatSession,
+    sessionStorage,
+    prefsStorage: new LocalStoreChatPrefs(storage),
+    initialSystemPrompt:
+      'You are a JSON assistant. Help the user edit, format, transform, and understand JSON data. You have tools to read and update the editor content. Use tools only when you need current JSON values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+  })
 
   jsonInput: string = ''
   mode: EditorMode = 'text'

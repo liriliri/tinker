@@ -125,7 +125,7 @@ import {
 } from 'share/components/AiChat'
 ```
 
-Low-level components are render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Use `ToolCard` for generic tool-call results; pass optional `getToolLabel`, `getArgSummary`, or `getToolIcon` for plugin-specific display. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
+Low-level components are render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Use `ToolCard` for generic tool-call results; pass optional `getToolLabel`, `getArgSummary`, or `getToolIcon` for plugin-specific display. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed, or use `PluginChat` props `systemPrompt` / `onSystemPromptChange`. Pass `renderToolMessage` to `PluginChat` for custom tool result UI (e.g. `SearchCard`). Override `emptyHint` or `placeholder` for plugin-specific copy.
 
 `PluginChat` is also render-only — use `getPluginChatProps(chat)` in an `observer` parent to pass state and handlers.
 
@@ -134,8 +134,12 @@ Low-level components are render-only. Provide `messages`, send/retry/delete hand
 ```ts
 import { PluginChat } from 'share/components/AiChat'
 import AiChatStore from 'share/store/AiChat'
-import { createChatDb } from 'share/lib/aiChat/chatDb'
-import { createChatSession } from 'share/lib/aiChat/chatSession'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
+import { ChatSession } from 'share/lib/aiChat/chatSession'
+import {
+  IndexedDbChatStorage,
+  MemoryChatStorage,
+} from 'share/lib/aiChat/chatStorage'
 import { createToolMessageHelpers } from 'share/lib/aiChat/toolHelpers'
 import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import {
@@ -143,13 +147,21 @@ import {
   toggleAiChatOpen,
 } from 'share/lib/aiChat/aiAvailability'
 
-const chatDb = createChatDb('my-plugin')
-const chatSession = createChatSession({
-  chatDb,
-  systemPrompt: 'You are a ... assistant.',
+// IndexedDB (persists across restarts)
+const sessionStorage = new IndexedDbChatStorage('my-plugin')
+// Or in-memory (lost on restart): new MemoryChatStorage()
+
+const chatSession = new ChatSession({
+  sessionId: sessionStorage.sessionId,
   tools: MY_AGENT_TOOLS,
 })
-const chat = new AiChatStore({ storage, chatDb, chatSession })
+const chat = new AiChatStore({
+  chatSession,
+  sessionStorage,
+  prefsStorage: new LocalStoreChatPrefs(storage), // optional
+  initialSystemPrompt: 'You are a ... assistant.',
+  systemPromptEditable: true, // optional, enables settings UI in PluginChat
+})
 
 void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
   store.hasAI = hasAI

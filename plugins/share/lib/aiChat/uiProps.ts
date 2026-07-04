@@ -1,6 +1,6 @@
-import type AiChatStore from '../../store/AiChat'
+import type { ChatController } from './chatController'
 
-export function getPluginChatProps(chat: AiChatStore) {
+export function getPluginChatProps(chat: ChatController) {
   const messages = chat.messages
   const lastMsg = messages[messages.length - 1]
   if (lastMsg?.generating) {
@@ -17,6 +17,12 @@ export function getPluginChatProps(chat: AiChatStore) {
     selectedCombined: chat.selectedCombined,
     combinedOptions: chat.combinedOptions,
     canClearMessages: chat.messages.length > 0,
+    ...(chat.systemPromptEditable
+      ? {
+          systemPrompt: chat.systemPrompt,
+          onSystemPromptChange: (value: string) => chat.setSystemPrompt(value),
+        }
+      : {}),
     onInputChange: (value: string) => chat.setInput(value),
     onSend: () => chat.sendMessage(),
     onStop: () => chat.abortGeneration(),
