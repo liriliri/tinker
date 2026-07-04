@@ -68,41 +68,43 @@ export default function SearchCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-lg border text-[11px] ${tw.border} ${tw.bg.secondary}`}
+      className={`overflow-hidden rounded-md border text-[10px] ${tw.border} ${tw.bg.secondary}`}
     >
       <button
         type="button"
         onClick={() => setExpanded((value) => !value)}
-        className={`w-full px-2.5 py-2 text-left ${
+        className={`w-full px-2 py-1 text-left ${
           isRunning || isError ? '' : tw.hover
         }`}
         disabled={isRunning || isError}
       >
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <div
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white ${
+            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded text-white ${
               isError ? 'bg-red-500 dark:bg-red-600' : tw.primary.bg
             }`}
           >
             <Search size={10} className={isRunning ? 'animate-pulse' : ''} />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <div
-                className={`min-w-0 flex-1 truncate text-[11px] font-medium leading-4 ${
+                className={`min-w-0 flex-1 truncate text-[10px] font-medium leading-none ${
                   isError ? 'text-red-500 dark:text-red-400' : tw.text.primary
                 }`}
               >
                 {query}
               </div>
-              <span className={`shrink-0 leading-none ${tw.text.tertiary}`}>
+              <span
+                className={`shrink-0 text-[9px] leading-none ${tw.text.tertiary}`}
+              >
                 {statusText}
               </span>
             </div>
           </div>
           {!isRunning && !isError && (
             <ChevronDown
-              size={12}
+              size={10}
               className={`shrink-0 transition-transform ${tw.text.tertiary} ${
                 expanded ? 'rotate-180' : ''
               }`}
@@ -113,24 +115,24 @@ export default function SearchCard({
 
       {expanded && results.length > 0 && (
         <div
-          className={`flex flex-col gap-1.5 border-t px-2.5 py-2 ${tw.border}`}
+          className={`flex flex-col gap-1 border-t px-2 py-1.5 ${tw.border}`}
         >
           {results.map((result, index) => (
             <button
               key={index}
               type="button"
               onClick={() => onOpenResult(result.url)}
-              className={`block w-full rounded-md border px-2.5 py-1.5 text-left transition-colors ${tw.border} ${tw.hover}`}
+              className={`block w-full rounded border px-2 py-1 text-left transition-colors ${tw.border} ${tw.hover}`}
             >
-              <div className="flex items-start gap-1.5">
+              <div className="flex items-start gap-1">
                 <span
-                  className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium leading-none ${tw.bg.secondary} ${tw.text.tertiary}`}
+                  className={`mt-px shrink-0 rounded px-1 py-px text-[8px] font-medium leading-none ${tw.bg.secondary} ${tw.text.tertiary}`}
                 >
                   {index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div
-                    className={`line-clamp-1 text-[11px] font-medium leading-4 ${tw.primary.text}`}
+                    className={`line-clamp-1 text-[10px] font-medium leading-none ${tw.primary.text}`}
                   >
                     {result.title}
                   </div>

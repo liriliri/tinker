@@ -18,5 +18,8 @@
   "save": "Save",
   "cancel": "Cancel",
   "edit": "Edit",
-  "delete": "Delete"
+  "delete": "Delete",
+  "chatTitle": "Web Assistant",
+  "chatInputPlaceholder": "Ask about this page...",
+  "chatEmptyHint": "I can help you summarize or analyze the current web page"
 }

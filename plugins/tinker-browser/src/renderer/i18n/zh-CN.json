@@ -18,5 +18,8 @@
   "save": "保存",
   "cancel": "取消",
   "edit": "编辑",
-  "delete": "删除"
+  "delete": "删除",
+  "chatTitle": "网页助手",
+  "chatInputPlaceholder": "询问当前网页相关问题...",
+  "chatEmptyHint": "我可以帮你总结或分析当前网页内容"
 }

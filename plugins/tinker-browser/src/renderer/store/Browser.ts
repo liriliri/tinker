@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import type AiChatStore from 'share/store/AiChat'
 
 class Browser {
   id: string
@@ -8,11 +9,13 @@ class Browser {
   isLoading = false
   canGoBack = false
   canGoForward = false
+  chatOpen = false
+  chat!: AiChatStore
 
   constructor(id: string, url = '') {
     this.id = id
     this.url = url
-    makeAutoObservable(this)
+    makeAutoObservable(this, { chat: false })
   }
 
   updateTitle(title: string) {

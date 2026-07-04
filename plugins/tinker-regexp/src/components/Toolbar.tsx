@@ -4,7 +4,6 @@ import { Clipboard, Eraser, MessageSquare } from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
-  ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
@@ -84,17 +83,14 @@ export default observer(function ToolbarComponent() {
       </ToolbarButtonGroup>
 
       {store.hasAI && (
-        <>
-          <ToolbarSeparator />
-          <ToolbarButton
-            variant="toggle"
-            active={store.chatOpen}
-            onClick={() => store.toggleChat()}
-            title={t('chatTitle')}
-          >
-            <MessageSquare size={TOOLBAR_ICON_SIZE} />
-          </ToolbarButton>
-        </>
+        <ToolbarButton
+          variant="toggle"
+          active={store.chatOpen}
+          onClick={() => store.toggleChat()}
+          title={t('chatTitle')}
+        >
+          <MessageSquare size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
       )}
     </Toolbar>
   )

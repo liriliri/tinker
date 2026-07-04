@@ -7,7 +7,11 @@ import Dialog, { DialogButton } from 'share/components/Dialog'
 import type { ISite } from '../types'
 import store from '../store'
 
-const SiteCard = observer(function SiteCard({ site }: { site: ISite }) {
+interface SiteCardProps {
+  site: ISite
+}
+
+const SiteCard = observer(function SiteCard({ site }: SiteCardProps) {
   const { t } = useTranslation()
   const favicon = store.favicons.get(site.id)
 

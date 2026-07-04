@@ -5,16 +5,21 @@ import isStr from 'licia/isStr'
 import contain from 'licia/contain'
 import startWith from 'licia/startWith'
 import LocalStore from 'licia/LocalStore'
+import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import BaseStore from 'share/store/Base'
 import Browser from './Browser'
 import type { ISite } from '../types'
 import { getAllFavicons, saveFavicon, removeFavicon } from '../lib/db'
+import { createBrowserChat } from '../lib/chat'
+import { registerPageContext, unregisterPageContext } from '../lib/pageContext'
 
 const NEW_TAB_URL = ''
 const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
 const DEVTOOLS_POSITIONS = ['bottom', 'left', 'right'] as const
 
 const storage = new LocalStore('tinker-browser')
+const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 const STORAGE_SITES = 'sites'
 const STORAGE_DEVTOOLS_POSITION = 'devToolsPosition'
@@ -35,6 +40,7 @@ class Store extends BaseStore {
   webviewRefs: Map<string, Electron.WebviewTag> = new Map()
   devToolsOpenTabs: Set<string> = new Set()
   devToolsPosition: DevToolsPosition = 'bottom'
+  hasAI = false
 
   private nextId = 1
 
@@ -45,6 +51,34 @@ class Store extends BaseStore {
     })
     this.addTab()
     this.loadStorage()
+    void initAiChatAvailability(storage).then(({ hasAI }) => {
+      this.hasAI = hasAI
+    })
+  }
+
+  private setupTab(tab: Browser) {
+    tab.chat = createBrowserChat(tab.id, chatPrefsStorage)
+    registerPageContext(tab.id, () => ({
+      title: tab.title,
+      url: tab.url,
+      isLoading: tab.isLoading,
+      getWebview: () => this.webviewRefs.get(tab.id),
+    }))
+  }
+
+  get activeTabChatOpen(): boolean {
+    return this.activeTab?.chatOpen ?? false
+  }
+
+  get canOpenChat(): boolean {
+    return Boolean(this.hasAI && this.activeTab?.url)
+  }
+
+  toggleActiveTabChat() {
+    if (!this.canOpenChat) return
+    const tab = this.activeTab
+    if (!tab) return
+    tab.chatOpen = !tab.chatOpen
   }
 
   private loadStorage() {
@@ -148,6 +182,7 @@ class Store extends BaseStore {
   addTab(url: string = NEW_TAB_URL, afterTabId?: string) {
     const id = `tab-${this.nextId++}`
     const tab = new Browser(id, url)
+    this.setupTab(tab)
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
       if (index !== -1) {
@@ -173,6 +208,7 @@ class Store extends BaseStore {
 
     this.webviewRefs.delete(id)
     this.devToolsOpenTabs.delete(id)
+    unregisterPageContext(id)
     this.tabs.splice(index, 1)
 
     if (this.activeTabId === id) {

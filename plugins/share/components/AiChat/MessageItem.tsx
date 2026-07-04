@@ -107,7 +107,7 @@ export default function MessageItem({
   if (!hasTextContent && hasFooterContent && !children) {
     return (
       <div className="px-4 py-1">
-        <div className="flex flex-col gap-1">{footer}</div>
+        <div className="flex flex-col gap-1.5">{footer}</div>
       </div>
     )
   }
@@ -191,7 +191,7 @@ export default function MessageItem({
         )}
 
         {hasFooterContent && (
-          <div className="flex flex-col gap-1">{footer}</div>
+          <div className="mt-2 flex flex-col gap-1.5">{footer}</div>
         )}
       </div>
     </div>

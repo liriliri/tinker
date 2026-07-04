@@ -8,6 +8,7 @@ import {
   Loader2,
   Search,
   Terminal,
+  WandSparkles,
 } from 'lucide-react'
 import isStrBlank from 'licia/isStrBlank'
 import { tw } from '../../theme'
@@ -62,6 +63,8 @@ function defaultArgSummary(
 function DefaultToolIcon({ name }: { name: string }) {
   switch (name) {
     case 'exec':
+    case 'run_command':
+    case 'write_to_terminal':
       return <Terminal size={ICON_SIZE} />
     case 'read_file':
     case 'write_file':
@@ -70,11 +73,15 @@ function DefaultToolIcon({ name }: { name: string }) {
     case 'list_dir':
       return <FolderOpen size={ICON_SIZE} />
     case 'web_fetch':
+    case 'get_page_info':
+    case 'get_page_text':
+    case 'get_page_selection':
+    case 'get_page_metadata':
       return <Globe size={ICON_SIZE} />
     case 'web_search':
       return <Search size={ICON_SIZE} />
     default:
-      return <Terminal size={ICON_SIZE} />
+      return <WandSparkles size={ICON_SIZE} />
   }
 }
 
@@ -114,17 +121,17 @@ export default function ToolCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-lg border text-[11px] ${tw.border} ${tw.bg.secondary}`}
+      className={`overflow-hidden rounded-md border text-[10px] ${tw.border} ${tw.bg.secondary}`}
     >
       <button
         type="button"
         onClick={() => canExpand && setExpanded((value) => !value)}
-        className={`w-full px-2.5 py-2 text-left ${canExpand ? tw.hover : ''}`}
+        className={`w-full px-2 py-1 text-left ${canExpand ? tw.hover : ''}`}
         disabled={!canExpand}
       >
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <div
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded ${
               isError
                 ? 'bg-red-500 dark:bg-red-600'
                 : isRunning
@@ -141,9 +148,9 @@ export default function ToolCard({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span
-                className={`shrink-0 font-medium leading-4 ${
+                className={`shrink-0 font-medium leading-none ${
                   isError ? 'text-red-500 dark:text-red-400' : tw.text.primary
                 }`}
               >
@@ -151,13 +158,15 @@ export default function ToolCard({
               </span>
               {summary && (
                 <span
-                  className={`min-w-0 flex-1 truncate font-mono leading-4 ${tw.text.tertiary}`}
+                  className={`min-w-0 flex-1 truncate font-mono text-[9px] leading-none ${tw.text.tertiary}`}
                 >
                   {summary}
                 </span>
               )}
               {isRunning && (
-                <span className={`shrink-0 leading-none ${tw.text.tertiary}`}>
+                <span
+                  className={`shrink-0 text-[9px] leading-none ${tw.text.tertiary}`}
+                >
                   {t('running')}
                 </span>
               )}
@@ -165,7 +174,7 @@ export default function ToolCard({
           </div>
           {canExpand && (
             <ChevronDown
-              size={12}
+              size={10}
               className={`shrink-0 transition-transform ${tw.text.tertiary} ${
                 expanded ? 'rotate-180' : ''
               }`}
@@ -175,9 +184,9 @@ export default function ToolCard({
       </button>
 
       {expanded && result && (
-        <div className={`border-t px-2.5 py-2 ${tw.border}`}>
+        <div className={`border-t px-2 py-1.5 ${tw.border}`}>
           <pre
-            className={`max-h-60 overflow-y-auto whitespace-pre-wrap break-all font-mono text-[10px] leading-relaxed ${tw.text.secondary}`}
+            className={`max-h-48 overflow-y-auto whitespace-pre-wrap break-all font-mono text-[9px] leading-snug ${tw.text.secondary}`}
           >
             {result}
           </pre>

@@ -12,10 +12,6 @@ export default observer(function WebviewContainer() {
     (tabId: string, handle: WebviewHandle | null) => {
       if (handle) {
         webviewHandles.current.set(tabId, handle)
-        const wvTag = handle.getWebviewTag()
-        if (wvTag) {
-          store.webviewRefs.set(tabId, wvTag)
-        }
       } else {
         webviewHandles.current.delete(tabId)
         store.webviewRefs.delete(tabId)
@@ -27,7 +23,7 @@ export default observer(function WebviewContainer() {
   const showNewTab = store.activeTab && !store.activeTab.url
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden relative">
+    <div className="h-full overflow-hidden relative">
       {store.tabs.map((tab) => {
         if (!tab.url) return null
 
@@ -88,6 +84,7 @@ export default observer(function WebviewContainer() {
               }}
               onNewWindow={(url) => store.addTab(url)}
               onDomReady={(wv) => {
+                store.webviewRefs.set(tab.id, wv)
                 wv.executeJavaScript(`
                   document.addEventListener('contextmenu', (e) => {
                     const selection = window.getSelection();
