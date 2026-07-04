@@ -25,7 +25,10 @@ import store from './store'
 import Sidebar from './components/Sidebar'
 import EditorPane from './components/EditorPane'
 import StatusBar from './components/StatusBar'
-import { TerminalPanel } from 'share/components/TerminalPanel'
+import {
+  TerminalPanel,
+  getTerminalPanelProps,
+} from 'share/components/TerminalPanel'
 import Welcome from './components/Welcome'
 import QuickOpen from './components/QuickOpen'
 import { relativePath } from './lib/path'
@@ -281,8 +284,7 @@ const App = observer(function App() {
                   {store.terminalOpen && (
                     <Panel id="terminal" defaultSize={200} minSize={100}>
                       <TerminalPanel
-                        terminal={store.terminal}
-                        isDark={store.isDark}
+                        {...getTerminalPanelProps(store.terminal, store.isDark)}
                       />
                     </Panel>
                   )}

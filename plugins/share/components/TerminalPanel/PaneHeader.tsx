@@ -1,31 +1,38 @@
-import { observer } from 'mobx-react-lite'
 import { X, Columns2 } from 'lucide-react'
 import { tw } from '../../theme'
 import { useTranslation } from 'react-i18next'
-import { useTerminalPanel } from './context'
+import type { SplitDirection } from '../../types/terminalLayout'
 import { I18N_NS } from './i18n'
 
 interface PaneHeaderProps {
   paneId: string
   paneIndex: number
+  title: string
+  isActive: boolean
+  onSetActivePane: (paneId: string) => void
+  onSplitPane: (paneId: string, direction: SplitDirection) => void
+  onClosePane: (paneId: string) => void
 }
 
-export default observer(function PaneHeader({
+export default function PaneHeader({
   paneId,
   paneIndex,
+  title,
+  isActive,
+  onSetActivePane,
+  onSplitPane,
+  onClosePane,
 }: PaneHeaderProps) {
-  const { terminal } = useTerminalPanel()
-  const title = terminal.paneTitles[paneId] || `Terminal ${paneIndex}`
   const { t } = useTranslation(I18N_NS)
-  const isActive = terminal.activePaneId === paneId
+  const displayTitle = title || `Terminal ${paneIndex}`
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation()
-    terminal.closePane(paneId)
+    onClosePane(paneId)
   }
 
   const handleFocus = () => {
-    terminal.setActivePane(paneId)
+    onSetActivePane(paneId)
   }
 
   return (
@@ -43,13 +50,13 @@ export default observer(function PaneHeader({
             : `font-medium ${tw.text.tertiary}`
         }`}
       >
-        {title}
+        {displayTitle}
       </span>
       <div className="flex items-center gap-0.5 ml-1 shrink-0">
         <button
           onClick={(e) => {
             e.stopPropagation()
-            terminal.splitPane(paneId, 'horizontal')
+            onSplitPane(paneId, 'horizontal')
           }}
           className="w-4 h-4 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all"
           title={t('splitVertical')}
@@ -59,7 +66,7 @@ export default observer(function PaneHeader({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            terminal.splitPane(paneId, 'vertical')
+            onSplitPane(paneId, 'vertical')
           }}
           className="w-4 h-4 flex items-center justify-center rounded opacity-40 hover:opacity-100 hover:bg-white/10 transition-all"
           title={t('splitHorizontal')}
@@ -76,4 +83,4 @@ export default observer(function PaneHeader({
       </div>
     </div>
   )
-})
+}

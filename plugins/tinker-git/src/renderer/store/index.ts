@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import BaseStore from 'share/store/Base'
 import TerminalStore from 'share/store/Terminal'
-import type { SplitDirection } from 'share/types/terminalLayout'
 import Repo, { type GitViewMode } from './Repo'
 import { repoDirName } from '../lib/util'
 
@@ -428,55 +427,13 @@ class Store extends BaseStore {
     }
   }
 
-  // ---- Terminal proxies ----
+  // ---- Terminal ----
 
   get terminalOpen() {
     return this.terminal.terminalOpen
   }
 
-  get terminalTabs() {
-    return this.terminal.tabs
-  }
-
-  get activeTerminalTabId() {
-    return this.terminal.activeTabId
-  }
-
-  get activePaneId() {
-    return this.terminal.activePaneId
-  }
-
-  get paneTitles() {
-    return this.terminal.paneTitles
-  }
-
-  get pendingCwd() {
-    return this.terminal.pendingCwd
-  }
-
-  get onDestroyPane() {
-    return this.terminal.onDestroyPane
-  }
-
-  set onDestroyPane(v: typeof this.terminal.onDestroyPane) {
-    this.terminal.onDestroyPane = v
-  }
-
   toggleTerminal = () => this.terminal.toggle()
-  addTerminalTab = (cwd?: string) => this.terminal.addTab(cwd)
-  closeTerminalTab = (id: string) => this.terminal.closeTab(id)
-  setActiveTerminalTab = (id: string) => this.terminal.setActiveTab(id)
-  setActivePane = (paneId: string) => this.terminal.setActivePane(paneId)
-  setPaneTitle = (paneId: string, title: string) =>
-    this.terminal.setPaneTitle(paneId, title)
-  splitPane = (paneId: string, direction: SplitDirection) =>
-    this.terminal.splitPane(paneId, direction)
-  closePane = (paneId: string) => this.terminal.closePane(paneId)
-  setDualColumns = () => this.terminal.setDualColumns()
-  setTripleColumns = () => this.terminal.setTripleColumns()
-  setGrid = () => this.terminal.setGrid()
-  moveTerminalTab = (from: number, to: number) =>
-    this.terminal.moveTab(from, to)
 
   async refreshBranches(tab: Repo = this.activeTab!, repoPath?: string) {
     if (!repoPath && !tab?.repoPath) return

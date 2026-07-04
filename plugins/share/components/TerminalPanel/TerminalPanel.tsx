@@ -1,5 +1,3 @@
-import { useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import {
   Terminal as TerminalIcon,
@@ -9,21 +7,47 @@ import {
 } from 'lucide-react'
 import { tw } from '../../theme'
 import TabBar from '../TabBar'
-import type TerminalStore from '../../store/Terminal'
+import type {
+  TerminalPanelProps,
+  TerminalPaneLayoutProps,
+} from '../../lib/terminalPanel'
 import SplitLayout from './SplitLayout'
-import { destroyPane } from './TerminalPane'
-import { TerminalPanelContext, useTerminalPanel } from './context'
 import { I18N_NS } from './i18n'
 import './i18n'
 
-export interface TerminalPanelProps {
-  terminal: TerminalStore
-  isDark: boolean
-}
+export type { TerminalPanelProps } from '../../lib/terminalPanel'
 
-const TerminalPanelInner = observer(function TerminalPanelInner() {
+export default function TerminalPanel({
+  tabs,
+  activeTabId,
+  activePaneId,
+  paneTitles,
+  isDark,
+  onAddTab,
+  onCloseTab,
+  onActivateTab,
+  onMoveTab,
+  onSetDualColumns,
+  onSetTripleColumns,
+  onSetGrid,
+  onSetActivePane,
+  onSetPaneTitle,
+  onSplitPane,
+  onClosePane,
+  createSession,
+}: TerminalPanelProps) {
   const { t } = useTranslation(I18N_NS)
-  const { terminal } = useTerminalPanel()
+
+  const paneProps: TerminalPaneLayoutProps = {
+    activePaneId,
+    paneTitles,
+    isDark,
+    onSetActivePane,
+    onSetPaneTitle,
+    onSplitPane,
+    onClosePane,
+    createSession,
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -32,13 +56,13 @@ const TerminalPanelInner = observer(function TerminalPanelInner() {
       >
         <div className="flex-1 min-w-0 h-full">
           <TabBar
-            tabs={terminal.tabs}
-            activeTabId={terminal.activeTabId}
+            tabs={tabs}
+            activeTabId={activeTabId}
             hideFirstBorder
-            onAddTab={() => terminal.addTab()}
-            onClose={(id) => terminal.closeTab(id)}
-            onActivate={(id) => terminal.setActiveTab(id)}
-            onMove={(from, to) => terminal.moveTab(from, to)}
+            onAddTab={onAddTab}
+            onClose={onCloseTab}
+            onActivate={onActivateTab}
+            onMove={onMoveTab}
             renderIcon={() => (
               <TerminalIcon size={12} className={tw.text.tertiary} />
             )}
@@ -47,21 +71,21 @@ const TerminalPanelInner = observer(function TerminalPanelInner() {
         <div className="flex-shrink-0 flex items-center justify-center h-full px-1.5">
           <button
             className={`p-1.5 rounded transition-colors ${tw.hover}`}
-            onClick={() => terminal.setDualColumns()}
+            onClick={onSetDualColumns}
             title={t('dualColumns')}
           >
             <Columns2 size={14} className={tw.text.secondary} />
           </button>
           <button
             className={`p-1.5 rounded transition-colors ${tw.hover}`}
-            onClick={() => terminal.setTripleColumns()}
+            onClick={onSetTripleColumns}
             title={t('tripleColumns')}
           >
             <Columns3 size={14} className={tw.text.secondary} />
           </button>
           <button
             className={`p-1.5 rounded transition-colors ${tw.hover}`}
-            onClick={() => terminal.setGrid()}
+            onClick={onSetGrid}
             title={t('gridLayout')}
           >
             <Grid2x2 size={14} className={tw.text.secondary} />
@@ -72,36 +96,18 @@ const TerminalPanelInner = observer(function TerminalPanelInner() {
         />
       </div>
       <div className="flex-1 relative overflow-hidden">
-        {terminal.tabs.map((tab) => (
+        {tabs.map((tab) => (
           <div
             key={tab.id}
             className="absolute inset-0"
             style={{
-              display: tab.id === terminal.activeTabId ? 'block' : 'none',
+              display: tab.id === activeTabId ? 'block' : 'none',
             }}
           >
-            <SplitLayout node={tab.layout} />
+            <SplitLayout node={tab.layout} {...paneProps} />
           </div>
         ))}
       </div>
     </div>
-  )
-})
-
-export default function TerminalPanel({
-  terminal,
-  isDark,
-}: TerminalPanelProps) {
-  useEffect(() => {
-    terminal.onDestroyPane = destroyPane
-    return () => {
-      terminal.onDestroyPane = undefined
-    }
-  }, [terminal])
-
-  return (
-    <TerminalPanelContext.Provider value={{ terminal, isDark }}>
-      <TerminalPanelInner />
-    </TerminalPanelContext.Provider>
   )
 }

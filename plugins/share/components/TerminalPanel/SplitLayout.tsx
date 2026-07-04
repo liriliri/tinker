@@ -1,28 +1,37 @@
-import { observer } from 'mobx-react-lite'
 import { Panel, Group, Separator } from 'react-resizable-panels'
 import type { ILayoutNode } from '../../types/terminalLayout'
+import type { TerminalPaneLayoutProps } from '../../lib/terminalPanel'
 import TerminalPane from './TerminalPane'
 import PaneHeader from './PaneHeader'
 
-interface LayoutProps {
+interface LayoutProps extends TerminalPaneLayoutProps {
   node: ILayoutNode
   showHeader: boolean
   paneIndex?: number
 }
 
-const LayoutNode = observer(function LayoutNode({
+function LayoutNode({
   node,
   showHeader,
   paneIndex = 1,
+  ...paneProps
 }: LayoutProps) {
   if (node.type === 'leaf') {
     return (
       <div className="flex flex-col h-full">
         {showHeader && (
-          <PaneHeader paneId={node.paneId} paneIndex={paneIndex} />
+          <PaneHeader
+            paneId={node.paneId}
+            paneIndex={paneIndex}
+            title={paneProps.paneTitles[node.paneId] ?? ''}
+            isActive={paneProps.activePaneId === node.paneId}
+            onSetActivePane={paneProps.onSetActivePane}
+            onSplitPane={paneProps.onSplitPane}
+            onClosePane={paneProps.onClosePane}
+          />
         )}
         <div className="flex-1 overflow-hidden">
-          <TerminalPane paneId={node.paneId} />
+          <TerminalPane paneId={node.paneId} {...paneProps} />
         </div>
       </div>
     )
@@ -42,6 +51,7 @@ const LayoutNode = observer(function LayoutNode({
           node={node.first}
           showHeader={showHeader}
           paneIndex={paneIndex}
+          {...paneProps}
         />
       </Panel>
       <Separator />
@@ -50,11 +60,12 @@ const LayoutNode = observer(function LayoutNode({
           node={node.second}
           showHeader={showHeader}
           paneIndex={paneIndex + countLeaves(node.first)}
+          {...paneProps}
         />
       </Panel>
     </Group>
   )
-})
+}
 
 function getLeafId(node: ILayoutNode): string {
   if (node.type === 'leaf') return node.paneId
@@ -66,12 +77,12 @@ function countLeaves(node: ILayoutNode): number {
   return countLeaves(node.first) + countLeaves(node.second)
 }
 
-interface SplitLayoutProps {
+interface SplitLayoutProps extends TerminalPaneLayoutProps {
   node: ILayoutNode
 }
 
-export default observer(function SplitLayout({ node }: SplitLayoutProps) {
+export default function SplitLayout({ node, ...paneProps }: SplitLayoutProps) {
   const hasSplits = node.type === 'split'
 
-  return <LayoutNode node={node} showHeader={hasSplits} />
-})
+  return <LayoutNode node={node} showHeader={hasSplits} {...paneProps} />
+}

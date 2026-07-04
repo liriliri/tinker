@@ -18,7 +18,10 @@ import store from './store'
 import Sidebar from './components/Sidebar'
 import ExplorerPane from './components/ExplorerPane'
 import StatusBar from './components/StatusBar'
-import { TerminalPanel } from 'share/components/TerminalPanel'
+import {
+  TerminalPanel,
+  getTerminalPanelProps,
+} from 'share/components/TerminalPanel'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 import './index.scss'
@@ -163,8 +166,7 @@ const App = observer(function App() {
                   {store.terminalOpen && (
                     <Panel id="terminal" defaultSize={200} minSize={100}>
                       <TerminalPanel
-                        terminal={store.terminal}
-                        isDark={store.isDark}
+                        {...getTerminalPanelProps(store.terminal, store.isDark)}
                       />
                     </Panel>
                   )}

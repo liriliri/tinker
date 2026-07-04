@@ -253,20 +253,25 @@ import Terminal, { getTerminalSession } from 'share/components/Terminal'
 
 ### TerminalPanel
 
-Multi-tab, split-pane terminal panel:
+Multi-tab, split-pane terminal panel. Render-only — use `getTerminalPanelProps(terminal, isDark)` in an `observer` parent:
 
 ```ts
 import TerminalStore from 'share/store/Terminal'
-import { TerminalPanel } from 'share/components/TerminalPanel'
+import {
+  TerminalPanel,
+  getTerminalPanelProps,
+} from 'share/components/TerminalPanel'
 
 // In store:
 this.terminal = new TerminalStore('my-plugin', () => this.rootPath)
 this.terminal.initIfOpen()
 
-// In layout:
+// In layout (inside observer):
 {
   store.terminalOpen && (
-    <TerminalPanel terminal={store.terminal} isDark={store.isDark} />
+    <TerminalPanel
+      {...getTerminalPanelProps(store.terminal, store.isDark)}
+    />
   )
 }
 ```

@@ -5,7 +5,6 @@ import pluck from 'licia/pluck'
 import isEmpty from 'licia/isEmpty'
 import BaseStore from 'share/store/Base'
 import TerminalStore from 'share/store/Terminal'
-import type { SplitDirection } from 'share/types/terminalLayout'
 import type {
   IFavoritePlace,
   ViewMode,
@@ -299,7 +298,7 @@ class Store extends BaseStore {
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
   }
 
-  // ---- Terminal proxies ----
+  // ---- Terminal ----
 
   get terminalOpen() {
     return this.terminal.terminalOpen
@@ -307,48 +306,10 @@ class Store extends BaseStore {
   set terminalOpen(v) {
     this.terminal.terminalOpen = v
   }
-  get terminalTabs() {
-    return this.terminal.tabs
-  }
-  get activeTerminalTabId() {
-    return this.terminal.activeTabId
-  }
-  get activePaneId() {
-    return this.terminal.activePaneId
-  }
-  set activePaneId(v) {
-    this.terminal.activePaneId = v
-  }
-  get paneTitles() {
-    return this.terminal.paneTitles
-  }
-  get pendingCwd() {
-    return this.terminal.pendingCwd
-  }
-  get onDestroyPane() {
-    return this.terminal.onDestroyPane
-  }
-  set onDestroyPane(v) {
-    this.terminal.onDestroyPane = v
-  }
 
   toggleTerminal = () => this.terminal.toggle()
-  addTerminalTab = (cwd?: string) => this.terminal.addTab(cwd)
   openInIntegratedTerminal = (path: string, isDir: boolean) =>
     this.terminal.openInDirectory(path, isDir)
-  closeTerminalTab = (id: string) => this.terminal.closeTab(id)
-  setActiveTerminalTab = (id: string) => this.terminal.setActiveTab(id)
-  setActivePane = (paneId: string) => this.terminal.setActivePane(paneId)
-  setPaneTitle = (paneId: string, title: string) =>
-    this.terminal.setPaneTitle(paneId, title)
-  splitPane = (paneId: string, direction: SplitDirection) =>
-    this.terminal.splitPane(paneId, direction)
-  closePane = (paneId: string) => this.terminal.closePane(paneId)
-  setDualColumns = () => this.terminal.setDualColumns()
-  setTripleColumns = () => this.terminal.setTripleColumns()
-  setGrid = () => this.terminal.setGrid()
-  moveTerminalTab = (from: number, to: number) =>
-    this.terminal.moveTab(from, to)
 
   setViewMode(mode: ViewMode) {
     this.viewMode = mode

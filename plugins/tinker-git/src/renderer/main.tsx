@@ -24,7 +24,10 @@ import WorkingTreeSidebar, {
   getWorkingTreeUIProps,
 } from 'share/components/WorkingTree'
 import WorkingTreeDiffViewer from './components/WorkingTreeDiffViewer'
-import { TerminalPanel } from 'share/components/TerminalPanel'
+import {
+  TerminalPanel,
+  getTerminalPanelProps,
+} from 'share/components/TerminalPanel'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -187,8 +190,7 @@ const App = observer(function App() {
               {store.terminalOpen && (
                 <Panel id="terminal" defaultSize={200} minSize={100}>
                   <TerminalPanel
-                    terminal={store.terminal}
-                    isDark={store.isDark}
+                    {...getTerminalPanelProps(store.terminal, store.isDark)}
                   />
                 </Panel>
               )}
