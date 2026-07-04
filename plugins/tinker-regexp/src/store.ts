@@ -1,16 +1,32 @@
 import { makeAutoObservable } from 'mobx'
+import LocalStore from 'licia/LocalStore'
+import {
+  initAiChatAvailability,
+  toggleAiChatOpen,
+} from 'share/lib/aiChat/aiAvailability'
+import { createChatDb } from 'share/lib/aiChat/chatDb'
+import { createChatSession } from 'share/lib/aiChat/chatSession'
+import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/BaseStore'
-import type { Match } from '../types'
-import Chat from './Chat'
-import storage, {
-  STORAGE_CHAT_OPEN,
-  STORAGE_FLAGS,
-  STORAGE_PATTERN,
-  STORAGE_TEXT,
-} from './storage'
+import { REGEXP_AGENT_TOOLS } from './lib/chatTools'
+import type { Match } from './types'
+
+const storage = new LocalStore('tinker-regexp')
+
+const STORAGE_PATTERN = 'pattern'
+const STORAGE_FLAGS = 'flags'
+const STORAGE_TEXT = 'text'
+
+const chatDb = createChatDb('tinker-regexp')
+const chatSession = createChatSession({
+  chatDb,
+  systemPrompt:
+    'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+  tools: REGEXP_AGENT_TOOLS,
+})
 
 class Store extends BaseStore {
-  chat: Chat
+  chat = new AiChatStore({ storage, chatDb, chatSession })
 
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'
@@ -27,20 +43,11 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   constructor() {
     super()
-    this.chat = new Chat()
     makeAutoObservable(this, { chat: false })
     this.loadStorage()
-    void tinker.getAIProviders().then((providers) => {
-      if (providers.length > 0) {
-        this.hasAI = true
-        const savedChatOpen = storage.get(STORAGE_CHAT_OPEN)
-        if (savedChatOpen !== undefined) {
-          this.chatOpen = savedChatOpen === true
-        }
-        return
-      }
-      this.hasAI = false
-      this.chatOpen = false
+    void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
+      this.hasAI = hasAI
+      this.chatOpen = chatOpen
     })
   }
 
@@ -126,10 +133,8 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
   }
 
   toggleChat() {
-    this.chatOpen = !this.chatOpen
-    if (this.hasAI) {
-      storage.set(STORAGE_CHAT_OPEN, this.chatOpen)
-    }
+    if (!this.hasAI) return
+    this.chatOpen = toggleAiChatOpen(storage, this.chatOpen)
   }
 
   get isEmpty() {

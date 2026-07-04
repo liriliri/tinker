@@ -5,12 +5,15 @@ import {
   Separator,
   useDefaultLayout,
 } from 'react-resizable-panels'
+import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
+import { PluginChat } from 'share/components/AiChat'
+import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ExpressionSection from './components/ExpressionSection'
 import TextSection from './components/TextSection'
-import ChatPanel from './components/chat/ChatPanel'
+import { getToolArgSummary, getVisibleToolMessages } from './lib/chatTools'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
 import './index.scss'
@@ -18,6 +21,7 @@ import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 
 const App = observer(function App() {
+  const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'chat'],
     id: 'tinker-regexp-layout',
@@ -47,7 +51,15 @@ const App = observer(function App() {
               <>
                 <Separator />
                 <Panel id="chat" minSize={250} defaultSize={360}>
-                  <ChatPanel />
+                  <PluginChat
+                    {...getPluginChatProps(store.chat)}
+                    isDark={store.isDark}
+                    title={t('chatTitle')}
+                    inputPlaceholder={t('chatInputPlaceholder')}
+                    emptyHint={t('chatEmptyHint')}
+                    getToolArgSummary={getToolArgSummary}
+                    getVisibleToolMessages={getVisibleToolMessages}
+                  />
                 </Panel>
               </>
             )}

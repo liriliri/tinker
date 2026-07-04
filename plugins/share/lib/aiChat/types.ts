@@ -1,6 +1,6 @@
-import type { Agent, AgentMessage } from 'share/lib/Agent'
+import type { Agent, AgentMessage } from '../Agent'
 
-export type { AgentMessage as ChatMessage }
+export type ChatMessage = AgentMessage
 
 export interface SessionData {
   id: string

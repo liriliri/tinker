@@ -6,17 +6,35 @@ import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
+import {
+  initAiChatAvailability,
+  toggleAiChatOpen,
+} from 'share/lib/aiChat/aiAvailability'
+import { createChatDb } from 'share/lib/aiChat/chatDb'
+import { createChatSession } from 'share/lib/aiChat/chatSession'
+import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/BaseStore'
+import { JSON_AGENT_TOOLS } from './lib/chatTools'
 
 type EditorMode = 'text' | 'tree'
+
+const storage = new LocalStore('tinker-json-editor')
 
 const STORAGE_CONTENT = 'tinker-json-editor-content'
 const STORAGE_MODE = 'tinker-json-editor-mode'
 const STORAGE_FILE_PATH = 'file-path'
 
-const storage = new LocalStore('tinker-json-editor')
+const chatDb = createChatDb('tinker-json-editor')
+const chatSession = createChatSession({
+  chatDb,
+  systemPrompt:
+    'You are a JSON assistant. Help the user edit, format, transform, and understand JSON data. You have tools to read and update the editor content. Use tools only when you need current JSON values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+  tools: JSON_AGENT_TOOLS,
+})
 
 class Store extends BaseStore {
+  chat = new AiChatStore({ storage, chatDb, chatSession })
+
   jsonInput: string = ''
   mode: EditorMode = 'text'
   treeEditorInstance: JSONEditor | null = null
@@ -26,16 +44,18 @@ class Store extends BaseStore {
   currentFilePath: string | null = null
   savedContent: string = ''
   hasAI: boolean = false
+  chatOpen: boolean = false
   isFixingWithAI: boolean = false
 
   constructor() {
     super()
-    makeAutoObservable(this)
+    makeAutoObservable(this, { chat: false })
     this.loadStorage()
     this.bindEvent()
     this.loadSavedFile()
-    tinker.getAIProviders().then((providers) => {
-      this.hasAI = providers.length > 0
+    void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
+      this.hasAI = hasAI
+      this.chatOpen = chatOpen
     })
   }
 
@@ -250,6 +270,11 @@ class Store extends BaseStore {
 
   clearJson() {
     this.setJsonInput('')
+  }
+
+  toggleChat() {
+    if (!this.hasAI) return
+    this.chatOpen = toggleAiChatOpen(storage, this.chatOpen)
   }
 
   setTreeEditorInstance(instance: JSONEditor | null) {

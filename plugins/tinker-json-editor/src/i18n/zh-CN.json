@@ -16,5 +16,8 @@
   "fixingJson": "正在修复 JSON 格式...",
   "fixJsonSuccess": "JSON 格式修复成功",
   "fixJsonFailed": "JSON 格式修复失败",
-  "lines": "{{count}} 行"
+  "lines": "{{count}} 行",
+  "chatTitle": "JSON 助手",
+  "chatInputPlaceholder": "询问 JSON 编辑相关问题...",
+  "chatEmptyHint": "我可以帮你编辑或转换 JSON 数据"
 }

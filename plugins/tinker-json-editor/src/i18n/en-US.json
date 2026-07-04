@@ -16,5 +16,8 @@
   "fixingJson": "Fixing JSON format...",
   "fixJsonSuccess": "JSON format fixed successfully",
   "fixJsonFailed": "Failed to fix JSON format",
-  "lines": "{{count}} lines"
+  "lines": "{{count}} lines",
+  "chatTitle": "JSON Assistant",
+  "chatInputPlaceholder": "Ask about JSON editing...",
+  "chatEmptyHint": "Ask me to help edit or transform JSON"
 }

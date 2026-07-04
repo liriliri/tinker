@@ -1,0 +1,207 @@
+import { Toolbar, ToolbarSpacer } from '../Toolbar'
+import { tw } from '../../theme'
+import ChatClearButton from './ChatClearButton'
+import ChatInputArea from './ChatInputArea'
+import MessageItem from './MessageItem'
+import MessageList from './MessageList'
+import ToolCard from './ToolCard'
+import type { ChatMessage } from './types'
+import type { MessageItemProps as BaseMessageItemProps } from './MessageItem'
+
+export interface PluginChatProps {
+  isDark: boolean
+  title: string
+  inputPlaceholder: string
+  emptyHint: string
+  messages: ChatMessage[]
+  sessionId: string
+  input: string
+  isGenerating: boolean
+  canSend: boolean
+  hasProviders: boolean
+  selectedCombined: string
+  combinedOptions: Array<{ value: string; label: string }>
+  canClearMessages: boolean
+  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  onInputChange: (value: string) => void
+  onSend: () => void
+  onStop: () => void
+  onClearMessages: () => void
+  onModelChange: (value: string) => void
+  onRetryLastMessage: () => void
+  onDeleteMessage: (id: string) => void
+}
+
+interface PluginChatMessageItemProps {
+  isDark: boolean
+  msg: ChatMessage
+  toolMessages?: ChatMessage[]
+  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  onRetryLastMessage: () => void
+  onDeleteMessage: (id: string) => void
+}
+
+function PluginChatMessageItem({
+  isDark,
+  msg,
+  toolMessages = [],
+  getToolArgSummary,
+  getVisibleToolMessages,
+  onRetryLastMessage,
+  onDeleteMessage,
+}: PluginChatMessageItemProps) {
+  const visibleToolMessages = getVisibleToolMessages(toolMessages)
+
+  const footer =
+    msg.role === 'assistant' && visibleToolMessages.length > 0 ? (
+      <>
+        {visibleToolMessages.map((toolMsg) => (
+          <ToolCard
+            key={toolMsg.id}
+            msg={toolMsg}
+            getArgSummary={getToolArgSummary}
+          />
+        ))}
+      </>
+    ) : undefined
+
+  const itemProps: BaseMessageItemProps = {
+    msg,
+    footer,
+    isDark,
+    onRetry: onRetryLastMessage,
+    onDelete: onDeleteMessage,
+  }
+
+  return <MessageItem {...itemProps} />
+}
+
+interface PluginChatMessageListProps {
+  messages: ChatMessage[]
+  sessionId: string
+  isDark: boolean
+  emptyHint: string
+  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  onRetryLastMessage: () => void
+  onDeleteMessage: (id: string) => void
+}
+
+function PluginChatMessageList({
+  messages,
+  sessionId,
+  isDark,
+  emptyHint,
+  getToolArgSummary,
+  getVisibleToolMessages,
+  onRetryLastMessage,
+  onDeleteMessage,
+}: PluginChatMessageListProps) {
+  const visibleMessages = messages.filter((msg) => msg.role !== 'tool')
+
+  const indexById = new Map(messages.map((m, i) => [m.id, i]))
+
+  function getToolMessages(msg: ChatMessage, index: number): ChatMessage[] {
+    if (msg.role !== 'assistant') return []
+    const toolMessages: ChatMessage[] = []
+    for (let i = index + 1; i < messages.length; i++) {
+      const next = messages[i]
+      if (next.role !== 'tool') break
+      toolMessages.push(next)
+    }
+    return toolMessages
+  }
+
+  return (
+    <MessageList
+      messages={visibleMessages}
+      sessionId={sessionId}
+      isDark={isDark}
+      emptyHint={emptyHint}
+    >
+      {(baseMsg) => {
+        const originalIndex = indexById.get(baseMsg.id) ?? -1
+        const msg = messages[originalIndex]
+        const toolMessages = getToolMessages(msg, originalIndex)
+
+        return (
+          <PluginChatMessageItem
+            key={msg.id}
+            isDark={isDark}
+            msg={msg}
+            toolMessages={toolMessages}
+            getToolArgSummary={getToolArgSummary}
+            getVisibleToolMessages={getVisibleToolMessages}
+            onRetryLastMessage={onRetryLastMessage}
+            onDeleteMessage={onDeleteMessage}
+          />
+        )
+      }}
+    </MessageList>
+  )
+}
+
+export default function PluginChat({
+  isDark,
+  title,
+  inputPlaceholder,
+  emptyHint,
+  messages,
+  sessionId,
+  input,
+  isGenerating,
+  canSend,
+  hasProviders,
+  selectedCombined,
+  combinedOptions,
+  canClearMessages,
+  getToolArgSummary,
+  getVisibleToolMessages,
+  onInputChange,
+  onSend,
+  onStop,
+  onClearMessages,
+  onModelChange,
+  onRetryLastMessage,
+  onDeleteMessage,
+}: PluginChatProps) {
+  return (
+    <div className={`h-full flex flex-col overflow-hidden ${tw.bg.primary}`}>
+      <Toolbar className={`border-b ${tw.border}`}>
+        <span className={`text-sm font-medium ${tw.text.primary}`}>
+          {title}
+        </span>
+        <ToolbarSpacer />
+        <ChatClearButton
+          onClick={onClearMessages}
+          disabled={!canClearMessages}
+        />
+      </Toolbar>
+      <PluginChatMessageList
+        messages={messages}
+        sessionId={sessionId}
+        isDark={isDark}
+        emptyHint={emptyHint}
+        getToolArgSummary={getToolArgSummary}
+        getVisibleToolMessages={getVisibleToolMessages}
+        onRetryLastMessage={onRetryLastMessage}
+        onDeleteMessage={onDeleteMessage}
+      />
+      <ChatInputArea
+        value={input}
+        onChange={onInputChange}
+        onSend={onSend}
+        onStop={onStop}
+        isGenerating={isGenerating}
+        canSend={canSend}
+        placeholder={inputPlaceholder}
+        hasProviders={hasProviders}
+        selectedCombined={selectedCombined}
+        combinedOptions={combinedOptions}
+        onModelChange={onModelChange}
+      />
+    </div>
+  )
+}

@@ -1,11 +1,21 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import endWith from 'licia/endWith'
+import {
+  Panel,
+  Group,
+  Separator,
+  useDefaultLayout,
+} from 'react-resizable-panels'
 import { tw } from 'share/theme'
 import { ToasterProvider } from 'share/components/Toaster'
+import { PluginChat } from 'share/components/AiChat'
+import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import TextEditor from './components/TextEditor'
 import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
+import { getToolArgSummary, getVisibleToolMessages } from './lib/chatTools'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -13,6 +23,13 @@ import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 
 const App = observer(function App() {
+  const { t } = useTranslation()
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    panelIds: ['main', 'chat'],
+    id: 'tinker-json-editor-layout',
+    storage: localStorage,
+  })
+
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault()
@@ -56,8 +73,35 @@ const App = observer(function App() {
       <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
         <Toolbar />
 
-        <div className={`flex-1 overflow-hidden ${tw.bg.primary}`}>
-          {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
+        <div className="flex-1 overflow-hidden min-h-0">
+          <Group
+            orientation="horizontal"
+            className="h-full"
+            defaultLayout={defaultLayout}
+            onLayoutChange={onLayoutChange}
+          >
+            <Panel id="main" minSize={300}>
+              <div className={`h-full overflow-hidden ${tw.bg.primary}`}>
+                {store.mode === 'text' ? <TextEditor /> : <TreeEditor />}
+              </div>
+            </Panel>
+            {store.hasAI && store.chatOpen && (
+              <>
+                <Separator />
+                <Panel id="chat" minSize={250} defaultSize={360}>
+                  <PluginChat
+                    {...getPluginChatProps(store.chat)}
+                    isDark={store.isDark}
+                    title={t('chatTitle')}
+                    inputPlaceholder={t('chatInputPlaceholder')}
+                    emptyHint={t('chatEmptyHint')}
+                    getToolArgSummary={getToolArgSummary}
+                    getVisibleToolMessages={getVisibleToolMessages}
+                  />
+                </Panel>
+              </>
+            )}
+          </Group>
         </div>
       </div>
     </ToasterProvider>

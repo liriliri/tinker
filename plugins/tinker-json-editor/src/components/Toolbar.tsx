@@ -11,6 +11,7 @@ import {
   AlertCircle,
   FilePlus,
   Save,
+  MessageSquare,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -185,6 +186,20 @@ export default observer(function ToolbarComponent() {
         <div className="text-gray-600 dark:text-gray-400 text-xs mr-1 whitespace-nowrap">
           {t('lines', { count: store.lineCount })}
         </div>
+      )}
+
+      {store.hasAI && (
+        <>
+          <ToolbarSeparator />
+          <ToolbarButton
+            variant="toggle"
+            active={store.chatOpen}
+            onClick={() => store.toggleChat()}
+            title={t('chatTitle')}
+          >
+            <MessageSquare size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+        </>
       )}
     </Toolbar>
   )

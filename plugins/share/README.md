@@ -7,7 +7,7 @@ Tinker plugins should reuse shared UI, store, and AI logic instead of rebuilding
 - Import `share/base.scss` in plugin `index.scss`.
 - Use `tw` utilities from `share/theme.ts`; do not hardcode colors.
 - Plugin stores extend `BaseStore`, call `super()` first, then `makeAutoObservable(this)`.
-- `share/components/AiChat` is display-only. State and actions stay in the caller.
+- `share/components/AiChat` provides chat UI and `PluginChat` for editor plugins.
 - `share/lib/Agent` owns AI message state, tool-call loops, and streaming.
 
 ## Base Styles
@@ -120,11 +120,54 @@ import {
   MarkdownContent,
   SearchCard,
   ToolCard,
+  PluginChat,
   type ChatMessage,
 } from 'share/components/AiChat'
 ```
 
-Render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Use `ToolCard` for generic tool-call results; pass optional `getToolLabel`, `getArgSummary`, or `getToolIcon` for plugin-specific display. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
+Low-level components are render-only. Provide `messages`, send/retry/delete handlers, and session logic. Use `getSearchCardProps(toolMsg)` for `SearchCard`. Use `ToolCard` for generic tool-call results; pass optional `getToolLabel`, `getArgSummary`, or `getToolIcon` for plugin-specific display. Pass `onSystemPromptChange` to `ChatInputArea` when system prompt editing is needed. Override `emptyHint` or `placeholder` for plugin-specific copy.
+
+`PluginChat` is also render-only — use `getPluginChatProps(chat)` in an `observer` parent to pass state and handlers.
+
+`PluginChat` is the full assistant panel for editor plugins. Pair it with `share/lib/aiChat`:
+
+```ts
+import { PluginChat } from 'share/components/AiChat'
+import AiChatStore from 'share/store/AiChat'
+import { createChatDb } from 'share/lib/aiChat/chatDb'
+import { createChatSession } from 'share/lib/aiChat/chatSession'
+import { createToolMessageHelpers } from 'share/lib/aiChat/toolHelpers'
+import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
+import {
+  initAiChatAvailability,
+  toggleAiChatOpen,
+} from 'share/lib/aiChat/aiAvailability'
+
+const chatDb = createChatDb('my-plugin')
+const chatSession = createChatSession({
+  chatDb,
+  systemPrompt: 'You are a ... assistant.',
+  tools: MY_AGENT_TOOLS,
+})
+const chat = new AiChatStore({ storage, chatDb, chatSession })
+
+void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
+  store.hasAI = hasAI
+  store.chatOpen = chatOpen
+})
+
+<PluginChat
+  {...getPluginChatProps(store.chat)}
+  isDark={store.isDark}
+  title={t('chatTitle')}
+  inputPlaceholder={t('chatInputPlaceholder')}
+  emptyHint={t('chatEmptyHint')}
+  getToolArgSummary={getToolArgSummary}
+  getVisibleToolMessages={getVisibleToolMessages}
+/>
+```
+
+Plugin-specific pieces stay in the plugin: `systemPrompt`, `AgentTool` definitions, and `getToolArgSummary`. Use `createToolMessageHelpers(['tool_a', 'tool_b'])` for tool message filtering. Add `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, and `syntaxhighlighter` vendor scripts plus `overlayscrollbars.scss` and `resizablepanels.scss` in `index.scss`. Reference: `tinker-regexp`, `tinker-json-editor`.
 
 ### TextSearch
 

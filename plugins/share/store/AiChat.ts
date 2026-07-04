@@ -1,15 +1,21 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import * as chatDb from '../lib/chatDb'
+import type LocalStore from 'licia/LocalStore'
+import type { ChatDbApi } from '../lib/aiChat/chatDb'
+import type { ChatSessionApi } from '../lib/aiChat/chatSession'
 import {
-  createEmptySession,
-  createSessionFromData,
-  hasSessionContent,
-  serializeSession,
-} from '../lib/chatSession'
-import storage, { STORAGE_MODEL, STORAGE_PROVIDER } from './storage'
+  STORAGE_CHAT_MODEL,
+  STORAGE_CHAT_PROVIDER,
+} from '../lib/aiChat/storage'
+import type { Session } from '../lib/aiChat/types'
 
-export default class Chat {
-  session = createEmptySession()
+export interface AiChatStoreOptions {
+  storage: LocalStore
+  chatDb: ChatDbApi
+  chatSession: ChatSessionApi
+}
+
+export default class AiChatStore {
+  session: Session
 
   providers: tinker.AiProviderInfo[] = []
   selectedProvider: string = ''
@@ -17,26 +23,39 @@ export default class Chat {
 
   input: string = ''
 
-  constructor() {
+  constructor(private options: AiChatStoreOptions) {
+    this.session = options.chatSession.createEmptySession()
     makeAutoObservable(this)
     this.loadStorage()
     this.loadDb()
   }
 
+  private get storage() {
+    return this.options.storage
+  }
+
+  private get chatDb() {
+    return this.options.chatDb
+  }
+
+  private get chatSession() {
+    return this.options.chatSession
+  }
+
   private loadStorage() {
-    this.selectedProvider = storage.get(STORAGE_PROVIDER) || ''
-    this.selectedModel = storage.get(STORAGE_MODEL) || ''
+    this.selectedProvider = this.storage.get(STORAGE_CHAT_PROVIDER) || ''
+    this.selectedModel = this.storage.get(STORAGE_CHAT_MODEL) || ''
   }
 
   private async loadDb() {
     const [savedSession] = await Promise.all([
-      chatDb.getSession(),
+      this.chatDb.getSession(),
       this.loadProviders(),
     ])
 
     runInAction(() => {
       if (savedSession) {
-        this.session = createSessionFromData(savedSession)
+        this.session = this.chatSession.createSessionFromData(savedSession)
       }
     })
   }
@@ -50,15 +69,15 @@ export default class Chat {
         if (!provider) {
           this.selectedProvider = providers[0].name
           this.selectedModel = providers[0].models[0]?.name || ''
-          storage.set(STORAGE_PROVIDER, this.selectedProvider)
-          storage.set(STORAGE_MODEL, this.selectedModel)
+          this.storage.set(STORAGE_CHAT_PROVIDER, this.selectedProvider)
+          this.storage.set(STORAGE_CHAT_MODEL, this.selectedModel)
         } else {
           const hasModel = provider.models.some(
             (m) => m.name === this.selectedModel
           )
           if (!hasModel) {
             this.selectedModel = provider.models[0]?.name || ''
-            storage.set(STORAGE_MODEL, this.selectedModel)
+            this.storage.set(STORAGE_CHAT_MODEL, this.selectedModel)
           }
         }
       }
@@ -107,9 +126,9 @@ export default class Chat {
     const provider = val.slice(0, idx)
     const model = val.slice(idx + 1)
     this.selectedProvider = provider
-    storage.set(STORAGE_PROVIDER, provider)
+    this.storage.set(STORAGE_CHAT_PROVIDER, provider)
     this.selectedModel = model
-    storage.set(STORAGE_MODEL, model)
+    this.storage.set(STORAGE_CHAT_MODEL, model)
   }
 
   clearMessages() {
@@ -118,12 +137,12 @@ export default class Chat {
   }
 
   private saveSession() {
-    const data = serializeSession(this.session)
-    if (hasSessionContent(data)) {
-      chatDb.putSession(data)
+    const data = this.chatSession.serializeSession(this.session)
+    if (this.chatSession.hasSessionContent(data)) {
+      this.chatDb.putSession(data)
       return
     }
-    chatDb.removeSession()
+    this.chatDb.removeSession()
   }
 
   async sendMessage() {
