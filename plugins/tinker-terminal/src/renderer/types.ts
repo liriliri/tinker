@@ -1,5 +1,11 @@
 export type SplitDirection = 'horizontal' | 'vertical'
 
+export interface TabPaneContext {
+  paneId: string
+  tabTitle: string
+  paneTitle: string
+}
+
 export interface ISplitNode {
   type: 'split'
   direction: SplitDirection

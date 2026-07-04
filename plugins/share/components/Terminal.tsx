@@ -68,6 +68,11 @@ export function getTerminalSession(id: string): TerminalSession | undefined {
   return instances.get(id)?.session
 }
 
+/** Get selected text from a terminal pane. Returns empty string if none. */
+export function getTerminalSelection(id: string): string {
+  return instances.get(id)?.xterm.getSelection() ?? ''
+}
+
 export function destroyTerminal(id: string) {
   const instance = instances.get(id)
   if (!instance) return

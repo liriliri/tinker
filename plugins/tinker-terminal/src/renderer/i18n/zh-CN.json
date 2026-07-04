@@ -3,9 +3,6 @@
   "closeTab": "关闭标签页",
   "closeOtherTabs": "关闭其他标签页",
   "closeTabsToRight": "关闭右侧标签页",
-  "copy": "复制",
-  "paste": "粘贴",
-  "selectAll": "全选",
   "splitVertical": "垂直拆分",
   "splitHorizontal": "水平拆分",
   "closePane": "关闭",
@@ -42,5 +39,8 @@
   "searchSession": "搜索",
   "dualColumns": "双栏",
   "tripleColumns": "三栏",
-  "gridLayout": "四格"
+  "gridLayout": "四格",
+  "chatTitle": "命令行助手",
+  "chatInputPlaceholder": "询问命令行相关问题...",
+  "chatEmptyHint": "我可以帮你编写或解释 shell 命令"
 }

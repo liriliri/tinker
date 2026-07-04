@@ -3,9 +3,6 @@
   "closeTab": "Close Tab",
   "closeOtherTabs": "Close Other Tabs",
   "closeTabsToRight": "Close Tabs to Right",
-  "copy": "Copy",
-  "paste": "Paste",
-  "selectAll": "Select All",
   "splitVertical": "Split Vertically",
   "splitHorizontal": "Split Horizontally",
   "closePane": "Close",
@@ -42,5 +39,8 @@
   "searchSession": "Search",
   "dualColumns": "Dual Columns",
   "tripleColumns": "Triple Columns",
-  "gridLayout": "Grid"
+  "gridLayout": "Grid",
+  "chatTitle": "Command Line Assistant",
+  "chatInputPlaceholder": "Ask about shell commands...",
+  "chatEmptyHint": "I can help you write or explain shell commands"
 }

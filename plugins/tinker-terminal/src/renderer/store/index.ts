@@ -1,6 +1,8 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
+import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import BaseStore from 'share/store/Base'
 import {
   getAllFolders,
@@ -9,12 +11,15 @@ import {
   ISessionFolder,
   ISessionConfig,
 } from '../lib/db'
+import { createTerminalChat } from '../lib/chat'
+import { registerTabContext, unregisterTabContext } from '../lib/tabContext'
 import type { ILayoutNode, SplitDirection } from '../types'
 import Terminal from './Terminal'
 import { getTerminalSession } from 'share/components/Terminal'
 
 const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 class Store extends BaseStore {
   tabs: Terminal[] = []
@@ -27,6 +32,7 @@ class Store extends BaseStore {
   onDestroyPane: ((paneId: string) => void) | null = null
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? false
   sessions: ISessionFolder[] = []
+  hasAI = false
 
   private tabCounter = 0
 
@@ -40,6 +46,30 @@ class Store extends BaseStore {
     })
     this.addTab()
     this.loadSessions()
+    void initAiChatAvailability(storage).then(({ hasAI }) => {
+      this.hasAI = hasAI
+    })
+  }
+
+  private setupTab(tab: Terminal) {
+    tab.chat = createTerminalChat(tab.id, chatPrefsStorage)
+    registerTabContext(tab.id, () => ({
+      paneId: tab.activePaneId,
+      tabTitle: tab.title,
+      paneTitle: this.paneTitles[tab.activePaneId] ?? '',
+    }))
+  }
+
+  get activeTabChatOpen(): boolean {
+    const tab = this.tabs.find((t) => t.id === this.activeTabId)
+    return tab?.chatOpen ?? false
+  }
+
+  toggleActiveTabChat() {
+    if (!this.hasAI) return
+    const tab = this.tabs.find((t) => t.id === this.activeTabId)
+    if (!tab) return
+    tab.chatOpen = !tab.chatOpen
   }
 
   toggleSidebar() {
@@ -52,6 +82,7 @@ class Store extends BaseStore {
     const paneId = uuid()
     const id = uuid()
     const tab = new Terminal(id, `Terminal ${this.tabCounter}`, paneId)
+    this.setupTab(tab)
 
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
@@ -82,11 +113,7 @@ class Store extends BaseStore {
 
     const index = this.tabs.findIndex((t) => t.id === id)
     this.tabs.splice(index, 1)
-
-    if (this.tabs.length === 0) {
-      this.addTab()
-      return
-    }
+    unregisterTabContext(id)
 
     if (this.activeTabId === id) {
       const newIndex = Math.min(index, this.tabs.length - 1)
@@ -105,17 +132,19 @@ class Store extends BaseStore {
       if (!paneIds.includes(this.activePaneId)) {
         this.activePaneId = paneIds[0]
       }
+      tab.activePaneId = this.activePaneId
     }
   }
 
   setActivePane(paneId: string) {
     this.activePaneId = paneId
+    const tab = this.tabs.find((t) => t.id === this.activeTabId)
+    if (!tab) return
+
+    tab.activePaneId = paneId
     const title = this.paneTitles[paneId]
     if (title) {
-      const tab = this.tabs.find((t) => t.id === this.activeTabId)
-      if (tab) {
-        tab.title = title
-      }
+      tab.title = title
     }
   }
 
@@ -157,6 +186,7 @@ class Store extends BaseStore {
     }
     tab.splitPane(paneId, direction, newPaneId)
     this.activePaneId = newPaneId
+    tab.activePaneId = newPaneId
   }
 
   closePane(paneId: string) {
@@ -175,6 +205,7 @@ class Store extends BaseStore {
     if (this.activePaneId === paneId) {
       const remaining = tab.collectPaneIds()
       this.activePaneId = remaining[0]
+      tab.activePaneId = this.activePaneId
     }
   }
 
@@ -227,6 +258,7 @@ class Store extends BaseStore {
     if (newPaneIds.length > 0) {
       this.activePaneId = newPaneIds[0]
     }
+    tab.activePaneId = this.activePaneId
   }
 
   // Session management
@@ -300,6 +332,7 @@ class Store extends BaseStore {
     const paneId = uuid()
     const id = uuid()
     const tab = new Terminal(id, config.name, paneId)
+    this.setupTab(tab)
 
     if (config.type === 'ssh') {
       this.pendingSSHConfig[paneId] = config

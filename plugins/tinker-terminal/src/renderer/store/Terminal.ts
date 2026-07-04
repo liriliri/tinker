@@ -1,17 +1,22 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
+import type AiChatStore from 'share/store/AiChat'
 import type { ILayoutNode, SplitDirection } from '../types'
 
 class Terminal {
   id: string
   title: string
   layout: ILayoutNode
+  activePaneId: string
+  chatOpen = false
+  chat!: AiChatStore
 
   constructor(id: string, title: string, paneId: string) {
     this.id = id
     this.title = title
+    this.activePaneId = paneId
     this.layout = { type: 'leaf', paneId }
-    makeAutoObservable(this)
+    makeAutoObservable(this, { chat: false })
   }
 
   collectPaneIds(): string[] {
