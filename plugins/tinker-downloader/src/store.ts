@@ -3,7 +3,7 @@ import LocalStore from 'licia/LocalStore'
 import contain from 'licia/contain'
 import find from 'licia/find'
 import filter from 'licia/filter'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { FilterTab } from './types'
 
 const storage = new LocalStore('tinker-downloader')

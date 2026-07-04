@@ -5,7 +5,7 @@ import contain from 'licia/contain'
 import remove from 'licia/remove'
 import { HostsConfig } from '../common/types'
 import { ViewMode } from './types'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import i18n from 'i18next'
 
 const STORAGE_CONFIGS = 'configs'

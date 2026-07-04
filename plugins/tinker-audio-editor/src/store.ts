@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable, reaction } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { encodeWav } from './lib/audioUtils'
 
 interface HistoryEntry {

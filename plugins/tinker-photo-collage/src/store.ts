@@ -3,7 +3,7 @@ import filter from 'licia/filter'
 import find from 'licia/find'
 import LocalStore from 'licia/LocalStore'
 import shuffle from 'licia/shuffle'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { getTemplatesByPhotoCount, getTemplateById } from './lib/templates'
 import type { Photo, LayoutTemplate, PhotoSlot } from './types'
 

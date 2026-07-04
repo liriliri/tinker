@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { confirm } from 'share/components/Confirm'
 import { getFileIcon } from 'share/lib/util'
 import find from 'licia/find'

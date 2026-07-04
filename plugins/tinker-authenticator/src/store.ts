@@ -3,7 +3,7 @@ import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import type { Account } from './types'
 import { generateTOTP } from './lib/totp'
 import {

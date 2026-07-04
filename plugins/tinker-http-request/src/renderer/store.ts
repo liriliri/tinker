@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import jsonClone from 'licia/jsonClone'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import * as db from '../lib/db'
 import type {
   HttpMethod,

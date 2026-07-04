@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { formatMs, pad } from './lib/util'
 import i18n from 'i18next'
 

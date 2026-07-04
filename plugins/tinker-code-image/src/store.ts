@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import { CSSProperties } from 'react'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { type Language, LANGUAGES } from './lib/languages'
 import {
   type Theme,

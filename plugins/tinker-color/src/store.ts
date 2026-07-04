@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { ColorResult } from '@uiw/react-color'
 import toast from 'react-hot-toast'
 import LocalStore from 'licia/LocalStore'

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import type { RefObject } from 'react'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
 

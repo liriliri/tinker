@@ -1,5 +1,5 @@
 import { makeAutoObservable, computed, toJS } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import type { Rule, RuleType, FileInfo, RenameOperation } from '../common/types'

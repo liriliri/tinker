@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 class Store extends BaseStore {
   stream: MediaStream | null = null

@@ -1,5 +1,2 @@
 export { default as TerminalPanel } from './TerminalPanel'
 export type { TerminalPanelProps } from './TerminalPanel'
-export { default as Terminal } from '../../store/Terminal'
-export { default as TerminalTab } from '../../store/TerminalTab'
-export type { SplitDirection, ILayoutNode } from '../../types/terminalLayout'

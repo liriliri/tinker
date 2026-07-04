@@ -1,13 +1,13 @@
 import { makeAutoObservable, observable, reaction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import TextSearch from 'share/lib/textSearch'
 import type { ITreeNode } from 'share/components/FileTree'
 import type { IFileWatchEvent } from '../../common/types'
 import normalizePath from 'licia/normalizePath'
 import last from 'licia/last'
 import { parentDir, relativePath } from '../lib/path'
-import Terminal from 'share/store/Terminal'
+import TerminalStore from 'share/store/Terminal'
 import type { SplitDirection } from 'share/types/terminalLayout'
 import Editor from './Editor'
 import QuickOpen from './QuickOpen'
@@ -33,7 +33,7 @@ class Store extends BaseStore {
   private refreshingTree = false
 
   // Sub-stores
-  terminal: Terminal
+  terminal: TerminalStore
   editor: Editor
   quickOpen: QuickOpen
   textSearch: TextSearch
@@ -47,7 +47,7 @@ class Store extends BaseStore {
   constructor() {
     super()
 
-    this.terminal = new Terminal('tinker-code-editor', () => this.rootPath)
+    this.terminal = new TerminalStore('tinker-code-editor', () => this.rootPath)
     this.editor = new Editor()
     this.quickOpen = new QuickOpen({
       getRootPath: () => this.rootPath,

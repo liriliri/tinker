@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { tw } from '../../theme'
 import TabBar from '../TabBar'
-import type Terminal from '../../store/Terminal'
+import type TerminalStore from '../../store/Terminal'
 import SplitLayout from './SplitLayout'
 import { destroyPane } from './TerminalPane'
 import { TerminalPanelContext, useTerminalPanel } from './context'
@@ -17,7 +17,7 @@ import { I18N_NS } from './i18n'
 import './i18n'
 
 export interface TerminalPanelProps {
-  terminal: Terminal
+  terminal: TerminalStore
   isDark: boolean
 }
 

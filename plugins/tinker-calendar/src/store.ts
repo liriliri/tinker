@@ -6,7 +6,7 @@ import LocalStore from 'licia/LocalStore'
 import sortBy from 'licia/sortBy'
 import trim from 'licia/trim'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import {
   createDateTime,
   getDatePart,

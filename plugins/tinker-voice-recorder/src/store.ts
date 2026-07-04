@@ -1,4 +1,4 @@
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { makeAutoObservable } from 'mobx'
 
 type RecorderState =

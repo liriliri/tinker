@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { alert } from 'share/components/Alert'
 import type { SystemInfoData } from '../common/types'
 

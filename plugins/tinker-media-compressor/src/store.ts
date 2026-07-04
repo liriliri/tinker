@@ -11,7 +11,7 @@ import type {
   AudioCompressionMode,
   TargetSizeUnit,
 } from './types'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { VIDEO_EXTS, AUDIO_EXTS } from 'share/lib/fileType'
 import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'

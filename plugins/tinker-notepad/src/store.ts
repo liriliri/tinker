@@ -3,7 +3,7 @@ import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 const STORAGE_CONTENT = 'content'
 const STORAGE_FILE_PATH = 'file-path'

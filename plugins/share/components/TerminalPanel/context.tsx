@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react'
-import type Terminal from '../../store/Terminal'
+import type TerminalStore from '../../store/Terminal'
 
 export interface TerminalPanelContextValue {
-  terminal: Terminal
+  terminal: TerminalStore
   isDark: boolean
 }
 

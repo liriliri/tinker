@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import BaseStore from 'share/BaseStore'
-import Terminal from 'share/store/Terminal'
+import BaseStore from 'share/store/Base'
+import TerminalStore from 'share/store/Terminal'
 import type { SplitDirection } from 'share/types/terminalLayout'
 import Repo, { type GitViewMode } from './Repo'
 import { repoDirName } from '../lib/util'
@@ -9,14 +9,14 @@ class Store extends BaseStore {
   tabs: Repo[] = []
   activeTabId = ''
 
-  terminal: Terminal
+  terminal: TerminalStore
 
   private nextId = 1
   private workingTreeUnwatch: (() => void) | undefined
 
   constructor() {
     super()
-    this.terminal = new Terminal('tinker-git', () => this.repoPath)
+    this.terminal = new TerminalStore('tinker-git', () => this.repoPath)
     makeAutoObservable(this)
     this.addTab()
     this.terminal.initIfOpen()

@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import clamp from 'licia/clamp'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { openImageFile } from 'share/lib/util'
 import { getPresetById } from './lib/presets'
 import {

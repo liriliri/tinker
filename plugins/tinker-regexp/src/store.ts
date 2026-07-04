@@ -8,7 +8,7 @@ import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { REGEXP_AGENT_TOOLS } from './lib/chatTools'
 import type { Match } from './types'
 

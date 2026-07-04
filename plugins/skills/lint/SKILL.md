@@ -30,7 +30,7 @@ Go through each category below and report violations with file path and line num
 
 ### 2. Store Structure
 
-- Store class must extend `BaseStore` from `share/BaseStore`
+- Store class must extend `BaseStore` from `share/store/Base`
 - Constructor must call `super()` before `makeAutoObservable(this)`
 - Export a singleton instance: `export default new Store()`
 
@@ -103,7 +103,7 @@ Example:
 ```
 [Theme] src/components/Toolbar.tsx:12 — hardcoded color `#0fc25e`, use tw.primary.bg instead
 [Naming] src/components/toolbar.tsx — component file should be PascalCase: Toolbar.tsx
-[Store] src/store.ts:5 — Store must extend BaseStore from share/BaseStore
+[Store] src/store.ts:5 — Store must extend BaseStore from share/store/Base
 [Comments] src/App.tsx:34 — comment in Chinese, must use English
 ```
 

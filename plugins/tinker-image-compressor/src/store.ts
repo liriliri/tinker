@@ -9,7 +9,7 @@ import map from 'licia/map'
 import splitPath from 'licia/splitPath'
 import mime from 'licia/mime'
 import type { ImageItem } from './types'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import {
   buildFfmpegArgs,
   detectImageFormat,

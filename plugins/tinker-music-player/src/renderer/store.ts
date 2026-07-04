@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import LocalStore from 'licia/LocalStore'
 import randomItem from 'licia/randomItem'
 import debounce from 'licia/debounce'

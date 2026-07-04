@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import fileUrl from 'licia/fileUrl'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import * as db from './lib/db'
 import { HistoryItem } from './types'
 

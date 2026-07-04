@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import durationFormat from 'licia/durationFormat'
 import clamp from 'licia/clamp'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import TimerWorker from './lib/timer.worker?worker'
 
 const storage = new LocalStore('tinker-pomodoro')

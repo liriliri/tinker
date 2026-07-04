@@ -1,5 +1,5 @@
 import { makeAutoObservable, reaction } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import toast from 'react-hot-toast'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import pdfjsLib from 'pdfjs-dist'

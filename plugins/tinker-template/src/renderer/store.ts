@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import type { SystemInfo } from '../common/types'
 
 class Store extends BaseStore {

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 type ViewMode = 'edit' | 'diff'
 

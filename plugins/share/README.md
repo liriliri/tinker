@@ -36,7 +36,7 @@ Common tokens: `tw.primary.*`, `tw.bg.*`, `tw.border`, `tw.text.*`, `tw.hover`, 
 
 ```ts
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 class Store extends BaseStore {
   input = ''
@@ -256,11 +256,11 @@ import Terminal, { getTerminalSession } from 'share/components/Terminal'
 Multi-tab, split-pane terminal panel:
 
 ```ts
-import Terminal from 'share/store/Terminal'
+import TerminalStore from 'share/store/Terminal'
 import { TerminalPanel } from 'share/components/TerminalPanel'
 
 // In store:
-this.terminal = new Terminal('my-plugin', () => this.rootPath)
+this.terminal = new TerminalStore('my-plugin', () => this.rootPath)
 this.terminal.initIfOpen()
 
 // In layout:

@@ -3,7 +3,7 @@ import i18n from 'i18next'
 import fileUrl from 'licia/fileUrl'
 import isUrl from 'licia/isUrl'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import {
   getFileCategory,
   IMAGE_EXTS,

@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import type { CleanRule, Category } from './types'
 
 const storage = new LocalStore('tinker-cleaner')

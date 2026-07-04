@@ -4,7 +4,7 @@ import isEmpty from 'licia/isEmpty'
 import LocalStore from 'licia/LocalStore'
 import toast from 'react-hot-toast'
 import i18next from 'i18next'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import {
   getAllFolders,
   putFolder,

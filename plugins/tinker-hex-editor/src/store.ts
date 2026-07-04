@@ -1,6 +1,6 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 class Store extends BaseStore {
   data: Uint8Array = new Uint8Array(0)

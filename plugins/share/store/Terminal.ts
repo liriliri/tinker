@@ -4,7 +4,7 @@ import LocalStore from 'licia/LocalStore'
 import normalizePath from 'licia/normalizePath'
 import { getTerminalSession } from '../components/Terminal'
 import type { ILayoutNode, SplitDirection } from '../types/terminalLayout'
-import TerminalTab from './TerminalTab'
+import TerminalTabStore from './TerminalTab'
 
 const STORAGE_TERMINAL_OPEN = 'terminalOpen'
 
@@ -14,9 +14,9 @@ function parentDir(filePath: string): string {
   return i > 0 ? normalized.substring(0, i) : normalized
 }
 
-class Terminal {
+class TerminalStore {
   terminalOpen: boolean
-  tabs: TerminalTab[] = []
+  tabs: TerminalTabStore[] = []
   activeTabId = ''
   activePaneId = ''
   paneTitles: Record<string, string> = {}
@@ -62,7 +62,11 @@ class Terminal {
     if (cwd) {
       this.pendingCwd[paneId] = cwd
     }
-    const tab = new TerminalTab(uuid(), `Terminal ${this.tabCounter}`, paneId)
+    const tab = new TerminalTabStore(
+      uuid(),
+      `Terminal ${this.tabCounter}`,
+      paneId
+    )
     this.tabs.push(tab)
     this.activeTabId = tab.id
     this.activePaneId = paneId
@@ -119,7 +123,7 @@ class Terminal {
     }
   }
 
-  private syncActiveTabTitle(tab: TerminalTab) {
+  private syncActiveTabTitle(tab: TerminalTabStore) {
     const title = this.paneTitles[this.activePaneId]
     if (title) {
       tab.title = title
@@ -183,15 +187,15 @@ class Terminal {
   }
 
   async setDualColumns() {
-    await this.applyLayout(2, TerminalTab.dualColumnsLayout)
+    await this.applyLayout(2, TerminalTabStore.dualColumnsLayout)
   }
 
   async setTripleColumns() {
-    await this.applyLayout(3, TerminalTab.tripleColumnsLayout)
+    await this.applyLayout(3, TerminalTabStore.tripleColumnsLayout)
   }
 
   async setGrid() {
-    await this.applyLayout(4, TerminalTab.gridLayout)
+    await this.applyLayout(4, TerminalTabStore.gridLayout)
   }
 
   moveTab(fromIndex: number, toIndex: number) {
@@ -250,4 +254,4 @@ class Terminal {
   }
 }
 
-export default Terminal
+export default TerminalStore

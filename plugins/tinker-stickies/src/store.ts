@@ -4,7 +4,7 @@ import filter from 'licia/filter'
 import lowerCase from 'licia/lowerCase'
 import isStrBlank from 'licia/isStrBlank'
 import stripHtmlTag from 'licia/stripHtmlTag'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { getAllStickies, putSticky, removeSticky } from './lib/db'
 
 export interface Sticky {

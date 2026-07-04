@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { Languages } from './lib/formatter/types'
 
 const storage = new LocalStore('tinker-code-formatter')

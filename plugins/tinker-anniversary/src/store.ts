@@ -8,7 +8,7 @@ import map from 'licia/map'
 import toInt from 'licia/toInt'
 import trim from 'licia/trim'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { createDateTime, normalizeDateKey } from './lib/date'
 import {
   getAnniversaryDatesInRange,

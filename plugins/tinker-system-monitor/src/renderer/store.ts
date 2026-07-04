@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
 import type { DataPoint, ResourceUsagePayload } from '../common/types'

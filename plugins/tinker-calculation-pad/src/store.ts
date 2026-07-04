@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import { evaluate } from 'mathjs'
 import isStrBlank from 'licia/isStrBlank'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 
 interface CalculationLine {
   id: number

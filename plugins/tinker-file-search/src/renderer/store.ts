@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import debounce from 'licia/debounce'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileResult } from './types'
 

@@ -7,7 +7,7 @@ import find from 'licia/find'
 import extend from 'licia/extend'
 import contain from 'licia/contain'
 import sum from 'licia/sum'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, ShredMethod, ShredResult } from '../common/types'
 

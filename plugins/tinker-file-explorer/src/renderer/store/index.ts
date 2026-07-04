@@ -3,8 +3,8 @@ import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
 import pluck from 'licia/pluck'
 import isEmpty from 'licia/isEmpty'
-import BaseStore from 'share/BaseStore'
-import Terminal from 'share/store/Terminal'
+import BaseStore from 'share/store/Base'
+import TerminalStore from 'share/store/Terminal'
 import type { SplitDirection } from 'share/types/terminalLayout'
 import type {
   IFavoritePlace,
@@ -34,7 +34,7 @@ const SHORTCUT_KEYS = [
 ] as const
 
 class Store extends BaseStore {
-  terminal: Terminal
+  terminal: TerminalStore
   tabs: Explorer[] = []
   activeTabId = ''
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
@@ -52,7 +52,7 @@ class Store extends BaseStore {
 
   constructor() {
     super()
-    this.terminal = new Terminal('tinker-file-explorer', () =>
+    this.terminal = new TerminalStore('tinker-file-explorer', () =>
       this.activeTab?.path ? this.activeTab.path : fileExplorer.getHomedir()
     )
     makeAutoObservable(this, { terminal: false })

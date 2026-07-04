@@ -1,6 +1,6 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import TextSearch, { type TextSearchActiveMatch } from 'share/lib/textSearch'
 
 class Store extends BaseStore {

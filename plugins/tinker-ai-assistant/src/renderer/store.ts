@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { Agent } from 'share/lib/Agent'
 import type { AgentMessage, AgentTool } from 'share/lib/Agent'
 import { createWebSearchToolResult } from 'share/tools/web'

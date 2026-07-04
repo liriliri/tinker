@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { getFileCategory } from 'share/lib/fileType'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'

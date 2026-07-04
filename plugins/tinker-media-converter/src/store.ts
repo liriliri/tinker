@@ -2,7 +2,7 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { MediaItem, MediaType, AudioInfo } from './types'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { VIDEO_EXTS, AUDIO_EXTS, IMAGE_EXTS } from 'share/lib/fileType'
 import {
   VIDEO_OUTPUT_FORMATS,

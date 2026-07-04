@@ -14,7 +14,7 @@ import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { JSON_AGENT_TOOLS } from './lib/chatTools'
 
 type EditorMode = 'text' | 'tree'

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import LocalStore from 'licia/LocalStore'
 import Vault from './lib/vault'
 

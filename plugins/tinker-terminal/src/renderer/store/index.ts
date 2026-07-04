@@ -1,7 +1,7 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import {
   getAllFolders,
   putFolder,

@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/BaseStore'
+import BaseStore from 'share/store/Base'
 import { alert } from 'share/components/Alert'
 import type { MenuItemConstructorOptions } from 'electron'
 import i18n from 'i18next'
