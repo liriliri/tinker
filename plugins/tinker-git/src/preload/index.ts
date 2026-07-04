@@ -1,4 +1,5 @@
 import { contextBridge } from 'electron'
+import { exec } from 'share/tools/shellImpl'
 import {
   getRepoPath,
   openRepository,
@@ -47,6 +48,7 @@ const gitObj = {
   discardFiles,
   commitStaged,
   watchWorkingTree,
+  exec,
 }
 
 contextBridge.exposeInMainWorld('git', gitObj)

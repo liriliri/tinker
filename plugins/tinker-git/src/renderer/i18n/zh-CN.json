@@ -42,5 +42,8 @@
   "workingTreeMode": "工作区",
   "selectChangeToView": "选择变更以预览",
   "refreshChanges": "刷新变更",
-  "toggleTerminal": "切换终端"
+  "toggleTerminal": "切换终端",
+  "chatTitle": "Git 助手",
+  "chatInputPlaceholder": "询问 Git 相关问题...",
+  "chatEmptyHint": "我可以帮你执行 git 命令、分析历史和处理分支"
 }

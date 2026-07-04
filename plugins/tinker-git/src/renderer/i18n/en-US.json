@@ -42,5 +42,8 @@
   "workingTreeMode": "Working Tree",
   "selectChangeToView": "Select a change to preview",
   "refreshChanges": "Refresh changes",
-  "toggleTerminal": "Toggle Terminal"
+  "toggleTerminal": "Toggle Terminal",
+  "chatTitle": "Git Assistant",
+  "chatInputPlaceholder": "Ask about Git...",
+  "chatEmptyHint": "I can run git commands, inspect history, and help with branches"
 }

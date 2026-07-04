@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
@@ -28,9 +29,18 @@ import {
   TerminalPanel,
   getTerminalPanelProps,
 } from 'share/components/TerminalPanel'
+import { PluginChat } from 'share/components/AiChat'
+import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
+import { getToolArgSummary, getVisibleToolMessages } from './lib/chatTools'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
+
+const MAIN_CONTENT_CLASS = 'flex-1 min-h-0 overflow-hidden flex flex-col'
+
+interface GitChatLayoutProps {
+  children: ReactNode
+}
 
 const RepoPanels = observer(function RepoPanels() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
@@ -137,14 +147,101 @@ const ErrorToast = observer(function ErrorToast() {
   return null
 })
 
-const App = observer(function App() {
-  const { t } = useTranslation()
+const RepoContent = observer(function RepoContent() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'terminal'],
     id: 'tinker-git-terminal-layout',
     storage: localStorage,
   })
 
+  return (
+    <Group
+      orientation="vertical"
+      className="flex-1 min-h-0"
+      defaultLayout={defaultLayout}
+      onLayoutChange={onLayoutChange}
+    >
+      <Panel id="main" minSize={200}>
+        <div className="h-full flex flex-col min-h-0 overflow-hidden">
+          <RepoPanels />
+        </div>
+      </Panel>
+      {store.terminalOpen && <Separator />}
+      {store.terminalOpen && (
+        <Panel id="terminal" defaultSize={200} minSize={100}>
+          <TerminalPanel
+            {...getTerminalPanelProps(store.terminal, store.isDark)}
+          />
+        </Panel>
+      )}
+    </Group>
+  )
+})
+
+const GitChatLayout = observer(function GitChatLayout({
+  children,
+}: GitChatLayoutProps) {
+  const { t } = useTranslation()
+  const tab = store.activeTab
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    panelIds: ['content', 'chat'],
+    id: `tinker-git-tab-${tab?.id ?? 'default'}`,
+    storage: localStorage,
+  })
+
+  if (!tab) return null
+
+  return (
+    <Group
+      orientation="horizontal"
+      className="flex-1 min-h-0"
+      defaultLayout={defaultLayout}
+      onLayoutChange={onLayoutChange}
+    >
+      <Panel id="content" minSize={400}>
+        <div className="h-full min-h-0 flex flex-col">{children}</div>
+      </Panel>
+      <Separator />
+      <Panel id="chat" minSize={250} defaultSize={360}>
+        <PluginChat
+          {...getPluginChatProps(tab.chat)}
+          isDark={store.isDark}
+          title={t('chatTitle')}
+          inputPlaceholder={t('chatInputPlaceholder')}
+          emptyHint={t('chatEmptyHint')}
+          getToolArgSummary={getToolArgSummary}
+          getVisibleToolMessages={getVisibleToolMessages}
+        />
+      </Panel>
+    </Group>
+  )
+})
+
+const MainContent = observer(function MainContent() {
+  const { t } = useTranslation()
+
+  if (store.repoPath && store.hasAI && store.activeTabChatOpen) {
+    return (
+      <GitChatLayout>
+        <RepoContent />
+      </GitChatLayout>
+    )
+  }
+
+  const content = store.repoPath ? (
+    <RepoContent />
+  ) : (
+    <FolderOpen
+      onOpenFolder={(path) => store.openRepository(path)}
+      openTitle={t('openRepo')}
+      dropTitle={t('dropRepoHere')}
+    />
+  )
+
+  return <div className={MAIN_CONTENT_CLASS}>{content}</div>
+})
+
+const App = observer(function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === '`') {
@@ -168,34 +265,7 @@ const App = observer(function App() {
           <TabBar />
           <Toolbar />
 
-          {!store.repoPath ? (
-            <FolderOpen
-              onOpenFolder={(path) => store.openRepository(path)}
-              openTitle={t('openRepo')}
-              dropTitle={t('dropRepoHere')}
-            />
-          ) : (
-            <Group
-              orientation="vertical"
-              className="flex-1 min-h-0"
-              defaultLayout={defaultLayout}
-              onLayoutChange={onLayoutChange}
-            >
-              <Panel id="main" minSize={200}>
-                <div className="h-full flex flex-col min-h-0 overflow-hidden">
-                  <RepoPanels />
-                </div>
-              </Panel>
-              {store.terminalOpen && <Separator />}
-              {store.terminalOpen && (
-                <Panel id="terminal" defaultSize={200} minSize={100}>
-                  <TerminalPanel
-                    {...getTerminalPanelProps(store.terminal, store.isDark)}
-                  />
-                </Panel>
-              )}
-            </Group>
-          )}
+          <MainContent />
         </div>
       </ConfirmProvider>
     </ToasterProvider>

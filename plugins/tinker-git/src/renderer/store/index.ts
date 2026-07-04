@@ -1,14 +1,22 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import TerminalStore from 'share/store/Terminal'
+import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
+import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import Repo, { type GitViewMode } from './Repo'
 import { repoDirName } from '../lib/util'
+import { buildGitSystemPrompt, createGitChat } from '../lib/chat'
+
+const storage = new LocalStore('tinker-git')
+const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 class Store extends BaseStore {
   tabs: Repo[] = []
   activeTabId = ''
 
   terminal: TerminalStore
+  hasAI = false
 
   private nextId = 1
   private workingTreeUnwatch: (() => void) | undefined
@@ -19,6 +27,24 @@ class Store extends BaseStore {
     makeAutoObservable(this)
     this.addTab()
     this.terminal.initIfOpen()
+    void initAiChatAvailability(storage).then(({ hasAI }) => {
+      this.hasAI = hasAI
+    })
+  }
+
+  private setupTab(tab: Repo) {
+    tab.chat = createGitChat(tab.id, chatPrefsStorage, () => tab.repoPath)
+  }
+
+  get activeTabChatOpen(): boolean {
+    return this.activeTab?.chatOpen ?? false
+  }
+
+  toggleActiveTabChat() {
+    if (!this.hasAI || !this.repoPath) return
+    const tab = this.activeTab
+    if (!tab) return
+    tab.chatOpen = !tab.chatOpen
   }
 
   private getTab(id: string): Repo | undefined {
@@ -320,6 +346,7 @@ class Store extends BaseStore {
   addTab(afterTabId?: string) {
     const id = `tab-${this.nextId++}`
     const tab = new Repo(id)
+    this.setupTab(tab)
     if (afterTabId) {
       const index = this.tabs.findIndex((t) => t.id === afterTabId)
       if (index !== -1) {
@@ -413,6 +440,7 @@ class Store extends BaseStore {
       runInAction(() => {
         this.updateTabTitle(tab.id, repoDirName(path))
         this.updateWindowTitle()
+        tab.chat.setSystemPrompt(buildGitSystemPrompt(tab.repoPath))
       })
       this.syncWorkingTreeWatcher()
     } catch (err) {

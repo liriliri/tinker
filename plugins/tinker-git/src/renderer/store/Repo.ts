@@ -20,6 +20,7 @@ import {
   type RefreshWorkingTreeOptions,
   type WorkingTreeDisplayGroup,
 } from 'share/lib/workingTree'
+import type AiChatStore from 'share/store/AiChat'
 
 export type GitViewMode = 'history' | 'workingTree'
 
@@ -30,6 +31,8 @@ class Repo {
   id: string
   title = ''
   repoPath = ''
+  chatOpen = false
+  chat!: AiChatStore
   branches: GitBranch[] = []
   commits: GitCommitSummary[] = []
   selectedBranch: GitBranch | null = null
@@ -94,7 +97,7 @@ class Repo {
 
   constructor(id: string) {
     this.id = id
-    makeAutoObservable(this)
+    makeAutoObservable(this, { chat: false })
     this._doSearch = debounce(this._search.bind(this), SEARCH_DEBOUNCE_MS)
   }
 
