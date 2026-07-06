@@ -302,6 +302,32 @@ export function isPluginRunning(id: string, backgroundOnly?: boolean) {
   return backgroundOnly ? !entry.win : true
 }
 
+export async function callPluginMcpTool(
+  id: string,
+  name: string,
+  args: Record<string, unknown>
+): Promise<string> {
+  const { view } = pluginViews[id]
+  if (!view) {
+    throw new Error('Plugin is not running')
+  }
+
+  const script = `(function() {
+    if (!window.mcp || typeof window.mcp.callTool !== 'function') {
+      return 'Error: Plugin MCP API is not ready. Please wait for the plugin to finish loading.';
+    }
+    try {
+      return window.mcp.callTool(${JSON.stringify(name)}, ${JSON.stringify(
+    args
+  )});
+    } catch (e) {
+      return 'Error: ' + (e.message || String(e));
+    }
+  })()`
+
+  return (await view.webContents.executeJavaScript(script, true)) as string
+}
+
 export const detachPlugin: IpcDetachPlugin = async function (id) {
   const { view, win } = pluginViews[id]
   if (!view || !win) {

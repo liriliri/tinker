@@ -1,6 +1,15 @@
 import { MenuItemConstructorOptions } from 'electron'
 import types from 'licia/types'
 
+export interface IMcpToolDefinition {
+  description: string
+  inputSchema?: Record<string, unknown>
+}
+
+export interface IPluginMcp {
+  tools: Record<string, IMcpToolDefinition>
+}
+
 export interface IRawPlugin {
   name: string
   description?: string
@@ -13,6 +22,7 @@ export interface IRawPlugin {
     name?: string
     description?: string
   }>
+  mcp?: IPluginMcp
 }
 
 export interface IPlugin {
@@ -30,6 +40,7 @@ export interface IPlugin {
   marketplace?: boolean
   userInstalled?: boolean
   version?: string
+  mcp?: IPluginMcp
 }
 
 export interface IApp {

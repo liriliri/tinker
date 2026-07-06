@@ -77,6 +77,7 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     builtin: startWith(dir, builtinDir),
     userInstalled: startWith(dir, userPluginDir),
     version: pkg.version,
+    mcp: rawPlugin.mcp,
   }
   if (plugin.icon) {
     const iconPath = path.join(dir, plugin.icon)

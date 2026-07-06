@@ -2,10 +2,12 @@ import net from 'net'
 import path from 'path'
 import os from 'os'
 import fs from 'fs'
+import { spawn } from 'child_process'
 import uuid from 'licia/uuid'
 import isWindows from 'licia/isWindows'
 import isMac from 'licia/isMac'
 import waitUntil from 'licia/waitUntil'
+import { isDev, getPlatform } from 'share/common/util'
 
 export interface IpcRequest {
   id: string
@@ -95,40 +97,104 @@ export function stopServer() {
   removeSocketFile()
 }
 
-export function sendCommand(
+function launchTinker(data?: Record<string, unknown>) {
+  const args: string[] = []
+  if (data?.remoteDebuggingPort) {
+    args.push(`--remote-debugging-port=${data.remoteDebuggingPort}`)
+  }
+
+  if (isDev()) {
+    args.unshift(path.resolve(__dirname, 'index.js'))
+  }
+
+  const env = { ...process.env }
+  delete env['ELECTRON_RUN_AS_NODE']
+
+  if (isMac && !isDev()) {
+    const execPath = process.execPath
+    const contentsIndex = execPath.indexOf('.app/Contents/')
+    const appPath = execPath.substring(0, contentsIndex + 4)
+    const openArgs = ['-a', appPath]
+    if (args.length > 0) {
+      openArgs.push('--args', ...args)
+    }
+    const child = spawn('open', openArgs, {
+      detached: true,
+      stdio: 'inherit',
+      env,
+    })
+    child.unref()
+    return
+  }
+
+  if (getPlatform() === 'linux') {
+    args.unshift('--no-sandbox')
+  }
+
+  const child = spawn(process.execPath, args, {
+    detached: true,
+    stdio: 'ignore',
+    cwd: path.resolve(__dirname, '../..'),
+    env,
+  })
+  child.unref()
+}
+
+export async function sendCommand(
   command: string,
   data?: Record<string, unknown>
 ): Promise<IpcResponse> {
-  return new Promise((resolve, reject) => {
-    let settled = false
-    const socket = net.createConnection(SOCKET_PATH, () => {
-      const req: IpcRequest = { id: uuid(), command, data }
-      socket.write(JSON.stringify(req))
+  const invoke = () =>
+    new Promise<IpcResponse>((resolve, reject) => {
+      let settled = false
+      const socket = net.createConnection(SOCKET_PATH, () => {
+        const req: IpcRequest = { id: uuid(), command, data }
+        socket.write(JSON.stringify(req))
+      })
+
+      let buf = ''
+      socket.on('data', (chunk) => {
+        buf += chunk.toString()
+        try {
+          const res: IpcResponse = JSON.parse(buf)
+          settled = true
+          resolve(res)
+          socket.end()
+        } catch {
+          // ignore
+        }
+      })
+
+      socket.on('error', (err) => {
+        if (!settled) reject(err)
+      })
+      socket.setTimeout(10000, () => {
+        if (!settled) {
+          socket.destroy()
+          reject(new Error('Connection timed out'))
+        }
+      })
     })
 
-    let buf = ''
-    socket.on('data', (chunk) => {
-      buf += chunk.toString()
-      try {
-        const res: IpcResponse = JSON.parse(buf)
-        settled = true
-        resolve(res)
-        socket.end()
-      } catch {
-        // ignore
-      }
-    })
+  try {
+    return await invoke()
+  } catch (err) {
+    if (!isConnectionError(err)) {
+      throw err
+    }
+    launchTinker(data)
+    await waitForServer()
+    return invoke()
+  }
+}
 
-    socket.on('error', (err) => {
-      if (!settled) reject(err)
-    })
-    socket.setTimeout(10000, () => {
-      if (!settled) {
-        socket.destroy()
-        reject(new Error('Connection timed out'))
-      }
-    })
-  })
+function isConnectionError(err: unknown) {
+  const code = (err as NodeJS.ErrnoException)?.code
+  if (code === 'ECONNREFUSED' || code === 'ENOENT' || code === 'ECONNRESET') {
+    return true
+  }
+  const message = err instanceof Error ? err.message : String(err)
+  return /ECONNREFUSED|connect/i.test(message)
 }
 
 function isServerRunning(): Promise<boolean> {

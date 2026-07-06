@@ -1,122 +1,102 @@
-import { spawn } from 'child_process'
-import path from 'path'
 import { Command } from 'commander'
-import { sendCommand, waitForServer, IpcResponse } from './ipc'
-import { isDev, getPlatform } from 'share/common/util'
-import isMac from 'licia/isMac'
+import { sendCommand } from './ipc'
+import { startMcpServer } from './mcp'
+import type { IPlugin } from 'common/types'
 
-function launchTinker(args: string[]) {
-  if (isDev()) {
-    args.unshift(path.resolve(__dirname, 'index.js'))
-  }
-
-  const env = { ...process.env }
-  delete env['ELECTRON_RUN_AS_NODE']
-
-  if (isMac && !isDev()) {
-    const execPath = process.execPath
-    const contentsIndex = execPath.indexOf('.app/Contents/')
-    const appPath = execPath.substring(0, contentsIndex + 4)
-    const openArgs = ['-a', appPath]
-    if (args.length > 0) {
-      openArgs.push('--args', ...args)
-    }
-    const child = spawn('open', openArgs, {
-      detached: true,
-      stdio: 'inherit',
-      env,
-    })
-    child.unref()
-    return
-  }
-
-  if (getPlatform() === 'linux') {
-    args.unshift('--no-sandbox')
-  }
-
-  const child = spawn(process.execPath, args, {
-    detached: true,
-    stdio: 'ignore',
-    cwd: path.resolve(__dirname, '../..'),
-    env,
-  })
-  child.unref()
+interface ExecuteCommandOptions {
+  format?: (data: unknown) => void
 }
 
 function normalizePluginId(name: string) {
   return name.startsWith('tinker-') ? name : `tinker-${name}`
 }
 
+function formatPluginList(data: unknown) {
+  const plugins = data as Array<{
+    id: string
+    name: string
+    description?: string
+    version?: string
+    builtin: boolean
+    mcp: boolean
+  }>
+  if (plugins.length === 0) {
+    console.log('No plugins installed.')
+    return
+  }
+  for (const p of plugins) {
+    const version = !p.builtin && p.version ? ` (${p.version})` : ''
+    const tags = [p.builtin ? 'builtin' : '', p.mcp ? 'mcp' : '']
+      .filter(Boolean)
+      .map((tag) => `[${tag}]`)
+      .join(' ')
+    const tag = tags ? ` ${tags}` : ''
+    const description = p.description ? ` - ${p.description}` : ''
+    console.log(`  ${p.id}${version}${tag}${description}`)
+  }
+}
+
+function formatRunningPlugins(data: unknown) {
+  const running = data as Array<{ id: string; pid: number }>
+  if (running.length === 0) {
+    console.log('No running plugins.')
+    return
+  }
+  for (const p of running) {
+    console.log(`  ${p.id} ${p.pid}`)
+  }
+}
+
+function formatPluginTools(data: unknown) {
+  const plugin = data as IPlugin
+  if (!plugin.mcp) {
+    throw new Error(`${plugin.name} does not support MCP.`)
+  }
+  console.log(JSON.stringify(plugin.mcp.tools, null, 2))
+}
+
+function formatToolCallResult(data: unknown) {
+  if (typeof data === 'string') {
+    console.log(data)
+    return
+  }
+  console.log(JSON.stringify(data, null, 2))
+}
+
 async function executeCommand(
   command: string,
-  data?: Record<string, unknown>
-): Promise<void> {
-  let res: IpcResponse
+  data?: Record<string, unknown>,
+  options?: ExecuteCommandOptions
+) {
+  let res
   try {
     res = await sendCommand(command, data)
-  } catch {
-    try {
-      const launchArgs: string[] = []
-      if (data?.remoteDebuggingPort) {
-        launchArgs.push(`--remote-debugging-port=${data.remoteDebuggingPort}`)
-      }
-      launchTinker(launchArgs)
-      await waitForServer()
-      res = await sendCommand(command, data)
-    } catch (err: any) {
-      console.error(`Error: ${err.message || 'Failed to connect to Tinker'}`)
-      process.exit(1)
-    }
+  } catch (err: any) {
+    console.error(`Error: ${err.message || 'Failed to connect to Tinker'}`)
+    process.exit(1)
   }
 
-  if (res.success) {
-    if (res.data !== undefined) {
-      printData(command, res.data)
-    } else {
-      console.log(`Done.`)
-    }
-  } else {
+  if (!res.success) {
     console.error(`Error: ${res.error}`)
     process.exit(1)
   }
 
-  process.exit(0)
-}
-
-function printData(command: string, data: unknown) {
-  switch (command) {
-    case 'list': {
-      const plugins = data as Array<{
-        id: string
-        name: string
-        version?: string
-        builtin: boolean
-      }>
-      if (plugins.length === 0) {
-        console.log('No plugins installed.')
-        return
+  if (res.data !== undefined) {
+    if (options?.format) {
+      try {
+        options.format(res.data)
+      } catch (err: any) {
+        console.error(`Error: ${err.message || String(err)}`)
+        process.exit(1)
       }
-      for (const p of plugins) {
-        const version = !p.builtin && p.version ? ` (${p.version})` : ''
-        const tag = p.builtin ? ' [builtin]' : ''
-        console.log(`  ${p.id}${version}${tag}`)
-      }
-      break
+    } else {
+      console.log(JSON.stringify(res.data, null, 2))
     }
-    case 'ps': {
-      const running = data as Array<{ id: string; pid: number }>
-      if (running.length === 0) {
-        console.log('No running plugins.')
-        return
-      }
-      for (const p of running) {
-        console.log(`  ${p.id} ${p.pid}`)
-      }
-      break
-    }
-    default:
-      console.log(JSON.stringify(data, null, 2))
+  } else {
+    console.log('Done.')
   }
+
+  process.exit(0)
 }
 
 const program = new Command()
@@ -162,14 +142,67 @@ program
   .command('list')
   .description('List installed plugins')
   .action(() => {
-    executeCommand('list')
+    executeCommand('list', undefined, { format: formatPluginList })
   })
 
 program
   .command('ps')
   .description('List running plugins with process IDs')
   .action(() => {
-    executeCommand('ps')
+    executeCommand('ps', undefined, { format: formatRunningPlugins })
+  })
+
+program
+  .command('tools <plugin>')
+  .description('List MCP tools for a plugin')
+  .action((pluginName: string) => {
+    executeCommand(
+      'getPlugin',
+      { id: normalizePluginId(pluginName) },
+      {
+        format: formatPluginTools,
+      }
+    )
+  })
+
+program
+  .command('call <plugin>')
+  .description('Call an MCP tool on a running plugin')
+  .requiredOption('--tool <name>', 'Tool name to call')
+  .option('--args <json>', 'Tool arguments as JSON', '{}')
+  .action((pluginName: string, opts: { tool: string; args: string }) => {
+    let args: Record<string, unknown>
+    try {
+      args = JSON.parse(opts.args)
+    } catch {
+      console.error('Error: Invalid JSON for --args')
+      process.exit(1)
+    }
+    if (args === null || typeof args !== 'object' || Array.isArray(args)) {
+      console.error('Error: --args must be a JSON object')
+      process.exit(1)
+    }
+    executeCommand(
+      'callMcpTool',
+      {
+        id: normalizePluginId(pluginName),
+        name: opts.tool,
+        args,
+      },
+      { format: formatToolCallResult }
+    )
+  })
+
+program
+  .command('mcp <plugin>')
+  .description('Start an MCP server for a plugin (stdio transport)')
+  .action(async (pluginName: string) => {
+    try {
+      await startMcpServer(normalizePluginId(pluginName))
+    } catch (err: any) {
+      console.error(`Error: ${err.message || 'Failed to start MCP server'}`)
+      process.exit(1)
+    }
   })
 
 program.parse(process.argv.slice(2), { from: 'user' })

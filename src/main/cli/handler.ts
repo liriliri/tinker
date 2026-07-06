@@ -4,9 +4,18 @@ import {
   closePlugin,
   isPluginRunning,
   pluginViews,
+  callPluginMcpTool,
 } from '../lib/plugin/view'
-import { getPlugins, hasPlugin } from '../lib/plugin/loader'
+import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
+
+function success(req: IpcRequest, data?: unknown): IpcResponse {
+  return { id: req.id, success: true, data }
+}
+
+function fail(req: IpcRequest, error: string): IpcResponse {
+  return { id: req.id, success: false, error }
+}
 
 async function listPlugins() {
   const plugins = await getPlugins()
@@ -18,6 +27,7 @@ async function listPlugins() {
       description: p.description,
       version: p.version,
       builtin: p.builtin,
+      mcp: !!p.mcp,
     }))
 }
 
@@ -28,14 +38,6 @@ function listRunningPlugins() {
   }))
 }
 
-function success(req: IpcRequest, data?: unknown): IpcResponse {
-  return { id: req.id, success: true, data }
-}
-
-function fail(req: IpcRequest, error: string): IpcResponse {
-  return { id: req.id, success: false, error }
-}
-
 async function ensurePlugin(req: IpcRequest): Promise<string | IpcResponse> {
   await getPlugins()
   const id = req.data?.id as string
@@ -43,6 +45,41 @@ async function ensurePlugin(req: IpcRequest): Promise<string | IpcResponse> {
     return fail(req, `Plugin not found: ${id}`)
   }
   return id
+}
+
+function pluginNotRunningMessage(id: string) {
+  const shortName = id.replace(/^tinker-/, '')
+  return `Plugin is not running. Please start it first: tinker open ${shortName}`
+}
+
+async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
+  const id = req.data?.id as string
+  const name = req.data?.name as string
+  const args = (req.data?.args as Record<string, unknown>) || {}
+  if (!id || !name) {
+    return fail(req, 'Missing plugin id or tool name')
+  }
+  if (!isPluginRunning(id)) {
+    return fail(req, pluginNotRunningMessage(id))
+  }
+
+  await getPlugins()
+  if (!hasPlugin(id)) {
+    return fail(req, `Plugin not found: ${id}`)
+  }
+
+  const plugin = plugins[id]
+  const tools = plugin.mcp?.tools
+  if (!tools || !tools[name]) {
+    return fail(req, `Unknown tool "${name}"`)
+  }
+
+  try {
+    const result = await callPluginMcpTool(id, name, args)
+    return success(req, result)
+  } catch (err: any) {
+    return fail(req, err.message || String(err))
+  }
 }
 
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
@@ -78,19 +115,22 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
         const data = await listPlugins()
         return success(req, data)
       }
+      case 'getPlugin': {
+        const result = await ensurePlugin(req)
+        if (typeof result !== 'string') return result
+        return success(req, plugins[result])
+      }
       case 'ps': {
         const data = listRunningPlugins()
         return success(req, data)
       }
+      case 'callMcpTool':
+        return callMcpTool(req)
       default:
-        return {
-          id: req.id,
-          success: false,
-          error: `Unknown command: ${req.command}`,
-        }
+        return fail(req, `Unknown command: ${req.command}`)
     }
   } catch (err: any) {
-    return { id: req.id, success: false, error: err.message || String(err) }
+    return fail(req, err.message || String(err))
   }
 }
 
