@@ -18,6 +18,7 @@ import {
 import { getHolidaysForYearRange } from 'share/lib/holidays'
 import * as db from './lib/db'
 import type { Anniversary } from './types'
+import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
 const storage = new LocalStore('tinker-anniversary')
@@ -26,7 +27,9 @@ const STORAGE_SHOW_HOLIDAYS = 'show-holidays'
 const DEFAULT_VISIBLE_START = normalizeDateKey(new Date())
 const DEFAULT_VISIBLE_END = DEFAULT_VISIBLE_START
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   selectedDate: string = this.getTodayKey()
   anniversaries: Anniversary[] = []
   sidebarOpen: boolean = true

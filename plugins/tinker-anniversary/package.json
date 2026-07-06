@@ -16,6 +16,122 @@
         "name": "纪念日",
         "description": "记录每年纪念日，日历展示并显示倒数天数"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get_anniversaries": {
+          "description": "Get all anniversaries with title, calendar type, date fields, start year, next occurrence date, days until next, and days since start."
+        },
+        "add_anniversary": {
+          "description": "Add a new anniversary. Use month/day for solar dates, or lunarMonth/lunarDay for lunar dates.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Anniversary title"
+              },
+              "isLunar": {
+                "type": "boolean",
+                "description": "Whether the date follows the lunar calendar (default false)"
+              },
+              "month": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "description": "Solar month (1-12), required when isLunar is false"
+              },
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 31,
+                "description": "Solar day (1-31), required when isLunar is false"
+              },
+              "lunarMonth": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "description": "Lunar month (1-12), required when isLunar is true"
+              },
+              "lunarDay": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30,
+                "description": "Lunar day (1-30), required when isLunar is true"
+              },
+              "startYear": {
+                "type": "integer",
+                "description": "Optional year the anniversary started (e.g. birth year or wedding year)"
+              }
+            },
+            "required": ["title"]
+          }
+        },
+        "update_anniversary": {
+          "description": "Update an existing anniversary by id. Omitted fields keep their current values.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Anniversary id"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New title"
+              },
+              "isLunar": {
+                "type": "boolean",
+                "description": "Whether the date follows the lunar calendar"
+              },
+              "month": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "description": "Solar month (1-12)"
+              },
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 31,
+                "description": "Solar day (1-31)"
+              },
+              "lunarMonth": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "description": "Lunar month (1-12)"
+              },
+              "lunarDay": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30,
+                "description": "Lunar day (1-30)"
+              },
+              "startYear": {
+                "type": ["integer", "null"],
+                "description": "Start year, or null to remove"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete_anniversary": {
+          "description": "Delete an anniversary by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Anniversary id"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      }
     }
   }
 }
