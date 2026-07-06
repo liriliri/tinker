@@ -9,7 +9,7 @@ import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/store/Base'
-import { REGEXP_AGENT_TOOLS } from './lib/chatTools'
+import { createMcpApi } from './mcp'
 import type { Match } from './types'
 
 const storage = new LocalStore('tinker-regexp')
@@ -19,19 +19,10 @@ const STORAGE_FLAGS = 'flags'
 const STORAGE_TEXT = 'text'
 
 const sessionStorage = new IndexedDbChatStorage('tinker-regexp')
-const chatSession = new ChatSession({
-  sessionId: sessionStorage.sessionId,
-  tools: REGEXP_AGENT_TOOLS,
-})
 
-class Store extends BaseStore {
-  chat = new AiChatStore({
-    chatSession,
-    sessionStorage,
-    prefsStorage: new LocalStoreChatPrefs(storage),
-    initialSystemPrompt:
-      'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
-  })
+export class Store extends BaseStore {
+  chat: AiChatStore
+  readonly mcp = createMcpApi(() => this)
 
   pattern: string = '([A-Z])\\w+'
   flags: string = 'g'
@@ -48,6 +39,17 @@ This plugin supports JavaScript RegEx flavor with common flags: g (global), i (c
 
   constructor() {
     super()
+    const chatSession = new ChatSession({
+      sessionId: sessionStorage.sessionId,
+      tools: this.mcp.createAgentTools(),
+    })
+    this.chat = new AiChatStore({
+      chatSession,
+      sessionStorage,
+      prefsStorage: new LocalStoreChatPrefs(storage),
+      initialSystemPrompt:
+        'You are a regular expression assistant. Help the user write, debug, and understand JavaScript regular expressions. You have tools to read and update the editor pattern, flags, and test text. Use tools only when you need current editor values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+    })
     makeAutoObservable(this, { chat: false })
     this.loadStorage()
     void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {

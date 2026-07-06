@@ -5,9 +5,15 @@ import ChatClearButton from './ChatClearButton'
 import ChatInputArea from './ChatInputArea'
 import MessageItem from './MessageItem'
 import MessageList from './MessageList'
-import ToolCard from './ToolCard'
+import ToolCard, { isToolMessageRenderable } from './ToolCard'
 import type { ChatMessage } from './types'
 import type { MessageItemProps as BaseMessageItemProps } from './MessageItem'
+
+function defaultGetVisibleToolMessages(
+  toolMessages: ChatMessage[]
+): ChatMessage[] {
+  return toolMessages.filter(isToolMessageRenderable)
+}
 
 export interface PluginChatProps {
   isDark: boolean
@@ -24,7 +30,7 @@ export interface PluginChatProps {
   combinedOptions: Array<{ value: string; label: string }>
   canClearMessages: boolean
   getToolArgSummary: (name: string, args: Record<string, unknown>) => string
-  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onInputChange: (value: string) => void
   onSend: () => void
   onStop: () => void
@@ -42,7 +48,7 @@ interface PluginChatMessageItemProps {
   msg: ChatMessage
   toolMessages?: ChatMessage[]
   getToolArgSummary: (name: string, args: Record<string, unknown>) => string
-  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
   renderToolMessage?: (msg: ChatMessage) => ReactNode
@@ -53,7 +59,7 @@ function PluginChatMessageItem({
   msg,
   toolMessages = [],
   getToolArgSummary,
-  getVisibleToolMessages,
+  getVisibleToolMessages = defaultGetVisibleToolMessages,
   onRetryLastMessage,
   onDeleteMessage,
   renderToolMessage,
@@ -94,7 +100,7 @@ interface PluginChatMessageListProps {
   isDark: boolean
   emptyHint: string
   getToolArgSummary: (name: string, args: Record<string, unknown>) => string
-  getVisibleToolMessages: (toolMessages: ChatMessage[]) => ChatMessage[]
+  getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
   renderToolMessage?: (msg: ChatMessage) => ReactNode
@@ -106,7 +112,7 @@ function PluginChatMessageList({
   isDark,
   emptyHint,
   getToolArgSummary,
-  getVisibleToolMessages,
+  getVisibleToolMessages = defaultGetVisibleToolMessages,
   onRetryLastMessage,
   onDeleteMessage,
   renderToolMessage,

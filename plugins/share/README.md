@@ -175,11 +175,40 @@ void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
   inputPlaceholder={t('chatInputPlaceholder')}
   emptyHint={t('chatEmptyHint')}
   getToolArgSummary={getToolArgSummary}
-  getVisibleToolMessages={getVisibleToolMessages}
 />
 ```
 
-Plugin-specific pieces stay in the plugin: `systemPrompt`, `AgentTool` definitions, and `getToolArgSummary`. Use `createToolMessageHelpers(['tool_a', 'tool_b'])` for tool message filtering. Add `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, and `syntaxhighlighter` vendor scripts plus `overlayscrollbars.scss` and `resizablepanels.scss` in `index.scss`. Reference: `tinker-regexp`, `tinker-json-editor`.
+`getVisibleToolMessages` is optional; `PluginChat` defaults to filtering with `isToolMessageRenderable`. Pass a custom filter when you need a tool whitelist or special cards (e.g. `web_search` with `SearchCard`).
+
+Plugin-specific pieces stay in the plugin: `systemPrompt`, `AgentTool` execute handlers, and `getToolArgSummary`. Tool schemas can live in `package.json` under `tinker.mcp.tools` (MCP format: `description` + optional `inputSchema`) and be converted for `callAI` via `share/lib/mcp`:
+
+```ts
+import pkg from '../../package.json'
+import {
+  getMcpToolsFromPackage,
+  mcpToolsToOpenAiDefinitions,
+  type PluginMcp,
+} from 'share/lib/mcp'
+
+const toolDefinitions = mcpToolsToOpenAiDefinitions(getMcpToolsFromPackage(pkg))
+```
+
+Plugins that expose MCP tools to the host (external AI assistants calling via main `executeJavaScript`) should call `registerPluginMcp` from `createMcpApi` (typically via `readonly mcp = createMcpApi(() => this)` on the store):
+
+```ts
+import { registerPluginMcp, type PluginMcp } from 'share/lib/mcp'
+
+export function createMcpApi(getStore: () => Store): PluginMcp {
+  return registerPluginMcp({
+    callTool: (name, args) => executeTool(getStore(), name, args),
+    createAgentTools: () => /* ... */,
+  })
+}
+```
+
+`PluginMcpBridge`, `registerPluginMcp`, and the global `window.mcp` type live in `share/lib/mcp.ts`. Main reads tool schemas from each plugin's `package.json`; the renderer bridge only exposes `callTool`.
+
+Use `createToolMessageHelpers` only when you need a custom `getVisibleToolMessages` whitelist. Add `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, and `syntaxhighlighter` vendor scripts plus `overlayscrollbars.scss` and `resizablepanels.scss` in `index.scss`. Reference: `tinker-regexp`, `tinker-json-editor`.
 
 ### TextSearch
 

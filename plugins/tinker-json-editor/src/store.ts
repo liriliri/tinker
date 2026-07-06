@@ -15,7 +15,7 @@ import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
 import BaseStore from 'share/store/Base'
-import { JSON_AGENT_TOOLS } from './lib/chatTools'
+import { createMcpApi } from './mcp'
 
 type EditorMode = 'text' | 'tree'
 
@@ -26,19 +26,10 @@ const STORAGE_MODE = 'tinker-json-editor-mode'
 const STORAGE_FILE_PATH = 'file-path'
 
 const sessionStorage = new IndexedDbChatStorage('tinker-json-editor')
-const chatSession = new ChatSession({
-  sessionId: sessionStorage.sessionId,
-  tools: JSON_AGENT_TOOLS,
-})
 
-class Store extends BaseStore {
-  chat = new AiChatStore({
-    chatSession,
-    sessionStorage,
-    prefsStorage: new LocalStoreChatPrefs(storage),
-    initialSystemPrompt:
-      'You are a JSON assistant. Help the user edit, format, transform, and understand JSON data. You have tools to read and update the editor content. Use tools only when you need current JSON values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
-  })
+export class Store extends BaseStore {
+  chat: AiChatStore
+  readonly mcp = createMcpApi(() => this)
 
   jsonInput: string = ''
   mode: EditorMode = 'text'
@@ -54,6 +45,17 @@ class Store extends BaseStore {
 
   constructor() {
     super()
+    const chatSession = new ChatSession({
+      sessionId: sessionStorage.sessionId,
+      tools: this.mcp.createAgentTools(),
+    })
+    this.chat = new AiChatStore({
+      chatSession,
+      sessionStorage,
+      prefsStorage: new LocalStoreChatPrefs(storage),
+      initialSystemPrompt:
+        'You are a JSON assistant. Help the user edit, format, transform, and understand JSON data. You have tools to read and update the editor content. Use tools only when you need current JSON values or must apply changes. After reading or updating, reply to the user with a clear explanation. Do not call tools again unless the user asks for another change or check.',
+    })
     makeAutoObservable(this, { chat: false })
     this.loadStorage()
     this.bindEvent()

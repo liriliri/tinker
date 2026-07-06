@@ -15,7 +15,7 @@ import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import TextEditor from './components/TextEditor'
 import TreeEditor from './components/TreeEditor'
 import Toolbar from './components/Toolbar'
-import { getToolArgSummary, getVisibleToolMessages } from './lib/chatTools'
+import { getToolArgSummary } from './mcp'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -96,7 +96,6 @@ const App = observer(function App() {
                     inputPlaceholder={t('chatInputPlaceholder')}
                     emptyHint={t('chatEmptyHint')}
                     getToolArgSummary={getToolArgSummary}
-                    getVisibleToolMessages={getVisibleToolMessages}
                   />
                 </Panel>
               </>

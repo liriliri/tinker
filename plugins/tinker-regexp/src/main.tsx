@@ -13,8 +13,8 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ExpressionSection from './components/ExpressionSection'
 import TextSection from './components/TextSection'
-import { getToolArgSummary, getVisibleToolMessages } from './lib/chatTools'
 import renderApp from 'share/lib/renderApp'
+import { getToolArgSummary } from './mcp'
 import store from './store'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -58,7 +58,6 @@ const App = observer(function App() {
                     inputPlaceholder={t('chatInputPlaceholder')}
                     emptyHint={t('chatEmptyHint')}
                     getToolArgSummary={getToolArgSummary}
-                    getVisibleToolMessages={getVisibleToolMessages}
                   />
                 </Panel>
               </>

@@ -16,6 +16,50 @@
         "name": "正则表达式",
         "description": "正则表达式测试，支持实时匹配和语法高亮"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get_regexp": {
+          "description": "Get the current regular expression pattern, flags, syntax error (if any), and match count against the test text."
+        },
+        "set_regexp": {
+          "description": "Update the regular expression pattern and/or flags in the editor. Changes apply immediately and re-run matching against the test text.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "The regular expression pattern (without delimiters)"
+              },
+              "flags": {
+                "type": "string",
+                "description": "Optional flags: g (global), i (case insensitive), m (multiline), s (dotall), u (unicode), y (sticky)"
+              }
+            },
+            "required": [
+              "pattern"
+            ]
+          }
+        },
+        "get_test_text": {
+          "description": "Get the current test text used to evaluate the regular expression."
+        },
+        "set_test_text": {
+          "description": "Replace the test text in the editor. Matching is re-run immediately against the current pattern.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The new test text"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
     }
   }
 }

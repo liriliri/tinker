@@ -16,6 +16,32 @@
         "name": "JSON 编辑",
         "description": "JSON 编辑器，支持文本和树形模式"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get_json": {
+          "description": "Get the current JSON content in the editor, validation error (if any), editor mode, and line count."
+        },
+        "set_json": {
+          "description": "Replace the JSON content in the editor. Changes apply immediately. The content may be valid or invalid JSON.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "The new JSON content"
+              }
+            },
+            "required": ["content"]
+          }
+        },
+        "format_json": {
+          "description": "Pretty-print the current JSON with 2-space indentation. Fails if the content is not valid JSON."
+        },
+        "minify_json": {
+          "description": "Minify the current JSON by removing whitespace. Fails if the content is not valid JSON."
+        }
+      }
     }
   },
   "devDependencies": {
