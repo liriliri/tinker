@@ -12,6 +12,9 @@ import { Item } from 'jstodotxt'
 import { type Priority, type FilterType, type TodoItem } from './types'
 import { parseTodoItem, createRawTodo, getLocalDateStr } from './lib/todo'
 import { fileExists } from 'share/lib/util'
+import { createMcpApi } from './mcp'
+
+export type { Priority, FilterType, TodoItem }
 
 const storage = new LocalStore('tinker-todo')
 const STORAGE_CURRENT_FILTER = 'currentFilter'
@@ -19,7 +22,9 @@ const STORAGE_SHOW_COMPLETED = 'showCompleted'
 const STORAGE_FILE_PATH = 'filePath'
 const STORAGE_RECENT_FILES = 'recentFiles'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   todos: TodoItem[] = []
   currentFilter: FilterType = 'all'
   searchQuery: string = ''

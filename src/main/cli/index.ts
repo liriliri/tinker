@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import { sendCommand } from './ipc'
 import { startMcpServer } from './mcp'
+import { runSkills } from './skills'
 import type { IPlugin } from 'common/types'
 
 interface ExecuteCommandOptions {
@@ -203,6 +204,15 @@ program
       console.error(`Error: ${err.message || 'Failed to start MCP server'}`)
       process.exit(1)
     }
+  })
+
+program
+  .command('skills [subcommand] [name]')
+  .description('List and locate bundled skill content')
+  .action((subcommand?: string, name?: string) => {
+    const args = subcommand ? (name ? [subcommand, name] : [subcommand]) : []
+    runSkills(args)
+    process.exit(0)
   })
 
 program.parse(process.argv.slice(2), { from: 'user' })

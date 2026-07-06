@@ -16,6 +16,109 @@
         "name": "待办清单",
         "description": "待办清单，使用 todo.txt 格式"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get_todos": {
+          "description": "Get all todos in the current file, including id, text, completion state, priority, due date, and summary stats."
+        },
+        "get_todo_file": {
+          "description": "Get the currently open todo file path, whether a file still needs to be selected, and recent file paths."
+        },
+        "open_todo_file": {
+          "description": "Open a todo.txt file by absolute path.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to the todo.txt file"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "add_todo": {
+          "description": "Add a new todo to the current file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Todo text"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["A", "B", "C"],
+                "description": "Optional priority (A = highest)"
+              },
+              "dueDate": {
+                "type": "string",
+                "description": "Optional due date in YYYY-MM-DD format"
+              }
+            },
+            "required": ["text"]
+          }
+        },
+        "update_todo": {
+          "description": "Update an existing todo by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Todo id"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New todo text"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["A", "B", "C"],
+                "description": "New priority, or omit to keep current"
+              },
+              "dueDate": {
+                "type": ["string", "null"],
+                "description": "New due date in YYYY-MM-DD format, or null to remove"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "toggle_todo": {
+          "description": "Toggle a todo's completed state by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Todo id"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete_todo": {
+          "description": "Delete a todo by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Todo id"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "clear_completed": {
+          "description": "Remove all completed todos from the current file."
+        }
+      }
     }
   },
   "devDependencies": {

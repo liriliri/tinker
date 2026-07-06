@@ -99,6 +99,7 @@ for (let i = 0, len = files.length; i < len; i++) {
 
 await fs.copy('build', 'dist/build')
 await fs.copy('resources', 'dist/resources')
+await fs.copy('src/skills', 'dist/skills')
 if (isMac) {
   await fs.copy('bin/mac', 'dist/bin')
 } else if (isWindows) {

@@ -8,6 +8,7 @@ import {
 } from '../lib/plugin/view'
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
+import { validateMcpToolArgs } from './mcp'
 
 function success(req: IpcRequest, data?: unknown): IpcResponse {
   return { id: req.id, success: true, data }
@@ -72,6 +73,15 @@ async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
   const tools = plugin.mcp?.tools
   if (!tools || !tools[name]) {
     return fail(req, `Unknown tool "${name}"`)
+  }
+
+  const validationError = validateMcpToolArgs(
+    `${id}:${name}`,
+    tools[name].inputSchema,
+    args
+  )
+  if (validationError) {
+    return fail(req, validationError)
   }
 
   try {

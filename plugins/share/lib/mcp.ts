@@ -55,8 +55,10 @@ export function mcpToolsToOpenAiDefinitions(
   )
 }
 
+export type McpToolCallResult = string | Promise<string>
+
 export interface PluginMcpBridge {
-  callTool: (name: string, args: Record<string, unknown>) => string
+  callTool: (name: string, args: Record<string, unknown>) => McpToolCallResult
 }
 
 export interface PluginMcp extends PluginMcpBridge {
