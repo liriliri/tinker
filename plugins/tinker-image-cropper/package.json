@@ -16,6 +16,102 @@
         "name": "图片裁剪",
         "description": "图片裁剪，支持旋转、翻转和宽高比控制"
       }
+    },
+    "mcp": {
+      "tools": {
+        "open_image": {
+          "description": "Open an image file in the editor. Same as opening a file in the UI. Returns image size and metadata needed before cropping.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a PNG, JPG, JPEG, or WebP image"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "get_image": {
+          "description": "Get the currently open image info, including width, height, file path, and save state."
+        },
+        "crop_image": {
+          "description": "Crop the currently open image with a rectangular region. Call open_image first to load the file and read its dimensions.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Crop region left offset in pixels"
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Crop region top offset in pixels"
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Crop region width in pixels"
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Crop region height in pixels"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "width",
+              "height"
+            ]
+          }
+        },
+        "resize_image": {
+          "description": "Resize the currently open image to new dimensions. Same as the resize dialog in the UI. Call open_image first to read the current size.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Target width in pixels"
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Target height in pixels"
+              },
+              "keepAspectRatio": {
+                "type": "boolean",
+                "description": "When true, provide width or height alone to scale proportionally."
+              }
+            }
+          }
+        },
+        "save_image": {
+          "description": "Save the current edited image after cropping or resizing. Same as clicking save in the UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "overwriteOriginal": {
+                "type": "boolean",
+                "description": "When true, save overwrites the original file. When false, outputPath is required."
+              },
+              "outputPath": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the cropped image when overwriteOriginal is false."
+              }
+            }
+          }
+        }
+      }
     }
   },
   "devDependencies": {

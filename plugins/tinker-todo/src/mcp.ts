@@ -1,53 +1,23 @@
 import {
-  getMcpToolsFromPackage,
-  mcpToolsToOpenAiDefinitions,
-  registerPluginMcp,
+  createPluginMcpApi,
+  formatMcpError,
+  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Priority, Store } from './store'
 import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
-  const toolDefinitions = mcpToolsToOpenAiDefinitions(
-    getMcpToolsFromPackage(pkg)
-  )
-
-  return registerPluginMcp({
-    callTool: (name, args) => executeTool(getStore(), name, args),
-    createAgentTools: () =>
-      toolDefinitions.map((definition) => ({
-        definition,
-        execute: (args) =>
-          executeTool(getStore(), definition.function.name, args),
-      })),
+  return createPluginMcpApi(getStore, pkg, {
+    get_todos: (store) => getTodos(store),
+    get_todo_file: (store) => getTodoFile(store),
+    open_todo_file: openTodoFile,
+    add_todo: addTodo,
+    update_todo: updateTodo,
+    toggle_todo: toggleTodo,
+    delete_todo: deleteTodo,
+    clear_completed: (store) => clearCompleted(store),
   })
-}
-
-function executeTool(
-  store: Store,
-  name: string,
-  args: Record<string, unknown>
-): string | Promise<string> {
-  switch (name) {
-    case 'get_todos':
-      return getTodos(store)
-    case 'get_todo_file':
-      return getTodoFile(store)
-    case 'open_todo_file':
-      return openTodoFile(store, args)
-    case 'add_todo':
-      return addTodo(store, args)
-    case 'update_todo':
-      return updateTodo(store, args)
-    case 'toggle_todo':
-      return toggleTodo(store, args)
-    case 'delete_todo':
-      return deleteTodo(store, args)
-    case 'clear_completed':
-      return clearCompleted(store)
-    default:
-      return `Error: Unknown tool "${name}"`
-  }
 }
 
 function requireFile(store: Store): string | null {
@@ -65,22 +35,18 @@ function requireTodo(store: Store, id: string) {
   return todo
 }
 
-function getTodoFile(store: Store): string {
-  return JSON.stringify(
-    {
-      filePath: store.filePath || null,
-      needsFileSelection: store.needsFileSelection,
-      recentFiles: store.recentFiles,
-    },
-    null,
-    2
-  )
+function getTodoFile(store: Store): McpToolHandlerResult {
+  return {
+    filePath: store.filePath || null,
+    needsFileSelection: store.needsFileSelection,
+    recentFiles: store.recentFiles,
+  }
 }
 
 async function openTodoFile(
   store: Store,
   args: Record<string, unknown>
-): Promise<string> {
+): Promise<McpToolHandlerResult> {
   try {
     await store.setFilePath(args.path as string)
     return getTodoFile(store)
@@ -88,37 +54,34 @@ async function openTodoFile(
     if (error instanceof Error && error.message === 'fileNotFound') {
       return 'Error: Todo file not found.'
     }
-    return `Error: ${
-      error instanceof Error ? error.message : 'Failed to open file'
-    }`
+    return formatMcpError(error, 'Failed to open file')
   }
 }
 
-function getTodos(store: Store): string {
-  return JSON.stringify(
-    {
-      filePath: store.filePath || null,
-      needsFileSelection: store.needsFileSelection,
-      currentFilter: store.currentFilter,
-      showCompleted: store.showCompleted,
-      stats: store.stats,
-      todos: store.todos.map((todo) => ({
-        id: todo.id,
-        text: todo.text,
-        completed: todo.completed,
-        priority: todo.priority,
-        dueDate: todo.dueDate,
-        createdDate: todo.createdDate,
-        completedDate: todo.completedDate,
-        raw: todo.raw,
-      })),
-    },
-    null,
-    2
-  )
+function getTodos(store: Store): McpToolHandlerResult {
+  return {
+    filePath: store.filePath || null,
+    needsFileSelection: store.needsFileSelection,
+    currentFilter: store.currentFilter,
+    showCompleted: store.showCompleted,
+    stats: store.stats,
+    todos: store.todos.map((todo) => ({
+      id: todo.id,
+      text: todo.text,
+      completed: todo.completed,
+      priority: todo.priority,
+      dueDate: todo.dueDate,
+      createdDate: todo.createdDate,
+      completedDate: todo.completedDate,
+      raw: todo.raw,
+    })),
+  }
 }
 
-function addTodo(store: Store, args: Record<string, unknown>): string {
+function addTodo(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -128,7 +91,10 @@ function addTodo(store: Store, args: Record<string, unknown>): string {
   return getTodos(store)
 }
 
-function updateTodo(store: Store, args: Record<string, unknown>): string {
+function updateTodo(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -151,7 +117,10 @@ function updateTodo(store: Store, args: Record<string, unknown>): string {
   return getTodos(store)
 }
 
-function toggleTodo(store: Store, args: Record<string, unknown>): string {
+function toggleTodo(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -163,7 +132,10 @@ function toggleTodo(store: Store, args: Record<string, unknown>): string {
   return getTodos(store)
 }
 
-function deleteTodo(store: Store, args: Record<string, unknown>): string {
+function deleteTodo(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -175,7 +147,7 @@ function deleteTodo(store: Store, args: Record<string, unknown>): string {
   return getTodos(store)
 }
 
-function clearCompleted(store: Store): string {
+function clearCompleted(store: Store): McpToolHandlerResult {
   const fileError = requireFile(store)
   if (fileError) return fileError
 

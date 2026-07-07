@@ -1,7 +1,6 @@
 import {
-  getMcpToolsFromPackage,
-  mcpToolsToOpenAiDefinitions,
-  registerPluginMcp,
+  createPluginMcpApi,
+  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import { getSidebarItems } from './lib/anniversary'
@@ -10,38 +9,12 @@ import type { Store } from './store'
 import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
-  const toolDefinitions = mcpToolsToOpenAiDefinitions(
-    getMcpToolsFromPackage(pkg)
-  )
-
-  return registerPluginMcp({
-    callTool: (name, args) => executeTool(getStore(), name, args),
-    createAgentTools: () =>
-      toolDefinitions.map((definition) => ({
-        definition,
-        execute: (args) =>
-          executeTool(getStore(), definition.function.name, args),
-      })),
+  return createPluginMcpApi(getStore, pkg, {
+    get_anniversaries: (store) => getAnniversaries(store),
+    add_anniversary: addAnniversary,
+    update_anniversary: updateAnniversary,
+    delete_anniversary: deleteAnniversary,
   })
-}
-
-function executeTool(
-  store: Store,
-  name: string,
-  args: Record<string, unknown>
-): string {
-  switch (name) {
-    case 'get_anniversaries':
-      return getAnniversaries(store)
-    case 'add_anniversary':
-      return addAnniversary(store, args)
-    case 'update_anniversary':
-      return updateAnniversary(store, args)
-    case 'delete_anniversary':
-      return deleteAnniversary(store, args)
-    default:
-      return `Error: Unknown tool "${name}"`
-  }
 }
 
 function serializeAnniversary(
@@ -50,25 +23,25 @@ function serializeAnniversary(
     string,
     { nextDate: string; daysUntil: number; daysSince?: number }
   >
-): Record<string, unknown> {
+) {
   const sidebarItem = sidebarById.get(anniversary.id)
 
   return {
     id: anniversary.id,
     title: anniversary.title,
     isLunar: anniversary.isLunar,
-    month: anniversary.month,
-    day: anniversary.day,
-    lunarMonth: anniversary.lunarMonth,
-    lunarDay: anniversary.lunarDay,
-    startYear: anniversary.startYear,
-    nextDate: sidebarItem?.nextDate,
-    daysUntil: sidebarItem?.daysUntil,
-    daysSince: sidebarItem?.daysSince,
+    month: anniversary.month ?? null,
+    day: anniversary.day ?? null,
+    lunarMonth: anniversary.lunarMonth ?? null,
+    lunarDay: anniversary.lunarDay ?? null,
+    startYear: anniversary.startYear ?? null,
+    nextDate: sidebarItem?.nextDate ?? null,
+    daysUntil: sidebarItem?.daysUntil ?? null,
+    daysSince: sidebarItem?.daysSince ?? null,
   }
 }
 
-function getAnniversaries(store: Store): string {
+function getAnniversaries(store: Store): McpToolHandlerResult {
   const sidebarById = new Map(
     getSidebarItems(store.anniversaries, false, 'en-US')
       .filter((item) => item.anniversaryId)
@@ -82,17 +55,13 @@ function getAnniversaries(store: Store): string {
       ])
   )
 
-  return JSON.stringify(
-    {
-      selectedDate: store.selectedDate,
-      showHolidays: store.showHolidays,
-      anniversaries: store.anniversaries.map((anniversary) =>
-        serializeAnniversary(anniversary, sidebarById)
-      ),
-    },
-    null,
-    2
-  )
+  return {
+    selectedDate: store.selectedDate,
+    showHolidays: store.showHolidays,
+    anniversaries: store.anniversaries.map((anniversary) =>
+      serializeAnniversary(anniversary, sidebarById)
+    ),
+  }
 }
 
 function requireAnniversary(store: Store, id: string) {
@@ -167,7 +136,10 @@ function parseStartYear(
   return existing?.startYear
 }
 
-function addAnniversary(store: Store, args: Record<string, unknown>): string {
+function addAnniversary(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
   const data = parseAnniversaryData(args)
   if (typeof data === 'string') return data
 
@@ -178,7 +150,7 @@ function addAnniversary(store: Store, args: Record<string, unknown>): string {
 function updateAnniversary(
   store: Store,
   args: Record<string, unknown>
-): string {
+): McpToolHandlerResult {
   const id = args.id as string
   const existing = requireAnniversary(store, id)
   if (typeof existing === 'string') return existing
@@ -193,7 +165,7 @@ function updateAnniversary(
 function deleteAnniversary(
   store: Store,
   args: Record<string, unknown>
-): string {
+): McpToolHandlerResult {
   const id = args.id as string
   const existing = requireAnniversary(store, id)
   if (typeof existing === 'string') return existing

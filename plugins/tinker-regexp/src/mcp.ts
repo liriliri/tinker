@@ -1,25 +1,18 @@
 import {
-  getMcpToolsFromPackage,
-  mcpToolsToOpenAiDefinitions,
-  registerPluginMcp,
+  createPluginMcpApi,
+  truncateMcpArg,
+  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Store } from './store'
 import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
-  const toolDefinitions = mcpToolsToOpenAiDefinitions(
-    getMcpToolsFromPackage(pkg)
-  )
-
-  return registerPluginMcp({
-    callTool: (name, args) => executeTool(getStore(), name, args),
-    createAgentTools: () =>
-      toolDefinitions.map((definition) => ({
-        definition,
-        execute: (args) =>
-          executeTool(getStore(), definition.function.name, args),
-      })),
+  return createPluginMcpApi(getStore, pkg, {
+    get_regexp: (store) => getRegexp(store),
+    set_regexp: setRegexp,
+    get_test_text: (store) => getTestText(store),
+    set_test_text: setTestText,
   })
 }
 
@@ -32,64 +25,46 @@ export function getToolArgSummary(
       const pattern = typeof args.pattern === 'string' ? args.pattern : ''
       const flags = typeof args.flags === 'string' ? args.flags : ''
       const summary = flags ? `/${pattern}/${flags}` : pattern
-      return summary.length > 60 ? `${summary.slice(0, 60)}…` : summary
+      return truncateMcpArg(summary)
     }
     case 'set_test_text': {
       const text = typeof args.text === 'string' ? args.text : ''
-      return text.length > 60 ? `${text.slice(0, 60)}…` : text
+      return truncateMcpArg(text)
     }
     default:
       return ''
   }
 }
 
-function executeTool(
-  store: Store,
-  name: string,
-  args: Record<string, unknown>
-): string {
-  switch (name) {
-    case 'get_regexp':
-      return getRegexp(store)
-    case 'set_regexp':
-      return setRegexp(store, args)
-    case 'get_test_text':
-      return getTestText(store)
-    case 'set_test_text':
-      return setTestText(store, args)
-    default:
-      return `Error: Unknown tool "${name}"`
+function getRegexp(store: Store): McpToolHandlerResult {
+  return {
+    pattern: store.pattern,
+    flags: store.flags,
+    error: store.error,
+    matchCount: store.matches.length,
   }
 }
 
-function getRegexp(store: Store): string {
-  return JSON.stringify(
-    {
-      pattern: store.pattern,
-      flags: store.flags,
-      error: store.error,
-      matchCount: store.matches.length,
-    },
-    null,
-    2
-  )
-}
-
-function setRegexp(store: Store, args: Record<string, unknown>): string {
-  const pattern = typeof args.pattern === 'string' ? args.pattern : ''
-  store.setPattern(pattern)
-  if (typeof args.flags === 'string') {
-    store.setFlags(args.flags)
+function setRegexp(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
+  store.setPattern(args.pattern as string)
+  if (args.flags !== undefined) {
+    store.setFlags(args.flags as string)
   }
   return getRegexp(store)
 }
 
-function getTestText(store: Store): string {
+function getTestText(store: Store): McpToolHandlerResult {
   return store.testText
 }
 
-function setTestText(store: Store, args: Record<string, unknown>): string {
-  const text = typeof args.text === 'string' ? args.text : ''
+function setTestText(
+  store: Store,
+  args: Record<string, unknown>
+): McpToolHandlerResult {
+  const text = args.text as string
   store.setTestText(text)
   return `Test text updated (${text.length} characters).`
 }

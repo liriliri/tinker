@@ -16,13 +16,16 @@ import {
   getFormatExtension,
 } from './lib/compress'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
+import { createMcpApi } from './mcp'
 
 const STORAGE_QUALITY = 'quality'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_KEEP_EXIF = 'keepExif'
 const storage = new LocalStore('tinker-image-compressor')
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   images: ImageItem[] = []
 
   quality: number = 80
@@ -234,7 +237,7 @@ class Store extends BaseStore {
     }
   }
 
-  async saveAll() {
+  async saveAll(outputDirectory?: string) {
     const compressedImages = this.images.filter((img) => img.compressedBlob)
     if (isEmpty(compressedImages)) return
 
@@ -259,19 +262,23 @@ class Store extends BaseStore {
         image.isSaved = true
       }
     } else {
-      const result = await tinker.showOpenDialog({
-        properties: ['openDirectory'],
-      })
+      let directory = outputDirectory
 
-      if (
-        result.canceled ||
-        !result.filePaths ||
-        result.filePaths.length === 0
-      ) {
-        return
+      if (!directory) {
+        const result = await tinker.showOpenDialog({
+          properties: ['openDirectory'],
+        })
+
+        if (
+          result.canceled ||
+          !result.filePaths ||
+          result.filePaths.length === 0
+        ) {
+          return
+        }
+
+        directory = result.filePaths[0]
       }
-
-      const directory = result.filePaths[0]
 
       for (const image of compressedImages) {
         if (!image.compressedBlob) continue

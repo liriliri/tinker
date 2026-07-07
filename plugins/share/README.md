@@ -185,28 +185,23 @@ Plugin-specific pieces stay in the plugin: `systemPrompt`, `AgentTool` execute h
 ```ts
 import pkg from '../../package.json'
 import {
-  getMcpToolsFromPackage,
-  mcpToolsToOpenAiDefinitions,
+  createPluginMcpApi,
+  formatMcpError,
+  truncateMcpArg,
   type PluginMcp,
 } from 'share/lib/mcp'
 
-const toolDefinitions = mcpToolsToOpenAiDefinitions(getMcpToolsFromPackage(pkg))
-```
-
-Plugins that expose MCP tools to the host (external AI assistants calling via main `executeJavaScript`) should call `registerPluginMcp` from `createMcpApi` (typically via `readonly mcp = createMcpApi(() => this)` on the store):
-
-```ts
-import { registerPluginMcp, type PluginMcp } from 'share/lib/mcp'
-
 export function createMcpApi(getStore: () => Store): PluginMcp {
-  return registerPluginMcp({
-    callTool: (name, args) => executeTool(getStore(), name, args),
-    createAgentTools: () => /* ... */,
+  return createPluginMcpApi(getStore, pkg, {
+    my_tool: myTool,
+    get_state: (store) => getState(store),
   })
 }
 ```
 
-`PluginMcpBridge`, `registerPluginMcp`, and the global `window.mcp` type live in `share/lib/mcp.ts`. Main reads tool schemas from each plugin's `package.json`; the renderer bridge only exposes `callTool`.
+Plugins that expose MCP tools to the host (external AI assistants calling via main `executeJavaScript`) should wire `createMcpApi` on the store (typically `readonly mcp = createMcpApi(() => this)`). `createPluginMcpApi` reads tool schemas from `package.json`, dispatches handlers by name, registers `window.mcp.callTool`, and builds agent tools. Handlers that only need the store can use `(store) => handler(store)`; handlers that read args pass `(store, args) => ...` or reference the function directly when the signature already matches.
+
+`PluginMcpBridge`, `createPluginMcpApi`, `registerPluginMcp`, `formatMcpToolResult`, and the global `window.mcp` type live in `share/lib/mcp.ts`. Tool handlers may return a plain object; `registerPluginMcp` serializes non-string results via `formatMcpToolResult`. Main reads tool schemas from each plugin's `package.json`; the renderer bridge only exposes `callTool`.
 
 Use `createToolMessageHelpers` only when you need a custom `getVisibleToolMessages` whitelist. Add `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, and `syntaxhighlighter` vendor scripts plus `overlayscrollbars.scss` and `resizablepanels.scss` in `index.scss`. Reference: `tinker-regexp`, `tinker-json-editor`.
 

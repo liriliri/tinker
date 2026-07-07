@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import { openImageFile } from 'share/lib/util'
+import { createMcpApi } from './mcp'
 
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const storage = new LocalStore('tinker-image-cropper')
@@ -20,7 +21,9 @@ interface HistoryState {
   timestamp: number
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   image: ImageInfo | null = null
   isLoading: boolean = false
 
@@ -169,7 +172,7 @@ class Store extends BaseStore {
     this.isSaved = false
   }
 
-  async saveImage() {
+  async saveImage(outputPath?: string) {
     if (!this.image) return
 
     try {
@@ -177,6 +180,8 @@ class Store extends BaseStore {
 
       if (this.overwriteOriginal && this.image.filePath) {
         savePath = this.image.filePath
+      } else if (outputPath) {
+        savePath = outputPath
       } else {
         const result = await tinker.showSaveDialog({
           defaultPath: this.image.fileName.replace(/\.[^.]+$/, '-cropped$&'),

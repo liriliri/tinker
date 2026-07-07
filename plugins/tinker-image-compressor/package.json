@@ -16,6 +16,51 @@
         "name": "图片压缩",
         "description": "批量图片压缩，支持 PNG、JPG 和 WebP"
       }
+    },
+    "mcp": {
+      "tools": {
+        "compress_images": {
+          "description": "Compress one or more images end to end: clear the list, load files, apply settings, compress, and save. Internally follows the same steps as the plugin UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Absolute paths to PNG, JPG, JPEG, or WebP images"
+              },
+              "quality": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Compression quality from 1 to 100. Defaults to the current UI setting."
+              },
+              "keepExif": {
+                "type": "boolean",
+                "description": "Preserve EXIF metadata. Defaults to the current UI setting."
+              },
+              "overwriteOriginal": {
+                "type": "boolean",
+                "description": "When true, save overwrites original files. When false, outputDirectory is required."
+              },
+              "outputDirectory": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save compressed images when overwriteOriginal is false."
+              },
+              "save": {
+                "type": "boolean",
+                "description": "Whether to save after compression. Defaults to true."
+              }
+            },
+            "required": ["paths"]
+          }
+        }
+      }
     }
   },
   "devDependencies": {

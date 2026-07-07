@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Call Tinker plugin MCP tools from the CLI or wire plugins into MCP clients. Covers listing tool schemas, one-shot tool invocation with tinker call, and stdio MCP servers with tinker mcp. Use when the user asks to call a plugin tool, automate a plugin programmatically, integrate a Tinker plugin with Cursor or Claude Code via MCP, use tinker tools, tinker call, or tinker mcp, or work with plugins marked [mcp] in tinker list.
+description: Call Tinker plugin MCP tools from the CLI or wire plugins into MCP clients. Covers listing tool schemas, one-shot tool invocation with tinker call, and stdio MCP servers with tinker mcp. When a plugin has no MCP tools, fall back to the debug skill (tinker open + agent-browser UI automation). Use when the user asks to call a plugin tool, automate a plugin programmatically, integrate a Tinker plugin with Cursor or Claude Code via MCP, use tinker tools, tinker call, or tinker mcp, or work with plugins marked [mcp] in tinker list.
 allowed-tools: Bash(tinker:*)
 ---
 
@@ -9,6 +9,8 @@ allowed-tools: Bash(tinker:*)
 Tinker plugins can expose [Model Context Protocol](https://modelcontextprotocol.io) tools in their `package.json` under `tinker.mcp.tools`. The CLI bridges agents to those tools in two ways: **direct calls** (`tinker call`) and **stdio MCP servers** (`tinker mcp`).
 
 Plugins with MCP support are tagged `[mcp]` in `tinker list`. The plugin **must be running** before any tool call. Open it first with `tinker open <plugin>`.
+
+Plugins **without** `[mcp]` have no `tinker tools` / `tinker call` API. To automate them anyway, load the **debug** skill and drive the plugin UI with `agent-browser` after `tinker open` (see [When MCP is not available](#when-mcp-is-not-available)).
 
 ## The MCP loop
 
@@ -128,6 +130,39 @@ tinker tools <plugin>
 tinker call <plugin> --tool <name> --args '{}'
 ```
 
+## When MCP is not available
+
+Not every plugin defines `tinker.mcp.tools`. If `tinker list` shows no `[mcp]` tag, or `tinker tools <plugin>` / `tinker call` returns **does not support MCP**, MCP commands cannot automate that plugin. Use the **debug** skill instead:
+
+```bash
+tinker skills path debug    # load full debug skill, then read SKILL.md
+```
+
+The debug workflow opens the plugin and controls it through the Electron renderer via Chrome DevTools Protocol:
+
+```bash
+tinker open <plugin> --remote-debugging-port=9222   # if CDP is not already enabled
+tinker open <plugin>
+
+agent-browser connect 9222
+agent-browser tab
+# switch to the plugin://tinker-<name>/index.html tab (not the localhost shell tab)
+agent-browser tab t2
+agent-browser snapshot -i
+# click, fill, screenshot, etc. — see the agent-browser skill
+```
+
+**When to prefer each approach:**
+
+| Situation | Approach |
+|-----------|----------|
+| Plugin tagged `[mcp]` in `tinker list` | MCP: `tinker tools`, `tinker call`, or `tinker mcp` |
+| No `[mcp]` tag or "does not support MCP" | Debug: `tinker open` + `agent-browser` on the `plugin://` tab |
+| Need stable, schema-defined automation | Add MCP tools to the plugin, or use an `[mcp]` plugin |
+| One-off interaction with any running plugin UI | Debug skill |
+
+Load the debug skill before driving the UI; it covers tab selection (`plugin://` vs the outer shell), CDP connection recovery, and interaction commands.
+
 ## Command reference
 
 | Command | Description |
@@ -149,7 +184,7 @@ Supporting lifecycle commands (from the core skill):
 
 **`Plugin is not running. Please start it first: tinker open <name>`** — Run `tinker open <plugin>` before `call` or before the MCP client invokes tools.
 
-**`<name> does not support MCP`** — The plugin has no `tinker.mcp` tools. Run `tinker list` and choose a `[mcp]` plugin, or automate via the UI instead.
+**`<name> does not support MCP`** — The plugin has no `tinker.mcp` tools. Either pick a `[mcp]` plugin from `tinker list`, or load the **debug** skill and automate via `tinker open` + `agent-browser` (see [When MCP is not available](#when-mcp-is-not-available)).
 
 **`Unknown tool "..."`** — Run `tinker tools <plugin>` for valid tool names.
 
