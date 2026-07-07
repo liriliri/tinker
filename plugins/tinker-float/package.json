@@ -1,18 +1,20 @@
 {
   "name": "tinker-float",
   "version": "0.1.0",
-  "description": "Float window for displaying webpages, images, videos and text",
+  "description": "Float Plugin for TINKER",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Float",
+    "description": "Always-on-top float window for webpages, images, videos, and text",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {
       "zh-CN": {
-        "name": "悬浮"
+        "name": "悬浮",
+        "description": "置顶悬浮窗口，用于展示网页、图片、视频和文本"
       }
     }
   }
