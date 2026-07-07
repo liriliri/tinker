@@ -1,8 +1,4 @@
-import {
-  createPluginMcpApi,
-  type McpToolHandlerResult,
-  type PluginMcp,
-} from 'share/lib/mcp'
+import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
 import { getSidebarItems } from './lib/anniversary'
 import type { Anniversary } from './types'
 import type { Store } from './store'
@@ -41,7 +37,7 @@ function serializeAnniversary(
   }
 }
 
-function getAnniversaries(store: Store): McpToolHandlerResult {
+function getAnniversaries(store: Store) {
   const sidebarById = new Map(
     getSidebarItems(store.anniversaries, false, 'en-US')
       .filter((item) => item.anniversaryId)
@@ -136,10 +132,7 @@ function parseStartYear(
   return existing?.startYear
 }
 
-function addAnniversary(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function addAnniversary(store: Store, args: Record<string, unknown>) {
   const data = parseAnniversaryData(args)
   if (typeof data === 'string') return data
 
@@ -147,10 +140,7 @@ function addAnniversary(
   return getAnniversaries(store)
 }
 
-function updateAnniversary(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function updateAnniversary(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
   const existing = requireAnniversary(store, id)
   if (typeof existing === 'string') return existing
@@ -162,10 +152,7 @@ function updateAnniversary(
   return getAnniversaries(store)
 }
 
-function deleteAnniversary(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function deleteAnniversary(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
   const existing = requireAnniversary(store, id)
   if (typeof existing === 'string') return existing

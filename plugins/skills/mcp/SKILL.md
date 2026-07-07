@@ -14,24 +14,24 @@ Implement and review MCP tools for Tinker plugins. Tool schemas live in `package
 
 ## References
 
-| Plugin | Pattern |
-|--------|---------|
-| `share/lib/mcp.ts` | `registerPluginMcp`, `formatMcpToolResult`, types |
-| `tinker-image-compressor` | Single end-to-end tool (`compress_images`) |
-| `tinker-image-cropper` | Multi-step workflow: `open_image` → edit → `save_image` |
-| `tinker-todo` / `tinker-anniversary` | CRUD-style multi-tool |
-| `tinker-json-editor` / `tinker-regexp` | Read/write editor tools |
-| `src/skills/mcp/SKILL.md` | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
+| Plugin                                 | Pattern                                                   |
+| -------------------------------------- | --------------------------------------------------------- |
+| `share/lib/mcp.ts`                     | `registerPluginMcp`, `formatMcpToolResult`, types         |
+| `tinker-image-compressor`              | Single end-to-end tool (`compress_images`)                |
+| `tinker-image-cropper`                 | Multi-step workflow: `open_image` → edit → `save_image`   |
+| `tinker-todo` / `tinker-anniversary`   | CRUD-style multi-tool                                     |
+| `tinker-json-editor` / `tinker-regexp` | Read/write editor tools                                   |
+| `src/skills/mcp/SKILL.md`              | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
 
 ## Tool design
 
 Pick granularity by plugin shape — not by toolbar button count.
 
-| Pattern | When | Example tools |
-|---------|------|---------------|
-| **End-to-end** | Batch operation with no required intermediate inspection | `compress_images` |
-| **Workflow stages** | Agent must read state before the next step | `open_image`, `get_image`, `crop_image`, `resize_image`, `save_image` |
-| **CRUD / editor** | Natural read/write/update/delete model | `get_todos`, `add_todo`, `get_json`, `set_json` |
+| Pattern             | When                                                     | Example tools                                                         |
+| ------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| **End-to-end**      | Batch operation with no required intermediate inspection | `compress_images`                                                     |
+| **Workflow stages** | Agent must read state before the next step               | `open_image`, `get_image`, `crop_image`, `resize_image`, `save_image` |
+| **CRUD / editor**   | Natural read/write/update/delete model                   | `get_todos`, `add_todo`, `get_json`, `set_json`                       |
 
 **Do** split by workflow stage when the agent needs dimensions, file state, or confirmation between steps.
 
@@ -58,7 +58,6 @@ Cross-field rules the schema cannot express (e.g. `outputPath` required when `ov
 import {
   createPluginMcpApi,
   formatMcpError,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Store } from './store'
@@ -70,10 +69,7 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-async function myTool(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function myTool(store: Store, args: Record<string, unknown>) {
   try {
     return { ok: true }
   } catch (error) {
@@ -100,14 +96,14 @@ Canvas/ffmpeg logic that only exists in UI event handlers may live in `mcp.ts` w
 
 ### 4. Handler rules
 
-| Do | Don't |
-|----|-------|
-| Return `string` for errors (`Error: ...`) | `JSON.stringify` in plugin — `registerPluginMcp` handles it |
-| Return plain objects for structured success | `Promise<McpToolHandlerResult>` on handler map values |
-| Use `Promise<McpToolHandlerResult>` on async handlers | Cast `Record<string, unknown>` to a typed args interface |
-| Extract args with per-field casts + store defaults | One monolithic tool when stages need intermediate reads |
+| Do                                                 | Don't                                                       |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| Return `string` for errors (`Error: ...`)          | `JSON.stringify` in plugin — `registerPluginMcp` handles it |
+| Return plain objects for structured success        | Redundant return-type annotations on handlers               |
+| Use async handlers when needed                     | Cast `Record<string, unknown>` to a typed args interface    |
+| Extract args with per-field casts + store defaults | One monolithic tool when stages need intermediate reads     |
 
-Shared state helpers (e.g. `serializeImage`) should return `Record<string, McpJsonValue>` so results can be spread into tool responses without TS errors.
+Shared state helpers (e.g. `serializeImage`) may return plain objects for spreading into tool responses.
 
 Extract args example:
 
@@ -150,7 +146,7 @@ Read `<plugin-name>/package.json`, `src/mcp.ts`, and `src/store.ts`. Report viol
 
 **Handlers** — existing store methods; no `JSON.stringify`; no redundant schema validation; runtime checks for file existence and conditional required paths.
 
-**Types** — `Promise<McpToolHandlerResult>` on async handlers; no full-args interface cast; serialize helpers typed for spread (`Record<string, McpJsonValue>`).
+**Types** — no full-args interface cast on handler `args`.
 
 **Design** — granularity matches plugin shape (end-to-end / workflow stages / CRUD); not one tool per toolbar button; store changes minimal.
 
@@ -172,11 +168,11 @@ Automate plugin?
 
 ## Common fixes
 
-| Violation | Fix |
-|-----------|-----|
-| Manual `JSON.stringify` | Return object; `registerPluginMcp` serializes |
+| Violation                                  | Fix                                                                           |
+| ------------------------------------------ | ----------------------------------------------------------------------------- |
+| Manual `JSON.stringify`                    | Return object; `registerPluginMcp` serializes                                 |
 | `executeTool`: `string \| Promise<string>` | Handlers return object or `Error: ...` string; `registerPluginMcp` serializes |
-| Spread error on serialize helper | Return `Record<string, McpJsonValue>` |
-| `args as FooArgs` on full args object | Per-field casts: `args.path as string` |
-| Toolbar button as MCP tool | Merge into workflow stage or skip |
-| Headless save blocked by dialog | Add optional path arg to existing `save*` method |
+| Spread error on serialize helper           | Return a plain object from the helper                                         |
+| `args as FooArgs` on full args object      | Per-field casts: `args.path as string`                                        |
+| Toolbar button as MCP tool                 | Merge into workflow stage or skip                                             |
+| Headless save blocked by dialog            | Add optional path arg to existing `save*` method                              |

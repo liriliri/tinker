@@ -6,6 +6,7 @@ import isStrBlank from 'licia/isStrBlank'
 import stripHtmlTag from 'licia/stripHtmlTag'
 import BaseStore from 'share/store/Base'
 import { getAllStickies, putSticky, removeSticky } from './lib/db'
+import { createMcpApi } from './mcp'
 
 export interface Sticky {
   id: string
@@ -24,7 +25,9 @@ export const STICKY_COLORS = [
   '#fed7aa', // orange
 ]
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   stickies: Sticky[] = []
   searchQuery: string = ''
   editingId: string = ''

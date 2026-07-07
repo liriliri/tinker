@@ -1,7 +1,6 @@
 import {
   createPluginMcpApi,
   formatMcpError,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Priority, Store } from './store'
@@ -35,7 +34,7 @@ function requireTodo(store: Store, id: string) {
   return todo
 }
 
-function getTodoFile(store: Store): McpToolHandlerResult {
+function getTodoFile(store: Store) {
   return {
     filePath: store.filePath || null,
     needsFileSelection: store.needsFileSelection,
@@ -43,10 +42,7 @@ function getTodoFile(store: Store): McpToolHandlerResult {
   }
 }
 
-async function openTodoFile(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function openTodoFile(store: Store, args: Record<string, unknown>) {
   try {
     await store.setFilePath(args.path as string)
     return getTodoFile(store)
@@ -58,7 +54,7 @@ async function openTodoFile(
   }
 }
 
-function getTodos(store: Store): McpToolHandlerResult {
+function getTodos(store: Store) {
   return {
     filePath: store.filePath || null,
     needsFileSelection: store.needsFileSelection,
@@ -78,10 +74,7 @@ function getTodos(store: Store): McpToolHandlerResult {
   }
 }
 
-function addTodo(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function addTodo(store: Store, args: Record<string, unknown>) {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -91,10 +84,7 @@ function addTodo(
   return getTodos(store)
 }
 
-function updateTodo(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function updateTodo(store: Store, args: Record<string, unknown>) {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -117,10 +107,7 @@ function updateTodo(
   return getTodos(store)
 }
 
-function toggleTodo(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function toggleTodo(store: Store, args: Record<string, unknown>) {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -132,10 +119,7 @@ function toggleTodo(
   return getTodos(store)
 }
 
-function deleteTodo(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function deleteTodo(store: Store, args: Record<string, unknown>) {
   const fileError = requireFile(store)
   if (fileError) return fileError
 
@@ -147,7 +131,7 @@ function deleteTodo(
   return getTodos(store)
 }
 
-function clearCompleted(store: Store): McpToolHandlerResult {
+function clearCompleted(store: Store) {
   const fileError = requireFile(store)
   if (fileError) return fileError
 

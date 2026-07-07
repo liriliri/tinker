@@ -16,6 +16,72 @@
         "name": "便签",
         "description": "彩色便签，随手记录想法和提醒"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get_stickies": {
+          "description": "Get all sticky notes with id, HTML content, color, and timestamps. Optionally filter by plain-text search.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "search": {
+                "type": "string",
+                "description": "Optional search query to filter stickies by plain-text content"
+              }
+            }
+          }
+        },
+        "add_sticky": {
+          "description": "Create a new sticky note.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "Optional HTML content for the sticky"
+              },
+              "color": {
+                "type": "string",
+                "description": "Optional background color hex (e.g. #fef08a). Defaults to yellow."
+              }
+            }
+          }
+        },
+        "update_sticky": {
+          "description": "Update an existing sticky note's content and/or color by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Sticky id"
+              },
+              "content": {
+                "type": "string",
+                "description": "New HTML content"
+              },
+              "color": {
+                "type": "string",
+                "description": "New background color hex"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete_sticky": {
+          "description": "Delete a sticky note by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Sticky id"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      }
     }
   }
 }

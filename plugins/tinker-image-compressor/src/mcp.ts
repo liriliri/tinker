@@ -2,7 +2,6 @@ import splitPath from 'licia/splitPath'
 import {
   createPluginMcpApi,
   formatMcpError,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import { fileExists } from 'share/lib/util'
@@ -16,10 +15,7 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-async function compressImages(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function compressImages(store: Store, args: Record<string, unknown>) {
   const paths = args.paths as string[]
   const quality = (args.quality as number | undefined) ?? store.quality
   const keepExif = (args.keepExif as boolean | undefined) ?? store.keepExif

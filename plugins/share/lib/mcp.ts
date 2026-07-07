@@ -63,11 +63,7 @@ export type McpJsonValue =
   | McpJsonValue[]
   | { [key: string]: McpJsonValue }
 
-export type McpToolHandlerResult = string | McpJsonValue
-
-export type McpToolHandlerReturn =
-  | McpToolHandlerResult
-  | Promise<McpToolHandlerResult>
+export type McpToolHandlerReturn = unknown | Promise<unknown>
 
 export type McpToolHandlerFn<TStore> = (
   store: TStore,

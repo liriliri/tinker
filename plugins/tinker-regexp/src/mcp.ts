@@ -1,7 +1,6 @@
 import {
   createPluginMcpApi,
   truncateMcpArg,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Store } from './store'
@@ -36,7 +35,7 @@ export function getToolArgSummary(
   }
 }
 
-function getRegexp(store: Store): McpToolHandlerResult {
+function getRegexp(store: Store) {
   return {
     pattern: store.pattern,
     flags: store.flags,
@@ -45,10 +44,7 @@ function getRegexp(store: Store): McpToolHandlerResult {
   }
 }
 
-function setRegexp(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function setRegexp(store: Store, args: Record<string, unknown>) {
   store.setPattern(args.pattern as string)
   if (args.flags !== undefined) {
     store.setFlags(args.flags as string)
@@ -56,14 +52,11 @@ function setRegexp(
   return getRegexp(store)
 }
 
-function getTestText(store: Store): McpToolHandlerResult {
+function getTestText(store: Store) {
   return store.testText
 }
 
-function setTestText(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function setTestText(store: Store, args: Record<string, unknown>) {
   const text = args.text as string
   store.setTestText(text)
   return `Test text updated (${text.length} characters).`

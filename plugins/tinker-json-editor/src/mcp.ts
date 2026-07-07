@@ -1,7 +1,6 @@
 import {
   createPluginMcpApi,
   truncateMcpArg,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import type { Store } from './store'
@@ -30,7 +29,7 @@ export function getToolArgSummary(
   }
 }
 
-function getJson(store: Store): McpToolHandlerResult {
+function getJson(store: Store) {
   return {
     content: store.jsonInput,
     error: store.jsonError,
@@ -41,15 +40,12 @@ function getJson(store: Store): McpToolHandlerResult {
   }
 }
 
-function setJson(
-  store: Store,
-  args: Record<string, unknown>
-): McpToolHandlerResult {
+function setJson(store: Store, args: Record<string, unknown>) {
   store.setJsonInput(args.content as string)
   return getJson(store)
 }
 
-function formatJson(store: Store): McpToolHandlerResult {
+function formatJson(store: Store) {
   if (store.isEmpty) {
     return 'Error: Editor is empty.'
   }
@@ -62,7 +58,7 @@ function formatJson(store: Store): McpToolHandlerResult {
   }
 }
 
-function minifyJson(store: Store): McpToolHandlerResult {
+function minifyJson(store: Store) {
   if (store.isEmpty) {
     return 'Error: Editor is empty.'
   }

@@ -3,7 +3,6 @@ import {
   createPluginMcpApi,
   formatMcpError,
   type McpJsonValue,
-  type McpToolHandlerResult,
   type PluginMcp,
 } from 'share/lib/mcp'
 import { fileExists } from 'share/lib/util'
@@ -62,10 +61,7 @@ function requireImage(store: Store): string | null {
   return null
 }
 
-async function openImage(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function openImage(store: Store, args: Record<string, unknown>) {
   const path = args.path as string
 
   if (!(await fileExists(path))) {
@@ -83,7 +79,7 @@ async function openImage(
   }
 }
 
-function getImage(store: Store): McpToolHandlerResult {
+function getImage(store: Store) {
   return serializeImage(store)
 }
 
@@ -174,10 +170,7 @@ function applyCanvasResult(
   store.setCropBoxSize(result.width, result.height)
 }
 
-async function cropImage(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function cropImage(store: Store, args: Record<string, unknown>) {
   const imageError = requireImage(store)
   if (imageError) return imageError
 
@@ -219,10 +212,7 @@ async function cropImage(
   }
 }
 
-async function resizeImage(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function resizeImage(store: Store, args: Record<string, unknown>) {
   const imageError = requireImage(store)
   if (imageError) return imageError
 
@@ -267,10 +257,7 @@ async function resizeImage(
   }
 }
 
-async function saveImage(
-  store: Store,
-  args: Record<string, unknown>
-): Promise<McpToolHandlerResult> {
+async function saveImage(store: Store, args: Record<string, unknown>) {
   const imageError = requireImage(store)
   if (imageError) return imageError
 
