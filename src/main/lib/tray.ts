@@ -173,7 +173,7 @@ function updateContextMenu() {
       label: t('restart'),
       click() {
         app.relaunch()
-        app.exit()
+        setTimeout(() => app.quit(), 100)
       },
     },
     {
