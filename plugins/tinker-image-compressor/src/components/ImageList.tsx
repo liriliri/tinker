@@ -6,6 +6,7 @@ import { tw } from 'share/theme'
 import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
 import { getCheckboardStyle } from '../lib/checkboard'
+import { getCompressionRatio } from '../lib/compress'
 import { MenuItemConstructorOptions } from 'electron'
 
 export default observer(function ImageList() {
@@ -56,7 +57,6 @@ export default observer(function ImageList() {
         }}
       >
         {store.images.map((image) => {
-          const ratio = (1 - image.compressedSize / image.originalSize) * 100
           const isLarger = image.compressedSize >= image.originalSize
           return (
             <div
@@ -109,7 +109,11 @@ export default observer(function ImageList() {
                         })}
                       >
                         {isLarger ? '+' : ''}
-                        {Math.abs(ratio).toFixed(1)}%
+                        {getCompressionRatio(
+                          image.originalSize,
+                          image.compressedSize
+                        )}
+                        %
                       </span>
                     </div>
                   ) : (

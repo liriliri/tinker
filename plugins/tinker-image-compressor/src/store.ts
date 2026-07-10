@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
-import clamp from 'licia/clamp'
 import each from 'licia/each'
 import isEmpty from 'licia/isEmpty'
 import sum from 'licia/sum'
@@ -12,13 +11,17 @@ import type { ImageItem } from './types'
 import BaseStore from 'share/store/Base'
 import {
   buildFfmpegArgs,
+  clampQuality,
   detectImageFormat,
+  getCompressionRatio,
   getFormatExtension,
+  PRESET_QUALITIES,
 } from './lib/compress'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 import { createMcpApi } from './mcp'
 
 const STORAGE_QUALITY = 'quality'
+const STORAGE_IS_CUSTOM_QUALITY = 'isCustomQuality'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_KEEP_EXIF = 'keepExif'
 const storage = new LocalStore('tinker-image-compressor')
@@ -29,6 +32,7 @@ export class Store extends BaseStore {
   images: ImageItem[] = []
 
   quality: number = 80
+  isCustomQuality: boolean = false
   overwriteOriginal: boolean = true
   keepExif: boolean = false
 
@@ -49,7 +53,14 @@ export class Store extends BaseStore {
   private loadQuality() {
     const savedQuality = storage.get(STORAGE_QUALITY)
     if (savedQuality !== null) {
-      this.quality = clamp(toNum(savedQuality), 1, 100)
+      this.quality = clampQuality(toNum(savedQuality))
+    }
+
+    const savedIsCustomQuality = storage.get(STORAGE_IS_CUSTOM_QUALITY)
+    if (savedIsCustomQuality !== null) {
+      this.isCustomQuality = savedIsCustomQuality === 'true'
+    } else {
+      this.isCustomQuality = !PRESET_QUALITIES.includes(this.quality)
     }
   }
 
@@ -72,9 +83,14 @@ export class Store extends BaseStore {
   }
 
   setQuality(quality: number) {
-    this.quality = quality
-    storage.set(STORAGE_QUALITY, String(quality))
+    this.quality = clampQuality(quality)
+    storage.set(STORAGE_QUALITY, String(this.quality))
     this.invalidateCompressedData()
+  }
+
+  setIsCustomQuality(isCustom: boolean) {
+    this.isCustomQuality = isCustom
+    storage.set(STORAGE_IS_CUSTOM_QUALITY, String(isCustom))
   }
 
   setOverwriteOriginal(overwrite: boolean) {
@@ -339,10 +355,6 @@ export class Store extends BaseStore {
     return this.images.length > 0
   }
 
-  get hasCompressed() {
-    return this.images.some((img) => img.compressedBlob !== null)
-  }
-
   get hasUncompressed() {
     return this.images.some((img) => img.compressedBlob === null)
   }
@@ -370,9 +382,7 @@ export class Store extends BaseStore {
 
   get totalCompressionRatio() {
     if (!this.totalOriginalSize || !this.totalCompressedSize) return 0
-    return Math.abs(
-      (1 - this.totalCompressedSize / this.totalOriginalSize) * 100
-    ).toFixed(1)
+    return getCompressionRatio(this.totalOriginalSize, this.totalCompressedSize)
   }
 }
 

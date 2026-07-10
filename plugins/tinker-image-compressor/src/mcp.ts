@@ -6,7 +6,7 @@ import {
 } from 'share/lib/mcp'
 import { fileExists } from 'share/lib/util'
 import type { Store } from './store'
-import { getFormatExtension } from './lib/compress'
+import { getFormatExtension, getCompressionRatio } from './lib/compress'
 import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
@@ -90,9 +90,7 @@ async function compressImages(store: Store, args: Record<string, unknown>) {
           compressedSize: image.compressedSize || null,
           compressionRatio:
             image.originalSize && image.compressedSize
-              ? Math.abs(
-                  (1 - image.compressedSize / image.originalSize) * 100
-                ).toFixed(1)
+              ? getCompressionRatio(image.originalSize, image.compressedSize)
               : null,
           isSaved: image.isSaved,
         }

@@ -1,4 +1,22 @@
+import clamp from 'licia/clamp'
 import type { ImageFormat } from '../types'
+
+export const MIN_QUALITY = 1
+export const MAX_QUALITY = 99
+
+export const QUALITY_PRESETS = [
+  { labelKey: 'qualityVeryLow', value: 20 },
+  { labelKey: 'qualityLow', value: 40 },
+  { labelKey: 'qualityMedium', value: 60 },
+  { labelKey: 'qualityHigh', value: 80 },
+  { labelKey: 'qualityExcellent', value: 95 },
+]
+
+export const PRESET_QUALITIES = QUALITY_PRESETS.map((preset) => preset.value)
+
+export function clampQuality(quality: number): number {
+  return clamp(quality, MIN_QUALITY, MAX_QUALITY)
+}
 
 interface FfmpegArgsOptions {
   filePath: string
@@ -26,6 +44,13 @@ export function getFormatExtension(format: ImageFormat): string {
   }
 }
 
+export function getCompressionRatio(
+  originalSize: number,
+  compressedSize: number
+): string {
+  return Math.abs((1 - compressedSize / originalSize) * 100).toFixed(1)
+}
+
 export function buildFfmpegArgs({
   filePath,
   outputPath,
@@ -48,9 +73,7 @@ export function buildFfmpegArgs({
       break
 
     case 'png':
-      // PNG: Use quantization for lossy compression (similar to pngquant/imagequant)
-      if (quality < 100) {
-        // Calculate color count based on quality (16 to 256 colors)
+      {
         const maxColors = Math.max(16, Math.round((quality / 100) * 256))
         args.push(
           '-vf',

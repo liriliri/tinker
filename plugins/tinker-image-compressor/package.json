@@ -36,8 +36,8 @@
               "quality": {
                 "type": "number",
                 "minimum": 1,
-                "maximum": 100,
-                "description": "Compression quality from 1 to 100. Defaults to the current UI setting."
+                "maximum": 99,
+                "description": "Compression quality from 1 to 99. Defaults to the current UI setting."
               },
               "keepExif": {
                 "type": "boolean",
@@ -57,7 +57,9 @@
                 "description": "Whether to save after compression. Defaults to true."
               }
             },
-            "required": ["paths"]
+            "required": [
+              "paths"
+            ]
           }
         }
       }

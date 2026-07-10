@@ -10,6 +10,7 @@
   "qualityMedium": "Medium",
   "qualityHigh": "High",
   "qualityExcellent": "Excellent",
+  "custom": "Custom",
   "compress": "Compress",
   "original": "Original",
   "compressed": "Compressed",
