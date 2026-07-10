@@ -1,16 +1,11 @@
 import fs from 'fs'
 import path from 'path'
-import { isDev } from 'share/common/util'
+import { resolveResources } from './util'
 
 interface SkillInfo {
   name: string
   description: string
   dir: string
-}
-
-function getSkillsDir(): string {
-  const relative = isDev() ? '../../src/skills' : '../skills'
-  return path.resolve(__dirname, relative)
 }
 
 function parseFrontmatter(
@@ -105,7 +100,7 @@ function truncateDescription(desc: string, maxLen: number): string {
 }
 
 function ensureSkillsDir(): string {
-  const skillsDir = getSkillsDir()
+  const skillsDir = resolveResources('skills')
   if (!fs.existsSync(skillsDir)) {
     console.error(`Error: Skills directory not found: ${skillsDir}`)
     process.exit(1)

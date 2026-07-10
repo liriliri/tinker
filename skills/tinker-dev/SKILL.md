@@ -15,7 +15,7 @@ Tinker must be running (or will be auto-launched by the CLI).
 
 ## CLI command convention
 
-Skills loaded from `src/skills` document commands as `tinker <subcommand>` for end users of the packaged app. **In this repo, always run the equivalent with `./bin/tinker-dev` instead of `tinker`.**
+Skills loaded from `resources/skills` document commands as `tinker <subcommand>` for end users of the packaged app. **In this repo, always run the equivalent with `./bin/tinker-dev` instead of `tinker`.**
 
 Examples:
 
@@ -37,7 +37,7 @@ This file is a discovery stub, not the usage guide. Before running `tinker-dev` 
 ./bin/tinker-dev skills path core    # print directory, then read SKILL.md inside it
 ```
 
-The CLI serves skill content from `src/skills` in development. Those files use `tinker` in examples; apply the [CLI command convention](#cli-command-convention) above when executing them.
+The CLI serves skill content from `resources/skills`. Those files use `tinker` in examples; apply the [CLI command convention](#cli-command-convention) above when executing them.
 
 ## Specialized skills
 

@@ -21,7 +21,7 @@ Implement and review MCP tools for Tinker plugins. Tool schemas live in `package
 | `tinker-image-cropper`                 | Multi-step workflow: `open_image` → edit → `save_image`   |
 | `tinker-todo` / `tinker-anniversary`   | CRUD-style multi-tool                                     |
 | `tinker-json-editor` / `tinker-regexp` | Read/write editor tools                                   |
-| `src/skills/mcp/SKILL.md`              | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
+| `resources/skills/mcp/SKILL.md`        | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
 
 ## Tool design
 

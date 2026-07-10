@@ -43,7 +43,6 @@ const config = {
     'preload',
     'renderer',
     'plugins',
-    'skills',
 
     '!node_modules/**/*.{map,ts,md,flow,yml,yaml,cs,gyp,gypi,h,c,html,Makefile}',
     '!node_modules/**/*LICENSE*',

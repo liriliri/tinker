@@ -5,10 +5,10 @@ description: Debug Tinker plugins with agent-browser. Use when the user needs to
 
 # Tinker Plugin Debug
 
-This skill has moved to `src/skills/debug`. Load the full content via the CLI:
+This skill has moved to `resources/skills/debug`. Load the full content via the CLI:
 
 ```bash
 ./bin/tinker-dev skills path debug    # print directory, then read SKILL.md inside it
 ```
 
-Skills in `src/skills` document commands as `tinker <subcommand>`. In this repo, run `./bin/tinker-dev` instead of `tinker`.
+Skills in `resources/skills` document commands as `tinker <subcommand>`. In this repo, run `./bin/tinker-dev` instead of `tinker`.
