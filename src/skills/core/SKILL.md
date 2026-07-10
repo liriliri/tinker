@@ -107,6 +107,7 @@ tinker ps
 
 ## When to load another skill
 
+- **Create a standalone plugin** (clone template, npm link, local dev): load the **create** skill.
 - **Plugin MCP tools** (`tools`, `call`, `mcp`, MCP client integration): load the **mcp** skill.
 
 ## Troubleshooting
