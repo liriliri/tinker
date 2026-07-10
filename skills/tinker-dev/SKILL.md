@@ -1,13 +1,15 @@
 ---
-name: tinker
-description: Tinker desktop toolbox CLI for AI agents. Use when the user needs to open a Tinker plugin, list installed plugins, control plugin windows from the command line, call plugin MCP tools, or integrate Tinker with an AI agent via MCP. Triggers include "open a Tinker plugin", "list tinker plugins", "tinker open", "call a plugin tool", "tinker MCP", "automate JSON editor", or any task requiring programmatic control of the Tinker Electron app and its plugins. Prefer tinker-dev CLI over guessing IPC or UI steps.
+name: tinker-dev
+description: Tinker development CLI for working in the tinker repo. Use when developing Tinker itself or its plugins and you need to open plugins, list installed plugins, control plugin windows, or call plugin MCP tools via `./bin/tinker-dev`. Do not use the packaged `tinker` CLI in this repo. Triggers include tasks in the tinker-utm repo requiring programmatic control of the dev Tinker app. Prefer `./bin/tinker-dev` over the global `tinker` skill or guessing IPC/UI steps.
 allowed-tools: Bash(./bin/tinker-dev:*)
 hidden: true
 ---
 
-# Tinker
+# Tinker Dev
 
 Desktop toolbox with an extensible plugin system. The `tinker-dev` CLI controls the running Tinker app over a local IPC socket: open plugins, list what is running, and invoke plugin MCP tools.
+
+This skill is for **development in the tinker repo**. The global `tinker` skill covers the packaged `tinker` CLI for end users.
 
 Tinker must be running (or will be auto-launched by the CLI).
 
