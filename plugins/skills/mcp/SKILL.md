@@ -98,7 +98,7 @@ Canvas/ffmpeg logic that only exists in UI event handlers may live in `mcp.ts` w
 
 | Do                                                 | Don't                                                       |
 | -------------------------------------------------- | ----------------------------------------------------------- |
-| Return `string` for errors (`Error: ...`)          | `JSON.stringify` in plugin — `registerPluginMcp` handles it |
+| Return `string` for errors (`Error: ...`)          | `JSON.stringify` in plugin — host `registerMcp` serializes |
 | Return plain objects for structured success        | Redundant return-type annotations on handlers               |
 | Use async handlers when needed                     | Cast `Record<string, unknown>` to a typed args interface    |
 | Extract args with per-field casts + store defaults | One monolithic tool when stages need intermediate reads     |
@@ -170,8 +170,8 @@ Automate plugin?
 
 | Violation                                  | Fix                                                                           |
 | ------------------------------------------ | ----------------------------------------------------------------------------- |
-| Manual `JSON.stringify`                    | Return object; `registerPluginMcp` serializes                                 |
-| `executeTool`: `string \| Promise<string>` | Handlers return object or `Error: ...` string; `registerPluginMcp` serializes |
+| Manual `JSON.stringify`                    | Return object; `tinker.registerMcp` serializes for the host bridge            |
+| `executeTool`: `string \| Promise<string>` | Handlers return object or `Error: ...` string; host serializes                |
 | Spread error on serialize helper           | Return a plain object from the helper                                         |
 | `args as FooArgs` on full args object      | Per-field casts: `args.path as string`                                        |
 | Toolbar button as MCP tool                 | Merge into workflow stage or skip                                             |

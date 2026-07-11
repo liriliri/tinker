@@ -622,6 +622,19 @@ declare global {
      * automatically destroyed when the plugin's webContents is closed.
      */
     createTerminal(options: tinker.CreateTerminalOptions): tinker.Terminal
+
+    /**
+     * Register the plugin MCP API (currently `callTool`; may grow later).
+     * `callTool` may return any value; non-strings are JSON-serialized for
+     * the host bridge. Used by `share/lib/mcp` — plugins should call
+     * `createPluginMcpApi` / `registerPluginMcp` instead of this directly.
+     */
+    registerMcp(api: {
+      callTool: (
+        name: string,
+        args: Record<string, unknown>
+      ) => unknown | Promise<unknown>
+    }): void
   }
 }
 

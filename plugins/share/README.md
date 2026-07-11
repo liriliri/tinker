@@ -165,7 +165,7 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
 // On store: readonly mcp = createMcpApi(() => this)
 ```
 
-`createPluginMcpApi` reads schemas, dispatches handlers, registers `window.mcp.callTool`, and builds agent tools. See `share/lib/mcp.ts` for `PluginMcpBridge`, `formatMcpToolResult`, etc.
+`createPluginMcpApi` reads schemas, dispatches handlers, registers via `tinker.registerMcp` (host serializes results), and builds agent tools. See `share/lib/mcp.ts` for `PluginMcp`, `formatMcpToolResult`, etc.
 
 ### TextSearch
 

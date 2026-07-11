@@ -1,6 +1,6 @@
 {
   "name": "tinker-api-types",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Type definitions for Tinker plugin API",
   "types": "tinker.d.ts",
   "files": [

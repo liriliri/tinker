@@ -247,6 +247,24 @@ export function injectApi() {
     }
   }
 
+  function formatMcpResult(result: unknown): string {
+    if (typeof result === 'string') return result
+    return JSON.stringify(result, null, 2)
+  }
+
+  function registerMcp(api: {
+    callTool: (
+      name: string,
+      args: Record<string, unknown>
+    ) => unknown | Promise<unknown>
+  }) {
+    window.mcp = {
+      async callTool(name: string, args: Record<string, unknown>) {
+        return formatMcpResult(await api.callTool(name, args))
+      },
+    }
+  }
+
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -279,6 +297,7 @@ export function injectApi() {
     download,
     getDownloads,
     createTerminal,
+    registerMcp,
   }
 
   // Patch webview prototype to add debugger methods

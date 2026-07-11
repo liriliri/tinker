@@ -72,8 +72,6 @@ export type McpToolHandlerFn<TStore> = (
 
 export type McpToolHandlers<TStore> = Record<string, McpToolHandlerFn<TStore>>
 
-export type McpToolCallResult = string | Promise<string>
-
 function dispatchMcpTool<TStore>(
   handlers: McpToolHandlers<TStore>,
   store: TStore,
@@ -111,11 +109,11 @@ export interface PluginMcpHandlers {
   }>
 }
 
-export interface PluginMcpBridge {
-  callTool: (name: string, args: Record<string, unknown>) => McpToolCallResult
-}
-
-export interface PluginMcp extends PluginMcpBridge {
+export interface PluginMcp {
+  callTool: (
+    name: string,
+    args: Record<string, unknown>
+  ) => McpToolHandlerReturn
   createAgentTools: () => AgentTool[]
 }
 
@@ -146,34 +144,14 @@ export function createPluginMcpApi<TStore>(
 }
 
 export function registerPluginMcp(api: PluginMcpHandlers): PluginMcp {
-  const callTool = (
-    name: string,
-    args: Record<string, unknown>
-  ): McpToolCallResult => {
-    const result = api.callTool(name, args)
-    if (result instanceof Promise) {
-      return result.then(formatMcpToolResult)
-    }
-    return formatMcpToolResult(result)
-  }
-
-  window.mcp = { callTool }
+  tinker.registerMcp({ callTool: api.callTool })
 
   return {
-    callTool,
+    callTool: api.callTool,
     createAgentTools: () =>
       api.createAgentTools().map((tool) => ({
         definition: tool.definition,
-        execute: async (args) => {
-          const result = await Promise.resolve(tool.execute(args))
-          return formatMcpToolResult(result)
-        },
+        execute: async (args) => formatMcpToolResult(await tool.execute(args)),
       })),
-  }
-}
-
-declare global {
-  interface Window {
-    mcp: PluginMcpBridge
   }
 }

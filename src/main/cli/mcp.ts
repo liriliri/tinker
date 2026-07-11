@@ -55,8 +55,7 @@ interface PluginMcpInfo {
   tools: Record<string, IMcpToolDefinition>
 }
 
-function formatToolResult(data: unknown): { text: string; isError: boolean } {
-  const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2)
+function formatToolResult(text: string): { text: string; isError: boolean } {
   return { text, isError: text.startsWith('Error:') }
 }
 
@@ -120,7 +119,7 @@ export async function startMcpServer(id: string): Promise<void> {
           isError: true,
         }
       }
-      const { text, isError } = formatToolResult(res.data)
+      const { text, isError } = formatToolResult(res.data as string)
       return {
         content: [{ type: 'text', text }],
         isError,
