@@ -1,3 +1,9 @@
+## v1.22.0 (11 Jul 2026)
+
+* feat: mcp
+* feat: skills
+* feat: better ai chat
+
 ## v1.21.0 (4 Jul 2026)
 
 * feat: add anniversary
