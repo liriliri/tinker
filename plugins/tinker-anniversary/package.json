@@ -19,10 +19,10 @@
     },
     "mcp": {
       "tools": {
-        "get_anniversaries": {
+        "list": {
           "description": "Get all anniversaries with title, calendar type, date fields, start year, next occurrence date, days until next, and days since start."
         },
-        "add_anniversary": {
+        "add": {
           "description": "Add a new anniversary. Use month/day for solar dates, or lunarMonth/lunarDay for lunar dates.",
           "inputSchema": {
             "type": "object",
@@ -65,10 +65,12 @@
                 "description": "Optional year the anniversary started (e.g. birth year or wedding year)"
               }
             },
-            "required": ["title"]
+            "required": [
+              "title"
+            ]
           }
         },
-        "update_anniversary": {
+        "update": {
           "description": "Update an existing anniversary by id. Omitted fields keep their current values.",
           "inputSchema": {
             "type": "object",
@@ -111,14 +113,19 @@
                 "description": "Lunar day (1-30)"
               },
               "startYear": {
-                "type": ["integer", "null"],
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Start year, or null to remove"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
-        "delete_anniversary": {
+        "delete": {
           "description": "Delete an anniversary by id.",
           "inputSchema": {
             "type": "object",
@@ -128,7 +135,9 @@
                 "description": "Anniversary id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         }
       }

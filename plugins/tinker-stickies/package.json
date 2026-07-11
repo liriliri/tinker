@@ -19,7 +19,7 @@
     },
     "mcp": {
       "tools": {
-        "get_stickies": {
+        "list": {
           "description": "Get all sticky notes with id, HTML content, color, and timestamps. Optionally filter by plain-text search.",
           "inputSchema": {
             "type": "object",
@@ -31,7 +31,7 @@
             }
           }
         },
-        "add_sticky": {
+        "add": {
           "description": "Create a new sticky note.",
           "inputSchema": {
             "type": "object",
@@ -47,7 +47,7 @@
             }
           }
         },
-        "update_sticky": {
+        "update": {
           "description": "Update an existing sticky note's content and/or color by id.",
           "inputSchema": {
             "type": "object",
@@ -65,10 +65,12 @@
                 "description": "New background color hex"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
-        "delete_sticky": {
+        "delete": {
           "description": "Delete a sticky note by id.",
           "inputSchema": {
             "type": "object",
@@ -78,7 +80,9 @@
                 "description": "Sticky id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         }
       }

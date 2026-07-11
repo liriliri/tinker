@@ -19,10 +19,10 @@
     },
     "mcp": {
       "tools": {
-        "get_regexp": {
+        "get": {
           "description": "Get the current regular expression pattern, flags, syntax error (if any), and match count against the test text."
         },
-        "set_regexp": {
+        "set": {
           "description": "Update the regular expression pattern and/or flags in the editor. Changes apply immediately and re-run matching against the test text.",
           "inputSchema": {
             "type": "object",
@@ -41,10 +41,10 @@
             ]
           }
         },
-        "get_test_text": {
+        "get_text": {
           "description": "Get the current test text used to evaluate the regular expression."
         },
-        "set_test_text": {
+        "set_text": {
           "description": "Replace the test text in the editor. Matching is re-run immediately against the current pattern.",
           "inputSchema": {
             "type": "object",

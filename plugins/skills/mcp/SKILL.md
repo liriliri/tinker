@@ -17,8 +17,8 @@ Implement and review MCP tools for Tinker plugins. Tool schemas live in `package
 | Plugin                                 | Pattern                                                   |
 | -------------------------------------- | --------------------------------------------------------- |
 | `share/lib/mcp.ts`                     | `registerPluginMcp`, `formatMcpToolResult`, types         |
-| `tinker-image-compressor`              | Single end-to-end tool (`compress_images`)                |
-| `tinker-image-cropper`                 | Multi-step workflow: `open_image` → edit → `save_image`   |
+| `tinker-image-compressor`              | Single end-to-end tool (`compress`)                       |
+| `tinker-image-cropper`                 | Multi-step workflow: `open` → edit → `save`               |
 | `tinker-todo` / `tinker-anniversary`   | CRUD-style multi-tool                                     |
 | `tinker-json-editor` / `tinker-regexp` | Read/write editor tools                                   |
 | `resources/skills/mcp/SKILL.md`        | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
@@ -29,9 +29,9 @@ Pick granularity by plugin shape — not by toolbar button count.
 
 | Pattern             | When                                                     | Example tools                                                         |
 | ------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
-| **End-to-end**      | Batch operation with no required intermediate inspection | `compress_images`                                                     |
-| **Workflow stages** | Agent must read state before the next step               | `open_image`, `get_image`, `crop_image`, `resize_image`, `save_image` |
-| **CRUD / editor**   | Natural read/write/update/delete model                   | `get_todos`, `add_todo`, `get_json`, `set_json`                       |
+| **End-to-end**      | Batch operation with no required intermediate inspection | `compress`                                                            |
+| **Workflow stages** | Agent must read state before the next step               | `open`, `get`, `crop`, `resize`, `save`                               |
+| **CRUD / editor**   | Natural read/write/update/delete model                   | `list`, `add`, `get`, `set`                                           |
 
 **Do** split by workflow stage when the agent needs dimensions, file state, or confirmation between steps.
 
@@ -45,7 +45,7 @@ Rotation/flip and other cropper UI controls are **not** MCP tools today; MCP cov
 
 Under `tinker.mcp.tools`, each tool needs:
 
-- `description` — what the tool does for agents; mention prerequisites (`Call open_image first…`)
+- `description` — what the tool does for agents; mention prerequisites (`Call open first…`)
 - `inputSchema` (optional) — JSON Schema validated by CLI before `callTool`
 
 Tool names: `snake_case`. Put type/range/required constraints in `inputSchema`. Do **not** duplicate them in `mcp.ts`.

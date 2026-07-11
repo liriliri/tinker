@@ -19,13 +19,13 @@
     },
     "mcp": {
       "tools": {
-        "get_todos": {
+        "list": {
           "description": "Get all todos in the current file, including id, text, completion state, priority, due date, and summary stats."
         },
-        "get_todo_file": {
+        "get_file": {
           "description": "Get the currently open todo file path, whether a file still needs to be selected, and recent file paths."
         },
-        "open_todo_file": {
+        "open_file": {
           "description": "Open a todo.txt file by absolute path.",
           "inputSchema": {
             "type": "object",
@@ -36,10 +36,12 @@
                 "description": "Absolute path to the todo.txt file"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         },
-        "add_todo": {
+        "add": {
           "description": "Add a new todo to the current file.",
           "inputSchema": {
             "type": "object",
@@ -51,7 +53,11 @@
               },
               "priority": {
                 "type": "string",
-                "enum": ["A", "B", "C"],
+                "enum": [
+                  "A",
+                  "B",
+                  "C"
+                ],
                 "description": "Optional priority (A = highest)"
               },
               "dueDate": {
@@ -59,10 +65,12 @@
                 "description": "Optional due date in YYYY-MM-DD format"
               }
             },
-            "required": ["text"]
+            "required": [
+              "text"
+            ]
           }
         },
-        "update_todo": {
+        "update": {
           "description": "Update an existing todo by id.",
           "inputSchema": {
             "type": "object",
@@ -78,18 +86,27 @@
               },
               "priority": {
                 "type": "string",
-                "enum": ["A", "B", "C"],
+                "enum": [
+                  "A",
+                  "B",
+                  "C"
+                ],
                 "description": "New priority, or omit to keep current"
               },
               "dueDate": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "description": "New due date in YYYY-MM-DD format, or null to remove"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
-        "toggle_todo": {
+        "toggle": {
           "description": "Toggle a todo's completed state by id.",
           "inputSchema": {
             "type": "object",
@@ -99,10 +116,12 @@
                 "description": "Todo id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
-        "delete_todo": {
+        "delete": {
           "description": "Delete a todo by id.",
           "inputSchema": {
             "type": "object",
@@ -112,7 +131,9 @@
                 "description": "Todo id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         "clear_completed": {

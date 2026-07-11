@@ -8,10 +8,10 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    get_json: (store) => getJson(store),
-    set_json: setJson,
-    format_json: (store) => formatJson(store),
-    minify_json: (store) => minifyJson(store),
+    get,
+    set,
+    format,
+    minify,
   })
 }
 
@@ -20,7 +20,7 @@ export function getToolArgSummary(
   args: Record<string, unknown>
 ): string {
   switch (name) {
-    case 'set_json': {
+    case 'set': {
       const content = typeof args.content === 'string' ? args.content : ''
       return truncateMcpArg(content)
     }
@@ -29,7 +29,7 @@ export function getToolArgSummary(
   }
 }
 
-function getJson(store: Store) {
+function get(store: Store) {
   return {
     content: store.jsonInput,
     error: store.jsonError,
@@ -40,32 +40,32 @@ function getJson(store: Store) {
   }
 }
 
-function setJson(store: Store, args: Record<string, unknown>) {
+function set(store: Store, args: Record<string, unknown>) {
   store.setJsonInput(args.content as string)
-  return getJson(store)
+  return get(store)
 }
 
-function formatJson(store: Store) {
+function format(store: Store) {
   if (store.isEmpty) {
     return 'Error: Editor is empty.'
   }
 
   try {
     store.formatJson()
-    return getJson(store)
+    return get(store)
   } catch {
     return `Error: ${store.jsonError || 'Invalid JSON'}`
   }
 }
 
-function minifyJson(store: Store) {
+function minify(store: Store) {
   if (store.isEmpty) {
     return 'Error: Editor is empty.'
   }
 
   try {
     store.minifyJson()
-    return getJson(store)
+    return get(store)
   } catch {
     return `Error: ${store.jsonError || 'Invalid JSON'}`
   }

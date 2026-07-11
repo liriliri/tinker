@@ -32,11 +32,11 @@ tinker list
 tinker open json-editor
 tinker tools json-editor
 
-tinker call json-editor --tool get_json
+tinker call json-editor --tool get
 
-tinker call json-editor --tool set_json --args '{"content":"{\"hello\":true}"}'
+tinker call json-editor --tool set --args '{"content":"{\"hello\":true}"}'
 
-tinker call json-editor --tool format_json
+tinker call json-editor --tool format
 ```
 
 ## Listing tools
@@ -51,10 +51,10 @@ Example tools on `tinker-json-editor`:
 
 | Tool | Purpose |
 |------|---------|
-| `get_json` | Read current editor content, validation state, mode, line count |
-| `set_json` | Replace editor content (`content` string argument) |
-| `format_json` | Pretty-print valid JSON |
-| `minify_json` | Minify valid JSON |
+| `get` | Read current editor content, validation state, mode, line count |
+| `set` | Replace editor content (`content` string argument) |
+| `format` | Pretty-print valid JSON |
+| `minify` | Minify valid JSON |
 
 Tool names and schemas are defined per plugin. Always use `tinker tools <plugin>` for the source of truth.
 
@@ -72,9 +72,9 @@ tinker call <plugin> --tool <name> [--args '<json-object>']
 
 ```bash
 tinker open json-editor
-tinker call json-editor --tool set_json --args '{"content":"[1,2,3]"}'
-tinker call json-editor --tool format_json
-tinker call json-editor --tool get_json
+tinker call json-editor --tool set --args '{"content":"[1,2,3]"}'
+tinker call json-editor --tool format
+tinker call json-editor --tool get
 ```
 
 ## Stdio MCP server
@@ -109,9 +109,9 @@ If Tinker is not running, start it first (the CLI auto-launches on other command
 tinker list
 tinker open json-editor
 tinker tools json-editor
-tinker call json-editor --tool set_json --args '{"content":"{\"a\":1}"}'
-tinker call json-editor --tool format_json
-tinker call json-editor --tool get_json
+tinker call json-editor --tool set --args '{"content":"{\"a\":1}"}'
+tinker call json-editor --tool format
+tinker call json-editor --tool get
 tinker close json-editor
 ```
 
@@ -190,7 +190,7 @@ Supporting lifecycle commands (from the core skill):
 
 **`Failed to connect to Tinker` / `Tinker is not running`** — Start the Tinker app, then retry. `mcp` and `call` require the main process IPC socket.
 
-**Tool call returns an error string** — Check `--args` matches the tool's `inputSchema` from `tinker tools`. Many tools require specific property names (e.g. `content` for `set_json`).
+**Tool call returns an error string** — Check `--args` matches the tool's `inputSchema` from `tinker tools`. Many tools require specific property names (e.g. `content` for `set`).
 
 **MCP client lists tools but calls fail** — The plugin window may have been closed. Run `tinker ps` and `tinker open <plugin>` again.
 

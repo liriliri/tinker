@@ -8,13 +8,13 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    get_todos: (store) => getTodos(store),
-    get_todo_file: (store) => getTodoFile(store),
-    open_todo_file: openTodoFile,
-    add_todo: addTodo,
-    update_todo: updateTodo,
-    toggle_todo: toggleTodo,
-    delete_todo: deleteTodo,
+    list: (store) => getTodos(store),
+    get_file: (store) => getTodoFile(store),
+    open_file: openTodoFile,
+    add: addTodo,
+    update: updateTodo,
+    toggle: toggleTodo,
+    delete: deleteTodo,
     clear_completed: (store) => clearCompleted(store),
   })
 }

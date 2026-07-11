@@ -6,10 +6,10 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    get_anniversaries: (store) => getAnniversaries(store),
-    add_anniversary: addAnniversary,
-    update_anniversary: updateAnniversary,
-    delete_anniversary: deleteAnniversary,
+    list: (store) => getAnniversaries(store),
+    add: addAnniversary,
+    update: updateAnniversary,
+    delete: deleteAnniversary,
   })
 }
 

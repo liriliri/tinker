@@ -11,11 +11,11 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    open_image: openImage,
-    get_image: (store) => getImage(store),
-    crop_image: cropImage,
-    resize_image: resizeImage,
-    save_image: saveImage,
+    open: openImage,
+    get: (store) => getImage(store),
+    crop: cropImage,
+    resize: resizeImage,
+    save: saveImage,
   })
 }
 
@@ -56,7 +56,7 @@ function serializeImage(store: Store): Record<string, McpJsonValue> {
 
 function requireImage(store: Store): string | null {
   if (!store.image) {
-    return 'Error: No image is open. Call open_image first.'
+    return 'Error: No image is open. Call open first.'
   }
   return null
 }

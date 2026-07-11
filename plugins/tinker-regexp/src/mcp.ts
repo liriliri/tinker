@@ -8,10 +8,10 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    get_regexp: (store) => getRegexp(store),
-    set_regexp: setRegexp,
-    get_test_text: (store) => getTestText(store),
-    set_test_text: setTestText,
+    get: (store) => getRegexp(store),
+    set: setRegexp,
+    get_text: (store) => getTestText(store),
+    set_text: setTestText,
   })
 }
 
@@ -20,13 +20,13 @@ export function getToolArgSummary(
   args: Record<string, unknown>
 ): string {
   switch (name) {
-    case 'set_regexp': {
+    case 'set': {
       const pattern = typeof args.pattern === 'string' ? args.pattern : ''
       const flags = typeof args.flags === 'string' ? args.flags : ''
       const summary = flags ? `/${pattern}/${flags}` : pattern
       return truncateMcpArg(summary)
     }
-    case 'set_test_text': {
+    case 'set_text': {
       const text = typeof args.text === 'string' ? args.text : ''
       return truncateMcpArg(text)
     }

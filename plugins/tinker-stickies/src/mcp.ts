@@ -9,10 +9,10 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    get_stickies: getStickies,
-    add_sticky: addSticky,
-    update_sticky: updateSticky,
-    delete_sticky: deleteSticky,
+    list: getStickies,
+    add: addSticky,
+    update: updateSticky,
+    delete: deleteSticky,
   })
 }
 

@@ -19,7 +19,7 @@
     },
     "mcp": {
       "tools": {
-        "compress_images": {
+        "compress": {
           "description": "Compress one or more images end to end: clear the list, load files, apply settings, compress, and save. Internally follows the same steps as the plugin UI.",
           "inputSchema": {
             "type": "object",

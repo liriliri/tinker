@@ -19,7 +19,7 @@
     },
     "mcp": {
       "tools": {
-        "open_image": {
+        "open": {
           "description": "Open an image file in the editor. Same as opening a file in the UI. Returns image size and metadata needed before cropping.",
           "inputSchema": {
             "type": "object",
@@ -35,11 +35,11 @@
             ]
           }
         },
-        "get_image": {
+        "get": {
           "description": "Get the currently open image info, including width, height, file path, and save state."
         },
-        "crop_image": {
-          "description": "Crop the currently open image with a rectangular region. Call open_image first to load the file and read its dimensions.",
+        "crop": {
+          "description": "Crop the currently open image with a rectangular region. Call open first to load the file and read its dimensions.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -72,8 +72,8 @@
             ]
           }
         },
-        "resize_image": {
-          "description": "Resize the currently open image to new dimensions. Same as the resize dialog in the UI. Call open_image first to read the current size.",
+        "resize": {
+          "description": "Resize the currently open image to new dimensions. Same as the resize dialog in the UI. Call open first to read the current size.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -94,7 +94,7 @@
             }
           }
         },
-        "save_image": {
+        "save": {
           "description": "Save the current edited image after cropping or resizing. Same as clicking save in the UI.",
           "inputSchema": {
             "type": "object",

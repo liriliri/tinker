@@ -11,7 +11,7 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    compress_images: compressImages,
+    compress: compressImages,
   })
 }
 
