@@ -626,8 +626,7 @@ declare global {
     /**
      * Register the plugin MCP API (currently `callTool`; may grow later).
      * `callTool` may return any value; non-strings are JSON-serialized for
-     * the host bridge. Used by `share/lib/mcp` — plugins should call
-     * `createPluginMcpApi` / `registerPluginMcp` instead of this directly.
+     * the host bridge. 
      */
     registerMcp(api: {
       callTool: (
