@@ -1,9 +1,5 @@
-import {
-  createPluginMcpApi,
-  formatMcpError,
-  type PluginMcp,
-} from 'share/lib/mcp'
-import type { Priority, Store } from './store'
+import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
+import type { Priority, Store, TodoItem } from './store'
 import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
@@ -19,17 +15,18 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-function requireFile(store: Store): string | null {
+function requireFile(store: Store) {
   if (store.needsFileSelection || !store.filePath) {
-    return 'Error: No todo file is open. Open or create a todo.txt file in the plugin first.'
+    throw new Error(
+      'No todo file is open. Open or create a todo.txt file in the plugin first.'
+    )
   }
-  return null
 }
 
-function requireTodo(store: Store, id: string) {
+function requireTodo(store: Store, id: string): TodoItem {
   const todo = store.todos.find((t) => t.id === id)
   if (!todo) {
-    return `Error: Todo with id "${id}" not found.`
+    throw new Error(`Todo with id "${id}" not found.`)
   }
   return todo
 }
@@ -45,13 +42,13 @@ function getTodoFile(store: Store) {
 async function openTodoFile(store: Store, args: Record<string, unknown>) {
   try {
     await store.setFilePath(args.path as string)
-    return getTodoFile(store)
   } catch (error) {
     if (error instanceof Error && error.message === 'fileNotFound') {
-      return 'Error: Todo file not found.'
+      throw new Error('Todo file not found.')
     }
-    return formatMcpError(error, 'Failed to open file')
+    throw error
   }
+  return getTodoFile(store)
 }
 
 function getTodos(store: Store) {
@@ -75,8 +72,7 @@ function getTodos(store: Store) {
 }
 
 function addTodo(store: Store, args: Record<string, unknown>) {
-  const fileError = requireFile(store)
-  if (fileError) return fileError
+  requireFile(store)
 
   store.setNewTodoText((args.text as string).trim())
   store.setNewTodoPriority((args.priority as Priority) ?? null)
@@ -85,12 +81,10 @@ function addTodo(store: Store, args: Record<string, unknown>) {
 }
 
 function updateTodo(store: Store, args: Record<string, unknown>) {
-  const fileError = requireFile(store)
-  if (fileError) return fileError
+  requireFile(store)
 
   const id = args.id as string
   const todo = requireTodo(store, id)
-  if (typeof todo === 'string') return todo
 
   const text =
     args.text !== undefined ? (args.text as string).trim() : todo.text
@@ -108,32 +102,27 @@ function updateTodo(store: Store, args: Record<string, unknown>) {
 }
 
 function toggleTodo(store: Store, args: Record<string, unknown>) {
-  const fileError = requireFile(store)
-  if (fileError) return fileError
+  requireFile(store)
 
   const id = args.id as string
-  const todo = requireTodo(store, id)
-  if (typeof todo === 'string') return todo
+  requireTodo(store, id)
 
   store.toggleTodo(id)
   return getTodos(store)
 }
 
 function deleteTodo(store: Store, args: Record<string, unknown>) {
-  const fileError = requireFile(store)
-  if (fileError) return fileError
+  requireFile(store)
 
   const id = args.id as string
-  const todo = requireTodo(store, id)
-  if (typeof todo === 'string') return todo
+  requireTodo(store, id)
 
   store.deleteTodo(id)
   return getTodos(store)
 }
 
 function clearCompleted(store: Store) {
-  const fileError = requireFile(store)
-  if (fileError) return fileError
+  requireFile(store)
 
   store.clearCompleted()
   return getTodos(store)

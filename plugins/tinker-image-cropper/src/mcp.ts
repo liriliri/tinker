@@ -1,7 +1,6 @@
 import splitPath from 'licia/splitPath'
 import {
   createPluginMcpApi,
-  formatMcpError,
   type McpJsonValue,
   type PluginMcp,
 } from 'share/lib/mcp'
@@ -54,29 +53,24 @@ function serializeImage(store: Store): Record<string, McpJsonValue> {
   }
 }
 
-function requireImage(store: Store): string | null {
+function requireImage(store: Store) {
   if (!store.image) {
-    return 'Error: No image is open. Call open first.'
+    throw new Error('No image is open. Call open first.')
   }
-  return null
 }
 
 async function openImage(store: Store, args: Record<string, unknown>) {
   const path = args.path as string
 
   if (!(await fileExists(path))) {
-    return `Error: Image file not found: ${path}`
+    throw new Error(`Image file not found: ${path}`)
   }
 
-  try {
-    const buffer = await tinker.readFile(path)
-    const fileName = splitPath(path).name
-    const file = new File([buffer], fileName, { type: 'image/*' })
-    await store.loadImage(file, path)
-    return serializeImage(store)
-  } catch (error) {
-    return formatMcpError(error, 'Failed to open image')
-  }
+  const buffer = await tinker.readFile(path)
+  const fileName = splitPath(path).name
+  const file = new File([buffer], fileName, { type: 'image/*' })
+  await store.loadImage(file, path)
+  return serializeImage(store)
 }
 
 function getImage(store: Store) {
@@ -171,8 +165,7 @@ function applyCanvasResult(
 }
 
 async function cropImage(store: Store, args: Record<string, unknown>) {
-  const imageError = requireImage(store)
-  if (imageError) return imageError
+  requireImage(store)
 
   const x = args.x as number
   const y = args.y as number
@@ -189,32 +182,29 @@ async function cropImage(store: Store, args: Record<string, unknown>) {
     x + width > imageWidth ||
     y + height > imageHeight
   ) {
-    return `Error: Crop region must be within image bounds (${imageWidth}x${imageHeight}).`
+    throw new Error(
+      `Crop region must be within image bounds (${imageWidth}x${imageHeight}).`
+    )
   }
 
-  try {
-    const cropped = await cropImageOnCanvas(
-      store.image!.originalUrl,
-      x,
-      y,
-      width,
-      height
-    )
+  const cropped = await cropImageOnCanvas(
+    store.image!.originalUrl,
+    x,
+    y,
+    width,
+    height
+  )
 
-    applyCanvasResult(store, cropped)
+  applyCanvasResult(store, cropped)
 
-    return {
-      crop: { x, y, width, height },
-      ...serializeImage(store),
-    }
-  } catch (error) {
-    return formatMcpError(error, 'Failed to crop image')
+  return {
+    crop: { x, y, width, height },
+    ...serializeImage(store),
   }
 }
 
 async function resizeImage(store: Store, args: Record<string, unknown>) {
-  const imageError = requireImage(store)
-  if (imageError) return imageError
+  requireImage(store)
 
   let width = args.width as number | undefined
   let height = args.height as number | undefined
@@ -236,33 +226,30 @@ async function resizeImage(store: Store, args: Record<string, unknown>) {
     width <= 0 ||
     height <= 0
   ) {
-    return 'Error: width and height are required. With keepAspectRatio true, provide either width or height.'
+    throw new Error(
+      'width and height are required. With keepAspectRatio true, provide either width or height.'
+    )
   }
 
-  try {
-    const resized = await resizeImageOnCanvas(
-      store.image!.originalUrl,
-      width,
-      height
-    )
+  const resized = await resizeImageOnCanvas(
+    store.image!.originalUrl,
+    width,
+    height
+  )
 
-    applyCanvasResult(store, resized)
+  applyCanvasResult(store, resized)
 
-    return {
-      resize: { width, height, keepAspectRatio },
-      ...serializeImage(store),
-    }
-  } catch (error) {
-    return formatMcpError(error, 'Failed to resize image')
+  return {
+    resize: { width, height, keepAspectRatio },
+    ...serializeImage(store),
   }
 }
 
 async function saveImage(store: Store, args: Record<string, unknown>) {
-  const imageError = requireImage(store)
-  if (imageError) return imageError
+  requireImage(store)
 
   if (store.historyIndex <= 0) {
-    return 'Error: No image edits to save.'
+    throw new Error('No image edits to save.')
   }
 
   const overwriteOriginal =
@@ -271,23 +258,21 @@ async function saveImage(store: Store, args: Record<string, unknown>) {
 
   if (!overwriteOriginal) {
     if (!outputPath) {
-      return 'Error: outputPath is required when overwriteOriginal is false.'
+      throw new Error('outputPath is required when overwriteOriginal is false.')
     }
 
     if (!(await fileExists(splitPath(outputPath).dir))) {
-      return `Error: Output directory not found: ${splitPath(outputPath).dir}`
+      throw new Error(
+        `Output directory not found: ${splitPath(outputPath).dir}`
+      )
     }
   }
 
-  try {
-    store.setOverwriteOriginal(overwriteOriginal)
-    const savedPath = (await store.saveImage(outputPath)) ?? null
+  store.setOverwriteOriginal(overwriteOriginal)
+  const savedPath = (await store.saveImage(outputPath)) ?? null
 
-    return {
-      savedPath,
-      ...serializeImage(store),
-    }
-  } catch (error) {
-    return formatMcpError(error, 'Failed to save image')
+  return {
+    savedPath,
+    ...serializeImage(store),
   }
 }

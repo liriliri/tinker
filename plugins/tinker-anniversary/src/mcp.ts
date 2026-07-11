@@ -60,10 +60,10 @@ function getAnniversaries(store: Store) {
   }
 }
 
-function requireAnniversary(store: Store, id: string) {
+function requireAnniversary(store: Store, id: string): Anniversary {
   const anniversary = store.getAnniversaryById(id)
   if (!anniversary) {
-    return `Error: Anniversary with id "${id}" not found.`
+    throw new Error(`Anniversary with id "${id}" not found.`)
   }
   return anniversary
 }
@@ -71,11 +71,11 @@ function requireAnniversary(store: Store, id: string) {
 function parseAnniversaryData(
   args: Record<string, unknown>,
   existing?: Anniversary
-): Omit<Anniversary, 'id'> | string {
+): Omit<Anniversary, 'id'> {
   const title =
     args.title !== undefined ? String(args.title).trim() : existing?.title ?? ''
   if (!title) {
-    return 'Error: title is required and cannot be empty.'
+    throw new Error('title is required and cannot be empty.')
   }
 
   const isLunar =
@@ -92,7 +92,9 @@ function parseAnniversaryData(
       args.lunarDay !== undefined ? Number(args.lunarDay) : existing?.lunarDay
 
     if (!lunarMonth || !lunarDay) {
-      return 'Error: lunarMonth and lunarDay are required for lunar anniversaries.'
+      throw new Error(
+        'lunarMonth and lunarDay are required for lunar anniversaries.'
+      )
     }
 
     return {
@@ -108,7 +110,7 @@ function parseAnniversaryData(
   const day = args.day !== undefined ? Number(args.day) : existing?.day
 
   if (!month || !day) {
-    return 'Error: month and day are required for solar anniversaries.'
+    throw new Error('month and day are required for solar anniversaries.')
   }
 
   return {
@@ -134,8 +136,6 @@ function parseStartYear(
 
 function addAnniversary(store: Store, args: Record<string, unknown>) {
   const data = parseAnniversaryData(args)
-  if (typeof data === 'string') return data
-
   store.addAnniversary(data)
   return getAnniversaries(store)
 }
@@ -143,20 +143,14 @@ function addAnniversary(store: Store, args: Record<string, unknown>) {
 function updateAnniversary(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
   const existing = requireAnniversary(store, id)
-  if (typeof existing === 'string') return existing
-
   const data = parseAnniversaryData(args, existing)
-  if (typeof data === 'string') return data
-
   store.updateAnniversary(id, data)
   return getAnniversaries(store)
 }
 
 function deleteAnniversary(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
-  const existing = requireAnniversary(store, id)
-  if (typeof existing === 'string') return existing
-
+  requireAnniversary(store, id)
   store.removeAnniversary(id)
   return getAnniversaries(store)
 }

@@ -80,7 +80,7 @@ function dispatchMcpTool<TStore>(
 ): McpToolHandlerReturn {
   const handler = handlers[name]
   if (!handler) {
-    return `Error: Unknown tool "${name}"`
+    throw new Error(`Unknown tool "${name}"`)
   }
   return handler(store, args)
 }
@@ -88,10 +88,6 @@ function dispatchMcpTool<TStore>(
 export function formatMcpToolResult(result: unknown): string {
   if (typeof result === 'string') return result
   return JSON.stringify(result, null, 2)
-}
-
-export function formatMcpError(error: unknown, fallback: string): string {
-  return `Error: ${error instanceof Error ? error.message : fallback}`
 }
 
 export function truncateMcpArg(value: string, max = 60): string {

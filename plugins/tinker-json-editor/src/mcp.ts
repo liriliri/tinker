@@ -47,26 +47,24 @@ function set(store: Store, args: Record<string, unknown>) {
 
 function format(store: Store) {
   if (store.isEmpty) {
-    return 'Error: Editor is empty.'
+    throw new Error('Editor is empty.')
+  }
+  if (store.jsonError) {
+    throw new Error(store.jsonError)
   }
 
-  try {
-    store.formatJson()
-    return get(store)
-  } catch {
-    return `Error: ${store.jsonError || 'Invalid JSON'}`
-  }
+  store.formatJson()
+  return get(store)
 }
 
 function minify(store: Store) {
   if (store.isEmpty) {
-    return 'Error: Editor is empty.'
+    throw new Error('Editor is empty.')
+  }
+  if (store.jsonError) {
+    throw new Error(store.jsonError)
   }
 
-  try {
-    store.minifyJson()
-    return get(store)
-  } catch {
-    return `Error: ${store.jsonError || 'Invalid JSON'}`
-  }
+  store.minifyJson()
+  return get(store)
 }

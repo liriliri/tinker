@@ -6,7 +6,7 @@ argument-hint: <plugin-name>
 
 # Plugin MCP
 
-Implement and review MCP tools for Tinker plugins. Tool schemas live in `package.json`; runtime handlers live in `src/mcp.ts`; serialization is centralized in `share/lib/mcp.ts`.
+Schemas in `package.json` (`tinker.mcp.tools`); handlers in `src/mcp.ts`; shared helpers in `share/lib/mcp.ts`.
 
 ## Arguments
 
@@ -14,52 +14,42 @@ Implement and review MCP tools for Tinker plugins. Tool schemas live in `package
 
 ## References
 
-| Plugin                                 | Pattern                                                   |
-| -------------------------------------- | --------------------------------------------------------- |
-| `share/lib/mcp.ts`                     | `registerPluginMcp`, `formatMcpToolResult`, types         |
-| `tinker-image-compressor`              | Single end-to-end tool (`compress`)                       |
-| `tinker-image-cropper`                 | Multi-step workflow: `open` → edit → `save`               |
-| `tinker-todo` / `tinker-anniversary`   | CRUD-style multi-tool                                     |
-| `tinker-json-editor` / `tinker-regexp` | Read/write editor tools                                   |
-| `resources/skills/mcp/SKILL.md`        | End-user CLI: `tinker call`, `tinker mcp`, `tinker tools` |
+| Plugin / path                              | Pattern                                                   |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `share/lib/mcp.ts`                         | `createPluginMcpApi`, `formatMcpToolResult`, types        |
+| `tinker-image-compressor`                  | End-to-end (`compress`)                                   |
+| `tinker-image-cropper`                     | Workflow: `open` → edit → `save`                          |
+| `tinker-todo` / `tinker-anniversary`       | CRUD                                                      |
+| `tinker-json-editor` / `tinker-regexp`     | Read/write editor                                         |
+| `resources/skills/mcp/SKILL.md`            | CLI: `tinker call`, `tinker mcp`, `tinker tools`          |
 
 ## Tool design
 
 Pick granularity by plugin shape — not by toolbar button count.
 
-| Pattern             | When                                                     | Example tools                                                         |
-| ------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
-| **End-to-end**      | Batch operation with no required intermediate inspection | `compress`                                                            |
-| **Workflow stages** | Agent must read state before the next step               | `open`, `get`, `crop`, `resize`, `save`                               |
-| **CRUD / editor**   | Natural read/write/update/delete model                   | `list`, `add`, `get`, `set`                                           |
+| Pattern             | When                                                     | Examples                                      |
+| ------------------- | -------------------------------------------------------- | --------------------------------------------- |
+| **End-to-end**      | Batch, no required intermediate inspection               | `compress`                                    |
+| **Workflow stages** | Agent must read state before the next step               | `open`, `get`, `crop`, `resize`, `save`       |
+| **CRUD / editor**   | Natural read/write/update/delete model                   | `list`, `add`, `get`, `set`                   |
 
-**Do** split by workflow stage when the agent needs dimensions, file state, or confirmation between steps.
+Don't expose one MCP tool per toolbar control (e.g. cropper rotate/flip/undo). If headless save is blocked by a dialog, add an optional path arg to the existing `save*` method — don't invent a separate MCP-only API.
 
-**Don't** expose one MCP tool per toolbar control (rotate, flip, undo, aspect-ratio picker) unless explicitly requested.
+## Implement
 
-Rotation/flip and other cropper UI controls are **not** MCP tools today; MCP covers open → crop/resize → save.
+### 1. `package.json`
 
-## Implement MCP
+Under `tinker.mcp.tools`:
 
-### 1. Define tools in `package.json`
+- `description` — for agents; note prerequisites (`Call open first…`)
+- `inputSchema` (optional) — JSON Schema; CLI validates before `callTool`
 
-Under `tinker.mcp.tools`, each tool needs:
+Tool names: `snake_case`. Put type/range/required constraints in `inputSchema` — do **not** re-validate them in `mcp.ts`. Cross-field rules the schema can't express stay in the handler.
 
-- `description` — what the tool does for agents; mention prerequisites (`Call open first…`)
-- `inputSchema` (optional) — JSON Schema validated by CLI before `callTool`
-
-Tool names: `snake_case`. Put type/range/required constraints in `inputSchema`. Do **not** duplicate them in `mcp.ts`.
-
-Cross-field rules the schema cannot express (e.g. `outputPath` required when `overwriteOriginal` is false and the value falls back to store defaults) stay in the handler.
-
-### 2. Create `src/mcp.ts`
+### 2. `src/mcp.ts`
 
 ```ts
-import {
-  createPluginMcpApi,
-  formatMcpError,
-  type PluginMcp,
-} from 'share/lib/mcp'
+import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
 import type { Store } from './store'
 import pkg from '../package.json'
 
@@ -70,17 +60,16 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
 }
 
 async function myTool(store: Store, args: Record<string, unknown>) {
-  try {
-    return { ok: true }
-  } catch (error) {
-    return formatMcpError(error, 'Operation failed')
+  if (!store.ready) {
+    throw new Error('Not ready. Call open first.')
   }
+  return { ok: true }
 }
 ```
 
-Optional: export `getToolArgSummary(name, args)` when the plugin uses AiChat and needs short tool-arg previews (`tinker-regexp`, `tinker-json-editor`).
+Optional: export `getToolArgSummary(name, args)` for AiChat tool-arg previews (`tinker-regexp`, `tinker-json-editor`).
 
-### 3. Wire store (minimal change)
+### 3. Wire store
 
 ```ts
 import { createMcpApi } from './mcp'
@@ -90,22 +79,18 @@ export class Store extends BaseStore {
 }
 ```
 
-Handlers call **existing** store APIs the UI already uses. Do not add store methods solely for MCP unless the UI would need the same headless path (e.g. optional `saveImage(outputPath?)` / `saveAll(outputDirectory?)` for non-overwrite saves).
-
-Canvas/ffmpeg logic that only exists in UI event handlers may live in `mcp.ts` when it mirrors the same store calls afterward (`setCroppedImage` + `applyCroppedImage`).
+Call existing store APIs. Don't add store methods solely for MCP unless the UI would need the same headless path. Canvas/ffmpeg that only lives in UI handlers may sit in `mcp.ts` when it still ends in the same store calls (`setCroppedImage` + `applyCroppedImage`).
 
 ### 4. Handler rules
 
-| Do                                                 | Don't                                                       |
-| -------------------------------------------------- | ----------------------------------------------------------- |
-| Return `string` for errors (`Error: ...`)          | `JSON.stringify` in plugin — host `registerMcp` serializes |
-| Return plain objects for structured success        | Redundant return-type annotations on handlers               |
-| Use async handlers when needed                     | Cast `Record<string, unknown>` to a typed args interface    |
-| Extract args with per-field casts + store defaults | One monolithic tool when stages need intermediate reads     |
+| Do                                                 | Don't                                                    |
+| -------------------------------------------------- | -------------------------------------------------------- |
+| `throw new Error(...)` for failures                | Return `'Error: ...'` strings / catch-and-return         |
+| Return plain objects for success                   | `JSON.stringify` — host `registerMcp` serializes         |
+| Per-field casts + store defaults for args          | `args as FooArgs` on the whole object                    |
+| Async when needed                                  | Redundant return-type annotations                        |
 
-Shared state helpers (e.g. `serializeImage`) may return plain objects for spreading into tool responses.
-
-Extract args example:
+Host and AiChat catch thrown errors and format them as `Error: ...` (AiChat also marks the tool as `error`).
 
 ```ts
 const quality = (args.quality as number | undefined) ?? store.quality
@@ -118,61 +103,18 @@ cd <plugin-name> && npm run build
 cd <plugin-name> && npx tsc --noEmit 2>&1 | rg "mcp\.ts" || true
 ```
 
-Then (Tinker running):
+With Tinker running: `tinker open <plugin>`, `tinker tools <plugin>`, `tinker call <plugin> --tool <name> --args '{}'`.
 
-```bash
-tinker open <plugin>
-tinker tools <plugin>
-tinker call <plugin> --tool <name> --args '{}'
-```
+Run the **lint** skill on changed files afterward.
 
-Run the **lint** skill on changed files after implementation.
+## Audit
 
-## Audit MCP
+Read `<plugin-name>/package.json`, `src/mcp.ts`, and `src/store.ts`. Check against the Implement rules above (schema ↔ args, handler map ↔ tool names, store wiring, throw-not-return errors, no JSON.stringify, design granularity).
 
-Read `<plugin-name>/package.json`, `src/mcp.ts`, and `src/store.ts`. Report violations as:
+Report:
 
 ```
 [Category] file/path:line — description
 ```
 
-### Checklist
-
-**Schema** — tools defined; descriptions present; `inputSchema` matches `args` field names; prerequisites documented in descriptions.
-
-**Structure** — `createMcpApi` + `createPluginMcpApi` handler map; tool names match `package.json`; unknown tools return `Error: Unknown tool`.
-
-**Store** — `export class Store`; `readonly mcp = createMcpApi(() => this)`.
-
-**Handlers** — existing store methods; no `JSON.stringify`; no redundant schema validation; runtime checks for file existence and conditional required paths.
-
-**Types** — no full-args interface cast on handler `args`.
-
-**Design** — granularity matches plugin shape (end-to-end / workflow stages / CRUD); not one tool per toolbar button; store changes minimal.
-
-### Output
-
-If no violations: **No MCP violations found.**
-
-Otherwise list violations by category with total count.
-
-## Decision guide
-
-```
-Automate plugin?
-├─ Batch, no intermediate inspection → one end-to-end tool (compressor)
-├─ Agent must read size/state before editing → workflow stages (cropper)
-├─ CRUD / editor → focused read/write tools (todo, json-editor)
-└─ Missing headless save path → optional outputPath on existing save method only
-```
-
-## Common fixes
-
-| Violation                                  | Fix                                                                           |
-| ------------------------------------------ | ----------------------------------------------------------------------------- |
-| Manual `JSON.stringify`                    | Return object; `tinker.registerMcp` serializes for the host bridge            |
-| `executeTool`: `string \| Promise<string>` | Handlers return object or `Error: ...` string; host serializes                |
-| Spread error on serialize helper           | Return a plain object from the helper                                         |
-| `args as FooArgs` on full args object      | Per-field casts: `args.path as string`                                        |
-| Toolbar button as MCP tool                 | Merge into workflow stage or skip                                             |
-| Headless save blocked by dialog            | Add optional path arg to existing `save*` method                              |
+If clean: **No MCP violations found.** Otherwise list by category with total count.

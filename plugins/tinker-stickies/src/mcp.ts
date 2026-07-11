@@ -16,21 +16,20 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-function requireSticky(store: Store, id: string): Sticky | string {
+function requireSticky(store: Store, id: string): Sticky {
   const sticky = store.stickies.find((s) => s.id === id)
   if (!sticky) {
-    return `Error: Sticky with id "${id}" not found.`
+    throw new Error(`Sticky with id "${id}" not found.`)
   }
   return sticky
 }
 
-function validateColor(color: string): string | null {
+function validateColor(color: string) {
   if (!STICKY_COLORS.includes(color)) {
-    return `Error: Invalid color "${color}". Must be one of: ${STICKY_COLORS.join(
-      ', '
-    )}`
+    throw new Error(
+      `Invalid color "${color}". Must be one of: ${STICKY_COLORS.join(', ')}`
+    )
   }
-  return null
 }
 
 function getStickies(store: Store, args: Record<string, unknown>) {
@@ -53,8 +52,7 @@ function getStickies(store: Store, args: Record<string, unknown>) {
 function addSticky(store: Store, args: Record<string, unknown>) {
   const color = args.color as string | undefined
   if (color !== undefined) {
-    const colorError = validateColor(color)
-    if (colorError) return colorError
+    validateColor(color)
   }
 
   const id = store.addSticky()
@@ -69,7 +67,7 @@ function addSticky(store: Store, args: Record<string, unknown>) {
 
   const sticky = store.stickies.find((s) => s.id === id)
   if (!sticky) {
-    return 'Error: Failed to create sticky.'
+    throw new Error('Failed to create sticky.')
   }
 
   return { sticky }
@@ -77,8 +75,7 @@ function addSticky(store: Store, args: Record<string, unknown>) {
 
 function updateSticky(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
-  const sticky = requireSticky(store, id)
-  if (typeof sticky === 'string') return sticky
+  requireSticky(store, id)
 
   if (args.content !== undefined) {
     store.updateSticky(id, args.content as string)
@@ -86,14 +83,13 @@ function updateSticky(store: Store, args: Record<string, unknown>) {
 
   if (args.color !== undefined) {
     const color = args.color as string
-    const colorError = validateColor(color)
-    if (colorError) return colorError
+    validateColor(color)
     store.updateStickyColor(id, color)
   }
 
   const updated = store.stickies.find((s) => s.id === id)
   if (!updated) {
-    return `Error: Sticky with id "${id}" not found.`
+    throw new Error(`Sticky with id "${id}" not found.`)
   }
 
   return { sticky: updated }
@@ -101,8 +97,7 @@ function updateSticky(store: Store, args: Record<string, unknown>) {
 
 function deleteSticky(store: Store, args: Record<string, unknown>) {
   const id = args.id as string
-  const sticky = requireSticky(store, id)
-  if (typeof sticky === 'string') return sticky
+  requireSticky(store, id)
 
   store.deleteSticky(id)
   return { deleted: true, id }
