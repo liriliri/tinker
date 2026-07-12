@@ -36,6 +36,7 @@ const globals: Record<string, string> = {
   'remark-gfm': 'remarkGfm',
   'remark-breaks': 'remarkBreaks',
   'rehype-raw': 'rehypeRaw',
+  mermaid: 'mermaid',
   '@headlessui/react': 'headlessui',
   'react-hot-toast': 'reactHotToast',
   'react-resizable-panels': 'reactResizablePanels',
@@ -360,6 +361,10 @@ export default defineConfig(({ mode }) => {
     return createConfig('markdown', 'PluginVendorMarkdown', {
       external: ['react', 'react/jsx-runtime'],
     })
+  }
+
+  if (target === 'mermaid') {
+    return createConfig('mermaid', 'PluginVendorMermaid')
   }
 
   if (target === 'headlessui') {

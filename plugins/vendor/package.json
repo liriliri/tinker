@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:calendar && npm run build:share:fileicon",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:mermaid && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:calendar && npm run build:share:fileicon",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --mode react",
     "build:mobx": "vite build --mode mobx",
@@ -18,6 +18,7 @@
     "build:resizablepanels": "vite build --mode resizablepanels",
     "build:syntaxhighlighter": "vite build --mode syntaxhighlighter",
     "build:markdown": "vite build --mode markdown",
+    "build:mermaid": "vite build --mode mermaid",
     "build:hexeditor": "vite build --mode hexeditor",
     "build:headlessui": "vite build --mode headlessui",
     "build:hottoast": "vite build --mode hottoast",
@@ -66,6 +67,7 @@
     "js-calendar-converter": "^0.0.7",
     "lucide-react": "^0.556.0",
     "mathjs": "^15.1.0",
+    "mermaid": "^11.16.0",
     "monaco-editor": "^0.55.1",
     "overlayscrollbars": "^2.10.0",
     "overlayscrollbars-react": "^0.5.6",

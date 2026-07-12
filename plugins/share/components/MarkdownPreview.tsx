@@ -5,6 +5,7 @@ import * as prismStyles from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import rehypeRaw from 'rehype-raw'
+import MermaidDiagram from './MermaidDiagram'
 import { tw } from '../theme'
 
 export interface MarkdownPreviewProps {
@@ -132,9 +133,13 @@ function useMarkdownComponents(isDark: boolean): Components {
           {children}
         </a>
       ),
+      // react-markdown wraps fenced code in <pre><code>; custom code renderer owns layout.
+      pre: ({ children }) => <>{children}</>,
       code: ({ className, children, ...props }) => {
         const match = /language-(\w+)/.exec(className || '')
-        const isInline = !String(children).includes('\n')
+        const language = match?.[1] || 'text'
+        const raw = String(children)
+        const isInline = !raw.includes('\n')
         if (isInline) {
           return (
             <code
@@ -145,10 +150,14 @@ function useMarkdownComponents(isDark: boolean): Components {
             </code>
           )
         }
+        const code = raw.replace(/\n$/, '')
+        if (language === 'mermaid') {
+          return <MermaidDiagram source={code} isDark={isDark} />
+        }
         return (
           <SyntaxHighlighter
             style={isDark ? prismStyles.oneDark : prismStyles.oneLight}
-            language={match?.[1] || 'text'}
+            language={language}
             PreTag="div"
             customStyle={{
               borderRadius: '6px',
@@ -156,7 +165,7 @@ function useMarkdownComponents(isDark: boolean): Components {
               fontSize: '13px',
             }}
           >
-            {String(children).replace(/\n$/, '')}
+            {code}
           </SyntaxHighlighter>
         )
       },

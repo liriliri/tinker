@@ -13,6 +13,7 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `pdfjs/pdfjs.js` | `pdfjs-dist` |
 | `syntaxhighlighter.js` | `react-syntax-highlighter`, `react-syntax-highlighter/dist/esm/styles/prism` |
 | `markdown.js` | `react-markdown`, `remark-gfm`, `remark-breaks`, `rehype-raw` |
+| `mermaid.js` | `mermaid` |
 | `mathjs.js` | `mathjs` |
 | `idb.js` | `idb` |
 | `zxing.js` | `@zxing/library` |

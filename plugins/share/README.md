@@ -98,7 +98,7 @@ Vendor scripts required for some viewers:
 |-----------|----------------|
 | HexEditor | `react-hex-editor` |
 | VideoPlayer | `videojs` (+ `share/styles/videoPlayer.scss`) |
-| MarkdownPreview | `markdown`, `syntaxhighlighter` |
+| MarkdownPreview | `markdown`, `syntaxhighlighter`, `mermaid` |
 | PdfViewer | `pdfjs` |
 | FilePreview | depends on file type (see component) |
 
@@ -247,7 +247,7 @@ Pass `rootPath` for blank-area context menu (New File / New Folder). File watchi
 
 **PdfViewer** — controlled PDF renderer; also exports `Thumbnail` and `Outline` atoms for custom sidebars.
 
-**MarkdownPreview** — GFM + syntax highlighting; optional `scrollPercent` / `onScrollPercentChange` to sync with an editor.
+**MarkdownPreview** — GFM + syntax highlighting + Mermaid diagrams (fenced `mermaid` code blocks); optional `scrollPercent` / `onScrollPercentChange` to sync with an editor.
 
 ```ts
 import FileList from 'share/components/FileList'
