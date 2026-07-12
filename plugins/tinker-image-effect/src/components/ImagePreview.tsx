@@ -6,7 +6,6 @@ import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import {
   PREVIEW_FIT_AREA,
-  computeFitRatio,
   computeFitRect,
   zoomRectAtPivot,
   type ImageRect,
@@ -334,7 +333,8 @@ const ImagePreview = observer(function ImagePreview() {
       const container = containerRef.current
       const containerRect = container.getBoundingClientRect()
       const { width: cw, height: ch } = containerRect
-      const fitRatio = computeFitRatio(nw, nh, cw, ch, PREVIEW_FIT_AREA)
+      const fitRect = computeFitRect(nw, nh, cw, ch, PREVIEW_FIT_AREA)
+      const fitRatio = fitRect.width / nw
       const pointerX = event.clientX - containerRect.left
       const pointerY = event.clientY - containerRect.top
       const isAtFit = Math.abs(ratio - fitRatio) < 0.01
@@ -342,13 +342,12 @@ const ImagePreview = observer(function ImagePreview() {
       if (isAtFit) {
         zoomTo(1, { x: pointerX, y: pointerY }, true)
       } else {
-        const targetRect = computeFitRect(nw, nh, cw, ch, PREVIEW_FIT_AREA)
-        animateToRect(targetRect, () => {
-          fitRatioRef.current = targetRect.width / nw
+        animateToRect(fitRect, () => {
+          fitRatioRef.current = fitRatio
           transform.current = {
             ...transform.current,
-            rect: targetRect,
-            ratio: fitRatioRef.current,
+            rect: fitRect,
+            ratio: fitRatio,
           }
         })
       }

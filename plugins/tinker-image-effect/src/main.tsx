@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import startWith from 'licia/startWith'
 import { tw } from 'share/theme'
 import ImageOpen from 'share/components/ImageOpen'
 import store from './store'
@@ -28,7 +29,7 @@ const App = observer(function App() {
     if (!files || files.length === 0) return
 
     const file = files[0]
-    if (!file.type.startsWith('image/')) {
+    if (!startWith(file.type, 'image/')) {
       console.warn('Only image files are supported')
       return
     }

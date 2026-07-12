@@ -50,7 +50,7 @@ export interface EffectParamsMap {
   ascii: AsciiParams
 }
 
-export interface EffectDefinition {
+interface EffectDefinition {
   id: EffectId
   nameKey: string
 }

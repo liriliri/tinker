@@ -1,5 +1,6 @@
 import clamp from 'licia/clamp'
 import type { AsciiCharset, AsciiParams } from '../types'
+import { getLuma } from './util'
 
 export const DEFAULT_ASCII_PARAMS: AsciiParams = {
   cellSize: 8,
@@ -34,10 +35,6 @@ const ASCII_PAPER_LIGHT = '#ffffff'
 const ASCII_PAPER_DARK = '#111111'
 const ASCII_INK_LIGHT = '#eeeeee'
 const ASCII_INK_DARK = '#111111'
-
-function getLuma(r: number, g: number, b: number): number {
-  return 0.299 * r + 0.587 * g + 0.114 * b
-}
 
 function applyContrast(value: number, contrast: number): number {
   const factor = (259 * (contrast + 255)) / (255 * (259 - contrast))

@@ -60,20 +60,3 @@ export function zoomRectAtPivot(
     top: top - (newHeight - height) * ((pivotPoint.y - top) / height),
   }
 }
-
-export function computeFitRatio(
-  naturalWidth: number,
-  naturalHeight: number,
-  containerWidth: number,
-  containerHeight: number,
-  fitArea: number
-): number {
-  const rect = computeFitRect(
-    naturalWidth,
-    naturalHeight,
-    containerWidth,
-    containerHeight,
-    fitArea
-  )
-  return rect.width / naturalWidth
-}

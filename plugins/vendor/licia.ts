@@ -6,6 +6,7 @@ import chunk from 'licia/chunk'
 import clamp from 'licia/clamp'
 import className from 'licia/className'
 import clone from 'licia/clone'
+import Color from 'licia/Color'
 import compact from 'licia/compact'
 import contain from 'licia/contain'
 import convertBin from 'licia/convertBin'
@@ -85,6 +86,7 @@ import stripHtmlTag from 'licia/stripHtmlTag'
 import sum from 'licia/sum'
 import toInt from 'licia/toInt'
 import toNum from 'licia/toNum'
+import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
 import trim from 'licia/trim'
 import truncate from 'licia/truncate'
@@ -104,6 +106,7 @@ const licia = {
   clamp,
   className,
   clone,
+  Color,
   compact,
   contain,
   convertBin,
@@ -183,6 +186,7 @@ const licia = {
   sum,
   toInt,
   toNum,
+  toBool,
   toStr,
   trim,
   truncate,
@@ -206,6 +210,7 @@ export {
   clamp,
   className,
   clone,
+  Color,
   compact,
   contain,
   convertBin,
@@ -285,6 +290,7 @@ export {
   sum,
   toInt,
   toNum,
+  toBool,
   toStr,
   trim,
   truncate,

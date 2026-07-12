@@ -12,25 +12,10 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    apply_sketch: applySketch,
-    apply_pixelate: applyPixelate,
-    apply_ascii: applyAscii,
+    apply_sketch: (store, args) => applyEffect(store, 'sketch', args),
+    apply_pixelate: (store, args) => applyEffect(store, 'pixelate', args),
+    apply_ascii: (store, args) => applyEffect(store, 'ascii', args),
   })
-}
-
-async function applySketch(store: Store, args: Record<string, unknown>) {
-  applySketchParams(store, args)
-  return applyEffect(store, 'sketch', args)
-}
-
-async function applyPixelate(store: Store, args: Record<string, unknown>) {
-  applyPixelateParams(store, args)
-  return applyEffect(store, 'pixelate', args)
-}
-
-async function applyAscii(store: Store, args: Record<string, unknown>) {
-  applyAsciiParams(store, args)
-  return applyEffect(store, 'ascii', args)
 }
 
 async function applyEffect(
@@ -58,6 +43,14 @@ async function applyEffect(
         `Output directory not found: ${splitPath(outputPath).dir}`
       )
     }
+  }
+
+  if (effect === 'sketch') {
+    applySketchParams(store, args)
+  } else if (effect === 'pixelate') {
+    applyPixelateParams(store, args)
+  } else {
+    applyAsciiParams(store, args)
   }
 
   store.setOverwriteOriginal(overwriteOriginal)

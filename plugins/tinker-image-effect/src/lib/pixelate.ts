@@ -1,3 +1,6 @@
+import Color from 'licia/Color'
+import map from 'licia/map'
+import mapObj from 'licia/mapObj'
 import type { PixelPaletteId, PixelateParams } from '../types'
 
 export const DEFAULT_PIXELATE_PARAMS: PixelateParams = {
@@ -20,7 +23,7 @@ interface RgbColor {
   b: number
 }
 
-const PALETTE_HEX: Record<PixelPaletteId, string[]> = {
+export const PALETTE_HEX: Record<PixelPaletteId, string[]> = {
   pico8: [
     '#000000',
     '#1D2B53',
@@ -78,45 +81,12 @@ const PALETTE_HEX: Record<PixelPaletteId, string[]> = {
   candy: ['#ff0a54', '#ff477e', '#ff85a1', '#fbb1bd'],
 }
 
-function parseHexColor(hex: string): RgbColor | null {
-  const raw = hex.replace('#', '')
-  if (raw.length === 3) {
-    return {
-      r: parseInt(raw[0] + raw[0], 16),
-      g: parseInt(raw[1] + raw[1], 16),
-      b: parseInt(raw[2] + raw[2], 16),
-    }
-  }
-  if (raw.length === 6) {
-    return {
-      r: parseInt(raw.slice(0, 2), 16),
-      g: parseInt(raw.slice(2, 4), 16),
-      b: parseInt(raw.slice(4, 6), 16),
-    }
-  }
-  return null
-}
-
-function buildPalette(hexColors: string[]): RgbColor[] {
-  const colors: RgbColor[] = []
-  for (const hex of hexColors) {
-    const color = parseHexColor(hex)
-    if (color) colors.push(color)
-  }
-  return colors
-}
-
-const PALETTE_RGB: Record<PixelPaletteId, RgbColor[]> = Object.fromEntries(
-  Object.entries(PALETTE_HEX).map(([id, colors]) => [id, buildPalette(colors)])
+const PALETTE_RGB = mapObj(PALETTE_HEX, (hexColors) =>
+  map(hexColors, (hex) => {
+    const { val } = Color.parse(hex)
+    return { r: val[0], g: val[1], b: val[2] }
+  })
 ) as Record<PixelPaletteId, RgbColor[]>
-
-function getPaletteColors(id: PixelPaletteId): RgbColor[] {
-  return PALETTE_RGB[id]
-}
-
-export function getPaletteHexColors(id: PixelPaletteId): string[] {
-  return PALETTE_HEX[id]
-}
 
 function nearestPaletteColor(
   r: number,
@@ -143,7 +113,7 @@ function nearestPaletteColor(
 }
 
 function quantizeToPalette(data: Uint8ClampedArray, paletteId: PixelPaletteId) {
-  const palette = getPaletteColors(paletteId)
+  const palette = PALETTE_RGB[paletteId]
 
   for (let i = 0; i < data.length; i += 4) {
     if (data[i + 3] === 0) continue

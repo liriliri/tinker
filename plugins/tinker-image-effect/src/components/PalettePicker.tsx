@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { tw } from 'share/theme'
-import { getPaletteHexColors } from '../lib/pixelate'
+import { PALETTE_HEX } from '../lib/pixelate'
 import { PIXEL_PALETTE_OPTIONS, type PixelPaletteId } from '../types'
 
-export interface PalettePickerProps {
+interface PalettePickerProps {
   value: PixelPaletteId
   onChange: (value: PixelPaletteId) => void
   labels: Record<PixelPaletteId, string>
@@ -77,7 +77,7 @@ function PaletteStrip({ colors }: PaletteStripProps) {
 }
 
 function PaletteSwatch({ id, label, selected, onSelect }: PaletteSwatchProps) {
-  const colors = getPaletteHexColors(id)
+  const colors = PALETTE_HEX[id]
 
   return (
     <button

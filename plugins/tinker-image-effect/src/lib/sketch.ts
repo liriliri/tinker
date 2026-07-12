@@ -1,5 +1,6 @@
 import clamp from 'licia/clamp'
 import type { SketchParams } from '../types'
+import { getLuma } from './util'
 
 export const DEFAULT_SKETCH_PARAMS: SketchParams = {
   thickness: 2,
@@ -35,10 +36,6 @@ export const DEEPEN_RANGE = {
   step: 1,
   default: DEFAULT_SKETCH_PARAMS.deepen,
 } as const
-
-function getLuma(r: number, g: number, b: number): number {
-  return 0.299 * r + 0.587 * g + 0.114 * b
-}
 
 function buildGaussKernel(radius: number): Float32Array {
   const sigma = radius / 3

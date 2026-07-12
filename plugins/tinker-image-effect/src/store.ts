@@ -1,11 +1,14 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import i18n from 'i18next'
+import clone from 'licia/clone'
+import contain from 'licia/contain'
 import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
 import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
+import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
 import toast from 'react-hot-toast'
 import BaseStore from 'share/store/Base'
@@ -18,6 +21,7 @@ import { DEFAULT_SKETCH_PARAMS } from './lib/sketch'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 import { createMcpApi } from './mcp'
 import {
+  EFFECTS,
   type AsciiParams,
   type EffectId,
   type EffectParamsMap,
@@ -30,31 +34,13 @@ const storage = new LocalStore('tinker-image-effect')
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_EFFECT_ID = 'effectId'
 const RENDER_DEBOUNCE_MS = 200
+const EFFECT_IDS = EFFECTS.map((effect) => effect.id)
 
 function createDefaultEffectParams(): EffectParamsMap {
   return {
-    sketch: { ...DEFAULT_SKETCH_PARAMS },
-    pixelate: { ...DEFAULT_PIXELATE_PARAMS },
-    ascii: { ...DEFAULT_ASCII_PARAMS },
-  }
-}
-
-function cloneEffectParams(params: EffectParamsMap): EffectParamsMap {
-  return {
-    sketch: { ...params.sketch },
-    pixelate: { ...params.pixelate },
-    ascii: { ...params.ascii },
-  }
-}
-
-function isEffectId(value: unknown): value is EffectId {
-  return value === 'sketch' || value === 'pixelate' || value === 'ascii'
-}
-
-function createDefaultEffectState() {
-  return {
-    effectId: 'sketch' as EffectId,
-    params: createDefaultEffectParams(),
+    sketch: clone(DEFAULT_SKETCH_PARAMS),
+    pixelate: clone(DEFAULT_PIXELATE_PARAMS),
+    ascii: clone(DEFAULT_ASCII_PARAMS),
   }
 }
 
@@ -82,7 +68,7 @@ export class Store extends BaseStore {
     this.effectId = this.loadEffectId()
     makeAutoObservable(this, {
       debouncedRender: false,
-    })
+    } as Record<string, false>)
     this.bindEvent()
   }
 
@@ -168,10 +154,10 @@ export class Store extends BaseStore {
   }
 
   setSketchParam<K extends keyof SketchParams>(key: K, value: SketchParams[K]) {
-    this.params = cloneEffectParams({
+    this.params = {
       ...this.params,
       sketch: { ...this.params.sketch, [key]: value },
-    })
+    }
     this.applyParamChange()
   }
 
@@ -179,18 +165,18 @@ export class Store extends BaseStore {
     key: K,
     value: PixelateParams[K]
   ) {
-    this.params = cloneEffectParams({
+    this.params = {
       ...this.params,
       pixelate: { ...this.params.pixelate, [key]: value },
-    })
+    }
     this.applyParamChange()
   }
 
   setAsciiParam<K extends keyof AsciiParams>(key: K, value: AsciiParams[K]) {
-    this.params = cloneEffectParams({
+    this.params = {
       ...this.params,
       ascii: { ...this.params.ascii, [key]: value },
-    })
+    }
     this.applyParamChange()
   }
 
@@ -210,13 +196,12 @@ export class Store extends BaseStore {
   }
 
   private loadOverwriteOriginal(): boolean {
-    const saved = storage.get(STORAGE_OVERWRITE)
-    return saved === 'true'
+    return toBool(storage.get(STORAGE_OVERWRITE))
   }
 
   private loadEffectId(): EffectId {
     const saved = storage.get(STORAGE_EFFECT_ID)
-    return isEffectId(saved) ? saved : 'sketch'
+    return contain(EFFECT_IDS, saved) ? (saved as EffectId) : 'sketch'
   }
 
   scheduleRender() {
@@ -323,7 +308,10 @@ export class Store extends BaseStore {
   get hasChanges() {
     return !isEqual(
       { effectId: this.effectId, params: this.params },
-      createDefaultEffectState()
+      {
+        effectId: 'sketch' as EffectId,
+        params: createDefaultEffectParams(),
+      }
     )
   }
 

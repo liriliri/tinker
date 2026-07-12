@@ -1,6 +1,6 @@
 import type { EffectId, EffectParamsMap } from '../types'
 import { applyAscii } from './ascii'
-import { computeWorkingDimensions, rasterizeImage } from './imageLoad'
+import { computeWorkingDimensions, rasterizeImage } from './util'
 import { applyPixelate } from './pixelate'
 import { applySketch } from './sketch'
 
