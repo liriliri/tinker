@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { COLOR_RANGE, type ColorAdjustmentKey } from '../types'
 import store from '../store'
-import AdjustmentSlider from './AdjustmentSlider'
+import { AdjustmentSlider } from 'share/components/Slider'
 
 const COLOR_SLIDERS: {
   key: ColorAdjustmentKey

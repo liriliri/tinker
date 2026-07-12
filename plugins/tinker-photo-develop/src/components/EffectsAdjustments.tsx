@@ -12,7 +12,7 @@ import {
   VIGNETTE_ROUNDNESS_RANGE,
   type EffectsAdjustmentKey,
 } from '../types'
-import AdjustmentSlider from './AdjustmentSlider'
+import { AdjustmentSlider } from 'share/components/Slider'
 
 const VIGNETTE_SLIDERS: {
   key: EffectsAdjustmentKey

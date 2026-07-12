@@ -67,7 +67,7 @@ import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
-import Slider from 'share/components/Slider'
+import Slider, { AdjustmentSlider } from 'share/components/Slider'
 import ScanDirsModal from 'share/components/ScanDirsModal'
 ```
 

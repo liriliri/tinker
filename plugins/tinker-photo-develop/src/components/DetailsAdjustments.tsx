@@ -8,7 +8,7 @@ import {
   SHARPNESS_THRESHOLD_RANGE,
   type DetailsAdjustmentKey,
 } from '../types'
-import AdjustmentSlider from './AdjustmentSlider'
+import { AdjustmentSlider } from 'share/components/Slider'
 
 const SHARPENING_SLIDERS: {
   key: DetailsAdjustmentKey

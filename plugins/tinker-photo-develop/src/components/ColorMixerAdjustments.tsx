@@ -15,7 +15,7 @@ import {
   type MixerAdjustmentKey,
   type MixerChannel,
 } from '../types'
-import AdjustmentSlider from './AdjustmentSlider'
+import { AdjustmentSlider } from 'share/components/Slider'
 
 const MIXER_LABEL_KEYS: Record<MixerChannel, string> = {
   reds: 'mixerReds',

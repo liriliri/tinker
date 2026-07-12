@@ -7,7 +7,7 @@ import {
   type BasicAdjustmentKey,
 } from '../types'
 import store from '../store'
-import AdjustmentSlider from './AdjustmentSlider'
+import { AdjustmentSlider } from 'share/components/Slider'
 
 const BASIC_SLIDERS: {
   key: BasicAdjustmentKey
