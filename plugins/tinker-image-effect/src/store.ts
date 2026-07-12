@@ -26,18 +26,23 @@ import {
 
 const storage = new LocalStore('tinker-image-effect')
 const STORAGE_OVERWRITE = 'overwriteOriginal'
+const STORAGE_EFFECT_ID = 'effectId'
 const RENDER_DEBOUNCE_MS = 200
+
+function isEffectId(value: unknown): value is EffectId {
+  return value === 'sketch' || value === 'pixelate' || value === 'ascii'
+}
 
 function createDefaultEffectState() {
   return {
-    effectId: 'original' as EffectId,
+    effectId: 'sketch' as EffectId,
     params: createDefaultEffectParams(),
   }
 }
 
 class Store extends BaseStore {
   image: ImageInfo | null = null
-  effectId: EffectId = 'original'
+  effectId: EffectId = 'sketch'
   params: EffectParamsMap = createDefaultEffectParams()
   previewVersion = 0
   isLoading = false
@@ -54,6 +59,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     this.overwriteOriginal = this.loadOverwriteOriginal()
+    this.effectId = this.loadEffectId()
     makeAutoObservable(this, {
       debouncedRender: false,
     })
@@ -107,7 +113,6 @@ class Store extends BaseStore {
           width: loadResult.width,
           height: loadResult.height,
         }
-        this.applyDefaultEffect()
         this.isSaved = false
       })
 
@@ -138,6 +143,7 @@ class Store extends BaseStore {
   setEffect(effectId: EffectId) {
     if (this.effectId === effectId) return
     this.effectId = effectId
+    storage.set(STORAGE_EFFECT_ID, effectId)
     this.applyStateChange()
   }
 
@@ -168,18 +174,6 @@ class Store extends BaseStore {
     this.applyParamChange()
   }
 
-  resetEffect() {
-    this.applyDefaultEffect()
-    this.isSaved = false
-    this.scheduleRender()
-  }
-
-  private applyDefaultEffect() {
-    const initial = createDefaultEffectState()
-    this.effectId = initial.effectId
-    this.params = initial.params
-  }
-
   private applyStateChange() {
     this.isSaved = false
     this.scheduleRender()
@@ -198,6 +192,11 @@ class Store extends BaseStore {
   private loadOverwriteOriginal(): boolean {
     const saved = storage.get(STORAGE_OVERWRITE)
     return saved === 'true'
+  }
+
+  private loadEffectId(): EffectId {
+    const saved = storage.get(STORAGE_EFFECT_ID)
+    return isEffectId(saved) ? saved : 'sketch'
   }
 
   scheduleRender() {

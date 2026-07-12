@@ -1,8 +1,47 @@
-import { computeWorkingDimensions, rasterizeImage } from './imageLoad'
-import { renderEffect } from './effects'
 import type { EffectId, EffectParamsMap } from '../types'
+import { applyAscii } from './ascii'
+import { computeWorkingDimensions, rasterizeImage } from './imageLoad'
+import { applyPixelate } from './pixelate'
+import { applySketch } from './sketch'
 
 const MAX_PREVIEW_DIMENSION = 4096
+
+function renderEffect(
+  source: HTMLCanvasElement,
+  target: HTMLCanvasElement,
+  effectId: EffectId,
+  params: EffectParamsMap
+): void {
+  const width = source.width
+  const height = source.height
+  target.width = width
+  target.height = height
+
+  const ctx = target.getContext('2d')
+  if (!ctx) {
+    throw new Error('Failed to get canvas context')
+  }
+
+  if (effectId === 'pixelate') {
+    const result = applyPixelate(source, params.pixelate)
+    ctx.putImageData(result, 0, 0)
+    return
+  }
+
+  const sourceCtx = source.getContext('2d')
+  if (!sourceCtx) {
+    throw new Error('Failed to get source canvas context')
+  }
+
+  const imageData = sourceCtx.getImageData(0, 0, width, height)
+
+  if (effectId === 'ascii') {
+    applyAscii(ctx, imageData, params.ascii)
+    return
+  }
+
+  ctx.putImageData(applySketch(imageData, params.sketch), 0, 0)
+}
 
 export class EffectRenderer {
   readonly canvas: HTMLCanvasElement

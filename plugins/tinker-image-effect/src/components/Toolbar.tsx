@@ -1,19 +1,30 @@
 import { observer } from 'mobx-react-lite'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen, RotateCcw, Save } from 'lucide-react'
+import { FolderOpen, Save } from 'lucide-react'
 import Checkbox from 'share/components/Checkbox'
+import Select from 'share/components/Select'
 import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
-  ToolbarLabel,
 } from 'share/components/Toolbar'
 import store from '../store'
+import { EFFECTS, type EffectId } from '../types'
 
 const ToolbarComponent = observer(function ToolbarComponent() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const effectOptions = useMemo(
+    () =>
+      EFFECTS.map((effect) => ({
+        value: effect.id,
+        label: t(effect.nameKey),
+      })),
+    [t, i18n.language]
+  )
 
   const handleOpenImage = async () => {
     try {
@@ -57,19 +68,12 @@ const ToolbarComponent = observer(function ToolbarComponent() {
 
       <ToolbarSpacer />
 
-      {store.hasImage && store.image && (
-        <ToolbarLabel className="tabular-nums">
-          {`${store.image.width} × ${store.image.height}`}
-        </ToolbarLabel>
-      )}
-
-      <ToolbarButton
-        onClick={() => store.resetEffect()}
-        disabled={!store.hasImage || !store.hasChanges}
-        title={t('resetEffect')}
-      >
-        <RotateCcw size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
+      <Select<EffectId>
+        className="w-24"
+        value={store.effectId}
+        onChange={(value) => store.setEffect(value)}
+        options={effectOptions}
+      />
     </Toolbar>
   )
 })

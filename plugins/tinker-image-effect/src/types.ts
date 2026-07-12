@@ -5,15 +5,32 @@ export interface ImageInfo {
   height: number
 }
 
-export type EffectId = 'original' | 'sketch' | 'pixelate' | 'ascii'
+export type EffectId = 'sketch' | 'pixelate' | 'ascii'
 
 export interface SketchParams {
   detail: number
   contrast: number
 }
 
+export type PixelPaletteId =
+  | 'pico8'
+  | 'lostCentury'
+  | 'sunset8'
+  | 'twilight5'
+  | 'gameboy'
+  | 'retroNes'
+  | 'cyberpunk'
+  | 'monochrome'
+  | 'sunset'
+  | 'ocean'
+  | 'forest'
+  | 'candy'
+
 export interface PixelateParams {
   pixelSize: number
+  paletteEnabled: boolean
+  palette: PixelPaletteId
+  outline: boolean
 }
 
 export type AsciiCharset = 'simple' | 'detailed' | 'blocks'
@@ -37,7 +54,6 @@ export interface EffectDefinition {
 }
 
 export const EFFECTS: EffectDefinition[] = [
-  { id: 'original', nameKey: 'effectOriginal' },
   { id: 'sketch', nameKey: 'effectSketch' },
   { id: 'pixelate', nameKey: 'effectPixelate' },
   { id: 'ascii', nameKey: 'effectAscii' },
@@ -52,6 +68,24 @@ export const ASCII_CHARSET_OPTIONS: {
   { value: 'blocks', labelKey: 'charsetBlocks' },
 ]
 
+export const PIXEL_PALETTE_OPTIONS: {
+  value: PixelPaletteId
+  labelKey: string
+}[] = [
+  { value: 'pico8', labelKey: 'palettePico8' },
+  { value: 'lostCentury', labelKey: 'paletteLostCentury' },
+  { value: 'sunset8', labelKey: 'paletteSunset8' },
+  { value: 'twilight5', labelKey: 'paletteTwilight5' },
+  { value: 'gameboy', labelKey: 'paletteGameboy' },
+  { value: 'retroNes', labelKey: 'paletteRetroNes' },
+  { value: 'cyberpunk', labelKey: 'paletteCyberpunk' },
+  { value: 'monochrome', labelKey: 'paletteMonochrome' },
+  { value: 'sunset', labelKey: 'paletteSunset' },
+  { value: 'ocean', labelKey: 'paletteOcean' },
+  { value: 'forest', labelKey: 'paletteForest' },
+  { value: 'candy', labelKey: 'paletteCandy' },
+]
+
 export const DEFAULT_SKETCH_PARAMS: SketchParams = {
   detail: 50,
   contrast: 50,
@@ -59,6 +93,9 @@ export const DEFAULT_SKETCH_PARAMS: SketchParams = {
 
 export const DEFAULT_PIXELATE_PARAMS: PixelateParams = {
   pixelSize: 12,
+  paletteEnabled: false,
+  palette: 'pico8',
+  outline: false,
 }
 
 export const DEFAULT_ASCII_PARAMS: AsciiParams = {

@@ -1,31 +1,30 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import Checkbox from 'share/components/Checkbox'
-import Select from 'share/components/Select'
 import { AdjustmentSlider } from 'share/components/Slider'
+import Switch from 'share/components/Switch'
 import { tw } from 'share/theme'
 import store from '../store'
 import {
-  ASCII_CHARSET_OPTIONS,
   CELL_SIZE_RANGE,
   CONTRAST_RANGE,
   DETAIL_RANGE,
+  PIXEL_PALETTE_OPTIONS,
   PIXEL_SIZE_RANGE,
-  type AsciiCharset,
+  type PixelPaletteId,
 } from '../types'
+import PalettePicker from './PalettePicker'
 
 const EffectParams = observer(function EffectParams() {
   const { t, i18n } = useTranslation()
 
-  const charsetOptions = useMemo(
-    () =>
-      ASCII_CHARSET_OPTIONS.map((option) => ({
-        value: option.value,
-        label: t(option.labelKey),
-      })),
-    [t, i18n.language]
-  )
+  const paletteLabels = useMemo(() => {
+    const labels = {} as Record<PixelPaletteId, string>
+    for (const option of PIXEL_PALETTE_OPTIONS) {
+      labels[option.value] = t(option.labelKey)
+    }
+    return labels
+  }, [t, i18n.language])
 
   if (store.effectId === 'sketch') {
     return (
@@ -53,16 +52,50 @@ const EffectParams = observer(function EffectParams() {
   }
 
   if (store.effectId === 'pixelate') {
+    const paletteEnabled = store.params.pixelate.paletteEnabled
+
     return (
-      <AdjustmentSlider
-        label={t('pixelSize')}
-        value={store.params.pixelate.pixelSize}
-        min={PIXEL_SIZE_RANGE.min}
-        max={PIXEL_SIZE_RANGE.max}
-        step={PIXEL_SIZE_RANGE.step}
-        defaultValue={PIXEL_SIZE_RANGE.default}
-        onChange={(value) => store.setPixelateParam('pixelSize', value)}
-      />
+      <>
+        <AdjustmentSlider
+          label={t('pixelSize')}
+          value={store.params.pixelate.pixelSize}
+          min={PIXEL_SIZE_RANGE.min}
+          max={PIXEL_SIZE_RANGE.max}
+          step={PIXEL_SIZE_RANGE.step}
+          defaultValue={PIXEL_SIZE_RANGE.default}
+          onChange={(value) => store.setPixelateParam('pixelSize', value)}
+        />
+        <div className="mb-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className={`text-sm select-none ${tw.text.primary}`}>
+              {t('palette')}
+            </div>
+            <Switch
+              checked={paletteEnabled}
+              onChange={(checked) =>
+                store.setPixelateParam('paletteEnabled', checked)
+              }
+            />
+          </div>
+          <PalettePicker
+            value={store.params.pixelate.palette}
+            onChange={(value) => {
+              store.setPixelateParam('palette', value)
+              store.setPixelateParam('paletteEnabled', true)
+            }}
+            labels={paletteLabels}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className={`text-sm select-none ${tw.text.primary}`}>
+            {t('outline')}
+          </div>
+          <Switch
+            checked={store.params.pixelate.outline}
+            onChange={(checked) => store.setPixelateParam('outline', checked)}
+          />
+        </div>
+      </>
     )
   }
 
@@ -86,23 +119,15 @@ const EffectParams = observer(function EffectParams() {
         defaultValue={CONTRAST_RANGE.default}
         onChange={(value) => store.setAsciiParam('contrast', value)}
       />
-      <div className="mb-3">
-        <div className={`mb-2 text-sm select-none ${tw.text.primary}`}>
-          {t('charset')}
+      <div className="flex items-center justify-between gap-2">
+        <div className={`text-sm select-none ${tw.text.primary}`}>
+          {t('invert')}
         </div>
-        <Select<AsciiCharset>
-          className="w-full"
-          value={store.params.ascii.charset}
-          onChange={(value) => store.setAsciiParam('charset', value)}
-          options={charsetOptions}
+        <Switch
+          checked={store.params.ascii.invert}
+          onChange={(checked) => store.setAsciiParam('invert', checked)}
         />
       </div>
-      <Checkbox
-        checked={store.params.ascii.invert}
-        onChange={(checked) => store.setAsciiParam('invert', checked)}
-      >
-        {t('invert')}
-      </Checkbox>
     </>
   )
 })

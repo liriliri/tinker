@@ -67,6 +67,7 @@ import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
+import Switch from 'share/components/Switch'
 import Slider, { AdjustmentSlider } from 'share/components/Slider'
 import ScanDirsModal from 'share/components/ScanDirsModal'
 ```
@@ -77,30 +78,31 @@ Wrap `App.tsx` with dialog/toast providers. Use `toast` directly for toasts.
 
 Simple components — import and use directly:
 
-| Component | Import |
-|-----------|--------|
-| CopyButton | `share/components/CopyButton` |
-| Tooltip | `share/components/Tooltip` |
-| NavList | `share/components/NavList` |
-| Tree | `share/components/Tree` |
-| Grid | `share/components/Grid` |
-| TabBar | `share/components/TabBar` |
-| StatusBar | `share/components/StatusBar` |
-| DarkModeSwitch | `share/components/DarkModeSwitch` |
-| FileOpen / FolderOpen / ImageOpen | `share/components/FileOpen` etc. |
-| FileIcon | `share/components/FileIcon` |
-| Welcome | `share/components/Welcome` |
-| Webview | `share/components/Webview` |
+| Component                         | Import                            |
+| --------------------------------- | --------------------------------- |
+| CopyButton                        | `share/components/CopyButton`     |
+| Tooltip                           | `share/components/Tooltip`        |
+| NavList                           | `share/components/NavList`        |
+| Tree                              | `share/components/Tree`           |
+| Grid                              | `share/components/Grid`           |
+| TabBar                            | `share/components/TabBar`         |
+| StatusBar                         | `share/components/StatusBar`      |
+| Switch                            | `share/components/Switch`         |
+| DarkModeSwitch                    | `share/components/DarkModeSwitch` |
+| FileOpen / FolderOpen / ImageOpen | `share/components/FileOpen` etc.  |
+| FileIcon                          | `share/components/FileIcon`       |
+| Welcome                           | `share/components/Welcome`        |
+| Webview                           | `share/components/Webview`        |
 
 Vendor scripts required for some viewers:
 
-| Component | Vendor scripts |
-|-----------|----------------|
-| HexEditor | `react-hex-editor` |
-| VideoPlayer | `videojs` (+ `share/styles/videoPlayer.scss`) |
-| MarkdownPreview | `markdown`, `syntaxhighlighter`, `mermaid` |
-| PdfViewer | `pdfjs` |
-| FilePreview | depends on file type (see component) |
+| Component       | Vendor scripts                                |
+| --------------- | --------------------------------------------- |
+| HexEditor       | `react-hex-editor`                            |
+| VideoPlayer     | `videojs` (+ `share/styles/videoPlayer.scss`) |
+| MarkdownPreview | `markdown`, `syntaxhighlighter`, `mermaid`    |
+| PdfViewer       | `pdfjs`                                       |
+| FilePreview     | depends on file type (see component)          |
 
 ### OverlayScrollbars
 
@@ -188,9 +190,11 @@ Add `@use '../../share/styles/textSearch.scss'` for highlight classes.
 ### WorkingTree
 
 ```ts
-import WorkingTreeSidebar, { getWorkingTreeUIProps } from 'share/components/WorkingTree'
+import WorkingTreeSidebar, {
+  getWorkingTreeUIProps,
+} from 'share/components/WorkingTree'
 
-<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
+;<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
 ```
 
 Implement `WorkingTreeController` on your store. Helpers in `share/lib/workingTree`.
@@ -200,21 +204,28 @@ Implement `WorkingTreeController` on your store. Helpers in `share/lib/workingTr
 ```ts
 import Terminal, { getTerminalSession } from 'share/components/Terminal'
 
-<Terminal createSession={(cols, rows) => tinker.createTerminal({ cols, rows })} />
+;<Terminal
+  createSession={(cols, rows) => tinker.createTerminal({ cols, rows })}
+/>
 ```
 
 **TerminalPanel** — multi-tab, split-pane. Render-only; use `getTerminalPanelProps(terminal, isDark)` in an `observer` parent:
 
 ```ts
 import TerminalStore from 'share/store/Terminal'
-import { TerminalPanel, getTerminalPanelProps } from 'share/components/TerminalPanel'
+import {
+  TerminalPanel,
+  getTerminalPanelProps,
+} from 'share/components/TerminalPanel'
 
 this.terminal = new TerminalStore('my-plugin', () => this.rootPath)
 this.terminal.initIfOpen()
 
-{store.terminalOpen && (
-  <TerminalPanel {...getTerminalPanelProps(store.terminal, store.isDark)} />
-)}
+{
+  store.terminalOpen && (
+    <TerminalPanel {...getTerminalPanelProps(store.terminal, store.isDark)} />
+  )
+}
 ```
 
 ### FileTree
@@ -275,7 +286,12 @@ Manages messages, AI streaming, tool-call loops, and abort state.
 ```ts
 import { Agent, type AgentTool } from 'share/lib/Agent'
 
-const agent = new Agent({ provider: 'openai', model: 'gpt-4o', systemPrompt: '...', tools })
+const agent = new Agent({
+  provider: 'openai',
+  model: 'gpt-4o',
+  systemPrompt: '...',
+  tools,
+})
 await agent.send('Hello')
 agent.abort()
 ```
@@ -285,7 +301,12 @@ agent.abort()
 ```ts
 import { WEB_FETCH_TOOL, WEB_SEARCH_TOOL } from 'share/tools/web'
 import { EXEC_TOOL } from 'share/tools/shell'
-import { READ_FILE_TOOL, WRITE_FILE_TOOL, EDIT_FILE_TOOL, LIST_DIR_TOOL } from 'share/tools/fileSystem'
+import {
+  READ_FILE_TOOL,
+  WRITE_FILE_TOOL,
+  EDIT_FILE_TOOL,
+  LIST_DIR_TOOL,
+} from 'share/tools/fileSystem'
 ```
 
 ## Utilities
