@@ -16,6 +16,7 @@ import { DEFAULT_ASCII_PARAMS } from './lib/ascii'
 import { DEFAULT_PIXELATE_PARAMS } from './lib/pixelate'
 import { DEFAULT_SKETCH_PARAMS } from './lib/sketch'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
+import { createMcpApi } from './mcp'
 import {
   type AsciiParams,
   type EffectId,
@@ -57,7 +58,9 @@ function createDefaultEffectState() {
   }
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   image: ImageInfo | null = null
   effectId: EffectId = 'sketch'
   params: EffectParamsMap = createDefaultEffectParams()
@@ -235,7 +238,7 @@ class Store extends BaseStore {
     this.previewVersion++
   }
 
-  async saveImage() {
+  async saveImage(outputPath?: string) {
     if (!this.image || !this.renderer?.hasImage) return
 
     try {
@@ -243,6 +246,8 @@ class Store extends BaseStore {
 
       if (this.overwriteOriginal && this.image.filePath) {
         savePath = this.image.filePath
+      } else if (outputPath) {
+        savePath = outputPath
       } else {
         const result = await tinker.showSaveDialog({
           defaultPath: this.getDefaultSavePath(),
