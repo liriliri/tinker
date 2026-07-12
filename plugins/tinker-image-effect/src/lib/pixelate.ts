@@ -1,5 +1,19 @@
 import type { PixelPaletteId, PixelateParams } from '../types'
 
+export const DEFAULT_PIXELATE_PARAMS: PixelateParams = {
+  pixelSize: 12,
+  paletteEnabled: false,
+  palette: 'pico8',
+  outline: false,
+}
+
+export const PIXEL_SIZE_RANGE = {
+  min: 2,
+  max: 48,
+  step: 1,
+  default: DEFAULT_PIXELATE_PARAMS.pixelSize,
+} as const
+
 interface RgbColor {
   r: number
   g: number

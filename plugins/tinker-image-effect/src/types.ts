@@ -8,8 +8,10 @@ export interface ImageInfo {
 export type EffectId = 'sketch' | 'pixelate' | 'ascii'
 
 export interface SketchParams {
+  thickness: number
+  brightness: number
   detail: number
-  contrast: number
+  deepen: number
 }
 
 export type PixelPaletteId =
@@ -85,66 +87,3 @@ export const PIXEL_PALETTE_OPTIONS: {
   { value: 'forest', labelKey: 'paletteForest' },
   { value: 'candy', labelKey: 'paletteCandy' },
 ]
-
-export const DEFAULT_SKETCH_PARAMS: SketchParams = {
-  detail: 50,
-  contrast: 50,
-}
-
-export const DEFAULT_PIXELATE_PARAMS: PixelateParams = {
-  pixelSize: 12,
-  paletteEnabled: false,
-  palette: 'pico8',
-  outline: false,
-}
-
-export const DEFAULT_ASCII_PARAMS: AsciiParams = {
-  cellSize: 8,
-  contrast: 50,
-  invert: false,
-  charset: 'detailed',
-}
-
-export function createDefaultEffectParams(): EffectParamsMap {
-  return {
-    sketch: { ...DEFAULT_SKETCH_PARAMS },
-    pixelate: { ...DEFAULT_PIXELATE_PARAMS },
-    ascii: { ...DEFAULT_ASCII_PARAMS },
-  }
-}
-
-export function cloneEffectParams(params: EffectParamsMap): EffectParamsMap {
-  return {
-    sketch: { ...params.sketch },
-    pixelate: { ...params.pixelate },
-    ascii: { ...params.ascii },
-  }
-}
-
-export const DETAIL_RANGE = {
-  min: 0,
-  max: 100,
-  step: 1,
-  default: DEFAULT_SKETCH_PARAMS.detail,
-} as const
-
-export const CONTRAST_RANGE = {
-  min: 0,
-  max: 100,
-  step: 1,
-  default: 50,
-} as const
-
-export const PIXEL_SIZE_RANGE = {
-  min: 2,
-  max: 48,
-  step: 1,
-  default: DEFAULT_PIXELATE_PARAMS.pixelSize,
-} as const
-
-export const CELL_SIZE_RANGE = {
-  min: 4,
-  max: 24,
-  step: 1,
-  default: DEFAULT_ASCII_PARAMS.cellSize,
-} as const

@@ -1,6 +1,27 @@
 import clamp from 'licia/clamp'
 import type { AsciiCharset, AsciiParams } from '../types'
 
+export const DEFAULT_ASCII_PARAMS: AsciiParams = {
+  cellSize: 8,
+  contrast: 50,
+  invert: false,
+  charset: 'detailed',
+}
+
+export const CELL_SIZE_RANGE = {
+  min: 4,
+  max: 24,
+  step: 1,
+  default: DEFAULT_ASCII_PARAMS.cellSize,
+} as const
+
+export const CONTRAST_RANGE = {
+  min: 0,
+  max: 100,
+  step: 1,
+  default: DEFAULT_ASCII_PARAMS.contrast,
+} as const
+
 const ASCII_CHARSETS: Record<AsciiCharset, string> = {
   simple: ' .:-=+*#%@',
   detailed:

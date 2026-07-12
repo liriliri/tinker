@@ -12,10 +12,11 @@ import BaseStore from 'share/store/Base'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
 import { openImageFile, resolveSavePath } from 'share/lib/util'
 import { EffectRenderer } from './lib/renderer'
+import { DEFAULT_ASCII_PARAMS } from './lib/ascii'
+import { DEFAULT_PIXELATE_PARAMS } from './lib/pixelate'
+import { DEFAULT_SKETCH_PARAMS } from './lib/sketch'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 import {
-  cloneEffectParams,
-  createDefaultEffectParams,
   type AsciiParams,
   type EffectId,
   type EffectParamsMap,
@@ -28,6 +29,22 @@ const storage = new LocalStore('tinker-image-effect')
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_EFFECT_ID = 'effectId'
 const RENDER_DEBOUNCE_MS = 200
+
+function createDefaultEffectParams(): EffectParamsMap {
+  return {
+    sketch: { ...DEFAULT_SKETCH_PARAMS },
+    pixelate: { ...DEFAULT_PIXELATE_PARAMS },
+    ascii: { ...DEFAULT_ASCII_PARAMS },
+  }
+}
+
+function cloneEffectParams(params: EffectParamsMap): EffectParamsMap {
+  return {
+    sketch: { ...params.sketch },
+    pixelate: { ...params.pixelate },
+    ascii: { ...params.ascii },
+  }
+}
 
 function isEffectId(value: unknown): value is EffectId {
   return value === 'sketch' || value === 'pixelate' || value === 'ascii'

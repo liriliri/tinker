@@ -5,14 +5,15 @@ import { AdjustmentSlider } from 'share/components/Slider'
 import Switch from 'share/components/Switch'
 import { tw } from 'share/theme'
 import store from '../store'
+import { CELL_SIZE_RANGE, CONTRAST_RANGE } from '../lib/ascii'
+import { PIXEL_SIZE_RANGE } from '../lib/pixelate'
 import {
-  CELL_SIZE_RANGE,
-  CONTRAST_RANGE,
+  BRIGHTNESS_RANGE,
+  DEEPEN_RANGE,
   DETAIL_RANGE,
-  PIXEL_PALETTE_OPTIONS,
-  PIXEL_SIZE_RANGE,
-  type PixelPaletteId,
-} from '../types'
+  THICKNESS_RANGE,
+} from '../lib/sketch'
+import { PIXEL_PALETTE_OPTIONS, type PixelPaletteId } from '../types'
 import PalettePicker from './PalettePicker'
 
 const EffectParams = observer(function EffectParams() {
@@ -30,6 +31,24 @@ const EffectParams = observer(function EffectParams() {
     return (
       <>
         <AdjustmentSlider
+          label={t('thickness')}
+          value={store.params.sketch.thickness}
+          min={THICKNESS_RANGE.min}
+          max={THICKNESS_RANGE.max}
+          step={THICKNESS_RANGE.step}
+          defaultValue={THICKNESS_RANGE.default}
+          onChange={(value) => store.setSketchParam('thickness', value)}
+        />
+        <AdjustmentSlider
+          label={t('brightness')}
+          value={store.params.sketch.brightness}
+          min={BRIGHTNESS_RANGE.min}
+          max={BRIGHTNESS_RANGE.max}
+          step={BRIGHTNESS_RANGE.step}
+          defaultValue={BRIGHTNESS_RANGE.default}
+          onChange={(value) => store.setSketchParam('brightness', value)}
+        />
+        <AdjustmentSlider
           label={t('detail')}
           value={store.params.sketch.detail}
           min={DETAIL_RANGE.min}
@@ -39,13 +58,13 @@ const EffectParams = observer(function EffectParams() {
           onChange={(value) => store.setSketchParam('detail', value)}
         />
         <AdjustmentSlider
-          label={t('contrast')}
-          value={store.params.sketch.contrast}
-          min={CONTRAST_RANGE.min}
-          max={CONTRAST_RANGE.max}
-          step={CONTRAST_RANGE.step}
-          defaultValue={CONTRAST_RANGE.default}
-          onChange={(value) => store.setSketchParam('contrast', value)}
+          label={t('deepen')}
+          value={store.params.sketch.deepen}
+          min={DEEPEN_RANGE.min}
+          max={DEEPEN_RANGE.max}
+          step={DEEPEN_RANGE.step}
+          defaultValue={DEEPEN_RANGE.default}
+          onChange={(value) => store.setSketchParam('deepen', value)}
         />
       </>
     )
