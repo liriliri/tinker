@@ -21,7 +21,8 @@ Schemas in `package.json` (`tinker.mcp.tools`); handlers in `src/mcp.ts`; shared
 | `tinker-image-cropper`                     | Workflow: `open` → edit → `save`                          |
 | `tinker-todo` / `tinker-anniversary`       | CRUD                                                      |
 | `tinker-json-editor` / `tinker-regexp`     | Read/write editor                                         |
-| `resources/skills/mcp/SKILL.md`            | CLI: `tinker call`, `tinker mcp`, `tinker tools`          |
+| `skills/tinker-dev/SKILL.md`               | Dev CLI in this repo: `./bin/tinker-dev` (not packaged `tinker`) |
+| `resources/skills/mcp/SKILL.md`            | Packaged CLI docs (`tinker call` / `tools` / `mcp`); map to `tinker-dev` here |
 
 ## Tool design
 
@@ -103,7 +104,16 @@ cd <plugin-name> && npm run build
 cd <plugin-name> && npx tsc --noEmit 2>&1 | rg "mcp\.ts" || true
 ```
 
-With Tinker running: `tinker open <plugin>`, `tinker tools <plugin>`, `tinker call <plugin> --tool <name> --args '{}'`.
+Live tool checks in this repo must use **`./bin/tinker-dev`** from the tinker-utm root (see `skills/tinker-dev/SKILL.md`). Do **not** use the packaged `tinker` CLI while developing here.
+
+```bash
+# from tinker-utm repo root
+./bin/tinker-dev open <plugin>
+./bin/tinker-dev tools <plugin>
+./bin/tinker-dev call <plugin> --tool <name> --args '{}'
+```
+
+MCP registers after the plugin window finishes loading; if `call` fails with "not ready", wait briefly and retry.
 
 Run the **lint** skill on changed files afterward.
 

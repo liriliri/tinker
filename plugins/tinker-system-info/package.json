@@ -21,6 +21,36 @@
         "name": "系统信息",
         "description": "系统信息查看，显示硬件和软件详情"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get": {
+          "description": "Get system hardware and software information, including system, CPU, memory, graphics, OS, disk, audio, and network details.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "section": {
+                "type": "string",
+                "enum": [
+                  "system",
+                  "cpu",
+                  "mem",
+                  "graphics",
+                  "os",
+                  "disk",
+                  "audio",
+                  "network"
+                ],
+                "description": "Optional section to return. Omit to return all sections."
+              },
+              "refresh": {
+                "type": "boolean",
+                "description": "If true, re-fetch fresh data before returning. Defaults to false (use cached data when available)."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
