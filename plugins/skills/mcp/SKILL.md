@@ -68,7 +68,7 @@ async function myTool(store: Store, args: Record<string, unknown>) {
 }
 ```
 
-Optional: export `getToolArgSummary(name, args)` for AiChat tool-arg previews (`tinker-regexp`, `tinker-json-editor`).
+Optional: export `getToolArgSummary(name, args)` for AiChat tool-arg previews when the default (`command` / `content` / `path` / …) is not enough. Return the full string — `ToolCard` truncates in the UI (`tinker-regexp`).
 
 ### 3. Wire store
 

@@ -19,11 +19,27 @@
     },
     "mcp": {
       "tools": {
+        "open": {
+          "description": "Open a JSON file in the editor. Same as opening a file in the UI. Call this before editing an existing file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a JSON file"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
         "get": {
-          "description": "Get the current JSON content in the editor, validation error (if any), editor mode, and line count."
+          "description": "Get the current JSON content in the editor, validation error (if any), editor mode, file path, and unsaved-change state."
         },
         "set": {
-          "description": "Replace the JSON content in the editor. Changes apply immediately. The content may be valid or invalid JSON.",
+          "description": "Replace the JSON content in the editor. Changes apply immediately. The content may be valid or invalid JSON. Call save afterward to write to disk.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -32,7 +48,9 @@
                 "description": "The new JSON content"
               }
             },
-            "required": ["content"]
+            "required": [
+              "content"
+            ]
           }
         },
         "format": {
@@ -40,6 +58,19 @@
         },
         "minify": {
           "description": "Minify the current JSON by removing whitespace. Fails if the content is not valid JSON."
+        },
+        "save": {
+          "description": "Save the current JSON content to disk. Uses the open file path by default. When no file is open, path is required.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save to. Required when no file is open; optional to save-as to a new path."
+              }
+            }
+          }
         }
       }
     }

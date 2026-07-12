@@ -29,7 +29,7 @@ export interface PluginChatProps {
   selectedCombined: string
   combinedOptions: Array<{ value: string; label: string }>
   canClearMessages: boolean
-  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getToolArgSummary?: (name: string, args: Record<string, unknown>) => string
   getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onInputChange: (value: string) => void
   onSend: () => void
@@ -47,7 +47,7 @@ interface PluginChatMessageItemProps {
   isDark: boolean
   msg: ChatMessage
   toolMessages?: ChatMessage[]
-  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getToolArgSummary?: (name: string, args: Record<string, unknown>) => string
   getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void
@@ -99,7 +99,7 @@ interface PluginChatMessageListProps {
   sessionId: string
   isDark: boolean
   emptyHint: string
-  getToolArgSummary: (name: string, args: Record<string, unknown>) => string
+  getToolArgSummary?: (name: string, args: Record<string, unknown>) => string
   getVisibleToolMessages?: (toolMessages: ChatMessage[]) => ChatMessage[]
   onRetryLastMessage: () => void
   onDeleteMessage: (id: string) => void

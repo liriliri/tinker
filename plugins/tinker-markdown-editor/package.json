@@ -16,6 +16,53 @@
         "name": "Markdown 编辑",
         "description": "Markdown 编辑器，支持实时预览和分栏视图"
       }
+    },
+    "mcp": {
+      "tools": {
+        "open": {
+          "description": "Open a Markdown file in the editor. Same as opening a file in the UI. Call this before editing an existing file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a Markdown file"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "get": {
+          "description": "Get the current Markdown content in the editor, view mode, line count, file path, and unsaved-change state."
+        },
+        "set": {
+          "description": "Replace the Markdown content in the editor. Changes apply immediately. Call save afterward to write to disk.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "The new Markdown content"
+              }
+            },
+            "required": ["content"]
+          }
+        },
+        "save": {
+          "description": "Save the current Markdown content to disk. Uses the open file path by default. When no file is open, path is required.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save to. Required when no file is open; optional to save-as to a new path."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

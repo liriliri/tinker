@@ -5,35 +5,17 @@ import pkg from '../package.json'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
-    open: openJson,
+    open: openMarkdown,
     get,
     set,
-    format,
-    minify,
-    save: saveJson,
+    save: saveMarkdown,
   })
-}
-
-export function getToolArgSummary(
-  name: string,
-  args: Record<string, unknown>
-): string {
-  switch (name) {
-    case 'open':
-    case 'save':
-      return (args.path as string) || ''
-    case 'set':
-      return (args.content as string) || ''
-    default:
-      return ''
-  }
 }
 
 function get(store: Store) {
   return {
-    content: store.jsonInput,
-    error: store.jsonError,
-    mode: store.mode,
+    content: store.markdownInput,
+    viewMode: store.viewMode,
     lineCount: store.lineCount,
     isEmpty: store.isEmpty,
     filePath: store.currentFilePath,
@@ -42,11 +24,11 @@ function get(store: Store) {
   }
 }
 
-async function openJson(store: Store, args: Record<string, unknown>) {
+async function openMarkdown(store: Store, args: Record<string, unknown>) {
   const path = args.path as string
 
   if (!(await fileExists(path))) {
-    throw new Error(`JSON file not found: ${path}`)
+    throw new Error(`Markdown file not found: ${path}`)
   }
 
   const content = await tinker.readFile(path, 'utf-8')
@@ -55,35 +37,11 @@ async function openJson(store: Store, args: Record<string, unknown>) {
 }
 
 function set(store: Store, args: Record<string, unknown>) {
-  store.setJsonInput(args.content as string)
+  store.setMarkdownInput(args.content as string)
   return get(store)
 }
 
-function format(store: Store) {
-  if (store.isEmpty) {
-    throw new Error('Editor is empty.')
-  }
-  if (store.jsonError) {
-    throw new Error(store.jsonError)
-  }
-
-  store.formatJson()
-  return get(store)
-}
-
-function minify(store: Store) {
-  if (store.isEmpty) {
-    throw new Error('Editor is empty.')
-  }
-  if (store.jsonError) {
-    throw new Error(store.jsonError)
-  }
-
-  store.minifyJson()
-  return get(store)
-}
-
-async function saveJson(store: Store, args: Record<string, unknown>) {
+async function saveMarkdown(store: Store, args: Record<string, unknown>) {
   const path =
     (args.path as string | undefined) ?? store.currentFilePath ?? undefined
 

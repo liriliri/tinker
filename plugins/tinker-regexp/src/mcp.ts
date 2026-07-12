@@ -1,8 +1,4 @@
-import {
-  createPluginMcpApi,
-  truncateMcpArg,
-  type PluginMcp,
-} from 'share/lib/mcp'
+import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
 import type { Store } from './store'
 import pkg from '../package.json'
 
@@ -21,15 +17,12 @@ export function getToolArgSummary(
 ): string {
   switch (name) {
     case 'set': {
-      const pattern = typeof args.pattern === 'string' ? args.pattern : ''
-      const flags = typeof args.flags === 'string' ? args.flags : ''
-      const summary = flags ? `/${pattern}/${flags}` : pattern
-      return truncateMcpArg(summary)
+      const pattern = (args.pattern as string) || ''
+      const flags = args.flags as string | undefined
+      return flags ? `/${pattern}/${flags}` : pattern
     }
-    case 'set_text': {
-      const text = typeof args.text === 'string' ? args.text : ''
-      return truncateMcpArg(text)
-    }
+    case 'set_text':
+      return (args.text as string) || ''
     default:
       return ''
   }

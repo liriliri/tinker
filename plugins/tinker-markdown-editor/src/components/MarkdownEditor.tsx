@@ -73,6 +73,17 @@ export default observer(function MarkdownEditor() {
     store.updateUndoRedoState()
   }, [store.fileVersion])
 
+  // Sync store changes (e.g. MCP set) back to editor
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+
+    const model = editor.getModel()
+    if (model && model.getValue() !== store.markdownInput) {
+      model.setValue(store.markdownInput)
+    }
+  }, [store.markdownInput])
+
   return (
     <div className="h-full w-full">
       <Editor

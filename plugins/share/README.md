@@ -145,7 +145,7 @@ void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
 <PluginChat {...getPluginChatProps(store.chat)} isDark={store.isDark} title={t('chatTitle')} />
 ```
 
-Plugin-specific: `systemPrompt`, tool execute handlers, `getToolArgSummary`, optional `renderToolMessage`. Use `createToolMessageHelpers` only for a custom tool whitelist. Vendor: `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, `syntaxhighlighter`. Reference: `tinker-regexp`, `tinker-json-editor`.
+Plugin-specific: `systemPrompt`, tool execute handlers, optional `getToolArgSummary` (full string; `ToolCard` truncates), optional `renderToolMessage`. Use `createToolMessageHelpers` only for a custom tool whitelist. Vendor: `idb`, `resizablepanels`, `overlayscrollbars`, `markdown`, `syntaxhighlighter`. Reference: `tinker-regexp`, `tinker-json-editor`.
 
 ### MCP Tools
 
@@ -166,6 +166,8 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
 ```
 
 `createPluginMcpApi` reads schemas, dispatches handlers, registers via `tinker.registerMcp` (host serializes results), and builds agent tools. See `share/lib/mcp.ts` for `PluginMcp`, `formatMcpToolResult`, etc.
+
+For AiChat tool-arg previews, optional `getToolArgSummary` should return the full preview string — `ToolCard` truncates in the UI. Only provide a custom summary when args need special formatting (e.g. regexp `pattern` + `flags`).
 
 ### TextSearch
 

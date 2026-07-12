@@ -238,16 +238,23 @@ export class Store extends BaseStore {
     }
   }
 
-  async saveFile() {
+  async saveFile(filePath?: string) {
     try {
-      if (this.currentFilePath) {
-        await tinker.writeFile(this.currentFilePath, this.jsonInput, 'utf-8')
+      const savePath = filePath ?? this.currentFilePath
+      if (savePath) {
+        await tinker.writeFile(savePath, this.jsonInput, 'utf-8')
+        this.currentFilePath = savePath
         this.savedContent = this.jsonInput
-      } else {
-        await this.saveFileAs()
+        storage.set(STORAGE_FILE_PATH, savePath)
+        storage.remove(STORAGE_CONTENT)
+        return savePath
       }
+
+      await this.saveFileAs()
+      return this.currentFilePath
     } catch (err) {
       console.error('Failed to save file:', err)
+      throw err
     }
   }
 

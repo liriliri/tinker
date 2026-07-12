@@ -103,12 +103,10 @@ export function getToolArgSummary(
 ): string {
   switch (name) {
     case 'run_command': {
-      const command = typeof args.command === 'string' ? args.command : ''
-      return command.length > 60 ? `${command.slice(0, 60)}…` : command
+      return typeof args.command === 'string' ? args.command : ''
     }
     case 'write_to_terminal': {
-      const text = typeof args.text === 'string' ? args.text : ''
-      return text.length > 60 ? `${text.slice(0, 60)}…` : text
+      return typeof args.text === 'string' ? args.text : ''
     }
     default:
       return ''

@@ -90,10 +90,6 @@ export function formatMcpToolResult(result: unknown): string {
   return JSON.stringify(result, null, 2)
 }
 
-export function truncateMcpArg(value: string, max = 60): string {
-  return value.length > max ? `${value.slice(0, max)}…` : value
-}
-
 export interface PluginMcpHandlers {
   callTool: (
     name: string,

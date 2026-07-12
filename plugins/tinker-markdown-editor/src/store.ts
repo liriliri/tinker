@@ -4,6 +4,7 @@ import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import BaseStore from 'share/store/Base'
+import { createMcpApi } from './mcp'
 
 const STORAGE_CONTENT = 'content'
 const STORAGE_FILE_PATH = 'file-path'
@@ -13,7 +14,9 @@ const storage = new LocalStore('tinker-markdown-editor')
 
 export type ViewMode = 'split' | 'editor' | 'preview'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   markdownInput: string = ''
   editorInstance: editor.IStandaloneCodeEditor | null = null
   undoRedoVersion: number = 0
@@ -188,22 +191,23 @@ class Store extends BaseStore {
     }
   }
 
-  async saveFile() {
+  async saveFile(filePath?: string) {
     try {
-      if (this.currentFilePath) {
-        // Save to existing file
-        await tinker.writeFile(
-          this.currentFilePath,
-          this.markdownInput,
-          'utf-8'
-        )
+      const savePath = filePath ?? this.currentFilePath
+      if (savePath) {
+        await tinker.writeFile(savePath, this.markdownInput, 'utf-8')
+        this.currentFilePath = savePath
         this.savedContent = this.markdownInput
-      } else {
-        // Show save dialog
-        await this.saveFileAs()
+        storage.set(STORAGE_FILE_PATH, savePath)
+        storage.remove(STORAGE_CONTENT)
+        return savePath
       }
+
+      await this.saveFileAs()
+      return this.currentFilePath
     } catch (err) {
       console.error('Failed to save file:', err)
+      throw err
     }
   }
 

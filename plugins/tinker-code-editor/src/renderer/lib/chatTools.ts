@@ -126,8 +126,7 @@ export function getToolArgSummary(
 ): string {
   switch (name) {
     case 'exec': {
-      const command = typeof args.command === 'string' ? args.command : ''
-      return command.length > 60 ? `${command.slice(0, 60)}…` : command
+      return typeof args.command === 'string' ? args.command : ''
     }
     case 'read_file':
     case 'write_file':

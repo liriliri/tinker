@@ -43,18 +43,23 @@ function humanizeToolName(name: string): string {
     .join(' ')
 }
 
-function truncateSummary(value: string, maxLen = 60): string {
-  return value.length > maxLen ? `${value.slice(0, maxLen)}…` : value
-}
-
 function defaultArgSummary(
   _name: string,
   args: Record<string, unknown>
 ): string {
-  for (const key of ['command', 'path', 'query', 'url', 'text', 'pattern']) {
+  for (const key of [
+    'command',
+    'content',
+    'path',
+    'query',
+    'url',
+    'text',
+    'pattern',
+    'outputPath',
+  ]) {
     const value = args[key]
     if (typeof value === 'string' && value) {
-      return truncateSummary(value)
+      return value
     }
   }
   return ''
@@ -154,6 +159,7 @@ export default function ToolCard({
               </span>
               {summary && (
                 <span
+                  title={summary}
                   className={`min-w-0 flex-1 truncate font-mono text-[9px] leading-none ${tw.text.tertiary}`}
                 >
                   {summary}
