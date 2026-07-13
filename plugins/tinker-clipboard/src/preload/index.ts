@@ -70,7 +70,7 @@ async function checkClipboard() {
   }
 }
 
-const clipboardObj = {
+const api = {
   startMonitoring(callback: (item: ClipboardItem) => void) {
     onClipboardChangeCallback = callback
     lastItemId = ''
@@ -122,8 +122,8 @@ const clipboardObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('clipboard', clipboardObj)
+contextBridge.exposeInMainWorld('clipboard', api)
 
 declare global {
-  const clipboard: typeof clipboardObj
+  const clipboard: typeof api
 }

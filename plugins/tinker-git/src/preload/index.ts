@@ -25,7 +25,7 @@ import {
   watchWorkingTree,
 } from 'share/preload/git'
 
-const gitObj = {
+const api = {
   getRepoPath,
   openRepository,
   getBranches,
@@ -51,8 +51,8 @@ const gitObj = {
   exec,
 }
 
-contextBridge.exposeInMainWorld('git', gitObj)
+contextBridge.exposeInMainWorld('git', api)
 
 declare global {
-  const git: typeof gitObj
+  const git: typeof api
 }

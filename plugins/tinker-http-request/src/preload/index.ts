@@ -27,7 +27,7 @@ function createErrorResponse(startTime: number, message: string): HttpResponse {
   }
 }
 
-const httpRequestObj = {
+const api = {
   async send(config: RequestConfig): Promise<HttpResponse> {
     return new Promise((resolve) => {
       const startTime = Date.now()
@@ -180,8 +180,8 @@ const httpRequestObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('httpRequest', httpRequestObj)
+contextBridge.exposeInMainWorld('httpRequest', api)
 
 declare global {
-  const httpRequest: typeof httpRequestObj
+  const httpRequest: typeof api
 }

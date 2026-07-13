@@ -253,7 +253,7 @@ async function downloadRemoteDirectory(
   }
 }
 
-const sftpObj = {
+const api = {
   basename(filePath: string): string {
     return path.basename(filePath)
   },
@@ -274,7 +274,7 @@ const sftpObj = {
     connectionId: string,
     config: ISftpConnectConfig
   ): Promise<void> {
-    await sftpObj.disconnect(connectionId)
+    await api.disconnect(connectionId)
 
     return new Promise((resolve, reject) => {
       const client = new Client()
@@ -444,8 +444,8 @@ const sftpObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('sftp', sftpObj)
+contextBridge.exposeInMainWorld('sftp', api)
 
 declare global {
-  const sftp: typeof sftpObj
+  const sftp: typeof api
 }

@@ -159,7 +159,7 @@ export function createTreemapChart(
       .sum((d) => (d.children && d.children.length > 0 ? 0 : d.size))
       .sort((a, b) => (b.value || 0) - (a.value || 0))
 
-    hierarchy.each((d) => {
+    hierarchy.each((d: { data: DiskItem; value?: number }) => {
       d.value = d.data.size
     })
 

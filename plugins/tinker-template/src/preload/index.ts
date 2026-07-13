@@ -3,7 +3,7 @@ import { exec } from 'child_process'
 import { homedir, platform, arch } from 'os'
 import type { SystemInfo } from '../common/types'
 
-const templateObj = {
+const api = {
   execCommand(cmd: string): Promise<{ stdout: string; stderr: string }> {
     return new Promise((resolve) => {
       exec(cmd, { encoding: 'utf-8' }, (error, stdout, stderr) => {
@@ -25,8 +25,8 @@ const templateObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('template', templateObj)
+contextBridge.exposeInMainWorld('template', api)
 
 declare global {
-  const template: typeof templateObj
+  const template: typeof api
 }

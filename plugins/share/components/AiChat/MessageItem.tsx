@@ -46,7 +46,7 @@ function useTypewriter(content: string, streaming: boolean): string {
 
 function hasRenderableContent(node: React.ReactNode): boolean {
   return Children.toArray(node).some((child) => {
-    if (child == null || child === false) return false
+    if (child == null) return false
     if (typeof child === 'string') return !isStrBlank(child)
     if (typeof child === 'number') return true
     return isValidElement(child)

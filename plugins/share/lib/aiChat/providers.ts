@@ -5,21 +5,22 @@ export interface AiChatProvidersApi {
   ensureLoaded(): Promise<void>
 }
 
+let loadPromise: Promise<void> | null = null
+
 class AiChatProvidersStore implements AiChatProvidersApi {
   providers: tinker.AiProviderInfo[] = []
-  private loadPromise: Promise<void> | null = null
   loaded = false
 
   constructor() {
-    makeAutoObservable(this, { loadPromise: false })
+    makeAutoObservable(this)
   }
 
   async ensureLoaded(): Promise<void> {
     if (this.loaded) return
-    if (!this.loadPromise) {
-      this.loadPromise = this.fetchProviders()
+    if (!loadPromise) {
+      loadPromise = this.fetchProviders()
     }
-    await this.loadPromise
+    await loadPromise
   }
 
   private async fetchProviders() {

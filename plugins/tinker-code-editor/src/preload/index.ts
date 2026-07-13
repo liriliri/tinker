@@ -52,7 +52,7 @@ interface IDirEntry {
   isDirectory: boolean
 }
 
-const codeEditorObj = {
+const api = {
   getHomedir(): string {
     return homedir()
   },
@@ -190,8 +190,8 @@ const codeEditorObj = {
   listDir,
 }
 
-contextBridge.exposeInMainWorld('codeEditor', codeEditorObj)
+contextBridge.exposeInMainWorld('codeEditor', api)
 
 declare global {
-  const codeEditor: typeof codeEditorObj
+  const codeEditor: typeof api
 }

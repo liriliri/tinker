@@ -47,7 +47,7 @@ async function extractExecutablePath(
   return execPath || undefined
 }
 
-const processKillerObj = {
+const api = {
   async getProcessList(): Promise<ProcessInfo[]> {
     try {
       const { list } = await si.processes()
@@ -90,8 +90,8 @@ const processKillerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('processKiller', processKillerObj)
+contextBridge.exposeInMainWorld('processKiller', api)
 
 declare global {
-  const processKiller: typeof processKillerObj
+  const processKiller: typeof api
 }

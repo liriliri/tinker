@@ -82,7 +82,7 @@ async function collectSnapshot(): Promise<SystemSnapshot> {
   }
 }
 
-const systemMonitorObj = {
+const api = {
   async getSnapshot(): Promise<SystemSnapshot> {
     try {
       return await collectSnapshot()
@@ -93,8 +93,8 @@ const systemMonitorObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('systemMonitor', systemMonitorObj)
+contextBridge.exposeInMainWorld('systemMonitor', api)
 
 declare global {
-  const systemMonitor: typeof systemMonitorObj
+  const systemMonitor: typeof api
 }

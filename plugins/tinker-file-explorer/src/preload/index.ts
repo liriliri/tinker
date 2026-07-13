@@ -79,7 +79,7 @@ async function transferPaths(
   return { processed, errors }
 }
 
-const fileExplorerObj = {
+const api = {
   getHomedir(): string {
     return homedir()
   },
@@ -251,8 +251,8 @@ const fileExplorerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('fileExplorer', fileExplorerObj)
+contextBridge.exposeInMainWorld('fileExplorer', api)
 
 declare global {
-  const fileExplorer: typeof fileExplorerObj
+  const fileExplorer: typeof api
 }

@@ -1,7 +1,7 @@
 import { contextBridge, shell } from 'electron'
 import { rm } from 'fs/promises'
 
-const diskUsageObj = {
+const api = {
   async deleteItem(
     itemPath: string,
     moveToTrash: boolean
@@ -19,8 +19,8 @@ const diskUsageObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('diskUsage', diskUsageObj)
+contextBridge.exposeInMainWorld('diskUsage', api)
 
 declare global {
-  const diskUsage: typeof diskUsageObj
+  const diskUsage: typeof api
 }

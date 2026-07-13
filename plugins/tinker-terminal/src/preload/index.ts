@@ -143,7 +143,7 @@ function createSSHSession(
   }
 }
 
-const terminalObj = {
+const api = {
   createSSH(cols: number, rows: number, config: SSHConfig): TerminalSession {
     return createSSHSession(cols, rows, config)
   },
@@ -151,8 +151,8 @@ const terminalObj = {
   getAvailableShells,
 }
 
-contextBridge.exposeInMainWorld('terminal', terminalObj)
+contextBridge.exposeInMainWorld('terminal', api)
 
 declare global {
-  var terminal: typeof terminalObj
+  var terminal: typeof api
 }

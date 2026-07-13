@@ -54,7 +54,7 @@ function fetchUrl(
   })
 }
 
-const browserObj = {
+const api = {
   async fetchFavicon(url: string): Promise<string> {
     try {
       const parsed = new URL(url)
@@ -69,8 +69,8 @@ const browserObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('browser', browserObj)
+contextBridge.exposeInMainWorld('browser', api)
 
 declare global {
-  const browser: typeof browserObj
+  const browser: typeof api
 }

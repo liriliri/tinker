@@ -13,7 +13,7 @@ import { webFetch, webSearch } from 'share/tools/webImpl'
 // contextBridge
 // ---------------------------------------------------------------------------
 
-const aiAssistantObj = {
+const api = {
   openExternal(url: string): void {
     shell.openExternal(url)
   },
@@ -39,8 +39,8 @@ const aiAssistantObj = {
   webFetch,
 }
 
-contextBridge.exposeInMainWorld('aiAssistant', aiAssistantObj)
+contextBridge.exposeInMainWorld('aiAssistant', api)
 
 declare global {
-  const aiAssistant: typeof aiAssistantObj
+  const aiAssistant: typeof api
 }

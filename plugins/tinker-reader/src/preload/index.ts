@@ -3,7 +3,7 @@ import type { BookMeta } from '../common/types'
 import { readBookMeta } from './book'
 import { scanBookFiles } from './scan'
 
-const readerObj = {
+const api = {
   async scanBookFiles(dirs: string[]) {
     return scanBookFiles(dirs)
   },
@@ -13,8 +13,8 @@ const readerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('reader', readerObj)
+contextBridge.exposeInMainWorld('reader', api)
 
 declare global {
-  const reader: typeof readerObj
+  const reader: typeof api
 }

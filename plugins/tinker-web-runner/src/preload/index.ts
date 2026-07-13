@@ -58,7 +58,7 @@ server.listen(0, '127.0.0.1', () => {
   }
 })
 
-const webRunnerObj = {
+const api = {
   getPort(): number {
     return serverPort
   },
@@ -70,8 +70,8 @@ const webRunnerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('webRunner', webRunnerObj)
+contextBridge.exposeInMainWorld('webRunner', api)
 
 declare global {
-  const webRunner: typeof webRunnerObj
+  const webRunner: typeof api
 }

@@ -52,7 +52,7 @@ process.on('message', ({ id, filePath, fileSize }) => {
   return child
 }
 
-const duplicateCleanerObj = {
+const api = {
   calculateMD5(filePath: string, fileSize: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const id = nextId++
@@ -82,8 +82,8 @@ const duplicateCleanerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('duplicateCleaner', duplicateCleanerObj)
+contextBridge.exposeInMainWorld('duplicateCleaner', api)
 
 declare global {
-  const duplicateCleaner: typeof duplicateCleanerObj
+  const duplicateCleaner: typeof api
 }

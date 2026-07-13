@@ -9,7 +9,7 @@ const HOSTS_PATH = isWindows
   ? 'C:\\Windows\\System32\\drivers\\etc\\hosts'
   : '/etc/hosts'
 
-const hostsObj = {
+const api = {
   getHostsPath(): string {
     return HOSTS_PATH
   },
@@ -44,7 +44,7 @@ const hostsObj = {
       const activeConfigs = filter(configs, (c) => configIds.includes(c.id))
       const mergedContent = activeConfigs.map((c) => c.content).join('\n\n')
 
-      const currentHosts = await hostsObj.readSystemHosts()
+      const currentHosts = await api.readSystemHosts()
       const startIndex = currentHosts.indexOf(CONTENT_START)
       const endIndex = currentHosts.indexOf(CONTENT_END)
 
@@ -70,7 +70,7 @@ const hostsObj = {
           afterContent.length > 0
             ? `${beforeContent}\n\n${afterContent}`
             : beforeContent
-        await hostsObj.writeSystemHosts(finalContent)
+        await api.writeSystemHosts(finalContent)
         return
       }
 
@@ -81,7 +81,7 @@ const hostsObj = {
       }
 
       const finalContent = parts.join('\n\n')
-      await hostsObj.writeSystemHosts(finalContent)
+      await api.writeSystemHosts(finalContent)
     } catch (error) {
       console.error('Failed to apply hosts:', error)
       throw error
@@ -89,8 +89,8 @@ const hostsObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('hosts', hostsObj)
+contextBridge.exposeInMainWorld('hosts', api)
 
 declare global {
-  const hosts: typeof hostsObj
+  const hosts: typeof api
 }

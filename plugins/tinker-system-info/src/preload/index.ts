@@ -2,7 +2,7 @@ import { contextBridge } from 'electron'
 import si from 'systeminformation'
 import type { SystemInfoData } from '../common/types'
 
-const systemInfoObj = {
+const api = {
   async getSystemInfo(): Promise<SystemInfoData> {
     try {
       const [
@@ -42,8 +42,8 @@ const systemInfoObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('systemInfo', systemInfoObj)
+contextBridge.exposeInMainWorld('systemInfo', api)
 
 declare global {
-  const systemInfo: typeof systemInfoObj
+  const systemInfo: typeof api
 }

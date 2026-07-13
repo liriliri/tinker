@@ -14,7 +14,7 @@ import {
 import { readExifFromFile, readPhotoMeta } from './photo'
 import { scanPhotoFiles } from './scan'
 
-const photoViewerObj = {
+const api = {
   async scanPhotoFiles(dirs: string[]) {
     return scanPhotoFiles(dirs)
   },
@@ -48,8 +48,8 @@ const photoViewerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('photoViewer', photoViewerObj)
+contextBridge.exposeInMainWorld('photoViewer', api)
 
 declare global {
-  const photoViewer: typeof photoViewerObj
+  const photoViewer: typeof api
 }

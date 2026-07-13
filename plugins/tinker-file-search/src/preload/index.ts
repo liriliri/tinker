@@ -1,7 +1,7 @@
 import { contextBridge, shell } from 'electron'
 import { promises as fs } from 'fs'
 
-const fileSearchObj = {
+const api = {
   async deleteFile(filePath: string, moveToTrash: boolean): Promise<void> {
     if (moveToTrash) {
       await shell.trashItem(filePath)
@@ -11,8 +11,8 @@ const fileSearchObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('fileSearch', fileSearchObj)
+contextBridge.exposeInMainWorld('fileSearch', api)
 
 declare global {
-  const fileSearch: typeof fileSearchObj
+  const fileSearch: typeof api
 }

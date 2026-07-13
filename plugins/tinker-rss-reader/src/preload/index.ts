@@ -51,7 +51,7 @@ function parseItems(items: ParserItem[]): ParsedItem[] {
   })
 }
 
-const rssReaderObj = {
+const api = {
   async fetchFeed(
     url: string
   ): Promise<{ title?: string; items?: ParsedItem[]; error?: string }> {
@@ -83,8 +83,8 @@ const rssReaderObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('rssReader', rssReaderObj)
+contextBridge.exposeInMainWorld('rssReader', api)
 
 declare global {
-  const rssReader: typeof rssReaderObj
+  const rssReader: typeof api
 }

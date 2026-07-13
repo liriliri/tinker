@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import type { RenameOperation } from '../common/types'
 
-const renamerObj = {
+const api = {
   async readDir(dirPath: string): Promise<string[]> {
     const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
     return entries
@@ -34,8 +34,8 @@ const renamerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('renamer', renamerObj)
+contextBridge.exposeInMainWorld('renamer', api)
 
 declare global {
-  const renamer: typeof renamerObj
+  const renamer: typeof api
 }

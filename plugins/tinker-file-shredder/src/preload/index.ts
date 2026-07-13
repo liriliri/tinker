@@ -21,7 +21,7 @@ async function collectFiles(dirPath: string): Promise<string[]> {
   return files
 }
 
-const fileShredderObj = {
+const api = {
   readDir(dirPath: string): Promise<string[]> {
     return collectFiles(dirPath)
   },
@@ -48,8 +48,8 @@ const fileShredderObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('fileShredder', fileShredderObj)
+contextBridge.exposeInMainWorld('fileShredder', api)
 
 declare global {
-  const fileShredder: typeof fileShredderObj
+  const fileShredder: typeof api
 }

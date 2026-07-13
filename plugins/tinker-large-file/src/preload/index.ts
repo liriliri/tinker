@@ -1,7 +1,7 @@
 import { contextBridge, shell } from 'electron'
 import { promises as fs } from 'fs'
 
-const largeFileObj = {
+const api = {
   async deleteFiles(
     filePaths: string[],
     moveToTrash: boolean
@@ -24,8 +24,8 @@ const largeFileObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('largeFile', largeFileObj)
+contextBridge.exposeInMainWorld('largeFile', api)
 
 declare global {
-  const largeFile: typeof largeFileObj
+  const largeFile: typeof api
 }

@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 import { resolveRules } from './lib/rules'
 
-const cleanerObj = {
+const api = {
   async cleanPath(
     targetPath: string,
     moveToTrash: boolean
@@ -59,8 +59,8 @@ const cleanerObj = {
   },
 }
 
-contextBridge.exposeInMainWorld('cleaner', cleanerObj)
+contextBridge.exposeInMainWorld('cleaner', api)
 
 declare global {
-  const cleaner: typeof cleanerObj
+  const cleaner: typeof api
 }
