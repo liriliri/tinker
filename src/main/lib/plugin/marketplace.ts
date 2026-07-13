@@ -32,6 +32,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-agent-skills',
+    name: 'Agent Skills',
+    description: 'Browse and manage local agent skills',
+    icon: 'tinker-agent-skills.png',
+    locales: {
+      'zh-CN': {
+        name: 'Agent 技能',
+        description: '浏览和管理本地 Agent 技能',
+      },
+    },
+  },
+  {
     id: 'tinker-ball-maze',
     name: 'Ball Maze',
     description: 'Roll the ball through the maze and find the exit!',
