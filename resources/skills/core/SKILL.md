@@ -23,6 +23,8 @@ tinker close <plugin> # 4. Close when done
 
 Plugin names accept the short form (`json-editor`) or the full id (`tinker-json-editor`). The CLI normalizes to `tinker-<name>` automatically.
 
+Scoped npm plugins (e.g. `@tencent/tinker-wxapkg`) appear in `tinker list` as ids like `tencent-tinker-wxapkg`. For those, use the **full id** from `list` (or the `@scope/...` package name) — short names such as `wxapkg` will not resolve.
+
 ## Quickstart
 
 ```bash

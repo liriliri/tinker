@@ -1,4 +1,7 @@
 import { Command } from 'commander'
+import startWith from 'licia/startWith'
+import contain from 'licia/contain'
+import replaceAll from 'licia/replaceAll'
 import { sendCommand } from './ipc'
 import { startMcpServer } from './mcp'
 import { runSkills } from './skills'
@@ -9,7 +12,13 @@ interface ExecuteCommandOptions {
 }
 
 function normalizePluginId(name: string) {
-  return name.startsWith('tinker-') ? name : `tinker-${name}`
+  if (startWith(name, '@')) {
+    return replaceAll(name.slice(1), '/', '-')
+  }
+  if (startWith(name, 'tinker-') || contain(name, '-tinker-')) {
+    return name
+  }
+  return `tinker-${name}`
 }
 
 function formatPluginList(data: unknown) {

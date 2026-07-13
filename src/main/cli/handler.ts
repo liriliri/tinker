@@ -48,11 +48,6 @@ async function ensurePlugin(req: IpcRequest): Promise<string | IpcResponse> {
   return id
 }
 
-function pluginNotRunningMessage(id: string) {
-  const shortName = id.replace(/^tinker-/, '')
-  return `Plugin is not running. Please start it first: tinker open ${shortName}`
-}
-
 async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
   const id = req.data?.id as string
   const name = req.data?.name as string
@@ -61,7 +56,10 @@ async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
     return fail(req, 'Missing plugin id or tool name')
   }
   if (!isPluginRunning(id)) {
-    return fail(req, pluginNotRunningMessage(id))
+    return fail(
+      req,
+      `Plugin is not running. Please start it first: tinker open ${id}`
+    )
   }
 
   await getPlugins()
