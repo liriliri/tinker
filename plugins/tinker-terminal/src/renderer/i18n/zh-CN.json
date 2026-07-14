@@ -26,7 +26,6 @@
   "password": "密码",
   "privateKey": "私钥",
   "create": "创建",
-  "cancel": "取消",
   "renameFolder": "重命名目录",
   "deleteFolder": "删除目录",
   "editSession": "编辑会话",

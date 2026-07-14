@@ -26,7 +26,6 @@
   "password": "Password",
   "privateKey": "Private Key",
   "create": "Create",
-  "cancel": "Cancel",
   "renameFolder": "Rename Folder",
   "deleteFolder": "Delete Folder",
   "editSession": "Edit Session",

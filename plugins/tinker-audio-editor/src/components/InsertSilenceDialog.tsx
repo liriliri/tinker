@@ -25,7 +25,7 @@ export default function InsertSilenceDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onCancel} title={t('insertSilence')}>
+    <Dialog open={open} onClose={onCancel} title={t('insertSilence')} showClose>
       <div className="mb-4">
         <div className={`text-sm mb-3 ${tw.text.primary}`}>
           {t('insertSilenceDuration')}: {seconds}s
@@ -50,9 +50,6 @@ export default function InsertSilenceDialog({
         ))}
       </div>
       <div className="flex gap-2 justify-end">
-        <DialogButton variant="text" onClick={onCancel}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
       </div>
     </Dialog>

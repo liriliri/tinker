@@ -38,7 +38,7 @@ export default function TargetSizeDialog({ open, onClose }: Props) {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title={t('targetSize')}>
+    <Dialog open={open} onClose={onClose} title={t('targetSize')} showClose>
       <div className="space-y-3">
         <div className="flex gap-3">
           <TextInput
@@ -59,9 +59,6 @@ export default function TargetSizeDialog({ open, onClose }: Props) {
         </div>
       </div>
       <div className="flex gap-2 justify-end mt-6">
-        <DialogButton variant="text" onClick={onClose}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
       </div>
     </Dialog>

@@ -54,7 +54,7 @@ export default function EditTodo({ todo, onClose }: EditTodoProps) {
   }
 
   return (
-    <Dialog open={true} onClose={onClose} title={t('editTodo')}>
+    <Dialog open={true} onClose={onClose} title={t('editTodo')} showClose>
       <div className="flex flex-col gap-3">
         <TextInput
           type="text"
@@ -107,9 +107,6 @@ export default function EditTodo({ todo, onClose }: EditTodoProps) {
         </div>
 
         <div className="flex gap-2 justify-end pt-2">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSave} disabled={!text.trim()}>
             {t('save')}
           </DialogButton>

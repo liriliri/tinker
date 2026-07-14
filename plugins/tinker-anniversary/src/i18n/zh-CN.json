@@ -24,6 +24,5 @@
   "startYearPlaceholder": "选填",
   "startYearLunarDate": "{{year}}年{{date}}",
   "daysSince": "已经 {{count}} 天",
-  "cancel": "取消",
   "save": "保存"
 }

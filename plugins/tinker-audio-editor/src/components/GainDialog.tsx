@@ -36,7 +36,7 @@ export default function GainDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onCancel} title={t('gain')}>
+    <Dialog open={open} onClose={onCancel} title={t('gain')} showClose>
       <div className="mb-4">
         <div className={`text-sm mb-3 ${tw.text.primary}`}>
           {t('gainLevel')}: {percent}%
@@ -61,9 +61,6 @@ export default function GainDialog({
         ))}
       </div>
       <div className="flex gap-2 justify-end">
-        <DialogButton variant="text" onClick={onCancel}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
       </div>
     </Dialog>

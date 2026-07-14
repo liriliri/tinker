@@ -105,6 +105,7 @@ export default function ChatInputArea({
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
           title={t('systemPrompt')}
+          showClose
         >
           <div className="flex flex-col gap-4">
             <textarea
@@ -115,12 +116,6 @@ export default function ChatInputArea({
               className={`w-full resize-none rounded border px-3 py-2 text-sm outline-none focus:ring-1 ${tw.bg.input} ${tw.border} ${tw.text.primary} ${tw.primary.focusRing}`}
             />
             <div className="flex justify-end gap-2">
-              <DialogButton
-                variant="text"
-                onClick={() => setSettingsOpen(false)}
-              >
-                {t('cancel')}
-              </DialogButton>
               <DialogButton onClick={saveSettings}>{t('save')}</DialogButton>
             </div>
           </div>

@@ -125,7 +125,7 @@ export default function SessionConfigDialog({
     : !name.trim()
 
   return (
-    <Dialog open={open} onClose={onClose} title={title}>
+    <Dialog open={open} onClose={onClose} title={title} showClose>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <label className={`text-sm font-medium ${tw.text.secondary}`}>
@@ -248,9 +248,6 @@ export default function SessionConfigDialog({
         )}
 
         <div className="flex justify-end gap-2 pt-1">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleConfirm} disabled={isConfirmDisabled}>
             {isEditing ? t('save') : t('create')}
           </DialogButton>

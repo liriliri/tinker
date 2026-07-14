@@ -41,6 +41,7 @@ export default observer(function ImportDialog() {
       open={store.showImportDialog}
       onClose={handleClose}
       title={t('importUri')}
+      showClose
     >
       <div className="flex flex-col gap-3">
         <textarea
@@ -52,9 +53,6 @@ export default observer(function ImportDialog() {
           spellCheck={false}
         />
         <div className="flex justify-end gap-2">
-          <DialogButton variant="text" onClick={handleClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleImport} disabled={isStrBlank(uri)}>
             {t('import')}
           </DialogButton>

@@ -115,6 +115,7 @@ const SiteDialog = observer(function SiteDialog() {
       open={store.showSiteDialog}
       onClose={() => store.closeSiteDialog()}
       title={isEdit ? t('editSite') : t('addSite')}
+      showClose
     >
       <div className="flex flex-col gap-4">
         <div>
@@ -144,9 +145,6 @@ const SiteDialog = observer(function SiteDialog() {
           />
         </div>
         <div className="flex justify-end gap-2 mt-2">
-          <DialogButton variant="text" onClick={() => store.closeSiteDialog()}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton
             onClick={handleSave}
             disabled={!name.trim() || !url.trim()}

@@ -20,7 +20,6 @@
   "setCropSize": "设置裁剪框大小",
   "width": "宽度",
   "height": "高度",
-  "cancel": "取消",
   "confirm": "确定",
   "resizeImage": "调整图片大小",
   "keepAspectRatio": "按比例缩放"

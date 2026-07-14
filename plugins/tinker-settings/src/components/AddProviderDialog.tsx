@@ -54,7 +54,12 @@ export default function AddProviderDialog({ open, onClose }: Props) {
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} title={t('addProvider')}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      title={t('addProvider')}
+      showClose
+    >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <label className={`text-sm font-medium ${tw.text.secondary}`}>
@@ -78,9 +83,6 @@ export default function AddProviderDialog({ open, onClose }: Props) {
           />
         </div>
         <div className="flex justify-end gap-2 pt-1">
-          <DialogButton variant="text" onClick={handleClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSave}>{t('save')}</DialogButton>
         </div>
       </div>

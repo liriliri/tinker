@@ -34,7 +34,7 @@ export default function SpeedDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onCancel} title={t('speed')}>
+    <Dialog open={open} onClose={onCancel} title={t('speed')} showClose>
       <div className="mb-4">
         <div className={`text-sm mb-3 ${tw.text.primary}`}>
           {t('speedRate')}: {toRate(percent).toFixed(2)}x
@@ -59,9 +59,6 @@ export default function SpeedDialog({
         ))}
       </div>
       <div className="flex gap-2 justify-end">
-        <DialogButton variant="text" onClick={onCancel}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
       </div>
     </Dialog>

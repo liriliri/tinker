@@ -55,6 +55,7 @@ export default observer(function RuleDialog() {
       open={store.dialogOpen}
       onClose={() => store.closeDialog()}
       title={title}
+      showClose
       className="w-full max-w-sm"
     >
       <div className="space-y-4">
@@ -81,9 +82,6 @@ export default observer(function RuleDialog() {
         )}
 
         <div className="flex justify-end gap-2 pt-2">
-          <DialogButton variant="text" onClick={() => store.closeDialog()}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSave}>{t('save')}</DialogButton>
         </div>
       </div>

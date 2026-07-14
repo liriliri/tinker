@@ -50,7 +50,7 @@ export default function SizeDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title={t('floatSettings')}>
+    <Dialog open={open} onClose={onClose} title={t('floatSettings')} showClose>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <label className={`text-sm font-medium ${tw.text.secondary} w-12`}>
@@ -83,9 +83,6 @@ export default function SizeDialog({
       </div>
 
       <div className="flex gap-2 justify-end mt-6">
-        <DialogButton variant="text" onClick={onClose}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm} disabled={!isValid}>
           {t('confirm')}
         </DialogButton>

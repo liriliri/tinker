@@ -25,7 +25,7 @@ export default function NormalizeDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onCancel} title={t('normalize')}>
+    <Dialog open={open} onClose={onCancel} title={t('normalize')} showClose>
       <div className="mb-4">
         <div className={`text-sm mb-3 ${tw.text.primary}`}>
           {t('normalizeLevel')}: {percent}%
@@ -44,9 +44,6 @@ export default function NormalizeDialog({
         </Checkbox>
       </div>
       <div className="flex gap-2 justify-end">
-        <DialogButton variant="text" onClick={onCancel}>
-          {t('cancel')}
-        </DialogButton>
         <DialogButton onClick={handleConfirm}>{t('confirm')}</DialogButton>
       </div>
     </Dialog>

@@ -93,6 +93,7 @@ const EventDialog = observer(
         open={isOpen}
         onClose={onClose}
         title={initialTitle ? t('editEventTitle') : t('newEventTitle')}
+        showClose
         className="w-full max-w-lg"
       >
         <div className="space-y-4">
@@ -147,9 +148,6 @@ const EventDialog = observer(
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSave} disabled={isStrBlank(title)}>
             {t('save')}
           </DialogButton>

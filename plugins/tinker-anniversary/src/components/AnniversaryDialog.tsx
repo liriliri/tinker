@@ -151,6 +151,7 @@ const AnniversaryDialog = observer(
         title={
           initialTitle ? t('editAnniversaryTitle') : t('newAnniversaryTitle')
         }
+        showClose
         className="w-full max-w-lg"
       >
         <div className="space-y-4">
@@ -212,9 +213,6 @@ const AnniversaryDialog = observer(
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSave} disabled={isStrBlank(title)}>
             {t('save')}
           </DialogButton>

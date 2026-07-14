@@ -57,6 +57,7 @@ export default function CustomPlaceDialog({
       open={open}
       onClose={onClose}
       title={isEditing ? t('editPlace') : t('addCustomPlace')}
+      showClose
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -88,9 +89,6 @@ export default function CustomPlaceDialog({
         </div>
 
         <div className="flex justify-end gap-2 pt-1">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleConfirm} disabled={isConfirmDisabled}>
             {isEditing ? t('save') : t('create')}
           </DialogButton>

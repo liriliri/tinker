@@ -17,7 +17,6 @@
   "confirmKill": "Confirm Kill Process",
   "confirmKillMessage": "Are you sure you want to kill process \"{{name}}\" (PID: {{pid}})?",
   "confirmKillSelected": "Are you sure you want to kill {{count}} selected processes?",
-  "cancel": "Cancel",
   "confirm": "Confirm",
   "killSuccess": "Process killed successfully",
   "killFailed": "Failed to kill process",

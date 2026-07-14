@@ -103,6 +103,7 @@ export default observer(function AddDialog() {
       open={store.showAddDialog}
       onClose={() => store.closeAddDialog()}
       title={editing ? t('editAccount') : t('addAccount')}
+      showClose
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -180,9 +181,6 @@ export default observer(function AddDialog() {
         </div>
 
         <div className="flex justify-end gap-2 pt-1">
-          <DialogButton variant="text" onClick={() => store.closeAddDialog()}>
-            {t('cancel')}
-          </DialogButton>
           <DialogButton onClick={handleSubmit}>
             {editing ? t('save') : t('add')}
           </DialogButton>

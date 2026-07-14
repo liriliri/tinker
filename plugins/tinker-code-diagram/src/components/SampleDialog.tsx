@@ -55,6 +55,7 @@ export default observer(function SampleDialog({
       open={open}
       onClose={onClose}
       title={t('samples')}
+      showClose
       className="w-full max-w-2xl"
     >
       <div className="flex gap-4 h-[300px] min-h-0">
@@ -106,14 +107,9 @@ export default observer(function SampleDialog({
         <div className={`text-xs truncate ${tw.text.tertiary}`}>
           {selected?.title}
         </div>
-        <div className="flex gap-2 shrink-0">
-          <DialogButton variant="text" onClick={onClose}>
-            {t('cancel')}
-          </DialogButton>
-          <DialogButton onClick={handleConfirm} disabled={!selected || !!error}>
-            {t('confirm')}
-          </DialogButton>
-        </div>
+        <DialogButton onClick={handleConfirm} disabled={!selected || !!error}>
+          {t('confirm')}
+        </DialogButton>
       </div>
     </Dialog>
   )

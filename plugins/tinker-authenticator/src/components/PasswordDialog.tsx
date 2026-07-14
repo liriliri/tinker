@@ -79,7 +79,7 @@ export default observer(function PasswordDialog() {
   const title = hasPassword ? t('managePassword') : t('setPassword')
 
   return (
-    <Dialog open={open} onClose={handleClose} title={title}>
+    <Dialog open={open} onClose={handleClose} title={title} showClose>
       {!hasPassword && (
         <form onSubmit={handleSet} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
@@ -106,9 +106,6 @@ export default observer(function PasswordDialog() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-1">
-            <DialogButton variant="text" type="button" onClick={handleClose}>
-              {t('cancel')}
-            </DialogButton>
             <DialogButton type="submit" disabled={loading}>
               {t('setPassword')}
             </DialogButton>
@@ -161,14 +158,9 @@ export default observer(function PasswordDialog() {
             >
               {t('removePassword')}
             </DialogButton>
-            <div className="flex gap-2">
-              <DialogButton variant="text" type="button" onClick={handleClose}>
-                {t('cancel')}
-              </DialogButton>
-              <DialogButton type="submit" disabled={loading}>
-                {t('save')}
-              </DialogButton>
-            </div>
+            <DialogButton type="submit" disabled={loading}>
+              {t('save')}
+            </DialogButton>
           </div>
         </form>
       )}

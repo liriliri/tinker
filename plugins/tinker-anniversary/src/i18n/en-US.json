@@ -24,6 +24,5 @@
   "startYearPlaceholder": "Optional",
   "startYearLunarDate": "{{year}} {{date}}",
   "daysSince": "{{count}} days passed",
-  "cancel": "Cancel",
   "save": "Save"
 }
