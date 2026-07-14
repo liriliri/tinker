@@ -42,20 +42,18 @@ function get(store: Store) {
   }
 }
 
-async function openJson(store: Store, args: Record<string, unknown>) {
-  const path = args.path as string
-
-  if (!(await fileExists(path))) {
-    throw new Error(`JSON file not found: ${path}`)
+async function openJson(store: Store, args: { path: string }) {
+  if (!(await fileExists(args.path))) {
+    throw new Error(`JSON file not found: ${args.path}`)
   }
 
-  const content = await tinker.readFile(path, 'utf-8')
-  store.loadFromFile(content, path)
+  const content = await tinker.readFile(args.path, 'utf-8')
+  store.loadFromFile(content, args.path)
   return get(store)
 }
 
-function set(store: Store, args: Record<string, unknown>) {
-  store.setJsonInput(args.content as string)
+function set(store: Store, args: { content: string }) {
+  store.setJsonInput(args.content)
   return get(store)
 }
 
@@ -83,9 +81,8 @@ function minify(store: Store) {
   return get(store)
 }
 
-async function saveJson(store: Store, args: Record<string, unknown>) {
-  const path =
-    (args.path as string | undefined) ?? store.currentFilePath ?? undefined
+async function saveJson(store: Store, args: { path?: string }) {
+  const path = args.path ?? store.currentFilePath ?? undefined
 
   if (!path) {
     throw new Error('path is required when no file is open.')

@@ -11,14 +11,22 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-async function compressImages(store: Store, args: Record<string, unknown>) {
-  const paths = args.paths as string[]
-  const quality = (args.quality as number | undefined) ?? store.quality
-  const keepExif = (args.keepExif as boolean | undefined) ?? store.keepExif
-  const overwriteOriginal =
-    (args.overwriteOriginal as boolean | undefined) ?? store.overwriteOriginal
-  const save = (args.save as boolean | undefined) ?? true
-  const outputDirectory = args.outputDirectory as string | undefined
+async function compressImages(
+  store: Store,
+  args: {
+    paths: string[]
+    quality?: number
+    keepExif?: boolean
+    overwriteOriginal?: boolean
+    save?: boolean
+    outputDirectory?: string
+  }
+) {
+  const quality = args.quality ?? store.quality
+  const keepExif = args.keepExif ?? store.keepExif
+  const overwriteOriginal = args.overwriteOriginal ?? store.overwriteOriginal
+  const save = args.save ?? true
+  const { paths, outputDirectory } = args
 
   for (const filePath of paths) {
     if (!(await fileExists(filePath))) {

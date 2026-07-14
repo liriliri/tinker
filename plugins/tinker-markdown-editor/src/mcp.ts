@@ -24,26 +24,23 @@ function get(store: Store) {
   }
 }
 
-async function openMarkdown(store: Store, args: Record<string, unknown>) {
-  const path = args.path as string
-
-  if (!(await fileExists(path))) {
-    throw new Error(`Markdown file not found: ${path}`)
+async function openMarkdown(store: Store, args: { path: string }) {
+  if (!(await fileExists(args.path))) {
+    throw new Error(`Markdown file not found: ${args.path}`)
   }
 
-  const content = await tinker.readFile(path, 'utf-8')
-  store.loadFromFile(content, path)
+  const content = await tinker.readFile(args.path, 'utf-8')
+  store.loadFromFile(content, args.path)
   return get(store)
 }
 
-function set(store: Store, args: Record<string, unknown>) {
-  store.setMarkdownInput(args.content as string)
+function set(store: Store, args: { content: string }) {
+  store.setMarkdownInput(args.content)
   return get(store)
 }
 
-async function saveMarkdown(store: Store, args: Record<string, unknown>) {
-  const path =
-    (args.path as string | undefined) ?? store.currentFilePath ?? undefined
+async function saveMarkdown(store: Store, args: { path?: string }) {
+  const path = args.path ?? store.currentFilePath ?? undefined
 
   if (!path) {
     throw new Error('path is required when no file is open.')

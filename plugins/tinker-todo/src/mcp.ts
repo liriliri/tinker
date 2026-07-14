@@ -39,9 +39,9 @@ function getTodoFile(store: Store) {
   }
 }
 
-async function openTodoFile(store: Store, args: Record<string, unknown>) {
+async function openTodoFile(store: Store, args: { path: string }) {
   try {
-    await store.setFilePath(args.path as string)
+    await store.setFilePath(args.path)
   } catch (error) {
     if (error instanceof Error && error.message === 'fileNotFound') {
       throw new Error('Todo file not found.')
@@ -71,53 +71,57 @@ function getTodos(store: Store) {
   }
 }
 
-function addTodo(store: Store, args: Record<string, unknown>) {
+function addTodo(
+  store: Store,
+  args: { text: string; priority?: Priority; dueDate?: string }
+) {
   requireFile(store)
 
-  store.setNewTodoText((args.text as string).trim())
-  store.setNewTodoPriority((args.priority as Priority) ?? null)
-  store.addTodo(args.dueDate as string | undefined)
+  store.setNewTodoText(args.text.trim())
+  store.setNewTodoPriority(args.priority ?? null)
+  store.addTodo(args.dueDate)
   return getTodos(store)
 }
 
-function updateTodo(store: Store, args: Record<string, unknown>) {
+function updateTodo(
+  store: Store,
+  args: {
+    id: string
+    text?: string
+    priority?: Priority | null
+    dueDate?: string | null
+  }
+) {
   requireFile(store)
 
-  const id = args.id as string
-  const todo = requireTodo(store, id)
+  const todo = requireTodo(store, args.id)
 
-  const text =
-    args.text !== undefined ? (args.text as string).trim() : todo.text
-  const priority =
-    args.priority !== undefined
-      ? (args.priority as Priority) ?? null
-      : todo.priority
+  const text = args.text !== undefined ? args.text.trim() : todo.text
+  const priority = args.priority !== undefined ? args.priority : todo.priority
   const dueDate =
     args.dueDate === undefined
       ? todo.dueDate ?? undefined
-      : (args.dueDate as string | null) ?? undefined
+      : args.dueDate ?? undefined
 
-  store.updateTodo(id, text, priority, dueDate)
+  store.updateTodo(args.id, text, priority, dueDate)
   return getTodos(store)
 }
 
-function toggleTodo(store: Store, args: Record<string, unknown>) {
+function toggleTodo(store: Store, args: { id: string }) {
   requireFile(store)
 
-  const id = args.id as string
-  requireTodo(store, id)
+  requireTodo(store, args.id)
 
-  store.toggleTodo(id)
+  store.toggleTodo(args.id)
   return getTodos(store)
 }
 
-function deleteTodo(store: Store, args: Record<string, unknown>) {
+function deleteTodo(store: Store, args: { id: string }) {
   requireFile(store)
 
-  const id = args.id as string
-  requireTodo(store, id)
+  requireTodo(store, args.id)
 
-  store.deleteTodo(id)
+  store.deleteTodo(args.id)
   return getTodos(store)
 }
 

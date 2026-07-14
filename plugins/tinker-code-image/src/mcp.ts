@@ -10,24 +10,25 @@ import {
 import { saveCodeImage } from './lib/exportImage'
 import pkg from '../package.json'
 
-interface GenerateArgs {
-  code: string
-  path: string
-  language?: string
-  theme?: string
-  darkMode?: boolean
-  showLineNumbers?: boolean
-  fileName?: string
-  format?: boolean
-}
-
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
     generate,
   })
 }
 
-async function generate(store: Store, args: GenerateArgs) {
+async function generate(
+  store: Store,
+  args: {
+    code: string
+    path: string
+    language?: string
+    theme?: string
+    darkMode?: boolean
+    showLineNumbers?: boolean
+    fileName?: string
+    format?: boolean
+  }
+) {
   let code = args.code
   const languageKey = args.language ?? store.languageKey
   const themeId = args.theme ?? store.selectedTheme.id

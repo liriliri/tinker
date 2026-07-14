@@ -41,12 +41,15 @@ function get(store: Store) {
   }
 }
 
-function set(store: Store, args: Record<string, unknown>) {
-  store.setCodeInput(args.content as string)
+function set(store: Store, args: { content: string }) {
+  store.setCodeInput(args.content)
   return get(store)
 }
 
-async function exportDiagram(store: Store, args: Record<string, unknown>) {
+async function exportDiagram(
+  store: Store,
+  args: { format: 'svg' | 'png'; path: string; darkMode?: boolean }
+) {
   if (store.isEmpty) {
     throw new Error('Editor is empty.')
   }
@@ -55,9 +58,7 @@ async function exportDiagram(store: Store, args: Record<string, unknown>) {
     store.setViewMode('split')
   }
 
-  const format = args.format as 'svg' | 'png'
-  const path = args.path as string
-  const darkMode = (args.darkMode as boolean | undefined) ?? store.darkMode
+  const darkMode = args.darkMode ?? store.darkMode
   const themeChanged = darkMode !== store.darkMode
 
   if (themeChanged) {
@@ -68,14 +69,14 @@ async function exportDiagram(store: Store, args: Record<string, unknown>) {
 
   await writeDiagramFile(
     svg,
-    format,
-    path,
+    args.format,
+    args.path,
     getDiagramBackground(store.darkMode)
   )
 
   return {
-    path,
-    format,
+    path: args.path,
+    format: args.format,
     ...get(store),
   }
 }

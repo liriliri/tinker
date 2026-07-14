@@ -59,17 +59,15 @@ function requireImage(store: Store) {
   }
 }
 
-async function openImage(store: Store, args: Record<string, unknown>) {
-  const path = args.path as string
-
-  if (!(await fileExists(path))) {
-    throw new Error(`Image file not found: ${path}`)
+async function openImage(store: Store, args: { path: string }) {
+  if (!(await fileExists(args.path))) {
+    throw new Error(`Image file not found: ${args.path}`)
   }
 
-  const buffer = await tinker.readFile(path)
-  const fileName = splitPath(path).name
+  const buffer = await tinker.readFile(args.path)
+  const fileName = splitPath(args.path).name
   const file = new File([buffer], fileName, { type: 'image/*' })
-  await store.loadImage(file, path)
+  await store.loadImage(file, args.path)
   return serializeImage(store)
 }
 
@@ -164,13 +162,13 @@ function applyCanvasResult(
   store.setCropBoxSize(result.width, result.height)
 }
 
-async function cropImage(store: Store, args: Record<string, unknown>) {
+async function cropImage(
+  store: Store,
+  args: { x: number; y: number; width: number; height: number }
+) {
   requireImage(store)
 
-  const x = args.x as number
-  const y = args.y as number
-  const width = args.width as number
-  const height = args.height as number
+  const { x, y, width, height } = args
   const imageWidth = store.image!.width
   const imageHeight = store.image!.height
 
@@ -203,12 +201,15 @@ async function cropImage(store: Store, args: Record<string, unknown>) {
   }
 }
 
-async function resizeImage(store: Store, args: Record<string, unknown>) {
+async function resizeImage(
+  store: Store,
+  args: { width?: number; height?: number; keepAspectRatio?: boolean }
+) {
   requireImage(store)
 
-  let width = args.width as number | undefined
-  let height = args.height as number | undefined
-  const keepAspectRatio = (args.keepAspectRatio as boolean | undefined) ?? false
+  let width = args.width
+  let height = args.height
+  const keepAspectRatio = args.keepAspectRatio ?? false
   const aspectRatio =
     store.originalAspectRatio ?? store.image!.width / store.image!.height
 
@@ -245,16 +246,18 @@ async function resizeImage(store: Store, args: Record<string, unknown>) {
   }
 }
 
-async function saveImage(store: Store, args: Record<string, unknown>) {
+async function saveImage(
+  store: Store,
+  args: { overwriteOriginal?: boolean; outputPath?: string }
+) {
   requireImage(store)
 
   if (store.historyIndex <= 0) {
     throw new Error('No image edits to save.')
   }
 
-  const overwriteOriginal =
-    (args.overwriteOriginal as boolean | undefined) ?? store.overwriteOriginal
-  const outputPath = args.outputPath as string | undefined
+  const overwriteOriginal = args.overwriteOriginal ?? store.overwriteOriginal
+  const { outputPath } = args
 
   if (!overwriteOriginal) {
     if (!outputPath) {

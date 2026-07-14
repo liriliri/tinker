@@ -10,6 +10,25 @@ import type {
 } from './types'
 import pkg from '../package.json'
 
+type EffectArgs = {
+  path: string
+  overwriteOriginal?: boolean
+  save?: boolean
+  outputPath?: string
+  thickness?: number
+  brightness?: number
+  detail?: number
+  deepen?: number
+  pixelSize?: number
+  paletteEnabled?: boolean
+  palette?: PixelPaletteId
+  outline?: boolean
+  cellSize?: number
+  contrast?: number
+  invert?: boolean
+  charset?: AsciiCharset
+}
+
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
     apply_sketch: (store, args) => applyEffect(store, 'sketch', args),
@@ -18,16 +37,10 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-async function applyEffect(
-  store: Store,
-  effect: EffectId,
-  args: Record<string, unknown>
-) {
-  const path = args.path as string
-  const overwriteOriginal =
-    (args.overwriteOriginal as boolean | undefined) ?? store.overwriteOriginal
-  const save = (args.save as boolean | undefined) ?? true
-  const outputPath = args.outputPath as string | undefined
+async function applyEffect(store: Store, effect: EffectId, args: EffectArgs) {
+  const overwriteOriginal = args.overwriteOriginal ?? store.overwriteOriginal
+  const save = args.save ?? true
+  const { path, outputPath } = args
 
   if (!(await fileExists(path))) {
     throw new Error(`Image file not found: ${path}`)
@@ -83,7 +96,7 @@ async function applyEffect(
   }
 }
 
-function applySketchParams(store: Store, args: Record<string, unknown>) {
+function applySketchParams(store: Store, args: EffectArgs) {
   const keys: Array<keyof SketchParams> = [
     'thickness',
     'brightness',
@@ -91,38 +104,39 @@ function applySketchParams(store: Store, args: Record<string, unknown>) {
     'deepen',
   ]
   for (const key of keys) {
-    if (args[key] !== undefined) {
-      store.setSketchParam(key, args[key] as SketchParams[typeof key])
+    const value = args[key]
+    if (value !== undefined) {
+      store.setSketchParam(key, value)
     }
   }
 }
 
-function applyPixelateParams(store: Store, args: Record<string, unknown>) {
+function applyPixelateParams(store: Store, args: EffectArgs) {
   if (args.pixelSize !== undefined) {
-    store.setPixelateParam('pixelSize', args.pixelSize as number)
+    store.setPixelateParam('pixelSize', args.pixelSize)
   }
   if (args.paletteEnabled !== undefined) {
-    store.setPixelateParam('paletteEnabled', args.paletteEnabled as boolean)
+    store.setPixelateParam('paletteEnabled', args.paletteEnabled)
   }
   if (args.palette !== undefined) {
-    store.setPixelateParam('palette', args.palette as PixelPaletteId)
+    store.setPixelateParam('palette', args.palette)
   }
   if (args.outline !== undefined) {
-    store.setPixelateParam('outline', args.outline as boolean)
+    store.setPixelateParam('outline', args.outline)
   }
 }
 
-function applyAsciiParams(store: Store, args: Record<string, unknown>) {
+function applyAsciiParams(store: Store, args: EffectArgs) {
   if (args.cellSize !== undefined) {
-    store.setAsciiParam('cellSize', args.cellSize as number)
+    store.setAsciiParam('cellSize', args.cellSize)
   }
   if (args.contrast !== undefined) {
-    store.setAsciiParam('contrast', args.contrast as number)
+    store.setAsciiParam('contrast', args.contrast)
   }
   if (args.invert !== undefined) {
-    store.setAsciiParam('invert', args.invert as boolean)
+    store.setAsciiParam('invert', args.invert)
   }
   if (args.charset !== undefined) {
-    store.setAsciiParam('charset', args.charset as AsciiCharset)
+    store.setAsciiParam('charset', args.charset)
   }
 }

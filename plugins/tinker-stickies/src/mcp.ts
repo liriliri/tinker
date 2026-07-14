@@ -32,12 +32,11 @@ function validateColor(color: string) {
   }
 }
 
-function getStickies(store: Store, args: Record<string, unknown>) {
+function getStickies(store: Store, args: { search?: string }) {
   let stickies = store.stickies
-  const search = args.search as string | undefined
 
-  if (search !== undefined && !isStrBlank(search)) {
-    const query = lowerCase(search)
+  if (args.search !== undefined && !isStrBlank(args.search)) {
+    const query = lowerCase(args.search)
     stickies = filter(stickies, (s) =>
       lowerCase(stripHtmlTag(s.content)).includes(query)
     )
@@ -49,20 +48,18 @@ function getStickies(store: Store, args: Record<string, unknown>) {
   }
 }
 
-function addSticky(store: Store, args: Record<string, unknown>) {
-  const color = args.color as string | undefined
-  if (color !== undefined) {
-    validateColor(color)
+function addSticky(store: Store, args: { content?: string; color?: string }) {
+  if (args.color !== undefined) {
+    validateColor(args.color)
   }
 
   const id = store.addSticky()
-  const content = args.content as string | undefined
 
-  if (content !== undefined) {
-    store.updateSticky(id, content)
+  if (args.content !== undefined) {
+    store.updateSticky(id, args.content)
   }
-  if (color !== undefined) {
-    store.updateStickyColor(id, color)
+  if (args.color !== undefined) {
+    store.updateStickyColor(id, args.color)
   }
 
   const sticky = store.stickies.find((s) => s.id === id)
@@ -73,32 +70,32 @@ function addSticky(store: Store, args: Record<string, unknown>) {
   return { sticky }
 }
 
-function updateSticky(store: Store, args: Record<string, unknown>) {
-  const id = args.id as string
-  requireSticky(store, id)
+function updateSticky(
+  store: Store,
+  args: { id: string; content?: string; color?: string }
+) {
+  requireSticky(store, args.id)
 
   if (args.content !== undefined) {
-    store.updateSticky(id, args.content as string)
+    store.updateSticky(args.id, args.content)
   }
 
   if (args.color !== undefined) {
-    const color = args.color as string
-    validateColor(color)
-    store.updateStickyColor(id, color)
+    validateColor(args.color)
+    store.updateStickyColor(args.id, args.color)
   }
 
-  const updated = store.stickies.find((s) => s.id === id)
+  const updated = store.stickies.find((s) => s.id === args.id)
   if (!updated) {
-    throw new Error(`Sticky with id "${id}" not found.`)
+    throw new Error(`Sticky with id "${args.id}" not found.`)
   }
 
   return { sticky: updated }
 }
 
-function deleteSticky(store: Store, args: Record<string, unknown>) {
-  const id = args.id as string
-  requireSticky(store, id)
+function deleteSticky(store: Store, args: { id: string }) {
+  requireSticky(store, args.id)
 
-  store.deleteSticky(id)
-  return { deleted: true, id }
+  store.deleteSticky(args.id)
+  return { deleted: true, id: args.id }
 }

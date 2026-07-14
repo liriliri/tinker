@@ -4,6 +4,17 @@ import type { Anniversary } from './types'
 import type { Store } from './store'
 import pkg from '../package.json'
 
+type AnniversaryArgs = {
+  id?: string
+  title?: string
+  isLunar?: boolean
+  month?: number
+  day?: number
+  lunarMonth?: number
+  lunarDay?: number
+  startYear?: number | null
+}
+
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
     list: (store) => getAnniversaries(store),
@@ -69,27 +80,20 @@ function requireAnniversary(store: Store, id: string): Anniversary {
 }
 
 function parseAnniversaryData(
-  args: Record<string, unknown>,
+  args: AnniversaryArgs,
   existing?: Anniversary
 ): Omit<Anniversary, 'id'> {
   const title =
-    args.title !== undefined ? String(args.title).trim() : existing?.title ?? ''
+    args.title !== undefined ? args.title.trim() : existing?.title ?? ''
   if (!title) {
     throw new Error('title is required and cannot be empty.')
   }
 
-  const isLunar =
-    args.isLunar !== undefined
-      ? Boolean(args.isLunar)
-      : existing?.isLunar ?? false
+  const isLunar = args.isLunar ?? existing?.isLunar ?? false
 
   if (isLunar) {
-    const lunarMonth =
-      args.lunarMonth !== undefined
-        ? Number(args.lunarMonth)
-        : existing?.lunarMonth
-    const lunarDay =
-      args.lunarDay !== undefined ? Number(args.lunarDay) : existing?.lunarDay
+    const lunarMonth = args.lunarMonth ?? existing?.lunarMonth
+    const lunarDay = args.lunarDay ?? existing?.lunarDay
 
     if (!lunarMonth || !lunarDay) {
       throw new Error(
@@ -106,8 +110,8 @@ function parseAnniversaryData(
     }
   }
 
-  const month = args.month !== undefined ? Number(args.month) : existing?.month
-  const day = args.day !== undefined ? Number(args.day) : existing?.day
+  const month = args.month ?? existing?.month
+  const day = args.day ?? existing?.day
 
   if (!month || !day) {
     throw new Error('month and day are required for solar anniversaries.')
@@ -123,34 +127,34 @@ function parseAnniversaryData(
 }
 
 function parseStartYear(
-  args: Record<string, unknown>,
+  args: AnniversaryArgs,
   existing?: Anniversary
 ): number | undefined {
   if (args.startYear === null) return undefined
   if (args.startYear !== undefined) {
-    const year = Number(args.startYear)
-    return Number.isNaN(year) ? undefined : year
+    return Number.isNaN(args.startYear) ? undefined : args.startYear
   }
   return existing?.startYear
 }
 
-function addAnniversary(store: Store, args: Record<string, unknown>) {
+function addAnniversary(store: Store, args: AnniversaryArgs) {
   const data = parseAnniversaryData(args)
   store.addAnniversary(data)
   return getAnniversaries(store)
 }
 
-function updateAnniversary(store: Store, args: Record<string, unknown>) {
-  const id = args.id as string
-  const existing = requireAnniversary(store, id)
+function updateAnniversary(
+  store: Store,
+  args: AnniversaryArgs & { id: string }
+) {
+  const existing = requireAnniversary(store, args.id)
   const data = parseAnniversaryData(args, existing)
-  store.updateAnniversary(id, data)
+  store.updateAnniversary(args.id, data)
   return getAnniversaries(store)
 }
 
-function deleteAnniversary(store: Store, args: Record<string, unknown>) {
-  const id = args.id as string
-  requireAnniversary(store, id)
-  store.removeAnniversary(id)
+function deleteAnniversary(store: Store, args: { id: string }) {
+  requireAnniversary(store, args.id)
+  store.removeAnniversary(args.id)
   return getAnniversaries(store)
 }

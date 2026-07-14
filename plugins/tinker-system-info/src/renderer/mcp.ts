@@ -23,16 +23,18 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
   })
 }
 
-async function getSystemInfo(store: Store, args: Record<string, unknown>) {
-  const refresh = (args.refresh as boolean | undefined) ?? false
-  const section = args.section as Section | undefined
+async function getSystemInfo(
+  store: Store,
+  args: { refresh?: boolean; section?: Section }
+) {
+  const refresh = args.refresh ?? false
   const info = await ensureSystemInfo(store, refresh)
 
-  if (!section) {
+  if (!args.section) {
     return info
   }
 
-  const key = SECTION_KEYS[section]
+  const key = SECTION_KEYS[args.section]
   return { [key]: info[key] }
 }
 

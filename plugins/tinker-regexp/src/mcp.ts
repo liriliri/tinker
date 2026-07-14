@@ -37,10 +37,10 @@ function getRegexp(store: Store) {
   }
 }
 
-function setRegexp(store: Store, args: Record<string, unknown>) {
-  store.setPattern(args.pattern as string)
+function setRegexp(store: Store, args: { pattern: string; flags?: string }) {
+  store.setPattern(args.pattern)
   if (args.flags !== undefined) {
-    store.setFlags(args.flags as string)
+    store.setFlags(args.flags)
   }
   return getRegexp(store)
 }
@@ -49,8 +49,7 @@ function getTestText(store: Store) {
   return store.testText
 }
 
-function setTestText(store: Store, args: Record<string, unknown>) {
-  const text = args.text as string
-  store.setTestText(text)
-  return `Test text updated (${text.length} characters).`
+function setTestText(store: Store, args: { text: string }) {
+  store.setTestText(args.text)
+  return `Test text updated (${args.text.length} characters).`
 }
