@@ -1,4 +1,5 @@
 import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
+import sleep from 'licia/sleep'
 import {
   getDiagramBackground,
   getSvgElement,
@@ -33,6 +34,7 @@ function get(store: Store) {
   return {
     content: store.codeInput,
     viewMode: store.viewMode,
+    darkMode: store.darkMode,
     lineCount: store.lineCount,
     isEmpty: store.isEmpty,
     renderError: store.renderError,
@@ -55,7 +57,14 @@ async function exportDiagram(store: Store, args: Record<string, unknown>) {
 
   const format = args.format as 'svg' | 'png'
   const path = args.path as string
-  const svg = await waitForSvg(store)
+  const darkMode = (args.darkMode as boolean | undefined) ?? store.darkMode
+  const themeChanged = darkMode !== store.darkMode
+
+  if (themeChanged) {
+    store.setDarkMode(darkMode)
+  }
+
+  const svg = await waitForSvg(store, themeChanged)
 
   await writeDiagramFile(
     svg,
@@ -71,15 +80,28 @@ async function exportDiagram(store: Store, args: Record<string, unknown>) {
   }
 }
 
-async function waitForSvg(store: Store): Promise<SVGSVGElement> {
+async function waitForSvg(
+  store: Store,
+  awaitRerender = false
+): Promise<SVGSVGElement> {
   const deadline = Date.now() + 10000
+
+  if (awaitRerender) {
+    const renderStartedBy = Date.now() + 500
+    while (!store.loading && Date.now() < renderStartedBy) {
+      await sleep(50)
+    }
+  }
+
   while (Date.now() < deadline) {
     if (store.renderError) {
       throw new Error(store.renderError)
     }
-    const svg = getSvgElement(document.getElementById('diagram-preview'))
-    if (svg) return svg
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    if (!store.loading) {
+      const svg = getSvgElement(document.getElementById('diagram-preview'))
+      if (svg) return svg
+    }
+    await sleep(50)
   }
   throw new Error('No diagram to export. Fix syntax errors first.')
 }

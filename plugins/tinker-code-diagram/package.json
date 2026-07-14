@@ -20,7 +20,7 @@
     "mcp": {
       "tools": {
         "get": {
-          "description": "Get the current diagram source, view mode, line count, and render error if any."
+          "description": "Get the current diagram source, view mode, dark mode, line count, and render error if any."
         },
         "set": {
           "description": "Replace the diagram source in the editor. Changes apply immediately and re-render the preview.",
@@ -38,7 +38,7 @@
           }
         },
         "export": {
-          "description": "Export the current diagram from the live preview to an SVG or PNG file. Same as the toolbar export, but path is required (no save dialog). Waits for the preview to finish rendering. Call set first if updating the diagram.",
+          "description": "Export the current diagram from the live preview to an SVG or PNG file. Same as the toolbar export, but path is required (no save dialog). Waits for the preview to finish rendering. Call set first if updating the diagram. Optional darkMode updates the toolbar theme toggle and re-renders before export.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -54,6 +54,10 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Absolute path to save the exported file"
+              },
+              "darkMode": {
+                "type": "boolean",
+                "description": "Export with dark (true) or light (false) theme. Also updates the toolbar dark-mode toggle. Defaults to the current UI setting."
               }
             },
             "required": [

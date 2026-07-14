@@ -195,7 +195,6 @@ Add `@use '../../share/styles/textSearch.scss'` for highlight classes.
 import WorkingTreeSidebar, {
   getWorkingTreeUIProps,
 } from 'share/components/WorkingTree'
-
 ;<WorkingTreeSidebar {...getWorkingTreeUIProps(store)} />
 ```
 
@@ -205,7 +204,6 @@ Implement `WorkingTreeController` on your store. Helpers in `share/lib/workingTr
 
 ```ts
 import Terminal, { getTerminalSession } from 'share/components/Terminal'
-
 ;<Terminal
   createSession={(cols, rows) => tinker.createTerminal({ cols, rows })}
 />
@@ -264,7 +262,7 @@ Pass `rootPath` for blank-area context menu (New File / New Folder). File watchi
 
 **MarkdownPreview** — GFM + syntax highlighting + Mermaid diagrams (fenced `mermaid` code blocks); optional `scrollPercent` / `onScrollPercentChange` to sync with an editor.
 
-**MermaidDiagram** — shared Mermaid renderer used by MarkdownPreview and diagram tools. Optional `debounceMs`, `errorDisplay` (`fallback` | `none`), `hideLoading`, and `onStatusChange`.
+**MermaidDiagram** — shared Mermaid renderer used by MarkdownPreview and diagram tools. Optional `debounceMs`, `errorDisplay` (`fallback` | `error` | `none`), `hideLoading`, and `onStatusChange`. Use `error` to fill the container with a red syntax-error panel; `fallback` shows the source (markdown embeds); `none` leaves error UI to the parent.
 
 ```ts
 import FileList from 'share/components/FileList'

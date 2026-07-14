@@ -24,7 +24,6 @@ interface PanOffset {
 export default observer(function DiagramPreview() {
   const { t } = useTranslation()
   const viewportRef = useRef<HTMLDivElement>(null)
-  const [loading, setLoading] = useState(false)
   const [scale, setScale] = useState(100)
   const [pan, setPan] = useState<PanOffset>({ x: 0, y: 0 })
   const draggingRef = useRef(false)
@@ -44,7 +43,7 @@ export default observer(function DiagramPreview() {
   }
 
   const handleStatusChange = (status: MermaidDiagramStatus) => {
-    setLoading(status.loading)
+    store.setLoading(status.loading)
     store.setRenderError(status.error)
     store.setHasRenderedDiagram(status.hasDiagram)
   }
@@ -90,23 +89,12 @@ export default observer(function DiagramPreview() {
   return (
     <div
       id="diagram-preview"
-      className={className(
-        'relative h-full w-full overflow-hidden',
-        store.renderError && 'opacity-60'
-      )}
+      className="relative h-full w-full overflow-hidden"
       style={{ backgroundColor: getDiagramBackground(store.darkMode) }}
     >
-      {loading && <RenderingBadge />}
+      {store.loading && <RenderingBadge />}
 
-      {store.renderError && (
-        <div
-          className={`absolute top-3 left-3 right-12 z-10 p-3 rounded text-xs font-mono whitespace-pre-wrap border max-h-40 overflow-auto ${tw.bg.primary} ${tw.border} text-red-500`}
-        >
-          {store.renderError}
-        </div>
-      )}
-
-      {!store.hasRenderedDiagram && !store.renderError && !loading && (
+      {!store.hasRenderedDiagram && !store.renderError && !store.loading && (
         <div
           className={`absolute inset-0 flex items-center justify-center text-sm ${tw.text.tertiary}`}
         >
@@ -126,19 +114,23 @@ export default observer(function DiagramPreview() {
         onPointerCancel={handlePointerUp}
       >
         <div
-          className="h-full w-full p-4"
-          style={{
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${
-              scale / 100
-            })`,
-            transformOrigin: 'center center',
-          }}
+          className={store.renderError ? 'h-full w-full' : 'h-full w-full p-4'}
+          style={
+            store.renderError
+              ? undefined
+              : {
+                  transform: `translate(${pan.x}px, ${pan.y}px) scale(${
+                    scale / 100
+                  })`,
+                  transformOrigin: 'center center',
+                }
+          }
         >
           <MermaidDiagram
             source={store.codeInput}
             isDark={store.darkMode}
             debounceMs={300}
-            errorDisplay="none"
+            errorDisplay="error"
             hideLoading
             onStatusChange={handleStatusChange}
           />

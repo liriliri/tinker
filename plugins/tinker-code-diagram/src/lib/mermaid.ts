@@ -1,9 +1,10 @@
 import convertBin from 'licia/convertBin'
-import createUrl from 'licia/createUrl'
+import dataUrl from 'licia/dataUrl'
 import loadImg from 'licia/loadImg'
 import max from 'licia/max'
 import promisify from 'licia/promisify'
 import replaceAll from 'licia/replaceAll'
+import strToBytes from 'licia/strToBytes'
 import { THEME_COLORS } from 'share/theme'
 
 export const DEFAULT_DIAGRAM = `flowchart TD
@@ -28,14 +29,19 @@ export function getSvgElement(
   return container?.querySelector('svg') ?? null
 }
 
-export function serializeSvg(
+function serializeSvg(
   svg: SVGSVGElement,
-  backgroundColor: string
+  backgroundColor: string,
+  size?: { width: number; height: number }
 ): string {
   const cloned = svg.cloneNode(true) as SVGSVGElement
   cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
   cloned.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
   cloned.style.backgroundColor = backgroundColor
+  if (size) {
+    cloned.setAttribute('width', `${size.width}`)
+    cloned.setAttribute('height', `${size.height}`)
+  }
 
   const svgString = replaceAll(cloned.outerHTML, '<br>', '<br/>').replace(
     /<img([^>]*)>/g,
@@ -45,7 +51,7 @@ export function serializeSvg(
   return `<?xml version="1.0" encoding="UTF-8"?>\n${svgString}`
 }
 
-export async function svgToPngBlob(
+async function svgToPngBlob(
   svg: SVGSVGElement,
   backgroundColor: string,
   pixelRatio = 2
@@ -74,24 +80,23 @@ export async function svgToPngBlob(
   context.fillStyle = backgroundColor
   context.fillRect(0, 0, width, height)
 
-  const url = createUrl(serializeSvg(svg, backgroundColor), {
-    type: 'image/svg+xml;charset=utf-8',
+  // data: avoids canvas taint from blob: URLs under the plugin:// origin.
+  const url = dataUrl.stringify(
+    strToBytes(serializeSvg(svg, backgroundColor, { width, height })),
+    'image/svg+xml',
+    { base64: true }
+  )
+
+  const image = await loadImage(url)
+  context.drawImage(image, 0, 0, width, height)
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, 'image/png')
   })
-
-  try {
-    const image = await loadImage(url)
-    context.drawImage(image, 0, 0, width, height)
-
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, 'image/png')
-    })
-    if (!blob) {
-      throw new Error('Failed to create PNG blob')
-    }
-    return blob
-  } finally {
-    URL.revokeObjectURL(url)
+  if (!blob) {
+    throw new Error('Failed to create PNG blob')
   }
+  return blob
 }
 
 export async function writeDiagramFile(

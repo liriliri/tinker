@@ -32,6 +32,7 @@ export class Store extends BaseStore {
   undoRedoVersion: number = 0
   viewMode: ViewMode = 'split'
   darkMode: boolean = false
+  loading: boolean = false
   renderError: string | null = null
   hasRenderedDiagram: boolean = false
   hasAI: boolean = false
@@ -117,6 +118,10 @@ export class Store extends BaseStore {
     this.renderError = error
   }
 
+  setLoading(loading: boolean) {
+    this.loading = loading
+  }
+
   setHasRenderedDiagram(hasRendered: boolean) {
     this.hasRenderedDiagram = hasRendered
   }
@@ -151,8 +156,8 @@ export class Store extends BaseStore {
     storage.set(STORAGE_VIEW_MODE, mode)
   }
 
-  toggleDarkMode() {
-    this.darkMode = !this.darkMode
+  setDarkMode(darkMode: boolean) {
+    this.darkMode = darkMode
     storage.set(STORAGE_DARK_MODE, this.darkMode)
   }
 

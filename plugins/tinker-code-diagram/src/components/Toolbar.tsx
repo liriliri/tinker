@@ -144,7 +144,7 @@ export default observer(function ToolbarComponent() {
 
         <DarkModeSwitch
           dark={store.darkMode}
-          onToggle={() => store.toggleDarkMode()}
+          onToggle={() => store.setDarkMode(!store.darkMode)}
           title={store.darkMode ? t('darkMode') : t('lightMode')}
           className="ml-2"
         />

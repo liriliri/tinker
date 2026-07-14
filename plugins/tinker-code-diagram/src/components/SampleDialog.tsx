@@ -83,25 +83,17 @@ export default observer(function SampleDialog({
 
         <div
           className={`relative flex-1 min-w-0 overflow-hidden rounded border ${tw.border}`}
-          style={{ backgroundColor: getDiagramBackground(store.darkMode) }}
+          style={{ backgroundColor: getDiagramBackground(store.isDark) }}
         >
           {loading && <RenderingBadge />}
 
-          {error && (
-            <div
-              className={`absolute inset-3 z-10 p-3 rounded text-xs font-mono whitespace-pre-wrap overflow-auto border ${tw.bg.primary} ${tw.border} text-red-500`}
-            >
-              {error}
-            </div>
-          )}
-
           {open && selected && (
-            <div className="h-full w-full p-4">
+            <div className={error ? 'h-full w-full' : 'h-full w-full p-4'}>
               <MermaidDiagram
                 source={selected.code}
-                isDark={store.darkMode}
+                isDark={store.isDark}
                 debounceMs={200}
-                errorDisplay="none"
+                errorDisplay="error"
                 hideLoading
                 onStatusChange={handleStatusChange}
               />

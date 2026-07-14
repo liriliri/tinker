@@ -81,12 +81,14 @@ import remove from 'licia/remove'
 import replaceAll from 'licia/replaceAll'
 import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
+import sleep from 'licia/sleep'
 import snakeCase from 'licia/snakeCase'
 import some from 'licia/some'
 import sortBy from 'licia/sortBy'
 import splitPath from 'licia/splitPath'
 import startWith from 'licia/startWith'
 import stripHtmlTag from 'licia/stripHtmlTag'
+import strToBytes from 'licia/strToBytes'
 import sum from 'licia/sum'
 import toInt from 'licia/toInt'
 import toNum from 'licia/toNum'
@@ -185,12 +187,14 @@ const licia = {
   replaceAll,
   rtrim,
   shuffle,
+  sleep,
   snakeCase,
   some,
   sortBy,
   splitPath,
   startWith,
   stripHtmlTag,
+  strToBytes,
   sum,
   toInt,
   toNum,
@@ -293,12 +297,14 @@ export {
   replaceAll,
   rtrim,
   shuffle,
+  sleep,
   snakeCase,
   some,
   sortBy,
   splitPath,
   startWith,
   stripHtmlTag,
+  strToBytes,
   sum,
   toInt,
   toNum,

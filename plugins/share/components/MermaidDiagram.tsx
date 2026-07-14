@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import mermaid from 'mermaid'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import className from 'licia/className'
 import debounce from 'licia/debounce'
 import { tw } from '../theme'
@@ -16,8 +16,12 @@ export interface MermaidDiagramProps {
   isDark: boolean
   className?: string
   debounceMs?: number
-  /** Default shows source fallback; `none` lets the parent render errors. */
-  errorDisplay?: 'fallback' | 'none'
+  /**
+   * `fallback` shows the source on error (default, for markdown embeds).
+   * `error` fills the container with a red error panel.
+   * `none` lets the parent render errors.
+   */
+  errorDisplay?: 'fallback' | 'error' | 'none'
   hideLoading?: boolean
   onStatusChange?: (status: MermaidDiagramStatus) => void
 }
@@ -93,6 +97,7 @@ export default function MermaidDiagram({
   const resultRef = useRef<MermaidRenderResult | null>(null)
   const [hasDiagram, setHasDiagram] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [renderToken, setRenderToken] = useState(0)
   const onStatusChangeRef = useRef(onStatusChange)
   onStatusChangeRef.current = onStatusChange
@@ -110,6 +115,7 @@ export default function MermaidDiagram({
           containerRef.current.innerHTML = ''
         }
         setHasDiagram(false)
+        setError(null)
         setLoading(false)
         setRenderToken((token) => token + 1)
         emitStatus({ loading: false, error: null, hasDiagram: false })
@@ -117,6 +123,7 @@ export default function MermaidDiagram({
       }
 
       setLoading(true)
+      setError(null)
       emitStatus({
         loading: true,
         error: null,
@@ -127,18 +134,20 @@ export default function MermaidDiagram({
         const result = await renderMermaid(trimmed, nextIsDark)
         resultRef.current = result
         setHasDiagram(true)
+        setError(null)
         setLoading(false)
         setRenderToken((token) => token + 1)
         emitStatus({ loading: false, error: null, hasDiagram: true })
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
-        if (errorDisplay === 'fallback') {
+        if (errorDisplay !== 'none') {
           resultRef.current = null
           if (containerRef.current) {
             containerRef.current.innerHTML = ''
           }
           setHasDiagram(false)
         }
+        setError(message)
         setLoading(false)
         setRenderToken((token) => token + 1)
         emitStatus({
@@ -168,6 +177,9 @@ export default function MermaidDiagram({
   const showInlineLoading =
     !hideLoading && loading && !hasDiagram && errorDisplay === 'fallback'
 
+  const showErrorPanel =
+    errorDisplay === 'error' && !!error && !loading && !hasDiagram
+
   const showFallback = errorDisplay === 'fallback' && !hasDiagram && !loading
 
   if (showInlineLoading) {
@@ -180,6 +192,34 @@ export default function MermaidDiagram({
       >
         <Loader2 size={16} className="animate-spin" />
         <span>Loading diagram...</span>
+      </div>
+    )
+  }
+
+  if (showErrorPanel) {
+    return (
+      <div
+        className={className(
+          'h-full w-full overflow-auto bg-red-50 dark:bg-red-950/90',
+          extraClassName
+        )}
+      >
+        <div className="flex items-start gap-3 p-6 min-h-full">
+          <AlertCircle
+            size={18}
+            className="shrink-0 mt-0.5 text-red-500 dark:text-red-400"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-red-600 dark:text-red-400">
+              Syntax Error
+            </div>
+            <pre
+              className={`mt-2 text-xs font-mono whitespace-pre-wrap break-words leading-relaxed ${tw.text.secondary}`}
+            >
+              {error}
+            </pre>
+          </div>
+        </div>
       </div>
     )
   }
