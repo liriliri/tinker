@@ -11,10 +11,10 @@ import {
   FileDown,
   Image,
   LayoutGrid,
+  MessageSquare,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import convertBin from 'licia/convertBin'
 import isErr from 'licia/isErr'
 import toStr from 'licia/toStr'
 import upperCase from 'licia/upperCase'
@@ -33,8 +33,7 @@ import store from '../store'
 import {
   getDiagramBackground,
   getSvgElement,
-  serializeSvg,
-  svgToPngBlob,
+  writeDiagramFile,
 } from '../lib/mermaid'
 import SampleDialog from './SampleDialog'
 
@@ -59,21 +58,12 @@ export default observer(function ToolbarComponent() {
       })
       if (result.canceled || !result.filePath) return
 
-      const background = getDiagramBackground(store.darkMode)
-      if (format === 'svg') {
-        await tinker.writeFile(
-          result.filePath,
-          serializeSvg(svg, background),
-          'utf-8'
-        )
-      } else {
-        const blob = await svgToPngBlob(svg, background)
-        const buffer = convertBin(
-          await convertBin.blobToArrBuffer(blob),
-          'Uint8Array'
-        )
-        await tinker.writeFile(result.filePath, buffer)
-      }
+      await writeDiagramFile(
+        svg,
+        format,
+        result.filePath,
+        getDiagramBackground(store.darkMode)
+      )
     } catch (err) {
       await alert({
         title: t('exportFailed'),
@@ -192,6 +182,17 @@ export default observer(function ToolbarComponent() {
             <Eye size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
         </ToolbarButtonGroup>
+
+        {store.hasAI && (
+          <ToolbarButton
+            variant="toggle"
+            active={store.chatOpen}
+            onClick={() => store.toggleChat()}
+            title={t('chatTitle')}
+          >
+            <MessageSquare size={TOOLBAR_ICON_SIZE} />
+          </ToolbarButton>
+        )}
       </Toolbar>
 
       <SampleDialog

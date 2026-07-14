@@ -1,3 +1,4 @@
+import convertBin from 'licia/convertBin'
 import createUrl from 'licia/createUrl'
 import loadImg from 'licia/loadImg'
 import max from 'licia/max'
@@ -91,4 +92,23 @@ export async function svgToPngBlob(
   } finally {
     URL.revokeObjectURL(url)
   }
+}
+
+export async function writeDiagramFile(
+  svg: SVGSVGElement,
+  format: 'svg' | 'png',
+  path: string,
+  backgroundColor: string
+): Promise<void> {
+  if (format === 'svg') {
+    await tinker.writeFile(path, serializeSvg(svg, backgroundColor), 'utf-8')
+    return
+  }
+
+  const blob = await svgToPngBlob(svg, backgroundColor)
+  const buffer = convertBin(
+    await convertBin.blobToArrBuffer(blob),
+    'Uint8Array'
+  )
+  await tinker.writeFile(path, buffer)
 }

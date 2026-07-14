@@ -17,5 +17,8 @@
   "lightMode": "Light Mode",
   "samples": "Sample Diagrams",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "chatTitle": "Diagram Assistant",
+  "chatInputPlaceholder": "Ask about Mermaid diagrams...",
+  "chatEmptyHint": "Ask me to help write or fix Mermaid diagrams"
 }

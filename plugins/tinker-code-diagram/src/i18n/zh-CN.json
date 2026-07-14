@@ -17,5 +17,8 @@
   "lightMode": "浅色模式",
   "samples": "范例图表",
   "cancel": "取消",
-  "confirm": "确定"
+  "confirm": "确定",
+  "chatTitle": "图表助手",
+  "chatInputPlaceholder": "询问 Mermaid 图表相关问题...",
+  "chatEmptyHint": "我可以帮你编写或修复 Mermaid 图表"
 }

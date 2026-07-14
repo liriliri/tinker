@@ -32,7 +32,34 @@
                 "description": "The new Mermaid diagram source"
               }
             },
-            "required": ["content"]
+            "required": [
+              "content"
+            ]
+          }
+        },
+        "export": {
+          "description": "Export the current diagram from the live preview to an SVG or PNG file. Same as the toolbar export, but path is required (no save dialog). Waits for the preview to finish rendering. Call set first if updating the diagram.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": [
+                  "svg",
+                  "png"
+                ],
+                "description": "Export file format"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the exported file"
+              }
+            },
+            "required": [
+              "format",
+              "path"
+            ]
           }
         }
       }
