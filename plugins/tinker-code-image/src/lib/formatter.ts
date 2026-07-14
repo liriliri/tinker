@@ -5,7 +5,7 @@ import typescript from 'prettier/plugins/typescript'
 import postcss from 'prettier/plugins/postcss'
 import html from 'prettier/plugins/html'
 
-const FORMATTABLE_LANGUAGES = [
+export const FORMATTABLE_LANGUAGES = [
   'javascript',
   'typescript',
   'css',

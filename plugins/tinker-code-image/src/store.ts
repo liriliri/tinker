@@ -12,6 +12,7 @@ import {
 import isStrBlank from 'licia/isStrBlank'
 import isUndef from 'licia/isUndef'
 import findKey from 'licia/findKey'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-code-image')
 const STORAGE_LANGUAGE = 'language'
@@ -20,8 +21,6 @@ const STORAGE_DARK_MODE = 'darkMode'
 const STORAGE_SHOW_LINE_NUMBERS = 'showLineNumbers'
 const STORAGE_CODE = 'code'
 const STORAGE_FILE_NAME = 'fileName'
-
-export { Language, Theme, LANGUAGES, THEMES }
 
 const defaultCode = `import { useState } from 'react';
 
@@ -38,7 +37,9 @@ export default function Counter() {
   );
 }`
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   code: string = defaultCode
   selectedLanguage: Language = LANGUAGES.javascript
 
@@ -105,9 +106,13 @@ class Store extends BaseStore {
     storage.set(STORAGE_THEME, theme.id)
   }
 
-  toggleDarkMode() {
-    this.darkMode = !this.darkMode
+  setDarkMode(darkMode: boolean) {
+    this.darkMode = darkMode
     storage.set(STORAGE_DARK_MODE, this.darkMode)
+  }
+
+  toggleDarkMode() {
+    this.setDarkMode(!this.darkMode)
   }
 
   setShowLineNumbers(show: boolean) {
@@ -143,6 +148,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

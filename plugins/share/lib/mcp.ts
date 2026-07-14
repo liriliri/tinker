@@ -63,12 +63,10 @@ export type McpJsonValue =
   | McpJsonValue[]
   | { [key: string]: McpJsonValue }
 
-export type McpToolHandlerReturn = unknown | Promise<unknown>
-
-export type McpToolHandlerFn<TStore> = (
+export type McpToolHandlerFn<TStore, TArgs = any> = (
   store: TStore,
-  args: Record<string, unknown>
-) => McpToolHandlerReturn
+  args: TArgs
+) => any
 
 export type McpToolHandlers<TStore> = Record<string, McpToolHandlerFn<TStore>>
 
@@ -77,7 +75,7 @@ function dispatchMcpTool<TStore>(
   store: TStore,
   name: string,
   args: Record<string, unknown>
-): McpToolHandlerReturn {
+) {
   const handler = handlers[name]
   if (!handler) {
     throw new Error(`Unknown tool "${name}"`)
@@ -91,21 +89,15 @@ export function formatMcpToolResult(result: unknown): string {
 }
 
 export interface PluginMcpHandlers {
-  callTool: (
-    name: string,
-    args: Record<string, unknown>
-  ) => McpToolHandlerReturn
+  callTool: (name: string, args: Record<string, unknown>) => any
   createAgentTools: () => Array<{
     definition: object
-    execute: (args: Record<string, unknown>) => McpToolHandlerReturn
+    execute: (args: Record<string, unknown>) => any
   }>
 }
 
 export interface PluginMcp {
-  callTool: (
-    name: string,
-    args: Record<string, unknown>
-  ) => McpToolHandlerReturn
+  callTool: (name: string, args: Record<string, unknown>) => any
   createAgentTools: () => AgentTool[]
 }
 

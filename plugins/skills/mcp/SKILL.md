@@ -54,17 +54,23 @@ import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
 import type { Store } from './store'
 import pkg from '../package.json'
 
+interface MyToolArgs {
+  path: string
+  quality?: number
+}
+
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
     my_tool: myTool,
   })
 }
 
-async function myTool(store: Store, args: Record<string, unknown>) {
+async function myTool(store: Store, args: MyToolArgs) {
   if (!store.ready) {
     throw new Error('Not ready. Call open first.')
   }
-  return { ok: true }
+  const quality = args.quality ?? store.quality
+  return { ok: true, path: args.path, quality }
 }
 ```
 
@@ -88,13 +94,13 @@ Call existing store APIs. Don't add store methods solely for MCP unless the UI w
 | -------------------------------------------------- | -------------------------------------------------------- |
 | `throw new Error(...)` for failures                | Return `'Error: ...'` strings / catch-and-return         |
 | Return plain objects for success                   | `JSON.stringify` — host `registerMcp` serializes         |
-| Per-field casts + store defaults for args          | `args as FooArgs` on the whole object                    |
+| Typed args interface + store defaults for optionals | Cast individual fields from `Record<string, unknown>`   |
 | Async when needed                                  | Redundant return-type annotations                        |
 
-Host and AiChat catch thrown errors and format them as `Error: ...` (AiChat also marks the tool as `error`).
+Host and AiChat catch thrown errors and format them as `Error: ...` (AiChat also marks the tool as `error`). CLI validates `inputSchema` before `callTool`, so required fields can be typed as required.
 
 ```ts
-const quality = (args.quality as number | undefined) ?? store.quality
+const quality = args.quality ?? store.quality
 ```
 
 ### 5. Verify

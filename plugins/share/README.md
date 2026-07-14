@@ -169,7 +169,7 @@ export function createMcpApi(getStore: () => Store): PluginMcp {
 // On store: readonly mcp = createMcpApi(() => this)
 ```
 
-`createPluginMcpApi` reads schemas, dispatches handlers, registers via `tinker.registerMcp` (host serializes results), and builds agent tools. See `share/lib/mcp.ts` for `PluginMcp`, `formatMcpToolResult`, etc.
+`createPluginMcpApi` reads schemas, dispatches handlers, registers via `tinker.registerMcp` (host serializes results), and builds agent tools. Handlers may type `args` with a concrete interface (optional fields still fall back to store defaults). See `share/lib/mcp.ts` for `PluginMcp`, `formatMcpToolResult`, etc.
 
 For AiChat tool-arg previews, optional `getToolArgSummary` should return the full preview string — `ToolCard` truncates in the UI. Only provide a custom summary when args need special formatting (e.g. regexp `pattern` + `flags`).
 

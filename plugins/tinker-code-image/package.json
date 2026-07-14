@@ -16,6 +16,82 @@
         "name": "代码图片",
         "description": "将代码片段生成为美观的可分享图片"
       }
+    },
+    "mcp": {
+      "tools": {
+        "generate": {
+          "description": "Generate a code screenshot PNG end to end: apply the code and display options in the UI, then export the image. Same visual result as configuring the toolbar and clicking save.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Source code to render in the image"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the PNG file"
+              },
+              "language": {
+                "type": "string",
+                "enum": [
+                  "javascript",
+                  "typescript",
+                  "python",
+                  "java",
+                  "go",
+                  "rust",
+                  "cpp",
+                  "html",
+                  "css",
+                  "json",
+                  "shell"
+                ],
+                "description": "Syntax highlighting language key. Defaults to the current UI setting."
+              },
+              "theme": {
+                "type": "string",
+                "enum": [
+                  "candy",
+                  "breeze",
+                  "crimson",
+                  "midnight",
+                  "sunset",
+                  "mono",
+                  "raindrop",
+                  "meadow",
+                  "falcon",
+                  "sand",
+                  "ice"
+                ],
+                "description": "Color theme id. Defaults to the current UI setting."
+              },
+              "darkMode": {
+                "type": "boolean",
+                "description": "Use dark (true) or light (false) variant of the theme. Defaults to the current UI setting."
+              },
+              "showLineNumbers": {
+                "type": "boolean",
+                "description": "Whether to show line numbers. Defaults to the current UI setting."
+              },
+              "fileName": {
+                "type": "string",
+                "description": "Window title shown in the frame (e.g. app.tsx). Defaults to the current UI setting."
+              },
+              "format": {
+                "type": "boolean",
+                "description": "Pretty-print the code before rendering. Supported for javascript, typescript, css, html, and json. Defaults to false."
+              }
+            },
+            "required": [
+              "code",
+              "path"
+            ]
+          }
+        }
+      }
     }
   }
 }
