@@ -11,6 +11,7 @@ import compact from 'licia/compact'
 import contain from 'licia/contain'
 import convertBin from 'licia/convertBin'
 import copy from 'licia/copy'
+import createUrl from 'licia/createUrl'
 import dataUrl from 'licia/dataUrl'
 import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
@@ -53,6 +54,7 @@ import kebabCase from 'licia/kebabCase'
 import last from 'licia/last'
 import keys from 'licia/keys'
 import LinkedList from 'licia/LinkedList'
+import loadImg from 'licia/loadImg'
 import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import lpad from 'licia/lpad'
@@ -70,11 +72,13 @@ import once from 'licia/once'
 import openFile from 'licia/openFile'
 import pluck from 'licia/pluck'
 import precision from 'licia/precision'
+import promisify from 'licia/promisify'
 import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
 import randomItem from 'licia/randomItem'
 import range from 'licia/range'
 import remove from 'licia/remove'
+import replaceAll from 'licia/replaceAll'
 import rtrim from 'licia/rtrim'
 import shuffle from 'licia/shuffle'
 import snakeCase from 'licia/snakeCase'
@@ -111,6 +115,7 @@ const licia = {
   contain,
   convertBin,
   copy,
+  createUrl,
   dataUrl,
   dateFormat,
   debounce,
@@ -153,6 +158,7 @@ const licia = {
   keys,
   last,
   LinkedList,
+  loadImg,
   LocalStore,
   lowerCase,
   lpad,
@@ -170,11 +176,13 @@ const licia = {
   openFile,
   pluck,
   precision,
+  promisify,
   query,
   randomBytes,
   randomItem,
   range,
   remove,
+  replaceAll,
   rtrim,
   shuffle,
   snakeCase,
@@ -215,6 +223,7 @@ export {
   contain,
   convertBin,
   copy,
+  createUrl,
   dataUrl,
   dateFormat,
   debounce,
@@ -257,6 +266,7 @@ export {
   keys,
   last,
   LinkedList,
+  loadImg,
   LocalStore,
   lowerCase,
   lpad,
@@ -274,11 +284,13 @@ export {
   openFile,
   pluck,
   precision,
+  promisify,
   query,
   randomBytes,
   randomItem,
   range,
   remove,
+  replaceAll,
   rtrim,
   shuffle,
   snakeCase,

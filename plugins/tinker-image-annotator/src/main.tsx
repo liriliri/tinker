@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import ImageOpen from 'share/components/ImageOpen'
+import ZoomControls from 'share/components/ZoomControls'
 import { ToasterProvider } from 'share/components/Toaster'
 import { openImageFile } from 'share/lib/util'
 import { tw } from 'share/theme'
 import Canvas from './components/Canvas'
 import SideToolbar from './components/SideToolbar'
 import TopToolbar from './components/TopToolbar'
-import ZoomControls from './components/ZoomControls'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -78,7 +78,15 @@ const App = observer(function App() {
             <SideToolbar />
             <div className={'flex-1 relative'}>
               <Canvas />
-              {store.hasImage && <ZoomControls />}
+              {store.hasImage && (
+                <ZoomControls
+                  scale={store.scale}
+                  onZoomIn={() => store.zoomIn()}
+                  onZoomOut={() => store.zoomOut()}
+                  onZoomFit={() => store.zoomFit()}
+                  onZoomToPercent={(percent) => store.zoomToPercent(percent)}
+                />
+              )}
               {!store.hasImage && (
                 <div className="absolute inset-0 p-4 flex">
                   <div className="flex-1 [&>div]:m-0 [&>div]:h-full">

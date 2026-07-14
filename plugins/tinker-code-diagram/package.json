@@ -1,0 +1,41 @@
+{
+  "name": "tinker-code-diagram",
+  "version": "0.1.0",
+  "description": "Code Diagram Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Code Diagram",
+    "description": "Create diagrams by writing Mermaid text code with live preview",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "代码图表",
+        "description": "通过编写 Mermaid 文本代码生成图表，支持实时预览"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "get": {
+          "description": "Get the current diagram source, view mode, line count, and render error if any."
+        },
+        "set": {
+          "description": "Replace the diagram source in the editor. Changes apply immediately and re-render the preview.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "The new Mermaid diagram source"
+              }
+            },
+            "required": ["content"]
+          }
+        }
+      }
+    }
+  }
+}

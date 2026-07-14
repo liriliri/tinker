@@ -1,0 +1,21 @@
+{
+  "undo": "Undo",
+  "redo": "Redo",
+  "copy": "Copy",
+  "paste": "Paste",
+  "clear": "Clear",
+  "splitView": "Split View",
+  "editorOnly": "Editor Only",
+  "previewOnly": "Preview Only",
+  "exportSvg": "Export SVG",
+  "exportPng": "Export PNG",
+  "exportFailed": "Export Failed",
+  "noDiagram": "No diagram to export. Fix syntax errors first.",
+  "rendering": "Rendering...",
+  "emptyPreview": "Diagram preview will appear here",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "samples": "Sample Diagrams",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
+}

@@ -1,10 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { AlertProvider } from 'share/components/Alert'
+import ZoomControls from 'share/components/ZoomControls'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MindMapCanvas from './components/MindMapCanvas'
-import ZoomControls from './components/ZoomControls'
 import Sidebar from './components/Sidebar'
+import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -19,7 +20,15 @@ const App = observer(function App() {
           <Sidebar />
           <div className="flex-1 overflow-hidden relative">
             <MindMapCanvas />
-            <ZoomControls />
+            <ZoomControls
+              scale={store.scale}
+              disabled={!store.mindMap}
+              presets={[50, 75, 100, 125, 150, 200]}
+              onZoomIn={() => store.zoomIn()}
+              onZoomOut={() => store.zoomOut()}
+              onZoomFit={() => store.fit()}
+              onZoomToPercent={(percent) => store.setZoom(percent)}
+            />
           </div>
         </div>
       </div>

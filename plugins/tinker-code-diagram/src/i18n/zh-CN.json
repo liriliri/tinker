@@ -1,0 +1,21 @@
+{
+  "undo": "撤销",
+  "redo": "重做",
+  "copy": "复制",
+  "paste": "粘贴",
+  "clear": "清空",
+  "splitView": "双栏",
+  "editorOnly": "仅编辑",
+  "previewOnly": "仅预览",
+  "exportSvg": "导出 SVG",
+  "exportPng": "导出 PNG",
+  "exportFailed": "导出失败",
+  "noDiagram": "没有可导出的图表，请先修复语法错误。",
+  "rendering": "渲染中...",
+  "emptyPreview": "图表预览将显示在这里",
+  "darkMode": "深色模式",
+  "lightMode": "浅色模式",
+  "samples": "范例图表",
+  "cancel": "取消",
+  "confirm": "确定"
+}

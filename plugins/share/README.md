@@ -82,6 +82,7 @@ Simple components — import and use directly:
 | --------------------------------- | --------------------------------- |
 | CopyButton                        | `share/components/CopyButton`     |
 | Tooltip                           | `share/components/Tooltip`        |
+| ZoomControls                      | `share/components/ZoomControls`   |
 | NavList                           | `share/components/NavList`        |
 | Tree                              | `share/components/Tree`           |
 | Grid                              | `share/components/Grid`           |
@@ -101,6 +102,7 @@ Vendor scripts required for some viewers:
 | HexEditor       | `react-hex-editor`                            |
 | VideoPlayer     | `videojs` (+ `share/styles/videoPlayer.scss`) |
 | MarkdownPreview | `markdown`, `syntaxhighlighter`, `mermaid`    |
+| MermaidDiagram  | `mermaid`                                     |
 | PdfViewer       | `pdfjs`                                       |
 | FilePreview     | depends on file type (see component)          |
 
@@ -262,6 +264,8 @@ Pass `rootPath` for blank-area context menu (New File / New Folder). File watchi
 
 **MarkdownPreview** — GFM + syntax highlighting + Mermaid diagrams (fenced `mermaid` code blocks); optional `scrollPercent` / `onScrollPercentChange` to sync with an editor.
 
+**MermaidDiagram** — shared Mermaid renderer used by MarkdownPreview and diagram tools. Optional `debounceMs`, `errorDisplay` (`fallback` | `none`), `hideLoading`, and `onStatusChange`.
+
 ```ts
 import FileList from 'share/components/FileList'
 import PathBar from 'share/components/PathBar'
@@ -269,6 +273,7 @@ import FilePreview from 'share/components/FilePreview'
 import PhotoViewer from 'share/components/PhotoViewer'
 import PdfViewer from 'share/components/PdfViewer'
 import MarkdownPreview from 'share/components/MarkdownPreview'
+import MermaidDiagram from 'share/components/MermaidDiagram'
 ```
 
 ## Hooks
