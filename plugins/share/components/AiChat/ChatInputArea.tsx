@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Settings } from 'lucide-react'
-import Select from '../Select'
 import Dialog, { DialogButton } from '../Dialog'
 import { tw } from '../../theme'
 import ChatInput from './ChatInput'
+import ModelSelect from './ModelSelect'
 import { AI_CHAT_NS } from './i18n'
 
 export interface ChatInputAreaProps {
@@ -56,31 +56,26 @@ export default function ChatInputArea({
 
   const modelSelect = (
     <>
-      {!hasProviders ? (
-        <Select
-          value=""
-          onChange={() => {}}
-          options={[{ value: '', label: t('noProviders') }]}
-          className="max-w-48"
-          disabled={true}
-        />
-      ) : (
-        <Select
-          value={selectedCombined}
-          onChange={(val) => onModelChange(val as string)}
-          options={combinedOptions}
-          className="max-w-48"
-        />
-      )}
+      <ModelSelect
+        value={hasProviders ? selectedCombined : ''}
+        onChange={onModelChange}
+        options={
+          hasProviders
+            ? combinedOptions
+            : [{ value: '', label: t('noProviders') }]
+        }
+        disabled={!hasProviders}
+      />
       {onSystemPromptChange && (
         <button
+          type="button"
           onClick={openSettings}
           title={t('settings')}
-          className={`shrink-0 w-6 h-6 rounded flex items-center justify-center ${
+          className={`flex size-8 shrink-0 items-center justify-center rounded-sm border-none ${
             tw.hover
           } ${systemPrompt ? tw.primary.text : tw.text.tertiary}`}
         >
-          <Settings size={12} />
+          <Settings size={14} />
         </button>
       )}
     </>

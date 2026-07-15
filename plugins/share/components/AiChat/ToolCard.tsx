@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from 'react'
+import type { ReactNode, MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  ChevronDown,
+  ChevronRight,
   FileText,
   FolderOpen,
   Globe,
@@ -10,12 +10,13 @@ import {
   Terminal,
   WandSparkles,
 } from 'lucide-react'
+import className from 'licia/className'
 import isStrBlank from 'licia/isStrBlank'
 import { tw } from '../../theme'
 import type { ToolStatus } from '../../lib/Agent'
 import { AI_CHAT_NS } from './i18n'
 
-const ICON_SIZE = 10
+const ICON_SIZE = 14
 
 export interface ToolCardMessage {
   toolName?: string
@@ -100,7 +101,6 @@ export default function ToolCard({
   getToolIcon,
 }: ToolCardProps) {
   const { t } = useTranslation(AI_CHAT_NS)
-  const [expanded, setExpanded] = useState(false)
 
   if (!isToolMessageRenderable(msg)) {
     return null
@@ -120,80 +120,84 @@ export default function ToolCard({
   const result = msg.error ?? msg.content
   const canExpand = !isRunning && Boolean(result)
 
-  return (
-    <div
-      className={`overflow-hidden rounded-md border text-[10px] ${tw.border} ${tw.bg.secondary}`}
-    >
-      <button
-        type="button"
-        onClick={() => canExpand && setExpanded((value) => !value)}
-        className={`w-full px-2 py-1 text-left ${canExpand ? tw.hover : ''}`}
-        disabled={!canExpand}
-      >
-        <div className="flex items-center gap-1">
-          <div
-            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded ${
-              isError
-                ? 'bg-red-500 dark:bg-red-600'
-                : isRunning
-                ? `${tw.primary.bg} opacity-70`
-                : tw.primary.bg
-            } text-white`}
-          >
-            {isRunning ? (
-              <Loader2 size={ICON_SIZE} className="animate-spin" />
-            ) : getToolIcon ? (
-              getToolIcon(toolName)
-            ) : (
-              <DefaultToolIcon name={toolName} />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`shrink-0 font-medium leading-none ${
-                  isError ? 'text-red-500 dark:text-red-400' : tw.text.primary
-                }`}
-              >
-                {label}
-              </span>
-              {summary && (
-                <span
-                  title={summary}
-                  className={`min-w-0 flex-1 truncate font-mono text-[9px] leading-none ${tw.text.tertiary}`}
-                >
-                  {summary}
-                </span>
-              )}
-              {isRunning && (
-                <span
-                  className={`shrink-0 text-[9px] leading-none ${tw.text.tertiary}`}
-                >
-                  {t('running')}
-                </span>
-              )}
-            </div>
-          </div>
-          {canExpand && (
-            <ChevronDown
-              size={10}
-              className={`shrink-0 transition-transform ${tw.text.tertiary} ${
-                expanded ? 'rotate-180' : ''
-              }`}
-            />
-          )}
-        </div>
-      </button>
+  const handleSummaryClick = (e: MouseEvent<HTMLElement>) => {
+    if (!canExpand) e.preventDefault()
+  }
 
-      {expanded && result && (
-        <div className={`border-t px-2 py-1.5 ${tw.border}`}>
+  return (
+    <details
+      className={className(
+        'group/tool w-full text-xs font-mono',
+        tw.text.tertiary
+      )}
+    >
+      <summary
+        onClick={handleSummaryClick}
+        className={className(
+          'flex list-none items-center gap-2 rounded-sm px-1 py-1.5 select-none [&::-webkit-details-marker]:hidden',
+          canExpand ? `cursor-pointer ${tw.hover}` : 'cursor-default'
+        )}
+      >
+        {isRunning ? (
+          <Loader2
+            size={ICON_SIZE}
+            className={className('shrink-0 animate-spin', tw.primary.text)}
+          />
+        ) : (
+          <ChevronRight
+            size={ICON_SIZE}
+            className={className(
+              'shrink-0 transition-transform group-open/tool:rotate-90',
+              canExpand ? '' : 'opacity-0'
+            )}
+          />
+        )}
+        <span
+          className={className(
+            'shrink-0',
+            isError ? 'text-red-500 dark:text-red-400' : tw.primary.text
+          )}
+        >
+          {getToolIcon ? (
+            getToolIcon(toolName)
+          ) : (
+            <DefaultToolIcon name={toolName} />
+          )}
+        </span>
+        <span
+          className={className(
+            'shrink-0 font-medium',
+            isError ? 'text-red-500 dark:text-red-400' : tw.primary.text
+          )}
+        >
+          {label}
+        </span>
+        {isRunning && <span className="shrink-0">{t('running')}</span>}
+        {summary && (
+          <span title={summary} className="min-w-0 flex-1 truncate">
+            {summary}
+          </span>
+        )}
+      </summary>
+
+      {canExpand && result && (
+        <div
+          className={className(
+            'mt-1 max-h-64 overflow-auto rounded-md border px-3 py-2',
+            tw.border,
+            tw.bg.primary
+          )}
+        >
           <pre
-            className={`max-h-48 overflow-y-auto whitespace-pre-wrap break-all font-mono text-[9px] leading-snug ${tw.text.secondary}`}
+            className={className(
+              'm-0 whitespace-pre-wrap break-all',
+              isError ? 'text-red-500 dark:text-red-400' : tw.text.primary
+            )}
           >
             {result}
           </pre>
         </div>
       )}
-    </div>
+    </details>
   )
 }
