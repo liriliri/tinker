@@ -4,7 +4,7 @@ An Electron-based desktop toolbox application with an extensible plugin system.
 
 ## Tech Stack
 
-- **Runtime**: Electron 30, Node.js
+- **Runtime**: Electron 35, Node.js
 - **Frontend**: React 19, MobX 6, Sass
 - **Build**: Vite 5, TypeScript
 - **UI Components**: luna-\* component library (modal, menu, data-grid, toolbar, etc.)
