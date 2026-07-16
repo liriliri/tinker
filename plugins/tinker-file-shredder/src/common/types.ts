@@ -1,6 +1,6 @@
 export type ShredMethod = 'quick' | 'dod' | 'thorough'
 
-export type FileStatus = 'pending' | 'shredding' | 'error'
+type FileStatus = 'pending' | 'shredding' | 'error'
 
 export interface FileEntry {
   path: string

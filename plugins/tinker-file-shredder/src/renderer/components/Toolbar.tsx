@@ -13,6 +13,8 @@ import { confirm } from 'share/components/Confirm'
 import Select from 'share/components/Select'
 import toast from 'react-hot-toast'
 import fileSize from 'licia/fileSize'
+import isEmpty from 'licia/isEmpty'
+import map from 'licia/map'
 import { tw } from 'share/theme'
 import { SHRED_METHODS, SHRED_METHOD_LABEL_KEYS } from '../../common/types'
 import store from '../store'
@@ -22,7 +24,7 @@ export default observer(function ToolbarComponent() {
 
   const methodOptions = useMemo(
     () =>
-      SHRED_METHODS.map((method) => ({
+      map(SHRED_METHODS, (method) => ({
         value: method,
         label: t(SHRED_METHOD_LABEL_KEYS[method]),
       })),
@@ -30,7 +32,7 @@ export default observer(function ToolbarComponent() {
   )
 
   const handleClear = () => {
-    if (store.files.length === 0 || store.shredding) return
+    if (!store.hasFiles || store.shredding) return
     store.clearFiles()
   }
 
@@ -47,7 +49,7 @@ export default observer(function ToolbarComponent() {
     if (result.shredded > 0) {
       toast.success(t('shredSuccess', { count: result.shredded }))
     }
-    if (result.errors.length > 0) {
+    if (!isEmpty(result.errors)) {
       toast.error(t('shredErrors', { count: result.errors.length }))
     }
   }
@@ -70,7 +72,7 @@ export default observer(function ToolbarComponent() {
       </ToolbarButton>
       <ToolbarButton
         onClick={handleClear}
-        disabled={store.shredding || store.files.length === 0}
+        disabled={store.shredding || !store.hasFiles}
         title={t('clearAll')}
       >
         <ListX size={TOOLBAR_ICON_SIZE} />

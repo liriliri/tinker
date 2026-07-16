@@ -1,5 +1,4 @@
-import { observer } from 'mobx-react-lite'
-import { useTranslation } from 'react-i18next'
+import isEmpty from 'licia/isEmpty'
 import {
   CaseUpper,
   FileText,
@@ -7,6 +6,8 @@ import {
   Clipboard,
   Eraser,
 } from 'lucide-react'
+import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import {
   Toolbar,
@@ -25,7 +26,7 @@ export default observer(function ToolbarComponent() {
     try {
       const filePaths = await tinker.getClipboardFilePaths()
 
-      if (filePaths && filePaths.length > 0) {
+      if (!isEmpty(filePaths)) {
         store.setInputType('file')
         await store.handleFilePath(filePaths[0])
       } else {

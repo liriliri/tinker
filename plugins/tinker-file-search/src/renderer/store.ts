@@ -1,9 +1,14 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import concat from 'licia/concat'
 import debounce from 'licia/debounce'
+import filter from 'licia/filter'
+import isStrBlank from 'licia/isStrBlank'
 import LocalStore from 'licia/LocalStore'
+import trim from 'licia/trim'
 import BaseStore from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileResult } from './types'
+import { createMcpApi } from './mcp'
 
 const MAX_RESULTS = 100
 const storage = new LocalStore('tinker-file-search')
@@ -11,7 +16,9 @@ const storage = new LocalStore('tinker-file-search')
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 const STORAGE_SHOW_PREVIEW = 'showPreview'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   query = ''
   results: FileResult[] = []
   searching = false
@@ -50,8 +57,8 @@ class Store extends BaseStore {
   }
 
   async search() {
-    const query = this.query.trim()
-    if (!query) {
+    const query = trim(this.query)
+    if (isStrBlank(query)) {
       this.cancelCurrentTask()
       this.results = []
       this.hasMore = false
@@ -80,8 +87,8 @@ class Store extends BaseStore {
   }
 
   async loadMore() {
-    const query = this.query.trim()
-    if (!query || this.searching || !this.hasMore) return
+    const query = trim(this.query)
+    if (isStrBlank(query) || this.searching || !this.hasMore) return
 
     this.cancelCurrentTask()
     this.searching = true
@@ -96,7 +103,7 @@ class Store extends BaseStore {
       const results = await task
       runInAction(() => {
         this.resetSearchState(
-          [...this.results, ...results],
+          concat(this.results, results),
           results.length >= MAX_RESULTS
         )
       })
@@ -117,14 +124,6 @@ class Store extends BaseStore {
         this.iconCache.set(filePath, icon)
       })
     }
-  }
-
-  showInFolder(filePath: string) {
-    tinker.showItemInPath(filePath)
-  }
-
-  copyPath(filePath: string) {
-    navigator.clipboard.writeText(filePath)
   }
 
   setMoveToTrash(value: boolean) {
@@ -157,7 +156,7 @@ class Store extends BaseStore {
     try {
       await fileSearch.deleteFile(filePath, this.moveToTrash)
       runInAction(() => {
-        this.results = this.results.filter((r) => r.path !== filePath)
+        this.results = filter(this.results, (r) => r.path !== filePath)
       })
       return true
     } catch {

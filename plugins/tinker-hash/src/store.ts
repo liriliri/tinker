@@ -1,11 +1,19 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import clone from 'licia/clone'
+import contain from 'licia/contain'
+import lowerCase from 'licia/lowerCase'
+import mapObj from 'licia/mapObj'
+import splitPath from 'licia/splitPath'
+import toBool from 'licia/toBool'
+import upperCase from 'licia/upperCase'
 import BaseStore from 'share/store/Base'
 import {
   calculateAllHashes,
   calculateFileHashes,
   type HashAlgorithm,
 } from './lib/hash'
+import { createMcpApi } from './mcp'
 
 type InputType = 'text' | 'file'
 
@@ -20,10 +28,12 @@ const EMPTY_HASH_RESULTS: Record<HashAlgorithm, string> = {
   sha512: '',
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   input: string = ''
-  textHashResults: Record<HashAlgorithm, string> = { ...EMPTY_HASH_RESULTS }
-  fileHashResults: Record<HashAlgorithm, string> = { ...EMPTY_HASH_RESULTS }
+  textHashResults: Record<HashAlgorithm, string> = clone(EMPTY_HASH_RESULTS)
+  fileHashResults: Record<HashAlgorithm, string> = clone(EMPTY_HASH_RESULTS)
   uppercase: boolean = false
   inputType: InputType = 'text'
   fileName: string = ''
@@ -43,11 +53,11 @@ class Store extends BaseStore {
   private loadStorage() {
     const savedUppercase = storage.get(STORAGE_UPPERCASE)
     if (savedUppercase !== null) {
-      this.uppercase = savedUppercase === true || savedUppercase === 'true'
+      this.uppercase = toBool(savedUppercase)
     }
 
     const savedInputType = storage.get(STORAGE_INPUT_TYPE)
-    if (savedInputType === 'text' || savedInputType === 'file') {
+    if (contain(['text', 'file'], savedInputType)) {
       this.inputType = savedInputType
     }
   }
@@ -72,20 +82,15 @@ class Store extends BaseStore {
   clear() {
     this.input = ''
     this.fileName = ''
-    this.textHashResults = { ...EMPTY_HASH_RESULTS }
-    this.fileHashResults = { ...EMPTY_HASH_RESULTS }
+    this.textHashResults = clone(EMPTY_HASH_RESULTS)
+    this.fileHashResults = clone(EMPTY_HASH_RESULTS)
   }
 
   private applyCase(
     results: Record<HashAlgorithm, string>
   ): Record<HashAlgorithm, string> {
     if (!this.uppercase) return results
-    return {
-      md5: results.md5.toUpperCase(),
-      sha1: results.sha1.toUpperCase(),
-      sha256: results.sha256.toUpperCase(),
-      sha512: results.sha512.toUpperCase(),
-    }
+    return mapObj(results, upperCase) as Record<HashAlgorithm, string>
   }
 
   async handleFileOpen(file: File) {
@@ -101,7 +106,7 @@ class Store extends BaseStore {
   async handleFilePath(filePath: string) {
     try {
       const buffer = await tinker.readFile(filePath)
-      const fileName = filePath.split(/[\\/]/).pop() || filePath
+      const fileName = splitPath(filePath).name
       this.fileName = fileName
 
       const file = new File([buffer], fileName)
@@ -115,7 +120,7 @@ class Store extends BaseStore {
 
   calculateHashes() {
     if (!this.input) {
-      this.textHashResults = { ...EMPTY_HASH_RESULTS }
+      this.textHashResults = clone(EMPTY_HASH_RESULTS)
       return
     }
 
@@ -128,16 +133,11 @@ class Store extends BaseStore {
       return
     }
 
-    const caseMethod = this.uppercase ? 'toUpperCase' : 'toLowerCase'
-    this.fileHashResults = {
-      md5: this.fileHashResults.md5[caseMethod](),
-      sha1: this.fileHashResults.sha1[caseMethod](),
-      sha256: this.fileHashResults.sha256[caseMethod](),
-      sha512: this.fileHashResults.sha512[caseMethod](),
-    }
+    this.fileHashResults = mapObj(
+      this.fileHashResults,
+      this.uppercase ? upperCase : lowerCase
+    ) as Record<HashAlgorithm, string>
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

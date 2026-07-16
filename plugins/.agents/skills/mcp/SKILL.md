@@ -74,7 +74,7 @@ async function myTool(store: Store, args: MyToolArgs) {
 }
 ```
 
-Optional: export `getToolArgSummary(name, args)` for AiChat tool-arg previews when the default (`command` / `content` / `path` / …) is not enough. Return the full string — `ToolCard` truncates in the UI (`tinker-regexp`).
+Only when the plugin has AiChat: export `getToolArgSummary(name, args)` for tool-arg previews if the default (`command` / `content` / `path` / …) is not enough. Return the full string — `ToolCard` truncates in the UI (`tinker-regexp`). Do **not** add `getToolArgSummary` when the plugin has no AiChat.
 
 ### 3. Wire store
 
@@ -125,7 +125,7 @@ Run the **lint** skill on changed files afterward.
 
 ## Audit
 
-Read `<plugin-name>/package.json`, `src/mcp.ts`, and `src/store.ts`. Check against the Implement rules above (schema ↔ args, handler map ↔ tool names, store wiring, throw-not-return errors, no JSON.stringify, design granularity).
+Read `<plugin-name>/package.json`, `src/mcp.ts`, and `src/store.ts`. Check against the Implement rules above (schema ↔ args, handler map ↔ tool names, store wiring, throw-not-return errors, no JSON.stringify, design granularity, no `getToolArgSummary` unless AiChat is wired).
 
 Report:
 

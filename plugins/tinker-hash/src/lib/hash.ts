@@ -32,13 +32,6 @@ const workerPromises: Map<
   }
 > = new Map()
 
-export const HASH_ALGORITHMS: HashAlgorithm[] = [
-  'md5',
-  'sha1',
-  'sha256',
-  'sha512',
-]
-
 function getWorker(): Worker | null {
   if (typeof Worker === 'undefined') return null
 
@@ -116,7 +109,7 @@ async function calculateFileHashesWithWorker(
   })
 }
 
-export function calculateHash(algorithm: HashAlgorithm, input: string): string {
+function calculateHash(algorithm: HashAlgorithm, input: string): string {
   if (!input) return ''
 
   try {

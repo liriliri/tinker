@@ -21,6 +21,39 @@
         "name": "文件粉碎",
         "description": "安全粉碎文件，防止数据被恢复"
       }
+    },
+    "mcp": {
+      "tools": {
+        "shred": {
+          "description": "Securely shred one or more files end to end: clear the list, load the given paths, apply the shred method, and overwrite then delete them so recovery is difficult. This permanently destroys data. Updates the plugin UI and returns shredded count plus any per-file errors.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Absolute paths to files to shred. Directories are not accepted."
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "quick",
+                  "dod",
+                  "thorough"
+                ],
+                "description": "Overwrite method: quick (1 pass), dod (3 passes), or thorough (7 passes). Defaults to the current UI setting."
+              }
+            },
+            "required": [
+              "paths"
+            ]
+          }
+        }
+      }
     }
   }
 }

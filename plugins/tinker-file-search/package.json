@@ -21,6 +21,26 @@
         "name": "文件搜索",
         "description": "快速本地文件搜索"
       }
+    },
+    "mcp": {
+      "tools": {
+        "search": {
+          "description": "Search local files by name (Spotlight on macOS, Everything on Windows). Updates the plugin UI and returns up to 100 matching paths with size and dateModified. hasMore is true when more results may exist.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "minLength": 1,
+                "description": "File name search query. Supports patterns like *.pdf."
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      }
     }
   }
 }

@@ -1,20 +1,27 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import splitPath from 'licia/splitPath'
-import filter from 'licia/filter'
-import pluck from 'licia/pluck'
-import find from 'licia/find'
-import extend from 'licia/extend'
+import concat from 'licia/concat'
 import contain from 'licia/contain'
+import each from 'licia/each'
+import extend from 'licia/extend'
+import filter from 'licia/filter'
+import find from 'licia/find'
+import isEmpty from 'licia/isEmpty'
+import LocalStore from 'licia/LocalStore'
+import map from 'licia/map'
+import pluck from 'licia/pluck'
+import splitPath from 'licia/splitPath'
 import sum from 'licia/sum'
 import BaseStore from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, ShredMethod, ShredResult } from '../common/types'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-file-shredder')
 const STORAGE_SHRED_METHOD = 'shredMethod'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   files: FileEntry[] = []
   shredMethod: ShredMethod = storage.get(STORAGE_SHRED_METHOD) || 'dod'
   shredding = false
@@ -39,7 +46,7 @@ class Store extends BaseStore {
   }
 
   get hasFiles(): boolean {
-    return this.files.length > 0
+    return !isEmpty(this.files)
   }
 
   setShredMethod(method: ShredMethod) {
@@ -88,8 +95,8 @@ class Store extends BaseStore {
       existing.add(filePath)
     }
 
-    if (entries.length > 0) {
-      this.files = [...this.files, ...entries]
+    if (!isEmpty(entries)) {
+      this.files = concat(this.files, entries)
     }
   }
 
@@ -97,7 +104,7 @@ class Store extends BaseStore {
     const result = await tinker.showOpenDialog({
       properties: ['openFile', 'multiSelections'],
     })
-    if (result.canceled || result.filePaths.length === 0) return
+    if (result.canceled || isEmpty(result.filePaths)) return
     await this.addFilePaths(result.filePaths)
   }
 
@@ -105,7 +112,7 @@ class Store extends BaseStore {
     const result = await tinker.showOpenDialog({
       properties: ['openDirectory'],
     })
-    if (result.canceled || result.filePaths.length === 0) return
+    if (result.canceled || isEmpty(result.filePaths)) return
 
     const filePaths = await fileShredder.readDir(result.filePaths[0])
     await this.addFilePaths(filePaths)
@@ -128,18 +135,18 @@ class Store extends BaseStore {
 
   async shredAll(): Promise<ShredResult | null> {
     const paths = pluck(this.pendingFiles, 'path')
-    if (paths.length === 0 || this.shredding) return null
+    if (isEmpty(paths) || this.shredding) return null
 
     this.shredding = true
     this.overallProgress = 0
 
-    for (const filePath of paths) {
+    each(paths, (filePath) => {
       this.updateFile(filePath, {
         status: 'shredding',
         progress: 0,
         error: undefined,
       })
-    }
+    })
 
     try {
       const result = await fileShredder.shredFiles(
@@ -158,10 +165,10 @@ class Store extends BaseStore {
 
       runInAction(() => {
         const errorMap = new Map(
-          result.errors.map((error) => [error.path, error.message])
+          map(result.errors, (error) => [error.path, error.message])
         )
 
-        for (const filePath of paths) {
+        each(paths, (filePath) => {
           const message = errorMap.get(filePath)
           if (message) {
             this.updateFile(filePath, {
@@ -170,7 +177,7 @@ class Store extends BaseStore {
               error: message,
             })
           }
-        }
+        })
 
         this.files = filter(
           this.files,

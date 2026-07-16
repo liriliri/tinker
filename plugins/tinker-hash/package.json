@@ -16,6 +16,31 @@
         "name": "哈希计算",
         "description": "哈希计算，支持 MD5、SHA1、SHA256 和 SHA512"
       }
+    },
+    "mcp": {
+      "tools": {
+        "hash": {
+          "description": "Calculate MD5, SHA1, SHA256, and SHA512 for text or a file. Provide exactly one of text or path. Updates the plugin UI and returns the hashes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Text content to hash. Mutually exclusive with path."
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a file to hash. Mutually exclusive with text."
+              },
+              "uppercase": {
+                "type": "boolean",
+                "description": "Return hashes in uppercase. Defaults to the current UI setting."
+              }
+            }
+          }
+        }
+      }
     }
   },
   "devDependencies": {

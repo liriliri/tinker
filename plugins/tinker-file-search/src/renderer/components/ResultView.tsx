@@ -9,8 +9,9 @@ import type {
   CellContextMenuEvent,
   BodyScrollEndEvent,
 } from 'ag-grid-community'
-import fileSize from 'licia/fileSize'
+import copy from 'licia/copy'
 import dateFormat from 'licia/dateFormat'
+import fileSize from 'licia/fileSize'
 import splitPath from 'licia/splitPath'
 import Grid from 'share/components/Grid'
 import Dialog, { DialogButton } from 'share/components/Dialog'
@@ -53,7 +54,7 @@ const PathCell = ({ data }: ICellRendererParams<FileResult>) => {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    store.showInFolder(data.path)
+    tinker.showItemInPath(data.path)
   }
 
   return (
@@ -134,7 +135,7 @@ export default observer(function ResultView() {
   const onRowDoubleClicked = useCallback(
     (event: RowDoubleClickedEvent<FileResult>) => {
       if (event.data) {
-        store.showInFolder(event.data.path)
+        tinker.showItemInPath(event.data.path)
       }
     },
     []
@@ -149,11 +150,11 @@ export default observer(function ResultView() {
       tinker.showContextMenu(e.clientX, e.clientY, [
         {
           label: t('showInFolder'),
-          click: () => store.showInFolder(filePath),
+          click: () => tinker.showItemInPath(filePath),
         },
         {
           label: t('copyPath'),
-          click: () => store.copyPath(filePath),
+          click: () => copy(filePath),
         },
         { type: 'separator' },
         {
