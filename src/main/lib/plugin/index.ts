@@ -1,5 +1,6 @@
 import { IpcGetFileIcon } from 'common/types'
 import { handleEvent } from 'share/main/lib/util'
+import { cleanUserAgent } from '../util'
 import path from 'path'
 import fs from 'fs-extra'
 import startWith from 'licia/startWith'
@@ -130,6 +131,7 @@ export function init() {
   loadSettingsPlugin()
 
   const pluginSession = session.fromPartition(PLUGIN_PARTITION)
+  pluginSession.setUserAgent(cleanUserAgent(pluginSession.getUserAgent()))
   pluginSession.protocol.handle('plugin', async (request) => {
     const urlObj = new URL(request.url)
     const pluginId = urlObj.host

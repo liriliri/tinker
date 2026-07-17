@@ -1,5 +1,11 @@
 import fs from 'fs-extra'
 
+const ELECTRON_UA_PATTERN = / Electron\/[\d.]+/g
+
+export function cleanUserAgent(ua: string): string {
+  return ua.replace(ELECTRON_UA_PATTERN, '')
+}
+
 export async function loadMod(moduleName: string) {
   try {
     const mod = await import(moduleName)
