@@ -25,6 +25,7 @@
   "unpin": "取消置顶",
   "autoDetach": "自动分离窗口",
   "runInBackground": "允许后台运行",
+  "runAtStartup": "启动时自动运行",
   "installPlugin": "安装",
   "installPluginConfirm": "是否要安装 \"{{name}}\"？",
   "installingPlugin": "安装中...",

@@ -36,6 +36,7 @@ import {
   clearPluginData,
   preparePluginView,
   getRunningPlugins,
+  startBackgroundPlugins,
 } from './view'
 
 export {
@@ -80,7 +81,7 @@ export function init() {
   pluginWebview.init()
   pluginTerminal.init()
   handleEvent('getPlugins', getPlugins)
-  handleEvent('openPlugin', openPlugin)
+  handleEvent('openPlugin', (id, detached) => openPlugin(id, detached))
   handleEvent('reopenPlugin', reopenPlugin)
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
@@ -205,4 +206,5 @@ export function init() {
       },
     })
   })
+  setTimeout(startBackgroundPlugins, 1000)
 }

@@ -7,6 +7,7 @@ import {
   callPluginMcpTool,
 } from '../lib/plugin/view'
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
+import { getMainStore } from '../lib/store'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 import { validateMcpToolArgs } from './mcp'
 
@@ -20,6 +21,7 @@ function fail(req: IpcRequest, error: string): IpcResponse {
 
 async function listPlugins() {
   const plugins = await getPlugins()
+  const pluginStates = getMainStore().get('pluginStates') || {}
   return plugins
     .filter((p) => !p.marketplace)
     .map((p) => ({
@@ -29,6 +31,7 @@ async function listPlugins() {
       version: p.version,
       builtin: p.builtin,
       mcp: !!p.mcp,
+      background: !!pluginStates[p.id]?.runInBackground,
     }))
 }
 
@@ -96,7 +99,7 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
       case 'open': {
         const result = await ensurePlugin(req)
         if (typeof result !== 'string') return result
-        openPlugin(result, true)
+        openPlugin(result, true, !!req.data?.headless)
         return success(req)
       }
       case 'close': {

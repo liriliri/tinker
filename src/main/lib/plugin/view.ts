@@ -4,7 +4,6 @@ import {
   IpcClearPluginData,
   IpcExportPluginData,
   IpcImportPluginData,
-  IpcOpenPlugin,
   IpcReopenPlugin,
   IpcShowPluginContextMenu,
   IpcTogglePluginDevtools,
@@ -24,8 +23,9 @@ import * as theme from 'share/main/lib/theme'
 import { colorBgContainer, colorBgContainerDark } from 'common/theme'
 import * as pluginWin from '../../window/plugin'
 import isMac from 'licia/isMac'
+import isEmpty from 'licia/isEmpty'
 import contextMenu from '../contextMenu'
-import { plugins } from './loader'
+import { plugins, getPlugins } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
 
 const settingsStore = getSettingsStore()
@@ -152,13 +152,31 @@ function getWebPluginView() {
   return view
 }
 
-export const openPlugin: IpcOpenPlugin = function (id, detached) {
+function getPluginStates() {
+  return getMainStore().get('pluginStates') || {}
+}
+
+export function openPlugin(
+  id: string,
+  detached?: boolean,
+  background?: boolean
+) {
   const plugin = plugins[id]
   if (!plugin) {
     return false
   }
 
+  if (background) {
+    const pluginStates = getPluginStates()
+    if (!pluginStates[id]?.runInBackground) {
+      throw new Error(`Plugin does not allow running in background: ${id}`)
+    }
+  }
+
   if (pluginViews[id]) {
+    if (background) {
+      return false
+    }
     const { view, win } = pluginViews[id]
     // Backgrounded plugin: reattach the existing view
     if (!win) {
@@ -190,18 +208,23 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
     }
   })
 
-  const mainWin = window.getWin('main')
-  if (detached || !mainWin) {
-    const newWin = pluginWin.showWin(plugin)
-    pluginViews[id] = { view: pluginView, win: newWin }
+  if (background) {
+    pluginViews[id] = { view: pluginView, win: null }
     updatePluginTheme(id)
-    newWin.contentView.addChildView(pluginView)
-    layoutPlugin(id)
   } else {
-    pluginViews[id] = { view: pluginView, win: mainWin }
-    updatePluginTheme(id)
-    mainWin.contentView.addChildView(pluginView)
-    layoutPlugin(id)
+    const mainWin = window.getWin('main')
+    if (detached || !mainWin) {
+      const newWin = pluginWin.showWin(plugin)
+      pluginViews[id] = { view: pluginView, win: newWin }
+      updatePluginTheme(id)
+      newWin.contentView.addChildView(pluginView)
+      layoutPlugin(id)
+    } else {
+      pluginViews[id] = { view: pluginView, win: mainWin }
+      updatePluginTheme(id)
+      mainWin.contentView.addChildView(pluginView)
+      layoutPlugin(id)
+    }
   }
 
   if (startWith(plugin.main, 'http')) {
@@ -216,6 +239,21 @@ export const openPlugin: IpcOpenPlugin = function (id, detached) {
 
   notifyRunningPluginsChanged()
   return true
+}
+
+export async function startBackgroundPlugins() {
+  const pluginStates = getPluginStates()
+  const ids = Object.keys(pluginStates).filter(
+    (id) => pluginStates[id]?.runAtStartup && pluginStates[id]?.runInBackground
+  )
+  if (isEmpty(ids)) {
+    return
+  }
+
+  await getPlugins()
+  for (const id of ids) {
+    openPlugin(id, false, true)
+  }
 }
 
 export const reopenPlugin: IpcReopenPlugin = async function (id) {
@@ -261,8 +299,7 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   }
 
   if (!destroy) {
-    const mainStore = getMainStore()
-    const pluginStates = mainStore.get('pluginStates') || {}
+    const pluginStates = getPluginStates()
     if (pluginStates[id]?.runInBackground) {
       pluginViews[id].win = null
       if (isMainWin) {

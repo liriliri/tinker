@@ -34,7 +34,7 @@ tinker ps
 tinker close json-editor
 ```
 
-`list` output tags plugins as `[builtin]` and `[mcp]` when applicable. Plugins marked `[mcp]` expose programmatic tools; see the **mcp** skill for `tools`, `call`, and `mcp` commands.
+`list` output tags plugins as `[builtin]`, `[mcp]`, and `[background]` when applicable. `[background]` means **Run in Background** is enabled (required for `tinker open --headless`). Plugins marked `[mcp]` expose programmatic tools; see the **mcp** skill for `tools`, `call`, and `mcp` commands.
 
 ## Prerequisites
 
@@ -61,6 +61,7 @@ Use the **id** column (`tinker-json-editor`) or the short name without the prefi
 
 ```bash
 tinker open <plugin>                              # open in a detached window
+tinker open <plugin> --headless                   # open in background (no window)
 tinker open <plugin> --remote-debugging-port 9222   # auto-launch Tinker with CDP (when app was not running)
 tinker close <plugin>                               # close a running plugin
 tinker restart <plugin>                             # close then open (starts if not running)
@@ -68,6 +69,8 @@ tinker quit                                         # quit the Tinker app
 ```
 
 `open` and `restart` succeed even when the plugin was not running. `close` fails if the plugin is not running.
+
+`--headless` starts the plugin without a window. The plugin must already have **Run in Background** enabled in Tinker (right-click the plugin → checkbox); otherwise open fails.
 
 `ps` lists running plugins with renderer process IDs:
 
@@ -103,6 +106,7 @@ tinker ps
 | `tinker list` | List installed plugins |
 | `tinker ps` | List running plugins with PIDs |
 | `tinker open <plugin>` | Open a plugin window |
+| `tinker open <plugin> --headless` | Open a plugin in the background (no window) |
 | `tinker close <plugin>` | Close a running plugin |
 | `tinker restart <plugin>` | Restart a plugin |
 | `tinker quit` | Quit Tinker |
@@ -119,6 +123,8 @@ tinker ps
 **`Plugin not found: tinker-...`** — Run `tinker list` and use a valid id or short name. External plugins are installed globally with the `tinker-` npm prefix.
 
 **`Plugin is not running: tinker-...`** — Run `tinker open <plugin>` before `close`.
+
+**`Plugin does not allow running in background: tinker-...`** — Enable **Run in Background** for the plugin in Tinker before using `tinker open --headless`.
 
 **Connection timed out** — Tinker may still be starting after auto-launch. Wait a few seconds and retry.
 

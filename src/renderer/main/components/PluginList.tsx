@@ -75,6 +75,7 @@ export default observer(function PluginList() {
 
       const autoDetach = store.isPluginAutoDetach(plugin.id)
       const runInBackground = store.isPluginRunInBackground(plugin.id)
+      const runAtStartup = store.isPluginRunAtStartup(plugin.id)
       const running = store.isPluginRunning(plugin.id)
       template.push({
         label: t('open'),
@@ -182,6 +183,20 @@ export default observer(function PluginList() {
           }
         },
       })
+      if (runInBackground) {
+        template.push({
+          label: t('runAtStartup'),
+          type: 'checkbox',
+          checked: runAtStartup,
+          click() {
+            if (runAtStartup) {
+              store.unsetPluginRunAtStartup(plugin.id)
+            } else {
+              store.setPluginRunAtStartup(plugin.id)
+            }
+          },
+        })
+      }
       if (plugin.userInstalled) {
         template.push({ type: 'separator' })
         template.push({

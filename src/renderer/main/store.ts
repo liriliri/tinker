@@ -50,6 +50,8 @@ class Store extends BaseStore {
       unsetPluginAutoDetach: action,
       setPluginRunInBackground: action,
       unsetPluginRunInBackground: action,
+      setPluginRunAtStartup: action,
+      unsetPluginRunAtStartup: action,
       setRunningPlugins: action,
     })
 
@@ -273,11 +275,28 @@ class Store extends BaseStore {
   unsetPluginRunInBackground(id: string) {
     const state = { ...this.pluginStates[id] }
     delete state.runInBackground
+    delete state.runAtStartup
     this.pluginStates = { ...this.pluginStates, [id]: state }
     setMainStore('pluginStates', this.pluginStates)
     if (this.isPluginRunning(id, true)) {
       main.closePlugin(id, true)
     }
+  }
+  setPluginRunAtStartup(id: string) {
+    this.pluginStates = {
+      ...this.pluginStates,
+      [id]: { ...this.pluginStates[id], runAtStartup: true },
+    }
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  unsetPluginRunAtStartup(id: string) {
+    const state = { ...this.pluginStates[id] }
+    delete state.runAtStartup
+    this.pluginStates = { ...this.pluginStates, [id]: state }
+    setMainStore('pluginStates', this.pluginStates)
+  }
+  isPluginRunAtStartup(id: string) {
+    return !!this.pluginStates[id]?.runAtStartup
   }
   isPluginRunning(id: string, backgroundOnly?: boolean) {
     const entry = this.runningPlugins[id]

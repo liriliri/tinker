@@ -29,6 +29,7 @@ function formatPluginList(data: unknown) {
     version?: string
     builtin: boolean
     mcp: boolean
+    background: boolean
   }>
   if (plugins.length === 0) {
     console.log('No plugins installed.')
@@ -36,7 +37,11 @@ function formatPluginList(data: unknown) {
   }
   for (const p of plugins) {
     const version = !p.builtin && p.version ? ` (${p.version})` : ''
-    const tags = [p.builtin ? 'builtin' : '', p.mcp ? 'mcp' : '']
+    const tags = [
+      p.builtin ? 'builtin' : '',
+      p.mcp ? 'mcp' : '',
+      p.background ? 'background' : '',
+    ]
       .filter(Boolean)
       .map((tag) => `[${tag}]`)
       .join(' ')
@@ -131,12 +136,19 @@ program
     '--remote-debugging-port <port>',
     'Enable remote debugging on the specified port'
   )
-  .action((pluginName: string, opts: { remoteDebuggingPort?: string }) => {
-    executeCommand('open', {
-      id: normalizePluginId(pluginName),
-      remoteDebuggingPort: opts.remoteDebuggingPort,
-    })
-  })
+  .option('--headless', 'Open the plugin in the background without a window')
+  .action(
+    (
+      pluginName: string,
+      opts: { remoteDebuggingPort?: string; headless?: boolean }
+    ) => {
+      executeCommand('open', {
+        id: normalizePluginId(pluginName),
+        remoteDebuggingPort: opts.remoteDebuggingPort,
+        headless: opts.headless,
+      })
+    }
+  )
 
 pluginCommand('close', 'Close a running plugin')
 pluginCommand('restart', 'Restart a running plugin (close then open)')

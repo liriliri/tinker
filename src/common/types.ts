@@ -54,6 +54,7 @@ export interface IPluginState {
   pinned?: boolean
   autoDetach?: boolean
   runInBackground?: boolean
+  runAtStartup?: boolean
 }
 
 export type IPluginStates = Record<string, IPluginState>
