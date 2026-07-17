@@ -18,14 +18,19 @@ import { isDev } from 'share/common/util'
 import * as updater from 'share/main/lib/updater'
 import { openPlugin, closePlugin, getAttachedPlugin } from './plugin/view'
 import * as window from 'share/main/lib/window'
-import { isCliInstalled, installCli } from './shell'
+import { installSkill, isSkillInstalled } from './agent'
+import { installCli, isCliInstalled } from './shell'
 
 const logger = log('tray')
 let tray: Tray | null = null
 let cliInstalled = false
+let skillInstalled = false
 
 export async function init() {
-  cliInstalled = await isCliInstalled()
+  ;[cliInstalled, skillInstalled] = await Promise.all([
+    isCliInstalled(),
+    isSkillInstalled(),
+  ])
   const iconPath = isMac ? 'tray-template.png' : 'tray.png'
   const icon = nativeImage.createFromPath(resolveResources(iconPath))
   if (isMac) {
@@ -123,26 +128,46 @@ function updateContextMenu() {
             process.showWin()
           },
         },
-        ...(!cliInstalled
-          ? [
-              { type: 'separator' as const },
-              {
-                label: `${t('installCli')}...`,
-                async click() {
-                  try {
-                    await installCli()
-                    cliInstalled = true
-                    updateContextMenu()
-                  } catch {
-                    // user cancelled or failed
-                  }
-                },
-              },
-            ]
-          : []),
       ],
     },
     helpMenu,
+    ...(!cliInstalled || !skillInstalled
+      ? [
+          { type: 'separator' as const },
+          ...(!cliInstalled
+            ? [
+                {
+                  label: `${t('installCli')}...`,
+                  async click() {
+                    try {
+                      await installCli()
+                      cliInstalled = true
+                      updateContextMenu()
+                    } catch {
+                      // user cancelled or failed
+                    }
+                  },
+                },
+              ]
+            : []),
+          ...(!skillInstalled
+            ? [
+                {
+                  label: `${t('installAgentSkill')}...`,
+                  async click() {
+                    try {
+                      await installSkill()
+                      skillInstalled = true
+                      updateContextMenu()
+                    } catch {
+                      // failed to install
+                    }
+                  },
+                },
+              ]
+            : []),
+        ]
+      : []),
     {
       type: 'separator',
     },

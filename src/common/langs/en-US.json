@@ -39,6 +39,8 @@
   "updatePluginErr": "Failed to update plugin",
   "installCli": "Install Command Line",
   "installCliSuccess": "Command line installed successfully",
+  "installAgentSkill": "Install Agent Skill",
+  "installAgentSkillSuccess": "Agent Skill installed successfully",
   "createShortcut": "Create Shortcut",
   "createShortcutSuccess": "Shortcut created at {{path}}",
   "createShortcutErr": "Failed to create shortcut"
