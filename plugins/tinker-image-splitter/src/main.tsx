@@ -33,7 +33,7 @@ const App = observer(function App() {
     }
 
     try {
-      const filePath = (file as File & { path?: string }).path
+      const filePath = tinker.getPathForFile(file) || undefined
       await store.loadImage(file, filePath)
     } catch (err) {
       console.error('Failed to load image:', err)

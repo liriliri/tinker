@@ -50,10 +50,13 @@ const FolderOpen: React.FC<FolderOpenProps> = ({
     const files = e.dataTransfer.files
     if (!files || files.length === 0) return
 
-    const file = files[0] as File & { path?: string }
-    if (!file?.path) return
+    const file = files[0]
+    if (!file) return
 
-    onOpenFolder(file.path)
+    const filePath = tinker.getPathForFile(file)
+    if (!filePath) return
+
+    onOpenFolder(filePath)
   }
 
   return (

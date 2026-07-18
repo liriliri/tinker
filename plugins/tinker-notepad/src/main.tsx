@@ -26,7 +26,7 @@ const App = observer(function App() {
       const file = files[0]
 
       try {
-        const filePath = (file as File & { path: string }).path
+        const filePath = tinker.getPathForFile(file) || undefined
         const content = await file.text()
         store.loadFromFile(content, filePath)
       } catch (err) {

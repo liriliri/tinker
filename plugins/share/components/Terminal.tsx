@@ -22,8 +22,8 @@ function getPathsFromDataTransfer(dataTransfer: DataTransfer): string[] {
   const paths: string[] = []
   const { files } = dataTransfer
   for (let i = 0; i < files.length; i++) {
-    const file = files[i] as File & { path?: string }
-    if (file.path) paths.push(file.path)
+    const filePath = tinker.getPathForFile(files[i])
+    if (filePath) paths.push(filePath)
   }
   return paths
 }

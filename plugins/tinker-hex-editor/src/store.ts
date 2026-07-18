@@ -74,7 +74,7 @@ class Store extends BaseStore {
   async openFileFromFile(file: File) {
     try {
       this.loading = true
-      const filePath = (file as File & { path?: string }).path
+      const filePath = tinker.getPathForFile(file)
       if (filePath) {
         const buffer = await tinker.readFile(filePath)
         this.importData(buffer, filePath)

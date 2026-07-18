@@ -18,7 +18,7 @@ const App = observer(function App() {
   const handleFileOpen = async (file: File) => {
     if (store.shredding) return
 
-    const filePath = (file as File & { path?: string }).path
+    const filePath = tinker.getPathForFile(file)
     if (filePath) {
       await store.addFilePaths([filePath])
     }

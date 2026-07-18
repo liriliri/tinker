@@ -433,6 +433,12 @@ declare global {
     getPath(name: Parameters<App['getPath']>[0]): Promise<string>
 
     /**
+     * Get the absolute path for a File from drag-drop or file input.
+     * Returns an empty string if the path cannot be determined.
+     */
+    getPathForFile(file: File): string
+
+    /**
      * Register an event listener.
      * @param event - e.g., 'changeTheme', 'changeLanguage'
      * @returns Unsubscribe function
@@ -626,7 +632,7 @@ declare global {
     /**
      * Register the plugin MCP API (currently `callTool`; may grow later).
      * `callTool` may return any value; non-strings are JSON-serialized for
-     * the host bridge. 
+     * the host bridge.
      */
     registerMcp(api: {
       callTool: (

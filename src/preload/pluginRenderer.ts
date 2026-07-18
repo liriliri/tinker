@@ -279,6 +279,7 @@ export function injectApi() {
     rm: _tinker.rm,
     fstat: _tinker.fstat,
     getPath: _tinker.getPath,
+    getPathForFile: _tinker.getPathForFile,
     getFileIcon: _tinker.getFileIcon,
     showNotification: _tinker.showNotification,
     on: _tinker.on,

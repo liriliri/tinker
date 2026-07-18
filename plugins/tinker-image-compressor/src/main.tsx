@@ -34,8 +34,7 @@ const App = observer(function App() {
 
     try {
       const fileArray = imageFiles.map((file) => {
-        // In Electron, the File object has a path property
-        const filePath = (file as File & { path?: string }).path
+        const filePath = tinker.getPathForFile(file) || undefined
         return { file, filePath }
       })
       await store.loadImages(fileArray)

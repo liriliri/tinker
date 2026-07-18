@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, webUtils } from 'electron'
 import mainObj from './main'
 import nodeObj from 'share/preload/node'
 import {
@@ -154,6 +154,7 @@ const tinkerObj = {
     }
   },
   getPath: mainObj.getPath,
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
   on: mainObj.on,
   runFFmpeg,
   killFFmpeg,

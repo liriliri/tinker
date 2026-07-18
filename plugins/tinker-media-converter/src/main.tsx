@@ -57,7 +57,7 @@ const App = observer(function App() {
     if (files.length === 0) return
 
     for (const file of files) {
-      const filePath = (file as File & { path?: string }).path
+      const filePath = tinker.getPathForFile(file)
       if (filePath) {
         await store.loadMedia(filePath, file.size)
       }

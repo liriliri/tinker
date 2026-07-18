@@ -183,7 +183,7 @@ class Store extends BaseStore {
   }
 
   async openFileFromFile(file: File) {
-    const filePath = (file as { path?: string }).path
+    const filePath = tinker.getPathForFile(file)
     if (!filePath) {
       this.showError('errorGetFilePath')
       return
