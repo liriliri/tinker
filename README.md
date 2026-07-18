@@ -327,6 +327,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/sftp.png"/></th>
       <th><img src="https://tinker.liriliri.io/reader.png"/></th>
     </tr>
+    <tr>
+      <th>Image Effect</th>
+      <th>Code Diagram</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/image_effect.png"/></th>
+      <th><img src="https://tinker.liriliri.io/code_diagram.png"/></th>
+    </tr>
   </tbody>
 </table>
 
