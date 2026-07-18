@@ -157,6 +157,7 @@ function updateContextMenu() {
                   async click() {
                     try {
                       await installSkill()
+                      cliInstalled = true
                       skillInstalled = true
                       updateContextMenu()
                     } catch {

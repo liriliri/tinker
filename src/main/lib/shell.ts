@@ -41,7 +41,9 @@ export async function isCliInstalled(): Promise<boolean> {
   }
 }
 
-export async function installCli(): Promise<void> {
+export async function installCli(
+  options: { silent?: boolean } = {}
+): Promise<void> {
   if (isMac) {
     const target = getTargetPath()
     if (!(await fs.pathExists(target))) {
@@ -63,5 +65,7 @@ export async function installCli(): Promise<void> {
     await exec(command)
   }
 
-  dialog.showMessageBox({ message: t('installCliSuccess') })
+  if (!options.silent) {
+    dialog.showMessageBox({ message: t('installCliSuccess') })
+  }
 }
