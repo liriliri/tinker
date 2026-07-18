@@ -92,6 +92,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-coding-agent',
+    name: 'Coding Agent',
+    description: 'A GUI coding agent for editing and coding tasks',
+    icon: 'tinker-coding-agent.png',
+    locales: {
+      'zh-CN': {
+        name: '编程助手',
+        description: '图形化编程助手，用于编辑与编码任务',
+      },
+    },
+  },
+  {
     id: 'tinker-dictionary',
     name: 'Dictionary',
     description: 'Look up word definitions and translations',
@@ -268,6 +280,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: '表情包',
         description: '搜索表情包',
+      },
+    },
+  },
+  {
+    id: 'tinker-mouse-tester',
+    name: 'Mouse Tester',
+    description: 'Test and visualize mouse inputs',
+    icon: 'tinker-mouse-tester.png',
+    locales: {
+      'zh-CN': {
+        name: '鼠标测试',
+        description: '测试并可视化鼠标输入',
       },
     },
   },

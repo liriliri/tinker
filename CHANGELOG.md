@@ -1,3 +1,11 @@
+## v2.0.0 (18 Jul 2026)
+
+* feat: add image effect
+* feat: add code diagram
+* feat: plugin auto start
+* feat: agent skill
+* chore: update electron to 35
+
 ## v1.22.0 (11 Jul 2026)
 
 * feat: mcp
