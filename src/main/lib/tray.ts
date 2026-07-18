@@ -43,7 +43,7 @@ export async function init() {
       main.showWin()
     })
     tray.on('right-click', () => {
-      updateContextMenu()
+      updateContextMenu(true)
     })
   } else {
     tray.on('click', () => {
@@ -53,7 +53,7 @@ export async function init() {
   }
 }
 
-function updateContextMenu() {
+function updateContextMenu(show = false) {
   if (!tray) {
     return
   }
@@ -210,7 +210,9 @@ function updateContextMenu() {
     },
   ])
   if (isMac) {
-    tray.popUpContextMenu(contextMenu)
+    if (show) {
+      tray.popUpContextMenu(contextMenu)
+    }
   } else {
     tray.setContextMenu(contextMenu)
   }
