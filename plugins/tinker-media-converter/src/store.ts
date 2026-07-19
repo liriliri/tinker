@@ -1,6 +1,16 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import contain from 'licia/contain'
+import find from 'licia/find'
+import loadImg from 'licia/loadImg'
+import lowerCase from 'licia/lowerCase'
+import map from 'licia/map'
+import pluck from 'licia/pluck'
+import promisify from 'licia/promisify'
+import some from 'licia/some'
 import splitPath from 'licia/splitPath'
+import upperCase from 'licia/upperCase'
+import i18n from 'i18next'
 import type { MediaItem, MediaType, AudioInfo } from './types'
 import BaseStore from 'share/store/Base'
 import { VIDEO_EXTS, AUDIO_EXTS, IMAGE_EXTS } from 'share/lib/fileType'
@@ -11,6 +21,8 @@ import {
   FFPROBE_CODEC_MAP,
 } from './lib/constants'
 import { buildFFmpegArgs, getOutputPath } from './lib/ffmpegArgs'
+import { detectMediaType, resolveMediaMode } from './lib/mediaType'
+import { createMcpApi } from './mcp'
 
 const STORAGE_OUTPUT_DIR = 'outputDir'
 const STORAGE_MODE = 'mode'
@@ -19,7 +31,13 @@ const STORAGE_AUDIO_FORMAT = 'audioFormat'
 const STORAGE_IMAGE_FORMAT = 'imageFormat'
 const storage = new LocalStore('tinker-media-converter')
 
-class Store extends BaseStore {
+const loadImage = promisify(loadImg) as (
+  src: string
+) => Promise<HTMLImageElement>
+
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   videoItems: MediaItem[] = []
   audioItems: MediaItem[] = []
   imageItems: MediaItem[] = []
@@ -31,6 +49,7 @@ class Store extends BaseStore {
 
   private currentTask: ReturnType<typeof tinker.runFFmpeg> | null = null
   private cancelRequested = false
+  private isBatchConverting = false
 
   get items(): MediaItem[] {
     if (this.mode === 'video') return this.videoItems
@@ -45,18 +64,20 @@ class Store extends BaseStore {
   }
 
   get outputFormatOptions(): { label: string; value: string }[] {
-    if (this.mode === 'video')
-      return VIDEO_OUTPUT_FORMATS.map((f) => ({
+    if (this.mode === 'video') {
+      return map(VIDEO_OUTPUT_FORMATS, (f) => ({
         label: f.label,
         value: f.value,
       }))
-    if (this.mode === 'audio')
-      return AUDIO_OUTPUT_FORMATS.map((f) => ({
-        label: f.toUpperCase(),
+    }
+    if (this.mode === 'audio') {
+      return map(AUDIO_OUTPUT_FORMATS, (f) => ({
+        label: upperCase(f),
         value: f,
       }))
-    return IMAGE_OUTPUT_FORMATS.map((f) => ({
-      label: f.toUpperCase(),
+    }
+    return map(IMAGE_OUTPUT_FORMATS, (f) => ({
+      label: upperCase(f),
       value: f,
     }))
   }
@@ -64,6 +85,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this, {
+      mcp: false,
       currentTask: false,
       cancelRequested: false,
     } as Record<string, false>)
@@ -94,21 +116,21 @@ class Store extends BaseStore {
 
   private loadVideoFormat() {
     const saved = storage.get(STORAGE_VIDEO_FORMAT)
-    if (saved && VIDEO_OUTPUT_FORMATS.some((f) => f.value === saved)) {
+    if (saved && contain(pluck(VIDEO_OUTPUT_FORMATS, 'value'), saved)) {
       this.videoOutputFormat = saved
     }
   }
 
   private loadAudioFormat() {
     const saved = storage.get(STORAGE_AUDIO_FORMAT)
-    if (saved && AUDIO_OUTPUT_FORMATS.includes(saved)) {
+    if (saved && contain(AUDIO_OUTPUT_FORMATS, saved)) {
       this.audioOutputFormat = saved
     }
   }
 
   private loadImageFormat() {
     const saved = storage.get(STORAGE_IMAGE_FORMAT)
-    if (saved && IMAGE_OUTPUT_FORMATS.includes(saved)) {
+    if (saved && contain(IMAGE_OUTPUT_FORMATS, saved)) {
       this.imageOutputFormat = saved
     }
   }
@@ -148,43 +170,27 @@ class Store extends BaseStore {
     this.setOutputDir(result.filePaths[0])
   }
 
-  private detectMediaType(filePath: string): MediaType | null {
-    const { ext } = splitPath(filePath)
-    const e = ext.slice(1).toLowerCase()
-    if (VIDEO_EXTS.has(e)) return 'video'
-    if (AUDIO_EXTS.has(e)) return 'audio'
-    if (IMAGE_EXTS.has(e)) return 'image'
-    return null
-  }
-
   async openMediaDialog() {
     try {
-      let filters: { name: string; extensions: string[] }[]
-      if (this.mode === 'video') {
-        filters = [
+      const result = await tinker.showOpenDialog({
+        filters: [
           {
-            name: 'Video',
+            name: i18n.t('media'),
+            extensions: [...VIDEO_EXTS, ...AUDIO_EXTS, ...IMAGE_EXTS],
+          },
+          {
+            name: i18n.t('video'),
             extensions: [...VIDEO_EXTS],
           },
-        ]
-      } else if (this.mode === 'audio') {
-        filters = [
           {
-            name: 'Audio',
+            name: i18n.t('audio'),
             extensions: [...AUDIO_EXTS],
           },
-        ]
-      } else {
-        filters = [
           {
-            name: 'Image',
+            name: i18n.t('image'),
             extensions: [...IMAGE_EXTS],
           },
-        ]
-      }
-
-      const result = await tinker.showOpenDialog({
-        filters,
+        ],
         properties: ['openFile', 'multiSelections'],
       })
 
@@ -196,20 +202,36 @@ class Store extends BaseStore {
         return
       }
 
-      for (const filePath of result.filePaths) {
-        await this.loadMedia(filePath)
-      }
+      await this.loadMediaFiles(result.filePaths)
     } catch (err) {
       console.error('Failed to open media:', err)
       throw err
     }
   }
 
+  async loadMediaFiles(
+    filePaths: string[],
+    fileSizes?: Record<string, number>
+  ) {
+    const mode = resolveMediaMode(filePaths)
+    if (mode !== this.mode) {
+      this.setMode(mode)
+    }
+
+    for (const filePath of filePaths) {
+      await this.loadMedia(filePath, fileSizes?.[filePath])
+    }
+  }
+
   async loadMedia(filePath: string, fileSize?: number) {
     if (this.items.some((i) => i.filePath === filePath)) return
 
-    const mediaType = this.detectMediaType(filePath)
-    if (!mediaType || mediaType !== this.mode) return
+    const mediaType = detectMediaType(filePath)
+    if (!mediaType) return
+
+    if (mediaType !== this.mode) {
+      this.setMode(mediaType)
+    }
 
     const { name } = splitPath(filePath)
 
@@ -242,23 +264,18 @@ class Store extends BaseStore {
         const blob = new Blob([buffer])
         const url = URL.createObjectURL(blob)
 
-        const img = new Image()
-        await new Promise<void>((resolve) => {
-          img.onload = () => resolve()
-          img.onerror = () => {
+        try {
+          const img = await loadImage(url)
+          if (img.naturalWidth > 0) {
+            storedItem.imageInfo = {
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+              url,
+            }
+          } else {
             URL.revokeObjectURL(url)
-            resolve()
           }
-          img.src = url
-        })
-
-        if (img.naturalWidth > 0) {
-          storedItem.imageInfo = {
-            width: img.naturalWidth,
-            height: img.naturalHeight,
-            url,
-          }
-        } else {
+        } catch {
           URL.revokeObjectURL(url)
         }
       } else {
@@ -297,11 +314,18 @@ class Store extends BaseStore {
 
   async convertAll() {
     this.cancelRequested = false
-    for (const item of this.items) {
-      if (this.cancelRequested) break
-      if (!item.isDone && !item.isConverting && this.isConvertible(item)) {
-        await this.convertItem(item.id)
+    this.isBatchConverting = true
+    try {
+      for (const item of this.items) {
+        if (this.cancelRequested) break
+        if (!item.isDone && !item.isConverting && this.isConvertible(item)) {
+          await this.convertItem(item.id)
+        }
       }
+    } finally {
+      runInAction(() => {
+        this.isBatchConverting = false
+      })
     }
   }
 
@@ -406,9 +430,10 @@ class Store extends BaseStore {
 
   isConvertible(item: MediaItem): boolean {
     const { ext } = splitPath(item.filePath)
-    const fileExt = ext.toLowerCase().slice(1)
+    const fileExt = lowerCase(ext.slice(1))
     if (this.mode === 'video') {
-      const fmt = VIDEO_OUTPUT_FORMATS.find(
+      const fmt = find(
+        VIDEO_OUTPUT_FORMATS,
         (f) => f.value === this.videoOutputFormat
       )
       if (!fmt) return true
@@ -422,13 +447,14 @@ class Store extends BaseStore {
   }
 
   get hasUnconverted() {
-    return this.items.some(
+    return some(
+      this.items,
       (i) => !i.isDone && !i.isConverting && this.isConvertible(i)
     )
   }
 
   get isConverting() {
-    return this.items.some((i) => i.isConverting)
+    return this.isBatchConverting || some(this.items, (i) => i.isConverting)
   }
 }
 

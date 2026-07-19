@@ -16,6 +16,99 @@
         "name": "媒体格式转换",
         "description": "基于 FFmpeg 的批量媒体格式转换"
       }
+    },
+    "mcp": {
+      "tools": {
+        "convert": {
+          "description": "Start a batch media conversion in the background. Returns immediately — call get_status to poll until isComplete is true. Fails if a conversion is already running. Mode is auto-detected from paths; all paths must be the same media type.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Absolute paths to media files of the same type (video, audio, or image)"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "video",
+                  "audio",
+                  "image"
+                ],
+                "description": "Media type. Auto-detected from paths when omitted; must match the files when provided."
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "mp4-h264",
+                  "mp4-h265",
+                  "mp4-av1",
+                  "mkv-h264",
+                  "mkv-h265",
+                  "mkv-vp9",
+                  "mkv-av1",
+                  "webm-vp9",
+                  "webm-vp8",
+                  "webm-av1",
+                  "mov-h264",
+                  "mov-h265",
+                  "mov-prores",
+                  "avi-h264",
+                  "avi-xvid",
+                  "avi-mpeg4",
+                  "flv-h264",
+                  "flv-sorenson",
+                  "ts-h264",
+                  "ts-h265",
+                  "wmv",
+                  "3gp",
+                  "gif",
+                  "mp3",
+                  "m4a",
+                  "aac",
+                  "ogg",
+                  "flac",
+                  "wav",
+                  "opus",
+                  "jpg",
+                  "png",
+                  "webp",
+                  "bmp",
+                  "tiff",
+                  "avif"
+                ],
+                "description": "Output format for the resolved media type. Video: mp4-h264, mp4-h265, mp4-av1, mkv-h264, mkv-h265, mkv-vp9, mkv-av1, webm-vp9, webm-vp8, webm-av1, mov-h264, mov-h265, mov-prores, avi-h264, avi-xvid, avi-mpeg4, flv-h264, flv-sorenson, ts-h264, ts-h265, wmv, 3gp, gif. Audio: mp3, m4a, aac, ogg, flac, wav, opus. Image: jpg, png, webp, bmp, tiff, avif. Defaults to the last used format for that type."
+              },
+              "outputDirectory": {
+                "type": "string",
+                "description": "Absolute output directory. Empty string writes next to each source file. Defaults to the last used output directory."
+              }
+            },
+            "required": [
+              "paths"
+            ]
+          }
+        },
+        "get_status": {
+          "description": "Get conversion progress. Poll after convert until isComplete is true. Returns per-file progress, output paths, and errors.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        "cancel": {
+          "description": "Cancel the conversion currently in progress.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      }
     }
   }
 }

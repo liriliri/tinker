@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { File } from 'lucide-react'
+import each from 'licia/each'
+import filter from 'licia/filter'
+import isEmpty from 'licia/isEmpty'
+import lowerCase from 'licia/lowerCase'
+import splitPath from 'licia/splitPath'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import MediaList from './components/MediaList'
 import store from './store'
-import { VIDEO_EXTS, AUDIO_EXTS, IMAGE_EXTS } from 'share/lib/fileType'
+import { MEDIA_EXTS } from './lib/mediaType'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -40,34 +45,30 @@ const App = observer(function App() {
 
     if (store.isConverting) return
 
-    let extensions: Set<string>
-    if (store.mode === 'video') {
-      extensions = VIDEO_EXTS
-    } else if (store.mode === 'audio') {
-      extensions = AUDIO_EXTS
-    } else {
-      extensions = IMAGE_EXTS
-    }
-
-    const files = Array.from(e.dataTransfer.files).filter((file) => {
-      const ext = file.name.toLowerCase().match(/\.([^.]+)$/)?.[1] || ''
-      return extensions.has(ext)
+    const files = filter(Array.from(e.dataTransfer.files), (file) => {
+      const ext = lowerCase(splitPath(file.name).ext.slice(1))
+      return MEDIA_EXTS.has(ext)
     })
 
-    if (files.length === 0) return
+    if (isEmpty(files)) return
 
-    for (const file of files) {
+    const filePaths: string[] = []
+    const fileSizes: Record<string, number> = {}
+    each(files, (file) => {
       const filePath = tinker.getPathForFile(file)
       if (filePath) {
-        await store.loadMedia(filePath, file.size)
+        filePaths.push(filePath)
+        fileSizes[filePath] = file.size
       }
-    }
-  }
+    })
 
-  const getOpenTitle = () => {
-    if (store.mode === 'video') return t('openTitleVideo')
-    if (store.mode === 'audio') return t('openTitleAudio')
-    return t('openTitleImage')
+    if (isEmpty(filePaths)) return
+
+    try {
+      await store.loadMediaFiles(filePaths, fileSizes)
+    } catch (err) {
+      console.error('Failed to load dropped media:', err)
+    }
   }
 
   return (
@@ -93,7 +94,7 @@ const App = observer(function App() {
                 className={`w-10 h-10 ${tw.gray.text400}`}
                 strokeWidth={1.5}
               />
-              <p className={`text-sm ${tw.text.primary}`}>{getOpenTitle()}</p>
+              <p className={`text-sm ${tw.text.primary}`}>{t('openTitle')}</p>
             </div>
           </div>
         ) : (
