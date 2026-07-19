@@ -2,14 +2,13 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
-import { renderQRToCanvas } from '../lib/qr'
+import { renderQRCode } from '../lib/qr'
 import store from '../store'
 
 export default observer(function QRGenerator() {
   const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // Store canvas ref in store for toolbar access
   useEffect(() => {
     store.canvasRef = canvasRef
   }, [])
@@ -20,51 +19,27 @@ export default observer(function QRGenerator() {
     }
 
     const canvas = canvasRef.current
+    let cancelled = false
 
-    try {
-      renderQRToCanvas(
-        canvas,
-        store.text,
-        store.size,
-        store.fgColor,
-        store.bgColor,
-        store.correctLevel
-      )
-    } catch (error) {
-      console.error('QR Code generation error:', error)
-      return
-    }
+    renderQRCode(canvas, {
+      text: store.text,
+      size: store.size,
+      fgColor: store.fgColor,
+      bgColor: store.bgColor,
+      correctLevel: store.correctLevel,
+      iconDataUrl: store.iconDataUrl || undefined,
+    })
+      .then((dataURL) => {
+        if (!cancelled) {
+          store.setQRCodeDataURL(dataURL)
+        }
+      })
+      .catch((error) => {
+        console.error('QR Code generation error:', error)
+      })
 
-    const drawDataUrl = () => {
-      const dataURL = canvas.toDataURL('image/png')
-      store.setQRCodeDataURL(dataURL)
-    }
-
-    if (store.iconDataUrl) {
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        drawDataUrl()
-        return
-      }
-      const img = new Image()
-      img.onload = () => {
-        const iconSize = canvas.width * 0.2
-        const x = (canvas.width - iconSize) / 2
-        const y = (canvas.height - iconSize) / 2
-        const padding = iconSize * 0.1
-        ctx.fillStyle = store.bgColor
-        ctx.fillRect(
-          x - padding,
-          y - padding,
-          iconSize + padding * 2,
-          iconSize + padding * 2
-        )
-        ctx.drawImage(img, x, y, iconSize, iconSize)
-        drawDataUrl()
-      }
-      img.src = store.iconDataUrl
-    } else {
-      drawDataUrl()
+    return () => {
+      cancelled = true
     }
   }, [store.text, store.size, store.fgColor, store.bgColor, store.correctLevel, store.iconDataUrl])
 

@@ -16,6 +16,69 @@
         "name": "二维码",
         "description": "二维码生成与扫描"
       }
+    },
+    "mcp": {
+      "tools": {
+        "generate": {
+          "description": "Generate a QR code PNG end to end: apply text and display options in the UI, then save the image. Same result as typing in the editor and clicking save.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Content encoded in the QR code"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the PNG file"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 2000,
+                "description": "QR code size in pixels (100-2000). Defaults to the current UI setting."
+              },
+              "fgColor": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "description": "Foreground color as #RRGGBB. Defaults to the current UI setting."
+              },
+              "bgColor": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "description": "Background color as #RRGGBB. Defaults to the current UI setting."
+              },
+              "correctLevel": {
+                "type": "string",
+                "enum": ["L", "M", "Q", "H"],
+                "description": "Error correction level. Defaults to the current UI setting."
+              },
+              "iconPath": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a center icon image. Omit to clear any existing icon."
+              }
+            },
+            "required": ["text", "path"]
+          }
+        },
+        "decode": {
+          "description": "Decode a QR code from an image file. Updates the plugin scan result UI and returns the text.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to an image containing a QR code"
+              }
+            },
+            "required": ["path"]
+          }
+        }
+      }
     }
   }
 }

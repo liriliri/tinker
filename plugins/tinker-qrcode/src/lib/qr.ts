@@ -6,6 +6,17 @@ import {
   QRCodeDecoderErrorCorrectionLevel,
 } from '@zxing/library'
 
+export type CorrectLevel = 'L' | 'M' | 'Q' | 'H'
+
+export interface QRRenderOptions {
+  text: string
+  size: number
+  fgColor: string
+  bgColor: string
+  correctLevel: CorrectLevel
+  iconDataUrl?: string
+}
+
 export async function decodeQRFromUrl(url: string): Promise<string> {
   const img = new window.Image()
   await new Promise<void>((resolve, reject) => {
@@ -31,7 +42,7 @@ function hexToRgba(hex: string): [number, number, number, number] {
 }
 
 function correctLevelToZxing(
-  level: 'L' | 'M' | 'Q' | 'H'
+  level: CorrectLevel
 ): QRCodeDecoderErrorCorrectionLevel {
   switch (level) {
     case 'M':
@@ -45,13 +56,13 @@ function correctLevelToZxing(
   }
 }
 
-export function renderQRToCanvas(
+function renderQRToCanvas(
   canvas: HTMLCanvasElement,
   text: string,
   size: number,
   fgColor: string,
   bgColor: string,
-  correctLevel: 'L' | 'M' | 'Q' | 'H'
+  correctLevel: CorrectLevel
 ) {
   const hints = new Map<EncodeHintType, unknown>()
   hints.set(EncodeHintType.ERROR_CORRECTION, correctLevelToZxing(correctLevel))
@@ -88,4 +99,60 @@ export function renderQRToCanvas(
   }
 
   ctx.putImageData(imageData, 0, 0)
+}
+
+async function drawCenterIcon(
+  canvas: HTMLCanvasElement,
+  iconDataUrl: string,
+  bgColor: string
+): Promise<void> {
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    throw new Error('Failed to create canvas context')
+  }
+
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const iconSize = canvas.width * 0.2
+      const x = (canvas.width - iconSize) / 2
+      const y = (canvas.height - iconSize) / 2
+      const padding = iconSize * 0.1
+      ctx.fillStyle = bgColor
+      ctx.fillRect(
+        x - padding,
+        y - padding,
+        iconSize + padding * 2,
+        iconSize + padding * 2
+      )
+      ctx.drawImage(img, x, y, iconSize, iconSize)
+      resolve()
+    }
+    img.onerror = () => reject(new Error('Failed to load icon image'))
+    img.src = iconDataUrl
+  })
+}
+
+export async function renderQRCode(
+  canvas: HTMLCanvasElement,
+  options: QRRenderOptions
+): Promise<string> {
+  const { text, size, fgColor, bgColor, correctLevel, iconDataUrl } = options
+  renderQRToCanvas(canvas, text, size, fgColor, bgColor, correctLevel)
+  if (iconDataUrl) {
+    await drawCenterIcon(canvas, iconDataUrl, bgColor)
+  }
+  return canvas.toDataURL('image/png')
+}
+
+export function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob)
+      } else {
+        reject(new Error('Failed to create PNG blob'))
+      }
+    }, 'image/png')
+  })
 }

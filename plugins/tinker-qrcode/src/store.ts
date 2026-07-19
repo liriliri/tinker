@@ -4,6 +4,8 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
+import { createMcpApi } from './mcp'
+import type { CorrectLevel } from './lib/qr'
 
 const STORAGE_SIZE = 'size'
 const STORAGE_FG_COLOR = 'fgColor'
@@ -14,7 +16,9 @@ const storage = new LocalStore('tinker-qrcode')
 
 const PRESET_SIZES = [300, 400, 500, 600]
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   text: string = ''
   qrCodeDataURL: string = ''
 
@@ -22,7 +26,7 @@ class Store extends BaseStore {
   isCustomSize: boolean = false
   fgColor: string = '#000000'
   bgColor: string = '#ffffff'
-  correctLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
+  correctLevel: CorrectLevel = 'M'
   iconDataUrl: string = ''
 
   scanResult: string = ''
@@ -34,6 +38,7 @@ class Store extends BaseStore {
     super()
     makeAutoObservable(this, {
       canvasRef: false,
+      mcp: false,
     })
     this.loadStorage()
   }
@@ -103,7 +108,7 @@ class Store extends BaseStore {
     storage.set(STORAGE_BG_COLOR, color)
   }
 
-  setCorrectLevel(level: 'L' | 'M' | 'Q' | 'H') {
+  setCorrectLevel(level: CorrectLevel) {
     this.correctLevel = level
     storage.set(STORAGE_CORRECT_LEVEL, level)
   }
