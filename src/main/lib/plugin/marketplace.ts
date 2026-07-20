@@ -357,6 +357,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-stock',
+    name: 'Stock',
+    description: 'View real-time stock information',
+    icon: 'tinker-stock.png',
+    locales: {
+      'zh-CN': {
+        name: '股票',
+        description: '查看股票实时信息',
+      },
+    },
+  },
+  {
     id: 'tinker-token-usage',
     name: 'Token Usage',
     description: 'Track token usage statistics for AI coding tools',
