@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import 'share/renderer/main.scss'
+import '../icon.css'
 import { i18n, t } from 'common/util'
 
 async function start() {

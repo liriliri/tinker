@@ -47,6 +47,8 @@
   "remote": "TINKER HTTP 远程",
   "noRunningPlugins": "没有运行中的插件",
   "back": "返回",
+  "fullscreen": "全屏",
+  "exitFullscreen": "退出全屏",
   "notActive": "未激活",
   "inputText": "输入文本",
   "send": "发送",

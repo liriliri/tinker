@@ -47,6 +47,8 @@
   "remote": "TINKER HTTP Remote",
   "noRunningPlugins": "No running plugins",
   "back": "Back",
+  "fullscreen": "Fullscreen",
+  "exitFullscreen": "Exit fullscreen",
   "notActive": "Not active",
   "inputText": "Enter text",
   "send": "Send",

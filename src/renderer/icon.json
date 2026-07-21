@@ -1,1 +1,8 @@
-["more.svg", "debug.svg", "delete.svg", "close.svg"]
+[
+  "more.svg",
+  "debug.svg",
+  "delete.svg",
+  "close.svg",
+  "fullscreen.svg",
+  "left.svg"
+]

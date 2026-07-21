@@ -2,7 +2,11 @@ import http from 'http'
 import { WebSocketServer, WebSocket } from 'ws'
 import { WebContents } from 'electron'
 import clamp from 'licia/clamp'
+import defaults from 'licia/defaults'
 import each from 'licia/each'
+import isStr from 'licia/isStr'
+import toBool from 'licia/toBool'
+import toNum from 'licia/toNum'
 import { hasPluginInspect } from '../plugin/inspect'
 import { pluginViews } from '../plugin/view'
 import { checkRequestAuth, HttpAuth } from './auth'
@@ -13,6 +17,7 @@ interface PluginSession {
   clients: Set<WebSocket>
   attachedByUs: boolean
   screencastOn: boolean
+  touchMode: boolean
   cdpVisible: boolean
   onDebuggerMessage: (
     event: Electron.Event,
@@ -129,6 +134,33 @@ async function startScreencast(
   session.screencastOn = true
 }
 
+async function setTouchMode(session: PluginSession, enabled: boolean) {
+  if (session.touchMode === enabled) return
+  if (
+    session.webContents.isDestroyed() ||
+    !session.webContents.debugger.isAttached()
+  ) {
+    return
+  }
+  // Match DevTools ScreencastView touch mode: mouse events are emitted as
+  // touch so lists and other touch-scrollable content can scroll.
+  await session.webContents.debugger.sendCommand(
+    'Emulation.setTouchEmulationEnabled',
+    {
+      enabled,
+      maxTouchPoints: 1,
+    }
+  )
+  await session.webContents.debugger.sendCommand(
+    'Emulation.setEmitTouchEventsForMouse',
+    {
+      enabled,
+      configuration: 'mobile',
+    }
+  )
+  session.touchMode = enabled
+}
+
 function disposePluginSession(pluginId: string) {
   const session = pluginSessions.get(pluginId)
   if (!session) return
@@ -158,6 +190,10 @@ function disposePluginSession(pluginId: string) {
     void stopScreencast(session)
     if (session.attachedByUs && !hasPluginInspect(pluginId)) {
       detachDebugger(session.webContents)
+    } else if (session.touchMode) {
+      // Keep debugger for inspect; clear touch emulation so local mouse
+      // input is not affected after remote clients disconnect.
+      void setTouchMode(session, false).catch(() => {})
     }
   }
 }
@@ -213,7 +249,7 @@ function getOrCreateSession(pluginId: string): PluginSession {
 
     if (method === 'Page.screencastVisibilityChanged') {
       const { visible } = params as { visible: boolean }
-      session.cdpVisible = !!visible
+      session.cdpVisible = toBool(visible)
       broadcastVisibility(session)
     }
   }
@@ -232,6 +268,7 @@ function getOrCreateSession(pluginId: string): PluginSession {
     clients,
     attachedByUs,
     screencastOn: false,
+    touchMode: false,
     cdpVisible: true,
     onDebuggerMessage,
     onDestroyed,
@@ -247,6 +284,7 @@ async function handleClientMessage(session: PluginSession, raw: string) {
     type?: string
     width?: number
     height?: number
+    enabled?: boolean
     eventType?: string
     x?: number
     y?: number
@@ -276,6 +314,11 @@ async function handleClientMessage(session: PluginSession, raw: string) {
     return
   }
 
+  if (msg.type === 'touchMode') {
+    await setTouchMode(session, toBool(msg.enabled))
+    return
+  }
+
   // Block input while the plugin window is not in the foreground.
   if (!isSessionActive(session)) {
     return
@@ -290,18 +333,26 @@ async function handleClientMessage(session: PluginSession, raw: string) {
     }
     const type = typeMap[msg.eventType || '']
     if (!type) return
-    const params: Record<string, unknown> = {
-      type,
-      x: Math.round(msg.x || 0),
-      y: Math.round(msg.y || 0),
-      modifiers: msg.modifiers || 0,
-      button: msg.button || 'none',
-      buttons: msg.buttons || 0,
-      clickCount: msg.clickCount || 0,
-    }
+    const params = defaults(
+      {
+        type,
+        x: Math.round(toNum(msg.x) || 0),
+        y: Math.round(toNum(msg.y) || 0),
+        modifiers: msg.modifiers,
+        button: msg.button,
+        buttons: msg.buttons,
+        clickCount: msg.clickCount,
+      },
+      {
+        modifiers: 0,
+        button: 'none',
+        buttons: 0,
+        clickCount: 0,
+      }
+    )
     if (type === 'mouseWheel') {
-      params.deltaX = msg.deltaX || 0
-      params.deltaY = msg.deltaY || 0
+      params.deltaX = toNum(msg.deltaX) || 0
+      params.deltaY = toNum(msg.deltaY) || 0
     }
     await session.webContents.debugger.sendCommand(
       'Input.dispatchMouseEvent',
@@ -311,13 +362,12 @@ async function handleClientMessage(session: PluginSession, raw: string) {
   }
 
   if (msg.type === 'insertText') {
-    const text = typeof msg.text === 'string' ? msg.text : ''
-    if (!text) return
+    if (!isStr(msg.text) || !msg.text) return
     try {
-      await session.webContents.insertText(text)
+      await session.webContents.insertText(msg.text)
     } catch {
       await session.webContents.debugger.sendCommand('Input.insertText', {
-        text,
+        text: msg.text,
       })
     }
     return
@@ -338,15 +388,15 @@ async function handleClientMessage(session: PluginSession, raw: string) {
         : undefined
     await session.webContents.debugger.sendCommand('Input.dispatchKeyEvent', {
       type,
-      modifiers: msg.modifiers || 0,
+      modifiers: toNum(msg.modifiers) || 0,
       text,
       unmodifiedText: text ? text.toLowerCase() : undefined,
       code: msg.code,
       key: msg.key,
       windowsVirtualKeyCode: msg.keyCode,
       nativeVirtualKeyCode: msg.keyCode,
-      autoRepeat: !!msg.autoRepeat,
-      location: msg.location || 0,
+      autoRepeat: toBool(msg.autoRepeat),
+      location: toNum(msg.location) || 0,
     })
   }
 }
