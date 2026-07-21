@@ -99,12 +99,28 @@ export function stopServer() {
 
 export interface LaunchOptions {
   remoteDebuggingPort?: string
+  http?: string | true
+  httpUsername?: string
+  httpPassword?: string
 }
 
 export function launchTinker(options?: LaunchOptions) {
   const args: string[] = []
   if (options?.remoteDebuggingPort) {
     args.push(`--remote-debugging-port=${options.remoteDebuggingPort}`)
+  }
+  if (options?.http !== undefined) {
+    if (options.http === true) {
+      args.push('--http')
+    } else {
+      args.push(`--http=${options.http}`)
+    }
+  }
+  if (options?.httpUsername !== undefined) {
+    args.push(`--http-username=${options.httpUsername}`)
+  }
+  if (options?.httpPassword !== undefined) {
+    args.push(`--http-password=${options.httpPassword}`)
   }
 
   if (isDev()) {

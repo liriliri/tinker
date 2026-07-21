@@ -217,6 +217,10 @@ function closeClients(session: InspectSession) {
   session.clients.clear()
 }
 
+export function hasPluginInspect(pluginId: string) {
+  return sessions.has(pluginId)
+}
+
 export function stopPluginInspect(pluginId: string) {
   const session = sessions.get(pluginId)
   if (!session) {

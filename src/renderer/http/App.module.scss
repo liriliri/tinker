@@ -1,0 +1,131 @@
+.page {
+  box-sizing: border-box;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.header {
+  margin-bottom: 24px;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li + li {
+    margin-top: 8px;
+  }
+
+  a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text);
+    text-decoration: none;
+    background: var(--color-fill-alter);
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-bg-text-hover);
+    }
+  }
+}
+
+.name {
+  font-size: 15px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.id {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  text-align: right;
+}
+
+.empty,
+.error {
+  padding: 16px;
+  border-radius: 6px;
+  background: var(--color-fill-alter);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.error {
+  border-color: var(--color-error);
+  color: var(--color-error-text);
+  background: var(--color-error-bg);
+  margin-bottom: 16px;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+
+  input {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-bg-container);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+.loginBtn {
+  height: 36px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

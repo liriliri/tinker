@@ -1,0 +1,156 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-container);
+  color: var(--color-text);
+}
+
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-fill-alter);
+  font-size: 13px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--color-text);
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--color-bg-text-hover);
+    color: var(--color-primary);
+  }
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 160px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+.status {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.error {
+  padding: 8px 14px;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-bottom: 1px solid var(--color-error);
+  font-size: 13px;
+}
+
+.viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  background: #000;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: default;
+  background: #000;
+  border: 0;
+  border-radius: 0;
+}
+
+.glasspane {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  font-size: 30px;
+  user-select: none;
+  pointer-events: auto;
+}
+
+:global(.-theme-with-dark-background) .glasspane {
+  background: rgba(0, 0, 0, 0.8);
+  color: #eee;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-fill-alter);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg-container);
+  color: var(--color-text);
+  font-size: 13px;
+  outline: none;
+
+  &:focus {
+    border-color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.send {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

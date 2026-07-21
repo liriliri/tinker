@@ -43,5 +43,21 @@
   "installAgentSkillSuccess": "Agent Skill installed successfully",
   "createShortcut": "Create Shortcut",
   "createShortcutSuccess": "Shortcut created at {{path}}",
-  "createShortcutErr": "Failed to create shortcut"
+  "createShortcutErr": "Failed to create shortcut",
+  "remote": "TINKER HTTP Remote",
+  "noRunningPlugins": "No running plugins",
+  "back": "Back",
+  "notActive": "Not active",
+  "inputText": "Enter text",
+  "send": "Send",
+  "username": "Username",
+  "password": "Password",
+  "login": "Login",
+  "loginErr": "Invalid username or password",
+  "connecting": "Connecting…",
+  "connected": "Connected",
+  "disconnected": "Disconnected",
+  "wsFailed": "WebSocket connection failed",
+  "unknownError": "Unknown error",
+  "loadPluginsErr": "Failed to load plugins ({{status}})"
 }

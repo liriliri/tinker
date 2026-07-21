@@ -43,5 +43,21 @@
   "installAgentSkillSuccess": "Agent 技能安装成功",
   "createShortcut": "创建快捷方式",
   "createShortcutSuccess": "快捷方式已创建：{{path}}",
-  "createShortcutErr": "创建快捷方式失败"
+  "createShortcutErr": "创建快捷方式失败",
+  "remote": "TINKER HTTP 远程",
+  "noRunningPlugins": "没有运行中的插件",
+  "back": "返回",
+  "notActive": "未激活",
+  "inputText": "输入文本",
+  "send": "发送",
+  "username": "用户名",
+  "password": "密码",
+  "login": "登录",
+  "loginErr": "用户名或密码错误",
+  "connecting": "连接中…",
+  "connected": "已连接",
+  "disconnected": "已断开",
+  "wsFailed": "WebSocket 连接失败",
+  "unknownError": "未知错误",
+  "loadPluginsErr": "加载插件失败（{{status}}）"
 }

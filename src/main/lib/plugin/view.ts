@@ -28,6 +28,7 @@ import contextMenu from '../contextMenu'
 import { plugins, getPlugins } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
 import { stopPluginInspect } from './inspect'
+import { disposePluginHttpSession } from '../http'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -311,6 +312,7 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   }
 
   stopPluginInspect(id)
+  disposePluginHttpSession(id)
   view.webContents.close()
   delete pluginViews[id]
 

@@ -20,6 +20,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       rollupOptions: {
         input: {
           app: './index.html',
+          http: './http.html',
         },
       },
     },
@@ -36,6 +37,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     server: {
       hmr: false,
       port: 8080,
+      cors: true,
     },
     define: {
       PRODUCT_NAME: JSON.stringify(pkg.productName),

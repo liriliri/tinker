@@ -68,6 +68,9 @@ tinker restart <plugin>                             # close then open (starts if
 tinker restart <plugin> --inspect                   # restart with per-plugin CDP
 tinker launch                                       # launch the Tinker app
 tinker launch --remote-debugging-port 9222          # launch with app-wide CDP
+tinker launch --http                                # launch with HTTP remote viewer
+tinker launch --http=127.0.0.1:9223                 # HTTP remote on a specific address
+tinker launch --http --http-username user --http-password secret   # HTTP remote with Basic Auth
 tinker quit                                         # quit the Tinker app
 ```
 
@@ -77,7 +80,11 @@ tinker quit                                         # quit the Tinker app
 
 `--inspect` starts a CDP WebSocket for that plugin's WebContents only and prints `Debugger listening on ws://...`. Connect with `agent-browser connect <ws-url>` — only that plugin page is exposed. Closing the plugin stops the inspect server.
 
-`launch` starts the Tinker app if it is not already running. `--remote-debugging-port` is only available on `launch` (app-wide). Prefer plugin `--inspect` for single-plugin debugging.
+`launch` starts the Tinker app if it is not already running. `--remote-debugging-port` and `--http` are only available on `launch` (app-wide). Prefer plugin `--inspect` for single-plugin debugging.
+
+`--http` starts an app-wide HTTP remote viewer at launch (same argv pattern as `--remote-debugging-port`). Open the address in a browser to list **running** plugins and view/interact with them (CDP screencast). Plugins that are not open cannot be accessed or started from this UI. If Tinker is already running, quit first before relaunching with `--http`.
+
+With `--http-username` (and optional `--http-password`), the viewer requires HTTP Basic Auth. Requests without credentials show a username/password form on the list page (no browser native auth dialog). API and WebSocket access require valid credentials.
 
 `ps` lists running plugins with renderer process IDs:
 
@@ -120,6 +127,8 @@ tinker ps
 | `tinker restart <plugin> --inspect` | Restart with per-plugin CDP WebSocket |
 | `tinker launch` | Launch the Tinker app |
 | `tinker launch --remote-debugging-port <port>` | Launch with app-wide Chrome DevTools Protocol |
+| `tinker launch --http [address]` | Launch with HTTP remote viewer for running plugins |
+| `tinker launch --http --http-username <user> [--http-password <pass>]` | HTTP remote with Basic Auth |
 | `tinker quit` | Quit Tinker |
 
 ## When to load another skill

@@ -207,27 +207,53 @@ program
     '--remote-debugging-port <port>',
     'Enable remote debugging on the specified port'
   )
-  .action(async (opts: { remoteDebuggingPort?: string }) => {
-    try {
-      if (await isServerRunning()) {
-        if (opts.remoteDebuggingPort) {
+  .option('--http [address]', 'Enable HTTP remote viewer (host:port or port)')
+  .option('--http-username <username>', 'HTTP Basic Auth username')
+  .option('--http-password <password>', 'HTTP Basic Auth password')
+  .action(
+    async (opts: {
+      remoteDebuggingPort?: string
+      http?: string | true
+      httpUsername?: string
+      httpPassword?: string
+    }) => {
+      try {
+        const httpOpt = parseInspectOption(opts.http)
+        if (
+          (opts.httpUsername !== undefined ||
+            opts.httpPassword !== undefined) &&
+          httpOpt === undefined
+        ) {
           console.error(
-            'Error: Tinker is already running. Quit first to relaunch with remote debugging: tinker quit'
+            'Error: --http-username and --http-password require --http'
           )
           process.exit(1)
         }
-        console.log('Tinker is already running.')
+        if (await isServerRunning()) {
+          if (opts.remoteDebuggingPort || httpOpt !== undefined) {
+            console.error(
+              'Error: Tinker is already running. Quit first to relaunch with launch options: tinker quit'
+            )
+            process.exit(1)
+          }
+          console.log('Tinker is already running.')
+          process.exit(0)
+        }
+        launchTinker({
+          remoteDebuggingPort: opts.remoteDebuggingPort,
+          http: httpOpt === true ? true : httpOpt,
+          httpUsername: opts.httpUsername,
+          httpPassword: opts.httpPassword,
+        })
+        await waitForServer()
+        console.log('Done.')
         process.exit(0)
+      } catch (err: any) {
+        console.error(`Error: ${err.message || 'Failed to launch Tinker'}`)
+        process.exit(1)
       }
-      launchTinker({ remoteDebuggingPort: opts.remoteDebuggingPort })
-      await waitForServer()
-      console.log('Done.')
-      process.exit(0)
-    } catch (err: any) {
-      console.error(`Error: ${err.message || 'Failed to launch Tinker'}`)
-      process.exit(1)
     }
-  })
+  )
 
 program
   .command('quit')

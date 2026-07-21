@@ -9,6 +9,7 @@ import {
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { getMainStore } from '../lib/store'
 import { parseInspectAddress, startPluginInspect } from '../lib/plugin/inspect'
+import { startHttp, stopHttp, parseHttpArgv } from '../lib/http'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 import { validateMcpToolArgs } from './mcp'
 
@@ -174,9 +175,20 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
 export function init() {
   app.on('ready', () => {
     startServer(handleIpcRequest)
+    const httpAddress = parseHttpArgv()
+    if (httpAddress) {
+      startHttp(httpAddress)
+        .then((info) => {
+          console.log(`HTTP remote listening on ${info.url}`)
+        })
+        .catch((err) => {
+          console.error('[http]', err?.message || err)
+        })
+    }
   })
 
   app.on('will-quit', () => {
+    void stopHttp()
     stopServer()
   })
 }
