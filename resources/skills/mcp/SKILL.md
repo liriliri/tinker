@@ -141,13 +141,9 @@ tinker skills path debug    # load full debug skill, then read SKILL.md
 The debug workflow opens the plugin and controls it through the Electron renderer via Chrome DevTools Protocol:
 
 ```bash
-tinker open <plugin> --remote-debugging-port=9222   # if CDP is not already enabled
-tinker open <plugin>
-
-agent-browser connect 9222
-agent-browser tab
-# switch to the plugin://tinker-<name>/index.html tab (not the localhost shell tab)
-agent-browser tab t2
+tinker open <plugin> --inspect
+# prints: Debugger listening on ws://127.0.0.1:.../...
+agent-browser connect "ws://127.0.0.1:.../..."
 agent-browser snapshot -i
 # click, fill, screenshot, etc. — see the agent-browser skill
 ```

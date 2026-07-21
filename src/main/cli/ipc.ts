@@ -97,10 +97,14 @@ export function stopServer() {
   removeSocketFile()
 }
 
-function launchTinker(data?: Record<string, unknown>) {
+export interface LaunchOptions {
+  remoteDebuggingPort?: string
+}
+
+export function launchTinker(options?: LaunchOptions) {
   const args: string[] = []
-  if (data?.remoteDebuggingPort) {
-    args.push(`--remote-debugging-port=${data.remoteDebuggingPort}`)
+  if (options?.remoteDebuggingPort) {
+    args.push(`--remote-debugging-port=${options.remoteDebuggingPort}`)
   }
 
   if (isDev()) {
@@ -182,7 +186,7 @@ export async function sendCommand(
     if (!isConnectionError(err)) {
       throw err
     }
-    launchTinker(data)
+    launchTinker()
     await waitForServer()
     return invoke()
   }
@@ -197,7 +201,7 @@ function isConnectionError(err: unknown) {
   return /ECONNREFUSED|connect/i.test(message)
 }
 
-function isServerRunning(): Promise<boolean> {
+export function isServerRunning(): Promise<boolean> {
   return new Promise((resolve) => {
     const socket = net.createConnection(SOCKET_PATH, () => {
       socket.destroy()

@@ -10,61 +10,69 @@ Debug and interact with Tinker plugins at runtime using `tinker` CLI and `agent-
 
 ## Prerequisites
 
-Tinker must be running with `--remote-debugging-port=9222`. The `--inspect` port is for Node.js main process debugging only and does NOT expose renderer pages.
-
-If remote debugging is not enabled, open or restart the plugin with the flag (see Connection Recovery).
+Open the plugin with `--inspect` so Tinker starts a per-plugin CDP WebSocket. This does **not** enable app-wide `--remote-debugging-port`.
 
 ## tinker Commands
 
 ```bash
-# Open a plugin
-tinker open <plugin-name>
+# Open a plugin with CDP inspect (prints ws:// URL)
+tinker open <plugin-name> --inspect
 
-# Restart a plugin (also starts if not running)
-tinker restart <plugin-name>
+# Or pin a port / address
+tinker open <plugin-name> --inspect=9222
+tinker open <plugin-name> --inspect=127.0.0.1:9222
 
-# Close a plugin
+# Restart with inspect
+tinker restart <plugin-name> --inspect
+
+# Close a plugin (also stops its inspect WebSocket server)
 tinker close <plugin-name>
 
 # Quit Tinker
 tinker quit
 ```
 
+Example CLI output:
+
+```
+Debugger listening on ws://127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83
+Open in Chrome: devtools://devtools/bundled/inspector.html?ws=127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83
+```
+
+Paste the `devtools://` URL into Chrome's address bar to open DevTools against the plugin.
+
 ## Connecting agent-browser
 
-After opening a plugin, connect to CDP port 9222:
+Pass the printed WebSocket URL directly (agent-browser accepts a single `ws://` URL):
 
 ```bash
-agent-browser connect 9222
-agent-browser tab
-# Switch to the plugin://tinker-<name>/index.html tab
-agent-browser tab t2
+WS=$(tinker open <plugin-name> --inspect | awk '/Debugger listening on/{print $NF}')
+agent-browser connect "$WS"
+agent-browser snapshot -i
+```
+
+Or copy the URL from the `Debugger listening on ...` line:
+
+```bash
+agent-browser connect "ws://127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83"
 agent-browser snapshot -i
 ```
 
 For agent-browser interaction commands (click, fill, screenshot, etc.), refer to the agent-browser skill documentation.
 
-## Tab Selection Tips
-
-- The plugin hosting window tab shows `http://localhost:8080/?page=plugin` (this is the outer shell, not the plugin content)
-- The actual plugin content is in the `plugin://tinker-<name>/index.html` tab
-- Always switch to the `plugin://` tab before running snapshot or interact commands
-
 ## Connection Recovery
 
-If `agent-browser connect 9222` fails with "Connection refused", restart Tinker with remote debugging enabled:
+If `agent-browser connect` fails, reopen the plugin with inspect:
 
 ```bash
-tinker quit
-tinker open <plugin-name> --remote-debugging-port=9222
-```
-
-Then retry connecting:
-
-```bash
-agent-browser connect 9222
+tinker close <plugin-name>
+tinker open <plugin-name> --inspect
+# then agent-browser connect <printed-ws-url>
 ```
 
 ## Notes
 
-- If the plugin tab doesn't appear, wait a moment after `tinker open/restart` for the page to load
+- `--inspect` is only on `tinker open` / `tinker restart` (not on `launch`)
+- Closing the plugin stops its inspect WebSocket server
+- Prefer plugin `--inspect` over `tinker launch --remote-debugging-port` when debugging a single plugin
+- If the plugin UI is not ready, wait a moment after `tinker open/restart` before snapshot

@@ -60,6 +60,7 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^4.7.0",
     "@xmldom/xmldom": "^0.9.8",
     "@xterm/addon-canvas": "^0.7.0",
@@ -124,6 +125,7 @@
     "licia": "^1.48.1",
     "node-pty": "^1.1.0",
     "npm": "^11.13.0",
-    "uiohook-napi": "1.5.4"
+    "uiohook-napi": "1.5.4",
+    "ws": "^8.21.1"
   }
 }

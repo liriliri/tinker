@@ -27,6 +27,7 @@ import isEmpty from 'licia/isEmpty'
 import contextMenu from '../contextMenu'
 import { plugins, getPlugins } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
+import { stopPluginInspect } from './inspect'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -309,6 +310,7 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
     }
   }
 
+  stopPluginInspect(id)
   view.webContents.close()
   delete pluginViews[id]
 

@@ -8,6 +8,7 @@ import {
 } from '../lib/plugin/view'
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { getMainStore } from '../lib/store'
+import { parseInspectAddress, startPluginInspect } from '../lib/plugin/inspect'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 import { validateMcpToolArgs } from './mcp'
 
@@ -93,6 +94,29 @@ async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
   }
 }
 
+async function startInspectIfNeeded(
+  req: IpcRequest,
+  id: string
+): Promise<string | undefined> {
+  if (req.data?.inspect === undefined) {
+    return undefined
+  }
+  const address = parseInspectAddress(req.data.inspect)
+  if (!address) {
+    return undefined
+  }
+  const entry = pluginViews[id]
+  if (!entry) {
+    throw new Error(`Plugin is not running: ${id}`)
+  }
+  const plugin = plugins[id]
+  return startPluginInspect(id, entry.view.webContents, {
+    address,
+    title: plugin?.name || id,
+    pageUrl: entry.view.webContents.getURL() || `plugin://${id}/`,
+  })
+}
+
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
   try {
     switch (req.command) {
@@ -100,7 +124,8 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
         const result = await ensurePlugin(req)
         if (typeof result !== 'string') return result
         openPlugin(result, true, !!req.data?.headless)
-        return success(req)
+        const inspectUrl = await startInspectIfNeeded(req, result)
+        return success(req, inspectUrl ? { inspectUrl } : undefined)
       }
       case 'close': {
         const id = req.data?.id as string
@@ -117,7 +142,8 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
           await closePlugin(result, true)
         }
         openPlugin(result, true)
-        return success(req)
+        const inspectUrl = await startInspectIfNeeded(req, result)
+        return success(req, inspectUrl ? { inspectUrl } : undefined)
       }
       case 'quit':
         setTimeout(() => app.quit(), 100)

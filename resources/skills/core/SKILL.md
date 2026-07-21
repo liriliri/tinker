@@ -1,6 +1,6 @@
 ---
 name: core
-description: Core Tinker CLI usage guide. Read this before running any tinker commands. Covers discovering installed plugins, opening and closing plugin windows, listing running plugins, and controlling the Tinker desktop app from the command line. Use when the user asks to open a Tinker plugin, list plugins, check what is running, restart or close a plugin, or quit Tinker.
+description: Core Tinker CLI usage guide. Read this before running any tinker commands. Covers discovering installed plugins, opening and closing plugin windows, listing running plugins, launching and quitting the Tinker desktop app from the command line. Use when the user asks to open a Tinker plugin, list plugins, check what is running, restart or close a plugin, launch or quit Tinker.
 allowed-tools: Bash(tinker:*)
 ---
 
@@ -62,15 +62,22 @@ Use the **id** column (`tinker-json-editor`) or the short name without the prefi
 ```bash
 tinker open <plugin>                              # open in a detached window
 tinker open <plugin> --headless                   # open in background (no window)
-tinker open <plugin> --remote-debugging-port 9222   # auto-launch Tinker with CDP (when app was not running)
+tinker open <plugin> --inspect                    # open with per-plugin CDP (prints ws:// URL)
 tinker close <plugin>                               # close a running plugin
 tinker restart <plugin>                             # close then open (starts if not running)
+tinker restart <plugin> --inspect                   # restart with per-plugin CDP
+tinker launch                                       # launch the Tinker app
+tinker launch --remote-debugging-port 9222          # launch with app-wide CDP
 tinker quit                                         # quit the Tinker app
 ```
 
 `open` and `restart` succeed even when the plugin was not running. `close` fails if the plugin is not running.
 
 `--headless` starts the plugin without a window. The plugin must already have **Run in Background** enabled in Tinker (right-click the plugin → checkbox); otherwise open fails.
+
+`--inspect` starts a CDP WebSocket for that plugin's WebContents only and prints `Debugger listening on ws://...`. Use with `agent-browser connect <ws-url>`. Closing the plugin stops the inspect server.
+
+`launch` starts the Tinker app if it is not already running. `--remote-debugging-port` is only available on `launch` (app-wide). Prefer plugin `--inspect` for single-plugin debugging.
 
 `ps` lists running plugins with renderer process IDs:
 
@@ -107,8 +114,12 @@ tinker ps
 | `tinker ps` | List running plugins with PIDs |
 | `tinker open <plugin>` | Open a plugin window |
 | `tinker open <plugin> --headless` | Open a plugin in the background (no window) |
+| `tinker open <plugin> --inspect` | Open with per-plugin CDP WebSocket |
 | `tinker close <plugin>` | Close a running plugin |
 | `tinker restart <plugin>` | Restart a plugin |
+| `tinker restart <plugin> --inspect` | Restart with per-plugin CDP WebSocket |
+| `tinker launch` | Launch the Tinker app |
+| `tinker launch --remote-debugging-port <port>` | Launch with app-wide Chrome DevTools Protocol |
 | `tinker quit` | Quit Tinker |
 
 ## When to load another skill
@@ -118,7 +129,7 @@ tinker ps
 
 ## Troubleshooting
 
-**`Failed to connect to Tinker`** — Tinker is not running and auto-launch may have failed. Start the Tinker app manually, then retry.
+**`Failed to connect to Tinker`** — Tinker is not running and auto-launch may have failed. Start with `tinker launch`, then retry.
 
 **`Plugin not found: tinker-...`** — Run `tinker list` and use a valid id or short name. External plugins are installed globally with the `tinker-` npm prefix.
 

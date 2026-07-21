@@ -2,7 +2,12 @@ import { Command } from 'commander'
 import startWith from 'licia/startWith'
 import contain from 'licia/contain'
 import replaceAll from 'licia/replaceAll'
-import { sendCommand } from './ipc'
+import {
+  sendCommand,
+  launchTinker,
+  isServerRunning,
+  waitForServer,
+} from './ipc'
 import { startMcpServer } from './mcp'
 import { runSkills } from './skills'
 import type { IPlugin } from 'common/types'
@@ -96,6 +101,17 @@ async function executeCommand(
     process.exit(1)
   }
 
+  const inspectUrl = (res.data as { inspectUrl?: string } | undefined)
+    ?.inspectUrl
+  if (inspectUrl) {
+    const ws = inspectUrl.replace(/^ws:\/\//, '')
+    console.log(`Debugger listening on ${inspectUrl}`)
+    console.log(
+      `Open in Chrome: devtools://devtools/bundled/inspector.html?ws=${ws}`
+    )
+    process.exit(0)
+  }
+
   if (res.data !== undefined) {
     if (options?.format) {
       try {
@@ -120,38 +136,98 @@ program
   .description('Tinker desktop toolbox CLI')
   .version(VERSION)
 
-function pluginCommand(name: string, description: string) {
-  program
-    .command(`${name} <plugin>`)
-    .description(description)
-    .action((pluginName: string) => {
-      executeCommand(name, { id: normalizePluginId(pluginName) })
-    })
+function parseInspectOption(value: unknown): string | boolean | undefined {
+  if (value === undefined) return undefined
+  if (value === true) return true
+  return String(value)
+}
+
+function withInspectData(
+  data: Record<string, unknown>,
+  inspect?: string | true
+) {
+  const value = parseInspectOption(inspect)
+  if (value !== undefined) {
+    data.inspect = value
+  }
+  return data
 }
 
 program
   .command('open <plugin>')
   .description('Open a plugin in a detached window')
+  .option('--headless', 'Open the plugin in the background without a window')
+  .option(
+    '--inspect [address]',
+    'Enable CDP inspect for the plugin (host:port or port)'
+  )
+  .action(
+    (
+      pluginName: string,
+      opts: { headless?: boolean; inspect?: string | true }
+    ) => {
+      executeCommand(
+        'open',
+        withInspectData(
+          {
+            id: normalizePluginId(pluginName),
+            headless: opts.headless,
+          },
+          opts.inspect
+        )
+      )
+    }
+  )
+
+program
+  .command('close <plugin>')
+  .description('Close a running plugin')
+  .action((pluginName: string) => {
+    executeCommand('close', { id: normalizePluginId(pluginName) })
+  })
+
+program
+  .command('restart <plugin>')
+  .description('Restart a running plugin (close then open)')
+  .option(
+    '--inspect [address]',
+    'Enable CDP inspect for the plugin (host:port or port)'
+  )
+  .action((pluginName: string, opts: { inspect?: string | true }) => {
+    executeCommand(
+      'restart',
+      withInspectData({ id: normalizePluginId(pluginName) }, opts.inspect)
+    )
+  })
+
+program
+  .command('launch')
+  .description('Launch the Tinker app')
   .option(
     '--remote-debugging-port <port>',
     'Enable remote debugging on the specified port'
   )
-  .option('--headless', 'Open the plugin in the background without a window')
-  .action(
-    (
-      pluginName: string,
-      opts: { remoteDebuggingPort?: string; headless?: boolean }
-    ) => {
-      executeCommand('open', {
-        id: normalizePluginId(pluginName),
-        remoteDebuggingPort: opts.remoteDebuggingPort,
-        headless: opts.headless,
-      })
+  .action(async (opts: { remoteDebuggingPort?: string }) => {
+    try {
+      if (await isServerRunning()) {
+        if (opts.remoteDebuggingPort) {
+          console.error(
+            'Error: Tinker is already running. Quit first to relaunch with remote debugging: tinker quit'
+          )
+          process.exit(1)
+        }
+        console.log('Tinker is already running.')
+        process.exit(0)
+      }
+      launchTinker({ remoteDebuggingPort: opts.remoteDebuggingPort })
+      await waitForServer()
+      console.log('Done.')
+      process.exit(0)
+    } catch (err: any) {
+      console.error(`Error: ${err.message || 'Failed to launch Tinker'}`)
+      process.exit(1)
     }
-  )
-
-pluginCommand('close', 'Close a running plugin')
-pluginCommand('restart', 'Restart a running plugin (close then open)')
+  })
 
 program
   .command('quit')
