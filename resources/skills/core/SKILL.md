@@ -75,7 +75,7 @@ tinker quit                                         # quit the Tinker app
 
 `--headless` starts the plugin without a window. The plugin must already have **Run in Background** enabled in Tinker (right-click the plugin → checkbox); otherwise open fails.
 
-`--inspect` starts a CDP WebSocket for that plugin's WebContents only and prints `Debugger listening on ws://...`. Use with `agent-browser connect <ws-url>`. Closing the plugin stops the inspect server.
+`--inspect` starts a CDP WebSocket for that plugin's WebContents only and prints `Debugger listening on ws://...`. Connect with `agent-browser connect <ws-url>` — only that plugin page is exposed. Closing the plugin stops the inspect server.
 
 `launch` starts the Tinker app if it is not already running. `--remote-debugging-port` is only available on `launch` (app-wide). Prefer plugin `--inspect` for single-plugin debugging.
 

@@ -41,13 +41,15 @@ The CLI serves skill content from `resources/skills`. Those files use `tinker` i
 
 ## Specialized skills
 
-Load the MCP skill when the task involves plugin tools or MCP client integration:
+Load the matching skill for the task:
 
 ```bash
-./bin/tinker-dev skills path mcp    # then read SKILL.md inside it
+./bin/tinker-dev skills path mcp     # tools / call / mcp
+./bin/tinker-dev skills path debug   # --inspect + agent-browser
+./bin/tinker-dev skills path create  # scaffold a new plugin
 ```
 
-Use it for `tinker-dev tools`, `tinker-dev call`, and `tinker-dev mcp`.
+Use **mcp** for `tinker-dev tools` / `call` / `mcp`. Use **debug** for UI automation via `agent-browser`.
 
 Run `./bin/tinker-dev skills list` to see everything available.
 

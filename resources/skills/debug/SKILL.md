@@ -6,11 +6,13 @@ allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*), Bash(tinker:*)
 
 # Tinker Plugin Debug
 
-Debug and interact with Tinker plugins at runtime using `tinker` CLI and `agent-browser` for visual inspection.
+Debug and interact with Tinker plugins at runtime using `tinker` CLI and `agent-browser`.
 
 ## Prerequisites
 
-Open the plugin with `--inspect` so Tinker starts a per-plugin CDP WebSocket. This does **not** enable app-wide `--remote-debugging-port`.
+Open the plugin with `--inspect` so Tinker starts a **per-plugin** CDP WebSocket. Only that plugin page is exposed — other running plugins are not visible to the debugger.
+
+This does **not** enable app-wide `--remote-debugging-port`.
 
 ## tinker Commands
 
@@ -43,7 +45,7 @@ Paste the `devtools://` URL into Chrome's address bar to open DevTools against t
 
 ## Connecting agent-browser
 
-Pass the printed WebSocket URL directly (agent-browser accepts a single `ws://` URL):
+Pass the printed WebSocket URL directly:
 
 ```bash
 WS=$(tinker open <plugin-name> --inspect | awk '/Debugger listening on/{print $NF}')
@@ -58,11 +60,13 @@ agent-browser connect "ws://127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83
 agent-browser snapshot -i
 ```
 
-For agent-browser interaction commands (click, fill, screenshot, etc.), refer to the agent-browser skill documentation.
+After connect, `agent-browser tab` should show a single `plugin://tinker-<name>/...` tab. No tab switching is needed.
+
+For interaction commands (click, fill, screenshot, etc.), refer to the agent-browser skill documentation.
 
 ## Connection Recovery
 
-If `agent-browser connect` fails, reopen the plugin with inspect:
+If `agent-browser connect` fails or lands on `about:blank`, reopen the plugin with inspect:
 
 ```bash
 tinker close <plugin-name>

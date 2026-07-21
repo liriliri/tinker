@@ -153,11 +153,11 @@ agent-browser snapshot -i
 | Situation | Approach |
 |-----------|----------|
 | Plugin tagged `[mcp]` in `tinker list` | MCP: `tinker tools`, `tinker call`, or `tinker mcp` |
-| No `[mcp]` tag or "does not support MCP" | Debug: `tinker open` + `agent-browser` on the `plugin://` tab |
+| No `[mcp]` tag or "does not support MCP" | Debug: `tinker open --inspect` + `agent-browser connect <ws-url>` |
 | Need stable, schema-defined automation | Add MCP tools to the plugin, or use an `[mcp]` plugin |
 | One-off interaction with any running plugin UI | Debug skill |
 
-Load the debug skill before driving the UI; it covers tab selection (`plugin://` vs the outer shell), CDP connection recovery, and interaction commands.
+Load the debug skill before driving the UI; it covers `--inspect`, ws URL connect, and connection recovery.
 
 ## Command reference
 

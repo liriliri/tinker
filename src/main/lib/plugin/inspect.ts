@@ -1,5 +1,5 @@
 import http from 'http'
-import { WebContents } from 'electron'
+import { webContents, WebContents } from 'electron'
 import { WebSocketServer, WebSocket } from 'ws'
 import getPort from 'licia/getPort'
 import uuid from 'licia/uuid'
@@ -21,6 +21,7 @@ interface InspectSession {
   wss: WebSocketServer
   webContents: WebContents
   clients: Set<WebSocket>
+  allowedTargets: Set<string>
   onDebuggerMessage: (
     event: Electron.Event,
     method: string,
@@ -35,6 +36,104 @@ const sessions = new Map<string, InspectSession>()
 
 function displayHost(host: string) {
   return host === '0.0.0.0' ? '127.0.0.1' : host
+}
+
+function isBlockedMethod(method: string) {
+  return (
+    method === 'Browser.close' ||
+    method === 'Browser.setDownloadBehavior' ||
+    method === 'Browser.grantPermissions' ||
+    method === 'Browser.resetPermissions'
+  )
+}
+
+function isOwnTarget(wc: WebContents, targetId: string) {
+  const owner = webContents.fromDevToolsTargetId(targetId)
+  return !owner || owner === wc
+}
+
+function rememberTarget(
+  session: InspectSession,
+  targetInfo?: { targetId?: string }
+) {
+  if (
+    targetInfo?.targetId &&
+    isOwnTarget(session.webContents, targetInfo.targetId)
+  ) {
+    session.allowedTargets.add(targetInfo.targetId)
+  }
+}
+
+function assertOwnOrAllowed(session: InspectSession, targetId: string) {
+  if (
+    session.allowedTargets.has(targetId) ||
+    isOwnTarget(session.webContents, targetId)
+  ) {
+    return
+  }
+  throw new Error(`Cannot access foreign target: ${targetId}`)
+}
+
+async function getOwnTargetInfo(wc: WebContents) {
+  const { targetInfo } = await wc.debugger.sendCommand('Target.getTargetInfo')
+  return targetInfo as { targetId: string; [key: string]: unknown }
+}
+
+async function handleCdpCommand(
+  session: InspectSession,
+  method: string,
+  params: any,
+  sessionId?: string
+) {
+  const { webContents: wc } = session
+
+  if (method === 'Browser.getVersion') {
+    return {
+      protocolVersion: '1.3',
+      product: `Chrome/Tinker/${VERSION}`,
+      revision: '0',
+      userAgent: '',
+      jsVersion: '',
+    }
+  }
+
+  if (method === 'Target.setDiscoverTargets') {
+    return {}
+  }
+
+  if (method === 'Target.createTarget') {
+    const targetInfo = await getOwnTargetInfo(wc)
+    rememberTarget(session, targetInfo)
+    return { targetId: targetInfo.targetId }
+  }
+
+  if (isBlockedMethod(method)) {
+    throw new Error(`CDP method not allowed: ${method}`)
+  }
+
+  if (method === 'Target.getTargets') {
+    const targetInfo = await getOwnTargetInfo(wc)
+    rememberTarget(session, targetInfo)
+    return { targetInfos: [targetInfo] }
+  }
+
+  if (method === 'Target.attachToTarget') {
+    const targetId = params?.targetId as string | undefined
+    if (!targetId) {
+      throw new Error('targetId is required')
+    }
+    assertOwnOrAllowed(session, targetId)
+    rememberTarget(session, { targetId })
+  }
+
+  if (method === 'Target.closeTarget') {
+    const targetId = params?.targetId as string | undefined
+    if (targetId) {
+      assertOwnOrAllowed(session, targetId)
+    }
+  }
+
+  return wc.debugger.sendCommand(method, params, sessionId)
 }
 
 export function parseInspectAddress(
@@ -165,6 +264,7 @@ export async function startPluginInspect(
   const url = `ws://${displayHost(host)}:${port}/${id}`
   const clients = new Set<WebSocket>()
   const wss = new WebSocketServer({ noServer: true })
+  const allowedTargets = new Set<string>()
 
   const onDebuggerMessage = (
     _event: Electron.Event,
@@ -172,6 +272,22 @@ export async function startPluginInspect(
     params: unknown,
     sessionId: string
   ) => {
+    const session = sessions.get(pluginId)
+    if (!session) return
+
+    if (
+      method === 'Target.attachedToTarget' ||
+      method === 'Target.targetCreated' ||
+      method === 'Target.targetInfoChanged'
+    ) {
+      const info = (params as { targetInfo?: { targetId?: string } })
+        ?.targetInfo
+      if (info?.targetId && !isOwnTarget(webContents, info.targetId)) {
+        return
+      }
+      rememberTarget(session, info)
+    }
+
     const message: Record<string, unknown> = { method, params }
     if (sessionId) {
       message.sessionId = sessionId
@@ -227,6 +343,7 @@ export async function startPluginInspect(
     wss,
     webContents,
     clients,
+    allowedTargets,
     onDebuggerMessage,
     onDetach,
     onDestroyed,
@@ -262,9 +379,10 @@ export async function startPluginInspect(
           if (webContents.isDestroyed() || !webContents.debugger.isAttached()) {
             throw new Error('Debugger is not attached')
           }
-          const result = await webContents.debugger.sendCommand(
+          const result = await handleCdpCommand(
+            session,
             msg.method,
-            msg.params as any,
+            msg.params,
             msg.sessionId
           )
           if (ws.readyState === WebSocket.OPEN) {
@@ -293,6 +411,12 @@ export async function startPluginInspect(
 
   try {
     attachDebugger(webContents)
+    try {
+      const targetInfo = await getOwnTargetInfo(webContents)
+      rememberTarget(session, targetInfo)
+    } catch {
+      // ignore
+    }
     webContents.debugger.on('message', onDebuggerMessage)
     webContents.debugger.on('detach', onDetach)
     webContents.on('destroyed', onDestroyed)
