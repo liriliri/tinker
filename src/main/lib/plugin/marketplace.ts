@@ -224,6 +224,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-mailbox',
+    name: 'Mailbox',
+    description: 'Email client for reading and sending mail',
+    icon: 'tinker-mailbox.png',
+    locales: {
+      'zh-CN': {
+        name: '邮箱',
+        description: '用于收发邮件的邮箱客户端',
+      },
+    },
+  },
+  {
     id: 'tinker-map',
     name: 'Map',
     description: 'Explore maps, search locations and manage bookmarks',
