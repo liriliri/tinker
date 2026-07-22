@@ -441,6 +441,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-avd',
+    name: 'AVD',
+    description: 'List, start and stop local Android Virtual Devices',
+    icon: 'tinker-avd.png',
+    locales: {
+      'zh-CN': {
+        name: 'AVD 管理',
+        description: '查找、启动和关闭本机 Android 虚拟设备',
+      },
+    },
+  },
+  {
     id: 'tinker-video-converter',
     name: 'Video Converter',
     description: 'Convert video formats with FFmpeg',
