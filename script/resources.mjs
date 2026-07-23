@@ -1,7 +1,6 @@
 import path from 'path'
 import normalizePath from 'licia/normalizePath.js'
 import isWindows from 'licia/isWindows.js'
-import isMac from 'licia/isMac.js'
 
 const dir = normalizePath(path.resolve(__dirname, '../resources'))
 
@@ -19,21 +18,4 @@ if (isWindows) {
   await $`curl -Lk ${everythingUrl} > ${dir}/everything-x64.zip`
   await $`unzip -o ${dir}/everything-x64.zip -d ${dir}/everything`
   await $`rm ${dir}/everything-x64.zip`
-}
-
-const pduVersion = '0.21.1'
-let pduFile
-let pduOutput = 'pdu'
-if (isWindows) {
-  pduFile = `pdu-x86_64-pc-windows-msvc.exe`
-  pduOutput = 'pdu.exe'
-} else if (isMac) {
-  pduFile = `pdu-x86_64-apple-darwin`
-} else {
-  pduFile = `pdu-x86_64-unknown-linux-gnu`
-}
-const pduUrl = `https://github.com/KSXGitHub/parallel-disk-usage/releases/download/${pduVersion}/${pduFile}`
-await $`curl -Lk ${pduUrl} > ${dir}/${pduOutput}`
-if (!isWindows) {
-  await $`chmod +x ${dir}/${pduOutput}`
 }

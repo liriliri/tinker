@@ -1,8 +1,8 @@
 import { spawn, ChildProcess } from 'child_process'
-import isWindows from 'licia/isWindows'
+import pduPath from 'pdu-static'
 import uuid from 'licia/uuid'
 import toNum from 'licia/toNum'
-import { resolveResources } from './util'
+import { isDev } from 'share/common/util'
 
 export interface DiskUsageOptions {
   paths: string[]
@@ -33,8 +33,14 @@ export interface DiskUsageResult {
 type ProgressCallback = (progress: DiskUsageProgress) => void
 
 function getPduPath(): string {
-  const name = isWindows ? 'pdu.exe' : 'pdu'
-  return resolveResources(name)
+  let path = pduPath || ''
+  if (!path) {
+    throw new Error('pdu binary not found')
+  }
+  if (!isDev()) {
+    path = path.replace('app.asar', 'app.asar.unpacked')
+  }
+  return path
 }
 
 const regProgress = /\(scanned (\d+), total (\d+)(?:, erred (\d+))?\)/
@@ -44,13 +50,12 @@ class PduTask {
   private pduProcess: ChildProcess | null = null
 
   constructor(options: DiskUsageOptions, onProgress?: ProgressCallback) {
-    const pduPath = getPduPath()
     const args = this.buildArgs(options, !!onProgress)
 
     let lastProgressTime = 0
 
     this.promise = new Promise<DiskUsageResult>((resolve, reject) => {
-      this.pduProcess = spawn(pduPath, args)
+      this.pduProcess = spawn(getPduPath(), args)
 
       let stdoutData = ''
       let stderrData = ''

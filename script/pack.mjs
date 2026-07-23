@@ -54,7 +54,11 @@ const config = {
     '!node_modules/nan',
     ...prebuildExclusions,
   ],
-  asarUnpack: ['node_modules/npm/**'],
+  asarUnpack: [
+    'node_modules/npm/**',
+    'node_modules/pdu-static/**',
+    'node_modules/pdu-static-*/**',
+  ],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: [
     {
