@@ -1,5 +1,6 @@
 import average from 'licia/average'
 import base64 from 'licia/base64'
+import bytesToStr from 'licia/bytesToStr'
 import camelCase from 'licia/camelCase'
 import capitalize from 'licia/capitalize'
 import chunk from 'licia/chunk'
@@ -35,12 +36,14 @@ import findKey from 'licia/findKey'
 import flatten from 'licia/flatten'
 import fullscreen from 'licia/fullscreen'
 import has from 'licia/has'
+import hex from 'licia/hex'
 import isArr from 'licia/isArr'
 import isBool from 'licia/isBool'
 import isDataUrl from 'licia/isDataUrl'
 import isEmpty from 'licia/isEmpty'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
+import isJson from 'licia/isJson'
 import isMac from 'licia/isMac'
 import isNil from 'licia/isNil'
 import isObj from 'licia/isObj'
@@ -68,6 +71,7 @@ import min from 'licia/min'
 import ms from 'licia/ms'
 import naturalSort from 'licia/naturalSort'
 import normalizePath from 'licia/normalizePath'
+import noop from 'licia/noop'
 import once from 'licia/once'
 import openFile from 'licia/openFile'
 import pluck from 'licia/pluck'
@@ -106,6 +110,7 @@ import values from 'licia/values'
 const licia = {
   average,
   base64,
+  bytesToStr,
   camelCase,
   capitalize,
   chunk,
@@ -141,12 +146,14 @@ const licia = {
   flatten,
   fullscreen,
   has,
+  hex,
   isArr,
   isBool,
   isDataUrl,
   isEmpty,
   isEqual,
   isErr,
+  isJson,
   isMac,
   isNil,
   isObj,
@@ -174,6 +181,7 @@ const licia = {
   ms,
   naturalSort,
   normalizePath,
+  noop,
   once,
   openFile,
   pluck,
@@ -216,6 +224,7 @@ g.licia = licia
 export {
   average,
   base64,
+  bytesToStr,
   camelCase,
   capitalize,
   chunk,
@@ -251,12 +260,14 @@ export {
   flatten,
   fullscreen,
   has,
+  hex,
   isArr,
   isBool,
   isDataUrl,
   isEmpty,
   isEqual,
   isErr,
+  isJson,
   isMac,
   isNil,
   isObj,
@@ -284,6 +295,7 @@ export {
   ms,
   naturalSort,
   normalizePath,
+  noop,
   once,
   openFile,
   pluck,

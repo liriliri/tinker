@@ -1,0 +1,21 @@
+{
+  "name": "tinker-websocket",
+  "version": "0.1.0",
+  "description": "WebSocket Debugging Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "WebSocket",
+    "description": "WebSocket client for connecting, sending messages, and inspecting traffic",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "WebSocket",
+        "description": "WebSocket 调试工具，支持连接、发送消息和查看通信内容"
+      }
+    }
+  }
+}
