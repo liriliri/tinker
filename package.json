@@ -55,6 +55,7 @@
     "@ai-sdk/openai": "^3.0.47",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/adm-zip": "^0.5.8",
     "@types/fs-extra": "^11.0.4",
     "@types/koa": "^3.0.1",
     "@types/koa__router": "^12.0.5",
@@ -70,7 +71,6 @@
     "@xterm/addon-unicode11": "^0.8.0",
     "@xterm/addon-webgl": "^0.18.0",
     "@xterm/xterm": "^5.5.0",
-    "adm-zip": "^0.5.16",
     "ajv": "^8.20.0",
     "autoprefixer": "^10.4.22",
     "commander": "^14.0.3",
@@ -122,6 +122,7 @@
   "dependencies": {
     "@koa/router": "^15.7.0",
     "@vscode/ripgrep": "1.17.1",
+    "adm-zip": "^0.5.16",
     "chokidar": "^4.0.3",
     "ffmpeg-static": "^5.3.0",
     "fs-extra": "^11.3.0",
