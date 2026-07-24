@@ -266,7 +266,7 @@ export default observer(function ArticleDetail() {
                 <button
                   className={`p-1.5 rounded-md ${tw.hover} ${tw.text.secondary}`}
                   title={t('openInBrowser')}
-                  onClick={() => rssReader.openExternal(item.link)}
+                  onClick={() => tinker.openExternal(item.link)}
                 >
                   <ExternalLink size={15} />
                 </button>

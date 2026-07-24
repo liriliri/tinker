@@ -62,6 +62,7 @@ const globals: Record<string, string> = {
   'prettier/plugins/typescript': 'prettierPluginTypescript',
   '@xterm/xterm': 'xterm',
   '@xterm/addon-fit': 'xtermAddonFit',
+  '@xterm/addon-web-links': 'xtermAddonWebLinks',
   codemirror: 'CodeMirror',
   'overlayscrollbars-react': 'overlayscrollbarsReact',
   'pdfjs-dist': 'pdfjsLib',
@@ -88,6 +89,7 @@ const globalsExports: Record<string, string[]> = {
   'lucide-react': keys(lucide),
   '@xterm/xterm': ['Terminal'],
   '@xterm/addon-fit': ['FitAddon'],
+  '@xterm/addon-web-links': ['WebLinksAddon'],
   codemirror: [],
   'pdfjs-dist': [],
   'overlayscrollbars-react': [

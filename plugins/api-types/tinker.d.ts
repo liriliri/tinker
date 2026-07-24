@@ -388,6 +388,9 @@ declare global {
     /** Show the given file in the system file manager. */
     showItemInPath(path: string): void
 
+    /** Open a URL in the system default browser. */
+    openExternal(url: string): void
+
     /**
      * Set the window title.
      * Empty string resets to plugin name; otherwise formatted as "{title} - {plugin name}".

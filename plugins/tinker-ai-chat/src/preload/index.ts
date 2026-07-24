@@ -1,10 +1,7 @@
-import { contextBridge, shell } from 'electron'
+import { contextBridge } from 'electron'
 import { webSearch } from '../../../share/tools/webImpl'
 
 const api = {
-  openExternal(url: string): void {
-    shell.openExternal(url)
-  },
   webSearch,
 }
 

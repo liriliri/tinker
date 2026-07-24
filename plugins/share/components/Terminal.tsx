@@ -2,6 +2,7 @@ import type { MenuItemConstructorOptions } from 'electron'
 import { useEffect, useRef, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
+import { WebLinksAddon } from '@xterm/addon-web-links'
 import { useTranslation } from 'react-i18next'
 import isWindows from 'licia/isWindows'
 import { tw, THEME_COLORS } from '../theme'
@@ -117,6 +118,11 @@ function getOrCreateInstance(
 
   const fitAddon = new FitAddon()
   xterm.loadAddon(fitAddon)
+  xterm.loadAddon(
+    new WebLinksAddon((_event, uri) => {
+      tinker.openExternal(uri)
+    })
+  )
   xterm.open(element)
 
   // Defer session creation until xterm has fitted to its container so we

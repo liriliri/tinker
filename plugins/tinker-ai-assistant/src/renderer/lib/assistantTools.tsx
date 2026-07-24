@@ -178,7 +178,7 @@ export function renderAssistantToolMessage(msg: ChatMessage) {
     return (
       <SearchCard
         {...getSearchCardProps(msg)}
-        onOpenResult={(url) => aiAssistant.openExternal(url)}
+        onOpenResult={(url) => tinker.openExternal(url)}
       />
     )
   }

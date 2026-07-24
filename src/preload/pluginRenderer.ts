@@ -271,6 +271,7 @@ export function injectApi() {
     showOpenDialog: _tinker.showOpenDialog,
     showSaveDialog: _tinker.showSaveDialog,
     showItemInPath: _tinker.showItemInPath,
+    openExternal: _tinker.openExternal,
     getClipboardFilePaths: _tinker.getClipboardFilePaths,
     captureScreen: _tinker.captureScreen,
     setTitle: _tinker.setTitle,

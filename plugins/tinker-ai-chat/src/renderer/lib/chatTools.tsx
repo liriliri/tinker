@@ -35,7 +35,7 @@ export function renderSearchToolMessage(msg: ChatMessage) {
   return (
     <SearchCard
       {...getSearchCardProps(msg)}
-      onOpenResult={(url) => aiChat.openExternal(url)}
+      onOpenResult={(url) => tinker.openExternal(url)}
     />
   )
 }

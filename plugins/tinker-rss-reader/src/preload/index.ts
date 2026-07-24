@@ -1,4 +1,4 @@
-import { contextBridge, shell } from 'electron'
+import { contextBridge } from 'electron'
 import Parser from 'rss-parser'
 import MercuryParser from '@postlight/parser'
 import type { ParsedItem } from '../common/types'
@@ -64,10 +64,6 @@ const api = {
     } catch (err) {
       return { error: (err as Error).message }
     }
-  },
-
-  openExternal(url: string): void {
-    shell.openExternal(url)
   },
 
   async fetchFullContent(

@@ -135,6 +135,7 @@ const tinkerObj = {
   sendDebuggerCommand: invoke<IpcSendDebuggerCommand>('sendDebuggerCommand'),
   setTitle,
   showItemInPath: mainObj.showItemInFolder,
+  openExternal: mainObj.openExternal,
   getAttachedPlugin: invoke<IpcGetAttachedPlugin>('getAttachedPlugin'),
   saveData,
   loadData,

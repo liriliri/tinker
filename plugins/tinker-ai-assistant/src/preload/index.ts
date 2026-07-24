@@ -1,4 +1,4 @@
-import { contextBridge, shell } from 'electron'
+import { contextBridge } from 'electron'
 import os from 'node:os'
 import {
   editFile,
@@ -14,9 +14,6 @@ import { webFetch, webSearch } from 'share/tools/webImpl'
 // ---------------------------------------------------------------------------
 
 const api = {
-  openExternal(url: string): void {
-    shell.openExternal(url)
-  },
   getHomeDir(): string {
     return os.homedir()
   },
