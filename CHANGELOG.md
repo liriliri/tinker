@@ -1,3 +1,9 @@
+## v2.1.0 (25 Jul 2026)
+
+* feat: add websocket
+* feat: add archive
+* feat: http remote control
+
 ## v2.0.0 (18 Jul 2026)
 
 * feat: add image effect
