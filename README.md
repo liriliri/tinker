@@ -335,6 +335,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/image_effect.png"/></th>
       <th><img src="https://tinker.liriliri.io/code_diagram.png"/></th>
     </tr>
+    <tr>
+      <th>WebSocket</th>
+      <th>Archive</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/websocket.png"/></th>
+      <th><img src="https://tinker.liriliri.io/archive.png"/></th>
+    </tr>
   </tbody>
 </table>
 
