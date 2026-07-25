@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import { config, getType, calculate } from './lib/units'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-unit-converter')
 
@@ -14,14 +15,18 @@ type ConversionResult = {
   unitKey: string
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   type = 'length'
   from = 'm'
   input = '1'
 
   constructor() {
     super()
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      mcp: false,
+    })
     this.loadStorage()
   }
 

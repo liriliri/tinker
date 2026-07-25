@@ -21,6 +21,41 @@
         "name": "磁盘空间分析",
         "description": "磁盘空间分析，交互式树状图可视化"
       }
+    },
+    "mcp": {
+      "tools": {
+        "scan": {
+          "description": "Scan a directory and return its disk usage distribution (children sorted by size). Updates the plugin UI. Does not delete anything.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to the directory to scan"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "get": {
+          "description": "Get the current disk usage distribution at the navigated path. Call scan first."
+        },
+        "navigate": {
+          "description": "Navigate into a scanned subdirectory (or back to the scan root) and return its size distribution. Call scan first. Use a path from children returned by scan/get.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path of a directory in the current scan results, or the scan root path"
+              }
+            },
+            "required": ["path"]
+          }
+        }
+      }
     }
   },
   "devDependencies": {

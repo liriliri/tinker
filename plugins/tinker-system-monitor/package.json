@@ -21,6 +21,22 @@
         "name": "系统监控",
         "description": "实时监听并展示 CPU、内存、磁盘与网络使用情况"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get": {
+          "description": "Get current system resource usage (CPU, memory, network, disk I/O, disk space, battery, uptime). Refreshes data and updates the plugin UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "includeHistory": {
+                "type": "boolean",
+                "description": "If true, also return recent history samples used by the charts. Defaults to false."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

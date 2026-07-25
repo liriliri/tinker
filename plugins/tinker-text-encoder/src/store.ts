@@ -3,6 +3,15 @@ import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
+import {
+  urlEncode,
+  urlDecode,
+  morseEncode,
+  morseDecode,
+  unicodeEncode,
+  unicodeDecode,
+} from './lib/encoder'
+import { createMcpApi } from './mcp'
 
 export type EncodingType = 'url' | 'morse' | 'unicode'
 
@@ -11,7 +20,8 @@ const STORAGE_ENCODING_TYPE = 'encodingType'
 
 const storage = new LocalStore('tinker-text-encoder')
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   inputText: string = ''
   outputText: string = ''
   encodingType: EncodingType = 'url'
@@ -76,6 +86,30 @@ class Store extends BaseStore {
   clearOutput() {
     this.outputText = ''
     this.saveToStorage()
+  }
+
+  encodeText() {
+    let result = ''
+    if (this.encodingType === 'url') {
+      result = urlEncode(this.inputText)
+    } else if (this.encodingType === 'morse') {
+      result = morseEncode(this.inputText)
+    } else if (this.encodingType === 'unicode') {
+      result = unicodeEncode(this.inputText)
+    }
+    this.setOutputText(result)
+  }
+
+  decodeText() {
+    let result = ''
+    if (this.encodingType === 'url') {
+      result = urlDecode(this.inputText)
+    } else if (this.encodingType === 'morse') {
+      result = morseDecode(this.inputText)
+    } else if (this.encodingType === 'unicode') {
+      result = unicodeDecode(this.inputText)
+    }
+    this.setOutputText(result)
   }
 
   async copyToClipboardWithToast(text: string) {

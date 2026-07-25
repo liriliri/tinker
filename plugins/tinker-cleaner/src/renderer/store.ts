@@ -2,12 +2,14 @@ import { makeAutoObservable, runInAction } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import type { CleanRule, Category } from './types'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-cleaner')
 
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   view: 'scanning' | 'result' = 'scanning'
   rules: CleanRule[] = []
   selectedRules: Set<string> = new Set()

@@ -14,13 +14,15 @@ import defaultWinIcon from './assets/default-win-icon.png'
 import toast from 'react-hot-toast'
 import type { ProcessInfo, NetworkConnection } from '../common/types'
 import type { SortField, SortOrder, ViewMode } from './types'
+import { createMcpApi } from './mcp'
 
 const STORAGE_VIEW_MODE = 'view-mode'
 
 const storage = new LocalStore('tinker-process-killer')
 const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   processes: ProcessInfo[] = []
   searchKeyword: string = ''
   sortField: SortField = 'cpu'
@@ -109,13 +111,17 @@ class Store extends BaseStore {
     if (!confirmed) return
 
     try {
-      await processKiller.killProcess(pid)
+      await this.forceKillProcess(pid)
       toast.success(i18n.t('killSuccess'))
-      await this.refreshProcessList()
     } catch (error) {
       console.error('Failed to kill process:', error)
       toast.error(i18n.t('killFailed'))
     }
+  }
+
+  async forceKillProcess(pid: number) {
+    await processKiller.killProcess(pid)
+    await this.refreshProcessList(false)
   }
 
   toggleAutoRefresh() {

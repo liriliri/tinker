@@ -16,6 +16,53 @@
         "name": "单位换算",
         "description": "单位换算，支持七大测量类别"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "List measurement categories and their unit keys/labels. Call this before convert if you need valid type or unit keys."
+        },
+        "convert": {
+          "description": "Convert a value between units. Updates the plugin UI. Omit to to get all units in the category; provide to for a single target.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Numeric value to convert, as a string (e.g. \"1.5\")"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "length",
+                  "area",
+                  "volume",
+                  "weight",
+                  "temperature",
+                  "time",
+                  "byte"
+                ],
+                "description": "Measurement category. Defaults to the current UI selection."
+              },
+              "from": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Source unit key (e.g. m, kg, c). Defaults to the current UI selection. Use list for valid keys."
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Target unit key. When omitted, returns all conversions in the category."
+              }
+            },
+            "required": ["value"]
+          }
+        },
+        "get": {
+          "description": "Get the current converter state: type, from unit, input value, and all conversion results."
+        }
+      }
     }
   }
 }

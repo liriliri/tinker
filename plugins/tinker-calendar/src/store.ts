@@ -15,6 +15,7 @@ import {
 } from './lib/date'
 import { getHolidaysForYearRange } from 'share/lib/holidays'
 import * as db from './lib/db'
+import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
 const storage = new LocalStore('tinker-calendar')
@@ -29,7 +30,8 @@ export type CalendarEvent = {
   allDay?: boolean
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   selectedDate: string = this.getTodayKey()
   events: CalendarEvent[] = []
   sidebarOpen: boolean = true

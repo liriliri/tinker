@@ -1,7 +1,11 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
+import isStrBlank from 'licia/isStrBlank'
+import isUndef from 'licia/isUndef'
 import BaseStore from 'share/store/Base'
 import { Languages } from './lib/formatter/types'
+import formatter from './lib/formatter'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-code-formatter')
 
@@ -13,7 +17,8 @@ type StoredState = {
   tabWidth: number
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   input: string = ''
   language: Languages = 'javascript'
   tabWidth: number = 4
@@ -55,8 +60,22 @@ class Store extends BaseStore {
     this.tabWidth = value
     this.saveState()
   }
+
+  async formatCode(code?: string) {
+    if (!isUndef(code)) {
+      this.setInput(code)
+    }
+
+    if (isStrBlank(this.input)) {
+      throw new Error('Input is empty.')
+    }
+
+    const handle = await formatter.load(this.language)
+    const result = await handle.set(this.input, { tab: this.tabWidth }).format()
+
+    this.setInput(result)
+    return result
+  }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

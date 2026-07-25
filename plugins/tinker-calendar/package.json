@@ -16,6 +16,113 @@
         "name": "日历",
         "description": "日历，支持事件管理、多种视图和农历显示"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "List calendar events. Omit date to return all events. Provide date (YYYY-MM-DD) to select that day in the UI and return events for it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "minLength": 10,
+                "description": "Date key YYYY-MM-DD. When set, updates the selected date in the UI."
+              }
+            }
+          }
+        },
+        "add": {
+          "description": "Add a calendar event. Updates the plugin UI and persists the event.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Event title"
+              },
+              "date": {
+                "type": "string",
+                "minLength": 10,
+                "description": "Start date YYYY-MM-DD"
+              },
+              "allDay": {
+                "type": "boolean",
+                "description": "All-day event. Defaults to true."
+              },
+              "startTime": {
+                "type": "string",
+                "description": "Start time HH:mm when allDay is false. Defaults to 09:00."
+              },
+              "endTime": {
+                "type": "string",
+                "description": "End time HH:mm when allDay is false. Defaults to 10:00."
+              },
+              "endDate": {
+                "type": "string",
+                "minLength": 10,
+                "description": "Optional end date YYYY-MM-DD for multi-day events"
+              }
+            },
+            "required": ["title", "date"]
+          }
+        },
+        "update": {
+          "description": "Update an existing calendar event by id. Omitted fields keep their current values.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Event id"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New title"
+              },
+              "date": {
+                "type": "string",
+                "minLength": 10,
+                "description": "Start date YYYY-MM-DD"
+              },
+              "allDay": {
+                "type": "boolean",
+                "description": "All-day event"
+              },
+              "startTime": {
+                "type": "string",
+                "description": "Start time HH:mm when allDay is false"
+              },
+              "endTime": {
+                "type": "string",
+                "description": "End time HH:mm when allDay is false"
+              },
+              "endDate": {
+                "type": ["string", "null"],
+                "description": "End date YYYY-MM-DD, or null to clear multi-day end"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete": {
+          "description": "Delete a calendar event by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Event id"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      }
     }
   }
 }

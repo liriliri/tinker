@@ -10,6 +10,7 @@ import dataUrl from 'licia/dataUrl'
 import mime from 'licia/mime'
 import { arrayBufferToBase64, base64ToUint8Array } from './lib/base64'
 import { encodeBytesBase64, encodeFileBase64 } from './lib/base64Worker'
+import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
 type InputType = 'text' | 'file'
@@ -18,7 +19,8 @@ const storage = new LocalStore('tinker-base64')
 const STORAGE_INPUT_TYPE = 'inputType'
 const STORAGE_OUTPUT_AS_DATA_URL = 'outputAsDataUrl'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   inputType: InputType = 'text'
   inputText: string = ''
   outputText: string = ''
@@ -135,7 +137,7 @@ class Store extends BaseStore {
     }
   }
 
-  async decodeToFile() {
+  async decodeToFile(path?: string): Promise<string | null> {
     try {
       const bytes = base64ToUint8Array(this.inputText)
 
@@ -152,16 +154,21 @@ class Store extends BaseStore {
         }
       }
 
-      const result = await tinker.showSaveDialog({
-        defaultPath: defaultFileName,
-      })
-
-      if (result && result.filePath) {
-        await tinker.writeFile(result.filePath, bytes)
+      let filePath = path
+      if (!filePath) {
+        const result = await tinker.showSaveDialog({
+          defaultPath: defaultFileName,
+        })
+        if (!result?.filePath) return null
+        filePath = result.filePath
       }
+
+      await tinker.writeFile(filePath, bytes)
+      return filePath
     } catch (error) {
       console.error('Failed to decode to file:', error)
       toast.error(i18n.t('decodeFailed'))
+      return null
     }
   }
 

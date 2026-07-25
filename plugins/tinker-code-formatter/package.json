@@ -16,6 +16,34 @@
         "name": "\u4ee3\u7801\u683c\u5f0f\u5316",
         "description": "\u4ee3\u7801\u683c\u5f0f\u5316\uff0c\u652f\u6301\u591a\u79cd\u7f16\u7a0b\u8bed\u8a00"
       }
+    },
+    "mcp": {
+      "tools": {
+        "format": {
+          "description": "Format code with Prettier. Updates the plugin UI and returns the formatted code.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Source code to format"
+              },
+              "language": {
+                "type": "string",
+                "enum": ["javascript", "typescript", "css", "html", "json"],
+                "description": "Language to format as. Defaults to the current UI selection."
+              },
+              "tabWidth": {
+                "type": "number",
+                "enum": [0, 2, 4, 6, 8],
+                "description": "Indent width in spaces. Use 0 for minified output. Defaults to the current UI selection."
+              }
+            },
+            "required": ["code"]
+          }
+        }
+      }
     }
   },
   "devDependencies": {}

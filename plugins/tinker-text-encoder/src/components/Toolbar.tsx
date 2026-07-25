@@ -11,29 +11,13 @@ import {
 import Select from 'share/components/Select'
 import store from '../store'
 import type { EncodingType } from '../store'
-import {
-  urlEncode,
-  urlDecode,
-  morseEncode,
-  morseDecode,
-  unicodeEncode,
-  unicodeDecode,
-} from '../lib/encoder'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
 
   const handleEncode = () => {
     try {
-      let result = ''
-      if (store.encodingType === 'url') {
-        result = urlEncode(store.inputText)
-      } else if (store.encodingType === 'morse') {
-        result = morseEncode(store.inputText)
-      } else if (store.encodingType === 'unicode') {
-        result = unicodeEncode(store.inputText)
-      }
-      store.setOutputText(result)
+      store.encodeText()
     } catch (error) {
       console.error('Encoding failed:', error)
     }
@@ -41,15 +25,7 @@ export default observer(function ToolbarComponent() {
 
   const handleDecode = () => {
     try {
-      let result = ''
-      if (store.encodingType === 'url') {
-        result = urlDecode(store.inputText)
-      } else if (store.encodingType === 'morse') {
-        result = morseDecode(store.inputText)
-      } else if (store.encodingType === 'unicode') {
-        result = unicodeDecode(store.inputText)
-      }
-      store.setOutputText(result)
+      store.decodeText()
     } catch (error) {
       console.error('Decoding failed:', error)
     }

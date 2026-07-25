@@ -11,6 +11,7 @@ import {
   removeNodes,
 } from './lib/dataProcess'
 import type { ChartControls } from './lib/d3chart'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-disk-usage')
 
@@ -20,7 +21,8 @@ export type ViewState = 'open' | 'scanning' | 'chart'
 
 const DEFAULT_MAX_DEPTH = 5
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   view: ViewState = 'open'
   scanPath: string = ''
   scanProgress: { count: number; size: number; errors: number } | null = null

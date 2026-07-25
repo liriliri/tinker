@@ -21,6 +21,56 @@
         "name": "重复文件清理",
         "description": "重复文件扫描与清理"
       }
+    },
+    "mcp": {
+      "tools": {
+        "scan": {
+          "description": "Scan a directory for duplicate files (same size + MD5). Updates the plugin UI and returns duplicate groups.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to the directory to scan"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "get": {
+          "description": "Get the current duplicate groups. Call scan first.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": ["all", "audio", "video", "document", "image", "other"],
+                "description": "Optional file-type filter. Defaults to the current UI filter."
+              }
+            }
+          }
+        },
+        "clean": {
+          "description": "Delete selected duplicate files by path. Call scan first, inspect groups with get, then pass paths to remove. Skips the UI confirm dialog. Does not require keeping one copy — choose carefully.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1,
+                "description": "Absolute file paths to delete from the current scan results"
+              },
+              "moveToTrash": {
+                "type": "boolean",
+                "description": "Move files to trash instead of permanent delete. Defaults to the current UI setting."
+              }
+            },
+            "required": ["paths"]
+          }
+        }
+      }
     }
   }
 }

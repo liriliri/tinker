@@ -1,9 +1,10 @@
 import { makeAutoObservable } from 'mobx'
 import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
+import { createMcpApi } from './mcp'
 
-type TimestampUnit = 'millisecond' | 'second'
-type Timezone = string
+export type TimestampUnit = 'millisecond' | 'second'
+export type Timezone = string
 
 const STORAGE_UNIT = 'unit'
 const STORAGE_TIMEZONE = 'timezone'
@@ -37,7 +38,8 @@ const TIMEZONE_KEYS: Record<string, string> = {
   'UTC-01:00': 'utcAzores',
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   currentTimestamp: number = Date.now()
   timestampUnit: TimestampUnit = 'millisecond'
   selectedDate: Date = new Date()

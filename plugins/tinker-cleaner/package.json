@@ -21,6 +21,38 @@
         "name": "垃圾清理",
         "description": "扫描和清理系统垃圾文件，释放磁盘空间"
       }
+    },
+    "mcp": {
+      "tools": {
+        "scan": {
+          "description": "Scan system junk locations and update the plugin UI. Returns items with non-zero size. Call this before clean."
+        },
+        "get": {
+          "description": "Get the current scan results without rescanning. If a scan is in progress, waits for it to finish."
+        },
+        "clean": {
+          "description": "Clean selected junk items by id. Call scan first to discover ids. Skips the UI confirm dialog. Optionally rescans afterward and returns updated results.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Rule ids to clean from the scan results"
+              },
+              "moveToTrash": {
+                "type": "boolean",
+                "description": "Move files to trash instead of deleting permanently. Defaults to the current UI setting."
+              }
+            },
+            "required": ["ids"]
+          }
+        }
+      }
     }
   }
 }

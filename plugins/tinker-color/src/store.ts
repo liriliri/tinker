@@ -5,12 +5,14 @@ import toast from 'react-hot-toast'
 import LocalStore from 'licia/LocalStore'
 import i18n from 'i18next'
 import { hexToRgb, rgbToHsl, hslToRgb, rgbToHex } from './lib/util'
+import { createMcpApi } from './mcp'
 
 const STORAGE_CURRENT = 'current'
 const STORAGE_ALPHA = 'alpha'
 const storage = new LocalStore('tinker-color')
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   currentColor: string = '#5a9020'
   alpha: number = 100
 
@@ -77,6 +79,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

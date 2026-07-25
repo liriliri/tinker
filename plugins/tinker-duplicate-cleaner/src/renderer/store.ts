@@ -6,6 +6,7 @@ import { getFileIcon } from 'share/lib/util'
 import type { DuplicateGroup } from '../common/types'
 import type { FilterTab } from './types'
 import { findDuplicates } from './lib/dataProcess'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-duplicate-cleaner')
 
@@ -14,7 +15,8 @@ const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   view: ViewState = 'open'
   scanPath = ''
   scanProgress: { count: number; size: number } | null = null

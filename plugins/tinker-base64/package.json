@@ -16,6 +16,50 @@
         "name": "Base64",
         "description": "Base64 编解码，支持文本和文件"
       }
+    },
+    "mcp": {
+      "tools": {
+        "encode": {
+          "description": "Encode text or a file to Base64. Provide exactly one of text or path. Updates the plugin UI and returns the Base64 output.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Text content to encode. Mutually exclusive with path."
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a file to encode. Mutually exclusive with text."
+              },
+              "asDataUrl": {
+                "type": "boolean",
+                "description": "When encoding a file, return a data URL (data:<mime>;base64,...). Defaults to the current UI setting. Ignored for text."
+              }
+            }
+          }
+        },
+        "decode": {
+          "description": "Decode Base64 text to UTF-8 text, or write decoded bytes to a file when path is provided. Updates the plugin UI. Accepts raw Base64 or a data URL.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Base64 string or data URL to decode"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to write decoded bytes. When omitted, decode to UTF-8 text in the UI."
+              }
+            },
+            "required": ["text"]
+          }
+        }
+      }
     }
   }
 }

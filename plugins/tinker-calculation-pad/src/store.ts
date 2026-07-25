@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { evaluate } from 'mathjs'
 import isStrBlank from 'licia/isStrBlank'
 import BaseStore from 'share/store/Base'
+import { createMcpApi } from './mcp'
 
 interface CalculationLine {
   id: number
@@ -9,14 +10,20 @@ interface CalculationLine {
   result: string
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   lines: CalculationLine[] = [{ id: 0, expression: '', result: '' }]
   activeLineId: number = 0
   inputRefs: { [key: number]: HTMLTextAreaElement | null } = {}
+  private nextLineId = 1
 
   constructor() {
     super()
     makeAutoObservable(this)
+  }
+
+  private createLineId() {
+    return this.nextLineId++
   }
 
   get isEmpty() {
@@ -59,13 +66,12 @@ class Store extends BaseStore {
     const hasResult = result !== ''
 
     if (hasResult && isLastLine) {
-      const newId = Date.now()
-      this.lines.push({ id: newId, expression: '', result: '' })
+      this.lines.push({ id: this.createLineId(), expression: '', result: '' })
     }
   }
 
   addNewLine(afterId: number) {
-    const newId = Date.now()
+    const newId = this.createLineId()
     const currentIndex = this.lines.findIndex((line) => line.id === afterId)
     this.lines.splice(currentIndex + 1, 0, {
       id: newId,
@@ -93,7 +99,7 @@ class Store extends BaseStore {
   }
 
   clear() {
-    const newId = Date.now()
+    const newId = this.createLineId()
     this.lines = [{ id: newId, expression: '', result: '' }]
     this.activeLineId = newId
   }

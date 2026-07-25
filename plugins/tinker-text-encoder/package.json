@@ -16,6 +16,47 @@
         "name": "文本编码",
         "description": "文本编码工具，支持 URL、Morse 电码和 Unicode"
       }
+    },
+    "mcp": {
+      "tools": {
+        "encode": {
+          "description": "Encode text with URL, Morse, or Unicode encoding. Updates the plugin UI and returns the encoded output.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Text content to encode"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["url", "morse", "unicode"],
+                "description": "Encoding type. Defaults to the current UI selection."
+              }
+            },
+            "required": ["text"]
+          }
+        },
+        "decode": {
+          "description": "Decode URL, Morse, or Unicode encoded text. Updates the plugin UI and returns the decoded output.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Encoded text to decode"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["url", "morse", "unicode"],
+                "description": "Encoding type. Defaults to the current UI selection."
+              }
+            },
+            "required": ["text"]
+          }
+        }
+      }
     }
   },
   "devDependencies": {

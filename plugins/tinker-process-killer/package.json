@@ -21,6 +21,41 @@
         "name": "进程清理",
         "description": "进程管理，支持查看、搜索和终止进程"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "Refresh and list processes. Supports optional search query and view mode (cpu/memory/port). Returns pid, name, cpu, memory, user, ports, and path.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Optional search keyword matched against name, pid, user, or ports"
+              },
+              "view": {
+                "type": "string",
+                "enum": ["cpu", "memory", "port"],
+                "description": "Optional view mode. port only shows processes with listening ports. Defaults to the current UI view."
+              }
+            }
+          }
+        },
+        "kill": {
+          "description": "Force-kill a process by pid. Skips the UI confirm dialog. Call list first to find the pid.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "pid": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Process id to kill"
+              }
+            },
+            "required": ["pid"]
+          }
+        }
+      }
     }
   }
 }

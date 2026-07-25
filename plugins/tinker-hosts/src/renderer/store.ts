@@ -7,13 +7,15 @@ import { HostsConfig } from '../common/types'
 import { ViewMode } from './types'
 import BaseStore from 'share/store/Base'
 import i18n from 'i18next'
+import { createMcpApi } from './mcp'
 
 const STORAGE_CONFIGS = 'configs'
 const STORAGE_ACTIVE_IDS = 'active-ids'
 
 const storage = new LocalStore('tinker-hosts')
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   configs: HostsConfig[] = []
   activeIds: string[] = []
   systemHosts: string = ''
@@ -109,21 +111,24 @@ class Store extends BaseStore {
     this.saveConfigs()
 
     if (contain(this.activeIds, id)) {
-      this.applyHosts().catch((error) => {
+      return this.applyHosts().catch((error) => {
         console.error('Failed to auto-apply hosts after update:', error)
       })
     }
   }
 
-  addConfig(name: string) {
+  addConfig(name: string, content = '') {
     const newConfig: HostsConfig = {
       id: uuid(),
       name,
-      content: '',
+      content,
     }
 
     this.configs = [...this.configs, newConfig]
     this.saveConfigs()
+    this.selectedId = newConfig.id
+    this.viewMode = 'config'
+    return newConfig.id
   }
 
   renameConfig(id: string, newName: string) {
@@ -147,7 +152,7 @@ class Store extends BaseStore {
     this.saveActiveIds()
 
     if (wasActive) {
-      this.applyHosts().catch((error) => {
+      return this.applyHosts().catch((error) => {
         console.error(
           'Failed to apply hosts after deleting active config:',
           error
@@ -166,7 +171,7 @@ class Store extends BaseStore {
 
     this.saveActiveIds()
 
-    this.applyHosts().catch((error) => {
+    return this.applyHosts().catch((error) => {
       console.error('Failed to auto-apply hosts after toggle:', error)
     })
   }
@@ -182,6 +187,4 @@ class Store extends BaseStore {
   }
 }
 
-const store = new Store()
-
-export default store
+export default new Store()

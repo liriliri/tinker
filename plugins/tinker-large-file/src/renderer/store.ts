@@ -5,6 +5,7 @@ import { getFileCategory } from 'share/lib/fileType'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, FilterTab } from './types'
 import { collectLargeFiles } from './lib/dataProcess'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-large-file')
 
@@ -13,7 +14,8 @@ const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
 export type ViewState = 'open' | 'scanning' | 'result'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   view: ViewState = 'open'
   scanPath = ''
   scanProgress: { count: number; size: number } | null = null

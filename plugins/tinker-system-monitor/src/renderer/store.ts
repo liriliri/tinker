@@ -5,11 +5,13 @@ import toast from 'react-hot-toast'
 import type { DataPoint, ResourceUsagePayload } from '../common/types'
 import { buildPayload, snapshotToDataPoint } from './lib/collector'
 import { RingBuffer } from './lib/ringBuffer'
+import { createMcpApi } from './mcp'
 
 const DEFAULT_INTERVAL = 500
 const DEFAULT_HISTORY = 60
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
   payload: ResourceUsagePayload | null = null
   isLoading = true
   refreshInterval = DEFAULT_INTERVAL

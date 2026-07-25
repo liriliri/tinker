@@ -16,6 +16,38 @@
         "name": "颜色",
         "description": "颜色选择器，支持格式转换和配色方案"
       }
+    },
+    "mcp": {
+      "tools": {
+        "get": {
+          "description": "Get the current color in HEX/RGB/HSL/HSV/CMYK/LAB/HSI formats, plus alpha, complementary, analogous, and lightness variants."
+        },
+        "set": {
+          "description": "Set the current color. Accepts CSS colors (e.g. #ff0000, rgb(255,0,0), hsl(0,100%,50%)) or comma-separated values matching the UI format fields. Updates the plugin UI and returns all formats.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Color value to set"
+              },
+              "format": {
+                "type": "string",
+                "enum": ["hex", "rgb", "hsl", "hsv", "cmyk", "lab", "hsi"],
+                "description": "Parse color as this format. Use for comma-separated UI values like \"255, 0, 0\". Optional for CSS colors."
+              },
+              "alpha": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Opacity percent (0-100). Defaults to the current UI value."
+              }
+            },
+            "required": ["color"]
+          }
+        }
+      }
     }
   },
   "devDependencies": {

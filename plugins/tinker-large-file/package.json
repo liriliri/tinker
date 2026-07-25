@@ -21,6 +21,56 @@
         "name": "大文件清理",
         "description": "扫描和清理大文件，释放磁盘空间"
       }
+    },
+    "mcp": {
+      "tools": {
+        "scan": {
+          "description": "Scan a directory for large files (≥ 10MB). Updates the plugin UI and returns files sorted by size.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to the directory to scan"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "get": {
+          "description": "Get the current large-file list. Call scan first.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": ["all", "audio", "video", "document", "image", "other"],
+                "description": "Optional file-type filter. Defaults to the current UI filter."
+              }
+            }
+          }
+        },
+        "clean": {
+          "description": "Delete selected large files by path. Call scan first, inspect with get, then pass paths to remove. Skips the UI confirm dialog.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1,
+                "description": "Absolute file paths to delete from the current scan results"
+              },
+              "moveToTrash": {
+                "type": "boolean",
+                "description": "Move files to trash instead of permanent delete. Defaults to the current UI setting."
+              }
+            },
+            "required": ["paths"]
+          }
+        }
+      }
     }
   }
 }

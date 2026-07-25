@@ -16,6 +16,30 @@
         "name": "计算稿纸",
         "description": "记事本风格计算器，逐行计算数学表达式"
       }
+    },
+    "mcp": {
+      "tools": {
+        "calculate": {
+          "description": "Evaluate one or more math expressions on the calculation pad. Separate multiple expressions with newlines. Replaces the current pad content, updates the UI, and returns each expression with its result.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Math expression, or multiple expressions separated by newlines"
+              }
+            },
+            "required": ["expression"]
+          }
+        },
+        "get": {
+          "description": "Get the current expressions and results on the calculation pad."
+        },
+        "clear": {
+          "description": "Clear all expressions on the calculation pad."
+        }
+      }
     }
   }
 }

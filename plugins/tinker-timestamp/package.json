@@ -16,6 +16,76 @@
         "name": "时间戳转换",
         "description": "时间戳与日期双向转换，支持多时区"
       }
+    },
+    "mcp": {
+      "tools": {
+        "now": {
+          "description": "Get the current timestamp and sync the plugin UI to now. Optional unit and timezone.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "unit": {
+                "type": "string",
+                "enum": ["millisecond", "second"],
+                "description": "Timestamp unit. Defaults to the current UI selection."
+              },
+              "timezone": {
+                "type": "string",
+                "description": "Timezone like UTC+08:00. Defaults to the current UI selection. Use get to list valid values."
+              }
+            }
+          }
+        },
+        "to_timestamp": {
+          "description": "Convert a date/time to a timestamp. Updates the plugin UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Date/time string, e.g. 2026-07-25T12:00:00 or ISO 8601"
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["millisecond", "second"],
+                "description": "Timestamp unit. Defaults to the current UI selection."
+              },
+              "timezone": {
+                "type": "string",
+                "description": "Timezone like UTC+08:00. Defaults to the current UI selection."
+              }
+            },
+            "required": ["date"]
+          }
+        },
+        "to_date": {
+          "description": "Convert a timestamp to a date/time string. Updates the plugin UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Unix timestamp in the selected unit (milliseconds or seconds)"
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["millisecond", "second"],
+                "description": "Timestamp unit. Defaults to the current UI selection."
+              },
+              "timezone": {
+                "type": "string",
+                "description": "Timezone like UTC+08:00. Defaults to the current UI selection."
+              }
+            },
+            "required": ["timestamp"]
+          }
+        },
+        "get": {
+          "description": "Get the current converter state, including unit, timezone, now, and both conversion panels."
+        }
+      }
     }
   }
 }

@@ -21,6 +21,96 @@
         "name": "Hosts 切换",
         "description": "Hosts 文件管理，快速切换多个配置"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "List hosts configs with id, name, and whether each is currently applied to the system hosts file."
+        },
+        "get": {
+          "description": "Get a hosts config by id, or the system hosts file when id is \"system\". Selects it in the UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Config id, or \"system\" for the system hosts file"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "add": {
+          "description": "Create a new hosts config. Does not apply it until you call toggle.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Display name for the config"
+              },
+              "content": {
+                "type": "string",
+                "description": "Optional hosts file content"
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "update": {
+          "description": "Update a hosts config name and/or content. If the config is active, content changes are applied to the system hosts file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Config id"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New display name"
+              },
+              "content": {
+                "type": "string",
+                "description": "New hosts file content"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete": {
+          "description": "Delete a hosts config. If it was active, the system hosts file is updated.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Config id"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "toggle": {
+          "description": "Activate or deactivate a hosts config (apply/unapply it in the system hosts file).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Config id"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      }
     }
   }
 }

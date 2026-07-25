@@ -14,7 +14,6 @@ import { Clipboard, Eraser } from 'lucide-react'
 import Select from 'share/components/Select'
 import isStrBlank from 'licia/isStrBlank'
 import store from '../store'
-import formatter from '../lib/formatter'
 import { LANGUAGES } from '../lib/languages'
 
 export default observer(function ToolbarComponent() {
@@ -40,14 +39,7 @@ export default observer(function ToolbarComponent() {
     }
 
     try {
-      const handle = await formatter.load(store.language)
-      const result = await handle
-        .set(store.input, { tab: store.tabWidth })
-        .format()
-
-      if (result) {
-        store.setInput(result)
-      }
+      await store.formatCode()
     } catch (error) {
       await alert({
         title: t('formatError'),
