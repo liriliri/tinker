@@ -16,6 +16,108 @@
         "name": "WebSocket",
         "description": "WebSocket 调试工具，支持连接、发送消息和查看通信内容"
       }
+    },
+    "mcp": {
+      "tools": {
+        "connect": {
+          "description": "Connect to a WebSocket server (ws:// or wss://). Waits until the connection is open or fails. Selects the new connection. Call get afterward to inspect messages, or send to transmit data.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1,
+                "description": "WebSocket URL, e.g. wss://ws.postman-echo.com/raw"
+              },
+              "timeout_ms": {
+                "type": "integer",
+                "minimum": 100,
+                "description": "Milliseconds to wait for the connection to open. Defaults to 10000."
+              }
+            },
+            "required": [
+              "url"
+            ]
+          }
+        },
+        "list": {
+          "description": "List all WebSocket connections with id, url, status, error, and message count. Does not include message bodies — use get for that."
+        },
+        "get": {
+          "description": "Get a connection's status and recent messages. Defaults to the selected connection. Use after connect or send to inspect traffic.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "connection_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Connection id from list/connect. Defaults to the selected connection."
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Max number of recent messages to return. Defaults to 50."
+              },
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "outgoing",
+                  "incoming"
+                ],
+                "description": "Filter messages by direction. Defaults to all (includes system events)."
+              }
+            }
+          }
+        },
+        "send": {
+          "description": "Send a text message on an open WebSocket connection. Call connect first. Updates the plugin UI and returns recent messages.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Text payload to send"
+              },
+              "connection_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Connection id. Defaults to the selected connection."
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        },
+        "disconnect": {
+          "description": "Close a WebSocket connection and wait until it settles. Defaults to the selected connection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "connection_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Connection id. Defaults to the selected connection."
+              }
+            }
+          }
+        },
+        "clear_messages": {
+          "description": "Clear the message history for a connection. Defaults to the selected connection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "connection_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Connection id. Defaults to the selected connection."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

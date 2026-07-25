@@ -14,6 +14,7 @@ import convertBin from 'licia/convertBin'
 import i18n from 'i18next'
 import BaseStore from 'share/store/Base'
 import { getByteSize, isValidWsUrl } from './lib/format'
+import { createMcpApi } from './mcp'
 import type {
   ConnectionStatus,
   DetailViewMode,
@@ -28,7 +29,7 @@ const STORAGE_LAST_URL = 'lastUrl'
 const MAX_MESSAGES = 2000
 const MAX_URL_HISTORY = 30
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
   url = ''
   connections: WsConnection[] = []
   selectedConnectionId: string | null = null
@@ -38,6 +39,7 @@ class Store extends BaseStore {
   composeText = ''
   detailViewMode: DetailViewMode = 'text'
   urlHistory: string[] = []
+  readonly mcp = createMcpApi(() => this)
 
   private sockets = new Map<string, WebSocket>()
 
@@ -210,9 +212,9 @@ class Store extends BaseStore {
     return { text: '', isBinary: true, size: bytes.length, bytes }
   }
 
-  connect(urlOverride?: string) {
+  connect(urlOverride?: string): string | null {
     const url = trim(urlOverride ?? this.url)
-    if (!isValidWsUrl(url)) return
+    if (!isValidWsUrl(url)) return null
 
     this.setUrl(url)
 
@@ -243,7 +245,7 @@ class Store extends BaseStore {
           i18n.t('connectError', { message: conn.error })
         )
       )
-      return
+      return id
     }
 
     this.sockets.set(id, ws)
@@ -300,6 +302,8 @@ class Store extends BaseStore {
         this.sockets.delete(id)
       })
     })
+
+    return id
   }
 
   disconnect(id?: string) {
@@ -349,20 +353,22 @@ class Store extends BaseStore {
     this.selectedMessageId = null
   }
 
-  clearMessages() {
-    const conn = this.selectedConnection
+  clearMessages(id?: string) {
+    const conn = id ? this.findConnection(id) : this.selectedConnection
     if (!conn) return
     conn.messages = []
-    this.selectedMessageId = null
+    if (this.selectedConnectionId === conn.id) {
+      this.selectedMessageId = null
+    }
   }
 
-  sendMessage(data?: string) {
+  sendMessage(data?: string): boolean {
     const text = trim(data ?? this.composeText)
     const conn = this.selectedConnection
-    if (!conn || conn.status !== 'open' || !text) return
+    if (!conn || conn.status !== 'open' || !text) return false
 
     const ws = this.sockets.get(conn.id)
-    if (!ws || ws.readyState !== WebSocket.OPEN) return
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false
 
     try {
       ws.send(text)
@@ -375,8 +381,10 @@ class Store extends BaseStore {
         isBinary: false,
       })
       if (data === undefined) this.composeText = ''
+      return true
     } catch (err) {
       this.appendSendError(conn.id, err)
+      return false
     }
   }
 
