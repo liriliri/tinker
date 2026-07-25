@@ -9,6 +9,7 @@ import { tw } from 'share/theme'
 import store from './store'
 import Toolbar from './components/Toolbar'
 import ArchivePane from './components/ArchivePane'
+import { ZIP_BASED_ACCEPT } from './lib/util'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -36,7 +37,7 @@ const App = observer(function App() {
                 <FileOpen
                   onOpenFile={(file) => store.openArchiveFromFile(file)}
                   openTitle={t('openTitle')}
-                  accept=".zip"
+                  accept={ZIP_BASED_ACCEPT}
                 />
               )}
             </div>

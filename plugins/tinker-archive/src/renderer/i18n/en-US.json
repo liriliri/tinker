@@ -1,7 +1,7 @@
 {
   "newArchive": "New Archive",
   "openArchive": "Open Archive",
-  "openTitle": "Drop ZIP here or click to open",
+  "openTitle": "Drop a ZIP-based file here or click to open",
   "goBack": "Back",
   "goForward": "Forward",
   "goUp": "Up",
@@ -30,7 +30,7 @@
   "errorOpenArchive": "Failed to open archive",
   "errorCreateArchive": "Failed to create archive",
   "errorGetFilePath": "Cannot get file path",
-  "errorUnsupportedFormat": "Only ZIP files are supported",
+  "errorUnsupportedFormat": "Unsupported format. Open ZIP-based files such as zip, apk, docx, jar, or epub.",
   "errorListDir": "Failed to list archive contents",
   "errorAddFiles": "Failed to add files",
   "errorCreateFolder": "Failed to create folder",

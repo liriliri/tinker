@@ -1,7 +1,7 @@
 {
   "newArchive": "新建压缩包",
   "openArchive": "打开压缩包",
-  "openTitle": "拖放 ZIP 到此处，或点击打开",
+  "openTitle": "拖放 ZIP 类文件到此处，或点击打开",
   "goBack": "后退",
   "goForward": "前进",
   "goUp": "上级",
@@ -30,7 +30,7 @@
   "errorOpenArchive": "打开压缩包失败",
   "errorCreateArchive": "创建压缩包失败",
   "errorGetFilePath": "无法获取文件路径",
-  "errorUnsupportedFormat": "目前仅支持 ZIP 格式",
+  "errorUnsupportedFormat": "不支持的格式。请打开 ZIP 类文件，如 zip、apk、docx、jar、epub 等。",
   "errorListDir": "读取压缩包内容失败",
   "errorAddFiles": "添加文件失败",
   "errorCreateFolder": "创建文件夹失败",

@@ -23,9 +23,12 @@ import type {
 import {
   buildPathBreadcrumbs,
   filterEntries,
+  isZipBasedArchive,
   joinZipPath,
   sortEntries,
+  ZIP_BASED_EXTENSIONS,
 } from './lib/util'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-archive')
 const STORAGE_VIEW_MODE = 'viewMode'
@@ -45,6 +48,7 @@ export class Store extends BaseStore {
   filterText = ''
   viewMode: ViewMode = 'list'
   pathInput = ''
+  readonly mcp = createMcpApi(() => this)
 
   constructor() {
     super()
@@ -223,7 +227,7 @@ export class Store extends BaseStore {
     }
   }
 
-  private async openArchivePath(filePath: string) {
+  async openArchivePath(filePath: string): Promise<boolean> {
     this.loading = true
     this.error = null
     try {
@@ -235,6 +239,7 @@ export class Store extends BaseStore {
         this.filterText = ''
       })
       await this.loadEntries('', true)
+      return true
     } catch {
       archive.close()
       runInAction(() => {
@@ -242,6 +247,7 @@ export class Store extends BaseStore {
         this.entries = []
       })
       this.showError('errorOpenArchive')
+      return false
     } finally {
       runInAction(() => {
         this.loading = false
@@ -251,7 +257,13 @@ export class Store extends BaseStore {
 
   async openArchive() {
     const result = await tinker.showOpenDialog({
-      filters: [{ name: 'ZIP', extensions: ['zip'] }],
+      filters: [
+        {
+          name: 'Archives',
+          extensions: [...ZIP_BASED_EXTENSIONS],
+        },
+        { name: 'All Files', extensions: ['*'] },
+      ],
       properties: ['openFile'],
     })
     if (result.canceled || isEmpty(result.filePaths)) return
@@ -264,36 +276,40 @@ export class Store extends BaseStore {
       this.showError('errorGetFilePath')
       return
     }
-    if (!endWith(lowerCase(filePath), '.zip')) {
+    if (!isZipBasedArchive(filePath)) {
       this.showError('errorUnsupportedFormat')
       return
     }
     await this.openArchivePath(filePath)
   }
 
-  async createArchive() {
-    const result = await tinker.showSaveDialog({
-      defaultPath: 'archive.zip',
-      filters: [{ name: 'ZIP', extensions: ['zip'] }],
-    })
-    if (result.canceled || !result.filePath) return
+  async createArchive(filePath?: string): Promise<boolean> {
+    let path = filePath
+    if (!path) {
+      const result = await tinker.showSaveDialog({
+        defaultPath: 'archive.zip',
+        filters: [{ name: 'ZIP', extensions: ['zip'] }],
+      })
+      if (result.canceled || !result.filePath) return false
+      path = result.filePath
+    }
 
-    let filePath = result.filePath
-    if (!endWith(lowerCase(filePath), '.zip')) {
-      filePath = `${filePath}.zip`
+    if (!endWith(lowerCase(path), '.zip')) {
+      path = `${path}.zip`
     }
 
     this.loading = true
     try {
-      archive.create(filePath)
+      archive.create(path)
       runInAction(() => {
-        this.archivePath = filePath
+        this.archivePath = path
         this.history = []
         this.historyIndex = -1
         this.filterText = ''
       })
       await this.loadEntries('', true)
       toast.success(i18n.t('createSuccess'))
+      return true
     } catch {
       archive.close()
       runInAction(() => {
@@ -301,6 +317,7 @@ export class Store extends BaseStore {
         this.entries = []
       })
       this.showError('errorCreateArchive')
+      return false
     } finally {
       runInAction(() => {
         this.loading = false
@@ -364,87 +381,124 @@ export class Store extends BaseStore {
     }
   }
 
-  async addFiles(filePaths?: string[]) {
-    if (!this.isOpen) return
+  async addFiles(filePaths?: string[], destDir?: string): Promise<boolean> {
+    if (!this.isOpen) return false
 
     let paths = filePaths
     if (!paths) {
       const result = await tinker.showOpenDialog({
         properties: ['openFile', 'openDirectory', 'multiSelections'],
       })
-      if (result.canceled || isEmpty(result.filePaths)) return
+      if (result.canceled || isEmpty(result.filePaths)) return false
       paths = result.filePaths
     }
 
     try {
-      archive.addFiles(paths, this.currentPath)
+      archive.addFiles(paths, destDir ?? this.currentPath)
       await this.refresh()
       toast.success(i18n.t('addSuccess'))
+      return true
     } catch {
       this.showError('errorAddFiles')
+      return false
     }
   }
 
-  async createFolder(name: string) {
-    if (!this.isOpen || isStrBlank(name)) return
+  async createFolder(name: string): Promise<boolean> {
+    if (!this.isOpen || isStrBlank(name)) return false
 
     const folderPath = joinZipPath(this.currentPath, trim(name))
+    return this.createFolderAt(folderPath)
+  }
+
+  async createFolderAt(folderPath: string): Promise<boolean> {
+    if (!this.isOpen || isStrBlank(folderPath)) return false
+
     const entryPath = endWith(folderPath, '/') ? folderPath : `${folderPath}/`
 
     try {
       if (archive.entryExists(entryPath)) {
         this.showError('errorFolderExists')
-        return
+        return false
       }
       archive.createFolder(entryPath)
       await this.refresh()
       toast.success(i18n.t('folderCreated'))
+      return true
     } catch {
       this.showError('errorCreateFolder')
+      return false
     }
   }
 
-  async extractSelection() {
-    if (!this.isOpen || isEmpty(this.selectedPaths)) return
+  async extractSelection(destDir?: string): Promise<boolean> {
+    if (!this.isOpen || isEmpty(this.selectedPaths)) return false
+    return this.extractEntries(this.selectedPaths.slice(), destDir)
+  }
 
-    const result = await tinker.showOpenDialog({
-      properties: ['openDirectory', 'createDirectory'],
-    })
-    if (result.canceled || isEmpty(result.filePaths)) return
+  async extractEntries(
+    entryPaths: string[],
+    destDir?: string
+  ): Promise<boolean> {
+    if (!this.isOpen || isEmpty(entryPaths)) return false
+
+    let dest = destDir
+    if (!dest) {
+      const result = await tinker.showOpenDialog({
+        properties: ['openDirectory', 'createDirectory'],
+      })
+      if (result.canceled || isEmpty(result.filePaths)) return false
+      dest = result.filePaths[0]
+    }
 
     try {
-      archive.extractEntries(this.selectedPaths.slice(), result.filePaths[0])
+      archive.extractEntries(entryPaths, dest)
       toast.success(i18n.t('extractSuccess'))
+      return true
     } catch {
       this.showError('errorExtract')
+      return false
     }
   }
 
-  async extractAll() {
-    if (!this.isOpen) return
+  async extractAll(destDir?: string): Promise<boolean> {
+    if (!this.isOpen) return false
 
-    const result = await tinker.showOpenDialog({
-      properties: ['openDirectory', 'createDirectory'],
-    })
-    if (result.canceled || isEmpty(result.filePaths)) return
+    let dest = destDir
+    if (!dest) {
+      const result = await tinker.showOpenDialog({
+        properties: ['openDirectory', 'createDirectory'],
+      })
+      if (result.canceled || isEmpty(result.filePaths)) return false
+      dest = result.filePaths[0]
+    }
 
     try {
-      archive.extractAll(result.filePaths[0])
+      archive.extractAll(dest)
       toast.success(i18n.t('extractSuccess'))
+      return true
     } catch {
       this.showError('errorExtract')
+      return false
     }
   }
 
-  async deleteSelection() {
-    if (!this.isOpen || isEmpty(this.selectedPaths)) return
+  async deleteSelection(): Promise<boolean> {
+    if (!this.isOpen || isEmpty(this.selectedPaths)) return false
+    return this.deleteEntries(this.selectedPaths.slice())
+  }
+
+  async deleteEntries(entryPaths: string[]): Promise<boolean> {
+    if (!this.isOpen || isEmpty(entryPaths)) return false
 
     try {
-      archive.deleteEntries(this.selectedPaths.slice())
+      archive.deleteEntries(entryPaths)
       await this.refresh()
       toast.success(i18n.t('deleteSuccess'))
+      return true
     } catch {
       this.showError('errorDelete')
+      return false
     }
   }
 }

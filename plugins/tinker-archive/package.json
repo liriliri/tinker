@@ -22,6 +22,139 @@
         "name": "压缩包",
         "description": "查看、解压和创建压缩包"
       }
+    },
+    "mcp": {
+      "tools": {
+        "open": {
+          "description": "Open a ZIP archive for viewing and editing. Call this before list/add/mkdir/delete/extract. Returns the archive path and root entries.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a .zip file"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "create": {
+          "description": "Create a new empty ZIP archive at the given path and open it. Same as creating an archive in the UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path for the new .zip file. A .zip extension is added if missing."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "list": {
+          "description": "List entries in the open archive. Optionally navigate to a directory inside the archive first. Call open or create first.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path inside the archive (use '' or omit for root / current directory). Directories should end with '/'."
+              }
+            }
+          }
+        },
+        "add": {
+          "description": "Add local files or folders into the open archive. Call open or create first. Changes are saved to the ZIP immediately.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Absolute local file or folder paths to add"
+              },
+              "dest": {
+                "type": "string",
+                "description": "Destination directory inside the archive. Defaults to the current directory."
+              }
+            },
+            "required": [
+              "paths"
+            ]
+          }
+        },
+        "mkdir": {
+          "description": "Create a folder inside the open archive. Call open or create first. Changes are saved immediately.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Folder path inside the archive (e.g. 'docs/' or 'a/b/'). A trailing slash is added if missing."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "delete": {
+          "description": "Delete files or folders from the open archive by their entry paths. Call open or create first. Folder paths should end with '/'. Changes are saved immediately.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Entry paths inside the archive to delete"
+              }
+            },
+            "required": [
+              "paths"
+            ]
+          }
+        },
+        "extract": {
+          "description": "Extract entries from the open archive to a local directory. Omit paths to extract the entire archive. Call open or create first.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "dest": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute local directory to extract into"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "description": "Entry paths inside the archive to extract. Omit to extract everything."
+              }
+            },
+            "required": [
+              "dest"
+            ]
+          }
+        }
+      }
     }
   }
 }

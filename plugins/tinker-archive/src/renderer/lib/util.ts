@@ -4,10 +4,47 @@ import contain from 'licia/contain'
 import filter from 'licia/filter'
 import trim from 'licia/trim'
 import lowerCase from 'licia/lowerCase'
+import last from 'licia/last'
 import compact from 'licia/compact'
 import each from 'licia/each'
+import map from 'licia/map'
 import type { PathBarItem } from 'share/components/PathBar'
 import type { IArchiveEntry, SortMethod, SortOrder } from '../../common/types'
+
+/** File extensions that use ZIP as the container format. */
+export const ZIP_BASED_EXTENSIONS = [
+  'zip',
+  'apk',
+  'aab',
+  'jar',
+  'war',
+  'ear',
+  'ipa',
+  'docx',
+  'xlsx',
+  'pptx',
+  'docm',
+  'xlsm',
+  'pptm',
+  'odt',
+  'ods',
+  'odp',
+  'epub',
+  'whl',
+  'nupkg',
+  'vsix',
+] as const
+
+export const ZIP_BASED_ACCEPT = map(
+  ZIP_BASED_EXTENSIONS,
+  (ext) => `.${ext}`
+).join(',')
+
+export function isZipBasedArchive(filePath: string): boolean {
+  const name = lowerCase(filePath)
+  const ext = last(name.split('.'))
+  return !!ext && contain(ZIP_BASED_EXTENSIONS as readonly string[], ext)
+}
 
 function isHiddenEntry(name: string): boolean {
   return startWith(name, '.')
