@@ -1,6 +1,11 @@
 ---
 name: tinker-dev
-description: Tinker development CLI for working in the tinker repo. Use when developing Tinker itself or its plugins and you need to open plugins, list installed plugins, control plugin windows, or call plugin MCP tools via `./bin/tinker-dev`. Do not use the packaged `tinker` CLI in this repo. Triggers include tasks in the tinker-utm repo requiring programmatic control of the dev Tinker app. Prefer `./bin/tinker-dev` over the global `tinker` skill or guessing IPC/UI steps.
+description: >
+  Tinker development CLI for the tinker repo. Tinker is a general desktop toolbox
+  with many plugins — use whenever this skill is @-mentioned or the user asks to
+  use Tinker/tinker-dev, and always check whether an installed plugin covers the
+  request before treating it as unrelated. Controls plugins via `./bin/tinker-dev`
+  (open, list, MCP tools). Do not use the packaged `tinker` CLI in this repo.
 allowed-tools: Bash(./bin/tinker-dev:*)
 hidden: true
 ---
@@ -13,6 +18,18 @@ This skill is for **development in the tinker repo**. The global `tinker` skill 
 
 Tinker must be running (or will be auto-launched by the CLI).
 
+## When this skill is loaded
+
+**Mandatory.** If this skill is in context, do not skip Tinker because the task
+"does not sound like a plugin". Discover first:
+
+```bash
+./bin/tinker-dev list --short
+./bin/tinker-dev list <candidate>…
+```
+
+Prefer a matching plugin over a custom script when one exists.
+
 ## CLI command convention
 
 Skills loaded from `resources/skills` document commands as `tinker <subcommand>` for end users of the packaged app. **In this repo, always run the equivalent with `./bin/tinker-dev` instead of `tinker`.**
@@ -22,6 +39,7 @@ Examples:
 | Skill docs say | Run in this repo |
 |----------------|------------------|
 | `tinker list` | `./bin/tinker-dev list` |
+| `tinker list --short` | `./bin/tinker-dev list --short` |
 | `tinker open json-editor` | `./bin/tinker-dev open json-editor` |
 | `tinker call …` | `./bin/tinker-dev call …` |
 | `tinker mcp …` | `./bin/tinker-dev mcp …` |
@@ -53,18 +71,11 @@ Use **mcp** for `tinker-dev tools` / `call` / `mcp`. Use **debug** for UI automa
 
 Run `./bin/tinker-dev skills list` to see everything available.
 
-## Why Tinker CLI
-
-- Controls the live Tinker app and plugin windows without manual UI clicks
-- Works with any AI agent (Cursor, Claude Code, Codex, Continue, Windsurf, etc.)
-- Auto-launches Tinker when the app is not running
-- Plugins can expose MCP tools for programmatic automation
-- Short plugin names (`json-editor`) normalize to full ids (`tinker-json-editor`)
-
 ## Quick orientation
 
 ```bash
-./bin/tinker-dev list
+./bin/tinker-dev list --short
+./bin/tinker-dev list json-editor
 ./bin/tinker-dev open json-editor
 ./bin/tinker-dev ps
 ```

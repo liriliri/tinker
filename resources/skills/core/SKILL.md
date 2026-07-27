@@ -1,14 +1,16 @@
 ---
 name: core
-description: Core Tinker CLI usage guide. Read this before running any tinker commands. Covers discovering installed plugins, opening and closing plugin windows, listing running plugins, launching and quitting the Tinker desktop app from the command line. Use when the user asks to open a Tinker plugin, list plugins, check what is running, restart or close a plugin, launch or quit Tinker.
+description: Core Tinker CLI usage guide. Read this before running any tinker commands. Covers discovering installed plugins, opening and closing plugin windows, listing running plugins, launching and quitting the Tinker desktop app from the command line. Use when this skill is loaded for any user goal that might map to a Tinker plugin, or when the user asks to open a Tinker plugin, list plugins, check what is running, restart or close a plugin, launch or quit Tinker.
 allowed-tools: Bash(tinker:*)
 ---
 
 # Tinker core
 
-Tinker is a desktop toolbox built on Electron. Each tool is a **plugin** (for example JSON Editor, RegExp tester). The `tinker` CLI talks to the running Tinker app over a local IPC socket, so agents can open plugins and inspect what is running without clicking the UI.
+Tinker is a desktop **toolbox**. Each tool is a **plugin** (JSON Editor, RegExp tester, hash, base64, file utilities, and many more — not only "Tinker development" tasks). The `tinker` CLI talks to the running Tinker app over a local IPC socket, so agents can open plugins and inspect what is running without clicking the UI.
 
 If Tinker is not running, the CLI **auto-launches** it and retries the command.
+
+**When this skill is in context**, treat the user's request as potentially solvable by an installed plugin. Check the catalog before saying Tinker cannot help or writing a one-off script.
 
 For calling plugin MCP tools or wiring plugins into MCP clients, load the **mcp** skill after the basics here.
 
