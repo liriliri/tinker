@@ -465,6 +465,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-video-downloader',
+    name: 'Video Downloader',
+    description: 'Download videos with yt-dlp',
+    icon: 'tinker-video-downloader.png',
+    locales: {
+      'zh-CN': {
+        name: '视频下载',
+        description: '使用 yt-dlp 下载视频（需自行安装 yt-dlp）',
+      },
+    },
+  },
+  {
     id: 'tinker-wallpaper',
     name: 'Wallpaper',
     description: 'Search, preview and set desktop wallpapers',
