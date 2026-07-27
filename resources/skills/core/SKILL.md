@@ -56,7 +56,7 @@ tinker list --short              # 1. All plugin ids only (compact)
 tinker list json-editor hash     # 2. Details for the candidate ids you care about
 ```
 
-`--short` prints one id per line. Pick likely candidates from those ids (name keywords), then request details with `tinker list <plugin>…` (multiple ids allowed; do not pass `--short` with ids). Detail lines look like:
+`--short` prints short plugin names (without the `tinker-` prefix) on a single space-separated line (avoids line-based truncation). Scoped ids that do not start with `tinker-` (e.g. `tencent-tinker-wxapkg`) are printed in full. Pick likely candidates from those names, then request details with `tinker list <plugin>…` (multiple ids allowed; do not pass `--short` with ids). Detail lines look like:
 
 ```
   tinker-json-editor [builtin] [mcp] - JSON editor with text and tree modes
@@ -126,7 +126,7 @@ tinker ps
 
 | Command | Description |
 |---------|-------------|
-| `tinker list --short` | List all plugin ids (preferred discovery step) |
+| `tinker list --short` | List short plugin names on one line (no `tinker-` prefix) |
 | `tinker list <plugin>…` | List details for one or more plugins |
 | `tinker list` | Full catalog with tags and descriptions (avoid for agents; may truncate) |
 | `tinker ps` | List running plugins with PIDs |

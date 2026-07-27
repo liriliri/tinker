@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import startWith from 'licia/startWith'
 import { normalizePluginId } from './util'
 
 type PluginListItem = {
@@ -45,9 +46,13 @@ function formatPluginListShort(data: unknown) {
     console.log('No plugins installed.')
     return
   }
-  for (const p of plugins) {
-    console.log(p.id)
-  }
+  console.log(
+    plugins
+      .map((p) =>
+        startWith(p.id, 'tinker-') ? p.id.slice('tinker-'.length) : p.id
+      )
+      .join(' ')
+  )
 }
 
 function filterPluginsByIds(
@@ -81,7 +86,7 @@ export function registerListCommand(
   program
     .command('list [plugins...]')
     .description('List installed plugins')
-    .option('--short', 'List all plugin ids only (not with specific ids)')
+    .option('--short', 'List all short plugin names on one line')
     .action((plugins: string[], opts: { short?: boolean }) => {
       if (opts.short && plugins.length > 0) {
         console.error('Error: --short cannot be used with specific plugin ids')
