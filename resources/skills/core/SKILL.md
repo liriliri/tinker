@@ -15,10 +15,11 @@ For calling plugin MCP tools or wiring plugins into MCP clients, load the **mcp*
 ## The core loop
 
 ```bash
-tinker list          # 1. See installed plugins
-tinker open <plugin> # 2. Open a plugin window
-tinker ps            # 3. Confirm it is running
-tinker close <plugin> # 4. Close when done
+tinker list --short              # 1. Discover: all plugin ids (skip if the user already named the plugin)
+tinker list <plugin>…            # 2. Details for candidates (tags + description)
+tinker open <plugin>             # 3. Open a plugin window
+tinker ps                        # 4. Confirm it is running
+tinker close <plugin>            # 5. Close when done
 ```
 
 Plugin names accept the short form (`json-editor`) or the full id (`tinker-json-editor`). The CLI normalizes to `tinker-<name>` automatically.
@@ -28,13 +29,14 @@ Scoped npm plugins (e.g. `@tencent/tinker-wxapkg`) appear in `tinker list` as id
 ## Quickstart
 
 ```bash
-tinker list
+tinker list --short
+tinker list json-editor
 tinker open json-editor
 tinker ps
 tinker close json-editor
 ```
 
-`list` output tags plugins as `[builtin]`, `[mcp]`, and `[background]` when applicable. `[background]` means **Run in Background** is enabled (required for `tinker open --headless`). Plugins marked `[mcp]` expose programmatic tools; see the **mcp** skill for `tools`, `call`, and `mcp` commands.
+`list` detail output tags plugins as `[builtin]`, `[mcp]`, and `[background]` when applicable. `[background]` means **Run in Background** is enabled (required for `tinker open --headless`). Plugins marked `[mcp]` expose programmatic tools; see the **mcp** skill for `tools`, `call`, and `mcp` commands.
 
 ## Prerequisites
 
@@ -43,19 +45,23 @@ tinker close json-editor
 
 ## Discovering plugins
 
+**Do not run bare `tinker list` for discovery.** The full catalog (ids + tags + descriptions) is long and agent tool output is often truncated, so matching plugins get lost.
+
+When you need to find a plugin, use this two-step flow (skip if the user already gave a clear plugin name/id):
+
 ```bash
-tinker list
+tinker list --short              # 1. All plugin ids only (compact)
+tinker list json-editor hash     # 2. Details for the candidate ids you care about
 ```
 
-Example output:
+`--short` prints one id per line. Pick likely candidates from those ids (name keywords), then request details with `tinker list <plugin>…` (multiple ids allowed; do not pass `--short` with ids). Detail lines look like:
 
 ```
   tinker-json-editor [builtin] [mcp] - JSON editor with text and tree modes
-  tinker-regexp [builtin] [mcp] - Regular expression tester
   tinker-hash [builtin] - Hash calculator
 ```
 
-Use the **id** column (`tinker-json-editor`) or the short name without the prefix (`json-editor`) in other commands.
+Use the **id** (`tinker-json-editor`) or short name (`json-editor`) in other commands.
 
 ## Plugin lifecycle
 
@@ -101,7 +107,8 @@ tinker ps
 ### Open a plugin for the user
 
 ```bash
-tinker list
+tinker list --short
+tinker list <plugin>
 tinker open <plugin>
 tinker ps
 ```
@@ -117,7 +124,9 @@ tinker ps
 
 | Command | Description |
 |---------|-------------|
-| `tinker list` | List installed plugins |
+| `tinker list --short` | List all plugin ids (preferred discovery step) |
+| `tinker list <plugin>…` | List details for one or more plugins |
+| `tinker list` | Full catalog with tags and descriptions (avoid for agents; may truncate) |
 | `tinker ps` | List running plugins with PIDs |
 | `tinker open <plugin>` | Open a plugin window |
 | `tinker open <plugin> --headless` | Open a plugin in the background (no window) |
@@ -140,7 +149,7 @@ tinker ps
 
 **`Failed to connect to Tinker`** — Tinker is not running and auto-launch may have failed. Start with `tinker launch`, then retry.
 
-**`Plugin not found: tinker-...`** — Run `tinker list` and use a valid id or short name. External plugins are installed globally with the `tinker-` npm prefix.
+**`Plugin not found: tinker-...`** — Run `tinker list --short`, then `tinker list <plugin>` for a valid id or short name. External plugins are installed globally with the `tinker-` npm prefix.
 
 **`Plugin is not running: tinker-...`** — Run `tinker open <plugin>` before `close`.
 
@@ -151,5 +160,5 @@ tinker ps
 ## Working safely
 
 - CLI commands affect the user's live Tinker session and open plugin windows on their desktop.
-- Confirm the target plugin with `tinker list` before opening or restarting.
+- Confirm the target plugin with `tinker list --short` then `tinker list <plugin>` before opening or restarting.
 - For programmatic plugin manipulation, load the **mcp** skill and follow its safety notes.

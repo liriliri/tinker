@@ -1,4 +1,4 @@
-.claude/
+.vscode/
 node_modules/
 dist/
 release/

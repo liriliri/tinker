@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Call Tinker plugin MCP tools from the CLI or wire plugins into MCP clients. Covers listing tool schemas, one-shot tool invocation with tinker call, and stdio MCP servers with tinker mcp. When a plugin has no MCP tools, fall back to the debug skill (tinker open + agent-browser UI automation). Use when the user asks to call a plugin tool, automate a plugin programmatically, integrate a Tinker plugin with Cursor or Claude Code via MCP, use tinker tools, tinker call, or tinker mcp, or work with plugins marked [mcp] in tinker list.
+description: Call Tinker plugin MCP tools from the CLI or wire plugins into MCP clients. Covers listing tool schemas, one-shot tool invocation with tinker call, and stdio MCP servers with tinker mcp. When a plugin has no MCP tools, fall back to the debug skill (tinker open + agent-browser UI automation). Use when the user asks to call a plugin tool, automate a plugin programmatically, integrate a Tinker plugin with Cursor or Claude Code via MCP, use tinker tools, tinker call, or tinker mcp, or work with plugins tagged [mcp].
 allowed-tools: Bash(tinker:*)
 ---
 
@@ -8,14 +8,15 @@ allowed-tools: Bash(tinker:*)
 
 Tinker plugins can expose [Model Context Protocol](https://modelcontextprotocol.io) tools in their `package.json` under `tinker.mcp.tools`. The CLI bridges agents to those tools in two ways: **direct calls** (`tinker call`) and **stdio MCP servers** (`tinker mcp`).
 
-Plugins with MCP support are tagged `[mcp]` in `tinker list`. The plugin **must be running** before any tool call. Open it first with `tinker open <plugin>`.
+Plugins with MCP support are tagged `[mcp]` in `tinker list <plugin>` detail output. The plugin **must be running** before any tool call. Open it first with `tinker open <plugin>`.
 
 Plugins **without** `[mcp]` have no `tinker tools` / `tinker call` API. To automate them anyway, load the **debug** skill and drive the plugin UI with `agent-browser` after `tinker open` (see [When MCP is not available](#when-mcp-is-not-available)).
 
 ## The MCP loop
 
 ```bash
-tinker list                              # find plugins tagged [mcp]
+tinker list --short                      # get all ids
+tinker list <plugin>…                    # confirm [mcp] on candidates
 tinker open <plugin>                     # start the plugin window
 tinker tools <plugin>                    # inspect tool names and input schemas
 tinker call <plugin> --tool <name> [--args '<json-object>']
@@ -28,7 +29,8 @@ Plugin names accept the short form (`json-editor`) or the full id (`tinker-json-
 ## Quickstart
 
 ```bash
-tinker list
+tinker list --short
+tinker list json-editor
 tinker open json-editor
 tinker tools json-editor
 
@@ -106,7 +108,8 @@ If Tinker is not running, start it first (the CLI auto-launches on other command
 ### Automate a plugin end to end
 
 ```bash
-tinker list
+tinker list --short
+tinker list json-editor
 tinker open json-editor
 tinker tools json-editor
 tinker call json-editor --tool set --args '{"content":"{\"a\":1}"}'
@@ -117,7 +120,7 @@ tinker close json-editor
 
 ### Wire a plugin into an MCP client
 
-1. Run `tinker list` and pick a plugin tagged `[mcp]`.
+1. Run `tinker list --short`, then `tinker list <plugin>` and pick a plugin tagged `[mcp]`.
 2. Add an MCP server entry: command `tinker`, args `["mcp", "<plugin>"]` (short name is fine).
 3. Before using tools from the client, open the plugin: `tinker open <plugin>`.
 4. Keep Tinker running while the MCP session is active.
@@ -132,7 +135,7 @@ tinker call <plugin> --tool <name> --args '{}'
 
 ## When MCP is not available
 
-Not every plugin defines `tinker.mcp.tools`. If `tinker list` shows no `[mcp]` tag, or `tinker tools <plugin>` / `tinker call` returns **does not support MCP**, MCP commands cannot automate that plugin. Use the **debug** skill instead:
+Not every plugin defines `tinker.mcp.tools`. If `tinker list <plugin>` shows no `[mcp]` tag, or `tinker tools <plugin>` / `tinker call` returns **does not support MCP**, MCP commands cannot automate that plugin. Use the **debug** skill instead:
 
 ```bash
 tinker skills path debug    # load full debug skill, then read SKILL.md
@@ -152,7 +155,7 @@ agent-browser snapshot -i
 
 | Situation | Approach |
 |-----------|----------|
-| Plugin tagged `[mcp]` in `tinker list` | MCP: `tinker tools`, `tinker call`, or `tinker mcp` |
+| Plugin tagged `[mcp]` in `tinker list <plugin>` | MCP: `tinker tools`, `tinker call`, or `tinker mcp` |
 | No `[mcp]` tag or "does not support MCP" | Debug: `tinker open --inspect` + `agent-browser connect <ws-url>` |
 | Need stable, schema-defined automation | Add MCP tools to the plugin, or use an `[mcp]` plugin |
 | One-off interaction with any running plugin UI | Debug skill |
@@ -171,7 +174,8 @@ Supporting lifecycle commands (from the core skill):
 
 | Command | Description |
 |---------|-------------|
-| `tinker list` | Find plugins tagged `[mcp]` |
+| `tinker list --short` | Get all plugin ids |
+| `tinker list <plugin>…` | Confirm `[mcp]` and details for candidates |
 | `tinker open <plugin>` | Start plugin (required before tool calls) |
 | `tinker ps` | Verify plugin is running |
 | `tinker restart <plugin>` | Reset a stuck plugin |
@@ -180,7 +184,7 @@ Supporting lifecycle commands (from the core skill):
 
 **`Plugin is not running. Please start it first: tinker open <name>`** — Run `tinker open <plugin>` before `call` or before the MCP client invokes tools.
 
-**`<name> does not support MCP`** — The plugin has no `tinker.mcp` tools. Either pick a `[mcp]` plugin from `tinker list`, or load the **debug** skill and automate via `tinker open` + `agent-browser` (see [When MCP is not available](#when-mcp-is-not-available)).
+**`<name> does not support MCP`** — The plugin has no `tinker.mcp` tools. Either pick a `[mcp]` plugin via `tinker list --short` / `tinker list <plugin>`, or load the **debug** skill and automate via `tinker open` + `agent-browser` (see [When MCP is not available](#when-mcp-is-not-available)).
 
 **`Unknown tool "..."`** — Run `tinker tools <plugin>` for valid tool names.
 
@@ -195,4 +199,4 @@ Supporting lifecycle commands (from the core skill):
 - MCP tools run inside the user's Tinker session with their data and permissions.
 - Do not pass secrets on the command line if shell history matters.
 - Read `tinker tools <plugin>` before calling unfamiliar tools; some operations replace or mutate user data immediately.
-- Confirm the target plugin with `tinker list` before destructive calls.
+- Confirm the target plugin with `tinker list --short` then `tinker list <plugin>` before destructive calls.

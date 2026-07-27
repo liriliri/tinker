@@ -1,3 +1,4 @@
+import { Command } from 'commander'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
@@ -6,7 +7,14 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import Ajv, { type ErrorObject, type ValidateFunction } from 'ajv'
 import { sendCommand } from './ipc'
+import { normalizePluginId } from './util'
 import type { IPlugin, IMcpToolDefinition } from 'common/types'
+
+type ExecuteCommand = (
+  command: string,
+  data?: Record<string, unknown>,
+  options?: { format?: (data: unknown) => void }
+) => void
 
 const ajv = new Ajv({ allErrors: true })
 const validatorCache = new Map<string, ValidateFunction>()
@@ -138,4 +146,78 @@ export async function startMcpServer(id: string): Promise<void> {
 
   const transport = new StdioServerTransport()
   await server.connect(transport)
+}
+
+function formatPluginTools(data: unknown) {
+  const plugin = data as IPlugin
+  if (!plugin.mcp) {
+    throw new Error(`${plugin.name} does not support MCP.`)
+  }
+  console.log(JSON.stringify(plugin.mcp.tools, null, 2))
+}
+
+function formatToolCallResult(data: unknown) {
+  if (typeof data === 'string') {
+    console.log(data)
+    return
+  }
+  console.log(JSON.stringify(data, null, 2))
+}
+
+export function registerMcpCommands(
+  program: Command,
+  executeCommand: ExecuteCommand
+) {
+  program
+    .command('tools <plugin>')
+    .description('List MCP tools for a plugin')
+    .action((pluginName: string) => {
+      executeCommand(
+        'getPlugin',
+        { id: normalizePluginId(pluginName) },
+        {
+          format: formatPluginTools,
+        }
+      )
+    })
+
+  program
+    .command('call <plugin>')
+    .description('Call an MCP tool on a running plugin')
+    .requiredOption('--tool <name>', 'Tool name to call')
+    .option('--args <json>', 'Tool arguments as JSON', '{}')
+    .action((pluginName: string, opts: { tool: string; args: string }) => {
+      let args: Record<string, unknown>
+      try {
+        args = JSON.parse(opts.args)
+      } catch {
+        console.error('Error: Invalid JSON for --args')
+        process.exit(1)
+      }
+      if (args === null || typeof args !== 'object' || Array.isArray(args)) {
+        console.error('Error: --args must be a JSON object')
+        process.exit(1)
+      }
+      executeCommand(
+        'callMcpTool',
+        {
+          id: normalizePluginId(pluginName),
+          name: opts.tool,
+          args,
+        },
+        { format: formatToolCallResult }
+      )
+    })
+
+  program
+    .command('mcp <plugin>')
+    .description('Start an MCP server for a plugin (stdio transport)')
+    .action(async (pluginName: string) => {
+      try {
+        await startMcpServer(normalizePluginId(pluginName))
+      } catch (err: any) {
+        console.error(`Error: ${err.message || 'Failed to start MCP server'}`)
+        process.exit(1)
+      }
+    })
 }
