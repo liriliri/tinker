@@ -381,6 +381,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-svg-editor',
+    name: 'SVG Editor',
+    description: 'Draw and edit SVG vector graphics, with PNG export',
+    icon: 'tinker-svg-editor.png',
+    locales: {
+      'zh-CN': {
+        name: 'SVG 编辑',
+        description: '绘制与编辑 SVG 矢量图，支持导出 PNG',
+      },
+    },
+  },
+  {
     id: 'tinker-token-usage',
     name: 'Token Usage',
     description: 'Track token usage statistics for AI coding tools',

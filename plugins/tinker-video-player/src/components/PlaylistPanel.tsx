@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Play, X, Film } from 'lucide-react'
 import { mediaDurationFormat } from 'share/lib/util'
 import { confirm } from 'share/components/Confirm'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import store from '../store'
 
 export default observer(function PlaylistPanel() {
@@ -77,7 +78,7 @@ export default observer(function PlaylistPanel() {
           e.stopPropagation()
         }}
       >
-        <div className="flex-1 overflow-y-auto">
+        <OverlayScrollbars defer className="min-h-0 flex-1">
           {store.playHistory.length === 0 ? (
             <div className="flex items-center justify-center h-full text-white/40 text-sm">
               {t('noHistory')}
@@ -138,7 +139,7 @@ export default observer(function PlaylistPanel() {
               )
             })
           )}
-        </div>
+        </OverlayScrollbars>
       </div>
     </>
   )

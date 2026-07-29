@@ -25,8 +25,10 @@ const App = observer(function App() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const file = e.dataTransfer.files[0]
-    if (file?.path) {
-      store.setVideo(file.path)
+    if (!file) return
+    const filePath = tinker.getPathForFile(file)
+    if (filePath) {
+      store.setVideo(filePath)
     }
   }
 
