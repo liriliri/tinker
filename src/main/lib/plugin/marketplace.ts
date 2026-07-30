@@ -344,6 +344,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-office',
+    name: 'Office',
+    description: 'Open and edit Word, Excel, and PowerPoint documents',
+    icon: 'tinker-office.png',
+    locales: {
+      'zh-CN': {
+        name: 'Office',
+        description: '打开并编辑 Word、Excel、PowerPoint 文档',
+      },
+    },
+  },
+  {
     id: 'tinker-sudoku',
     name: 'Sudoku',
     description: 'Fill the grid so every row, column, and box contains 1–9.',
