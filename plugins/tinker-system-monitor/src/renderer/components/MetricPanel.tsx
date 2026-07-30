@@ -62,7 +62,7 @@ const MetricPanel = observer(function MetricPanel({ id }: MetricPanelProps) {
     <div
       ref={cardRef}
       style={{ height: layout.height }}
-      className={`${tw.bg.tertiary} ${tw.border} border rounded-lg shadow-sm flex overflow-hidden min-w-0`}
+      className={`${tw.bg.tertiary} ${tw.border} border rounded-md shadow-sm flex overflow-hidden min-w-0`}
     >
       {showRing && (
         <div

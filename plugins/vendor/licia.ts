@@ -18,6 +18,7 @@ import dataUrl from 'licia/dataUrl'
 import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
 import decodeUriComponent from 'licia/decodeUriComponent'
+import defaults from 'licia/defaults'
 import download from 'licia/download'
 import durationFormat from 'licia/durationFormat'
 import each from 'licia/each'
@@ -129,6 +130,7 @@ const licia = {
   dateFormat,
   debounce,
   decodeUriComponent,
+  defaults,
   download,
   durationFormat,
   each,
@@ -244,6 +246,7 @@ export {
   dateFormat,
   debounce,
   decodeUriComponent,
+  defaults,
   download,
   durationFormat,
   each,

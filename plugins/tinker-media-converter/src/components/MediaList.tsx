@@ -77,7 +77,7 @@ const ImageCard = observer(({ item }: MediaItemProps) => {
   return (
     <div
       className={className(
-        `${tw.bg.tertiary} rounded-lg border ${tw.border} overflow-hidden relative flex flex-col ${tw.primary.hoverBorder} transition-all duration-100 select-none`,
+        `${tw.bg.tertiary} rounded-md border ${tw.border} overflow-hidden relative flex flex-col ${tw.primary.hoverBorder} transition-all duration-100 select-none`,
         { [`${tw.primary.border}`]: item.isConverting }
       )}
       style={IMAGE_CARD_STYLE}

@@ -26,7 +26,7 @@ export default observer(function ColorSchemes() {
           {variants.map((variant) => (
             <button
               key={variant.lightness}
-              className={`aspect-square rounded-lg shadow-sm hover:scale-110 transition-transform cursor-pointer border-2 border-transparent ${tw.primary.hoverBorder} flex flex-col items-center justify-center relative group`}
+              className={`aspect-square rounded-md shadow-sm hover:scale-110 transition-transform cursor-pointer border-2 border-transparent ${tw.primary.hoverBorder} flex flex-col items-center justify-center relative group`}
               style={{ backgroundColor: variant.color }}
               onClick={() =>
                 store.copyToClipboardWithToast(toCssHex(variant.color))

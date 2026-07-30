@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import contain from 'licia/contain'
 import isMac from 'licia/isMac'
+import startWith from 'licia/startWith'
 import { tw } from 'share/theme'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -71,6 +73,7 @@ interface ShortcutInputProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  className?: string
 }
 
 function getModifierName(code: string): string {
@@ -96,6 +99,7 @@ export default function ShortcutInput({
   value,
   onChange,
   placeholder,
+  className = '',
 }: ShortcutInputProps) {
   const { t } = useTranslation()
   const [isRecording, setIsRecording] = useState(false)
@@ -136,7 +140,7 @@ export default function ShortcutInput({
       e.preventDefault()
       e.stopPropagation()
 
-      const isModifierKey = MODIFIER_CODES.includes(e.code)
+      const isModifierKey = contain(MODIFIER_CODES, e.code)
 
       const keys: string[] = []
       if (e.metaKey) keys.push('Command')
@@ -150,9 +154,9 @@ export default function ShortcutInput({
         lastModifierTapRef.current = null
 
         let mainKey = ''
-        if (e.code.startsWith('Key')) {
+        if (startWith(e.code, 'Key')) {
           mainKey = e.code.replace('Key', '')
-        } else if (e.code.startsWith('Digit')) {
+        } else if (startWith(e.code, 'Digit')) {
           mainKey = e.code.replace('Digit', '')
         } else if (/^F([1-9]|1[0-2])$/.test(e.code)) {
           mainKey = e.code
@@ -180,7 +184,7 @@ export default function ShortcutInput({
       e.preventDefault()
       e.stopPropagation()
 
-      const isModifierKey = MODIFIER_CODES.includes(e.code)
+      const isModifierKey = contain(MODIFIER_CODES, e.code)
 
       if (isModifierKey && !mainKeyPressedRef.current) {
         // Only modifier key released, no main key pressed
@@ -284,11 +288,11 @@ export default function ShortcutInput({
   return (
     <div
       data-shortcut-input
-      className={`w-full px-2 py-1 border text-xs text-center cursor-pointer select-none transition-all rounded ${
+      className={`w-full px-2 border text-xs text-center cursor-pointer select-none transition-all rounded flex items-center justify-center ${
         isRecording
           ? `${tw.primary.border} ${tw.primary.bgFocused} ${tw.primary.text} animate-pulse`
           : `${tw.bg.input} ${tw.text.primary} ${tw.gray.border600} ${tw.hover}`
-      }`}
+      } ${className}`}
       onClick={() => setIsRecording(true)}
     >
       {displayText}

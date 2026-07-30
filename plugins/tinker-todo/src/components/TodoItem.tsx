@@ -93,7 +93,7 @@ export default observer(function TodoItem({ todo }: TodoItemProps) {
   return (
     <div
       className={className(
-        'group border rounded-lg p-2 transition-all duration-200 hover:shadow-sm',
+        'group border rounded-md p-2 transition-all duration-200 hover:shadow-sm',
         tw.bg.tertiary,
         tw.border,
         todo.completed && 'opacity-60'

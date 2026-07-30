@@ -1,16 +1,24 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, Plus, Trash2, GripVertical } from 'lucide-react'
+import filter from 'licia/filter'
+import isEmpty from 'licia/isEmpty'
+import isStrBlank from 'licia/isStrBlank'
+import map from 'licia/map'
+import trim from 'licia/trim'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
-import type { AiProvider, AiModel } from '../types'
+import type { AiProvider } from '../types'
 
-interface Props {
+interface ProviderFieldsProps {
   value: AiProvider
   onChange: (patch: Partial<AiProvider>) => void
 }
 
-export default function ProviderFields({ value, onChange }: Props) {
+export default function ProviderFields({
+  value,
+  onChange,
+}: ProviderFieldsProps) {
   const { t } = useTranslation()
   const [showApiKey, setShowApiKey] = useState(false)
   const [newModelId, setNewModelId] = useState('')
@@ -20,21 +28,20 @@ export default function ProviderFields({ value, onChange }: Props) {
   const isClaude = value.apiType === 'claude'
 
   const handleModelIdChange = (index: number, name: string) => {
-    const models = value.models.map((m, i) =>
-      i === index ? { ...m, name } : m
-    )
-    onChange({ models })
+    onChange({
+      models: map(value.models, (m, i) => (i === index ? { ...m, name } : m)),
+    })
   }
 
   const handleAddModel = () => {
-    const name = newModelId.trim()
-    if (!name) return
+    const name = trim(newModelId)
+    if (isStrBlank(name)) return
     onChange({ models: [...value.models, { name }] })
     setNewModelId('')
   }
 
   const handleDeleteModel = (index: number) => {
-    onChange({ models: value.models.filter((_, i) => i !== index) })
+    onChange({ models: filter(value.models, (_, i) => i !== index) })
   }
 
   const handleDragStart = (index: number) => {
@@ -129,9 +136,9 @@ export default function ProviderFields({ value, onChange }: Props) {
             {t('addModel')}
           </button>
         </div>
-        {value.models.length > 0 && (
+        {!isEmpty(value.models) && (
           <div className={`rounded border ${tw.border} divide-y ${tw.divide}`}>
-            {value.models.map((model: AiModel, index: number) => (
+            {value.models.map((model, index) => (
               <div
                 key={index}
                 onDragOver={(e) => handleDragOver(e, index)}

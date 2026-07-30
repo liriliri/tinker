@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next'
 import Select from 'share/components/Select'
 import TextInput from 'share/components/TextInput'
 import store from '../store'
-import Section, { SettingItem } from './Section'
+import Section, {
+  SettingItem,
+  SETTING_INPUT_CLASS,
+  commitOnEnterOrBlur,
+} from './Section'
 
 export default observer(function NetworkSection() {
   const { t } = useTranslation()
@@ -32,14 +36,10 @@ export default observer(function NetworkSection() {
         <TextInput
           value={store.proxyHost}
           onChange={(e) => (store.proxyHost = e.target.value)}
-          onBlur={() => store.setProxyHost(store.proxyHost)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              store.setProxyHost(store.proxyHost)
-            }
-          }}
+          {...commitOnEnterOrBlur(() => store.setProxyHost(store.proxyHost))}
           placeholder="http://127.0.0.1:7890"
           disabled={store.proxyMode !== 'fixed_servers'}
+          className={SETTING_INPUT_CLASS}
         />
       </SettingItem>
     </Section>

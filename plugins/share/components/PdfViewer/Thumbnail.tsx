@@ -147,7 +147,7 @@ export default function Thumbnail({
     >
       <div
         className={className(
-          `relative ${tw.bg.primary} overflow-hidden rounded-lg transition-shadow`
+          `relative ${tw.bg.primary} overflow-hidden rounded-md transition-shadow`
         )}
         style={{
           width: dimensions.width,

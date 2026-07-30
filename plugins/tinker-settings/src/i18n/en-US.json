@@ -26,6 +26,7 @@
 
   "plugin": "Plugin",
   "showMarketplace": "Show Uninstalled Plugins",
+  "npm": "NPM",
   "registry": "Registry",
 
   "network": "Network",

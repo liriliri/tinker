@@ -61,7 +61,7 @@ export default observer(function ImageList() {
           return (
             <div
               key={image.id}
-              className={`${tw.bg.tertiary} rounded-lg border ${tw.border} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
+              className={`${tw.bg.tertiary} rounded-md border ${tw.border} overflow-hidden relative group flex flex-col ${tw.primary.hoverBorder} transition-all duration-100`}
               style={{ aspectRatio: '1 / 1' }}
               onContextMenu={(e) => handleContextMenu(e, image.id)}
             >

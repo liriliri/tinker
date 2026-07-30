@@ -17,7 +17,7 @@ export default observer(function ComponentsTab() {
   return (
     <div className="space-y-4">
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('checkboxDemo')}
@@ -39,7 +39,7 @@ export default observer(function ComponentsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('selectDemo')}
@@ -62,7 +62,7 @@ export default observer(function ComponentsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('sliderDemo')}
@@ -88,7 +88,7 @@ export default observer(function ComponentsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('textInputDemo')}
@@ -108,7 +108,7 @@ export default observer(function ComponentsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('loadingDemo')}
@@ -131,7 +131,7 @@ export default observer(function ComponentsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('colorDemo')}

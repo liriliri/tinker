@@ -74,7 +74,7 @@ function SidebarListItem({
   return (
     <div
       className={className(
-        'flex items-stretch gap-2 rounded-lg border px-2.5 py-2 cursor-pointer transition-all',
+        'flex items-stretch gap-2 rounded-md border px-2.5 py-2 cursor-pointer transition-all',
         tw.border,
         tw.bg.primary,
         isSelected

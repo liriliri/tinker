@@ -96,7 +96,7 @@ const Sidebar = observer(() => {
             {eventsForSelectedDate.map((event) => (
               <div
                 key={event.id}
-                className={`border rounded-lg p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.tertiary} ${tw.border}`}
+                className={`border rounded-md p-2 transition-all duration-200 hover:shadow-sm ${tw.bg.tertiary} ${tw.border}`}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="flex-1 min-w-0">

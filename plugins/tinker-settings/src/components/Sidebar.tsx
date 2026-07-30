@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Settings, Cpu, Package } from 'lucide-react'
 import NavList, { type NavListItem } from 'share/components/NavList'
@@ -9,26 +10,29 @@ import type { Section } from '../types'
 export default observer(function Sidebar() {
   const { t } = useTranslation()
 
-  const items: NavListItem[] = [
-    {
-      id: 'general',
-      icon: Settings,
-      iconClassName: tw.primary.text,
-      label: t('general'),
-    },
-    {
-      id: 'plugin',
-      icon: Package,
-      iconClassName: tw.primary.text,
-      label: t('plugin'),
-    },
-    {
-      id: 'ai',
-      icon: Cpu,
-      iconClassName: tw.primary.text,
-      label: t('aiModels'),
-    },
-  ]
+  const items: NavListItem[] = useMemo(
+    () => [
+      {
+        id: 'general',
+        icon: Settings,
+        iconClassName: tw.primary.text,
+        label: t('general'),
+      },
+      {
+        id: 'plugin',
+        icon: Package,
+        iconClassName: tw.primary.text,
+        label: t('plugin'),
+      },
+      {
+        id: 'ai',
+        icon: Cpu,
+        iconClassName: tw.primary.text,
+        label: t('aiModels'),
+      },
+    ],
+    [t]
+  )
 
   return (
     <div

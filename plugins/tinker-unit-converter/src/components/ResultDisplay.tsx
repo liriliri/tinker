@@ -24,7 +24,7 @@ export default observer(function ResultDisplay() {
         return (
           <div
             key={item.key}
-            className={`p-4 rounded-lg cursor-pointer transition-colors ${
+            className={`p-4 rounded-md cursor-pointer transition-colors ${
               isSourceUnit
                 ? `${tw.primary.bg} text-white`
                 : `${tw.bg.secondary} hover:opacity-80`

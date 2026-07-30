@@ -26,6 +26,7 @@
 
   "plugin": "插件",
   "showMarketplace": "显示未安装插件",
+  "npm": "NPM",
   "registry": "镜像源",
 
   "network": "网络",

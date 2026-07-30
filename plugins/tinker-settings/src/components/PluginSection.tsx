@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next'
 import TextInput from 'share/components/TextInput'
 import Checkbox from 'share/components/Checkbox'
 import store from '../store'
-import Section, { SettingItem } from './Section'
+import Section, {
+  SettingItem,
+  SETTING_INPUT_CLASS,
+  commitOnEnterOrBlur,
+} from './Section'
 
 export default observer(function PluginSection() {
   const { t } = useTranslation()
@@ -18,18 +22,16 @@ export default observer(function PluginSection() {
           />
         </SettingItem>
       </Section>
-      <Section title="NPM">
+      <Section title={t('npm')}>
         <SettingItem label={t('registry')}>
           <TextInput
             value={store.npmRegistry}
             onChange={(e) => (store.npmRegistry = e.target.value)}
-            onBlur={() => store.setNpmRegistry(store.npmRegistry)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                store.setNpmRegistry(store.npmRegistry)
-              }
-            }}
+            {...commitOnEnterOrBlur(() =>
+              store.setNpmRegistry(store.npmRegistry)
+            )}
             placeholder="https://registry.npmmirror.com"
+            className={SETTING_INPUT_CLASS}
           />
         </SettingItem>
       </Section>

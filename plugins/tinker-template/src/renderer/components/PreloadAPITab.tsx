@@ -15,7 +15,7 @@ export default observer(function PreloadAPITab() {
   return (
     <div className="space-y-4">
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           execCommand
@@ -65,7 +65,7 @@ export default observer(function PreloadAPITab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           getSystemInfo

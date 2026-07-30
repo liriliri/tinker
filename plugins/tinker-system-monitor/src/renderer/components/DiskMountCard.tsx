@@ -28,7 +28,7 @@ const DiskMountCard = observer(function DiskMountCard({
     <div
       ref={cardRef}
       style={{ height: layout.height }}
-      className={`${tw.bg.tertiary} ${tw.border} border rounded-lg shadow-sm flex items-center justify-center min-w-0 px-1`}
+      className={`${tw.bg.tertiary} ${tw.border} border rounded-md shadow-sm flex items-center justify-center min-w-0 px-1`}
     >
       <StatsRing
         label={disk.mount}

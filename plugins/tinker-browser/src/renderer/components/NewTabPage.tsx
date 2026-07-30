@@ -32,7 +32,7 @@ const SiteCard = observer(function SiteCard({ site }: SiteCardProps) {
 
   return (
     <button
-      className={`flex flex-col items-center gap-2 w-20 p-2 rounded-lg ${tw.hover} transition-colors`}
+      className={`flex flex-col items-center gap-2 w-20 p-2 rounded-md ${tw.hover} transition-colors`}
       onClick={() => store.navigate(site.url)}
       onContextMenu={handleContextMenu}
     >
@@ -61,7 +61,7 @@ function AddButton() {
 
   return (
     <button
-      className={`flex flex-col items-center gap-2 w-20 p-2 rounded-lg ${tw.hover} transition-colors`}
+      className={`flex flex-col items-center gap-2 w-20 p-2 rounded-md ${tw.hover} transition-colors`}
       onClick={() => store.openSiteDialog()}
     >
       <div

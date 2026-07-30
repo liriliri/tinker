@@ -1,6 +1,10 @@
 import { useState, useMemo } from 'react'
+import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import find from 'licia/find'
+import isStrBlank from 'licia/isStrBlank'
+import trim from 'licia/trim'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
 import Dialog, { DialogButton } from 'share/components/Dialog'
@@ -9,12 +13,15 @@ import store from '../store'
 import type { ApiType } from '../types'
 import { API_TYPE_DEFAULTS } from '../lib/aiProvider'
 
-interface Props {
+interface AddProviderDialogProps {
   open: boolean
   onClose: () => void
 }
 
-export default function AddProviderDialog({ open, onClose }: Props) {
+export default observer(function AddProviderDialog({
+  open,
+  onClose,
+}: AddProviderDialogProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [apiType, setApiType] = useState<ApiType>('openai')
@@ -34,12 +41,12 @@ export default function AddProviderDialog({ open, onClose }: Props) {
   }
 
   const handleSave = async () => {
-    if (!name.trim()) {
+    const trimmedName = trim(name)
+    if (isStrBlank(trimmedName)) {
       toast.error(t('nameRequired'))
       return
     }
-    const trimmedName = name.trim()
-    if (store.aiProviders.some((p) => p.name === trimmedName)) {
+    if (find(store.aiProviders, (p) => p.name === trimmedName)) {
       toast.error(t('providerNameExists'))
       return
     }
@@ -88,4 +95,4 @@ export default function AddProviderDialog({ open, onClose }: Props) {
       </div>
     </Dialog>
   )
-}
+})

@@ -45,7 +45,7 @@ export default observer(function AccountCard({ account }: AccountCardProps) {
 
   return (
     <div
-      className={`rounded-lg border ${tw.border} ${tw.bg.secondary} p-3 flex flex-col gap-2`}
+      className={`rounded-md border ${tw.border} ${tw.bg.secondary} p-3 flex flex-col gap-2`}
     >
       <div className="flex items-start justify-between">
         <div className="min-w-0">

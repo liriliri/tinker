@@ -1,4 +1,10 @@
 import { makeAutoObservable } from 'mobx'
+import clamp from 'licia/clamp'
+import defaults from 'licia/defaults'
+import find from 'licia/find'
+import findIdx from 'licia/findIdx'
+import map from 'licia/map'
+import remove from 'licia/remove'
 import BaseStore from 'share/store/Base'
 import type { AiProvider, Section } from './types'
 
@@ -41,7 +47,8 @@ class Store extends BaseStore {
 
   get selectedProvider(): AiProvider | null {
     return (
-      this.aiProviders.find((p) => p.name === this.selectedProviderName) ?? null
+      find(this.aiProviders, (p) => p.name === this.selectedProviderName) ??
+      null
     )
   }
 
@@ -95,11 +102,9 @@ class Store extends BaseStore {
     const parsed: AiProvider[] = aiProvidersRaw
       ? JSON.parse(aiProvidersRaw)
       : []
-    this.aiProviders = parsed.map((p) => ({
-      ...p,
-      apiType: p.apiType ?? 'openai',
-      models: p.models ?? [],
-    }))
+    this.aiProviders = map(parsed, (p) =>
+      defaults({ ...p }, { apiType: 'openai', models: [] })
+    )
     this.npmRegistry = npmRegistry ?? 'https://registry.npmmirror.com'
     this.showMarketplace = showMarketplace !== false
     this.proxyMode = proxyMode ?? 'system'
@@ -177,8 +182,9 @@ class Store extends BaseStore {
   }
 
   async setHttpPort(value: number) {
-    this.httpPort = value
-    await tinker.setSetting('httpPort', value)
+    const port = clamp(value || 9223, 1, 65535)
+    this.httpPort = port
+    await tinker.setSetting('httpPort', port)
   }
 
   async setHttpUsername(value: string) {
@@ -201,14 +207,13 @@ class Store extends BaseStore {
   }
 
   async updateAiProvider(provider: AiProvider) {
-    const idx = this.aiProviders.findIndex((p) => p.name === provider.name)
+    const idx = findIdx(this.aiProviders, (p) => p.name === provider.name)
     if (idx !== -1) this.aiProviders[idx] = provider
     await this.saveAiProviders()
   }
 
   async deleteAiProvider(name: string) {
-    const idx = this.aiProviders.findIndex((p) => p.name === name)
-    if (idx !== -1) this.aiProviders.splice(idx, 1)
+    remove(this.aiProviders, (p) => p.name === name)
     if (this.selectedProviderName === name) {
       this.selectedProviderName = null
     }

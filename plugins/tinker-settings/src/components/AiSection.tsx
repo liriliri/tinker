@@ -1,6 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import contain from 'licia/contain'
+import filter from 'licia/filter'
+import findIdx from 'licia/findIdx'
+import isEmpty from 'licia/isEmpty'
+import lowerCase from 'licia/lowerCase'
+import map from 'licia/map'
+import some from 'licia/some'
+import trim from 'licia/trim'
 import Grid from 'share/components/Grid'
 import {
   ColDef,
@@ -33,7 +41,7 @@ const ProviderNameCell = ({ data }: ICellRendererParams<RowData>) => {
   )
 }
 
-interface Props {
+interface AiSectionProps {
   search: string
   addOpen: boolean
   onAddClose: () => void
@@ -43,7 +51,7 @@ export default observer(function AiSection({
   search,
   addOpen,
   onAddClose,
-}: Props) {
+}: AiSectionProps) {
   const { t } = useTranslation()
 
   const columnDefs: ColDef<RowData>[] = useMemo(
@@ -71,21 +79,23 @@ export default observer(function AiSection({
     [t]
   )
 
-  const keyword = search.trim().toLowerCase()
-  const rowData: RowData[] = store.aiProviders
-    .filter(
+  const keyword = lowerCase(trim(search))
+  const rowData: RowData[] = map(
+    filter(
+      store.aiProviders,
       (p) =>
-        !keyword ||
-        p.name.toLowerCase().includes(keyword) ||
-        p.models.some((m) => m.name.toLowerCase().includes(keyword)) ||
-        p.apiUrl.toLowerCase().includes(keyword)
-    )
-    .map((p) => ({
+        isEmpty(keyword) ||
+        contain(lowerCase(p.name), keyword) ||
+        some(p.models, (m) => contain(lowerCase(m.name), keyword)) ||
+        contain(lowerCase(p.apiUrl), keyword)
+    ),
+    (p) => ({
       name: p.name,
       defaultModel: p.models[0]?.name ?? '',
       apiUrl: p.apiUrl,
       apiType: p.apiType,
-    }))
+    })
+  )
 
   const onSelectionChanged = useCallback(
     (event: SelectionChangedEvent<RowData>) => {
@@ -106,8 +116,8 @@ export default observer(function AiSection({
     const fromName = node.data?.name
     const toName = overNode.data?.name
     if (!fromName || !toName) return
-    const fromIndex = store.aiProviders.findIndex((p) => p.name === fromName)
-    const toIndex = store.aiProviders.findIndex((p) => p.name === toName)
+    const fromIndex = findIdx(store.aiProviders, (p) => p.name === fromName)
+    const toIndex = findIdx(store.aiProviders, (p) => p.name === toName)
     if (fromIndex !== -1 && toIndex !== -1) {
       store.reorderAiProviders(fromIndex, toIndex)
     }

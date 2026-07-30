@@ -43,7 +43,7 @@ export default observer(function DialogsTab() {
   return (
     <div className="space-y-4">
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('alertDemo')}
@@ -58,7 +58,7 @@ export default observer(function DialogsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('confirmDemo')}
@@ -73,7 +73,7 @@ export default observer(function DialogsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('promptDemo')}
@@ -88,7 +88,7 @@ export default observer(function DialogsTab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-4 ${tw.text.secondary}`}>
           {t('toastDemo')}

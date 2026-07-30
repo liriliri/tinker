@@ -72,7 +72,7 @@ const Welcome: React.FC<WelcomeProps> = ({
             <button
               key={index}
               onClick={action.onClick}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${tw.bg.tertiary} ${tw.hover} transition-colors border ${tw.border} ${tw.primary.hoverBorder}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-md ${tw.bg.tertiary} ${tw.hover} transition-colors border ${tw.border} ${tw.primary.hoverBorder}`}
             >
               <span className={tw.primary.text}>{action.icon}</span>
               <span className="font-medium">{action.label}</span>
@@ -81,7 +81,7 @@ const Welcome: React.FC<WelcomeProps> = ({
         </div>
 
         {recentFiles.length > 0 && (
-          <div className={`border ${tw.border} rounded-lg overflow-hidden`}>
+          <div className={`border ${tw.border} rounded-md overflow-hidden`}>
             {recentFiles.map((path) => (
               <button
                 key={path}

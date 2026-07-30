@@ -64,7 +64,7 @@ const BookCard = observer(function BookCard({ book, onOpen }: BookCardProps) {
       }}
     >
       <div
-        className={`relative aspect-[3/4] flex items-center justify-center overflow-hidden rounded-lg ${tw.bg.secondary} ${tw.border} ${tw.hover} transition-colors`}
+        className={`relative aspect-[3/4] flex items-center justify-center overflow-hidden rounded-md ${tw.bg.secondary} ${tw.border} ${tw.hover} transition-colors`}
       >
         {book.coverDataUrl ? (
           <img

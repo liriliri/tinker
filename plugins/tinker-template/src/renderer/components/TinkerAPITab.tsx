@@ -20,7 +20,7 @@ export default observer(function TinkerAPITab() {
   return (
     <div className="space-y-4">
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           {t('getTheme')} / {t('getLanguage')}
@@ -63,7 +63,7 @@ export default observer(function TinkerAPITab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           {t('setTitle')}
@@ -89,7 +89,7 @@ export default observer(function TinkerAPITab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           {t('showOpenDialog')}
@@ -133,7 +133,7 @@ export default observer(function TinkerAPITab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           {t('getClipboardFilePaths')}
@@ -179,7 +179,7 @@ export default observer(function TinkerAPITab() {
       </section>
 
       <section
-        className={`rounded-lg p-5 border ${tw.border} ${tw.bg.secondary}`}
+        className={`rounded-md p-5 border ${tw.border} ${tw.bg.secondary}`}
       >
         <h2 className={`text-sm font-semibold mb-1 ${tw.text.secondary}`}>
           {t('showContextMenu')}
