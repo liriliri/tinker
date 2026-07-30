@@ -30,7 +30,6 @@ export default observer(function PluginSection() {
               }
             }}
             placeholder="https://registry.npmmirror.com"
-            className="flex-1 text-sm"
           />
         </SettingItem>
       </Section>

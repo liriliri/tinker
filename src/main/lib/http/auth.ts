@@ -2,7 +2,9 @@ import crypto from 'crypto'
 import startWith from 'licia/startWith'
 import isArr from 'licia/isArr'
 import isUndef from 'licia/isUndef'
+import isStrBlank from 'licia/isStrBlank'
 import Url from 'licia/Url'
+import { getSettingsStore } from '../store'
 
 export interface HttpAuth {
   username: string
@@ -40,6 +42,24 @@ export function parseHttpAuthArgv(
     return undefined
   }
   return { username, password: password ?? '' }
+}
+
+function parseHttpAuthSettings(): HttpAuth | undefined {
+  const store = getSettingsStore()
+  const username = store.get('httpUsername')
+  if (isStrBlank(username)) {
+    return undefined
+  }
+  return {
+    username,
+    password: store.get('httpPassword') ?? '',
+  }
+}
+
+export function resolveHttpAuth(
+  argv: string[] = process.argv
+): HttpAuth | undefined {
+  return parseHttpAuthArgv(argv) ?? parseHttpAuthSettings()
 }
 
 function safeEqual(a: string, b: string) {

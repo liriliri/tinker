@@ -14,6 +14,12 @@ class Store extends BaseStore {
   aiProviders: AiProvider[] = []
   npmRegistry: string = 'https://registry.npmmirror.com'
   showMarketplace: boolean = true
+  proxyMode: string = 'system'
+  proxyHost: string = ''
+  enableHttp: boolean = false
+  httpPort: number = 9223
+  httpUsername: string = ''
+  httpPassword: string = ''
 
   isLoading: boolean = true
   currentSection: Section = 'general'
@@ -52,6 +58,12 @@ class Store extends BaseStore {
       aiProvidersRaw,
       npmRegistry,
       showMarketplace,
+      proxyMode,
+      proxyHost,
+      enableHttp,
+      httpPort,
+      httpUsername,
+      httpPassword,
     ] = await Promise.all([
       tinker.getSetting('theme'),
       tinker.getSetting('language'),
@@ -64,6 +76,12 @@ class Store extends BaseStore {
       tinker.getSetting('aiProviders'),
       tinker.getSetting('npmRegistry'),
       tinker.getSetting('showMarketplace'),
+      tinker.getSetting('proxyMode'),
+      tinker.getSetting('proxyHost'),
+      tinker.getSetting('enableHttp'),
+      tinker.getSetting('httpPort'),
+      tinker.getSetting('httpUsername'),
+      tinker.getSetting('httpPassword'),
     ])
 
     this.theme = theme ?? 'system'
@@ -84,6 +102,12 @@ class Store extends BaseStore {
     }))
     this.npmRegistry = npmRegistry ?? 'https://registry.npmmirror.com'
     this.showMarketplace = showMarketplace !== false
+    this.proxyMode = proxyMode ?? 'system'
+    this.proxyHost = proxyHost ?? ''
+    this.enableHttp = enableHttp === true
+    this.httpPort = httpPort || 9223
+    this.httpUsername = httpUsername ?? ''
+    this.httpPassword = httpPassword ?? ''
     this.isLoading = false
   }
 
@@ -135,6 +159,36 @@ class Store extends BaseStore {
   async setShowMarketplace(value: boolean) {
     this.showMarketplace = value
     await tinker.setSetting('showMarketplace', value)
+  }
+
+  async setProxyMode(value: string) {
+    this.proxyMode = value
+    await tinker.setSetting('proxyMode', value)
+  }
+
+  async setProxyHost(value: string) {
+    this.proxyHost = value
+    await tinker.setSetting('proxyHost', value)
+  }
+
+  async setEnableHttp(value: boolean) {
+    this.enableHttp = value
+    await tinker.setSetting('enableHttp', value)
+  }
+
+  async setHttpPort(value: number) {
+    this.httpPort = value
+    await tinker.setSetting('httpPort', value)
+  }
+
+  async setHttpUsername(value: string) {
+    this.httpUsername = value
+    await tinker.setSetting('httpUsername', value)
+  }
+
+  async setHttpPassword(value: string) {
+    this.httpPassword = value
+    await tinker.setSetting('httpPassword', value)
   }
 
   private async saveAiProviders() {

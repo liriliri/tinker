@@ -11,6 +11,10 @@
   "startup": "启动",
   "openAtLogin": "开机自启动",
   "silentStart": "静默启动",
+  "enableHttp": "启用 HTTP 远程",
+  "httpPort": "HTTP 端口",
+  "httpUsername": "HTTP 用户名",
+  "httpPassword": "HTTP 密码",
 
   "window": "窗口",
   "showShortcut": "唤出快捷键",
@@ -23,6 +27,13 @@
   "plugin": "插件",
   "showMarketplace": "显示未安装插件",
   "registry": "镜像源",
+
+  "network": "网络",
+  "proxyMode": "代理模式",
+  "proxyDirect": "直连",
+  "proxySystem": "系统代理",
+  "proxyManual": "手动代理",
+  "proxyHost": "代理主机",
 
   "restartRequired": "需要重启应用后生效。",
 

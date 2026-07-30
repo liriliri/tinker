@@ -9,7 +9,7 @@ import {
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { getMainStore } from '../lib/store'
 import { parseInspectAddress, startPluginInspect } from '../lib/plugin/inspect'
-import { startHttp, stopHttp, parseHttpArgv } from '../lib/http'
+import { startHttp, stopHttp, resolveHttpAddress } from '../lib/http'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 import { validateMcpToolArgs } from './mcp'
 
@@ -175,7 +175,7 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
 export function init() {
   app.on('ready', () => {
     startServer(handleIpcRequest)
-    const httpAddress = parseHttpArgv()
+    const httpAddress = resolveHttpAddress()
     if (httpAddress) {
       startHttp(httpAddress)
         .then((info) => {

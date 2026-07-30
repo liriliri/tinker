@@ -45,6 +45,7 @@ export default observer(function AppearanceSection() {
           value={store.theme}
           onChange={(value) => store.setTheme(value)}
           options={themeOptions}
+          className="w-full"
         />
       </SettingItem>
       <SettingItem label={t('language')}>
@@ -52,6 +53,7 @@ export default observer(function AppearanceSection() {
           value={store.language}
           onChange={handleLanguageChange}
           options={languageOptions}
+          className="w-full"
         />
       </SettingItem>
       <SettingItem label={t('useNativeTitlebar')}>

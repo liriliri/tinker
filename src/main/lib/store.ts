@@ -22,6 +22,12 @@ export const getSettingsStore = memoize(function () {
     searchLocalApps: true,
     npmRegistry: 'https://registry.npmmirror.com',
     showMarketplace: true,
+    proxyMode: 'system',
+    proxyHost: '',
+    enableHttp: false,
+    httpPort: 9223,
+    httpUsername: '',
+    httpPassword: '',
   })
 })
 

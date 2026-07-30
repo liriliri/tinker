@@ -9,6 +9,7 @@ import className from 'licia/className'
 import clone from 'licia/clone'
 import Color from 'licia/Color'
 import compact from 'licia/compact'
+import concat from 'licia/concat'
 import contain from 'licia/contain'
 import convertBin from 'licia/convertBin'
 import copy from 'licia/copy'
@@ -119,6 +120,7 @@ const licia = {
   clone,
   Color,
   compact,
+  concat,
   contain,
   convertBin,
   copy,
@@ -233,6 +235,7 @@ export {
   clone,
   Color,
   compact,
+  concat,
   contain,
   convertBin,
   copy,

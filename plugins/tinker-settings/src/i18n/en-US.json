@@ -11,6 +11,10 @@
   "startup": "Startup",
   "openAtLogin": "Open at Login",
   "silentStart": "Silent Start",
+  "enableHttp": "Enable HTTP Remote",
+  "httpPort": "HTTP Port",
+  "httpUsername": "HTTP Username",
+  "httpPassword": "HTTP Password",
 
   "window": "Window",
   "showShortcut": "Show Shortcut",
@@ -23,6 +27,13 @@
   "plugin": "Plugin",
   "showMarketplace": "Show Uninstalled Plugins",
   "registry": "Registry",
+
+  "network": "Network",
+  "proxyMode": "Proxy Mode",
+  "proxyDirect": "Direct",
+  "proxySystem": "System",
+  "proxyManual": "Manual",
+  "proxyHost": "Proxy Host",
 
   "restartRequired": "Restart required to apply changes.",
 

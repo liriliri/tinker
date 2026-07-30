@@ -33,9 +33,9 @@ interface SettingItemProps {
 
 export function SettingItem({ label, children }: SettingItemProps) {
   return (
-    <div className="flex items-center justify-between px-3 py-2">
-      <label className={`text-sm ${tw.text.primary}`}>{label}</label>
-      {children}
+    <div className="flex items-center justify-between gap-3 px-3 py-2">
+      <label className={`shrink-0 text-sm ${tw.text.primary}`}>{label}</label>
+      <div className="w-56 shrink-0 flex justify-end">{children}</div>
     </div>
   )
 }

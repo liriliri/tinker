@@ -3,8 +3,9 @@ import { WebSocketServer } from 'ws'
 import getPort from 'licia/getPort'
 import startWith from 'licia/startWith'
 import { InspectAddress, parseInspectAddress } from '../plugin/inspect'
+import { getSettingsStore } from '../store'
 import { createApp } from './app'
-import { parseHttpAuthArgv } from './auth'
+import { resolveHttpAuth } from './auth'
 import {
   disposeAllHttpSessions,
   disposePluginHttpSession,
@@ -61,7 +62,7 @@ export async function startHttp(
     throw new Error(`HTTP port ${parsed.port} is already in use`)
   }
 
-  const auth = parseHttpAuthArgv()
+  const auth = resolveHttpAuth()
   const wss = new WebSocketServer({ noServer: true })
   const server = http.createServer(createApp(auth).callback())
   server.on('upgrade', (req, socket, head) => {
@@ -103,4 +104,18 @@ export function parseHttpArgv(
     }
   }
   return undefined
+}
+
+export function resolveHttpAddress(
+  argv: string[] = process.argv
+): InspectAddress | undefined {
+  const fromArgv = parseHttpArgv(argv)
+  if (fromArgv) {
+    return fromArgv
+  }
+  if (!getSettingsStore().get('enableHttp')) {
+    return
+  }
+  const port = getSettingsStore().get('httpPort') || 9223
+  return { host: '0.0.0.0', port }
 }

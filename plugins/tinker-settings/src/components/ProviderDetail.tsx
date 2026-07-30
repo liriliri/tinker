@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { Trash2 } from 'lucide-react'
 import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
+import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import store from '../store'
 import type { AiProvider } from '../types'
 import ProviderFields from './ProviderFields'
@@ -50,7 +51,7 @@ export default observer(function ProviderDetail() {
   }
 
   return (
-    <div className={`h-full overflow-y-auto ${tw.bg.tertiary}`}>
+    <OverlayScrollbars defer className={`h-full min-h-0 ${tw.bg.tertiary}`}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-base font-semibold truncate">{provider.name}</h2>
@@ -66,6 +67,6 @@ export default observer(function ProviderDetail() {
           <ProviderFields value={form} onChange={handleChange} />
         </div>
       </div>
-    </div>
+    </OverlayScrollbars>
   )
 })

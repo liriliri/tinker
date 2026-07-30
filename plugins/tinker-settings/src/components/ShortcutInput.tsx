@@ -284,7 +284,7 @@ export default function ShortcutInput({
   return (
     <div
       data-shortcut-input
-      className={`min-w-[120px] px-2 py-1 border text-xs text-center cursor-pointer select-none transition-all rounded ${
+      className={`w-full px-2 py-1 border text-xs text-center cursor-pointer select-none transition-all rounded ${
         isRecording
           ? `${tw.primary.border} ${tw.primary.bgFocused} ${tw.primary.text} animate-pulse`
           : `${tw.bg.input} ${tw.text.primary} ${tw.gray.border600} ${tw.hover}`
