@@ -1,3 +1,8 @@
+## v2.1.1 (31 Jul 2026)
+
+* feat: network proxy settings
+* fix: skill plugin not found
+
 ## v2.1.0 (25 Jul 2026)
 
 * feat: add websocket
