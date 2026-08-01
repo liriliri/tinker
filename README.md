@@ -27,7 +27,7 @@ Toolbox for Everyone.
 
 <img src="https://tinker.liriliri.io/screenshot.png" style="width:100%">
 
-[TINKER](https://tinker.liriliri.io/) is a toolbox that brings together a variety of productivity tools.
+[TINKER](https://tinker.liriliri.io/) is a toolbox that brings together a variety of productivity tools. It can be driven from the command line, and AI agents can call any installed tool via Agent Skills.
 
 ## Installation
 
