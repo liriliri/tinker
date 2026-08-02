@@ -188,6 +188,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-gold-price',
+    name: 'Gold Price',
+    description: 'Query gold prices',
+    icon: 'tinker-gold-price.png',
+    locales: {
+      'zh-CN': {
+        name: '金价',
+        description: '查询黄金价格',
+      },
+    },
+  },
+  {
     id: 'tinker-hanzi-converter',
     name: 'Hanzi Converter',
     description: 'Chinese character tools for pinyin and conversion',
