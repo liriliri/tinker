@@ -188,6 +188,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-ip-info',
+    name: 'IP Info',
+    description: 'View LAN/public IP, latency and DNS exits',
+    icon: 'tinker-ip-info.png',
+    locales: {
+      'zh-CN': {
+        name: 'IP 信息',
+        description: '查看本机/公网 IP、延迟与 DNS 出口',
+      },
+    },
+  },
+  {
     id: 'tinker-js13k',
     name: 'JS13K Games',
     description: 'Play curated JS13K games',
