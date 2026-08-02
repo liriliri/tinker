@@ -104,6 +104,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-color-bg',
+    name: 'Color Background',
+    description: 'Generate colorful abstract backgrounds',
+    icon: 'tinker-color-bg.png',
+    locales: {
+      'zh-CN': {
+        name: '炫彩背景',
+        description: '生成彩色抽象背景图',
+      },
+    },
+  },
+  {
     id: 'tinker-dictionary',
     name: 'Dictionary',
     description: 'Look up word definitions and translations',
