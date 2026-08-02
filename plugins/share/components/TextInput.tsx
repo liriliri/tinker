@@ -9,7 +9,9 @@ export default function TextInput({
   ...rest
 }: TextInputProps) {
   const baseClassName = `w-full px-2.5 py-1.5 text-sm border ${tw.border} ${tw.primary.focusBorder} rounded ${tw.bg.input} ${tw.text.primary} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`
-  const combinedClassName = `${baseClassName} ${className}`.trim()
+  const typeClassName = type === 'date' ? 'tabular-nums' : ''
+  const combinedClassName =
+    `${baseClassName} ${typeClassName} ${className}`.trim()
 
   return <input type={type} className={combinedClassName} {...rest} />
 }
