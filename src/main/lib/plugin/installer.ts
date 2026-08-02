@@ -59,7 +59,13 @@ export async function installPlugin(name: string): Promise<void> {
   await fs.mkdirs(pluginInstallDir)
   const registry = getSettingsStore().get('npmRegistry')
   await runNpm(
-    ['install', name, '--prefix', pluginInstallDir, `--registry=${registry}`],
+    [
+      'install',
+      `${name}@latest`,
+      '--prefix',
+      pluginInstallDir,
+      `--registry=${registry}`,
+    ],
     { cwd: pluginInstallDir }
   )
 }
