@@ -30,7 +30,7 @@ import { plugins, getPlugins, hasPlugin } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
 import { stopPluginInspect } from './inspect'
 import { disposePluginHttpSession } from '../http'
-import { validateMcpToolArgs } from './mcp'
+import { validateMcpToolArgs } from '../util'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
