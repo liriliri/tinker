@@ -57,6 +57,8 @@
   "sensingMethod": "Sensing Method",
   "focalPlaneResolution": "Focal Plane Resolution",
   "showInFolder": "Show in Folder",
+  "develop": "Develop",
+  "crop": "Crop",
   "prevPhoto": "Previous",
   "nextPhoto": "Next",
   "closeViewer": "Close",

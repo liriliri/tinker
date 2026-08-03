@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import {
   Children,
+  isValidElement,
   useEffect,
   useMemo,
   useRef,
@@ -41,17 +42,21 @@ function InfoRow({ label, value, ellipsis = false }: InfoRowProps) {
   const text = String(value)
 
   return (
-    <div className="flex justify-between py-1.5">
-      <span className={tw.text.secondary}>{label}</span>
+    <div className="flex items-baseline justify-between gap-4 py-1.5">
+      <span className={`shrink-0 whitespace-nowrap ${tw.text.secondary}`}>
+        {label}
+      </span>
       {ellipsis ? (
         <span
-          className={`ml-4 min-w-0 max-w-[55%] truncate text-right ${tw.text.primary}`}
+          className={`min-w-0 truncate text-right ${tw.text.primary}`}
           title={text}
         >
           {text}
         </span>
       ) : (
-        <span className={tw.text.primary}>{text}</span>
+        <span className={`min-w-0 break-all text-right ${tw.text.primary}`}>
+          {text}
+        </span>
       )}
     </div>
   )
@@ -68,7 +73,11 @@ function InfoSection({
   children,
   className = 'py-2',
 }: InfoSectionProps) {
-  const items = Children.toArray(children).filter(Boolean)
+  const items = Children.toArray(children).filter((child) => {
+    if (!isValidElement<InfoRowProps>(child)) return Boolean(child)
+    if (child.type !== InfoRow) return true
+    return hasDisplayValue(child.props.value)
+  })
   if (items.length === 0) return null
 
   return (

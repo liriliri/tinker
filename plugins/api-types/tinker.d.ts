@@ -417,6 +417,34 @@ declare global {
      */
     showNotification(body: string): void
 
+    /**
+     * Open another plugin in a detached window.
+     * If the plugin is already running, focuses the existing window instead.
+     * @param id - Plugin id (e.g. 'json-editor')
+     * @returns false if the plugin does not exist or is not installed
+     */
+    openPlugin(id: string): Promise<boolean>
+
+    /**
+     * Check whether a plugin is installed (builtin, npm global, or user-installed).
+     * Marketplace-only entries that are not installed return false.
+     */
+    hasPlugin(id: string): Promise<boolean>
+
+    /**
+     * Call an MCP tool on a running plugin.
+     * The target plugin must already be running (e.g. via openPlugin); this does not start it.
+     * @param id - Plugin id
+     * @param name - MCP tool name
+     * @param args - Tool arguments
+     * @returns Tool result as a string
+     */
+    callPluginMcpTool(
+      id: string,
+      name: string,
+      args?: Record<string, unknown>
+    ): Promise<string>
+
     /** Wraps Node's fs.promises.readFile */
     readFile: ReadFile
 

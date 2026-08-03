@@ -11,7 +11,6 @@ import { getMainStore } from '../lib/store'
 import { parseInspectAddress, startPluginInspect } from '../lib/plugin/inspect'
 import { startHttp, stopHttp, resolveHttpAddress } from '../lib/http'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
-import { validateMcpToolArgs } from './mcp'
 
 function success(req: IpcRequest, data?: unknown): IpcResponse {
   return { id: req.id, success: true, data }
@@ -57,36 +56,6 @@ async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
   const id = req.data?.id as string
   const name = req.data?.name as string
   const args = (req.data?.args as Record<string, unknown>) || {}
-  if (!id || !name) {
-    return fail(req, 'Missing plugin id or tool name')
-  }
-  if (!isPluginRunning(id)) {
-    return fail(
-      req,
-      `Plugin is not running. Please start it first: tinker open ${id}`
-    )
-  }
-
-  await getPlugins()
-  if (!hasPlugin(id)) {
-    return fail(req, `Plugin not found: ${id}`)
-  }
-
-  const plugin = plugins[id]
-  const tools = plugin.mcp?.tools
-  if (!tools || !tools[name]) {
-    return fail(req, `Unknown tool "${name}"`)
-  }
-
-  const validationError = validateMcpToolArgs(
-    `${id}:${name}`,
-    tools[name].inputSchema,
-    args
-  )
-  if (validationError) {
-    return fail(req, validationError)
-  }
-
   try {
     const result = await callPluginMcpTool(id, name, args)
     return success(req, result)

@@ -66,6 +66,7 @@ export type IpcDragMain = (
   height: number
 ) => void
 export type IpcGetPlugins = (force?: boolean) => Promise<IPlugin[]>
+export type IpcHasPlugin = (id: string) => Promise<boolean>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string, destroy?: boolean) => void
 export type IpcDetachPlugin = (id: string) => void
@@ -92,6 +93,11 @@ export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
+export type IpcCallPluginMcpTool = (
+  id: string,
+  name: string,
+  args?: Record<string, unknown>
+) => Promise<string>
 export type IpcInstallPlugin = (name: string) => Promise<void>
 export type IpcUninstallPlugin = (name: string) => Promise<void>
 export type IpcCheckPluginUpdate = (id: string) => Promise<string | null>

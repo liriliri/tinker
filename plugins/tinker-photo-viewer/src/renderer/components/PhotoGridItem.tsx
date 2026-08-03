@@ -1,8 +1,17 @@
 import { observer } from 'mobx-react-lite'
+import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 import { formatFileSize } from '../lib/util'
 import type { Photo } from '../types'
 import LazyPhotoImage from './LazyPhotoImage'
+
+const PHOTO_DEVELOP_ID = 'tinker-photo-develop'
+const IMAGE_CROPPER_ID = 'tinker-image-cropper'
+
+async function openInPlugin(id: string, path: string) {
+  await tinker.openPlugin(id)
+  await tinker.callPluginMcpTool(id, 'open', { path })
+}
 
 interface PhotoGridItemProps {
   photo: Photo
@@ -15,10 +24,30 @@ const PhotoGridItem = observer(function PhotoGridItem({
   scrollRoot,
   onOpen,
 }: PhotoGridItemProps) {
+  const { t } = useTranslation()
+
   return (
     <button
       type="button"
       onClick={() => onOpen(photo)}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        tinker.showContextMenu(e.clientX, e.clientY, [
+          {
+            label: t('develop'),
+            click: () => {
+              void openInPlugin(PHOTO_DEVELOP_ID, photo.path)
+            },
+          },
+          {
+            label: t('crop'),
+            click: () => {
+              void openInPlugin(IMAGE_CROPPER_ID, photo.path)
+            },
+          },
+        ])
+      }}
       className={`group relative block h-full w-full cursor-pointer overflow-hidden rounded-sm ${tw.bg.secondary}`}
     >
       <LazyPhotoImage path={photo.path} alt={photo.title} root={scrollRoot} />

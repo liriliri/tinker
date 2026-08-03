@@ -40,12 +40,15 @@ import {
   type AdjustSectionId,
   type SectionOpenState,
 } from './types/adjustSections'
+import { createMcpApi } from './mcp'
 
 const storage = new LocalStore('tinker-photo-develop')
 const STORAGE_SECTION_OPEN = 'sectionOpen'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   image: ImageInfo | null = null
   adjustments: Adjustments = createDefaultAdjustments()
   sectionOpen: SectionOpenState
@@ -433,7 +436,7 @@ class Store extends BaseStore {
     this.previewVersion++
   }
 
-  async saveImage() {
+  async saveImage(outputPath?: string) {
     if (!this.image || !this.renderer?.hasImage) return
 
     try {
@@ -441,6 +444,8 @@ class Store extends BaseStore {
 
       if (this.overwriteOriginal && this.image.filePath) {
         savePath = this.image.filePath
+      } else if (outputPath) {
+        savePath = outputPath
       } else {
         const result = await tinker.showSaveDialog({
           defaultPath: this.getDefaultSavePath(),

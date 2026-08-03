@@ -16,6 +16,231 @@
         "name": "照片调色",
         "description": "专业照片调色，支持曝光、色调、色彩与曲线调整"
       }
+    },
+    "mcp": {
+      "tools": {
+        "open": {
+          "description": "Open an image file in Photo Develop. Same as opening a file in the UI. Call this before adjust, apply_filter, or save.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a PNG, JPG, JPEG, or WebP image"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "get": {
+          "description": "Get the currently open image info, adjustments, active filter, and available filter ids."
+        },
+        "adjust": {
+          "description": "Update development adjustments on the currently open image. Call open first. Omit fields you do not want to change.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "exposure": {
+                "type": "number",
+                "minimum": -5,
+                "maximum": 5,
+                "description": "Exposure from -5 to 5"
+              },
+              "brightness": {
+                "type": "number",
+                "minimum": -5,
+                "maximum": 5,
+                "description": "Brightness from -5 to 5"
+              },
+              "contrast": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Contrast from -100 to 100"
+              },
+              "highlights": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Highlights from -100 to 100"
+              },
+              "shadows": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Shadows from -100 to 100"
+              },
+              "whites": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Whites from -100 to 100"
+              },
+              "blacks": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Blacks from -100 to 100"
+              },
+              "temperature": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Temperature from -100 to 100"
+              },
+              "tint": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Tint from -100 to 100"
+              },
+              "vibrance": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Vibrance from -100 to 100"
+              },
+              "saturation": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Saturation from -100 to 100"
+              },
+              "sharpness": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Sharpness from -100 to 100"
+              },
+              "sharpnessThreshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 80,
+                "description": "Sharpening threshold from 0 to 80"
+              },
+              "lumaNoiseReduction": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Luminance noise reduction from 0 to 100"
+              },
+              "colorNoiseReduction": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Color noise reduction from 0 to 100"
+              },
+              "vignetteAmount": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Vignette amount from -100 to 100"
+              },
+              "vignetteMidpoint": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Vignette midpoint from 0 to 100"
+              },
+              "vignetteRoundness": {
+                "type": "number",
+                "minimum": -100,
+                "maximum": 100,
+                "description": "Vignette roundness from -100 to 100"
+              },
+              "vignetteFeather": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Vignette feather from 0 to 100"
+              },
+              "grainAmount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Grain amount from 0 to 100"
+              },
+              "grainSize": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Grain size from 0 to 100"
+              },
+              "grainRoughness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Grain roughness from 0 to 100"
+              },
+              "hsl": {
+                "type": "object",
+                "description": "Partial HSL mixer adjustments by channel (reds, oranges, yellows, greens, aquas, blues, purples, magentas). Each channel accepts hue (-100..100), saturation (-100..100), luminance (-100..100)."
+              },
+              "curves": {
+                "type": "object",
+                "description": "Partial tone curves by channel (luma, red, green, blue). Each channel is an array of {x,y} points where x and y are 0..255."
+              }
+            }
+          }
+        },
+        "apply_filter": {
+          "description": "Apply a named preset filter to the currently open image. Call open first. Use get to list available filter ids.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "filterId": {
+                "type": "string",
+                "enum": [
+                  "original",
+                  "sepia",
+                  "clarendon",
+                  "skyline",
+                  "loFi",
+                  "lark",
+                  "reyes",
+                  "slumber",
+                  "ludwig",
+                  "mayfair",
+                  "hudson",
+                  "valencia",
+                  "xPro2",
+                  "inkwell",
+                  "kelvin",
+                  "brannan",
+                  "sutro"
+                ],
+                "description": "Preset filter id"
+              }
+            },
+            "required": [
+              "filterId"
+            ]
+          }
+        },
+        "reset": {
+          "description": "Reset all adjustments on the currently open image to defaults. Call open first."
+        },
+        "save": {
+          "description": "Save the currently developed image. Same as clicking save in the UI. Call open first.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "overwriteOriginal": {
+                "type": "boolean",
+                "description": "When true, save overwrites the original file. When false, outputPath is required."
+              },
+              "outputPath": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the image when overwriteOriginal is false."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

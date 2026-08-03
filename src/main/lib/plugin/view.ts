@@ -17,6 +17,7 @@ import contain from 'licia/contain'
 import trim from 'licia/trim'
 import toNum from 'licia/toNum'
 import debounce from 'licia/debounce'
+import waitUntil from 'licia/waitUntil'
 import { BrowserWindow, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
@@ -25,10 +26,11 @@ import * as pluginWin from '../../window/plugin'
 import isMac from 'licia/isMac'
 import isEmpty from 'licia/isEmpty'
 import contextMenu from '../contextMenu'
-import { plugins, getPlugins } from './loader'
+import { plugins, getPlugins, hasPlugin } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
 import { stopPluginInspect } from './inspect'
 import { disposePluginHttpSession } from '../http'
+import { validateMcpToolArgs } from './mcp'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -346,27 +348,66 @@ export function isPluginRunning(id: string, backgroundOnly?: boolean) {
 export async function callPluginMcpTool(
   id: string,
   name: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown> = {}
 ): Promise<string> {
-  const { view } = pluginViews[id]
-  if (!view) {
-    throw new Error('Plugin is not running')
+  if (!id || !name) {
+    throw new Error('Missing plugin id or tool name')
+  }
+  if (!isPluginRunning(id)) {
+    throw new Error(
+      `Plugin is not running. Please start it first: tinker open ${id}`
+    )
   }
 
-  const script = `(function() {
+  await getPlugins()
+  if (!hasPlugin(id)) {
+    throw new Error(`Plugin not found: ${id}`)
+  }
+
+  const plugin = plugins[id]
+  const tools = plugin.mcp?.tools
+  if (!tools || !tools[name]) {
+    throw new Error(`Unknown tool "${name}"`)
+  }
+
+  const validationError = validateMcpToolArgs(
+    `${id}:${name}`,
+    tools[name].inputSchema,
+    args
+  )
+  if (validationError) {
+    throw new Error(validationError)
+  }
+
+  const { view } = pluginViews[id]
+  const script = `(async function() {
     if (!window.mcp || typeof window.mcp.callTool !== 'function') {
-      return 'Error: Plugin MCP API is not ready. Please wait for the plugin to finish loading.';
+      return null;
     }
     try {
-      return window.mcp.callTool(${JSON.stringify(name)}, ${JSON.stringify(
-    args
-  )});
+      return await window.mcp.callTool(${JSON.stringify(
+        name
+      )}, ${JSON.stringify(args)});
     } catch (e) {
       return 'Error: ' + (e.message || String(e));
     }
   })()`
 
-  return (await view.webContents.executeJavaScript(script, true)) as string
+  try {
+    const { result } = await waitUntil(
+      async () => {
+        const result = await view.webContents.executeJavaScript(script, true)
+        return result === null ? false : { result: result as string }
+      },
+      5000,
+      100
+    )
+    return result
+  } catch {
+    throw new Error(
+      'Plugin MCP API is not ready. Please wait for the plugin to finish loading.'
+    )
+  }
 }
 
 export const detachPlugin: IpcDetachPlugin = async function (id) {

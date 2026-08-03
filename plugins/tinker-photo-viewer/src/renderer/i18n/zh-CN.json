@@ -57,6 +57,8 @@
   "sensingMethod": "感光方式",
   "focalPlaneResolution": "焦平面分辨率",
   "showInFolder": "在文件夹中显示",
+  "develop": "调色",
+  "crop": "裁剪",
   "prevPhoto": "上一张",
   "nextPhoto": "下一张",
   "closeViewer": "关闭",

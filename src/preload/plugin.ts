@@ -10,6 +10,9 @@ import {
   IpcSendDebuggerCommand,
   IpcShowPluginNotification,
   IpcShowPluginContextMenu,
+  IpcOpenPlugin,
+  IpcCallPluginMcpTool,
+  IpcHasPlugin,
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
@@ -133,6 +136,12 @@ const tinkerObj = {
   showNotification: invoke<IpcShowPluginNotification>('showPluginNotification'),
   showDevTools: invoke<IpcShowDevTools>('showDevTools'),
   sendDebuggerCommand: invoke<IpcSendDebuggerCommand>('sendDebuggerCommand'),
+  openPlugin: (() => {
+    const open = invoke<IpcOpenPlugin>('openPlugin')
+    return (id: string) => open(id, true)
+  })(),
+  callPluginMcpTool: invoke<IpcCallPluginMcpTool>('callPluginMcpTool'),
+  hasPlugin: invoke<IpcHasPlugin>('hasPlugin'),
   setTitle,
   showItemInPath: mainObj.showItemInFolder,
   openExternal: mainObj.openExternal,

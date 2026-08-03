@@ -74,7 +74,7 @@ export default function PhotoViewer<T extends PhotoViewerItem>({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 z-20 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+            className="absolute right-3 top-3 z-20 rounded-full bg-black/50 p-2 text-white opacity-0 pointer-events-none transition-opacity duration-200 hover:bg-black/70 group-hover:pointer-events-auto group-hover:opacity-100"
             title={labels.closeViewer}
           >
             <X size={18} />

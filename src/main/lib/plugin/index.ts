@@ -17,6 +17,7 @@ import {
   plugins,
   getBuiltinPluginDir,
   loadSettingsPlugin,
+  hasPlugin,
 } from './loader'
 import * as pluginDownload from './download'
 import * as pluginWebview from './webview'
@@ -37,6 +38,7 @@ import {
   preparePluginView,
   getRunningPlugins,
   startBackgroundPlugins,
+  callPluginMcpTool,
 } from './view'
 
 export {
@@ -81,7 +83,12 @@ export function init() {
   pluginWebview.init()
   pluginTerminal.init()
   handleEvent('getPlugins', getPlugins)
+  handleEvent('hasPlugin', async (id: string) => {
+    await getPlugins()
+    return hasPlugin(id)
+  })
   handleEvent('openPlugin', (id, detached) => openPlugin(id, detached))
+  handleEvent('callPluginMcpTool', callPluginMcpTool)
   handleEvent('reopenPlugin', reopenPlugin)
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
