@@ -284,7 +284,7 @@ export function injectApi() {
     getFileIcon: _tinker.getFileIcon,
     showNotification: _tinker.showNotification,
     openPlugin: _tinker.openPlugin,
-    callPluginMcpTool: _tinker.callPluginMcpTool,
+    callMcpTool: _tinker.callMcpTool,
     hasPlugin: _tinker.hasPlugin,
     on: _tinker.on,
     runFFmpeg,

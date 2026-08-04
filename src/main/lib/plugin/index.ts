@@ -1,6 +1,7 @@
 import { IpcGetFileIcon } from 'common/types'
 import { handleEvent } from 'share/main/lib/util'
 import { cleanUserAgent } from '../util'
+import * as mcp from '../mcp'
 import path from 'path'
 import fs from 'fs-extra'
 import startWith from 'licia/startWith'
@@ -38,7 +39,7 @@ import {
   preparePluginView,
   getRunningPlugins,
   startBackgroundPlugins,
-  callPluginMcpTool,
+  callMcpTool,
 } from './view'
 
 export {
@@ -82,13 +83,14 @@ export function init() {
   pluginInstaller.init()
   pluginWebview.init()
   pluginTerminal.init()
+  mcp.init()
   handleEvent('getPlugins', getPlugins)
   handleEvent('hasPlugin', async (id: string) => {
     await getPlugins()
     return hasPlugin(id)
   })
   handleEvent('openPlugin', (id, detached) => openPlugin(id, detached))
-  handleEvent('callPluginMcpTool', callPluginMcpTool)
+  handleEvent('callMcpTool', callMcpTool)
   handleEvent('reopenPlugin', reopenPlugin)
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)

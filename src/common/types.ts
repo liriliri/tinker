@@ -10,6 +10,22 @@ export interface IPluginMcp {
   tools: Record<string, IMcpToolDefinition>
 }
 
+export type McpStdioServerConfig = {
+  type?: 'stdio'
+  command: string
+  args?: string[]
+  env?: Record<string, string>
+  cwd?: string
+}
+
+export type McpHttpServerConfig = {
+  type: 'http' | 'sse'
+  url: string
+  headers?: Record<string, string>
+}
+
+export type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig
+
 export interface IRawPlugin {
   name: string
   description?: string
@@ -93,8 +109,8 @@ export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
-export type IpcCallPluginMcpTool = (
-  id: string,
+export type IpcCallMcpTool = (
+  target: string | McpServerConfig,
   name: string,
   args?: Record<string, unknown>
 ) => Promise<string>

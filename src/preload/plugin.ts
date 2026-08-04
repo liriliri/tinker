@@ -11,7 +11,7 @@ import {
   IpcShowPluginNotification,
   IpcShowPluginContextMenu,
   IpcOpenPlugin,
-  IpcCallPluginMcpTool,
+  IpcCallMcpTool,
   IpcHasPlugin,
   IPlugin,
 } from 'common/types'
@@ -140,7 +140,7 @@ const tinkerObj = {
     const open = invoke<IpcOpenPlugin>('openPlugin')
     return (id: string) => open(id, true)
   })(),
-  callPluginMcpTool: invoke<IpcCallPluginMcpTool>('callPluginMcpTool'),
+  callMcpTool: invoke<IpcCallMcpTool>('callMcpTool'),
   hasPlugin: invoke<IpcHasPlugin>('hasPlugin'),
   setTitle,
   showItemInPath: mainObj.showItemInFolder,

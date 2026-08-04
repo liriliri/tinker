@@ -10,7 +10,7 @@ const IMAGE_CROPPER_ID = 'tinker-image-cropper'
 
 async function openInPlugin(id: string, path: string) {
   await tinker.openPlugin(id)
-  await tinker.callPluginMcpTool(id, 'open', { path })
+  await tinker.callMcpTool(id, 'open', { path })
 }
 
 interface PhotoGridItemProps {

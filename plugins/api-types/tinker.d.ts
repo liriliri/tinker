@@ -364,6 +364,22 @@ declare global {
       getInfo(): Promise<tinker.TerminalInfo>
     }
 
+    interface McpStdioServerConfig {
+      type?: 'stdio'
+      command: string
+      args?: string[]
+      env?: Record<string, string>
+      cwd?: string
+    }
+
+    interface McpHttpServerConfig {
+      type: 'http' | 'sse'
+      url: string
+      headers?: Record<string, string>
+    }
+
+    type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig
+
     interface TerminalInfo {
       /** Foreground process name (e.g. "vim", "zsh"). */
       processName: string
@@ -432,15 +448,16 @@ declare global {
     hasPlugin(id: string): Promise<boolean>
 
     /**
-     * Call an MCP tool on a running plugin.
-     * The target plugin must already be running (e.g. via openPlugin); this does not start it.
-     * @param id - Plugin id
+     * Call an MCP tool on a running plugin or an external MCP server.
+     * When `target` is a plugin id, the plugin must already be running (e.g. via openPlugin).
+     * When `target` is an MCP server config, connects via stdio / http / sse (connections are cached).
+     * @param target - Plugin id or MCP server config
      * @param name - MCP tool name
      * @param args - Tool arguments
      * @returns Tool result as a string
      */
-    callPluginMcpTool(
-      id: string,
+    callMcpTool(
+      target: string | tinker.McpServerConfig,
       name: string,
       args?: Record<string, unknown>
     ): Promise<string>

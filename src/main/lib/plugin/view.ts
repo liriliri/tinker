@@ -1,4 +1,5 @@
 import {
+  IpcCallMcpTool,
   IpcClosePlugin,
   IpcDetachPlugin,
   IpcClearPluginData,
@@ -30,7 +31,7 @@ import { plugins, getPlugins, hasPlugin } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
 import { stopPluginInspect } from './inspect'
 import { disposePluginHttpSession } from '../http'
-import { validateMcpToolArgs } from '../util'
+import { callExternalMcpTool, validateMcpToolArgs } from '../mcp'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -408,6 +409,17 @@ export async function callPluginMcpTool(
       'Plugin MCP API is not ready. Please wait for the plugin to finish loading.'
     )
   }
+}
+
+export const callMcpTool: IpcCallMcpTool = async function (
+  target,
+  name,
+  args = {}
+) {
+  if (typeof target === 'string') {
+    return callPluginMcpTool(target, name, args)
+  }
+  return callExternalMcpTool(target, name, args)
 }
 
 export const detachPlugin: IpcDetachPlugin = async function (id) {
