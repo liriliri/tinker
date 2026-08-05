@@ -65,8 +65,12 @@ export default observer(function AddDownloadModal({
     const url = trim(downloadUrl)
     const name = trim(fileName)
 
-    store.startDownload(url, store.buildSavePath(name))
-    onClose()
+    try {
+      store.startDownload(url, store.buildSavePath(name))
+      onClose()
+    } catch {
+      // keep modal open; error toast is shown by startDownload
+    }
   }
 
   useEffect(() => {

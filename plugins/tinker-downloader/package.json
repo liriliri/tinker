@@ -16,6 +16,34 @@
         "name": "下载器",
         "description": "下载管理器，支持暂停、续传和进度跟踪"
       }
+    },
+    "mcp": {
+      "tools": {
+        "add": {
+          "description": "Add a download task by URL. Starts downloading immediately to the save directory.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Download URL"
+              },
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "description": "File name to save as. Defaults to the name inferred from the URL."
+              },
+              "saveDir": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute directory to save into. Defaults to the current UI save directory."
+              }
+            },
+            "required": ["url"]
+          }
+        }
+      }
     }
   }
 }

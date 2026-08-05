@@ -14,5 +14,6 @@
   "resume": "Resume",
   "open": "Open",
   "delete": "Delete",
-  "copySuccess": "Copied"
+  "copySuccess": "Copied",
+  "duplicateDownloadUrl": "This URL is already being downloaded"
 }

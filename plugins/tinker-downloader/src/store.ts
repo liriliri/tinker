@@ -3,7 +3,10 @@ import LocalStore from 'licia/LocalStore'
 import contain from 'licia/contain'
 import find from 'licia/find'
 import filter from 'licia/filter'
+import i18n from 'i18next'
+import toast from 'react-hot-toast'
 import BaseStore from 'share/store/Base'
+import { createMcpApi } from './mcp'
 import { FilterTab } from './types'
 
 const storage = new LocalStore('tinker-downloader')
@@ -14,7 +17,9 @@ function isFinished(d: tinker.DownloadTask): boolean {
   return d.state === 'completed' || d.state === 'cancelled'
 }
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   downloads: tinker.DownloadTask[] = []
   addModalVisible: boolean = false
   saveDir: string = ''
@@ -51,9 +56,9 @@ class Store extends BaseStore {
     storage.set(STORAGE_SAVE_DIR, dir)
   }
 
-  buildSavePath(fileName: string): string {
-    const sep = contain(this.saveDir, '\\') ? '\\' : '/'
-    return this.saveDir + sep + fileName
+  buildSavePath(fileName: string, dir = this.saveDir): string {
+    const sep = contain(dir, '\\') ? '\\' : '/'
+    return dir + sep + fileName
   }
 
   setAddModalVisible(visible: boolean) {
@@ -111,9 +116,23 @@ class Store extends BaseStore {
   }
 
   startDownload(url: string, savePath: string) {
+    const existing = find(
+      this.downloads,
+      (d) => !isFinished(d) && d.url === url
+    )
+    if (existing) {
+      if (existing.savePath === savePath) {
+        return existing
+      }
+      const message = i18n.t('duplicateDownloadUrl')
+      toast.error(message)
+      throw new Error(message)
+    }
+
     const task = tinker.download({ url, savePath })
     this.listen(task)
     this.downloads.push(task)
+    return task
   }
 
   togglePause(id: string) {

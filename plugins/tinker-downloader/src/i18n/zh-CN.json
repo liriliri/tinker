@@ -14,5 +14,6 @@
   "resume": "继续",
   "open": "打开",
   "delete": "删除",
-  "copySuccess": "已复制"
+  "copySuccess": "已复制",
+  "duplicateDownloadUrl": "该链接已在下载中"
 }
