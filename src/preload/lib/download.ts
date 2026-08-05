@@ -58,6 +58,7 @@ export function startDownload(
     const timeout = setTimeout(() => {
       if (pendingCallbacks.has(downloadId)) {
         pendingCallbacks.delete(downloadId)
+        ipcRenderer.invoke('cancelPluginDownload', downloadId)
         reject(new Error('Download failed to start'))
       }
     }, 30000)

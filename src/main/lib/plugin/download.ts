@@ -4,6 +4,10 @@ import { PLUGIN_PARTITION, pluginViews } from './view'
 import path from 'path'
 import fs from 'fs-extra'
 import now from 'licia/now'
+import contain from 'licia/contain'
+import findIdx from 'licia/findIdx'
+import remove from 'licia/remove'
+import isEmpty from 'licia/isEmpty'
 
 interface IPluginDownload {
   id: string
@@ -21,13 +25,12 @@ interface IPluginDownload {
 
 const downloads = new Map<string, IPluginDownload>()
 
-const pendingDownloads = new Map<
-  string,
-  Array<{
-    downloadId: string
-    options: IDownloadOptions
-  }>
->()
+interface IPendingDownload {
+  downloadId: string
+  options: IDownloadOptions
+}
+
+const pendingDownloads = new Map<string, IPendingDownload[]>()
 
 function findPluginId(webContents: Electron.WebContents): string | undefined {
   for (const id in pluginViews) {
@@ -35,6 +38,16 @@ function findPluginId(webContents: Electron.WebContents): string | undefined {
       return id
     }
   }
+}
+
+function removePendingDownload(
+  pluginId: string | undefined,
+  downloadId: string
+) {
+  if (!pluginId) return
+  const queue = pendingDownloads.get(pluginId)
+  if (!queue) return
+  remove(queue, (p) => p.downloadId === downloadId)
 }
 
 function serializeDownload(dl: IPluginDownload): IDownloadProgress {
@@ -55,9 +68,17 @@ export function init() {
     if (!pluginId) return
 
     const queue = pendingDownloads.get(pluginId)
-    if (!queue || queue.length === 0) return
+    if (!queue || isEmpty(queue)) return
 
-    const pending = queue.shift()!
+    const urlChain = item.getURLChain()
+    const itemUrl = item.getURL()
+    const idx = findIdx(
+      queue,
+      (p) => contain(urlChain, p.options.url) || p.options.url === itemUrl
+    )
+    if (idx < 0) return
+
+    const [pending] = queue.splice(idx, 1)
     const { downloadId, options } = pending
 
     const savePath = options.savePath
@@ -67,7 +88,7 @@ export function init() {
     const download: IPluginDownload = {
       id: downloadId,
       pluginId,
-      url: item.getURL(),
+      url: options.url,
       fileName: path.basename(savePath),
       state: item.getState(),
       speed: 0,
@@ -166,6 +187,7 @@ export function init() {
 
   ipcMain.handle('cancelPluginDownload', (event, downloadId: string) => {
     const pluginId = findPluginId(event.sender)
+    removePendingDownload(pluginId, downloadId)
     const dl = downloads.get(downloadId)
     if (dl && dl.pluginId === pluginId) {
       dl.downloadItem.cancel()
@@ -174,6 +196,7 @@ export function init() {
 
   ipcMain.handle('deletePluginDownload', (event, downloadId: string) => {
     const pluginId = findPluginId(event.sender)
+    removePendingDownload(pluginId, downloadId)
     const dl = downloads.get(downloadId)
     if (dl && dl.pluginId === pluginId) {
       if (dl.state !== 'completed' && dl.state !== 'cancelled') {
