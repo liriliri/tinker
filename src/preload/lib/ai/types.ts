@@ -56,12 +56,6 @@ export interface AiTool {
   }
 }
 
-export interface AiResult {
-  success: boolean
-  data?: AiMessage
-  error?: string
-}
-
 export interface AiChunk {
   content?: string
   reasoningContent?: string

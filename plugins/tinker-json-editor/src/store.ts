@@ -344,12 +344,12 @@ export class Store extends BaseStore {
         ],
       })
 
-      if (!result.success || !result.data?.content) {
+      if (!result.content) {
         toast.error(i18n.t('fixJsonFailed'), { id: loadingToast })
         return
       }
 
-      const content = (result.data.content as string).trim()
+      const content = (result.content as string).trim()
       JSON.parse(content)
       this.setJsonInput(content)
       toast.success(i18n.t('fixJsonSuccess'), { id: loadingToast })

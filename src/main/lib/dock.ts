@@ -9,8 +9,7 @@ export function hide() {
 
   const visibleWins = window.getVisibleWins()
   const mainWin = window.getWin('main')
-  const onlyMain =
-    visibleWins.length === 1 && visibleWins[0] === mainWin
+  const onlyMain = visibleWins.length === 1 && visibleWins[0] === mainWin
 
   if (isEmpty(visibleWins) || onlyMain) {
     app.dock.hide()

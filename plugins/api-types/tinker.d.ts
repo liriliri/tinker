@@ -188,12 +188,6 @@ declare global {
       maxTokens?: number
     }
 
-    interface AiResult {
-      success: boolean
-      data?: AiMessage
-      error?: string
-    }
-
     interface AiChunk {
       content?: string
       reasoningContent?: string
@@ -568,9 +562,10 @@ declare global {
      * Call AI with a non-streaming request.
      * Uses the configured AI provider to send messages and receive a response.
      * @param option - Call options including messages, provider, tools, etc.
-     * @returns Result with success flag and response message or error
+     * @returns Assistant response message
+     * @throws If no provider is configured or the request fails
      */
-    callAI(option: tinker.AiCallOption): Promise<tinker.AiResult>
+    callAI(option: tinker.AiCallOption): Promise<tinker.AiMessage>
 
     /**
      * Call AI with a streaming request.

@@ -3,7 +3,7 @@ import type { AiAdapter } from './adapter'
 import { ClaudeAdapter } from './claude'
 import { OpenAIAdapter } from './openai'
 import { findProvider, getProviderList } from './provider'
-import type { AiCallOption, AiChunk, AiProvider, AiResult } from './types'
+import type { AiCallOption, AiChunk, AiMessage, AiProvider } from './types'
 
 export type {
   AiApiType,
@@ -13,7 +13,6 @@ export type {
   AiMessage,
   AiModel,
   AiProvider,
-  AiResult,
   AiTool,
   AiToolCall,
 } from './types'
@@ -37,17 +36,10 @@ function createAdapter(
 
 const abortControllers = new Map<string, AbortController>()
 
-export async function callAI(option: AiCallOption): Promise<AiResult> {
+export async function callAI(option: AiCallOption): Promise<AiMessage> {
   const provider = await findProvider(option.provider)
-  if (!provider) return { success: false, error: 'No AI provider configured' }
-
-  try {
-    const adapter = createAdapter(provider)
-    const data = await adapter.call(option)
-    return { success: true, data }
-  } catch (err: any) {
-    return { success: false, error: err.message || String(err) }
-  }
+  const adapter = createAdapter(provider)
+  return adapter.call(option)
 }
 
 export function callAIStream(
