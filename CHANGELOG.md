@@ -1,3 +1,9 @@
+## v2.1.2 (6 Aug 2026)
+
+* feat: add callMcpTool plugin api
+* feat(downloader): mcp support
+* fix: offical plugin update menu not working
+
 ## v2.1.1 (31 Jul 2026)
 
 * feat: network proxy settings
