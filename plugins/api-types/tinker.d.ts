@@ -431,9 +431,8 @@ declare global {
      * Open another plugin in a detached window.
      * If the plugin is already running, focuses the existing window instead.
      * @param id - Plugin id (e.g. 'json-editor')
-     * @returns false if the plugin does not exist or is not installed
      */
-    openPlugin(id: string): Promise<boolean>
+    openPlugin(id: string): Promise<void>
 
     /**
      * Check whether a plugin is installed (builtin, npm global, or user-installed).

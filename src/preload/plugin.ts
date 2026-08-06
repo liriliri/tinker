@@ -136,10 +136,9 @@ const tinkerObj = {
   showNotification: invoke<IpcShowPluginNotification>('showPluginNotification'),
   showDevTools: invoke<IpcShowDevTools>('showDevTools'),
   sendDebuggerCommand: invoke<IpcSendDebuggerCommand>('sendDebuggerCommand'),
-  openPlugin: (() => {
-    const open = invoke<IpcOpenPlugin>('openPlugin')
-    return (id: string) => open(id, true)
-  })(),
+  openPlugin: async (id: string) => {
+    await invoke<IpcOpenPlugin>('openPlugin')(id, true)
+  },
   callMcpTool: invoke<IpcCallMcpTool>('callMcpTool'),
   hasPlugin: invoke<IpcHasPlugin>('hasPlugin'),
   setTitle,
