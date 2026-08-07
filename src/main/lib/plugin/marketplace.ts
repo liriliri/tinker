@@ -44,6 +44,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-audio-transcriber',
+    name: 'Audio Transcriber',
+    description: 'Transcribe audio from long media files',
+    icon: 'tinker-audio-transcriber.png',
+    locales: {
+      'zh-CN': {
+        name: '音频转录',
+        description: '将超长音频/影片音轨转写为文本',
+      },
+    },
+  },
+  {
     id: 'tinker-ball-maze',
     name: 'Ball Maze',
     description: 'Roll the ball through the maze and find the exit!',

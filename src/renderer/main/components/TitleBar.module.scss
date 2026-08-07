@@ -51,6 +51,9 @@
   text-align: center;
   font-size: #{$font-size-x-l}px;
   background-color: var(--color-bg-container);
+  &.with-close {
+    padding: 0 32px;
+  }
 }
 
 .more {
