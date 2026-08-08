@@ -19,3 +19,14 @@ if (isWindows) {
   await $`unzip -o ${dir}/everything-x64.zip -d ${dir}/everything`
   await $`rm ${dir}/everything-x64.zip`
 }
+
+// Full npm tree for plugin install/update. Shipped via extraResources so
+// ELECTRON_RUN_AS_NODE can run it outside asar.
+const npmVersion = '11.13.0'
+const npmDir = path.join(dir, 'npm')
+cd(path.resolve(__dirname, '..'))
+const npmTgz = (await $`npm pack npm@${npmVersion}`).stdout.trim()
+await fs.remove(npmDir)
+await fs.mkdir(npmDir)
+await $`tar -xzf ${npmTgz} -C ${npmDir} --strip-components=1`
+await fs.remove(npmTgz)

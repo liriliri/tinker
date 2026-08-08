@@ -8,4 +8,5 @@ resources/ScreenCapture.exe
 resources/pdu
 resources/pdu.exe
 resources/everything/
+resources/npm/
 package-lock.json

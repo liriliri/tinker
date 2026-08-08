@@ -1,66 +1,5 @@
 import builder from 'electron-builder'
-import { createRequire } from 'module'
-import path from 'path'
 import isMac from 'licia/isMac.js'
-
-const require = createRequire(import.meta.url)
-
-// Collect asarUnpack patterns for a package and every dependency it actually
-// resolves to. Needed because ELECTRON_RUN_AS_NODE cannot read asar, and npm's
-// deps may be hoisted out of node_modules/npm/.
-function collectAsarUnpack(entryPkg, cwd = process.cwd()) {
-  const root = fs.realpathSync(cwd)
-  const seen = new Set()
-  const dirs = []
-
-  function walk(name, fromDir) {
-    let pkgJson
-    try {
-      pkgJson = require.resolve(`${name}/package.json`, { paths: [fromDir] })
-    } catch {
-      return
-    }
-    const dir = fs.realpathSync(path.dirname(pkgJson))
-    if (seen.has(dir)) {
-      return
-    }
-    seen.add(dir)
-    dirs.push(dir)
-
-    let pkg
-    try {
-      pkg = JSON.parse(fs.readFileSync(pkgJson, 'utf8'))
-    } catch {
-      return
-    }
-    const deps = {
-      ...pkg.dependencies,
-      ...pkg.optionalDependencies,
-    }
-    for (const dep of Object.keys(deps)) {
-      walk(dep, dir)
-    }
-  }
-
-  walk(entryPkg, root)
-
-  const rels = dirs
-    .map((dir) => path.relative(root, dir).split(path.sep).join('/'))
-    .filter((rel) => rel && !rel.startsWith('..'))
-    .sort()
-
-  const collapsed = []
-  for (const rel of rels) {
-    const covered = collapsed.some(
-      (parent) => rel === parent || rel.startsWith(`${parent}/`)
-    )
-    if (!covered) {
-      collapsed.push(rel)
-    }
-  }
-
-  return collapsed.map((rel) => `${rel}/**`)
-}
 
 cd('dist')
 
@@ -94,9 +33,6 @@ if (isMac && process.arch !== 'arm64') {
   publishChannel = '${productName}-latest-${arch}'
 }
 
-const npmUnpack = collectAsarUnpack('npm')
-console.log('asarUnpack for npm:', npmUnpack)
-
 const config = {
   appId: pkg.appId,
   directories: {
@@ -118,7 +54,6 @@ const config = {
     '!node_modules/nan',
     ...prebuildExclusions,
   ],
-  asarUnpack: [...npmUnpack],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: [
     {

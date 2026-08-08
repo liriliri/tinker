@@ -2,19 +2,18 @@ import { spawn } from 'child_process'
 import type { SpawnOptions } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
-import { getUserDataPath, handleEvent } from 'share/main/lib/util'
+import {
+  getUserDataPath,
+  handleEvent,
+  resolveResources,
+} from 'share/main/lib/util'
 import { getSettingsStore } from '../store'
 import { plugins } from './loader'
-import { isDev } from 'share/common/util'
 
 const pluginInstallDir = getUserDataPath('plugins')
 
 function getNpmCliPath() {
-  let npmDir = path.dirname(require.resolve('npm/package.json'))
-  if (!isDev()) {
-    npmDir = npmDir.replace('app.asar', 'app.asar.unpacked')
-  }
-  return path.join(npmDir, 'bin/npm-cli.js')
+  return path.join(resolveResources('npm'), 'bin/npm-cli.js')
 }
 
 function runNpm(args: string[], options: SpawnOptions = {}): Promise<string> {
