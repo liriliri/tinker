@@ -1,3 +1,7 @@
+## v2.1.3 (8 Aug 2026)
+
+* fix: npm install
+
 ## v2.1.2 (6 Aug 2026)
 
 * feat: add callMcpTool plugin api
