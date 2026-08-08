@@ -168,7 +168,9 @@ export default observer(function Titlebar() {
         onDoubleClick={() => main.toggleWinMaximize()}
       >
         <input
-          className={`${Style.input}${store.plugin ? ` ${Style.withClose}` : ''}`}
+          className={`${Style.input}${
+            store.plugin ? ` ${Style.withClose}` : ''
+          }`}
           placeholder={t('searchTool')}
           autoFocus={true}
           value={store.filter}
