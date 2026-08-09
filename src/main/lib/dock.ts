@@ -2,6 +2,11 @@ import * as window from 'share/main/lib/window'
 import isEmpty from 'licia/isEmpty'
 import { app } from 'electron'
 
+const workspaceOpts = {
+  visibleOnFullScreen: true,
+  skipTransformProcessType: true,
+}
+
 export function hide() {
   if (!app.dock) {
     return
@@ -14,19 +19,17 @@ export function hide() {
   if (isEmpty(visibleWins) || onlyMain) {
     app.dock.hide()
     if (onlyMain && mainWin) {
-      mainWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      mainWin.setVisibleOnAllWorkspaces(true, workspaceOpts)
       mainWin.focus()
-      mainWin.setVisibleOnAllWorkspaces(false, {
-        visibleOnFullScreen: true,
-      })
+      mainWin.setVisibleOnAllWorkspaces(false, workspaceOpts)
     }
   }
 }
 
-export function show() {
+export async function show() {
   if (!app.dock) {
     return
   }
 
-  app.dock.show()
+  await app.dock.show()
 }

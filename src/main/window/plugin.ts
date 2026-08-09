@@ -32,7 +32,9 @@ export function showWin(plugin: IPlugin) {
   win.on('enter-full-screen', onLayout)
   win.on('leave-full-screen', onLayout)
 
-  dock.show()
+  win.on('show', () => {
+    dock.show()
+  })
 
   window.loadPage(win, {
     page: 'plugin',

@@ -501,6 +501,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-tts',
+    name: 'Text to Speech',
+    description: 'Convert text to speech with Microsoft Edge TTS',
+    icon: 'tinker-tts.png',
+    locales: {
+      'zh-CN': {
+        name: '语音合成',
+        description: '使用 Microsoft Edge TTS 将文本合成为语音',
+      },
+    },
+  },
+  {
     id: 'tinker-typing-test',
     name: 'Typing Test',
     description: 'Test and improve your typing speed',
