@@ -1,3 +1,7 @@
+## v2.1.4 (11 Aug 2026)
+
+* fix: windows npm install
+
 ## v2.1.3 (8 Aug 2026)
 
 * fix: npm install

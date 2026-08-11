@@ -20,6 +20,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-3d-viewer',
+    name: '3D Viewer',
+    description: 'Preview 3D models',
+    icon: 'tinker-3d-viewer.png',
+    locales: {
+      'zh-CN': {
+        name: '3D 预览',
+        description: '预览 3D 模型',
+      },
+    },
+  },
+  {
     id: 'tinker-agent-notification',
     name: 'Agent Notification',
     description: 'Configure notification sounds for coding agents',
