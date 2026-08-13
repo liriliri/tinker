@@ -208,7 +208,7 @@ export class Store extends BaseStore {
       return { text: data, isBinary: false, size: getByteSize(data) }
     }
     const buffer = data instanceof ArrayBuffer ? data : await data.arrayBuffer()
-    const bytes = convertBin(buffer, 'Array') as number[]
+    const bytes = convertBin(buffer, 'Array')
     return { text: '', isBinary: true, size: bytes.length, bytes }
   }
 
@@ -397,7 +397,7 @@ export class Store extends BaseStore {
 
     try {
       ws.send(buffer)
-      const bytes = convertBin(buffer, 'Array') as number[]
+      const bytes = convertBin(buffer, 'Array')
       this.appendMessage(conn.id, {
         id: uuid(),
         direction: 'outgoing',

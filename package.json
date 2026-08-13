@@ -129,7 +129,7 @@
     "koa": "^3.2.1",
     "koa-compose": "^4.1.0",
     "koa-static": "^5.0.0",
-    "licia": "^1.48.1",
+    "licia": "^1.49.0",
     "node-pty": "^1.1.0",
     "pdu-static": "^0.1.0",
     "uiohook-napi": "1.5.4",

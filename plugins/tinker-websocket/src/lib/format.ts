@@ -34,16 +34,16 @@ export function getByteSize(data: string): number {
 }
 
 export function formatBytesAsHex(bytes: number[] | Uint8Array): string {
-  const encoded = hex.encode(convertBin(bytes, 'Array') as number[])
+  const encoded = hex.encode(bytes)
   return encoded.match(/.{1,2}/g)?.join(' ') || ''
 }
 
 export function bytesToText(bytes: number[] | Uint8Array): string {
-  return bytesToStr(convertBin(bytes, 'Array') as number[])
+  return bytesToStr(bytes)
 }
 
 export function textToBytes(text: string): Uint8Array {
-  return convertBin(strToBytes(text), 'Uint8Array') as Uint8Array
+  return convertBin(strToBytes(text), 'Uint8Array')
 }
 
 export function shortUrl(url: string, maxLen = 40): string {

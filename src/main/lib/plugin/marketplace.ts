@@ -152,6 +152,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-dos',
+    name: 'DOS',
+    description: 'Run DOS programs and games',
+    icon: 'tinker-dos.png',
+    locales: {
+      'zh-CN': {
+        name: 'DOS',
+        description: '运行 DOS 程序与游戏',
+      },
+    },
+  },
+  {
     id: 'tinker-electron-debug',
     name: 'Electron Debug',
     description: 'Remote debugger for Electron applications',

@@ -42,7 +42,7 @@ export default observer(function MessageDetail() {
   const hexData = useMemo(() => {
     if (!msg) return new Uint8Array(0)
     if (msg.isBinary && msg.bytes) {
-      return convertBin(msg.bytes, 'Uint8Array') as Uint8Array
+      return convertBin(msg.bytes, 'Uint8Array')
     }
     return textToBytes(msg.data)
   }, [msg])
