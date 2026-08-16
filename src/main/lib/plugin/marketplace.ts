@@ -56,6 +56,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-aquarium',
+    name: 'Aquarium',
+    description: 'Desktop aquarium fish tank simulation',
+    icon: 'tinker-aquarium.png',
+    locales: {
+      'zh-CN': {
+        name: '水族箱',
+        description: '桌面鱼缸模拟',
+      },
+    },
+  },
+  {
     id: 'tinker-audio-transcriber',
     name: 'Audio Transcriber',
     description: 'Transcribe audio from long media files',
