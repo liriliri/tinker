@@ -269,7 +269,7 @@ async function ensureInspect(pluginId: string) {
 
 async function connectSession(pluginId: string): Promise<UiSession> {
   const httpUrl = await ensureInspect(pluginId)
-  const browser = await chromium.connectOverCDP(httpUrl)
+  const browser = await chromium.connectOverCDP(httpUrl, { noDefaults: true })
 
   let context = browser.contexts()[0]
   for (let i = 0; i < 30 && (!context || context.pages().length === 0); i++) {
