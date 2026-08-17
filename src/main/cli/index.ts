@@ -6,12 +6,14 @@ import {
   waitForServer,
 } from './ipc'
 import { registerMcpCommands } from './mcp'
+import { registerUiCommands } from './ui'
 import { runSkills } from './skills'
 import { registerListCommand } from './list'
 import { normalizePluginId } from './util'
 
 interface ExecuteCommandOptions {
   format?: (data: unknown) => void
+  timeout?: number
 }
 
 function formatRunningPlugins(data: unknown) {
@@ -32,7 +34,7 @@ async function executeCommand(
 ) {
   let res
   try {
-    res = await sendCommand(command, data)
+    res = await sendCommand(command, data, { timeout: options?.timeout })
   } catch (err: any) {
     console.error(`Error: ${err.message || 'Failed to connect to Tinker'}`)
     process.exit(1)
@@ -206,6 +208,7 @@ program
 
 registerListCommand(program, executeCommand)
 registerMcpCommands(program, executeCommand)
+registerUiCommands(program, executeCommand)
 
 program
   .command('ps')

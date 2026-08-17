@@ -5,10 +5,12 @@ import {
   isPluginRunning,
   pluginViews,
   callPluginMcpTool,
+  startPluginInspectForRunning,
 } from '../lib/plugin/view'
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { getMainStore } from '../lib/store'
-import { parseInspectAddress, startPluginInspect } from '../lib/plugin/inspect'
+import { parseInspectAddress } from '../lib/plugin/inspect'
+import { runUiCommand, disposeAllUiSessions } from '../lib/plugin/ui'
 import { startHttp, stopHttp, resolveHttpAddress } from '../lib/http'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
 
@@ -75,16 +77,7 @@ async function startInspectIfNeeded(
   if (!address) {
     return undefined
   }
-  const entry = pluginViews[id]
-  if (!entry) {
-    throw new Error(`Plugin is not running: ${id}`)
-  }
-  const plugin = plugins[id]
-  return startPluginInspect(id, entry.view.webContents, {
-    address,
-    title: plugin?.name || id,
-    pageUrl: entry.view.webContents.getURL() || `plugin://${id}/`,
-  })
+  return startPluginInspectForRunning(id, address)
 }
 
 async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
@@ -133,6 +126,24 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
       }
       case 'callMcpTool':
         return callMcpTool(req)
+      case 'ui': {
+        const result = await ensurePlugin(req)
+        if (typeof result !== 'string') return result
+        const action = req.data?.action as string
+        if (!action) {
+          return fail(req, 'Missing ui action')
+        }
+        try {
+          const output = await runUiCommand(result, {
+            action,
+            args: (req.data?.args as string[]) || [],
+            options: (req.data?.options as Record<string, unknown>) || {},
+          })
+          return success(req, output)
+        } catch (err: any) {
+          return fail(req, err.message || String(err))
+        }
+      }
       default:
         return fail(req, `Unknown command: ${req.command}`)
     }
@@ -157,6 +168,7 @@ export function init() {
   })
 
   app.on('will-quit', () => {
+    disposeAllUiSessions()
     void stopHttp()
     stopServer()
   })

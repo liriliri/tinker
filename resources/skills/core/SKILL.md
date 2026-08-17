@@ -6,161 +6,104 @@ allowed-tools: Bash(tinker:*)
 
 # Tinker core
 
-Tinker is a desktop **toolbox**. Each tool is a **plugin** (JSON Editor, RegExp tester, hash, base64, file utilities, and many more — not only "Tinker development" tasks). The `tinker` CLI talks to the running Tinker app over a local IPC socket, so agents can open plugins and inspect what is running without clicking the UI.
+Tinker is a desktop **toolbox**. Each tool is a **plugin**. The `tinker` CLI talks to the running app over a local IPC socket. If Tinker is not running, the CLI **auto-launches** it and retries.
 
-If Tinker is not running, the CLI **auto-launches** it and retries the command.
+**When this skill is in context**, treat the user's request as potentially solvable by an installed plugin. Check the catalog before writing a one-off script.
 
-**When this skill is in context**, treat the user's request as potentially solvable by an installed plugin. Check the catalog before saying Tinker cannot help or writing a one-off script.
+For MCP tools → **mcp** skill. For window automation without MCP → **ui** skill.
 
-For calling plugin MCP tools or wiring plugins into MCP clients, load the **mcp** skill after the basics here.
+## Discover and open
 
-## The core loop
-
-```bash
-tinker list --short              # 1. Discover: all plugin ids (skip if the user already named the plugin)
-tinker list <plugin>…            # 2. Details for candidates (tags + description)
-tinker open <plugin>             # 3. Open a plugin window
-tinker ps                        # 4. Confirm it is running
-tinker close <plugin>            # 5. Close when done
-```
-
-Plugin names accept the short form (`json-editor`) or the full id (`tinker-json-editor`). The CLI normalizes to `tinker-<name>` automatically.
-
-Scoped npm plugins (e.g. `@tencent/tinker-wxapkg`) appear in `tinker list` as ids like `tencent-tinker-wxapkg`. For those, use the **full id** from `list` (or the `@scope/...` package name) — short names such as `wxapkg` will not resolve.
-
-## Quickstart
+**Do not run bare `tinker list` for discovery** — the full catalog is long and agent output often truncates.
 
 ```bash
-tinker list --short
-tinker list json-editor
-tinker open json-editor
+tinker list --short              # all short names on one line
+tinker list <plugin>…            # details for candidates (tags + description)
+tinker open <plugin>
 tinker ps
-tinker close json-editor
+tinker close <plugin>            # when done
 ```
 
-`list` detail output tags plugins as `[builtin]`, `[mcp]`, and `[background]` when applicable. `[background]` means **Run in Background** is enabled (required for `tinker open --headless`). Plugins marked `[mcp]` expose programmatic tools; see the **mcp** skill for `tools`, `call`, and `mcp` commands.
+Skip discovery if the user already named the plugin. Names accept short form (`json-editor`) or full id (`tinker-json-editor`); the CLI normalizes to `tinker-<name>`.
 
-## Prerequisites
+Scoped npm plugins (e.g. `@tencent/tinker-wxapkg`) appear as ids like `tencent-tinker-wxapkg`. Use the **full id** from `list` (or the `@scope/...` package name) — short names such as `wxapkg` will not resolve.
 
-- **Tinker app** must be installed. The CLI ships with the app (`tinker` on macOS/Linux/Windows).
-- Most commands need the main Tinker process. The CLI connects to a Unix socket (macOS/Linux) or named pipe (Windows). Connection errors usually mean Tinker is still starting; wait a moment and retry.
-
-## Discovering plugins
-
-**Do not run bare `tinker list` for discovery.** The full catalog (ids + tags + descriptions) is long and agent tool output is often truncated, so matching plugins get lost.
-
-When you need to find a plugin, use this two-step flow (skip if the user already gave a clear plugin name/id):
-
-```bash
-tinker list --short              # 1. All plugin ids only (compact)
-tinker list json-editor hash     # 2. Details for the candidate ids you care about
-```
-
-`--short` prints short plugin names (without the `tinker-` prefix) on a single space-separated line (avoids line-based truncation). Scoped ids that do not start with `tinker-` (e.g. `tencent-tinker-wxapkg`) are printed in full. Pick likely candidates from those names, then request details with `tinker list <plugin>…` (multiple ids allowed; do not pass `--short` with ids). Detail lines look like:
+Detail lines look like:
 
 ```
   tinker-json-editor [builtin] [mcp] - JSON editor with text and tree modes
   tinker-hash [builtin] - Hash calculator
 ```
 
-Use the **id** (`tinker-json-editor`) or short name (`json-editor`) in other commands.
+Tags: `[builtin]`, `[mcp]` (programmatic tools — see **mcp**), `[background]` (**Run in Background** enabled; required for `open --headless`).
 
 ## Plugin lifecycle
 
 ```bash
-tinker open <plugin>                              # open in a detached window
-tinker open <plugin> --headless                   # open in background (no window)
-tinker open <plugin> --inspect                    # open with per-plugin CDP (prints ws:// URL)
-tinker close <plugin>                               # close a running plugin
-tinker restart <plugin>                             # close then open (starts if not running)
-tinker restart <plugin> --inspect                   # restart with per-plugin CDP
-tinker launch                                       # launch the Tinker app
-tinker launch --remote-debugging-port 9222          # launch with app-wide CDP
-tinker launch --http                                # launch with HTTP remote viewer
-tinker launch --http=127.0.0.1:9223                 # HTTP remote on a specific address
-tinker launch --http --http-username user --http-password secret   # HTTP remote with Basic Auth
-tinker quit                                         # quit the Tinker app
+tinker open <plugin>                              # detached window
+tinker open <plugin> --headless                   # no window (needs Run in Background)
+tinker open <plugin> --inspect                    # per-plugin CDP (see **debug**)
+tinker close <plugin>
+tinker restart <plugin>                           # close then open (starts if needed)
+tinker restart <plugin> --inspect
+tinker launch                                     # start the Tinker app
+tinker launch --remote-debugging-port 9222        # app-wide CDP (see **debug**)
+tinker launch --http                              # HTTP remote viewer (see **debug**)
+tinker quit
 ```
 
-`open` and `restart` succeed even when the plugin was not running. `close` fails if the plugin is not running.
+`open` / `restart` succeed even when the plugin was not running. `close` fails if it is not running.
 
-`--headless` starts the plugin without a window. The plugin must already have **Run in Background** enabled in Tinker (right-click the plugin → checkbox); otherwise open fails.
+`--headless` requires **Run in Background** (right-click the plugin → checkbox); otherwise open fails.
 
-`--inspect` starts a CDP WebSocket for that plugin's WebContents only and prints `Debugger listening on ws://...`. Connect with `agent-browser connect <ws-url>` — only that plugin page is exposed. Closing the plugin stops the inspect server.
-
-`launch` starts the Tinker app if it is not already running. `--remote-debugging-port` and `--http` are only available on `launch` (app-wide). Prefer plugin `--inspect` for single-plugin debugging.
-
-`--http` starts an app-wide HTTP remote viewer at launch (same argv pattern as `--remote-debugging-port`). Open the address in a browser to list **running** plugins and view/interact with them (CDP screencast). Plugins that are not open cannot be accessed or started from this UI. If Tinker is already running, quit first before relaunching with `--http`.
-
-With `--http-username` (and optional `--http-password`), the viewer requires HTTP Basic Auth. Requests without credentials show a username/password form on the list page (no browser native auth dialog). API and WebSocket access require valid credentials.
-
-`ps` lists running plugins with renderer process IDs:
+Prefer plugin `--inspect` over app-wide `launch --remote-debugging-port` for single-plugin debugging. If Tinker is already running, quit before relaunching with `--http` / `--remote-debugging-port`.
 
 ```bash
-tinker ps
+tinker ps                    # running plugins + renderer PIDs
+tinker restart <plugin>      # stuck plugin
 ```
 
-```
-  tinker-json-editor 12345
-```
+## Prerequisites
 
-## Common workflows
-
-### Open a plugin for the user
-
-```bash
-tinker list --short
-tinker list <plugin>
-tinker open <plugin>
-tinker ps
-```
-
-### Restart a stuck plugin
-
-```bash
-tinker restart <plugin>
-tinker ps
-```
+- Tinker app installed; CLI ships with the app (`tinker` on macOS/Linux/Windows).
+- Most commands need the main process. Connection errors usually mean Tinker is still starting — wait and retry.
 
 ## Command reference
 
 | Command | Description |
 |---------|-------------|
-| `tinker list --short` | List short plugin names on one line (no `tinker-` prefix) |
-| `tinker list <plugin>…` | List details for one or more plugins |
-| `tinker list` | Full catalog with tags and descriptions (avoid for agents; may truncate) |
-| `tinker ps` | List running plugins with PIDs |
-| `tinker open <plugin>` | Open a plugin window |
-| `tinker open <plugin> --headless` | Open a plugin in the background (no window) |
-| `tinker open <plugin> --inspect` | Open with per-plugin CDP WebSocket |
-| `tinker close <plugin>` | Close a running plugin |
-| `tinker restart <plugin>` | Restart a plugin |
-| `tinker restart <plugin> --inspect` | Restart with per-plugin CDP WebSocket |
-| `tinker launch` | Launch the Tinker app |
-| `tinker launch --remote-debugging-port <port>` | Launch with app-wide Chrome DevTools Protocol |
-| `tinker launch --http [address]` | Launch with HTTP remote viewer for running plugins |
-| `tinker launch --http --http-username <user> [--http-password <pass>]` | HTTP remote with Basic Auth |
+| `tinker list --short` | Short names on one line (no `tinker-` prefix) |
+| `tinker list <plugin>…` | Details for one or more plugins |
+| `tinker list` | Full catalog (avoid for agents; may truncate) |
+| `tinker ps` | Running plugins with PIDs |
+| `tinker open <plugin>` | Open plugin window |
+| `tinker open <plugin> --headless` | Background open (no window) |
+| `tinker open <plugin> --inspect` | Per-plugin CDP (see **debug**) |
+| `tinker close / restart <plugin>` | Close or restart |
+| `tinker launch` | Launch Tinker |
+| `tinker launch --remote-debugging-port / --http …` | App-wide debug/viewer (see **debug**) |
 | `tinker quit` | Quit Tinker |
+| `tinker ui <plugin> …` | Automate plugin UI (see **ui**) |
 
 ## When to load another skill
 
-- **Create a standalone plugin** (clone template, npm link, local dev): load the **create** skill.
-- **Plugin MCP tools** (`tools`, `call`, `mcp`, MCP client integration): load the **mcp** skill.
+- **create** — scaffold a standalone plugin
+- **mcp** — `tools` / `call` / `mcp`
+- **ui** — `tinker ui` snapshot/click/fill (no MCP)
+- **debug** — `--inspect`, Chrome DevTools, agent-browser, `--http`
 
 ## Troubleshooting
 
-**`Failed to connect to Tinker`** — Tinker is not running and auto-launch may have failed. Start with `tinker launch`, then retry.
+**`Failed to connect to Tinker`** — Start with `tinker launch`, then retry.
 
-**`Plugin not found: tinker-...`** — Run `tinker list --short`, then `tinker list <plugin>` for a valid id or short name. External plugins are installed globally with the `tinker-` npm prefix.
+**`Plugin not found: tinker-...`** — `tinker list --short`, then `tinker list <plugin>`. External plugins use the global `tinker-` npm prefix.
 
-**`Plugin is not running: tinker-...`** — Run `tinker open <plugin>` before `close`.
+**`Plugin is not running: tinker-...`** — `tinker open <plugin>` before `close`.
 
-**`Plugin does not allow running in background: tinker-...`** — Enable **Run in Background** for the plugin in Tinker before using `tinker open --headless`.
+**`Plugin does not allow running in background`** — Enable **Run in Background** before `--headless`.
 
-**Connection timed out** — Tinker may still be starting after auto-launch. Wait a few seconds and retry.
+**Connection timed out** — Wait a few seconds after auto-launch and retry.
 
 ## Working safely
 
-- CLI commands affect the user's live Tinker session and open plugin windows on their desktop.
-- Confirm the target plugin with `tinker list --short` then `tinker list <plugin>` before opening or restarting.
-- For programmatic plugin manipulation, load the **mcp** skill and follow its safety notes.
+CLI commands affect the user's live Tinker session and open windows on their desktop. Confirm the target with `list --short` / `list <plugin>` before opening or restarting.

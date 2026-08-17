@@ -162,8 +162,10 @@ export function launchTinker(options?: LaunchOptions) {
 
 export async function sendCommand(
   command: string,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
+  options?: { timeout?: number }
 ): Promise<IpcResponse> {
+  const timeout = options?.timeout ?? 10000
   const invoke = () =>
     new Promise<IpcResponse>((resolve, reject) => {
       let settled = false
@@ -188,7 +190,7 @@ export async function sendCommand(
       socket.on('error', (err) => {
         if (!settled) reject(err)
       })
-      socket.setTimeout(10000, () => {
+      socket.setTimeout(timeout, () => {
         if (!settled) {
           socket.destroy()
           reject(new Error('Connection timed out'))
@@ -231,6 +233,6 @@ export function isServerRunning(): Promise<boolean> {
   })
 }
 
-export function waitForServer(timeout = 10000): Promise<void> {
-  return waitUntil(() => isServerRunning(), timeout, 300)
+export async function waitForServer(timeout = 10000): Promise<void> {
+  await waitUntil(() => isServerRunning(), timeout, 300)
 }

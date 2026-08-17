@@ -1,37 +1,25 @@
 ---
 name: debug
-description: Debug Tinker plugins with agent-browser. Use when the user needs to open, inspect, interact with, restart, or close a plugin in the running Tinker Electron app.
+description: Debug Tinker plugins with CDP inspect, app-wide remote debugging, the HTTP remote viewer, and optional agent-browser. Prefer the ui skill (tinker ui) for everyday plugin UI automation. Use this skill when you need open --inspect, launch --remote-debugging-port, launch --http, Chrome DevTools, or an external CDP client.
 allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*), Bash(tinker:*)
 ---
 
 # Tinker Plugin Debug
 
-Debug and interact with Tinker plugins at runtime using `tinker` CLI and `agent-browser`.
+Low-level CDP debugging for Tinker plugins. For normal agent UI automation (snapshot / click / fill), prefer the **ui** skill (`tinker ui`) — no extra install required.
 
-## Prerequisites
+Use this skill for the raw inspect WebSocket, Chrome DevTools, `agent-browser`, app-wide `--remote-debugging-port`, or the `--http` remote viewer.
 
-Open the plugin with `--inspect` so Tinker starts a **per-plugin** CDP WebSocket. Only that plugin page is exposed — other running plugins are not visible to the debugger.
+## Per-plugin inspect
 
-This does **not** enable app-wide `--remote-debugging-port`.
-
-## tinker Commands
+Open the plugin with `--inspect` so Tinker starts a **per-plugin** CDP WebSocket. Only that plugin page is exposed.
 
 ```bash
-# Open a plugin with CDP inspect (prints ws:// URL)
-tinker open <plugin-name> --inspect
-
-# Or pin a port / address
-tinker open <plugin-name> --inspect=9222
-tinker open <plugin-name> --inspect=127.0.0.1:9222
-
-# Restart with inspect
-tinker restart <plugin-name> --inspect
-
-# Close a plugin (also stops its inspect WebSocket server)
-tinker close <plugin-name>
-
-# Quit Tinker
-tinker quit
+tinker open <plugin> --inspect
+tinker open <plugin> --inspect=9222
+tinker open <plugin> --inspect=127.0.0.1:9222
+tinker restart <plugin> --inspect
+tinker close <plugin>              # also stops its inspect WebSocket
 ```
 
 Example CLI output:
@@ -41,14 +29,34 @@ Debugger listening on ws://127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83
 Open in Chrome: devtools://devtools/bundled/inspector.html?ws=127.0.0.1:57104/ed7bc332-316d-45ce-996a-1c3f6f22ac83
 ```
 
-Paste the `devtools://` URL into Chrome's address bar to open DevTools against the plugin.
+Paste the `devtools://` URL into Chrome to open DevTools against the plugin.
+
+`--inspect` is only on `open` / `restart` (not on `launch`). Prefer it over app-wide debugging when working on a single plugin.
+
+`tinker ui` auto-starts inspect and will disconnect other CDP clients on the same plugin — don't mix `ui` and agent-browser on one plugin.
+
+## App-wide debugging and HTTP viewer
+
+These flags are only on `tinker launch`. If Tinker is already running, quit first, then relaunch:
+
+```bash
+tinker quit
+tinker launch --remote-debugging-port 9222
+tinker launch --http                              # viewer for running plugins
+tinker launch --http=127.0.0.1:9223
+tinker launch --http --http-username user --http-password secret
+```
+
+`--http` starts an HTTP remote viewer (same argv pattern as `--remote-debugging-port`). Open the address in a browser to list **running** plugins and view/interact with them (CDP screencast). Plugins that are not open cannot be accessed or started from this UI.
+
+With `--http-username` (and optional `--http-password`), the viewer requires HTTP Basic Auth. Requests without credentials show a username/password form on the list page. API and WebSocket access require valid credentials.
 
 ## Connecting agent-browser
 
 Pass the printed WebSocket URL directly:
 
 ```bash
-WS=$(tinker open <plugin-name> --inspect | awk '/Debugger listening on/{print $NF}')
+WS=$(tinker open <plugin> --inspect | awk '/Debugger listening on/{print $NF}')
 agent-browser connect "$WS"
 agent-browser snapshot -i
 ```
@@ -64,19 +72,14 @@ After connect, `agent-browser tab` should show a single `plugin://tinker-<name>/
 
 For interaction commands (click, fill, screenshot, etc.), refer to the agent-browser skill documentation.
 
-## Connection Recovery
+## Connection recovery
 
-If `agent-browser connect` fails or lands on `about:blank`, reopen the plugin with inspect:
+If `agent-browser connect` fails or lands on `about:blank`:
 
 ```bash
-tinker close <plugin-name>
-tinker open <plugin-name> --inspect
+tinker close <plugin>
+tinker open <plugin> --inspect
 # then agent-browser connect <printed-ws-url>
 ```
 
-## Notes
-
-- `--inspect` is only on `tinker open` / `tinker restart` (not on `launch`)
-- Closing the plugin stops its inspect WebSocket server
-- Prefer plugin `--inspect` over `tinker launch --remote-debugging-port` when debugging a single plugin
-- If the plugin UI is not ready, wait a moment after `tinker open/restart` before snapshot
+If the plugin UI is not ready, wait a moment after `open` / `restart` before snapshot.

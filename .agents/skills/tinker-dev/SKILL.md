@@ -43,6 +43,7 @@ Examples:
 | `tinker open json-editor` | `./bin/tinker-dev open json-editor` |
 | `tinker call …` | `./bin/tinker-dev call …` |
 | `tinker mcp …` | `./bin/tinker-dev mcp …` |
+| `tinker ui …` | `./bin/tinker-dev ui …` |
 
 Do not invoke the packaged `tinker` binary while working in the development tree.
 
@@ -63,11 +64,12 @@ Load the matching skill for the task:
 
 ```bash
 ./bin/tinker-dev skills path mcp     # tools / call / mcp
+./bin/tinker-dev skills path ui      # ui snapshot / click / fill
 ./bin/tinker-dev skills path debug   # --inspect + agent-browser
 ./bin/tinker-dev skills path create  # scaffold a new plugin
 ```
 
-Use **mcp** for `tinker-dev tools` / `call` / `mcp`. Use **debug** for UI automation via `agent-browser`.
+Use **mcp** for `tinker-dev tools` / `call` / `mcp`. Use **ui** for plugin window automation without MCP. Use **debug** for raw CDP / agent-browser.
 
 Run `./bin/tinker-dev skills list` to see everything available.
 

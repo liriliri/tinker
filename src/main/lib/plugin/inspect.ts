@@ -22,6 +22,8 @@ interface InspectSession {
   webContents: WebContents
   clients: Set<WebSocket>
   allowedTargets: Set<string>
+  /** Playwright flatten auto-attach session id */
+  flatSessionId?: string
   onDebuggerMessage: (
     event: Electron.Event,
     method: string,
@@ -33,6 +35,16 @@ interface InspectSession {
 }
 
 const sessions = new Map<string, InspectSession>()
+
+interface CdpEvent {
+  method: string
+  params: Record<string, unknown>
+}
+
+interface CdpCommandResult {
+  result: unknown
+  events?: CdpEvent[]
+}
 
 function displayHost(host: string) {
   return host === '0.0.0.0' ? '127.0.0.1' : host
@@ -76,7 +88,79 @@ function assertOwnOrAllowed(session: InspectSession, targetId: string) {
 
 async function getOwnTargetInfo(wc: WebContents) {
   const { targetInfo } = await wc.debugger.sendCommand('Target.getTargetInfo')
-  return targetInfo as { targetId: string; [key: string]: unknown }
+  const info = targetInfo as {
+    targetId: string
+    type?: string
+    [key: string]: unknown
+  }
+  // Playwright only materializes pages for type "page" / "webview" / etc.
+  if (!info.type || info.type === 'other') {
+    info.type = 'page'
+  }
+  return info
+}
+
+function sendToClients(session: InspectSession, message: object) {
+  const data = JSON.stringify(message)
+  for (const client of session.clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data)
+    }
+  }
+}
+
+function replyCdp(
+  ws: WebSocket,
+  id: number,
+  payload: { result?: unknown; error?: { code: number; message: string } },
+  sessionId?: string
+) {
+  if (ws.readyState !== WebSocket.OPEN) return
+  ws.send(
+    JSON.stringify(
+      sessionId !== undefined
+        ? { id, sessionId, ...payload }
+        : { id, ...payload }
+    )
+  )
+}
+
+async function rememberOwnTarget(session: InspectSession) {
+  const targetInfo = await getOwnTargetInfo(session.webContents)
+  rememberTarget(session, targetInfo)
+  return targetInfo
+}
+
+function ownTargetResult(targetInfo: {
+  targetId: string
+  [key: string]: unknown
+}): CdpCommandResult {
+  return { result: { targetInfo } }
+}
+
+function attachedToTargetEvent(
+  sessionId: string,
+  targetInfo: { targetId: string; [key: string]: unknown }
+): CdpEvent {
+  return {
+    method: 'Target.attachedToTarget',
+    params: {
+      sessionId,
+      targetInfo,
+      // Avoid Runtime.runIfWaitingForDebugger handshake stalls.
+      waitingForDebugger: false,
+    },
+  }
+}
+
+async function attachFlatSession(session: InspectSession): Promise<{
+  sessionId: string
+  targetInfo: { targetId: string; [key: string]: unknown }
+}> {
+  const targetInfo = await rememberOwnTarget(session)
+  const sessionId = session.flatSessionId || uuid()
+  session.flatSessionId = sessionId
+  return { sessionId, targetInfo }
 }
 
 async function handleCdpCommand(
@@ -84,37 +168,80 @@ async function handleCdpCommand(
   method: string,
   params: any,
   sessionId?: string
-) {
+): Promise<CdpCommandResult> {
   const { webContents: wc } = session
+
+  if (
+    sessionId &&
+    session.flatSessionId &&
+    sessionId === session.flatSessionId
+  ) {
+    if (method === 'Target.getTargetInfo') {
+      return ownTargetResult(await rememberOwnTarget(session))
+    }
+    if (
+      method === 'Target.detachFromTarget' ||
+      method === 'Target.closeTarget' ||
+      method === 'Target.setAutoAttach'
+    ) {
+      return { result: {} }
+    }
+    const result = await wc.debugger.sendCommand(method, params)
+    return { result: result ?? {} }
+  }
 
   if (method === 'Browser.getVersion') {
     return {
-      protocolVersion: '1.3',
-      product: `Chrome/Tinker/${VERSION}`,
-      revision: '0',
-      userAgent: '',
-      jsVersion: '',
+      result: {
+        protocolVersion: '1.3',
+        product: `Chrome/Tinker/${VERSION}`,
+        revision: '0',
+        userAgent: '',
+        jsVersion: '',
+      },
     }
   }
 
+  if (method === 'Target.getTargetInfo') {
+    return ownTargetResult(await rememberOwnTarget(session))
+  }
+
   if (method === 'Target.setDiscoverTargets') {
-    return {}
+    const events: CdpEvent[] = []
+    if (params?.discover) {
+      events.push({
+        method: 'Target.targetCreated',
+        params: { targetInfo: await rememberOwnTarget(session) },
+      })
+    }
+    return { result: {}, events }
+  }
+
+  if (method === 'Target.setAutoAttach') {
+    const events: CdpEvent[] = []
+    if (params?.autoAttach) {
+      const { sessionId: flatId, targetInfo } = await attachFlatSession(session)
+      events.push(attachedToTargetEvent(flatId, targetInfo))
+    } else {
+      session.flatSessionId = undefined
+    }
+    return { result: {}, events }
   }
 
   if (method === 'Target.createTarget') {
-    const targetInfo = await getOwnTargetInfo(wc)
-    rememberTarget(session, targetInfo)
-    return { targetId: targetInfo.targetId }
+    const targetInfo = await rememberOwnTarget(session)
+    return { result: { targetId: targetInfo.targetId } }
   }
 
   if (isBlockedMethod(method)) {
-    throw new Error(`CDP method not allowed: ${method}`)
+    // Playwright connectOverCDP sends these; rejecting breaks attach.
+    return { result: {} }
   }
 
   if (method === 'Target.getTargets') {
-    const targetInfo = await getOwnTargetInfo(wc)
-    rememberTarget(session, targetInfo)
-    return { targetInfos: [targetInfo] }
+    return {
+      result: { targetInfos: [await rememberOwnTarget(session)] },
+    }
   }
 
   if (method === 'Target.attachToTarget') {
@@ -123,7 +250,15 @@ async function handleCdpCommand(
       throw new Error('targetId is required')
     }
     assertOwnOrAllowed(session, targetId)
-    rememberTarget(session, { targetId })
+    const { sessionId: flatId, targetInfo } = await attachFlatSession(session)
+    return {
+      result: { sessionId: flatId },
+      events: [attachedToTargetEvent(flatId, targetInfo)],
+    }
+  }
+
+  if (method === 'Target.detachFromTarget') {
+    return { result: {} }
   }
 
   if (method === 'Target.closeTarget') {
@@ -131,9 +266,15 @@ async function handleCdpCommand(
     if (targetId) {
       assertOwnOrAllowed(session, targetId)
     }
+    return { result: {} }
   }
 
-  return wc.debugger.sendCommand(method, params, sessionId)
+  if (sessionId) {
+    throw new Error(`Unknown CDP session: ${sessionId}`)
+  }
+
+  const result = await wc.debugger.sendCommand(method, params)
+  return { result: result ?? {} }
 }
 
 export function parseInspectAddress(
@@ -202,7 +343,7 @@ function detachDebugger(webContents: WebContents) {
       webContents.debugger.detach()
     }
   } catch {
-    // already detached
+    // ignore
   }
 }
 
@@ -221,12 +362,38 @@ export function hasPluginInspect(pluginId: string) {
   return sessions.has(pluginId)
 }
 
+export function getPluginInspectHttpUrl(pluginId: string): string | undefined {
+  const session = sessions.get(pluginId)
+  if (!session) {
+    return undefined
+  }
+  return `http://${displayHost(session.host)}:${session.port}`
+}
+
+type InspectStopListener = (pluginId: string) => void
+const inspectStopListeners = new Set<InspectStopListener>()
+
+export function onPluginInspectStop(listener: InspectStopListener) {
+  inspectStopListeners.add(listener)
+  return () => {
+    inspectStopListeners.delete(listener)
+  }
+}
+
 export function stopPluginInspect(pluginId: string) {
   const session = sessions.get(pluginId)
   if (!session) {
     return
   }
   sessions.delete(pluginId)
+
+  for (const listener of inspectStopListeners) {
+    try {
+      listener(pluginId)
+    } catch {
+      // ignore
+    }
+  }
 
   if (!session.webContents.isDestroyed()) {
     session.webContents.debugger.removeListener(
@@ -293,15 +460,13 @@ export async function startPluginInspect(
     }
 
     const message: Record<string, unknown> = { method, params }
-    if (sessionId) {
+    // Playwright expects events on the flatten session from Target.setAutoAttach.
+    if (session.flatSessionId) {
+      message.sessionId = session.flatSessionId
+    } else if (sessionId) {
       message.sessionId = sessionId
     }
-    const data = JSON.stringify(message)
-    for (const client of clients) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(data)
-      }
-    }
+    sendToClients(session, message)
   }
 
   const onDetach = () => {
@@ -319,7 +484,8 @@ export async function startPluginInspect(
       res.end()
       return
     }
-    const pathname = (req.url || '/').split('?')[0]
+    // Playwright requests /json/version/ (trailing slash); normalize.
+    const pathname = ((req.url || '/').split('?')[0] || '/').replace(/\/+$/, '')
     if (pathname === '/json' || pathname === '/json/list') {
       sendJson(res, [buildTarget(session)])
       return
@@ -362,6 +528,7 @@ export async function startPluginInspect(
     }
     wss.handleUpgrade(req, socket, head, (ws) => {
       closeClients(session)
+      session.flatSessionId = undefined
       clients.add(ws)
 
       ws.on('message', async (raw) => {
@@ -383,32 +550,38 @@ export async function startPluginInspect(
           if (webContents.isDestroyed() || !webContents.debugger.isAttached()) {
             throw new Error('Debugger is not attached')
           }
-          const result = await handleCdpCommand(
+          const { result, events } = await handleCdpCommand(
             session,
             msg.method,
             msg.params,
             msg.sessionId
           )
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ id: msg.id, result: result ?? {} }))
+          replyCdp(ws, msg.id, { result: result ?? {} }, msg.sessionId)
+          if (events) {
+            for (const event of events) {
+              sendToClients(session, event)
+            }
           }
         } catch (err: any) {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(
-              JSON.stringify({
-                id: msg.id,
-                error: {
-                  code: -32000,
-                  message: err?.message || String(err),
-                },
-              })
-            )
-          }
+          replyCdp(
+            ws,
+            msg.id,
+            {
+              error: {
+                code: -32000,
+                message: err?.message || String(err),
+              },
+            },
+            msg.sessionId
+          )
         }
       })
 
       ws.on('close', () => {
         clients.delete(ws)
+        if (clients.size === 0) {
+          session.flatSessionId = undefined
+        }
       })
     })
   })
@@ -416,8 +589,7 @@ export async function startPluginInspect(
   try {
     attachDebugger(webContents)
     try {
-      const targetInfo = await getOwnTargetInfo(webContents)
-      rememberTarget(session, targetInfo)
+      await rememberOwnTarget(session)
     } catch {
       // ignore
     }

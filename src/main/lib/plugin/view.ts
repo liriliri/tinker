@@ -29,7 +29,11 @@ import isEmpty from 'licia/isEmpty'
 import contextMenu from '../contextMenu'
 import { plugins, getPlugins, hasPlugin } from './loader'
 import { getSettingsStore, getMainStore } from '../store'
-import { stopPluginInspect } from './inspect'
+import {
+  InspectAddress,
+  startPluginInspect,
+  stopPluginInspect,
+} from './inspect'
 import { disposePluginHttpSession } from '../http'
 import { callExternalMcpTool, validateMcpToolArgs } from '../mcp'
 
@@ -332,6 +336,22 @@ export function getRunningPlugins() {
     id,
     background: !pluginViews[id].win,
   }))
+}
+
+export async function startPluginInspectForRunning(
+  pluginId: string,
+  address?: InspectAddress
+): Promise<string> {
+  const entry = pluginViews[pluginId]
+  if (!entry) {
+    throw new Error(`Plugin is not running: ${pluginId}`)
+  }
+  const plugin = plugins[pluginId]
+  return startPluginInspect(pluginId, entry.view.webContents, {
+    address,
+    title: plugin?.name || pluginId,
+    pageUrl: entry.view.webContents.getURL() || `plugin://${pluginId}/`,
+  })
 }
 
 const notifyRunningPluginsChanged = debounce(function () {
