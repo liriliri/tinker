@@ -16,7 +16,8 @@ import {
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
-import * as pluginRenderer from './pluginRenderer'
+import path from 'node:path'
+import { injectApi } from './lib/injectApi'
 import { invoke } from 'share/preload/util'
 import isStrBlank from 'licia/isStrBlank'
 import { injectRendererScript, domReady } from './lib/util'
@@ -59,18 +60,26 @@ window.addEventListener('DOMContentLoaded', () => {
   mainObj.on('clearData', clearData)
 })
 
+function injectPluginRenderer() {
+  const code = fs.readFileSync(
+    path.join(__dirname, 'pluginRenderer.js'),
+    'utf8'
+  )
+  injectRendererScript(code)
+}
+
 function exportData() {
   injectRendererScript(
-    `(${pluginRenderer.exportData.toString()})('${plugin?.id || ''}')`
+    `_tinkerRenderer.exportData(${JSON.stringify(plugin?.id || '')})`
   )
 }
 
 function importData() {
-  injectRendererScript(`(${pluginRenderer.importData.toString()})()`)
+  injectRendererScript('_tinkerRenderer.importData()')
 }
 
 function clearData() {
-  injectRendererScript(`(${pluginRenderer.clearData.toString()})()`)
+  injectRendererScript('_tinkerRenderer.clearData()')
 }
 
 let plugin: IPlugin | null = null
@@ -78,7 +87,7 @@ let plugin: IPlugin | null = null
 async function preparePlugin(p: IPlugin) {
   plugin = p
   if (p.preload) {
-    pluginRenderer.injectApi()
+    injectApi()
     await import(pathToFileURL(p.preload).href)
   }
 }
@@ -211,7 +220,7 @@ contextBridge.exposeInMainWorld('_tinker', tinkerObj)
 window._tinker = tinkerObj
 
 domReady(() => {
-  injectRendererScript(`(${pluginRenderer.injectApi.toString()})()`)
+  injectPluginRenderer()
 })
 ;(async function () {
   const plugin = await tinkerObj.getAttachedPlugin()
