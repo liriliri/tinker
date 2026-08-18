@@ -128,6 +128,13 @@ export type IpcSendDebuggerCommand = (
   params?: Record<string, unknown>
 ) => Promise<unknown>
 
+export type IpcPluginRecorderStarted = (pluginId: string) => Promise<void>
+export type IpcPluginRecorderStopped = (pluginId: string) => Promise<void>
+export type IpcPluginRecorderError = (
+  pluginId: string,
+  message: string
+) => Promise<void>
+
 export interface IDownloadOptions {
   url: string
   savePath: string

@@ -14,6 +14,9 @@ import {
   IpcCreatePluginShortcut,
   IpcOpenApp,
   IpcOpenPlugin,
+  IpcPluginRecorderError,
+  IpcPluginRecorderStarted,
+  IpcPluginRecorderStopped,
   IpcReopenPlugin,
   IpcTogglePluginDevtools,
 } from 'common/types'
@@ -40,6 +43,13 @@ export default Object.assign(mainObj, {
   installPlugin: invoke<IpcInstallPlugin>('installPlugin'),
   uninstallPlugin: invoke<IpcUninstallPlugin>('uninstallPlugin'),
   checkPluginUpdate: invoke<IpcCheckPluginUpdate>('checkPluginUpdate'),
+  pluginRecorderStarted: invoke<IpcPluginRecorderStarted>(
+    'pluginRecorderStarted'
+  ),
+  pluginRecorderStopped: invoke<IpcPluginRecorderStopped>(
+    'pluginRecorderStopped'
+  ),
+  pluginRecorderError: invoke<IpcPluginRecorderError>('pluginRecorderError'),
   getMainStore: invoke<IpcGetStore>('getMainStore'),
   setMainStore: invoke<IpcSetStore>('setMainStore'),
 })

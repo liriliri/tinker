@@ -21,6 +21,7 @@ import {
   hasPlugin,
 } from './loader'
 import * as pluginDownload from './download'
+import * as pluginRecorder from './recorder'
 import * as pluginWebview from './webview'
 import * as pluginInstaller from './installer'
 import * as pluginTerminal from './terminal'
@@ -83,6 +84,7 @@ export function init() {
   pluginInstaller.init()
   pluginWebview.init()
   pluginTerminal.init()
+  pluginRecorder.init()
   mcp.init()
   handleEvent('getPlugins', getPlugins)
   handleEvent('hasPlugin', async (id: string) => {

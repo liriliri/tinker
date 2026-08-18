@@ -4,6 +4,7 @@ import { chromium, type Browser } from 'playwright-core'
 import { getUserDataPath } from 'share/main/lib/util'
 import { pluginViews, startPluginInspectForRunning } from './view'
 import { getPluginInspectHttpUrl, onPluginInspectStop } from './inspect'
+import { startPluginRecorder, stopPluginRecorder } from './recorder'
 
 const require = createRequire(__filename)
 // Playwright ships BrowserBackend via coreBundle (not a public package export).
@@ -458,6 +459,18 @@ export async function runUiCommand(
   req: UiCommandRequest
 ): Promise<string> {
   const action = req.action
+  if (action === 'video-start') {
+    const filePath = req.args?.[0]
+    if (!filePath) {
+      throw new Error('video-start requires a filename')
+    }
+    await startPluginRecorder(pluginId, filePath)
+    return `Video recording started: ${filePath}`
+  }
+  if (action === 'video-stop') {
+    return stopPluginRecorder(pluginId)
+  }
+
   const session = await ensureSession(pluginId)
   const bound = bindPlaywrightCliArgs(action, req.args || [], req.options || {})
   const { toolName, toolParams } = resolveUiCommand(action, bound)
