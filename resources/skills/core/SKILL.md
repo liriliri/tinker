@@ -63,6 +63,17 @@ tinker ps                    # running plugins + renderer PIDs
 tinker restart <plugin>      # stuck plugin
 ```
 
+## Plugin data
+
+Backup, restore, or wipe a plugin's localStorage / IndexedDB. The plugin **must be running**. No dialogs; import overwrites; `clear` requires `--yes`.
+
+```bash
+tinker open json-editor
+tinker data export json-editor ./backup.zip
+tinker data import json-editor ./backup.zip
+tinker data clear json-editor --yes
+```
+
 ## Prerequisites
 
 - Tinker app installed; CLI ships with the app (`tinker` on macOS/Linux/Windows).
@@ -84,6 +95,7 @@ tinker restart <plugin>      # stuck plugin
 | `tinker launch --remote-debugging-port / --http …` | App-wide debug/viewer (see **debug**) |
 | `tinker quit` | Quit Tinker |
 | `tinker ui <plugin> …` | Automate plugin UI (see **ui**) |
+| `tinker data …` | Export / import / clear plugin data |
 
 ## When to load another skill
 
@@ -98,7 +110,7 @@ tinker restart <plugin>      # stuck plugin
 
 **`Plugin not found: tinker-...`** — `tinker list --short`, then `tinker list <plugin>`. External plugins use the global `tinker-` npm prefix.
 
-**`Plugin is not running: tinker-...`** — `tinker open <plugin>` before `close`.
+**`Plugin is not running: tinker-...`** — `tinker open <plugin>` before `close`, `call`, `ui`, or `data`.
 
 **`Plugin does not allow running in background`** — Enable **Run in Background** before `--headless`.
 

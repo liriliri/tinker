@@ -530,30 +530,79 @@ export const showPluginContextMenu: IpcShowPluginContextMenu = function (
 }
 
 export const exportPluginData: IpcExportPluginData = function (id) {
-  const { view } = pluginViews[id]
-  if (!view) {
-    return
-  }
-
-  view.webContents.send('exportData')
+  evalPluginRendererMenu(id, 'exportData', id)
 }
 
 export const importPluginData: IpcImportPluginData = function (id) {
-  const { view } = pluginViews[id]
-  if (!view) {
-    return
-  }
-
-  view.webContents.send('importData')
+  evalPluginRendererMenu(id, 'importData')
 }
 
 export const clearPluginData: IpcClearPluginData = function (id) {
-  const { view } = pluginViews[id]
+  evalPluginRendererMenu(id, 'clearData')
+}
+
+type PluginRendererFn = 'importData' | 'exportData' | 'clearData'
+
+function evalPluginRendererMenu(
+  id: string,
+  fn: PluginRendererFn,
+  ...args: unknown[]
+) {
+  void evalPluginRenderer(id, fn, ...args).catch(() => {})
+}
+
+export async function evalPluginRenderer(
+  id: string,
+  fn: PluginRendererFn,
+  ...args: unknown[]
+) {
+  const { view } = pluginViews[id] || {}
   if (!view) {
-    return
+    throw new Error(`Plugin is not running: ${id}`)
   }
 
-  view.webContents.send('clearData')
+  try {
+    await waitUntil(
+      async () => {
+        const ready = await view.webContents.executeJavaScript(
+          'typeof _tinkerRenderer !== "undefined"',
+          true
+        )
+        return !!ready
+      },
+      5000,
+      100
+    )
+  } catch {
+    throw new Error(
+      'Plugin renderer is not ready. Please wait for the plugin to finish loading.'
+    )
+  }
+
+  const call = `_tinkerRenderer.${fn}(${args
+    .map((arg) => JSON.stringify(arg))
+    .join(', ')})`
+  const result = await view.webContents.executeJavaScript(
+    `(async () => {
+      try {
+        return await ${call}
+      } catch (e) {
+        return { error: e.message || String(e) }
+      }
+    })()`,
+    true
+  )
+
+  if (
+    result &&
+    typeof result === 'object' &&
+    !Array.isArray(result) &&
+    'error' in result
+  ) {
+    throw new Error(String((result as { error: unknown }).error))
+  }
+
+  return result
 }
 
 export function preparePluginView() {

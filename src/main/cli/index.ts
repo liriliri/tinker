@@ -7,6 +7,7 @@ import {
 } from './ipc'
 import { registerMcpCommands } from './mcp'
 import { registerUiCommands } from './ui'
+import { registerDataCommands } from './data'
 import { runSkills } from './skills'
 import { registerListCommand } from './list'
 import { normalizePluginId } from './util'
@@ -209,6 +210,7 @@ program
 registerListCommand(program, executeCommand)
 registerMcpCommands(program, executeCommand)
 registerUiCommands(program, executeCommand)
+registerDataCommands(program, executeCommand)
 
 program
   .command('ps')

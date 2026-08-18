@@ -6,6 +6,7 @@ import {
   pluginViews,
   callPluginMcpTool,
   startPluginInspectForRunning,
+  evalPluginRenderer,
 } from '../lib/plugin/view'
 import { getPlugins, hasPlugin, plugins } from '../lib/plugin/loader'
 import { getMainStore } from '../lib/store'
@@ -52,6 +53,38 @@ async function ensurePlugin(req: IpcRequest): Promise<string | IpcResponse> {
     return fail(req, `Plugin not found: ${id}`)
   }
   return id
+}
+
+async function ensureRunningPlugin(
+  req: IpcRequest
+): Promise<string | IpcResponse> {
+  const result = await ensurePlugin(req)
+  if (typeof result !== 'string') {
+    return result
+  }
+  if (!isPluginRunning(result)) {
+    return fail(
+      req,
+      `Plugin is not running. Please start it first: tinker open ${result}`
+    )
+  }
+  return result
+}
+
+async function runPluginData(
+  req: IpcRequest,
+  run: (id: string) => Promise<unknown>
+): Promise<IpcResponse> {
+  const result = await ensureRunningPlugin(req)
+  if (typeof result !== 'string') {
+    return result
+  }
+  try {
+    const data = await run(result)
+    return success(req, data)
+  } catch (err: any) {
+    return fail(req, err.message || String(err))
+  }
 }
 
 async function callMcpTool(req: IpcRequest): Promise<IpcResponse> {
@@ -126,6 +159,28 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
       }
       case 'callMcpTool':
         return callMcpTool(req)
+      case 'exportData': {
+        const filePath = req.data?.path as string
+        if (!filePath) {
+          return fail(req, 'Missing output path')
+        }
+        return runPluginData(req, (id) =>
+          evalPluginRenderer(id, 'exportData', id, filePath)
+        )
+      }
+      case 'importData': {
+        const filePath = req.data?.path as string
+        if (!filePath) {
+          return fail(req, 'Missing input path')
+        }
+        return runPluginData(req, (id) =>
+          evalPluginRenderer(id, 'importData', filePath)
+        )
+      }
+      case 'clearData':
+        return runPluginData(req, (id) =>
+          evalPluginRenderer(id, 'clearData', true)
+        )
       case 'ui': {
         const result = await ensurePlugin(req)
         if (typeof result !== 'string') return result

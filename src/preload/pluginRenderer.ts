@@ -2,13 +2,19 @@ import { injectApi } from './lib/injectApi'
 
 injectApi()
 
-export async function importData() {
+function reloadSoon() {
+  setTimeout(() => location.reload(), 0)
+}
+
+export async function importData(filePath?: string) {
   const BINARY_TAG = '__tinker_bin__'
-  const result = confirm(_tinker.t('importDataConfirm'))
-  if (!result) {
-    return
+  if (!filePath) {
+    const result = confirm(_tinker.t('importDataConfirm'))
+    if (!result) {
+      return
+    }
   }
-  const files = await _tinker.loadData()
+  const files = await _tinker.loadData(filePath)
   if (!files) return
 
   // localStorage
@@ -94,7 +100,7 @@ export async function importData() {
     db.close()
   }
 
-  location.reload()
+  reloadSoon()
 
   function restoreBin(value: any): any {
     if (value === null || value === undefined) return value
@@ -131,10 +137,12 @@ export async function importData() {
   }
 }
 
-export async function clearData() {
-  const result = confirm(_tinker.t('clearDataConfirm'))
-  if (!result) {
-    return
+export async function clearData(force?: boolean) {
+  if (!force) {
+    const result = confirm(_tinker.t('clearDataConfirm'))
+    if (!result) {
+      return
+    }
   }
 
   // localStorage
@@ -176,10 +184,10 @@ export async function clearData() {
     })
   }
 
-  location.reload()
+  reloadSoon()
 }
 
-export async function exportData(id: string) {
+export async function exportData(id: string, filePath?: string) {
   const BINARY_TAG = '__tinker_bin__'
   const files: Record<string, string | Uint8Array> = {
     'plugin.json': JSON.stringify({ id, date: Date.now() }),
@@ -255,7 +263,7 @@ export async function exportData(id: string) {
     db.close()
   }
 
-  _tinker.saveData(files)
+  return _tinker.saveData(files, filePath)
 
   function extractBin(value: any): any {
     if (value === null || value === undefined) return value

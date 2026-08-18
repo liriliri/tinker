@@ -55,9 +55,6 @@ window.addEventListener('DOMContentLoaded', () => {
   updateTheme()
   mainObj.getLanguage().then((lang) => i18n.locale(lang))
   mainObj.on('changeTheme', updateTheme)
-  mainObj.on('exportData', exportData)
-  mainObj.on('importData', importData)
-  mainObj.on('clearData', clearData)
 })
 
 function injectPluginRenderer() {
@@ -66,20 +63,6 @@ function injectPluginRenderer() {
     'utf8'
   )
   injectRendererScript(code)
-}
-
-function exportData() {
-  injectRendererScript(
-    `_tinkerRenderer.exportData(${JSON.stringify(plugin?.id || '')})`
-  )
-}
-
-function importData() {
-  injectRendererScript('_tinkerRenderer.importData()')
-}
-
-function clearData() {
-  injectRendererScript('_tinkerRenderer.clearData()')
 }
 
 let plugin: IPlugin | null = null
@@ -119,14 +102,17 @@ function builtinOnly<T extends (...args: any[]) => any>(fn: T): T {
   }) as T
 }
 
-async function saveData(files: types.PlainObj<string | Uint8Array>) {
-  return saveDataUtil(files, plugin)
+async function saveData(
+  files: types.PlainObj<string | Uint8Array>,
+  filePath?: string
+) {
+  return saveDataUtil(files, plugin, filePath)
 }
 
-async function loadData(): Promise<
-  types.PlainObj<string | Uint8Array> | undefined
-> {
-  return loadDataUtil(plugin)
+async function loadData(
+  filePath?: string
+): Promise<types.PlainObj<string | Uint8Array> | undefined> {
+  return loadDataUtil(plugin, filePath)
 }
 
 const tinkerObj = {
