@@ -27,7 +27,7 @@ Tinker must be running (or will be auto-launched by the CLI).
 the request is "unrelated to Tinker" without checking the plugin catalog first:
 
 ```bash
-tinker list --short              # all ids (compact; avoids truncation)
+tinker list --short              # short ids + names on one line
 tinker list <candidate>…         # details for likely matches
 ```
 

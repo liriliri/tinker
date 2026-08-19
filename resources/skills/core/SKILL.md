@@ -17,7 +17,7 @@ For MCP tools → **mcp** skill. For window automation without MCP → **ui** sk
 **Do not run bare `tinker list` for discovery** — the full catalog is long and agent output often truncates.
 
 ```bash
-tinker list --short              # all short names on one line
+tinker list --short              # short ids + names on one line
 tinker list <plugin>…            # details for candidates (tags + description)
 tinker open <plugin>
 tinker ps
@@ -31,8 +31,8 @@ Scoped npm plugins (e.g. `@tencent/tinker-wxapkg`) appear as ids like `tencent-t
 Detail lines look like:
 
 ```
-  tinker-json-editor [builtin] [mcp] - JSON editor with text and tree modes
-  tinker-hash [builtin] - Hash calculator
+  tinker-json-editor JSON Editor [builtin] [mcp] - JSON editor with text and tree modes
+  tinker-hash Hash [builtin] - Hash calculator
 ```
 
 Tags: `[builtin]`, `[mcp]` (programmatic tools — see **mcp**), `[background]` (**Run in Background** enabled; required for `open --headless`).
@@ -83,7 +83,7 @@ tinker data clear json-editor --yes
 
 | Command | Description |
 |---------|-------------|
-| `tinker list --short` | Short names on one line (no `tinker-` prefix) |
+| `tinker list --short` | Short ids and names on one line (no `tinker-` prefix) |
 | `tinker list <plugin>…` | Details for one or more plugins |
 | `tinker list` | Full catalog (avoid for agents; may truncate) |
 | `tinker ps` | Running plugins with PIDs |

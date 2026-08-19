@@ -35,9 +35,14 @@ function formatPluginList(data: unknown) {
       .map((tag) => `[${tag}]`)
       .join(' ')
     const tag = tags ? ` ${tags}` : ''
+    const name = p.name ? ` ${p.name}` : ''
     const description = p.description ? ` - ${p.description}` : ''
-    console.log(`  ${p.id}${version}${tag}${description}`)
+    console.log(`  ${p.id}${name}${version}${tag}${description}`)
   }
+}
+
+function shortPluginId(id: string) {
+  return startWith(id, 'tinker-') ? id.slice('tinker-'.length) : id
 }
 
 function formatPluginListShort(data: unknown) {
@@ -48,9 +53,10 @@ function formatPluginListShort(data: unknown) {
   }
   console.log(
     plugins
-      .map((p) =>
-        startWith(p.id, 'tinker-') ? p.id.slice('tinker-'.length) : p.id
-      )
+      .map((p) => {
+        const id = shortPluginId(p.id)
+        return p.name ? `${id}(${p.name})` : id
+      })
       .join(' ')
   )
 }
@@ -86,7 +92,7 @@ export function registerListCommand(
   program
     .command('list [plugins...]')
     .description('List installed plugins')
-    .option('--short', 'List all short plugin names on one line')
+    .option('--short', 'List short plugin ids and names on one line')
     .action((plugins: string[], opts: { short?: boolean }) => {
       if (opts.short && plugins.length > 0) {
         console.error('Error: --short cannot be used with specific plugin ids')
