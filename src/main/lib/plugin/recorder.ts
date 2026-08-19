@@ -9,13 +9,14 @@ import isEmpty from 'licia/isEmpty'
 import isErr from 'licia/isErr'
 import toStr from 'licia/toStr'
 import { handleEvent } from 'share/main/lib/util'
-import { pluginViews } from './view'
+import { evalPluginRenderer, pluginViews } from './view'
 
 interface RecordingSession {
   pluginId: string
   filePath: string
   requestWebContents: WebContents
   stopping: boolean
+  showCursor: boolean
   startedResolve: () => void
   startedReject: (err: Error) => void
   started: Promise<void>
@@ -25,7 +26,39 @@ interface RecordingSession {
   cleanup: () => void
 }
 
+async function evalRecordingCursor(
+  pluginId: string,
+  fn: 'showRecordingCursor' | 'hideRecordingCursor' | 'moveRecordingCursorTo',
+  ...args: unknown[]
+) {
+  try {
+    await evalPluginRenderer(pluginId, fn, ...args)
+  } catch {
+    // Overlay may not be ready, or the plugin page already unloaded.
+  }
+}
+
+async function setRecordingCursor(pluginId: string, show: boolean) {
+  await evalRecordingCursor(
+    pluginId,
+    show ? 'showRecordingCursor' : 'hideRecordingCursor'
+  )
+}
+
 const sessions = new Map<string, RecordingSession>()
+
+export function isRecordingCursor(pluginId: string) {
+  return sessions.get(pluginId)?.showCursor === true
+}
+
+export async function moveRecordingCursorTo(
+  pluginId: string,
+  x: number,
+  y: number
+) {
+  if (!isRecordingCursor(pluginId)) return
+  await evalRecordingCursor(pluginId, 'moveRecordingCursorTo', x, y)
+}
 
 function createDeferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void
@@ -46,6 +79,9 @@ function failSession(session: RecordingSession, err: Error) {
   session.startedReject(err)
   session.stoppedReject(err)
   session.cleanup()
+  if (session.showCursor) {
+    void setRecordingCursor(session.pluginId, false)
+  }
 }
 
 function getSession(pluginId: string) {
@@ -56,7 +92,11 @@ function getSession(pluginId: string) {
   return session
 }
 
-export async function startPluginRecorder(pluginId: string, filePath: string) {
+export async function startPluginRecorder(
+  pluginId: string,
+  filePath: string,
+  options?: { cursor?: boolean }
+) {
   if (isEmpty(filePath)) {
     throw new Error('Missing output path')
   }
@@ -92,11 +132,14 @@ export async function startPluginRecorder(pluginId: string, filePath: string) {
   requestWebContents.once('destroyed', onDestroyed)
   targetWebContents.once('destroyed', onDestroyed)
 
+  const showCursor = options?.cursor !== false
+
   const session: RecordingSession = {
     pluginId,
     filePath,
     requestWebContents,
     stopping: false,
+    showCursor,
     startedResolve: started.resolve,
     startedReject: started.reject,
     started: started.promise,
@@ -112,6 +155,9 @@ export async function startPluginRecorder(pluginId: string, filePath: string) {
   sessions.set(pluginId, session)
 
   try {
+    if (showCursor) {
+      await setRecordingCursor(pluginId, true)
+    }
     const sourceId = targetWebContents.getMediaSourceId(requestWebContents)
     requestWebContents.send('pluginRecorderStart', {
       pluginId,
@@ -159,6 +205,9 @@ const pluginRecorderStopped: IpcPluginRecorderStopped = async function (
   session.cleanup()
   session.startedResolve()
   session.stoppedResolve(session.filePath)
+  if (session.showCursor) {
+    void setRecordingCursor(pluginId, false)
+  }
 }
 
 const pluginRecorderError: IpcPluginRecorderError = async function (

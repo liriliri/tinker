@@ -1,12 +1,11 @@
-import { defineConfig, Plugin, build as viteBuild } from 'vite'
+import { defineConfig, Plugin, build as viteBuild, InlineConfig } from 'vite'
 import { resolve } from 'path'
 import { builtinModules } from 'node:module'
 import fs from 'fs-extra'
-import path from 'path'
 import keys from 'licia/keys'
 import { alias } from './vite.config'
 
-const pkg = fs.readJSONSync(path.resolve(__dirname, 'package.json'))
+const pkg = fs.readJSONSync(resolve(__dirname, 'package.json'))
 const external = builtinModules.filter((e) => !e.startsWith('_'))
 external.push(
   'electron',
@@ -17,29 +16,44 @@ external.push(
 
 function bundlePluginRenderer(mode: string): Plugin {
   const entry = resolve(__dirname, 'src/preload/pluginRenderer.ts')
+  let watcher: { close: () => Promise<void> } | null = null
+
+  function config(watch: boolean): InlineConfig {
+    return {
+      configFile: false,
+      mode,
+      resolve: { alias },
+      build: {
+        watch: watch ? {} : null,
+        outDir: 'dist/preload',
+        emptyOutDir: false,
+        minify: mode === 'development' ? false : 'esbuild',
+        lib: {
+          entry,
+          name: '_tinkerRenderer',
+          fileName: () => 'pluginRenderer.js',
+          formats: ['iife'],
+        },
+      },
+    }
+  }
 
   return {
     name: 'bundle-plugin-renderer',
     apply: 'build',
-    buildStart() {
-      this.addWatchFile(entry)
+    async buildStart() {
+      if (!this.meta.watchMode || watcher) return
+      watcher = (await viteBuild(config(true))) as {
+        close: () => Promise<void>
+      }
     },
     async writeBundle() {
-      await viteBuild({
-        configFile: false,
-        resolve: { alias },
-        build: {
-          outDir: 'dist/preload',
-          emptyOutDir: false,
-          minify: mode === 'development' ? false : 'esbuild',
-          lib: {
-            entry,
-            name: '_tinkerRenderer',
-            fileName: () => 'pluginRenderer.js',
-            formats: ['iife'],
-          },
-        },
-      })
+      if (this.meta.watchMode) return
+      await viteBuild(config(false))
+    },
+    async closeWatcher() {
+      await watcher?.close()
+      watcher = null
     },
   }
 }

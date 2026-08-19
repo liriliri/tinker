@@ -1,10 +1,19 @@
 import { createRequire } from 'module'
 import path from 'path'
 import { chromium, type Browser } from 'playwright-core'
+import contain from 'licia/contain'
+import isFinite from 'licia/isFinite'
+import isNum from 'licia/isNum'
+import isStr from 'licia/isStr'
 import { getUserDataPath } from 'share/main/lib/util'
 import { pluginViews, startPluginInspectForRunning } from './view'
 import { getPluginInspectHttpUrl, onPluginInspectStop } from './inspect'
-import { startPluginRecorder, stopPluginRecorder } from './recorder'
+import {
+  startPluginRecorder,
+  stopPluginRecorder,
+  isRecordingCursor,
+  moveRecordingCursorTo,
+} from './recorder'
 
 const require = createRequire(__filename)
 // Playwright ships BrowserBackend via coreBundle (not a public package export).
@@ -448,6 +457,64 @@ function formatToolResult(result: {
   return parsed.text || 'Done.'
 }
 
+const ARIA_REF = /^(f\d+)?e\d+$/
+const POINTER_TOOLS = [
+  'browser_click',
+  'browser_type',
+  'browser_hover',
+  'browser_check',
+  'browser_uncheck',
+  'browser_select_option',
+  'browser_drag',
+  'browser_drop',
+  'browser_mouse_move_xy',
+]
+
+async function pointerTargetPoint(
+  session: UiSession,
+  params: Record<string, unknown>
+): Promise<{ x: number; y: number } | null> {
+  if (
+    isNum(params.x) &&
+    isNum(params.y) &&
+    isFinite(params.x) &&
+    isFinite(params.y)
+  ) {
+    return { x: params.x, y: params.y }
+  }
+
+  const target =
+    (isStr(params.target) && params.target) ||
+    (isStr(params.startTarget) && params.startTarget)
+  if (!target) return null
+
+  const page = session.browser.contexts()[0]?.pages()[0]
+  if (!page) return null
+
+  try {
+    const locator = ARIA_REF.test(target)
+      ? page.locator(`aria-ref=${target}`)
+      : page.locator(target)
+    const box = await locator.boundingBox()
+    if (!box) return null
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2 }
+  } catch {
+    return null
+  }
+}
+
+async function previewPointer(
+  pluginId: string,
+  session: UiSession,
+  toolName: string,
+  params: Record<string, unknown>
+) {
+  if (!contain(POINTER_TOOLS, toolName) || !isRecordingCursor(pluginId)) return
+  const point = await pointerTargetPoint(session, params)
+  if (!point) return
+  await moveRecordingCursorTo(pluginId, point.x, point.y)
+}
+
 export interface UiCommandRequest {
   action: string
   args?: string[]
@@ -464,7 +531,9 @@ export async function runUiCommand(
     if (!filePath) {
       throw new Error('video-start requires a filename')
     }
-    await startPluginRecorder(pluginId, filePath)
+    await startPluginRecorder(pluginId, filePath, {
+      cursor: req.options?.cursor !== 'none',
+    })
     return `Video recording started: ${filePath}`
   }
   if (action === 'video-stop') {
@@ -482,6 +551,7 @@ export async function runUiCommand(
     if (v !== undefined) cleaned[k] = v
   }
 
+  await previewPointer(pluginId, session, toolName, cleaned)
   const result = await session.backend.callTool(toolName, cleaned)
   return formatToolResult(result)
 }

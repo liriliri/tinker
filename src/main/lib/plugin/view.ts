@@ -541,7 +541,13 @@ export const clearPluginData: IpcClearPluginData = function (id) {
   evalPluginRendererMenu(id, 'clearData')
 }
 
-type PluginRendererFn = 'importData' | 'exportData' | 'clearData'
+type PluginRendererFn =
+  | 'importData'
+  | 'exportData'
+  | 'clearData'
+  | 'showRecordingCursor'
+  | 'hideRecordingCursor'
+  | 'moveRecordingCursorTo'
 
 function evalPluginRendererMenu(
   id: string,

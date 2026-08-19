@@ -66,9 +66,13 @@ tinker ui <plugin> screenshot [--full-page] [--hires]
 tinker ui <plugin> screenshot e5
 tinker ui <plugin> eval "document.title"
 tinker ui <plugin> eval "el => el.textContent" e5
+tinker ui <plugin> video-start /abs/path/out.webm
+tinker ui <plugin> video-stop
 ```
 
 **`fill` vs `type`:** use `fill <ref> …` for a specific input; use `type` only when focus is already correct.
+
+`video-start` records the plugin window and overlays a mouse pointer that follows click/hover. Pass `--cursor=none` to record without the pointer.
 
 Less common: `drag`, `drop`, `upload`, `dialog-accept` / `dialog-dismiss`, `keydown` / `keyup`, `mousemove` / `mousewheel`, `reload`, `resize`, `highlight`, `generate-locator`, `run-code`.
 
