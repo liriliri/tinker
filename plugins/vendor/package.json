@@ -1,7 +1,7 @@
 {
   "name": "plugin-vendor",
   "scripts": {
-    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:mermaid && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:calendar && npm run build:share:fileicon",
+    "build": "npm run build:tailwind && npm run build:react && npm run build:mobx && npm run build:mathjs && npm run build:idb && npm run build:monaco && npm run build:pdfjs && npm run build:aggrid && npm run build:lucide && npm run build:licia && npm run build:htmltoimage && npm run build:wavesurfer && npm run build:zxing && npm run build:resizablepanels && npm run build:syntaxhighlighter && npm run build:markdown && npm run build:mermaid && npm run build:hexeditor && npm run build:headlessui && npm run build:hottoast && npm run build:tiptap && npm run build:videojs && npm run build:i18next && npm run build:cryptojs && npm run build:prettier && npm run build:xterm && npm run build:codemirror && npm run build:overlayscrollbars && npm run build:calendar && npm run build:reactadvancedcropper && npm run build:share:fileicon",
     "build:tailwind": "node tailwind.js",
     "build:react": "vite build --mode react",
     "build:mobx": "vite build --mode mobx",
@@ -13,6 +13,7 @@
     "build:lucide": "vite build --mode lucide",
     "build:licia": "vite build --mode licia",
     "build:htmltoimage": "vite build --mode htmltoimage",
+    "build:reactadvancedcropper": "vite build --mode reactadvancedcropper",
     "build:wavesurfer": "vite build --mode wavesurfer",
     "build:zxing": "vite build --mode zxing",
     "build:resizablepanels": "vite build --mode resizablepanels",
@@ -74,6 +75,7 @@
     "overlayscrollbars-react": "^0.5.6",
     "pdfjs-dist": "5.4.530",
     "prettier": "^3.7.4",
+    "react-advanced-cropper": "^0.20.1",
     "react-hex-editor": "0.3.0",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^16.5.4",

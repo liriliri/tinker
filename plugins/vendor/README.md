@@ -18,6 +18,7 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `idb.js` | `idb` |
 | `zxing.js` | `@zxing/library` |
 | `htmltoimage.js` | `html-to-image` |
+| `reactadvancedcropper/reactadvancedcropper.js` | `react-advanced-cropper` |
 | `wavesurfer.js` | `wavesurfer.js`, `wavesurfer.js/plugins/regions`, `wavesurfer.js/plugins/timeline` |
 | `tiptap.js` | `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-underline`, `@tiptap/extension-highlight` |
 | `cryptojs.js` | `crypto-js` |

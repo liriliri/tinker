@@ -80,8 +80,5 @@
         }
       }
     }
-  },
-  "devDependencies": {
-    "react-advanced-cropper": "^0.20.1"
   }
 }

@@ -29,6 +29,7 @@ const globals: Record<string, string> = {
   'licia/': 'licia',
   '@zxing/library': 'zxing',
   'html-to-image': 'htmlToImage',
+  'react-advanced-cropper': 'reactAdvancedCropper',
   'react-syntax-highlighter': 'reactSyntaxHighlighter',
   'react-syntax-highlighter/dist/esm/styles/prism':
     'reactSyntaxHighlighterPrismStyles',
@@ -331,6 +332,17 @@ export default defineConfig(({ mode }) => {
 
   if (target === 'htmltoimage') {
     return createConfig('htmltoimage', 'PluginVendorHtmlToImage')
+  }
+
+  if (target === 'reactadvancedcropper') {
+    return createConfig(
+      'reactadvancedcropper',
+      'PluginVendorReactAdvancedCropper',
+      {
+        external: ['react', 'react-dom', 'react/jsx-runtime'],
+        outDir: 'dist/reactadvancedcropper',
+      }
+    )
   }
 
   if (target === 'hexeditor') {

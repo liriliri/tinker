@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { Cropper, CropperRef } from 'react-advanced-cropper'
-import 'react-advanced-cropper/dist/style.css'
 import { RefObject } from 'react'
 import { tw } from 'share/theme'
 import store from '../store'
