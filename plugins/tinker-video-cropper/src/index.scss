@@ -1,0 +1,30 @@
+@use '../../share/base.scss';
+@use '../../share/styles/videoPlayer.scss';
+@config "../tailwind.config.js";
+
+.video-cropper-root {
+  .video-cropper-mount {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .media-controls {
+    z-index: 10;
+  }
+}
+
+.video-cropper-stencil {
+  background: transparent !important;
+  pointer-events: auto;
+
+  .advanced-cropper__background,
+  .advanced-cropper__foreground {
+    opacity: 0;
+  }
+
+  &--disabled {
+    pointer-events: none;
+  }
+}

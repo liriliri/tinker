@@ -1,0 +1,15 @@
+{
+  "openVideo": "Open Video",
+  "crop": "Crop",
+  "aspectRatioFree": "Free",
+  "aspectRatioOriginal": "Original",
+  "openTitle": "Drop video here or click to open",
+  "supportedFormats": "Supports MP4, WebM, MOV, MKV, and more",
+  "setCropSize": "Set Crop Size",
+  "width": "Width",
+  "height": "Height",
+  "confirm": "Confirm",
+  "openFailed": "Failed to open video",
+  "exportFailed": "Failed to crop video",
+  "unsupportedFile": "Only video files are supported"
+}

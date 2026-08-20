@@ -1,0 +1,87 @@
+{
+  "name": "tinker-video-cropper",
+  "version": "0.1.0",
+  "description": "Video Cropper Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Video Cropper",
+    "description": "Crop video with region selection, then export via FFmpeg",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "视频裁剪",
+        "description": "视频区域裁剪，通过 FFmpeg 导出"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "open": {
+          "description": "Open a video file in the editor. Same as opening a file in the UI. Returns video size and metadata needed before cropping.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to a video file (MP4, WebM, MOV, MKV, and similar)"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "get": {
+          "description": "Get the currently open video info, including width, height, file path, and the current crop region."
+        },
+        "crop": {
+          "description": "Crop the currently open video with a rectangular region via FFmpeg, save to outputPath, then open the result in the editor. Same as setting the crop box and clicking Crop in the UI (UI shows a save dialog; MCP requires outputPath). Call open first to load the file and read its dimensions. Coordinates may be adjusted to even pixel values required by encoding. To overwrite the original file, set outputPath to the source video path.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Crop region left offset in pixels"
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Crop region top offset in pixels"
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Crop region width in pixels"
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Crop region height in pixels"
+              },
+              "outputPath": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the cropped video"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "width",
+              "height",
+              "outputPath"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "react-advanced-cropper": "^0.20.1"
+  }
+}

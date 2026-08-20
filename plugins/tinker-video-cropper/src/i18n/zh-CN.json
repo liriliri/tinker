@@ -1,0 +1,15 @@
+{
+  "openVideo": "打开视频",
+  "crop": "裁剪",
+  "aspectRatioFree": "自由",
+  "aspectRatioOriginal": "原始比例",
+  "openTitle": "拖拽视频到此处或点击打开",
+  "supportedFormats": "支持 MP4、WebM、MOV、MKV 等格式",
+  "setCropSize": "设置裁剪框大小",
+  "width": "宽度",
+  "height": "高度",
+  "confirm": "确定",
+  "openFailed": "打开视频失败",
+  "exportFailed": "裁剪视频失败",
+  "unsupportedFile": "仅支持视频文件"
+}
