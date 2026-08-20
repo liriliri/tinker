@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles } from 'lucide-react'
 import OverlayScrollbars from '../OverlayScrollbars'
 import { tw } from '../../theme'
+import AiIcon from '../../assets/ai.svg?react'
 import MessageItem, { type MessageItemProps } from './MessageItem'
 import type { ChatMessage } from './types'
 import { AI_CHAT_NS } from './i18n'
@@ -69,7 +69,12 @@ export default function MessageList({
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center ${tw.primary.bgFocused}`}
         >
-          <Sparkles size={24} className={tw.primary.text} />
+          <AiIcon
+            width={24}
+            height={24}
+            className={tw.text.secondary}
+            aria-hidden="true"
+          />
         </div>
         <p className={`text-sm text-center ${tw.text.tertiary}`}>{hint}</p>
       </div>

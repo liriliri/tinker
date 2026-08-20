@@ -5,7 +5,6 @@ import {
   Toolbar,
   ToolbarAiButton,
   ToolbarButton,
-  ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import store from '../store'
@@ -31,13 +30,10 @@ export default observer(function TabBarToolbar() {
         <Grid2x2 size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       {store.hasAI && (
-        <>
-          <ToolbarSeparator />
-          <ToolbarAiButton
-            onClick={() => store.toggleActiveTabChat()}
-            title={t('chatTitle')}
-          />
-        </>
+        <ToolbarAiButton
+          onClick={() => store.toggleActiveTabChat()}
+          title={t('chatTitle')}
+        />
       )}
     </Toolbar>
   )

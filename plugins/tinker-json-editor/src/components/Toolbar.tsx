@@ -189,13 +189,10 @@ export default observer(function ToolbarComponent() {
       )}
 
       {store.hasAI && (
-        <>
-          <ToolbarSeparator />
-          <ToolbarAiButton
-            onClick={() => store.toggleChat()}
-            title={t('chatTitle')}
-          />
-        </>
+        <ToolbarAiButton
+          onClick={() => store.toggleChat()}
+          title={t('chatTitle')}
+        />
       )}
     </Toolbar>
   )
