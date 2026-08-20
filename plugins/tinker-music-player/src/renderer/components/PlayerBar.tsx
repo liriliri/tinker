@@ -54,7 +54,6 @@ const PlayerBar = observer(() => {
 
   return (
     <div className={`relative z-[60] ${tw.bg.secondary}`}>
-      {/* Progress bar at top like a border */}
       <div className="absolute -top-1.5 left-0 right-0">
         <ProgressBar
           value={store.currentTime}
@@ -63,9 +62,7 @@ const PlayerBar = observer(() => {
         />
       </div>
 
-      {/* Controls row */}
       <div className="flex items-center px-4 h-14">
-        {/* Track info - left */}
         <div className="flex-1 min-w-0 flex items-center gap-3">
           {track ? (
             <>
@@ -131,7 +128,6 @@ const PlayerBar = observer(() => {
           )}
         </div>
 
-        {/* Playback controls - center */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => store.playPrev()}
@@ -157,7 +153,6 @@ const PlayerBar = observer(() => {
           </button>
         </div>
 
-        {/* Right controls */}
         <div className="flex-1 flex items-center justify-end gap-3">
           <button
             onClick={() => store.cyclePlayMode()}

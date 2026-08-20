@@ -1,10 +1,2 @@
 @use '../../../share/base.scss';
 @config "../../tailwind.config.js";
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}

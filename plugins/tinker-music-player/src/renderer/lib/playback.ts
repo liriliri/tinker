@@ -1,11 +1,11 @@
 import md5 from 'licia/md5'
 import { getFileExt } from 'share/lib/fileType'
 
-export const TRANSCODE_EXTS = new Set(['ape'])
+const TRANSCODE_EXTS = new Set(['ape'])
 
 let currentTask: ReturnType<typeof tinker.runFFmpeg> | null = null
 
-export function needsTranscode(filePath: string): boolean {
+function needsTranscode(filePath: string): boolean {
   return TRANSCODE_EXTS.has(getFileExt(filePath))
 }
 

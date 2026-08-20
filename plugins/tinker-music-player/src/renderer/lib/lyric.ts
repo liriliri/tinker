@@ -1,7 +1,4 @@
-export interface LyricLine {
-  time: number
-  text: string
-}
+import type { LyricLine } from '../types'
 
 /**
  * Parse LRC format lyrics into structured lines.

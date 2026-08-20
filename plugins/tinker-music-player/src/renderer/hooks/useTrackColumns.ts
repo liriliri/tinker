@@ -2,9 +2,10 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ColDef } from 'ag-grid-community'
 import { mediaDurationFormat } from 'share/lib/util'
-import { TitleCellRenderer, TrackRowData } from './TrackCell'
+import { TitleCellRenderer } from '../components/TrackCell'
+import type { Track } from '../types'
 
-export function useTrackColumns(sortable = false): ColDef<TrackRowData>[] {
+export function useTrackColumns(sortable = false): ColDef<Track>[] {
   const { t } = useTranslation()
 
   return useMemo(

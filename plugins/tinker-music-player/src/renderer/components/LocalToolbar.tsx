@@ -18,11 +18,7 @@ const LocalToolbar = observer(() => {
     const result = await tinker.showOpenDialog(AUDIO_DIALOG_OPTIONS)
     if (!result.canceled && result.filePaths.length > 0) {
       await store.addFiles(result.filePaths)
-      const added = store.tracks.find((t) => t.path === result.filePaths[0])
-      if (added) {
-        const index = store.tracks.indexOf(added)
-        store.playTrack(index)
-      }
+      store.playTrackByPath(result.filePaths[0])
     }
   }
 

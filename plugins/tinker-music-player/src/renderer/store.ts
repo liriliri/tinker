@@ -11,16 +11,8 @@ import toast from 'react-hot-toast'
 import { fileExists } from 'share/lib/util'
 import audio from './lib/audio'
 import { cancelTranscode, resolvePlaybackUrl } from './lib/playback'
+import { parseLrc, loadLrcForPath, findCurrentLine } from './lib/lyric'
 import {
-  LyricLine,
-  parseLrc,
-  loadLrcForPath,
-  findCurrentLine,
-} from './lib/lyric'
-import {
-  Track,
-  RecentTrack,
-  MusicSheet,
   getAllTracks,
   putTracks,
   removeTrack as dbRemoveTrack,
@@ -31,14 +23,21 @@ import {
   putSheet,
   removeSheet as dbRemoveSheet,
 } from './lib/db'
-
 import { AUDIO_EXTS } from 'share/lib/fileType'
 import {
   isPathUnderScanDirs,
   findTrackByPath,
   normalizeScanDir,
 } from './lib/scanPath'
-import { PlayMode, SideTab } from './types'
+import { MAX_RECENT } from './lib/util'
+import {
+  PlayMode,
+  SideTab,
+  Track,
+  RecentTrack,
+  MusicSheet,
+  LyricLine,
+} from './types'
 
 interface FileSearchResult {
   path: string
@@ -46,7 +45,6 @@ interface FileSearchResult {
 }
 
 const FAVORITE_SHEET_ID = 'favorite'
-const MAX_RECENT = 100
 
 const storage = new LocalStore('tinker-music-player')
 
@@ -502,7 +500,6 @@ class Store extends BaseStore {
     this.tracks.splice(index, 1)
     await dbRemoveTrack(id)
 
-    // Remove from play queue
     const queueIdx = this.playQueue.findIndex((t) => t.id === id)
     if (queueIdx !== -1) {
       if (queueIdx === this.currentIndex) {
@@ -515,7 +512,6 @@ class Store extends BaseStore {
       this.saveQueue()
     }
 
-    // Remove from all sheets
     for (const sheet of this.sheets) {
       if (sheet.trackIds.includes(id)) {
         const updated = {
@@ -527,7 +523,6 @@ class Store extends BaseStore {
       }
     }
 
-    // Remove from recent tracks
     const recentIdx = this.recentTracks.findIndex((t) => t.id === id)
     if (recentIdx !== -1) {
       this.recentTracks.splice(recentIdx, 1)
@@ -581,6 +576,16 @@ class Store extends BaseStore {
       this.saveQueue()
     }
     await this.startPlayback(track)
+  }
+
+  async playTrackById(id: string) {
+    const index = this.tracks.findIndex((t) => t.id === id)
+    if (index >= 0) await this.playTrack(index)
+  }
+
+  async playTrackByPath(path: string) {
+    const index = this.tracks.findIndex((t) => t.path === path)
+    if (index >= 0) await this.playTrack(index)
   }
 
   async togglePlay() {

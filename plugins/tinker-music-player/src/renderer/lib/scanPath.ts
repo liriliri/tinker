@@ -1,5 +1,5 @@
 import normalizePath from 'licia/normalizePath'
-import type { Track } from './db'
+import type { Track } from '../types'
 
 export function normalizeScanDir(dir: string): string {
   return normalizePath(dir).replace(/\/$/, '')

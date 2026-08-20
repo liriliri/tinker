@@ -24,11 +24,7 @@ const ListToolbar = observer(() => {
           await store.addTrackToSheet(track.id, store.activeSheetId)
         }
       }
-      const first = store.tracks.find((t) => t.path === result.filePaths[0])
-      if (first) {
-        const index = store.tracks.indexOf(first)
-        store.playTrack(index)
-      }
+      store.playTrackByPath(result.filePaths[0])
     }
   }
 

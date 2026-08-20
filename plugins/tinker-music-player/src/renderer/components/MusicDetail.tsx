@@ -69,7 +69,6 @@ const MusicDetail = observer(() => {
       onTransitionEnd={handleTransitionEnd}
       className={`fixed top-0 left-0 right-0 bottom-14 z-50 flex flex-col ${tw.bg.primary}`}
     >
-      {/* Background blur */}
       {track?.cover && (
         <div
           className="absolute inset-0 opacity-30 blur-3xl scale-110"
@@ -80,7 +79,6 @@ const MusicDetail = observer(() => {
         />
       )}
 
-      {/* Header */}
       <div className="relative flex items-center px-4 py-2">
         <button
           onClick={() => store.hideMusicDetail()}
@@ -90,9 +88,7 @@ const MusicDetail = observer(() => {
         </button>
       </div>
 
-      {/* Body */}
       <div className="relative flex-1 flex items-center justify-center gap-12 px-8 overflow-hidden min-h-0">
-        {/* Album art */}
         <div className="flex-shrink-0">
           {track?.cover ? (
             <img
@@ -121,7 +117,6 @@ const MusicDetail = observer(() => {
           )}
         </div>
 
-        {/* Lyrics */}
         <div className="relative w-96 self-stretch">
           <div
             ref={containerRef}

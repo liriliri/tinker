@@ -41,7 +41,6 @@ export default observer(function FloatLyric({ onClose }: FloatLyricProps) {
       }}
       onMouseLeave={() => setShowOps(false)}
     >
-      {/* Operations bar */}
       <div className="w-full h-[46px] flex items-end justify-center">
         {(showOps || locked) && (
           <div
@@ -98,22 +97,15 @@ export default observer(function FloatLyric({ onClose }: FloatLyricProps) {
         )}
       </div>
 
-      {/* Lyric content */}
       <div
         className="w-full flex items-center justify-center overflow-hidden px-4"
         style={{ height: 'calc(100% - 60px)' }}
       >
-        <div
-          className="truncate text-white text-5xl max-w-full text-center"
-          style={{
-            WebkitTextStroke: '1px #b48f1d',
-          }}
-        >
+        <div className="truncate text-white text-5xl max-w-full text-center [-webkit-text-stroke:1px_theme(colors.amber.600)]">
           {lyricText}
         </div>
       </div>
 
-      {/* Bottom spacer */}
       <div className="h-3.5" />
     </div>
   )

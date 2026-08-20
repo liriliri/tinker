@@ -43,7 +43,7 @@ const MusicToolbar = observer(() => {
         resizable: false,
         positionKey: 'miniMode',
       },
-      (_popup, onClose) => <MiniMode onClose={onClose} />
+      (popup, onClose) => <MiniMode popup={popup} onClose={onClose} />
     )
   }
 

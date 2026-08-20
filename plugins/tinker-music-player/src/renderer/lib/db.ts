@@ -1,25 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
-
-export interface Track {
-  id: string
-  title: string
-  artist: string
-  album: string
-  duration: number
-  cover?: string
-  path: string
-}
-
-export interface RecentTrack extends Track {
-  playedAt: number
-}
-
-export interface MusicSheet {
-  id: string
-  title: string
-  trackIds: string[]
-  createdAt: number
-}
+import type { Track, RecentTrack, MusicSheet } from '../types'
+import { MAX_RECENT } from './util'
 
 interface MusicDB extends DBSchema {
   tracks: {
@@ -84,8 +65,6 @@ export async function removeTrack(id: string): Promise<void> {
   await db.delete(STORE_NAME, id)
 }
 
-const MAX_RECENT = 100
-
 export async function addRecentTrack(track: Track): Promise<void> {
   const db = await getDB()
   const recentTrack: RecentTrack = { ...track, playedAt: Date.now() }
@@ -117,8 +96,6 @@ export async function getRecentTracks(): Promise<RecentTrack[]> {
   const all = await db.getAllFromIndex(RECENT_STORE, 'by-playedAt')
   return all.reverse()
 }
-
-// Sheet operations
 
 export async function getAllSheets(): Promise<MusicSheet[]> {
   const db = await getDB()
