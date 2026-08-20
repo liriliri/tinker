@@ -53,6 +53,7 @@ Go through each category below and report violations with file path and line num
 - Forbidden directory names for utilities: `src/utils/`, `src/helpers/`
 - Logic in `store.ts` that has no dependency on store state or MobX should be extracted to `src/lib/`. Candidates: pure functions, data transformation, algorithm helpers, API wrappers
 - Never create `src/lib/index.ts` as a catch-all. Name files by their purpose (e.g. `util.ts`, `math.ts`). When unsure of the name, use `lib/util.ts`
+- Do not add a new `src/lib/*.ts` file for a handful of helpers. Put small utilities in `src/lib/util.ts`. A dedicated file is allowed only when it is a clear domain with substantial code (for example PDF export, sample data, or menu normalization)
 
 ### 6. React Hooks (`hooks/` directory)
 
@@ -103,7 +104,8 @@ Example:
 ```
 [Theme] src/components/Toolbar.tsx:12 — hardcoded color `#0fc25e`, use tw.primary.bg instead
 [Naming] src/components/toolbar.tsx — component file should be PascalCase: Toolbar.tsx
-[Store] src/store.ts:5 — Store must extend BaseStore from share/store/Base
+[Store] src/store.ts:5 — Store must extend BaseStore from `share/store/Base`
+[Library] src/lib/visible.ts — 4-line helper; move `visibleItems` into `src/lib/util.ts`
 [Comments] src/App.tsx:34 — comment in Chinese, must use English
 ```
 

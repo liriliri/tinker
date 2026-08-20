@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient
+      id="tinker-ai-mark"
+      x1="3"
+      y1="1"
+      x2="21"
+      y2="23"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop offset="0%" stop-color="currentColor" stop-opacity="1" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+  <g fill="url(#tinker-ai-mark)">
+    <path
+      opacity="0.44"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+    <path
+      opacity="0.54"
+      transform="rotate(60 12 12)"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+    <path
+      opacity="0.64"
+      transform="rotate(120 12 12)"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+    <path
+      opacity="0.74"
+      transform="rotate(180 12 12)"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+    <path
+      opacity="0.86"
+      transform="rotate(240 12 12)"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+    <path
+      opacity="0.98"
+      transform="rotate(300 12 12)"
+      d="M12 1.15c1.95 0 3.55 2.2 3.8 6.35.18 2.55-1.55 4.55-3.8 4.55s-3.98-2-3.8-4.55C8.45 3.35 10.05 1.15 12 1.15z"
+    />
+  </g>
+</svg>

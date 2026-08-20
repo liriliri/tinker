@@ -59,6 +59,7 @@ import {
   ToolbarSeparator,
   ToolbarSpacer,
   ToolbarSearch,
+  ToolbarAiButton,
 } from 'share/components/Toolbar'
 import { alert, AlertProvider } from 'share/components/Alert'
 import { confirm, ConfirmProvider } from 'share/components/Confirm'
@@ -71,6 +72,8 @@ import Switch from 'share/components/Switch'
 import Slider, { AdjustmentSlider } from 'share/components/Slider'
 import ScanDirsModal from 'share/components/ScanDirsModal'
 ```
+
+`ToolbarAiButton` is a dedicated AI entry (gray layered mark in `share/assets/ai.svg`, hover tint, no active highlight).
 
 Wrap `App.tsx` with dialog/toast providers. Use `toast` directly for toasts.
 

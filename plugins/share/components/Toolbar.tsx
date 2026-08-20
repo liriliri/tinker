@@ -7,6 +7,7 @@ import React, {
   MouseEvent,
 } from 'react'
 import { Search, X } from 'lucide-react'
+import AiIcon from '../assets/ai.svg?react'
 import type { MenuItemConstructorOptions } from 'electron'
 import { tw } from '../theme'
 
@@ -205,6 +206,20 @@ export const ToolbarTextInput = React.forwardRef<
 })
 
 export const TOOLBAR_ICON_SIZE = 14
+
+export function ToolbarAiButton({
+  className = '',
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      className={`p-1.5 rounded-full transition-colors ${tw.text.secondary} ${tw.primary.textHover} ${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed ${className}`}
+      {...props}
+    >
+      <AiIcon width={20} height={20} aria-hidden="true" />
+    </button>
+  )
+}
 
 const toolbarLabelClassName = `text-xs ${tw.text.secondary} whitespace-nowrap`
 

@@ -1,0 +1,69 @@
+{
+  "name": "tinker-resume",
+  "version": "0.1.0",
+  "description": "Resume Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Resume",
+    "description": "Fill in resume details, pick a template, and export PDF",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "简历",
+        "description": "填写个人信息、选择模板并导出 PDF"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "get": {
+          "description": "Get the current resume JSON, template id (classic or sidebar), and accent themeColor. Call this before editing."
+        },
+        "set": {
+          "description": "Update the live resume. Provide resume to replace the document, and/or templateId, and/or themeColor. Changes apply immediately in the preview. Call get first if you need current values. Call export_pdf afterward to write a PDF.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "resume": {
+                "type": "object",
+                "description": "Full resume document: basic, skillContent, selfEvaluationContent, experience, projects, education, certificates, menuSections"
+              },
+              "templateId": {
+                "type": "string",
+                "enum": [
+                  "classic",
+                  "sidebar"
+                ],
+                "description": "Preview template"
+              },
+              "themeColor": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "description": "Accent color as #RRGGBB"
+              }
+            }
+          }
+        },
+        "export_pdf": {
+          "description": "Export the current resume preview to a PDF file. Same as the toolbar export, but path is required (no save dialog). Call set first if updating the resume.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to save the PDF"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

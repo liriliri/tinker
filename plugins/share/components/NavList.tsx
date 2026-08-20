@@ -1,7 +1,8 @@
-import { ComponentType, ReactNode } from 'react'
+import { ComponentType, ReactNode, useState } from 'react'
 import type { MenuItemConstructorOptions } from 'electron'
-import { tw } from '../theme'
+import { GripVertical } from 'lucide-react'
 import className from 'licia/className'
+import { tw } from '../theme'
 
 export interface NavListItem {
   id: string
@@ -12,12 +13,14 @@ export interface NavListItem {
   suffix?: ReactNode
   title?: string
   menu?: () => MenuItemConstructorOptions[]
+  draggable?: boolean
 }
 
 interface NavListProps {
   items: NavListItem[]
   activeId?: string
-  onSelect?: (id: string) => void
+  onSelect?: (id: string, event: React.MouseEvent) => void
+  onReorder?: (fromId: string, toId: string) => void
   iconSize?: number
   className?: string
 }
@@ -26,14 +29,21 @@ export default function NavList({
   items,
   activeId,
   onSelect,
+  onReorder,
   iconSize = 14,
   className: customClassName,
 }: NavListProps) {
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+
   return (
     <div className={customClassName}>
       {items.map((item) => {
         const Icon = item.icon
         const isActive = activeId === item.id
+        const canDrag = Boolean(onReorder && item.draggable)
+        const isDragOver =
+          canDrag && dragOverId === item.id && dragId !== item.id
 
         const handleContextMenu = (e: React.MouseEvent) => {
           if (!item.menu) return
@@ -45,15 +55,57 @@ export default function NavList({
           <button
             key={item.id}
             title={item.title}
+            draggable={canDrag}
             className={className(
               'w-full flex items-center gap-2 py-2.5 px-2 transition-colors text-sm',
               tw.hover,
               tw.text.primary,
-              isActive && tw.active
+              (isActive || isDragOver) && tw.active
             )}
-            onClick={() => onSelect?.(item.id)}
+            onClick={(event) => onSelect?.(item.id, event)}
             onContextMenu={handleContextMenu}
+            onDragStart={
+              canDrag
+                ? (event) => {
+                    event.dataTransfer.effectAllowed = 'move'
+                    event.dataTransfer.setData('text/plain', item.id)
+                    setDragId(item.id)
+                  }
+                : undefined
+            }
+            onDragOver={
+              canDrag
+                ? (event) => {
+                    event.preventDefault()
+                    setDragOverId(item.id)
+                  }
+                : undefined
+            }
+            onDrop={
+              canDrag
+                ? (event) => {
+                    event.preventDefault()
+                    if (dragId) onReorder?.(dragId, item.id)
+                    setDragId(null)
+                    setDragOverId(null)
+                  }
+                : undefined
+            }
+            onDragEnd={() => {
+              setDragId(null)
+              setDragOverId(null)
+            }}
           >
+            {onReorder ? (
+              canDrag ? (
+                <GripVertical
+                  size={iconSize}
+                  className={`shrink-0 cursor-grab ${tw.text.secondary}`}
+                />
+              ) : (
+                <span className="w-3.5 shrink-0" />
+              )
+            ) : null}
             {Icon && <Icon size={iconSize} className={item.iconClassName} />}
             <span className="flex-1 text-left truncate">{item.label}</span>
             {item.suffix !== undefined
