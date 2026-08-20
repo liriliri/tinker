@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, Eraser, MessageSquare } from 'lucide-react'
+import { Clipboard, Eraser } from 'lucide-react'
 import className from 'licia/className'
 import {
   Toolbar,
+  ToolbarAiButton,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
@@ -83,14 +84,10 @@ export default observer(function ToolbarComponent() {
       </ToolbarButtonGroup>
 
       {store.hasAI && (
-        <ToolbarButton
-          variant="toggle"
-          active={store.chatOpen}
+        <ToolbarAiButton
           onClick={() => store.toggleChat()}
           title={t('chatTitle')}
-        >
-          <MessageSquare size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+        />
       )}
     </Toolbar>
   )

@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { Columns2, Columns3, Grid2x2, MessageSquare } from 'lucide-react'
+import { Columns2, Columns3, Grid2x2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Toolbar,
+  ToolbarAiButton,
   ToolbarButton,
   ToolbarSeparator,
   TOOLBAR_ICON_SIZE,
@@ -32,14 +33,10 @@ export default observer(function TabBarToolbar() {
       {store.hasAI && (
         <>
           <ToolbarSeparator />
-          <ToolbarButton
-            variant="toggle"
-            active={store.activeTabChatOpen}
+          <ToolbarAiButton
             onClick={() => store.toggleActiveTabChat()}
             title={t('chatTitle')}
-          >
-            <MessageSquare size={TOOLBAR_ICON_SIZE} />
-          </ToolbarButton>
+          />
         </>
       )}
     </Toolbar>

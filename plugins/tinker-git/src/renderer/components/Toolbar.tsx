@@ -6,12 +6,12 @@ import {
   GitBranch,
   GitCommit,
   GitCompare,
-  MessageSquare,
   RotateCw,
   Terminal,
 } from 'lucide-react'
 import {
   Toolbar,
+  ToolbarAiButton,
   ToolbarButton,
   ToolbarButtonGroup,
   ToolbarSearch,
@@ -192,14 +192,10 @@ export default observer(function ToolbarComponent() {
             <Terminal size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
           {store.hasAI && (
-            <ToolbarButton
-              variant="toggle"
-              active={store.activeTabChatOpen}
+            <ToolbarAiButton
               onClick={() => store.toggleActiveTabChat()}
               title={t('chatTitle')}
-            >
-              <MessageSquare size={TOOLBAR_ICON_SIZE} />
-            </ToolbarButton>
+            />
           )}
         </>
       )}

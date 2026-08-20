@@ -73,7 +73,7 @@ import Slider, { AdjustmentSlider } from 'share/components/Slider'
 import ScanDirsModal from 'share/components/ScanDirsModal'
 ```
 
-`ToolbarAiButton` is a dedicated AI entry (gray layered mark in `share/assets/ai.svg`, hover tint, no active highlight).
+`ToolbarAiButton` is a dedicated AI entry (gray layered mark in `share/assets/ai.svg`, hover tint, no active highlight). Optional `size` defaults to `20` (use a smaller size in compact chrome like the status bar).
 
 Wrap `App.tsx` with dialog/toast providers. Use `toast` directly for toasts.
 

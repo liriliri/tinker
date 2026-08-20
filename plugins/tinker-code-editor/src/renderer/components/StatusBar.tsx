@@ -10,7 +10,6 @@ import {
   GitBranch,
   X,
   Terminal,
-  MessageSquare,
 } from 'lucide-react'
 import {
   StatusBar,
@@ -18,6 +17,7 @@ import {
   StatusBarSpacer,
 } from 'share/components/StatusBar'
 import { tw } from 'share/theme'
+import AiIcon from 'share/assets/ai.svg?react'
 import store from '../store'
 
 export default observer(function StatusBarComponent() {
@@ -74,7 +74,7 @@ export default observer(function StatusBarComponent() {
           onClick={() => store.toggleChat()}
           className={className(store.chatOpen && tw.primary.text)}
         >
-          <MessageSquare size={14} />
+          <AiIcon width={14} height={14} aria-hidden="true" />
         </StatusBarItem>
       )}
     </StatusBar>

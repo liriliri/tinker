@@ -11,7 +11,6 @@ import {
   FileDown,
   Image,
   LayoutGrid,
-  MessageSquare,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
@@ -20,6 +19,7 @@ import toStr from 'licia/toStr'
 import upperCase from 'licia/upperCase'
 import {
   Toolbar,
+  ToolbarAiButton,
   ToolbarSeparator,
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
@@ -184,14 +184,10 @@ export default observer(function ToolbarComponent() {
         </ToolbarButtonGroup>
 
         {store.hasAI && (
-          <ToolbarButton
-            variant="toggle"
-            active={store.chatOpen}
+          <ToolbarAiButton
             onClick={() => store.toggleChat()}
             title={t('chatTitle')}
-          >
-            <MessageSquare size={TOOLBAR_ICON_SIZE} />
-          </ToolbarButton>
+          />
         )}
       </Toolbar>
 

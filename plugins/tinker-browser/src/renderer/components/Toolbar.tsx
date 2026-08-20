@@ -1,16 +1,10 @@
 import { observer } from 'mobx-react-lite'
-import {
-  ArrowLeft,
-  ArrowRight,
-  MessageSquare,
-  RotateCw,
-  Search,
-  X,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCw, Search, X } from 'lucide-react'
 import { tw } from 'share/theme'
 import { useTranslation } from 'react-i18next'
 import {
   Toolbar,
+  ToolbarAiButton,
   ToolbarButton,
   ToolbarTextInput,
   TOOLBAR_ICON_SIZE,
@@ -80,15 +74,11 @@ export default observer(function ToolbarComponent() {
         />
       </div>
       {store.hasAI && (
-        <ToolbarButton
-          variant="toggle"
-          active={store.activeTabChatOpen}
+        <ToolbarAiButton
           disabled={!store.canOpenChat}
           onClick={() => store.toggleActiveTabChat()}
           title={t('chatTitle')}
-        >
-          <MessageSquare size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
+        />
       )}
     </Toolbar>
   )

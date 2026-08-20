@@ -207,16 +207,21 @@ export const ToolbarTextInput = React.forwardRef<
 
 export const TOOLBAR_ICON_SIZE = 14
 
+interface ToolbarAiButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: number
+}
+
 export function ToolbarAiButton({
   className = '',
+  size = 20,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
+}: ToolbarAiButtonProps) {
   return (
     <button
       className={`p-1.5 rounded-full transition-colors ${tw.text.secondary} ${tw.primary.textHover} ${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed ${className}`}
       {...props}
     >
-      <AiIcon width={20} height={20} aria-hidden="true" />
+      <AiIcon width={size} height={size} aria-hidden="true" />
     </button>
   )
 }
