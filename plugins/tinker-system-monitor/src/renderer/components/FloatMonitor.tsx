@@ -128,8 +128,8 @@ const FloatMonitor = observer(function FloatMonitor() {
 })
 
 export function openFloatWindow() {
-  if (store.popupWindow && !store.popupWindow.closed) {
-    store.popupWindow.focus()
+  if (store.hasLiveFloat) {
+    store.popupWindow!.focus()
     return
   }
   const popup = openPopupWindow(
@@ -137,9 +137,17 @@ export function openFloatWindow() {
       width: 200,
       height: 210,
       resizable: false,
-      positionKey: 'systemMonitorFloat5',
+      positionKey: 'systemMonitorFloat',
     },
     () => <FloatMonitor />
   )
   if (popup) store.attachPopupWindow(popup)
+}
+
+export function toggleFloatWindow() {
+  if (store.hasLiveFloat) {
+    store.dismissFloatWindow()
+    return
+  }
+  openFloatWindow()
 }

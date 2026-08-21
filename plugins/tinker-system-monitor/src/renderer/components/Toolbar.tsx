@@ -10,7 +10,7 @@ import {
 import { tw } from 'share/theme'
 import { formatUptime } from '../lib/format'
 import store from '../store'
-import { openFloatWindow } from './FloatMonitor'
+import { toggleFloatWindow } from './FloatMonitor'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
@@ -34,7 +34,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         variant="toggle"
         active={store.floatOpen}
-        onClick={openFloatWindow}
+        onClick={toggleFloatWindow}
         title={t('float')}
       >
         <PictureInPicture2 size={TOOLBAR_ICON_SIZE} />

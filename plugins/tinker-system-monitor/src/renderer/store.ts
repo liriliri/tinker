@@ -24,15 +24,15 @@ export class Store extends BaseStore {
 
   private history = new RingBuffer<DataPoint>(DEFAULT_HISTORY)
   private refreshTimer: ReturnType<typeof setInterval> | null = null
-  private unloading = false
 
   constructor() {
     super()
     makeAutoObservable(this)
     tinker.setBackgroundThrottling(false)
-    window.addEventListener('pagehide', () => {
-      this.unloading = true
-    })
+  }
+
+  get hasLiveFloat() {
+    return !!this.popupWindow && !this.popupWindow.closed
   }
 
   shouldRestoreFloat() {
@@ -66,14 +66,29 @@ export class Store extends BaseStore {
     this.popupWindow = popup
     this.floatOpen = true
     storage.set(STORAGE_FLOAT, true)
+    popup.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key !== 'Escape') return
+        e.stopImmediatePropagation()
+        this.dismissFloatWindow()
+      },
+      true
+    )
     popup.addEventListener('beforeunload', () => {
       this.floatOpen = false
       this.popupWindow = null
-      // Keep preference when the plugin itself is tearing down
-      if (!this.unloading) {
-        storage.set(STORAGE_FLOAT, false)
-      }
     })
+  }
+
+  dismissFloatWindow() {
+    storage.set(STORAGE_FLOAT, false)
+    if (this.hasLiveFloat) {
+      this.popupWindow!.close()
+      return
+    }
+    this.floatOpen = false
+    this.popupWindow = null
   }
 
   startPolling() {
