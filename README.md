@@ -343,6 +343,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/websocket.png"/></th>
       <th><img src="https://tinker.liriliri.io/archive.png"/></th>
     </tr>
+    <tr>
+      <th>Resume</th>
+      <th>Video Cropper</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/resume.png"/></th>
+      <th><img src="https://tinker.liriliri.io/video_cropper.png"/></th>
+    </tr>
   </tbody>
 </table>
 
