@@ -30,6 +30,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    tinker.setBackgroundThrottling(false)
     this.loadStorage()
   }
 

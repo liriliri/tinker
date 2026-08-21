@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { AlertProvider } from 'share/components/Alert'
 import { ToasterProvider } from 'share/components/Toaster'
@@ -13,6 +14,10 @@ import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 
 const App = observer(function App() {
+  useEffect(() => {
+    store.startPolling()
+  }, [])
+
   if (store.isLoading && !store.payload) {
     return (
       <ToasterProvider>

@@ -9,6 +9,7 @@ import {
   IpcShowDevTools,
   IpcSendDebuggerCommand,
   IpcShowPluginNotification,
+  IpcSetBackgroundThrottling,
   IpcShowPluginContextMenu,
   IpcOpenPlugin,
   IpcCallMcpTool,
@@ -129,6 +130,9 @@ const tinkerObj = {
   captureScreen: invoke<IpcCaptureScreen>('captureScreen'),
   getFileIcon: invoke<IpcGetFileIcon>('pluginGetFileIcon'),
   showNotification: invoke<IpcShowPluginNotification>('showPluginNotification'),
+  setBackgroundThrottling: invoke<IpcSetBackgroundThrottling>(
+    'setBackgroundThrottling'
+  ),
   showDevTools: invoke<IpcShowDevTools>('showDevTools'),
   sendDebuggerCommand: invoke<IpcSendDebuggerCommand>('sendDebuggerCommand'),
   openPlugin: async (id: string) => {

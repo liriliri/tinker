@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import last from 'licia/last'
 import clamp from 'licia/clamp'
-import { X } from 'lucide-react'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { MetricId } from '../../common/types'
 import {
@@ -12,10 +11,6 @@ import {
 } from '../lib/metricDisplay'
 import { getHistoryValues, METRIC_COLORS } from '../lib/metrics'
 import store from '../store'
-
-interface FloatMonitorProps {
-  onClose: () => void
-}
 
 const RING_METRICS: MetricId[] = ['cpu', 'memActive']
 const NUMBER_METRICS: MetricId[] = ['netRx', 'netTx', 'diskRx', 'diskWx']
@@ -111,39 +106,21 @@ const FloatMetricValue = observer(function FloatMetricValue({
   )
 })
 
-export default observer(function FloatMonitor({ onClose }: FloatMonitorProps) {
-  const { t } = useTranslation()
-
+export default observer(function FloatMonitor() {
   return (
-    <div className={`h-screen flex flex-col ${tw.bg.primary}`}>
-      <div
-        className={`flex items-center px-3 py-2 border-b ${tw.border}`}
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      >
-        <span className={`text-sm font-medium ${tw.text.primary}`}>
-          {t('floatTitle')}
-        </span>
-        <div className="flex-1" />
-        <button
-          className={`p-0.5 rounded ${tw.hover} ${tw.text.secondary}`}
-          onClick={onClose}
-          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-        >
-          <X size={16} />
-        </button>
+    <div
+      className={`h-screen flex flex-col justify-center px-1.5 py-1.5 gap-2 ${tw.bg.primary}`}
+      style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+    >
+      <div className="grid grid-cols-2 gap-2.5">
+        {RING_METRICS.map((id) => (
+          <FloatRing key={id} id={id} />
+        ))}
       </div>
-
-      <div className="flex-1 flex flex-col p-3 gap-3 min-h-0">
-        <div className="grid grid-cols-2 gap-3">
-          {RING_METRICS.map((id) => (
-            <FloatRing key={id} id={id} />
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-2 flex-1">
-          {NUMBER_METRICS.map((id) => (
-            <FloatMetricValue key={id} id={id} />
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-x-2.5 gap-y-2">
+        {NUMBER_METRICS.map((id) => (
+          <FloatMetricValue key={id} id={id} />
+        ))}
       </div>
     </div>
   )

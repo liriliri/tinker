@@ -109,6 +109,7 @@ export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
+export type IpcSetBackgroundThrottling = (allowed: boolean) => void
 export type IpcCallMcpTool = (
   target: string | McpServerConfig,
   name: string,

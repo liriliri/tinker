@@ -132,6 +132,10 @@ export function init() {
     new Notification(options).show()
   })
 
+  ipcMain.handle('setBackgroundThrottling', (event, allowed: boolean) => {
+    event.sender.setBackgroundThrottling(!!allowed)
+  })
+
   ipcMain.handle('getAttachedPlugin', (event) => {
     for (const id in pluginViews) {
       if (pluginViews[id].view.webContents === event.sender) {

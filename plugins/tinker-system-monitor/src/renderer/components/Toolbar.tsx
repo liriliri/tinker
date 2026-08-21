@@ -25,12 +25,12 @@ export default observer(function ToolbarComponent() {
     }
     const popup = openPopupWindow(
       {
-        width: 240,
-        height: 260,
+        width: 200,
+        height: 210,
         resizable: false,
-        positionKey: 'systemMonitorFloat2',
+        positionKey: 'systemMonitorFloat5',
       },
-      (_popup, onClose) => <FloatMonitor onClose={onClose} />
+      () => <FloatMonitor />
     )
     store.attachPopupWindow(popup)
   }

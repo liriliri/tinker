@@ -393,6 +393,7 @@ export function injectApi() {
     getPathForFile: _tinker.getPathForFile,
     getFileIcon: _tinker.getFileIcon,
     showNotification: _tinker.showNotification,
+    setBackgroundThrottling: _tinker.setBackgroundThrottling,
     openPlugin: _tinker.openPlugin,
     callMcpTool: _tinker.callMcpTool,
     hasPlugin: _tinker.hasPlugin,

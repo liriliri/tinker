@@ -428,6 +428,14 @@ declare global {
     showNotification(body: string): void
 
     /**
+     * Control whether Chromium throttles timers/animations when this plugin page is
+     * backgrounded (hidden, unfocused, or runInBackground). Defaults to true.
+     * Pass false to keep setInterval / setTimeout / rAF running in the background.
+     * @param allowed - Whether background throttling is allowed
+     */
+    setBackgroundThrottling(allowed: boolean): Promise<void>
+
+    /**
      * Open another plugin in a detached window.
      * If the plugin is already running, focuses the existing window instead.
      * @param id - Plugin id (e.g. 'json-editor')
