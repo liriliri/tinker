@@ -1,3 +1,9 @@
+## v2.2.0 (21 Aug 2026)
+
+* feat: add resume
+* feat: add video cropper
+* feat: ui automation
+
 ## v2.1.4 (11 Aug 2026)
 
 * fix: windows npm install

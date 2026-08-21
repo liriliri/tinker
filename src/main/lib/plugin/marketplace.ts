@@ -44,6 +44,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-agent-pet',
+    name: 'Agent Pet',
+    description: 'Browse Petdex pets and run an animated desktop companion',
+    icon: 'tinker-agent-pet.png',
+    locales: {
+      'zh-CN': {
+        name: 'Agent 桌宠',
+        description: '浏览 Petdex 宠物并在桌面启用动画桌宠',
+      },
+    },
+  },
+  {
     id: 'tinker-agent-skills',
     name: 'Agent Skills',
     description: 'Browse and manage local agent skills',
