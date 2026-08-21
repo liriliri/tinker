@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import LocalStore from 'licia/LocalStore'
 import BaseStore from 'share/store/Base'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
@@ -9,6 +10,8 @@ import { createMcpApi } from './mcp'
 
 const DEFAULT_INTERVAL = 500
 const DEFAULT_HISTORY = 60
+const STORAGE_FLOAT = 'floatOpen'
+const storage = new LocalStore('tinker-system-monitor')
 
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)
@@ -21,11 +24,19 @@ export class Store extends BaseStore {
 
   private history = new RingBuffer<DataPoint>(DEFAULT_HISTORY)
   private refreshTimer: ReturnType<typeof setInterval> | null = null
+  private unloading = false
 
   constructor() {
     super()
     makeAutoObservable(this)
     tinker.setBackgroundThrottling(false)
+    window.addEventListener('pagehide', () => {
+      this.unloading = true
+    })
+  }
+
+  shouldRestoreFloat() {
+    return storage.get(STORAGE_FLOAT) === true
   }
 
   async refresh() {
@@ -51,13 +62,17 @@ export class Store extends BaseStore {
     }
   }
 
-  attachPopupWindow(popup: Window | null) {
+  attachPopupWindow(popup: Window) {
     this.popupWindow = popup
-    this.floatOpen = !!popup
-    if (!popup) return
+    this.floatOpen = true
+    storage.set(STORAGE_FLOAT, true)
     popup.addEventListener('beforeunload', () => {
       this.floatOpen = false
       this.popupWindow = null
+      // Keep preference when the plugin itself is tearing down
+      if (!this.unloading) {
+        storage.set(STORAGE_FLOAT, false)
+      }
     })
   }
 

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import last from 'licia/last'
 import clamp from 'licia/clamp'
+import { openPopupWindow } from 'share/lib/popupWindow'
 import { tw, THEME_COLORS } from 'share/theme'
 import type { MetricId } from '../../common/types'
 import {
@@ -106,7 +107,7 @@ const FloatMetricValue = observer(function FloatMetricValue({
   )
 })
 
-export default observer(function FloatMonitor() {
+const FloatMonitor = observer(function FloatMonitor() {
   return (
     <div
       className={`h-screen flex flex-col justify-center px-1.5 py-1.5 gap-2 ${tw.bg.primary}`}
@@ -125,3 +126,20 @@ export default observer(function FloatMonitor() {
     </div>
   )
 })
+
+export function openFloatWindow() {
+  if (store.popupWindow && !store.popupWindow.closed) {
+    store.popupWindow.focus()
+    return
+  }
+  const popup = openPopupWindow(
+    {
+      width: 200,
+      height: 210,
+      resizable: false,
+      positionKey: 'systemMonitorFloat5',
+    },
+    () => <FloatMonitor />
+  )
+  if (popup) store.attachPopupWindow(popup)
+}

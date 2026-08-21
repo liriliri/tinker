@@ -7,6 +7,7 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import Dashboard from './components/Dashboard'
 import FloatOpened from './components/FloatOpened'
+import { openFloatWindow } from './components/FloatMonitor'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -16,6 +17,9 @@ import zhCN from './i18n/zh-CN.json'
 const App = observer(function App() {
   useEffect(() => {
     store.startPolling()
+    if (store.shouldRestoreFloat()) {
+      openFloatWindow()
+    }
   }, [])
 
   if (store.isLoading && !store.payload) {

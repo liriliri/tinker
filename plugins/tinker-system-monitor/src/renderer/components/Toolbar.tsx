@@ -8,32 +8,14 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import { tw } from 'share/theme'
-import { openPopupWindow } from 'share/lib/popupWindow'
 import { formatUptime } from '../lib/format'
 import store from '../store'
-import FloatMonitor from './FloatMonitor'
+import { openFloatWindow } from './FloatMonitor'
 
 export default observer(function ToolbarComponent() {
   const { t } = useTranslation()
   const battery = store.payload?.textMetrics.battery
   const uptime = store.payload?.textMetrics.uptime ?? 0
-
-  const handleFloat = () => {
-    if (store.popupWindow && !store.popupWindow.closed) {
-      store.popupWindow.focus()
-      return
-    }
-    const popup = openPopupWindow(
-      {
-        width: 200,
-        height: 210,
-        resizable: false,
-        positionKey: 'systemMonitorFloat5',
-      },
-      () => <FloatMonitor />
-    )
-    store.attachPopupWindow(popup)
-  }
 
   return (
     <Toolbar>
@@ -52,7 +34,7 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         variant="toggle"
         active={store.floatOpen}
-        onClick={handleFloat}
+        onClick={openFloatWindow}
         title={t('float')}
       >
         <PictureInPicture2 size={TOOLBAR_ICON_SIZE} />
