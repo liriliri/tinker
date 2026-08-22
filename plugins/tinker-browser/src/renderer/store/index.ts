@@ -4,7 +4,6 @@ import isArr from 'licia/isArr'
 import isStr from 'licia/isStr'
 import contain from 'licia/contain'
 import startWith from 'licia/startWith'
-import LocalStore from 'licia/LocalStore'
 import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
 import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import BaseStore from 'share/store/Base'
@@ -13,12 +12,12 @@ import type { ISite } from '../types'
 import { getAllFavicons, saveFavicon, removeFavicon } from '../lib/db'
 import { createBrowserChat } from '../lib/chat'
 import { registerPageContext, unregisterPageContext } from '../lib/pageContext'
+import { storage } from '../lib/storage'
 
 const NEW_TAB_URL = ''
 const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
 const DEVTOOLS_POSITIONS = ['bottom', 'left', 'right'] as const
 
-const storage = new LocalStore('tinker-browser')
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 const STORAGE_SITES = 'sites'

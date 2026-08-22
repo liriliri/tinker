@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useRef, useCallback } from 'react'
 import Webview, { WebviewHandle } from 'share/components/Webview'
 import store from '../store'
+import { panelLayoutStorage } from '../lib/storage'
 import { cleanUserAgent } from '../lib/util'
 import NewTabPage from './NewTabPage'
 
@@ -49,6 +50,7 @@ export default observer(function WebviewContainer() {
               userAgent={cleanUserAgent(navigator.userAgent)}
               devTools={store.devToolsOpenTabs.has(tab.id)}
               devToolsPosition={store.devToolsPosition}
+              devToolsLayoutStorage={panelLayoutStorage}
               contextMenu={{
                 openInNewTab: true,
                 saveImage: true,

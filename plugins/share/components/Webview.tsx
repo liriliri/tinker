@@ -5,12 +5,14 @@ import {
   forwardRef,
   useCallback,
   useState,
+  type RefObject,
 } from 'react'
 import {
   Panel,
   Group,
   Separator,
   useDefaultLayout,
+  type LayoutStorage,
 } from 'react-resizable-panels'
 import copy from 'licia/copy'
 import convertBin from 'licia/convertBin'
@@ -121,6 +123,7 @@ export interface WebviewProps {
   onNavStateChange?: (canGoBack: boolean, canGoForward: boolean) => void
   onDevToolsPositionChange?: (position: DevToolsPosition) => void
   onDevToolsClose?: () => void
+  devToolsLayoutStorage?: LayoutStorage
   pendingInspect?: { x: number; y: number } | null
   onPendingInspectHandled?: () => void
   onInspectElement?: (x: number, y: number) => void
@@ -160,6 +163,94 @@ const dockButtons: {
   { pos: 'left', Icon: PanelLeft, title: 'Dock to left' },
   { pos: 'right', Icon: PanelRight, title: 'Dock to right' },
 ]
+
+interface DevToolsSplitLayoutProps {
+  devToolsPosition: DevToolsPosition
+  devToolsLayoutStorage?: LayoutStorage
+  panelSlotRef: RefObject<HTMLDivElement | null>
+  devToolsContainerRef: RefObject<HTMLDivElement | null>
+  onDevToolsPositionChange?: (position: DevToolsPosition) => void
+  onDevToolsClose?: () => void
+}
+
+function DevToolsSplitLayout({
+  devToolsPosition,
+  devToolsLayoutStorage,
+  panelSlotRef,
+  devToolsContainerRef,
+  onDevToolsPositionChange,
+  onDevToolsClose,
+}: DevToolsSplitLayoutProps) {
+  const orientation = devToolsPosition === 'bottom' ? 'vertical' : 'horizontal'
+  const devToolsBefore = devToolsPosition === 'left'
+  const layoutId = devToolsLayoutStorage
+    ? `devtools-${devToolsPosition}`
+    : `tinker-webview-layout-${devToolsPosition}`
+
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    panelIds: devToolsBefore
+      ? ['devtools', 'webview']
+      : ['webview', 'devtools'],
+    id: layoutId,
+    storage: devToolsLayoutStorage ?? localStorage,
+    onlySaveAfterUserInteractions: !!devToolsLayoutStorage,
+  })
+
+  const devToolsPanel = (
+    <Panel id="devtools" minSize={80} defaultSize={300}>
+      <div className="h-full flex flex-col">
+        <div
+          className={`flex items-center justify-between px-2 py-1 ${
+            tw.bg.secondary
+          } ${devToolsPosition === 'bottom' ? `${tw.border} border-t` : ''}`}
+        >
+          <div className="flex items-center gap-1">
+            {dockButtons.map(({ pos, Icon, title }) => (
+              <button
+                key={pos}
+                className={`p-0.5 rounded ${
+                  devToolsPosition === pos ? tw.text.primary : tw.text.secondary
+                } ${tw.hover}`}
+                onClick={() => onDevToolsPositionChange?.(pos)}
+                title={title}
+              >
+                <Icon size={14} />
+              </button>
+            ))}
+          </div>
+          <button
+            className={`p-0.5 rounded ${tw.text.secondary} ${tw.hover}`}
+            onClick={() => onDevToolsClose?.()}
+          >
+            <X size={14} />
+          </button>
+        </div>
+        <div
+          ref={devToolsContainerRef}
+          className="flex-1 overflow-hidden relative"
+        />
+      </div>
+    </Panel>
+  )
+
+  return (
+    <Group
+      key={devToolsPosition}
+      orientation={orientation}
+      className="h-full"
+      defaultLayout={defaultLayout}
+      onLayoutChanged={onLayoutChanged}
+    >
+      {devToolsBefore && devToolsPanel}
+      {devToolsBefore && <Separator />}
+      <Panel id="webview" minSize={100}>
+        <div ref={panelSlotRef} className="h-full" />
+      </Panel>
+      {!devToolsBefore && <Separator />}
+      {!devToolsBefore && devToolsPanel}
+    </Group>
+  )
+}
 
 function resolveFeatures(
   contextMenu: boolean | ContextMenuFeatures | undefined
@@ -365,6 +456,7 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
     onNavStateChange,
     onDevToolsPositionChange,
     onDevToolsClose,
+    devToolsLayoutStorage,
     pendingInspect,
     onPendingInspectHandled,
     onInspectElement,
@@ -689,75 +781,20 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
     []
   )
 
-  const orientation = devToolsPosition === 'bottom' ? 'vertical' : 'horizontal'
-  const devToolsBefore = devToolsPosition === 'left'
-
-  const { defaultLayout, onLayoutChange } = useDefaultLayout({
-    panelIds: devToolsBefore
-      ? ['devtools', 'webview']
-      : ['webview', 'devtools'],
-    id: `tinker-webview-layout-${devToolsPosition}`,
-    storage: localStorage,
-  })
-
-  const devToolsPanel = devTools ? (
-    <Panel id="devtools" minSize={80} defaultSize={300}>
-      <div className="h-full flex flex-col">
-        <div
-          className={`flex items-center justify-between px-2 py-1 ${
-            tw.bg.secondary
-          } ${devToolsPosition === 'bottom' ? `${tw.border} border-t` : ''}`}
-        >
-          <div className="flex items-center gap-1">
-            {dockButtons.map(({ pos, Icon, title }) => (
-              <button
-                key={pos}
-                className={`p-0.5 rounded ${
-                  devToolsPosition === pos ? tw.text.primary : tw.text.secondary
-                } ${tw.hover}`}
-                onClick={() => onDevToolsPositionChange?.(pos)}
-                title={title}
-              >
-                <Icon size={14} />
-              </button>
-            ))}
-          </div>
-          <button
-            className={`p-0.5 rounded ${tw.text.secondary} ${tw.hover}`}
-            onClick={() => onDevToolsClose?.()}
-          >
-            <X size={14} />
-          </button>
-        </div>
-        <div
-          ref={devToolsContainerRef}
-          className="flex-1 overflow-hidden relative"
-        />
-      </div>
-    </Panel>
-  ) : null
-
   return (
     <div
       ref={wrapperRef}
       className={`flex flex-col overflow-hidden relative ${className}`}
     >
       {devTools && (
-        <Group
-          key={devToolsPosition}
-          orientation={orientation}
-          className="h-full"
-          defaultLayout={defaultLayout}
-          onLayoutChange={onLayoutChange}
-        >
-          {devToolsBefore && devToolsPanel}
-          {devToolsBefore && <Separator />}
-          <Panel id="webview" minSize={100}>
-            <div ref={panelSlotRef} className="h-full" />
-          </Panel>
-          {!devToolsBefore && <Separator />}
-          {!devToolsBefore && devToolsPanel}
-        </Group>
+        <DevToolsSplitLayout
+          devToolsPosition={devToolsPosition}
+          devToolsLayoutStorage={devToolsLayoutStorage}
+          panelSlotRef={panelSlotRef}
+          devToolsContainerRef={devToolsContainerRef}
+          onDevToolsPositionChange={onDevToolsPositionChange}
+          onDevToolsClose={onDevToolsClose}
+        />
       )}
       <div
         ref={containerRef}

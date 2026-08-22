@@ -1,12 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
 import { PluginChat } from 'share/components/AiChat'
 import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import store from '../store'
@@ -28,19 +23,9 @@ const TabChatLayout = observer(function TabChatLayout({
   children,
 }: TabChatLayoutProps) {
   const { t } = useTranslation()
-  const { defaultLayout, onLayoutChange } = useDefaultLayout({
-    panelIds: ['terminal', 'chat'],
-    id: `tinker-terminal-tab-${tab.id}`,
-    storage: localStorage,
-  })
 
   return (
-    <Group
-      orientation="horizontal"
-      className="h-full"
-      defaultLayout={defaultLayout}
-      onLayoutChange={onLayoutChange}
-    >
+    <Group orientation="horizontal" className="h-full">
       <Panel id="terminal" minSize={300}>
         {children}
       </Panel>
