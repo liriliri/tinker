@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import BaseStore from 'share/store/Base'
-import LocalStore from 'licia/LocalStore'
+import BaseStore, { storage } from 'share/store/Base'
 import randomItem from 'licia/randomItem'
 import debounce from 'licia/debounce'
 import splitPath from 'licia/splitPath'
@@ -45,8 +44,6 @@ interface FileSearchResult {
 }
 
 const FAVORITE_SHEET_ID = 'favorite'
-
-const storage = new LocalStore('tinker-music-player')
 
 const STORAGE_VOLUME = 'volume'
 const STORAGE_PLAY_MODE = 'playMode'

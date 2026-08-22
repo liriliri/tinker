@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import BaseStore from 'share/store/Base'
-import LocalStore from 'licia/LocalStore'
+import BaseStore, { storage } from 'share/store/Base'
 import chunk from 'licia/chunk'
 import contain from 'licia/contain'
 import debounce from 'licia/debounce'
@@ -35,7 +34,6 @@ interface FileSearchResult {
   name: string
 }
 
-const storage = new LocalStore('tinker-photo-viewer')
 const IMPORT_BATCH_SIZE = 32
 
 const STORAGE_SCAN_DIRS = 'scanDirs'

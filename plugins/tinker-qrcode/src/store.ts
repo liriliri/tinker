@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import type { RefObject } from 'react'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
 import { createMcpApi } from './mcp'
@@ -12,8 +11,6 @@ const STORAGE_FG_COLOR = 'fgColor'
 const STORAGE_BG_COLOR = 'bgColor'
 const STORAGE_IS_CUSTOM_SIZE = 'isCustomSize'
 const STORAGE_CORRECT_LEVEL = 'correctLevel'
-const storage = new LocalStore('tinker-qrcode')
-
 const PRESET_SIZES = [300, 400, 500, 600]
 
 export class Store extends BaseStore {

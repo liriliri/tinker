@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import contain from 'licia/contain'
 import find from 'licia/find'
 import loadImg from 'licia/loadImg'
@@ -12,7 +11,7 @@ import splitPath from 'licia/splitPath'
 import upperCase from 'licia/upperCase'
 import i18n from 'i18next'
 import type { MediaItem, MediaType, AudioInfo } from './types'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { VIDEO_EXTS, AUDIO_EXTS, IMAGE_EXTS } from 'share/lib/fileType'
 import {
   VIDEO_OUTPUT_FORMATS,
@@ -29,8 +28,6 @@ const STORAGE_MODE = 'mode'
 const STORAGE_VIDEO_FORMAT = 'videoFormat'
 const STORAGE_AUDIO_FORMAT = 'audioFormat'
 const STORAGE_IMAGE_FORMAT = 'imageFormat'
-const storage = new LocalStore('tinker-media-converter')
-
 const loadImage = promisify(loadImg) as (
   src: string
 ) => Promise<HTMLImageElement>

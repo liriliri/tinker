@@ -16,11 +16,10 @@ import each from 'licia/each'
 import isBool from 'licia/isBool'
 import isErr from 'licia/isErr'
 import isObj from 'licia/isObj'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import toStr from 'licia/toStr'
 import toast from 'react-hot-toast'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
 import { openImageFile, resolveSavePath } from 'share/lib/util'
 import { WebGLRenderer } from './lib/renderer'
@@ -42,7 +41,6 @@ import {
 } from './types/adjustSections'
 import { createMcpApi } from './mcp'
 
-const storage = new LocalStore('tinker-photo-develop')
 const STORAGE_SECTION_OPEN = 'sectionOpen'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 

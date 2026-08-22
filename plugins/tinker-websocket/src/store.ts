@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
 import trim from 'licia/trim'
 import isStr from 'licia/isStr'
@@ -12,7 +11,7 @@ import find from 'licia/find'
 import some from 'licia/some'
 import convertBin from 'licia/convertBin'
 import i18n from 'i18next'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getByteSize, isValidWsUrl } from './lib/format'
 import { createMcpApi } from './mcp'
 import type {
@@ -23,7 +22,6 @@ import type {
   WsMessage,
 } from './types'
 
-const storage = new LocalStore('tinker-websocket')
 const STORAGE_URL_HISTORY = 'urlHistory'
 const STORAGE_LAST_URL = 'lastUrl'
 const MAX_MESSAGES = 2000

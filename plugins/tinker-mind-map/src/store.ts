@@ -1,13 +1,11 @@
 import { makeAutoObservable, reaction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { alert } from 'share/components/Alert'
 import type { MenuItemConstructorOptions } from 'electron'
 import i18n from 'i18next'
 import type { MindMapNode, MindMapInstance } from './types'
 
-const storage = new LocalStore('tinker-mind-map')
 const STORAGE_FILE_PATH = 'file-path'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_MINDMAP_DATA = 'mindmap-data'

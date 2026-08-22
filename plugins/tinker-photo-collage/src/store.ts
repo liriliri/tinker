@@ -1,9 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import filter from 'licia/filter'
 import find from 'licia/find'
-import LocalStore from 'licia/LocalStore'
 import shuffle from 'licia/shuffle'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getTemplatesByPhotoCount, getTemplateById } from './lib/templates'
 import type { Photo, LayoutTemplate, PhotoSlot } from './types'
 
@@ -18,8 +17,6 @@ const STORAGE_SPACING = 'spacing'
 const STORAGE_RADIUS = 'radius'
 const STORAGE_CANVAS_WIDTH = 'canvasWidth'
 const STORAGE_CANVAS_HEIGHT = 'canvasHeight'
-const storage = new LocalStore('tinker-photo-collage')
-
 class Store extends BaseStore {
   photos: Photo[] = []
   selectedTemplateId: string = 'quad-grid'

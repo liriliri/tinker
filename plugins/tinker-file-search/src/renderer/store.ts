@@ -3,16 +3,13 @@ import concat from 'licia/concat'
 import debounce from 'licia/debounce'
 import filter from 'licia/filter'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import trim from 'licia/trim'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileResult } from './types'
 import { createMcpApi } from './mcp'
 
 const MAX_RESULTS = 100
-const storage = new LocalStore('tinker-file-search')
-
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 const STORAGE_SHOW_PREVIEW = 'showPreview'
 

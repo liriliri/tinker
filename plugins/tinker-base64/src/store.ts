@@ -1,9 +1,8 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import trim from 'licia/trim'
 import truncate from 'licia/truncate'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import toast from 'react-hot-toast'
 import isDataUrl from 'licia/isDataUrl'
 import dataUrl from 'licia/dataUrl'
@@ -15,7 +14,6 @@ import i18n from 'i18next'
 
 type InputType = 'text' | 'file'
 
-const storage = new LocalStore('tinker-base64')
 const STORAGE_INPUT_TYPE = 'inputType'
 const STORAGE_OUTPUT_AS_DATA_URL = 'outputAsDataUrl'
 

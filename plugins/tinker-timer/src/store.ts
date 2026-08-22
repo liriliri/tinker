@@ -1,10 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { formatMs, pad } from './lib/util'
 import i18n from 'i18next'
-
-const storage = new LocalStore('tinker-timer')
 
 const STORAGE_TAB = 'tab'
 const STORAGE_CD_HOURS = 'cdHours'

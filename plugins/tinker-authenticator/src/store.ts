@@ -1,9 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import type { Account } from './types'
 import { generateTOTP } from './lib/totp'
 import {
@@ -12,8 +11,6 @@ import {
   encryptText,
   decryptText,
 } from './lib/crypto'
-
-const storage = new LocalStore('tinker-authenticator')
 
 const STORAGE_ACCOUNTS = 'accounts'
 const STORAGE_PASSWORD_HASH = 'passwordHash'

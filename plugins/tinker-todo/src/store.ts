@@ -1,13 +1,12 @@
 import { makeAutoObservable, runInAction, reaction } from 'mobx'
 import filter from 'licia/filter'
-import LocalStore from 'licia/LocalStore'
 import find from 'licia/find'
 import findIdx from 'licia/findIdx'
 import isStrBlank from 'licia/isStrBlank'
 import lowerCase from 'licia/lowerCase'
 import sortBy from 'licia/sortBy'
 import trim from 'licia/trim'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { Item } from 'jstodotxt'
 import { type Priority, type FilterType, type TodoItem } from './types'
 import { parseTodoItem, createRawTodo, getLocalDateStr } from './lib/todo'
@@ -16,7 +15,6 @@ import { createMcpApi } from './mcp'
 
 export type { Priority, FilterType, TodoItem }
 
-const storage = new LocalStore('tinker-todo')
 const STORAGE_CURRENT_FILTER = 'currentFilter'
 const STORAGE_SHOW_COMPLETED = 'showCompleted'
 const STORAGE_FILE_PATH = 'filePath'

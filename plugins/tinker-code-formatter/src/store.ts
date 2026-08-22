@@ -1,13 +1,10 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import isStrBlank from 'licia/isStrBlank'
 import isUndef from 'licia/isUndef'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { Languages } from './lib/formatter/types'
 import formatter from './lib/formatter'
 import { createMcpApi } from './mcp'
-
-const storage = new LocalStore('tinker-code-formatter')
 
 const STORAGE_STATE = 'code-formatter-state'
 

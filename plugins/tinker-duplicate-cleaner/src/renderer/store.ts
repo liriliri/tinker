@@ -1,14 +1,11 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getFileCategory } from 'share/lib/fileType'
 import { getFileIcon } from 'share/lib/util'
 import type { DuplicateGroup } from '../common/types'
 import type { FilterTab } from './types'
 import { findDuplicates } from './lib/dataProcess'
 import { createMcpApi } from './mcp'
-
-const storage = new LocalStore('tinker-duplicate-cleaner')
 
 const STORAGE_SHOW_PREVIEW = 'showPreview'
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'

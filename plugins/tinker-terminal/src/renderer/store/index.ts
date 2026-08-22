@@ -1,9 +1,8 @@
 import { makeAutoObservable, toJS } from 'mobx'
 import uuid from 'licia/uuid'
-import LocalStore from 'licia/LocalStore'
 import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
 import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   getAllFolders,
   putFolder,
@@ -17,7 +16,6 @@ import type { ILayoutNode, SplitDirection } from '../types'
 import Terminal from './Terminal'
 import { getTerminalSession } from 'share/components/Terminal'
 
-const storage = new LocalStore('tinker-terminal')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 

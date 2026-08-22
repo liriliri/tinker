@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import BaseStore from 'share/store/Base'
-import LocalStore from 'licia/LocalStore'
+import BaseStore, { storage } from 'share/store/Base'
 import clamp from 'licia/clamp'
 import contain from 'licia/contain'
 import isEqual from 'licia/isEqual'
@@ -28,7 +27,6 @@ import {
 import type { Book } from './types'
 import type { BookMeta } from '../common/types'
 
-const storage = new LocalStore('tinker-reader')
 const STORAGE_SCAN_DIRS = 'scanDirs'
 const STORAGE_SCAN_DIR_CHECKED = 'scanDirChecked'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'

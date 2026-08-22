@@ -1,10 +1,10 @@
 import { makeAutoObservable } from 'mobx'
 import uuid from 'licia/uuid'
-import LocalStore from 'licia/LocalStore'
 import normalizePath from 'licia/normalizePath'
 import { getTerminalSession } from '../components/Terminal'
 import type { ILayoutNode, SplitDirection } from '../types/terminalLayout'
 import TerminalTabStore from './TerminalTab'
+import { storage } from './Base'
 
 const STORAGE_TERMINAL_OPEN = 'terminalOpen'
 
@@ -23,13 +23,11 @@ class TerminalStore {
   pendingCwd: Record<string, string> = {}
   onDestroyPane?: (id: string) => void
   private tabCounter = 0
-  private storage: LocalStore
 
   private getRootPath: () => string
 
-  constructor(storageKey: string, getRootPath: () => string) {
-    this.storage = new LocalStore(storageKey)
-    this.terminalOpen = this.storage.get(STORAGE_TERMINAL_OPEN) ?? false
+  constructor(getRootPath: () => string) {
+    this.terminalOpen = storage.get(STORAGE_TERMINAL_OPEN) ?? false
     this.getRootPath = getRootPath
     makeAutoObservable(this, {
       onDestroyPane: false,
@@ -45,7 +43,7 @@ class TerminalStore {
 
   toggle() {
     this.terminalOpen = !this.terminalOpen
-    this.storage.set(STORAGE_TERMINAL_OPEN, this.terminalOpen)
+    storage.set(STORAGE_TERMINAL_OPEN, this.terminalOpen)
     if (this.terminalOpen && this.tabs.length === 0) {
       this.addTab()
     }
@@ -53,7 +51,7 @@ class TerminalStore {
 
   open() {
     this.terminalOpen = true
-    this.storage.set(STORAGE_TERMINAL_OPEN, true)
+    storage.set(STORAGE_TERMINAL_OPEN, true)
   }
 
   addTab(cwd?: string) {
@@ -89,7 +87,7 @@ class TerminalStore {
       this.activeTabId = ''
       this.activePaneId = ''
       this.terminalOpen = false
-      this.storage.set(STORAGE_TERMINAL_OPEN, false)
+      storage.set(STORAGE_TERMINAL_OPEN, false)
       return
     }
 

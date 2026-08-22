@@ -1,13 +1,11 @@
 import { makeAutoObservable, computed, toJS } from 'mobx'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import uuid from 'licia/uuid'
-import LocalStore from 'licia/LocalStore'
 import type { Rule, RuleType, FileInfo, RenameOperation } from '../common/types'
 import type { FileRow, RuleRow } from './types'
 import { execRules } from './lib/rules'
 import { parseFile, ruleDescription } from './lib/util'
 
-const storage = new LocalStore('tinker-renamer')
 const STORAGE_RULES = 'rules'
 
 class Store extends BaseStore {

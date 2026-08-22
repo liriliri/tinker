@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 
 const STORAGE_HTML = 'html'
 const STORAGE_CSS = 'css'
@@ -10,8 +9,6 @@ const STORAGE_DEV_TOOLS = 'devTools'
 const STORAGE_DEV_TOOLS_POSITION = 'devToolsPosition'
 const STORAGE_VISIBLE_PANELS = 'visiblePanels'
 const STORAGE_LAYOUT = 'layout'
-
-const storage = new LocalStore('tinker-web-runner')
 
 class Store extends BaseStore {
   html = ''

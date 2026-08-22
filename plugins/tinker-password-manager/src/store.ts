@@ -1,9 +1,8 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import find from 'licia/find'
-import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import splitPath from 'licia/splitPath'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import * as kdbxweb from 'kdbxweb'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
@@ -16,8 +15,6 @@ import {
 import { KdbxEntry, KdbxGroup } from './types'
 
 export type { KdbxEntry, KdbxGroup }
-
-const storage = new LocalStore('tinker-password-manager')
 
 const STORAGE_RECENT_FILES = 'recent-files'
 

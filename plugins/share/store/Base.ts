@@ -1,3 +1,8 @@
+import LocalStore from 'licia/LocalStore'
+
+/** Plugin-scoped persistent storage (namespace = plugin id from URL). */
+export const storage = new LocalStore(location.host)
+
 /**
  * BaseStore - Base store class for all Tinker plugin stores
  * Provides common functionality like theme management

@@ -2,11 +2,10 @@ import { makeAutoObservable } from 'mobx'
 import filter from 'licia/filter'
 import find from 'licia/find'
 import findIdx from 'licia/findIdx'
-import LocalStore from 'licia/LocalStore'
 import sortBy from 'licia/sortBy'
 import trim from 'licia/trim'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   createDateTime,
   getDatePart,
@@ -18,7 +17,6 @@ import * as db from './lib/db'
 import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
-const storage = new LocalStore('tinker-calendar')
 const STORAGE_SIDEBAR_OPEN = 'sidebar-open'
 const HOLIDAY_COLOR = '#fb923c'
 

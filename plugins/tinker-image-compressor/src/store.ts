@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
 import each from 'licia/each'
 import isEmpty from 'licia/isEmpty'
@@ -8,7 +7,7 @@ import map from 'licia/map'
 import splitPath from 'licia/splitPath'
 import mime from 'licia/mime'
 import type { ImageItem } from './types'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   buildFfmpegArgs,
   clampQuality,
@@ -24,8 +23,6 @@ const STORAGE_QUALITY = 'quality'
 const STORAGE_IS_CUSTOM_QUALITY = 'isCustomQuality'
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_KEEP_EXIF = 'keepExif'
-const storage = new LocalStore('tinker-image-compressor')
-
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)
 

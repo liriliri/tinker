@@ -1,15 +1,12 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
 import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { AI_CHAT_AGENT_TOOLS } from './lib/chatTools'
 import { AiChatSessionStorage } from './lib/sessionStorage'
 import type { AiChatPersistedSession } from './lib/sessionStorage'
-
-const storage = new LocalStore('tinker-ai-chat')
 
 const STORAGE_ACTIVE_SESSION = 'activeSessionId'
 

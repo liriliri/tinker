@@ -1,9 +1,8 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import isStrBlank from 'licia/isStrBlank'
 import lowerCase from 'licia/lowerCase'
 import sortBy from 'licia/sortBy'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import * as db from './lib/db'
 import { ClipboardItem, ClipboardType } from '../common/types'
 import { FilterTab } from './types'
@@ -12,8 +11,6 @@ export type { ClipboardType, ClipboardItem, FilterTab }
 
 const STORAGE_FILTER_TAB = 'filter-tab'
 const STORAGE_SEARCH_QUERY = 'search-query'
-
-const storage = new LocalStore('tinker-clipboard')
 
 class Store extends BaseStore {
   items: ClipboardItem[] = []

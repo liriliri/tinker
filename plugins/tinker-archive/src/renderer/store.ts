@@ -1,5 +1,4 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import pluck from 'licia/pluck'
 import splitPath from 'licia/splitPath'
 import isEmpty from 'licia/isEmpty'
@@ -13,7 +12,7 @@ import lowerCase from 'licia/lowerCase'
 import endWith from 'licia/endWith'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import type {
   IArchiveEntry,
   SortMethod,
@@ -30,7 +29,6 @@ import {
 } from './lib/util'
 import { createMcpApi } from './mcp'
 
-const storage = new LocalStore('tinker-archive')
 const STORAGE_VIEW_MODE = 'viewMode'
 
 export class Store extends BaseStore {

@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import toNum from 'licia/toNum'
 import clamp from 'licia/clamp'
 import splitPath from 'licia/splitPath'
@@ -11,7 +10,7 @@ import type {
   AudioCompressionMode,
   TargetSizeUnit,
 } from './types'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { VIDEO_EXTS, AUDIO_EXTS } from 'share/lib/fileType'
 import { buildFFmpegArgs } from './lib/ffmpegArgs'
 import { detectGpuEncoder } from './lib/gpuDetect'
@@ -24,8 +23,6 @@ const STORAGE_VIDEO_MODE = 'videoMode'
 const STORAGE_AUDIO_MODE = 'audioMode'
 const STORAGE_TARGET_SIZE = 'targetSize'
 const STORAGE_TARGET_SIZE_UNIT = 'targetSizeUnit'
-const storage = new LocalStore('tinker-media-compressor')
-
 class Store extends BaseStore {
   videoItems: MediaItem[] = []
   audioItems: MediaItem[] = []

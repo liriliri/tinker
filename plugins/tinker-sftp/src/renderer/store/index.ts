@@ -1,10 +1,9 @@
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
 import uuid from 'licia/uuid'
 import isEmpty from 'licia/isEmpty'
-import LocalStore from 'licia/LocalStore'
 import toast from 'react-hot-toast'
 import i18next from 'i18next'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   getAllFolders,
   putFolder,
@@ -17,7 +16,6 @@ import Explorer from './Explorer'
 import Transfer from './Transfer'
 import { isHiddenEntry } from '../lib/util'
 
-const storage = new LocalStore('tinker-sftp')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_SHOW_HIDDEN = 'showHiddenFiles'
 const STORAGE_VIEW_MODE = 'viewMode'

@@ -1,10 +1,7 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import isStrBlank from 'licia/isStrBlank'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import math, { createScope, formatResult } from './lib/math'
-
-const storage = new LocalStore('tinker-calculator')
 
 const OPERATORS = ['+', '-', '*', '/', '^']
 const STORAGE_STATE = 'calculator-state'

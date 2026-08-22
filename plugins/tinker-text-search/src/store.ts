@@ -4,7 +4,7 @@ import BaseStore from 'share/store/Base'
 import TextSearch, { type TextSearchActiveMatch } from 'share/lib/textSearch'
 
 class Store extends BaseStore {
-  search = new TextSearch({ storageNamespace: 'tinker-text-search' })
+  search = new TextSearch({ persist: true })
 
   activeMatch: TextSearchActiveMatch | null = null
 

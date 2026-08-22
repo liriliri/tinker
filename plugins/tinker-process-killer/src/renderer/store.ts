@@ -1,10 +1,9 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { confirm } from 'share/components/Confirm'
 import { getFileIcon } from 'share/lib/util'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import i18n from 'i18next'
 import isMac from 'licia/isMac'
 import isWindows from 'licia/isWindows'
@@ -18,7 +17,6 @@ import { createMcpApi } from './mcp'
 
 const STORAGE_VIEW_MODE = 'view-mode'
 
-const storage = new LocalStore('tinker-process-killer')
 const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
 
 export class Store extends BaseStore {

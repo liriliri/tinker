@@ -1,18 +1,15 @@
 import { makeAutoObservable, toJS } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import uuid from 'licia/uuid'
 import contain from 'licia/contain'
 import remove from 'licia/remove'
 import { HostsConfig } from '../common/types'
 import { ViewMode } from './types'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import i18n from 'i18next'
 import { createMcpApi } from './mcp'
 
 const STORAGE_CONFIGS = 'configs'
 const STORAGE_ACTIVE_IDS = 'active-ids'
-
-const storage = new LocalStore('tinker-hosts')
 
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)

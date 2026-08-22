@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { CSSProperties } from 'react'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { type Language, LANGUAGES } from './lib/languages'
 import {
   type Theme,
@@ -14,7 +13,6 @@ import isUndef from 'licia/isUndef'
 import findKey from 'licia/findKey'
 import { createMcpApi } from './mcp'
 
-const storage = new LocalStore('tinker-code-image')
 const STORAGE_LANGUAGE = 'language'
 const STORAGE_THEME = 'theme'
 const STORAGE_DARK_MODE = 'darkMode'

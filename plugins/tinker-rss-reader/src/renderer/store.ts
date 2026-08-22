@@ -1,16 +1,13 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import lowerCase from 'licia/lowerCase'
 import sortBy from 'licia/sortBy'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import type { RSSSource, RSSItem } from '../common/types'
 import type { Filter, ViewMode } from './types'
 import { getAllItems, addItems, putItem, deleteItemsBySource } from './lib/db'
-
-const storage = new LocalStore('tinker-rss-reader')
 
 const STORAGE_SOURCES = 'sources'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'

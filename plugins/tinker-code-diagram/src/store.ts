@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import type { editor } from 'monaco-editor'
 import {
   initAiChatAvailability,
@@ -10,7 +9,7 @@ import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 import { DEFAULT_DIAGRAM } from './lib/mermaid'
 
@@ -18,7 +17,6 @@ const STORAGE_CONTENT = 'content'
 const STORAGE_VIEW_MODE = 'view-mode'
 const STORAGE_DARK_MODE = 'darkMode'
 
-const storage = new LocalStore('tinker-code-diagram')
 const sessionStorage = new IndexedDbChatStorage('tinker-code-diagram')
 
 type ViewMode = 'split' | 'editor' | 'preview'

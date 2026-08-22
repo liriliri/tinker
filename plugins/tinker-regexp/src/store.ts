@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import {
   initAiChatAvailability,
   toggleAiChatOpen,
@@ -8,11 +7,9 @@ import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 import type { Match } from './types'
-
-const storage = new LocalStore('tinker-regexp')
 
 const STORAGE_PATTERN = 'pattern'
 const STORAGE_FLAGS = 'flags'

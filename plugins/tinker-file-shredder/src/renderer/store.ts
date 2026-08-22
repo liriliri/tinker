@@ -6,17 +6,15 @@ import extend from 'licia/extend'
 import filter from 'licia/filter'
 import find from 'licia/find'
 import isEmpty from 'licia/isEmpty'
-import LocalStore from 'licia/LocalStore'
 import map from 'licia/map'
 import pluck from 'licia/pluck'
 import splitPath from 'licia/splitPath'
 import sum from 'licia/sum'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getFileIcon } from 'share/lib/util'
 import type { FileEntry, ShredMethod, ShredResult } from '../common/types'
 import { createMcpApi } from './mcp'
 
-const storage = new LocalStore('tinker-file-shredder')
 const STORAGE_SHRED_METHOD = 'shredMethod'
 
 export class Store extends BaseStore {

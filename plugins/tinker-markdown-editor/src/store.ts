@@ -1,16 +1,13 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 
 const STORAGE_CONTENT = 'content'
 const STORAGE_FILE_PATH = 'file-path'
 const STORAGE_VIEW_MODE = 'view-mode'
-
-const storage = new LocalStore('tinker-markdown-editor')
 
 export type ViewMode = 'split' | 'editor' | 'preview'
 

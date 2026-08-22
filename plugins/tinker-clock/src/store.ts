@@ -1,8 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
-
-const storage = new LocalStore('tinker-clock')
+import BaseStore, { storage } from 'share/store/Base'
 
 const STORAGE_THEME = 'theme'
 const STORAGE_TIMEZONE = 'timezone'

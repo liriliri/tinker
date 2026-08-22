@@ -50,7 +50,7 @@ Always use theme utilities from `share/theme.ts`. Never hardcode colors. Only us
 
 ## Persistent Storage
 
-Use `licia/LocalStore` for data persistence. Reference: `tinker-json-editor/src/store.ts:14,64-70,73-74`
+Use `storage` from `share/store/Base` for data persistence (plugin-scoped `LocalStore` keyed by `location.host`). Reference: `share/store/Base.ts`, `tinker-json-editor/src/store.ts`
 
 ## Preload Scripts (Advanced Plugins)
 

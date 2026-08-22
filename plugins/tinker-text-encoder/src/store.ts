@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import toast from 'react-hot-toast'
 import i18n from 'i18next'
 import {
@@ -17,8 +16,6 @@ export type EncodingType = 'url' | 'morse' | 'unicode'
 
 const STORAGE_CONTENT = 'content'
 const STORAGE_ENCODING_TYPE = 'encodingType'
-
-const storage = new LocalStore('tinker-text-encoder')
 
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)

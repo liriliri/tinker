@@ -1,15 +1,13 @@
 import { makeAutoObservable, reaction } from 'mobx'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import toast from 'react-hot-toast'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import pdfjsLib from 'pdfjs-dist'
-import LocalStore from 'licia/LocalStore'
 import clamp from 'licia/clamp'
 import dataUrl from 'licia/dataUrl'
 import convertBin from 'licia/convertBin'
 import i18n from 'i18next'
 
-const storage = new LocalStore('tinker-pdf')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_SIDEBAR_VIEW = 'sidebarView'
 

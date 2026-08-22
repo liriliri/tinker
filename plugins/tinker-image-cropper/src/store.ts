@@ -1,12 +1,9 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { openImageFile } from 'share/lib/util'
 import { createMcpApi } from './mcp'
 
 const STORAGE_OVERWRITE = 'overwriteOriginal'
-const storage = new LocalStore('tinker-image-cropper')
-
 export interface ImageInfo {
   fileName: string
   filePath?: string

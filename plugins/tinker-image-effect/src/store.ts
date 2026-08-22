@@ -6,12 +6,11 @@ import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
 import toast from 'react-hot-toast'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
 import { openImageFile, resolveSavePath } from 'share/lib/util'
 import { EffectRenderer } from './lib/renderer'
@@ -30,7 +29,6 @@ import {
   type SketchParams,
 } from './types'
 
-const storage = new LocalStore('tinker-image-effect')
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_EFFECT_ID = 'effectId'
 const RENDER_DEBOUNCE_MS = 200

@@ -1,13 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import i18n from 'i18next'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { Agent } from 'share/lib/Agent'
 import type { AgentMessage } from 'share/lib/Agent'
 import { buildAssistantTools } from './lib/assistantTools'
 import * as sessionStorage from './lib/sessionStorage'
-
-const storage = new LocalStore('tinker-ai-assistant')
 
 const STORAGE_PROVIDER = 'provider'
 const STORAGE_MODEL = 'model'

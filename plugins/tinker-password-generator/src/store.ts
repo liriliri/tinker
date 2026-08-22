@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import BaseStore from 'share/store/Base'
-import LocalStore from 'licia/LocalStore'
+import BaseStore, { storage } from 'share/store/Base'
 import Vault from './lib/vault'
 
 export type CharsetState = 'required' | 'allowed' | 'forbidden'
@@ -11,8 +10,6 @@ export interface CharType {
   state: CharsetState
   setter: (state: CharsetState) => void
 }
-
-const storage = new LocalStore('tinker-password-generator')
 
 const STORAGE_SETTINGS = 'settings'
 

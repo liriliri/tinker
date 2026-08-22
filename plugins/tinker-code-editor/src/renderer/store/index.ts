@@ -1,6 +1,5 @@
 import { makeAutoObservable, observable, reaction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import TextSearch from 'share/lib/textSearch'
 import type { ITreeNode } from 'share/components/FileTree'
 import type { IFileWatchEvent } from '../../common/types'
@@ -20,7 +19,6 @@ import WorkingTree from './WorkingTree'
 import { buildCodeEditorSystemPrompt, createCodeEditorChat } from '../lib/chat'
 import type { EditorChatContext } from '../lib/chatTools'
 
-const storage = new LocalStore('tinker-code-editor')
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_ROOT_PATH = 'rootPath'
@@ -58,7 +56,7 @@ class Store extends BaseStore {
   constructor() {
     super()
 
-    this.terminal = new TerminalStore('tinker-code-editor', () => this.rootPath)
+    this.terminal = new TerminalStore(() => this.rootPath)
     this.editor = new Editor()
     this.chat = createCodeEditorChat(
       chatPrefsStorage,
@@ -75,7 +73,7 @@ class Store extends BaseStore {
         this.editor.openFile(filePath, fileName),
     })
     this.textSearch = new TextSearch({
-      storageNamespace: 'tinker-code-editor-search',
+      persist: true,
       initialRootDir: storage.get(STORAGE_ROOT_PATH) || '',
     })
     this.workingTree = new WorkingTree({

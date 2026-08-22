@@ -1,10 +1,7 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { config, getType, calculate } from './lib/units'
 import { createMcpApi } from './mcp'
-
-const storage = new LocalStore('tinker-unit-converter')
 
 const STORAGE_STATE = 'state'
 

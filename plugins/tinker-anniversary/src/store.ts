@@ -3,12 +3,11 @@ import find from 'licia/find'
 import findIdx from 'licia/findIdx'
 import flatten from 'licia/flatten'
 import isNil from 'licia/isNil'
-import LocalStore from 'licia/LocalStore'
 import map from 'licia/map'
 import toInt from 'licia/toInt'
 import trim from 'licia/trim'
 import uuid from 'licia/uuid'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createDateTime, normalizeDateKey } from './lib/date'
 import {
   getAnniversaryDatesInRange,
@@ -21,7 +20,6 @@ import type { Anniversary } from './types'
 import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
-const storage = new LocalStore('tinker-anniversary')
 const STORAGE_SIDEBAR_OPEN = 'sidebar-open'
 const STORAGE_SHOW_HOLIDAYS = 'show-holidays'
 const DEFAULT_VISIBLE_START = normalizeDateKey(new Date())

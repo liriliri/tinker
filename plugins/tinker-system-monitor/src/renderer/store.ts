@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
 import type { DataPoint, ResourceUsagePayload } from '../common/types'
@@ -11,8 +10,6 @@ import { createMcpApi } from './mcp'
 const DEFAULT_INTERVAL = 500
 const DEFAULT_HISTORY = 60
 const STORAGE_FLOAT = 'floatOpen'
-const storage = new LocalStore('tinker-system-monitor')
-
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)
   payload: ResourceUsagePayload | null = null

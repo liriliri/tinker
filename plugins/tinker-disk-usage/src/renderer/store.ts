@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import type { DiskItem } from './types'
 import {
   buildDiskData,
@@ -12,8 +11,6 @@ import {
 } from './lib/dataProcess'
 import type { ChartControls } from './lib/d3chart'
 import { createMcpApi } from './mcp'
-
-const storage = new LocalStore('tinker-disk-usage')
 
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 

@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 
 export type TimestampUnit = 'millisecond' | 'second'
@@ -8,8 +7,6 @@ export type Timezone = string
 
 const STORAGE_UNIT = 'unit'
 const STORAGE_TIMEZONE = 'timezone'
-const storage = new LocalStore('tinker-timestamp')
-
 const TIMEZONE_KEYS: Record<string, string> = {
   'UTC+00:00': 'utcLondon',
   'UTC+01:00': 'utcBerlin',

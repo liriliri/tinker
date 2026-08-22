@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import clone from 'licia/clone'
 import contain from 'licia/contain'
 import lowerCase from 'licia/lowerCase'
@@ -7,7 +6,7 @@ import mapObj from 'licia/mapObj'
 import splitPath from 'licia/splitPath'
 import toBool from 'licia/toBool'
 import upperCase from 'licia/upperCase'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   calculateAllHashes,
   calculateFileHashes,
@@ -19,8 +18,6 @@ type InputType = 'text' | 'file'
 
 const STORAGE_UPPERCASE = 'uppercase'
 const STORAGE_INPUT_TYPE = 'inputType'
-const storage = new LocalStore('tinker-hash')
-
 const EMPTY_HASH_RESULTS: Record<HashAlgorithm, string> = {
   md5: '',
   sha1: '',

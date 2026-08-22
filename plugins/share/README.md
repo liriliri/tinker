@@ -182,7 +182,7 @@ For AiChat tool-arg previews, optional `getToolArgSummary` should return the ful
 import TextSearchSidebar, { getTextSearchUIProps } from 'share/components/TextSearch'
 import TextSearch from 'share/lib/textSearch'
 
-const search = new TextSearch({ storageNamespace: 'my-plugin-search' })
+const search = new TextSearch({ persist: true })
 
 <TextSearchSidebar
   {...getTextSearchUIProps(search)}
@@ -221,7 +221,7 @@ import {
   getTerminalPanelProps,
 } from 'share/components/TerminalPanel'
 
-this.terminal = new TerminalStore('my-plugin', () => this.rootPath)
+this.terminal = new TerminalStore(() => this.rootPath)
 this.terminal.initIfOpen()
 
 {

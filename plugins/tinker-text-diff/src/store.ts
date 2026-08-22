@@ -1,15 +1,12 @@
 import { makeAutoObservable } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 
 type ViewMode = 'edit' | 'diff'
 
 const STORAGE_CONTENT = 'content'
 const STORAGE_MODE = 'mode'
 const STORAGE_LANGUAGE = 'language'
-
-const storage = new LocalStore('tinker-text-diff')
 
 interface DiffStats {
   additions: number

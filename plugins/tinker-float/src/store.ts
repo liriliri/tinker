@@ -2,8 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import i18n from 'i18next'
 import fileUrl from 'licia/fileUrl'
 import isUrl from 'licia/isUrl'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import {
   getFileCategory,
   IMAGE_EXTS,
@@ -18,8 +17,6 @@ const MIN_WINDOW_SIZE = {
   video: { width: 320, height: 200 },
   url: { width: 320, height: 240 },
 }
-
-const storage = new LocalStore('tinker-float')
 
 const STORAGE_WINDOW_WIDTH = 'windowWidth'
 const STORAGE_WINDOW_HEIGHT = 'windowHeight'

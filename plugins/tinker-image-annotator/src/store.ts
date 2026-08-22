@@ -1,9 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
 import download from 'licia/download'
 import toast from 'react-hot-toast'
 import debounce from 'licia/debounce'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { alert } from 'share/components/Alert'
 import { THEME_COLORS } from 'share/theme'
 import i18n from 'i18next'
@@ -23,7 +22,6 @@ const STORAGE_SHAPE_TYPE = 'shape-type'
 const STORAGE_WATERMARK_ENABLED = 'watermark-enabled'
 const STORAGE_WATERMARK_TEXT = 'watermark-text'
 const STORAGE_WATERMARK_COLOR = 'watermark-color'
-const storage = new LocalStore('tinker-image-annotator')
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
 const DEFAULT_WATERMARK_TEXT = 'Tinker'

@@ -1,9 +1,8 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { getConfigFiles } from './lib/configFiles'
 import type { ConfigFile } from './types'
 
@@ -14,8 +13,6 @@ const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const DEFAULT_FONT_SIZE = 14
 const MIN_FONT_SIZE = 10
 const MAX_FONT_SIZE = 32
-
-const storage = new LocalStore('tinker-config-editor')
 
 class Store extends BaseStore {
   content: string = ''

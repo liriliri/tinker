@@ -1,9 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import clamp from 'licia/clamp'
 import debounce from 'licia/debounce'
-import LocalStore from 'licia/LocalStore'
 import rtrim from 'licia/rtrim'
 import sortBy from 'licia/sortBy'
+import { storage } from '../store/Base'
 import { fileExists } from './util'
 
 export interface TextSearchFileGroup {
@@ -19,12 +19,8 @@ export interface TextSearchActiveMatch {
 }
 
 export interface TextSearchOptions {
-  /**
-   * Namespace for LocalStore persistence. Each plugin should pass a unique
-   * value to avoid colliding with other plugins. Pass `undefined` to disable
-   * persistence (state lives only in memory).
-   */
-  storageNamespace?: string
+  /** Persist search options in plugin-scoped storage from `share/store/Base`. */
+  persist?: boolean
   /** Initial root directory; only used when persistence is disabled. */
   initialRootDir?: string
 }
@@ -229,16 +225,15 @@ export default class TextSearch {
    */
   restored: boolean = true
 
-  private storage: LocalStore | null = null
+  private persist = false
   private groupIndex: Map<string, number> = new Map()
   private currentTask: tinker.SearchTextTask | null = null
   private debounceSearch = debounce(() => this.search(), 300)
 
   constructor(opts: TextSearchOptions = {}) {
-    if (opts.storageNamespace) {
-      const storage = new LocalStore(opts.storageNamespace)
-      this.storage = storage
-      this.rootDir = storage.get(STORAGE_ROOT_DIR) || ''
+    if (opts.persist) {
+      this.persist = true
+      this.rootDir = storage.get(STORAGE_ROOT_DIR) || opts.initialRootDir || ''
       this.includes = storage.get(STORAGE_INCLUDES) || ''
       this.excludes = storage.get(STORAGE_EXCLUDES) || ''
       this.caseSensitive = storage.get(STORAGE_CASE_SENSITIVE) === true
@@ -254,9 +249,9 @@ export default class TextSearch {
 
     makeAutoObservable<
       this,
-      'storage' | 'groupIndex' | 'currentTask' | 'debounceSearch'
+      'persist' | 'groupIndex' | 'currentTask' | 'debounceSearch'
     >(this, {
-      storage: false,
+      persist: false,
       groupIndex: false,
       currentTask: false,
       debounceSearch: false,
@@ -270,7 +265,7 @@ export default class TextSearch {
     runInAction(() => {
       if (!exists && this.rootDir === dir) {
         this.rootDir = ''
-        this.storage?.set(STORAGE_ROOT_DIR, '')
+        if (this.persist) storage.set(STORAGE_ROOT_DIR, '')
       }
       this.restored = true
     })
@@ -284,43 +279,43 @@ export default class TextSearch {
   setRootDir(value: string) {
     if (this.rootDir === value) return
     this.rootDir = value
-    this.storage?.set(STORAGE_ROOT_DIR, value)
+    if (this.persist) storage.set(STORAGE_ROOT_DIR, value)
     this.debounceSearch()
   }
 
   setIncludes(value: string) {
     this.includes = value
-    this.storage?.set(STORAGE_INCLUDES, value)
+    if (this.persist) storage.set(STORAGE_INCLUDES, value)
     this.debounceSearch()
   }
 
   setExcludes(value: string) {
     this.excludes = value
-    this.storage?.set(STORAGE_EXCLUDES, value)
+    if (this.persist) storage.set(STORAGE_EXCLUDES, value)
     this.debounceSearch()
   }
 
   setCaseSensitive(value: boolean) {
     this.caseSensitive = value
-    this.storage?.set(STORAGE_CASE_SENSITIVE, value)
+    if (this.persist) storage.set(STORAGE_CASE_SENSITIVE, value)
     this.debounceSearch()
   }
 
   setWholeWord(value: boolean) {
     this.wholeWord = value
-    this.storage?.set(STORAGE_WHOLE_WORD, value)
+    if (this.persist) storage.set(STORAGE_WHOLE_WORD, value)
     this.debounceSearch()
   }
 
   setRegex(value: boolean) {
     this.regex = value
-    this.storage?.set(STORAGE_REGEX, value)
+    if (this.persist) storage.set(STORAGE_REGEX, value)
     this.debounceSearch()
   }
 
   setMaxResults(value: number) {
     this.maxResults = value
-    this.storage?.set(STORAGE_MAX_RESULTS, value)
+    if (this.persist) storage.set(STORAGE_MAX_RESULTS, value)
     this.debounceSearch()
   }
 
@@ -333,8 +328,8 @@ export default class TextSearch {
     this.query = ''
     this.includes = ''
     this.excludes = ''
-    this.storage?.set(STORAGE_INCLUDES, '')
-    this.storage?.set(STORAGE_EXCLUDES, '')
+    if (this.persist) storage.set(STORAGE_INCLUDES, '')
+    if (this.persist) storage.set(STORAGE_EXCLUDES, '')
     this.resetResults()
     this.activeMatchKey = ''
     this.searching = false

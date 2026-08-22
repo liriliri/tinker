@@ -1,9 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import uuid from 'licia/uuid'
-import LocalStore from 'licia/LocalStore'
 import pluck from 'licia/pluck'
 import isEmpty from 'licia/isEmpty'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import TerminalStore from 'share/store/Terminal'
 import type {
   IFavoritePlace,
@@ -14,7 +13,6 @@ import type {
 import Explorer from './Explorer'
 import { isHiddenEntry } from '../lib/util'
 
-const storage = new LocalStore('tinker-file-explorer')
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const STORAGE_VIEW_MODE = 'viewMode'
 const STORAGE_SHOW_PREVIEW = 'showPreview'
@@ -51,7 +49,7 @@ class Store extends BaseStore {
 
   constructor() {
     super()
-    this.terminal = new TerminalStore('tinker-file-explorer', () =>
+    this.terminal = new TerminalStore(() =>
       this.activeTab?.path ? this.activeTab.path : fileExplorer.getHomedir()
     )
     makeAutoObservable(this, { terminal: false })

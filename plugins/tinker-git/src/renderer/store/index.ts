@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import LocalStore from 'licia/LocalStore'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import TerminalStore from 'share/store/Terminal'
 import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
 import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
@@ -8,7 +7,6 @@ import Repo, { type GitViewMode } from './Repo'
 import { repoDirName } from '../lib/util'
 import { buildGitSystemPrompt, createGitChat } from '../lib/chat'
 
-const storage = new LocalStore('tinker-git')
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 class Store extends BaseStore {
@@ -23,7 +21,7 @@ class Store extends BaseStore {
 
   constructor() {
     super()
-    this.terminal = new TerminalStore('tinker-git', () => this.repoPath)
+    this.terminal = new TerminalStore(() => this.repoPath)
     makeAutoObservable(this)
     this.addTab()
     this.terminal.initIfOpen()

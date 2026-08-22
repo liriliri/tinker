@@ -1,7 +1,6 @@
 import { makeAutoObservable, reaction } from 'mobx'
 import type JSONEditor from 'jsoneditor'
 import isStrBlank from 'licia/isStrBlank'
-import LocalStore from 'licia/LocalStore'
 import splitPath from 'licia/splitPath'
 import type { editor } from 'monaco-editor'
 import toast from 'react-hot-toast'
@@ -14,12 +13,10 @@ import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import { ChatSession } from 'share/lib/aiChat/chatSession'
 import { IndexedDbChatStorage } from 'share/lib/aiChat/chatStorage'
 import AiChatStore from 'share/store/AiChat'
-import BaseStore from 'share/store/Base'
+import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 
 type EditorMode = 'text' | 'tree'
-
-const storage = new LocalStore('tinker-json-editor')
 
 const STORAGE_CONTENT = 'tinker-json-editor-content'
 const STORAGE_MODE = 'tinker-json-editor-mode'
