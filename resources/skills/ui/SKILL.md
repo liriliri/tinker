@@ -29,7 +29,7 @@ Prefer **`snapshot --inline`** so the agent reads YAML from stdout. After any DO
 
 ```bash
 tinker ui <plugin> snapshot --inline
-tinker ui <plugin> snapshot                 # auto-save under the plugin UI data dir
+tinker ui <plugin> snapshot                 # auto-save under the plugin UI temp dir
 tinker ui <plugin> snapshot --depth=4
 tinker ui <plugin> snapshot e34             # subtree at a ref
 tinker ui <plugin> snapshot "#main"
@@ -38,7 +38,7 @@ tinker ui <plugin> find "Save"
 tinker ui <plugin> find --regex "/sign (in|up)/i"
 ```
 
-File outputs (`snapshot --filename`, `screenshot --filename`) must stay under the plugin UI data root (e.g. `…/data/ui/tinker-<plugin>/`). Paths like `/tmp/...` are rejected.
+File outputs (`snapshot --filename`, `screenshot --filename`) must stay under the plugin UI temp root (e.g. `$TMPDIR/tinker-<plugin>/` on macOS). Paths outside that directory are rejected.
 
 ## Targeting
 
@@ -94,6 +94,6 @@ Unknown actions print the full supported set. Flags: `--flag`, `--flag=value`, o
 
 **`Ref not found` / locator timeout** — Snapshot again; use a fresh ref.
 
-**`File access denied` / outside allowed roots** — Write under the plugin UI data dir, or omit `--filename`.
+**`File access denied` / outside allowed roots** — Write under the plugin UI temp dir (`$TMPDIR/tinker-<plugin>/`), or omit `--filename`.
 
 **CDP / connect errors** — Close and reopen the plugin, retry `tinker ui`. Don't attach agent-browser to the same plugin while `ui` is in use.

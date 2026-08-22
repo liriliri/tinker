@@ -1,11 +1,11 @@
 import { createRequire } from 'module'
+import os from 'os'
 import path from 'path'
 import { chromium, type Browser } from 'playwright-core'
 import contain from 'licia/contain'
 import isFinite from 'licia/isFinite'
 import isNum from 'licia/isNum'
 import isStr from 'licia/isStr'
-import { getUserDataPath } from 'share/main/lib/util'
 import { pluginViews, startPluginInspectForRunning } from './view'
 import { getPluginInspectHttpUrl, onPluginInspectStop } from './inspect'
 import {
@@ -260,8 +260,8 @@ onPluginInspectStop((pluginId) => {
   void disposeUiSession(pluginId)
 })
 
-function snapshotDir(pluginId: string) {
-  return getUserDataPath(path.join('data', 'ui', pluginId))
+function uiOutputDir(pluginId: string) {
+  return path.join(os.tmpdir(), pluginId)
 }
 
 async function ensureInspect(pluginId: string) {
@@ -291,7 +291,7 @@ async function connectSession(pluginId: string): Promise<UiSession> {
     throw new Error(`No page found for plugin: ${pluginId}`)
   }
 
-  const outputDir = snapshotDir(pluginId)
+  const outputDir = uiOutputDir(pluginId)
   const backend = new BrowserBackend(
     {
       outputDir,
@@ -545,7 +545,7 @@ export async function runUiCommand(
   const { toolName, toolParams } = resolveUiCommand(action, bound)
 
   const cleaned: Record<string, unknown> = {
-    _meta: { cwd: snapshotDir(pluginId) },
+    _meta: { cwd: uiOutputDir(pluginId) },
   }
   for (const [k, v] of Object.entries(toolParams || {})) {
     if (v !== undefined) cleaned[k] = v
