@@ -12,6 +12,7 @@ class Store extends BaseStore {
   theme: string = 'system'
   language: string = 'system'
   useNativeTitlebar: boolean = false
+  hardwareAcceleration: boolean = true
   openAtLogin: boolean = false
   silentStart: boolean = false
   showShortcut: string = 'Alt+Space'
@@ -57,6 +58,7 @@ class Store extends BaseStore {
       theme,
       language,
       useNativeTitlebar,
+      hardwareAcceleration,
       openAtLogin,
       silentStart,
       showShortcut,
@@ -75,6 +77,7 @@ class Store extends BaseStore {
       tinker.getSetting('theme'),
       tinker.getSetting('language'),
       tinker.getSetting('useNativeTitlebar'),
+      tinker.getSetting('hardwareAcceleration'),
       tinker.getSetting('openAtLogin'),
       tinker.getSetting('silentStart'),
       tinker.getSetting('showShortcut'),
@@ -94,6 +97,7 @@ class Store extends BaseStore {
     this.theme = theme ?? 'system'
     this.language = language ?? 'system'
     this.useNativeTitlebar = useNativeTitlebar ?? false
+    this.hardwareAcceleration = hardwareAcceleration ?? false
     this.openAtLogin = openAtLogin ?? false
     this.silentStart = silentStart ?? false
     this.showShortcut = showShortcut ?? 'Alt+Space'
@@ -129,6 +133,11 @@ class Store extends BaseStore {
   async setUseNativeTitlebar(value: boolean) {
     this.useNativeTitlebar = value
     await tinker.setSetting('useNativeTitlebar', value)
+  }
+
+  async setHardwareAcceleration(value: boolean) {
+    this.hardwareAcceleration = value
+    await tinker.setSetting('hardwareAcceleration', value)
   }
 
   async setOpenAtLogin(value: boolean) {

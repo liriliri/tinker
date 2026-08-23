@@ -23,6 +23,10 @@ fixPath()
 
 const settingsStore = getSettingsStore()
 
+if (!settingsStore.get('hardwareAcceleration')) {
+  app.disableHardwareAcceleration()
+}
+
 window.setDefaultOptions({
   minWidth: 800,
   minHeight: 600,

@@ -7,7 +7,7 @@
   "light": "Light",
   "dark": "Dark",
   "useNativeTitlebar": "Use Native Title Bar",
-
+  "hardwareAcceleration": "Hardware Acceleration",
   "startup": "Startup",
   "openAtLogin": "Open at Login",
   "silentStart": "Silent Start",
@@ -15,7 +15,6 @@
   "httpPort": "HTTP Port",
   "httpUsername": "HTTP Username",
   "httpPassword": "HTTP Password",
-
   "window": "Window",
   "showShortcut": "Show Shortcut",
   "autoHide": "Auto Hide",
@@ -23,21 +22,17 @@
   "recordShortcut": "Click to record shortcut",
   "recording": "Press shortcut keys...",
   "unsupportedKey": "Unsupported key",
-
   "plugin": "Plugin",
   "showMarketplace": "Show Uninstalled Plugins",
   "npm": "NPM",
   "registry": "Registry",
-
   "network": "Network",
   "proxyMode": "Proxy Mode",
   "proxyDirect": "Direct",
   "proxySystem": "System",
   "proxyManual": "Manual",
   "proxyHost": "Proxy Host",
-
   "restartRequired": "Restart required to apply changes.",
-
   "aiModels": "AI Models",
   "addProvider": "Add Provider",
   "providerName": "Name",

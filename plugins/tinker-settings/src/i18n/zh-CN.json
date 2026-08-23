@@ -7,7 +7,7 @@
   "light": "浅色",
   "dark": "深色",
   "useNativeTitlebar": "使用系统原生标题栏",
-
+  "hardwareAcceleration": "硬件加速",
   "startup": "启动",
   "openAtLogin": "开机自启动",
   "silentStart": "静默启动",
@@ -15,7 +15,6 @@
   "httpPort": "HTTP 端口",
   "httpUsername": "HTTP 用户名",
   "httpPassword": "HTTP 密码",
-
   "window": "窗口",
   "showShortcut": "唤出快捷键",
   "autoHide": "自动隐藏",
@@ -23,21 +22,17 @@
   "recordShortcut": "点击录制快捷键",
   "recording": "请按下快捷键...",
   "unsupportedKey": "不支持的按键",
-
   "plugin": "插件",
   "showMarketplace": "显示未安装插件",
   "npm": "NPM",
   "registry": "镜像源",
-
   "network": "网络",
   "proxyMode": "代理模式",
   "proxyDirect": "直连",
   "proxySystem": "系统代理",
   "proxyManual": "手动代理",
   "proxyHost": "代理主机",
-
   "restartRequired": "需要重启应用后生效。",
-
   "aiModels": "AI 模型",
   "addProvider": "添加提供商",
   "providerName": "名称",

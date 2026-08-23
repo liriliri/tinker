@@ -38,6 +38,11 @@ export default observer(function AppearanceSection() {
     toast(t('restartRequired'))
   }
 
+  const handleHardwareAccelerationChange = async (value: boolean) => {
+    await store.setHardwareAcceleration(value)
+    toast(t('restartRequired'))
+  }
+
   return (
     <Section title={t('appearance')}>
       <SettingItem label={t('theme')}>
@@ -60,6 +65,12 @@ export default observer(function AppearanceSection() {
         <Checkbox
           checked={store.useNativeTitlebar}
           onChange={handleNativeTitlebarChange}
+        />
+      </SettingItem>
+      <SettingItem label={t('hardwareAcceleration')}>
+        <Checkbox
+          checked={store.hardwareAcceleration}
+          onChange={handleHardwareAccelerationChange}
         />
       </SettingItem>
     </Section>
