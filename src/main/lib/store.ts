@@ -15,7 +15,7 @@ export const getSettingsStore = memoize(function () {
     language: 'system',
     theme: 'system',
     useNativeTitlebar: false,
-    hardwareAcceleration: isMac,
+    hardwareAcceleration: true,
     openAtLogin: false,
     silentStart: false,
     showShortcut: isMac ? 'Option+Space' : 'Alt+Space',

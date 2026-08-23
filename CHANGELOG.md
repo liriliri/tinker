@@ -1,3 +1,7 @@
+## v2.2.1 (23 Aug 2026)
+
+* fix: windows gpu disabled
+
 ## v2.2.0 (21 Aug 2026)
 
 * feat: add resume
