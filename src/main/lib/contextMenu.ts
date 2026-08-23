@@ -1,11 +1,17 @@
-import { Menu, MenuItemConstructorOptions, WebContentsView } from 'electron'
+import {
+  BrowserWindow,
+  Menu,
+  MenuItemConstructorOptions,
+  WebContentsView,
+} from 'electron'
 import each from 'licia/each'
 
 const contextMenu = function (
   view: WebContentsView,
   x: number,
   y: number,
-  template: MenuItemConstructorOptions[]
+  template: MenuItemConstructorOptions[],
+  browserWindow?: BrowserWindow | null
 ) {
   x = Math.round(x)
   y = Math.round(y)
@@ -13,6 +19,7 @@ const contextMenu = function (
   transOptions(view, template)
   const menu = Menu.buildFromTemplate(template)
   menu.popup({
+    window: browserWindow ?? undefined,
     x,
     y,
   })

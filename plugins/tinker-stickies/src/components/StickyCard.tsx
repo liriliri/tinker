@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -10,10 +10,10 @@ const popupWindows = new Map<string, Window>()
 import { confirm } from 'share/components/Confirm'
 import store, { STICKY_COLORS, type Sticky } from '../store'
 import {
-  HIGHLIGHT_COLORS,
   TEXT_COLOR,
   createEditorExtensions,
   formatTime,
+  showStickyEditorContextMenu,
 } from '../lib/editor'
 import PopupEditor from './PopupEditor'
 
@@ -58,59 +58,10 @@ export default observer(function StickyCard({ sticky }: StickyCardProps) {
     }
   }, [sticky.content, editor, isEditing])
 
-  const handleContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      if (!editor || editor.state.selection.empty) return
-
-      e.preventDefault()
-      tinker.showContextMenu(e.clientX, e.clientY, [
-        {
-          label: t('bold'),
-          type: 'checkbox',
-          checked: editor.isActive('bold'),
-          click: () => editor.chain().focus().toggleBold().run(),
-        },
-        {
-          label: t('italic'),
-          type: 'checkbox',
-          checked: editor.isActive('italic'),
-          click: () => editor.chain().focus().toggleItalic().run(),
-        },
-        {
-          label: t('underline'),
-          type: 'checkbox',
-          checked: editor.isActive('underline'),
-          click: () => editor.chain().focus().toggleUnderline().run(),
-        },
-        {
-          label: t('strikethrough'),
-          type: 'checkbox',
-          checked: editor.isActive('strike'),
-          click: () => editor.chain().focus().toggleStrike().run(),
-        },
-        { type: 'separator' as const },
-        {
-          label: t('highlight'),
-          submenu: [
-            ...HIGHLIGHT_COLORS.map(({ color, label }) => ({
-              label: t(label),
-              type: 'checkbox' as const,
-              checked: editor.isActive('highlight', { color }),
-              click: () =>
-                editor.chain().focus().toggleHighlight({ color }).run(),
-            })),
-            { type: 'separator' as const },
-            {
-              label: t('removeHighlight'),
-              enabled: editor.isActive('highlight'),
-              click: () => editor.chain().focus().unsetHighlight().run(),
-            },
-          ],
-        },
-      ])
-    },
-    [editor, t]
-  )
+  function handleContextMenu(e: React.MouseEvent) {
+    if (!editor) return
+    showStickyEditorContextMenu(e, editor, t)
+  }
 
   async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation()

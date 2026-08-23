@@ -517,16 +517,30 @@ export const showPluginContextMenu: IpcShowPluginContextMenu = function (
   y,
   options
 ) {
-  const plugin = getAttachedPlugin(window.getFocusedWin()!)
-  if (plugin) {
-    const { view } = pluginViews[plugin.id]
-
-    const bounds = view.getBounds()
-    x += bounds.x
-    y += bounds.y
-
-    contextMenu(view, x, y, options)
+  const focused = BrowserWindow.getFocusedWindow()
+  let plugin = getAttachedPlugin(window.getFocusedWin()!)
+  if (!plugin && focused) {
+    const parent = focused.getParentWindow()
+    if (parent) {
+      plugin = getAttachedPlugin(parent)
+    }
   }
+  if (!plugin) {
+    return
+  }
+
+  const { view, win } = pluginViews[plugin.id]
+
+  if (focused && win && focused !== win) {
+    contextMenu(view, x, y, options, focused)
+    return
+  }
+
+  const bounds = view.getBounds()
+  x += bounds.x
+  y += bounds.y
+
+  contextMenu(view, x, y, options, win)
 }
 
 export const exportPluginData: IpcExportPluginData = function (id) {

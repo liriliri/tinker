@@ -5,7 +5,12 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import { X, Circle } from 'lucide-react'
 import { tw } from 'share/theme'
 import store, { STICKY_COLORS, type Sticky } from '../store'
-import { TEXT_COLOR, createEditorExtensions, formatTime } from '../lib/editor'
+import {
+  TEXT_COLOR,
+  createEditorExtensions,
+  formatTime,
+  showStickyEditorContextMenu,
+} from '../lib/editor'
 
 interface PopupEditorProps {
   sticky: Sticky
@@ -16,7 +21,7 @@ export default observer(function PopupEditor({
   sticky,
   onClose,
 }: PopupEditorProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [showColors, setShowColors] = useState(false)
   const popupEditor = useEditor({
     extensions: createEditorExtensions(),
@@ -120,7 +125,13 @@ export default observer(function PopupEditor({
         </button>
       </div>
 
-      <div className="flex-1 px-4 pb-4 overflow-y-auto sticky-editor is-editing">
+      <div
+        className="flex-1 px-4 pb-4 overflow-y-auto sticky-editor is-editing"
+        onContextMenu={(e) => {
+          if (!popupEditor) return
+          showStickyEditorContextMenu(e, popupEditor, t)
+        }}
+      >
         <EditorContent editor={popupEditor} />
       </div>
     </div>
