@@ -13,7 +13,6 @@ import isEmpty from 'licia/isEmpty'
 import { BrowserWindow, WebContents, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
-import { colorBgContainer, colorBgContainerDark } from 'common/theme'
 import * as pluginWin from '../../../window/plugin'
 import { plugins, getPlugins } from '../loader'
 import { getSettingsStore, getMainStore } from '../../store'
@@ -25,6 +24,7 @@ import {
 import { disposePluginHttpSession } from '../../http'
 import { findPluginByWebContents, pluginViews, setPluginView } from './state'
 import { getPluginView, getWebPluginView } from './create'
+import { applyViewTheme, applyWindowTheme } from './util'
 
 const settingsStore = getSettingsStore()
 const customTitlebar = !settingsStore.get('useNativeTitlebar')
@@ -157,13 +157,9 @@ export function updatePluginTheme(id: string) {
     return
   }
 
-  entry.view.webContents.send('changeTheme')
-  const backgroundColor =
-    theme.get() === 'dark' ? colorBgContainerDark : colorBgContainer
-  entry.view.setBackgroundColor(backgroundColor)
+  applyViewTheme(entry.view)
   entry.childWindows.forEach((childWin) => {
-    childWin.webContents.send('changeTheme')
-    childWin.setBackgroundColor(backgroundColor)
+    applyWindowTheme(childWin)
   })
 }
 

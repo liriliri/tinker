@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import type { ReactNode } from 'react'
+import { storage } from 'share/store/Base'
 
 export interface PopupWindowOptions {
   width: number
@@ -11,6 +12,17 @@ export interface PopupWindowOptions {
   webviewTag?: boolean
   transparent?: boolean
   positionKey?: string
+}
+
+interface PopupBounds {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+function getPositionStorageKey(positionKey: string) {
+  return `popupWindow_${positionKey}`
 }
 
 export function openPopupWindow(
@@ -29,18 +41,17 @@ export function openPopupWindow(
     positionKey,
   } = options
 
-  let savedBounds: {
-    x: number
-    y: number
-    width: number
-    height: number
-  } | null = null
+  let savedBounds: PopupBounds | null = null
   if (positionKey) {
-    try {
-      const raw = localStorage.getItem(`popupWindow_${positionKey}`)
-      if (raw) savedBounds = JSON.parse(raw)
-    } catch {
-      // Ignore invalid stored bounds
+    const bounds = storage.get(getPositionStorageKey(positionKey))
+    if (
+      bounds &&
+      typeof bounds.x === 'number' &&
+      typeof bounds.y === 'number' &&
+      typeof bounds.width === 'number' &&
+      typeof bounds.height === 'number'
+    ) {
+      savedBounds = bounds
     }
   }
 
@@ -108,13 +119,13 @@ export function openPopupWindow(
 
   popup.addEventListener('beforeunload', () => {
     if (positionKey) {
-      const bounds = {
+      const bounds: PopupBounds = {
         x: popup.screenX,
         y: popup.screenY,
         width: popup.outerWidth,
         height: popup.outerHeight,
       }
-      localStorage.setItem(`popupWindow_${positionKey}`, JSON.stringify(bounds))
+      storage.set(getPositionStorageKey(positionKey), bounds)
     }
     root.unmount()
     unsubscribe()

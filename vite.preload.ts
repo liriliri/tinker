@@ -62,6 +62,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [bundlePluginRenderer(mode)],
   build: {
     outDir: 'dist/preload',
+    emptyOutDir: false,
     minify: mode === 'development' ? false : 'esbuild',
     lib: {
       entry: [

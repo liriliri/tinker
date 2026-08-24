@@ -14,6 +14,11 @@ export function injectRendererScript(str: string) {
 }
 
 export function domReady(callback: () => void) {
+  if (document.documentElement) {
+    callback()
+    return
+  }
+
   const observer = new MutationObserver(() => {
     if (document.documentElement) {
       observer.disconnect()

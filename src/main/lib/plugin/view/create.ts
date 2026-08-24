@@ -7,6 +7,7 @@ import toNum from 'licia/toNum'
 import { BrowserWindow, WebContents, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import { PLUGIN_PARTITION, findPluginByWebContents } from './state'
+import { applyWindowTheme, markTransparent } from './util'
 
 let preloadPluginView: WebContentsView | null = null
 
@@ -29,6 +30,7 @@ const allowedWindowOptions = [
   'minHeight',
   'alwaysOnTop',
   'resizable',
+  'transparent',
 ]
 
 const allowedWebPreferences = ['webviewTag']
@@ -115,6 +117,10 @@ function setupWindowOpenHandler(webContents: WebContents) {
     }
 
     entry.childWindows.add(childWin)
+    if (details.options.transparent) {
+      markTransparent(childWin)
+    }
+    applyWindowTheme(childWin)
     childWin.on('closed', () => {
       entry.childWindows.delete(childWin)
     })

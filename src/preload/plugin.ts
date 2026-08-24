@@ -51,12 +51,18 @@ import types from 'licia/types'
 import { i18n } from 'common/util'
 import fs from 'node:fs'
 
-window.addEventListener('DOMContentLoaded', () => {
-  tinkerObj.setTitle('')
-  updateTheme()
-  mainObj.getLanguage().then((lang) => i18n.locale(lang))
-  mainObj.on('changeTheme', updateTheme)
-})
+async function updateTheme() {
+  const theme = await mainObj.getTheme()
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+
+mainObj.getLanguage().then((lang) => i18n.locale(lang))
+mainObj.on('changeTheme', updateTheme)
+window.addEventListener('DOMContentLoaded', () => setTitle(''))
 
 function injectPluginRenderer() {
   const code = fs.readFileSync(
@@ -73,15 +79,6 @@ async function preparePlugin(p: IPlugin) {
   if (p.preload) {
     injectApi()
     await import(pathToFileURL(p.preload).href)
-  }
-}
-
-async function updateTheme() {
-  const theme = await mainObj.getTheme()
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
   }
 }
 
@@ -210,6 +207,7 @@ contextBridge.exposeInMainWorld('_tinker', tinkerObj)
 window._tinker = tinkerObj
 
 domReady(() => {
+  updateTheme()
   injectPluginRenderer()
 })
 ;(async function () {
