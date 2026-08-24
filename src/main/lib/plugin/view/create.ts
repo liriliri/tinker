@@ -110,17 +110,16 @@ function setupWindowOpenHandler(webContents: WebContents) {
 
   webContents.on('did-create-window', (childWin, details) => {
     const entry = findPluginByWebContents(webContents)?.entry
-    if (entry && startWith(details.url, 'plugin:')) {
-      entry.childWindows.add(childWin)
+    if (!entry) {
+      return
+    }
+
+    entry.childWindows.add(childWin)
+    childWin.on('closed', () => {
+      entry.childWindows.delete(childWin)
+    })
+    if (startWith(details.url, 'plugin:')) {
       childWin.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
-      childWin.on('closed', () => {
-        entry.childWindows.delete(childWin)
-      })
-    } else if (details.url === 'about:blank') {
-      childWin.on('close', (e) => {
-        e.preventDefault()
-        childWin.hide()
-      })
     }
   })
 
