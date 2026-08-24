@@ -4,7 +4,6 @@ import className from 'licia/className'
 import {
   PanelLeft,
   PanelLeftClose,
-  FolderOpen,
   Search,
   FileText,
   GitBranch,
@@ -34,9 +33,6 @@ export default observer(function StatusBarComponent() {
         ) : (
           <PanelLeft size={14} />
         )}
-      </StatusBarItem>
-      <StatusBarItem onClick={() => store.openFolder()}>
-        <FolderOpen size={14} />
       </StatusBarItem>
       <StatusBarItem
         onClick={() => store.setSidebarMode('explorer')}

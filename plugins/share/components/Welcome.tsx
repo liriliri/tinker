@@ -87,7 +87,7 @@ const Welcome: React.FC<WelcomeProps> = ({
                 key={path}
                 onClick={() => onOpenRecent(path)}
                 onContextMenu={(e) => handleContextMenu(e, path)}
-                className={`w-full text-left px-2 py-1 ${tw.bg.primary} ${tw.hover} transition-colors`}
+                className={`block w-full text-left px-2 py-1 ${tw.bg.primary} ${tw.hover} transition-colors`}
               >
                 <div className={`text-sm font-medium ${tw.text.primary}`}>
                   {path.split('/').pop()}
