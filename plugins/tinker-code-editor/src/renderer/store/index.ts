@@ -16,20 +16,27 @@ import type AiChatStore from 'share/store/AiChat'
 import Editor from './Editor'
 import QuickOpen from './QuickOpen'
 import WorkingTree from './WorkingTree'
-import { buildCodeEditorSystemPrompt, createCodeEditorChat } from '../lib/chat'
+import { createCodeEditorChat } from '../lib/chat'
 import type { EditorChatContext } from '../lib/chatTools'
+import { createMcpApi } from '../mcp'
 
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
+// The main window only shows the welcome screen, every project is opened in its
+// own window carrying the project root in the url.
+const initialRootPath = new URLSearchParams(location.search).get('root') || ''
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
-const STORAGE_ROOT_PATH = 'rootPath'
 const STORAGE_SIDEBAR_MODE = 'sidebarMode'
 const STORAGE_RECENT_DIRECTORIES = 'recentDirectories'
 
 type SidebarMode = 'explorer' | 'search' | 'git'
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  // MCP is registered on the welcome window only so project windows do not
+  // compete for the same plugin tools.
+  readonly mcp = initialRootPath ? null : createMcpApi(() => this)
+
   // FileTree state (inline, tightly coupled)
-  rootPath: string = storage.get(STORAGE_ROOT_PATH) || ''
+  rootPath: string = initialRootPath
   recentDirectories: string[] = storage.get(STORAGE_RECENT_DIRECTORIES) || []
   fileTree: ITreeNode[] = []
   watchedDirs = observable.set<string>()
@@ -74,7 +81,7 @@ class Store extends BaseStore {
     })
     this.textSearch = new TextSearch({
       persist: true,
-      initialRootDir: storage.get(STORAGE_ROOT_PATH) || '',
+      initialRootDir: this.rootPath,
     })
     this.workingTree = new WorkingTree({
       getIsDark: () => this.isDark,
@@ -85,31 +92,27 @@ class Store extends BaseStore {
     })
 
     makeAutoObservable(this, {
+      mcp: false,
       quickOpen: false,
       textSearch: false,
       workingTree: false,
     })
+  }
 
+  init() {
     if (this.rootPath) {
       this.loadDirectory(this.rootPath)
+      // The persisted search root is shared by all windows, so it is forced
+      // back to this window's project root.
       this.textSearch.setRootDir(this.rootPath)
       void this.workingTree.onProjectRootChanged(this.rootPath)
+      this.terminal.initIfOpen()
     }
-    this.terminal.initIfOpen()
     void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
       this.hasAI = hasAI
       this.chatOpen = chatOpen
     })
 
-    // Keep search rootDir in sync with the project root
-    reaction(
-      () => this.rootPath,
-      (rootPath) => {
-        this.textSearch.setRootDir(rootPath)
-        void this.workingTree.onProjectRootChanged(rootPath)
-        this.chat.setSystemPrompt(buildCodeEditorSystemPrompt(rootPath))
-      }
-    )
     reaction(
       () => this.sidebarMode,
       (mode) => {
@@ -131,41 +134,27 @@ class Store extends BaseStore {
       properties: ['openDirectory'],
     })
     if (!result.canceled && result.filePaths.length > 0) {
-      const path = result.filePaths[0]
-      await this.setRootPath(path)
+      this.openProject(result.filePaths[0])
     }
   }
 
-  async openRecentDirectory(path: string) {
-    try {
-      await this.setRootPath(path)
-    } catch {
-      this.removeRecentDirectory(path)
-    }
+  openRecentDirectory(path: string) {
+    this.openProject(path)
   }
 
-  closeProject() {
-    if (!this.rootPath) return
+  // Projects always live in their own window, so the current window keeps its
+  // root and a new window is opened for the picked directory.
+  openProject(path: string) {
+    this.addRecentDirectory(path)
 
-    this.rootPath = ''
-    storage.set(STORAGE_ROOT_PATH, '')
-    this.fileTree = []
-    this.unwatch?.()
-    this.unwatch = undefined
-    this.watchedDirs.clear()
-    this.treeRefreshDirs.clear()
+    const root = normalizePath(path)
+    const url = new URL(location.href)
+    url.search = ''
+    url.searchParams.set('root', root)
 
-    for (const tab of [...this.editor.tabs]) {
-      this.editor.closeTab(tab.id)
-    }
-    for (const tab of [...this.terminal.tabs]) {
-      this.terminal.closeTab(tab.id)
-    }
-    this.workingTree.dispose()
-    this.workingTree.reset()
-    this.quickOpen.hide()
-    this.chatOpen = false
-    this.chat.clearMessages()
+    // Use _blank so Chromium does not navigate an existing named window (which
+    // reloads it). Duplicate URLs are focused in setWindowOpenHandler instead.
+    window.open(url.href, '_blank', 'width=1200,height=800,resizable=yes')
   }
 
   addRecentDirectory(path: string) {
@@ -179,21 +168,6 @@ class Store extends BaseStore {
   removeRecentDirectory(path: string) {
     this.recentDirectories = this.recentDirectories.filter((p) => p !== path)
     storage.set(STORAGE_RECENT_DIRECTORIES, this.recentDirectories)
-  }
-
-  private async setRootPath(path: string) {
-    this.rootPath = path
-    storage.set(STORAGE_ROOT_PATH, path)
-    this.addRecentDirectory(path)
-    this.watchedDirs.clear()
-    this.treeRefreshDirs.clear()
-    if (this.terminal.terminalOpen) {
-      for (const tab of [...this.terminal.tabs]) {
-        this.terminal.closeTab(tab.id)
-      }
-      this.terminal.openInDirectory(path, true)
-    }
-    await this.loadDirectory(path)
   }
 
   async loadDirectory(dirPath: string) {

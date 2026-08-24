@@ -108,6 +108,7 @@ import upperCase from 'licia/upperCase'
 import upperFirst from 'licia/upperFirst'
 import uuid from 'licia/uuid'
 import values from 'licia/values'
+import waitUntil from 'licia/waitUntil'
 
 const licia = {
   average,
@@ -220,6 +221,7 @@ const licia = {
   upperFirst,
   uuid,
   values,
+  waitUntil,
 }
 
 const g = globalThis as Record<string, unknown>
@@ -336,4 +338,5 @@ export {
   upperFirst,
   uuid,
   values,
+  waitUntil,
 }

@@ -27,7 +27,6 @@ import * as pluginInstaller from './installer'
 import * as pluginTerminal from './terminal'
 import {
   PLUGIN_PARTITION,
-  pluginViews,
   openPlugin,
   reopenPlugin,
   closePlugin,
@@ -41,6 +40,7 @@ import {
   getRunningPlugins,
   startBackgroundPlugins,
   callMcpTool,
+  getWebContentsPlugin,
 } from './view'
 
 export {
@@ -97,7 +97,9 @@ export function init() {
   handleEvent('closePlugin', closePlugin)
   handleEvent('detachPlugin', detachPlugin)
   handleEvent('togglePluginDevtools', togglePluginDevtools)
-  handleEvent('showPluginContextMenu', showPluginContextMenu)
+  ipcMain.handle('showPluginContextMenu', (event, x, y, options) =>
+    showPluginContextMenu(event.sender, x, y, options)
+  )
   handleEvent('getClipboardFilePaths', getClipboardFilePaths)
   handleEvent('exportPluginData', exportPluginData)
   handleEvent('importPluginData', importPluginData)
@@ -116,16 +118,11 @@ export function init() {
       body,
     }
 
-    for (const id in pluginViews) {
-      if (pluginViews[id].view.webContents === event.sender) {
-        const plugin = plugins[id]
-        if (plugin) {
-          options.title = plugin.name
-          if (plugin.icon) {
-            options.icon = plugin.icon
-          }
-        }
-        break
+    const plugin = getWebContentsPlugin(event.sender)
+    if (plugin) {
+      options.title = plugin.name
+      if (plugin.icon) {
+        options.icon = plugin.icon
       }
     }
 
@@ -137,11 +134,7 @@ export function init() {
   })
 
   ipcMain.handle('getAttachedPlugin', (event) => {
-    for (const id in pluginViews) {
-      if (pluginViews[id].view.webContents === event.sender) {
-        return plugins[id]
-      }
-    }
+    return getWebContentsPlugin(event.sender)
   })
 
   loadSettingsPlugin()

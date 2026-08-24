@@ -19,7 +19,7 @@ import trim from 'licia/trim'
 import toNum from 'licia/toNum'
 import debounce from 'licia/debounce'
 import waitUntil from 'licia/waitUntil'
-import { BrowserWindow, WebContentsView } from 'electron'
+import { BrowserWindow, WebContents, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
 import { colorBgContainer, colorBgContainerDark } from 'common/theme'
@@ -45,9 +45,18 @@ export const PLUGIN_PARTITION = 'persist:plugin'
 export const pluginViews: types.PlainObj<{
   view: WebContentsView
   win: BrowserWindow | null
+  childWindows: Set<BrowserWindow>
 }> = {}
 
 let preloadPluginView: WebContentsView | null = null
+
+function setPluginView(
+  id: string,
+  view: WebContentsView,
+  win: BrowserWindow | null
+) {
+  pluginViews[id] = { view, win, childWindows: new Set() }
+}
 
 const allowedWindowOptions = [
   'minWidth',
@@ -96,9 +105,47 @@ function parseOpenWindowFeatures(features: string) {
   return opts
 }
 
-function setupWindowOpenHandler(view: WebContentsView) {
-  view.webContents.setWindowOpenHandler(({ features }) => {
+function getPluginViewEntry(webContents: WebContents) {
+  for (const id in pluginViews) {
+    const entry = pluginViews[id]
+    if (entry.view.webContents === webContents) {
+      return entry
+    }
+  }
+}
+
+function focusChildWindow(childWindows: Set<BrowserWindow>, url: string) {
+  for (const childWin of childWindows) {
+    if (childWin.webContents.getURL() !== url) continue
+
+    if (childWin.isMinimized()) {
+      childWin.restore()
+    }
+    childWin.show()
+    childWin.focus()
+    return true
+  }
+
+  return false
+}
+
+function setupWindowOpenHandler(webContents: WebContents) {
+  webContents.setWindowOpenHandler(({ url, features }) => {
+    const entry = getPluginViewEntry(webContents)
+    if (entry && focusChildWindow(entry.childWindows, url)) {
+      return { action: 'deny' }
+    }
+
     const opts = parseOpenWindowFeatures(features)
+    if (entry && startWith(url, 'plugin:')) {
+      opts.webPreferences = {
+        ...opts.webPreferences,
+        preload: path.join(__dirname, '../preload/plugin.js'),
+        partition: PLUGIN_PARTITION,
+        webSecurity: false,
+        sandbox: false,
+      }
+    }
 
     return {
       action: 'allow',
@@ -106,19 +153,28 @@ function setupWindowOpenHandler(view: WebContentsView) {
     }
   })
 
-  view.webContents.on('did-create-window', (childWin) => {
-    childWin.on('close', () => {
-      childWin.hide()
-    })
+  webContents.on('did-create-window', (childWin, details) => {
+    const entry = getPluginViewEntry(webContents)
+    if (entry && startWith(details.url, 'plugin:')) {
+      entry.childWindows.add(childWin)
+      childWin.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+      childWin.on('closed', () => {
+        entry.childWindows.delete(childWin)
+      })
+    } else if (details.url === 'about:blank') {
+      childWin.on('close', () => {
+        childWin.hide()
+      })
+    }
   })
 
-  view.webContents.on('before-input-event', (_event, input) => {
+  webContents.on('before-input-event', (_event, input) => {
     if (input.type !== 'keyDown') {
       return
     }
 
     if (input.key === 'Escape') {
-      const win = BrowserWindow.fromWebContents(view.webContents)
+      const win = BrowserWindow.fromWebContents(webContents)
       if (win === window.getWin('main')) {
         window.sendTo('main', 'pressEsc')
       }
@@ -136,7 +192,7 @@ function createPluginView() {
       webviewTag: true,
     },
   })
-  setupWindowOpenHandler(view)
+  setupWindowOpenHandler(view.webContents)
   view.webContents.loadURL('about:blank')
   return view
 }
@@ -157,7 +213,7 @@ function getWebPluginView() {
       partition: PLUGIN_PARTITION,
     },
   })
-  setupWindowOpenHandler(view)
+  setupWindowOpenHandler(view.webContents)
   return view
 }
 
@@ -218,18 +274,18 @@ export function openPlugin(
   })
 
   if (background) {
-    pluginViews[id] = { view: pluginView, win: null }
+    setPluginView(id, pluginView, null)
     updatePluginTheme(id)
   } else {
     const mainWin = window.getWin('main')
     if (detached || !mainWin) {
       const newWin = pluginWin.showWin(plugin)
-      pluginViews[id] = { view: pluginView, win: newWin }
+      setPluginView(id, pluginView, newWin)
       updatePluginTheme(id)
       newWin.contentView.addChildView(pluginView)
       layoutPlugin(id)
     } else {
-      pluginViews[id] = { view: pluginView, win: mainWin }
+      setPluginView(id, pluginView, mainWin)
       updatePluginTheme(id)
       mainWin.contentView.addChildView(pluginView)
       layoutPlugin(id)
@@ -287,9 +343,13 @@ export function updatePluginTheme(id: string) {
   }
 
   view.webContents.send('changeTheme')
-  view.setBackgroundColor(
+  const backgroundColor =
     theme.get() === 'dark' ? colorBgContainerDark : colorBgContainer
-  )
+  view.setBackgroundColor(backgroundColor)
+  pluginViews[id].childWindows.forEach((childWin) => {
+    childWin.webContents.send('changeTheme')
+    childWin.setBackgroundColor(backgroundColor)
+  })
 }
 
 export const closePlugin: IpcClosePlugin = async function (id, destroy) {
@@ -320,6 +380,9 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
 
   stopPluginInspect(id)
   disposePluginHttpSession(id)
+  for (const childWin of [...pluginViews[id].childWindows]) {
+    childWin.close()
+  }
   view.webContents.close()
   delete pluginViews[id]
 
@@ -471,6 +534,22 @@ export function getAttachedPlugin(win: BrowserWindow): IPlugin | undefined {
   }
 }
 
+export function getWebContentsPlugin(
+  webContents: WebContents
+): IPlugin | undefined {
+  for (const id in pluginViews) {
+    const entry = pluginViews[id]
+    if (entry.view.webContents === webContents) {
+      return plugins[id]
+    }
+    for (const childWin of entry.childWindows) {
+      if (childWin.webContents === webContents) {
+        return plugins[id]
+      }
+    }
+  }
+}
+
 export function layoutPlugin(id: string) {
   const { view, win } = pluginViews[id]
   if (!win) {
@@ -512,27 +591,22 @@ export const togglePluginDevtools: IpcTogglePluginDevtools = function (id) {
   }
 }
 
-export const showPluginContextMenu: IpcShowPluginContextMenu = function (
-  x,
-  y,
-  options
+export function showPluginContextMenu(
+  webContents: WebContents,
+  x: number,
+  y: number,
+  options: Parameters<IpcShowPluginContextMenu>[2]
 ) {
-  const focused = BrowserWindow.getFocusedWindow()
-  let plugin = getAttachedPlugin(window.getFocusedWin()!)
-  if (!plugin && focused) {
-    const parent = focused.getParentWindow()
-    if (parent) {
-      plugin = getAttachedPlugin(parent)
-    }
-  }
+  const plugin = getWebContentsPlugin(webContents)
   if (!plugin) {
     return
   }
 
   const { view, win } = pluginViews[plugin.id]
+  const focused = BrowserWindow.fromWebContents(webContents)
 
-  if (focused && win && focused !== win) {
-    contextMenu(view, x, y, options, focused)
+  if (webContents !== view.webContents) {
+    contextMenu(webContents, x, y, options, focused)
     return
   }
 
@@ -540,7 +614,7 @@ export const showPluginContextMenu: IpcShowPluginContextMenu = function (
   x += bounds.x
   y += bounds.y
 
-  contextMenu(view, x, y, options, win)
+  contextMenu(webContents, x, y, options, win)
 }
 
 export const exportPluginData: IpcExportPluginData = function (id) {

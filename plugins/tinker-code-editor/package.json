@@ -21,6 +21,24 @@
         "name": "代码编辑",
         "description": "轻量级代码编辑器，支持语法高亮和多标签页"
       }
+    },
+    "mcp": {
+      "tools": {
+        "open_project": {
+          "description": "Open a project window for the given directory. Registered on the Code Editor main (welcome) window only.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to the project directory"
+              }
+            },
+            "required": ["path"]
+          }
+        }
+      }
     }
   }
 }

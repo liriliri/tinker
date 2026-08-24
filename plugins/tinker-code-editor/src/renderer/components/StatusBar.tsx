@@ -8,7 +8,6 @@ import {
   Search,
   FileText,
   GitBranch,
-  X,
   Terminal,
 } from 'lucide-react'
 import {
@@ -38,9 +37,6 @@ export default observer(function StatusBarComponent() {
       </StatusBarItem>
       <StatusBarItem onClick={() => store.openFolder()}>
         <FolderOpen size={14} />
-      </StatusBarItem>
-      <StatusBarItem onClick={() => store.closeProject()}>
-        <X size={14} />
       </StatusBarItem>
       <StatusBarItem
         onClick={() => store.setSidebarMode('explorer')}

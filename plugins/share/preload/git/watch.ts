@@ -1,12 +1,9 @@
-import { execFile } from 'child_process'
 import { watch, type FSWatcher } from 'chokidar'
 import debounce from 'licia/debounce'
 import path from 'path'
 
 const DEBOUNCE_MS = 1000
 const MIN_REFRESH_INTERVAL_MS = 5000
-const MAX_TRACKED_FILES_FOR_WATCH = 8000
-const MAX_WATCH_PATHS = 5000
 
 const WATCH_EVENTS = new Set(['add', 'addDir', 'change', 'unlink', 'unlinkDir'])
 
@@ -16,27 +13,6 @@ let watcher: FSWatcher | null = null
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let watchSession = 0
 let lastRefreshAt = 0
-
-function execGitLsFiles(repoPath: string): Promise<string[]> {
-  return new Promise((resolve) => {
-    execFile(
-      'git',
-      ['ls-files', '-z'],
-      {
-        cwd: repoPath,
-        encoding: 'buffer',
-        maxBuffer: 50 * 1024 * 1024,
-      },
-      (err, stdout) => {
-        if (err) {
-          resolve([])
-          return
-        }
-        resolve(stdout.toString('utf8').split('\0').filter(Boolean))
-      }
-    )
-  })
-}
 
 function gitMetadataPaths(repoPath: string): string[] {
   const gitDir = path.join(repoPath, '.git')
@@ -95,6 +71,18 @@ function startChokidar(
 
   watcher = w
 
+  // An unhandled error event is rethrown per failing path, which floods
+  // the renderer when file descriptors run out (EMFILE).
+  w.on('error', () => {
+    if (session !== watchSession || watcher !== w) return
+
+    void w.close()
+    watcher = null
+    if (!pollTimer) {
+      startPolling(session, emit)
+    }
+  })
+
   w.on('all', (event, filePath) => {
     if (session !== watchSession) return
     if (!WATCH_EVENTS.has(event)) return
@@ -125,29 +113,14 @@ export function watchWorkingTree(
   }, DEBOUNCE_MS)
 
   setImmediate(() => {
-    void setup()
+    if (session !== watchSession) return
+
+    // Only watch .git metadata (HEAD, index, refs, …). Tracked working-tree
+    // files are covered by polling so we do not register thousands of watches
+    // per project window.
+    startChokidar(session, gitMetadataPaths(repoPath), emit)
+    startPolling(session, emit)
   })
-
-  async function setup() {
-    if (session !== watchSession) return
-
-    const tracked = await execGitLsFiles(repoPath)
-    if (session !== watchSession) return
-
-    const metaPaths = gitMetadataPaths(repoPath)
-
-    if (tracked.length > MAX_TRACKED_FILES_FOR_WATCH) {
-      startChokidar(session, metaPaths, emit)
-      startPolling(session, emit)
-      return
-    }
-
-    const trackedPaths = tracked
-      .slice(0, MAX_WATCH_PATHS)
-      .map((file) => path.join(repoPath, file))
-
-    startChokidar(session, [...metaPaths, ...trackedPaths], emit)
-  }
 
   return () => stopWatch(session)
 }

@@ -32,7 +32,6 @@ export const VIDEO_EXTS = new Set([
   'wmv',
   'm4v',
   '3gp',
-  'ts',
   'ogv',
 ])
 

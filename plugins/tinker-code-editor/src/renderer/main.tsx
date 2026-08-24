@@ -335,4 +335,10 @@ const App = observer(function App() {
   )
 })
 
-renderApp(App, { 'en-US': enUS, 'zh-CN': zhCN })
+renderApp(
+  App,
+  { 'en-US': enUS, 'zh-CN': zhCN },
+  {
+    waitUntil: 'codeEditor',
+  }
+).then(() => store.init())

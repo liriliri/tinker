@@ -40,4 +40,4 @@ export {
   commitStaged,
 } from './operations'
 
-export { watchWorkingTree } from './workingTreeWatch'
+export { watchWorkingTree } from './watch'

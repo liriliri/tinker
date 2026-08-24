@@ -140,6 +140,15 @@ const api = {
 
       watcher = w
 
+      // An unhandled error event is rethrown per failing path, which floods
+      // the renderer when file descriptors run out (EMFILE).
+      w.on('error', () => {
+        if (session !== watchSession || watcher !== w) return
+
+        void w.close()
+        watcher = null
+      })
+
       w.on('all', (event, filePath) => {
         if (!WATCH_EVENTS.has(event as FileWatchEventType)) return
         pendingEvents.push({
