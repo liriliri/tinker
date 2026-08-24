@@ -5,14 +5,14 @@ import { storage } from 'share/store/Base'
 
 const STORAGE_PROJECTS = 'projects'
 
-export interface ProjectWindowBounds {
+interface ProjectWindowBounds {
   x: number
   y: number
   width: number
   height: number
 }
 
-export interface ProjectData {
+interface ProjectData {
   bounds?: ProjectWindowBounds
   sidebarOpen?: boolean
   chatOpen?: boolean

@@ -87,7 +87,9 @@ export default observer(function ArchivePane() {
         onAddFiles: () => {
           void store.addFiles()
         },
-        onCreateFolder: (name) => store.createFolder(name),
+        onCreateFolder: async (name) => {
+          await store.createFolder(name)
+        },
         onExtractAll: () => {
           void store.extractAll()
         },

@@ -58,10 +58,7 @@ export class Store extends BaseStore {
   chat: AiChatStore
 
   // sidebarOpen / chatOpen are per-project; mode always starts as explorer
-  sidebarOpen: boolean =
-    typeof initialProject.sidebarOpen === 'boolean'
-      ? initialProject.sidebarOpen
-      : true
+  sidebarOpen: boolean = initialProject.sidebarOpen !== false
   sidebarMode: SidebarMode = 'explorer'
   hasAI = false
   chatOpen = false
@@ -118,14 +115,10 @@ export class Store extends BaseStore {
         saveWindowBounds(this.rootPath)
       })
     }
-    void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
+    void initAiChatAvailability(storage).then(({ hasAI }) => {
       this.hasAI = hasAI
-      if (!this.rootPath) {
-        this.chatOpen = chatOpen
-        return
-      }
-      const saved = getProjectData(this.rootPath).chatOpen
-      this.chatOpen = typeof saved === 'boolean' ? saved : false
+      if (!this.rootPath) return
+      this.chatOpen = getProjectData(this.rootPath).chatOpen === true
     })
 
     reaction(

@@ -138,7 +138,9 @@ export default observer(function Toolbar() {
           <ToolbarButton
             title={t('newFolder')}
             onClick={() =>
-              void promptCreateFolder(t, (name) => store.createFolder(name))
+              void promptCreateFolder(t, async (name) => {
+                await store.createFolder(name)
+              })
             }
           >
             <FolderPlus size={TOOLBAR_ICON_SIZE} />
