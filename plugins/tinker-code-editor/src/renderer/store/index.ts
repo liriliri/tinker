@@ -7,10 +7,7 @@ import normalizePath from 'licia/normalizePath'
 import last from 'licia/last'
 import { parentDir, relativePath } from '../lib/path'
 import TerminalStore from 'share/store/Terminal'
-import {
-  initAiChatAvailability,
-  toggleAiChatOpen,
-} from 'share/lib/aiChat/aiAvailability'
+import { initAiChatAvailability } from 'share/lib/aiChat/aiAvailability'
 import { LocalStoreChatPrefs } from 'share/lib/aiChat/chatPrefsStorage'
 import type AiChatStore from 'share/store/AiChat'
 import Editor from './Editor'
@@ -18,15 +15,22 @@ import QuickOpen from './QuickOpen'
 import WorkingTree from './WorkingTree'
 import { createCodeEditorChat } from '../lib/chat'
 import type { EditorChatContext } from '../lib/chatTools'
+import {
+  getProjectData,
+  getSavedWindowBounds,
+  saveWindowBounds,
+  setProjectData,
+} from '../lib/projectStorage'
 import { createMcpApi } from '../mcp'
 
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 // The main window only shows the welcome screen, every project is opened in its
 // own window carrying the project root in the url.
 const initialRootPath = new URLSearchParams(location.search).get('root') || ''
-const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
-const STORAGE_SIDEBAR_MODE = 'sidebarMode'
+const initialProject = initialRootPath ? getProjectData(initialRootPath) : {}
 const STORAGE_RECENT_DIRECTORIES = 'recentDirectories'
+const DEFAULT_WINDOW_WIDTH = 800
+const DEFAULT_WINDOW_HEIGHT = 600
 
 type SidebarMode = 'explorer' | 'search' | 'git'
 
@@ -53,10 +57,12 @@ export class Store extends BaseStore {
   workingTree: WorkingTree
   chat: AiChatStore
 
-  // Layout state
-  sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? true
-  sidebarMode: SidebarMode =
-    (storage.get(STORAGE_SIDEBAR_MODE) as SidebarMode) || 'explorer'
+  // sidebarOpen / chatOpen are per-project; mode always starts as explorer
+  sidebarOpen: boolean =
+    typeof initialProject.sidebarOpen === 'boolean'
+      ? initialProject.sidebarOpen
+      : true
+  sidebarMode: SidebarMode = 'explorer'
   hasAI = false
   chatOpen = false
 
@@ -107,10 +113,19 @@ export class Store extends BaseStore {
       this.textSearch.setRootDir(this.rootPath)
       void this.workingTree.onProjectRootChanged(this.rootPath)
       this.terminal.initIfOpen()
+      // Same as share/popupWindow: persist bounds on close for next open.
+      window.addEventListener('beforeunload', () => {
+        saveWindowBounds(this.rootPath)
+      })
     }
     void initAiChatAvailability(storage).then(({ hasAI, chatOpen }) => {
       this.hasAI = hasAI
-      this.chatOpen = chatOpen
+      if (!this.rootPath) {
+        this.chatOpen = chatOpen
+        return
+      }
+      const saved = getProjectData(this.rootPath).chatOpen
+      this.chatOpen = typeof saved === 'boolean' ? saved : false
     })
 
     reaction(
@@ -152,9 +167,20 @@ export class Store extends BaseStore {
     url.search = ''
     url.searchParams.set('root', root)
 
+    const saved = getSavedWindowBounds(root)
+    const features = [
+      `width=${saved?.width ?? DEFAULT_WINDOW_WIDTH}`,
+      `height=${saved?.height ?? DEFAULT_WINDOW_HEIGHT}`,
+      'resizable=yes',
+      saved ? `left=${saved.x}` : '',
+      saved ? `top=${saved.y}` : '',
+    ]
+      .filter(Boolean)
+      .join(',')
+
     // Use _blank so Chromium does not navigate an existing named window (which
     // reloads it). Duplicate URLs are focused in setWindowOpenHandler instead.
-    window.open(url.href, '_blank', 'width=1200,height=800,resizable=yes')
+    window.open(url.href, '_blank', features)
   }
 
   addRecentDirectory(path: string) {
@@ -359,7 +385,8 @@ export class Store extends BaseStore {
 
   toggleChat() {
     if (!this.hasAI || !this.rootPath) return
-    this.chatOpen = toggleAiChatOpen(storage, this.chatOpen)
+    this.chatOpen = !this.chatOpen
+    setProjectData(this.rootPath, { chatOpen: this.chatOpen })
   }
 
   getEditorChatContext(): EditorChatContext {
@@ -381,15 +408,18 @@ export class Store extends BaseStore {
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
-    storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
+    if (this.rootPath) {
+      setProjectData(this.rootPath, { sidebarOpen: this.sidebarOpen })
+    }
   }
 
   setSidebarMode(mode: SidebarMode) {
     this.sidebarMode = mode
-    storage.set(STORAGE_SIDEBAR_MODE, mode)
     if (!this.sidebarOpen) {
       this.sidebarOpen = true
-      storage.set(STORAGE_SIDEBAR_OPEN, true)
+      if (this.rootPath) {
+        setProjectData(this.rootPath, { sidebarOpen: true })
+      }
     }
   }
 

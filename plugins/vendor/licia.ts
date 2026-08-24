@@ -48,6 +48,7 @@ import isErr from 'licia/isErr'
 import isJson from 'licia/isJson'
 import isMac from 'licia/isMac'
 import isNil from 'licia/isNil'
+import isNum from 'licia/isNum'
 import isObj from 'licia/isObj'
 import isStr from 'licia/isStr'
 import isStrBlank from 'licia/isStrBlank'
@@ -161,6 +162,7 @@ const licia = {
   isJson,
   isMac,
   isNil,
+  isNum,
   isObj,
   isStr,
   isStrBlank,
@@ -278,6 +280,7 @@ export {
   isJson,
   isMac,
   isNil,
+  isNum,
   isObj,
   isStr,
   isStrBlank,
