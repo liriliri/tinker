@@ -2,12 +2,8 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import endWith from 'licia/endWith'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { tw } from 'share/theme'
 import { ToasterProvider } from 'share/components/Toaster'
 import { PluginChat } from 'share/components/AiChat'
@@ -26,8 +22,6 @@ const App = observer(function App() {
   const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'chat'],
-    id: 'tinker-json-editor-layout',
-    storage: localStorage,
   })
 
   useEffect(() => {

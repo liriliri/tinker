@@ -283,6 +283,7 @@ import MermaidDiagram from 'share/components/MermaidDiagram'
 import { useCopyToClipboard } from 'share/hooks/useCopyToClipboard'
 import { useInView } from 'share/hooks/useInView'
 import { useBlameDecorations } from 'share/hooks/useBlameDecorations'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 ```
 
 ## Agent

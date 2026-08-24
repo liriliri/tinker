@@ -4,12 +4,8 @@ import { ConfirmProvider } from 'share/components/Confirm'
 import { PromptProvider } from 'share/components/Prompt'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import store from './store'
 import Welcome from './components/Welcome'
 import Toolbar from './components/Toolbar'
@@ -24,8 +20,6 @@ import zhCN from './i18n/zh-CN.json'
 const App = observer(function App() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['left', 'center', 'right'],
-    id: 'tinker-password-manager-layout',
-    storage: localStorage,
   })
 
   if (store.isLocked) {

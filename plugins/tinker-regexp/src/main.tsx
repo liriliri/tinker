@@ -1,10 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { useTranslation } from 'react-i18next'
 import { AlertProvider } from 'share/components/Alert'
 import { PluginChat } from 'share/components/AiChat'
@@ -24,8 +20,6 @@ const App = observer(function App() {
   const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'chat'],
-    id: 'tinker-regexp-layout',
-    storage: localStorage,
   })
 
   return (

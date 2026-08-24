@@ -12,12 +12,8 @@ import {
   Eye,
   Video,
 } from 'lucide-react'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import { ConfirmProvider } from 'share/components/Confirm'
@@ -44,8 +40,6 @@ import './index.scss'
 const EditorContent = observer(function EditorContent() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['editor', 'terminal'],
-    id: 'tinker-code-editor-layout',
-    storage: localStorage,
   })
 
   return (
@@ -230,8 +224,6 @@ const ChatLayout = observer(function ChatLayout({ children }: ChatLayoutProps) {
   const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['content', 'chat'],
-    id: 'tinker-code-editor-chat-layout',
-    storage: localStorage,
   })
 
   return (
@@ -266,8 +258,6 @@ const App = observer(function App() {
     onLayoutChange: onSidebarLayoutChange,
   } = useDefaultLayout({
     panelIds: ['sidebar', 'main'],
-    id: 'tinker-code-editor-sidebar-layout',
-    storage: localStorage,
   })
 
   useEffect(() => {

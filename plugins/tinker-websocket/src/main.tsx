@@ -1,10 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import {
-  Group,
-  Panel,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Group, Panel, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { PromptProvider } from 'share/components/Prompt'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
@@ -20,8 +16,6 @@ import zhCN from './i18n/zh-CN.json'
 const App = observer(function App() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['sidebar', 'main'],
-    id: 'tinker-websocket-layout',
-    storage: localStorage,
   })
 
   return (

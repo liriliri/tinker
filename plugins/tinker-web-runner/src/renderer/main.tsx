@@ -1,12 +1,8 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { OnMount } from '@monaco-editor/react'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { WebviewHandle } from 'share/components/Webview'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
@@ -47,15 +43,13 @@ const App = observer(function App() {
   const { defaultLayout: outerLayout, onLayoutChange: onOuterLayoutChange } =
     useDefaultLayout({
       panelIds: previewBefore ? ['preview', 'editor'] : ['editor', 'preview'],
-      id: `tinker-web-runner-outer-${store.layout}`,
-      storage: localStorage,
+      id: `outer-${store.layout}`,
     })
 
   const { defaultLayout: innerLayout, onLayoutChange: onInnerLayoutChange } =
     useDefaultLayout({
       panelIds: ['html', 'css', 'javascript'],
-      id: `tinker-web-runner-inner-${isHorizontal ? 'v' : 'h'}`,
-      storage: localStorage,
+      id: `inner-${isHorizontal ? 'v' : 'h'}`,
     })
 
   const handleRun = useCallback(() => {

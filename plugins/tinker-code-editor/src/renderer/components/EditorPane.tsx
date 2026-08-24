@@ -4,12 +4,8 @@ import { useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import fileUrl from 'licia/fileUrl'
 import type { editor } from 'monaco-editor'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { createPlayer } from '@videojs/react'
 import { Video, videoFeatures } from '@videojs/react/video'
 import VideoPlayer from 'share/components/VideoPlayer'
@@ -77,8 +73,6 @@ export default observer(function EditorPane({ tabId }: EditorPaneProps) {
 
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['editor', 'preview'],
-    id: 'tinker-code-editor-markdown-layout',
-    storage: localStorage,
   })
 
   const showingMarkdownPreview = tab?.showingMarkdownPreview ?? false

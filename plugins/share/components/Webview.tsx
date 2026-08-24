@@ -7,13 +7,8 @@ import {
   useState,
   type RefObject,
 } from 'react'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-  type LayoutStorage,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import copy from 'licia/copy'
 import convertBin from 'licia/convertBin'
 import { X, PanelBottom, PanelLeft, PanelRight, LucideIcon } from 'lucide-react'
@@ -123,7 +118,8 @@ export interface WebviewProps {
   onNavStateChange?: (canGoBack: boolean, canGoForward: boolean) => void
   onDevToolsPositionChange?: (position: DevToolsPosition) => void
   onDevToolsClose?: () => void
-  devToolsLayoutStorage?: LayoutStorage
+  /** Base id for panel layout persistence; position is appended. Defaults to `'webview-devtools'`. */
+  layoutId?: string
   pendingInspect?: { x: number; y: number } | null
   onPendingInspectHandled?: () => void
   onInspectElement?: (x: number, y: number) => void
@@ -166,7 +162,7 @@ const dockButtons: {
 
 interface DevToolsSplitLayoutProps {
   devToolsPosition: DevToolsPosition
-  devToolsLayoutStorage?: LayoutStorage
+  layoutId?: string
   panelSlotRef: RefObject<HTMLDivElement | null>
   devToolsContainerRef: RefObject<HTMLDivElement | null>
   onDevToolsPositionChange?: (position: DevToolsPosition) => void
@@ -175,7 +171,7 @@ interface DevToolsSplitLayoutProps {
 
 function DevToolsSplitLayout({
   devToolsPosition,
-  devToolsLayoutStorage,
+  layoutId = 'webview-devtools',
   panelSlotRef,
   devToolsContainerRef,
   onDevToolsPositionChange,
@@ -183,17 +179,13 @@ function DevToolsSplitLayout({
 }: DevToolsSplitLayoutProps) {
   const orientation = devToolsPosition === 'bottom' ? 'vertical' : 'horizontal'
   const devToolsBefore = devToolsPosition === 'left'
-  const layoutId = devToolsLayoutStorage
-    ? `devtools-${devToolsPosition}`
-    : `tinker-webview-layout-${devToolsPosition}`
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     panelIds: devToolsBefore
       ? ['devtools', 'webview']
       : ['webview', 'devtools'],
-    id: layoutId,
-    storage: devToolsLayoutStorage ?? localStorage,
-    onlySaveAfterUserInteractions: !!devToolsLayoutStorage,
+    id: `${layoutId}-${devToolsPosition}`,
+    onlySaveAfterUserInteractions: true,
   })
 
   const devToolsPanel = (
@@ -456,7 +448,7 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
     onNavStateChange,
     onDevToolsPositionChange,
     onDevToolsClose,
-    devToolsLayoutStorage,
+    layoutId,
     pendingInspect,
     onPendingInspectHandled,
     onInspectElement,
@@ -789,7 +781,7 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
       {devTools && (
         <DevToolsSplitLayout
           devToolsPosition={devToolsPosition}
-          devToolsLayoutStorage={devToolsLayoutStorage}
+          layoutId={layoutId}
           panelSlotRef={panelSlotRef}
           devToolsContainerRef={devToolsContainerRef}
           onDevToolsPositionChange={onDevToolsPositionChange}

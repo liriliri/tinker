@@ -1,30 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useRef, useCallback } from 'react'
-import isObj from 'licia/isObj'
-import type { LayoutStorage } from 'react-resizable-panels'
 import Webview, { WebviewHandle } from 'share/components/Webview'
-import { storage } from 'share/store/Base'
 import store from '../store'
 import { cleanUserAgent } from '../lib/util'
 import NewTabPage from './NewTabPage'
-
-const STORAGE_PANEL_LAYOUTS = 'panelLayouts'
-
-const panelLayoutStorage: LayoutStorage = {
-  getItem(storageKey: string) {
-    const layouts = storage.get(STORAGE_PANEL_LAYOUTS)
-    if (!isObj(layouts)) return null
-    return (layouts as Record<string, string>)[storageKey] ?? null
-  },
-  setItem(storageKey: string, value: string) {
-    const existing = storage.get(STORAGE_PANEL_LAYOUTS)
-    const layouts = isObj(existing)
-      ? { ...(existing as Record<string, string>) }
-      : {}
-    layouts[storageKey] = value
-    storage.set(STORAGE_PANEL_LAYOUTS, layouts)
-  },
-}
 
 export default observer(function WebviewContainer() {
   const webviewHandles = useRef<Map<string, WebviewHandle>>(new Map())
@@ -70,7 +49,6 @@ export default observer(function WebviewContainer() {
               userAgent={cleanUserAgent(navigator.userAgent)}
               devTools={store.devToolsOpenTabs.has(tab.id)}
               devToolsPosition={store.devToolsPosition}
-              devToolsLayoutStorage={panelLayoutStorage}
               contextMenu={{
                 openInNewTab: true,
                 saveImage: true,

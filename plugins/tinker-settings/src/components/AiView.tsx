@@ -9,12 +9,8 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import AiSection from './AiSection'
 import ProviderDetail from './ProviderDetail'
 
@@ -24,8 +20,6 @@ export default observer(function AiView() {
   const [search, setSearch] = useState('')
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['list', 'detail'],
-    id: 'tinker-settings-ai-layout',
-    storage: localStorage,
   })
 
   return (

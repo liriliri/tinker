@@ -1,10 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { ConfirmProvider } from 'share/components/Confirm'
 import { ToasterProvider } from 'share/components/Toaster'
 import { tw } from 'share/theme'
@@ -20,8 +16,6 @@ import zhCN from './i18n/zh-CN.json'
 const App = observer(function App() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['files', 'rules'],
-    id: 'tinker-renamer-layout',
-    storage: localStorage,
   })
 
   return (

@@ -3,12 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import copy from 'licia/copy'
 import { Folder } from 'lucide-react'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { tw } from 'share/theme'
 import TabBar from 'share/components/TabBar'
 import { ConfirmProvider } from 'share/components/Confirm'
@@ -30,16 +26,12 @@ const App = observer(function App() {
   const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['sidebar', 'main'],
-    id: 'tinker-file-explorer-layout-v2',
-    storage: localStorage,
   })
   const {
     defaultLayout: mainDefaultLayout,
     onLayoutChange: onMainLayoutChange,
   } = useDefaultLayout({
     panelIds: ['explorer', 'terminal'],
-    id: 'tinker-file-explorer-main-layout',
-    storage: localStorage,
   })
 
   useEffect(() => {

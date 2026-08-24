@@ -1,12 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import className from 'licia/className'
 import { useTranslation } from 'react-i18next'
-import {
-  Panel,
-  Group,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { AlertProvider } from 'share/components/Alert'
 import { PluginChat } from 'share/components/AiChat'
 import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
@@ -25,8 +21,6 @@ const App = observer(function App() {
   const { t } = useTranslation()
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'chat'],
-    id: 'tinker-code-diagram-layout',
-    storage: localStorage,
   })
 
   return (

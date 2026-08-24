@@ -2,12 +2,8 @@ import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import {
-  Group,
-  Panel,
-  Separator,
-  useDefaultLayout,
-} from 'react-resizable-panels'
+import { Group, Panel, Separator } from 'react-resizable-panels'
+import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import toast from 'react-hot-toast'
 import { ToasterProvider } from 'share/components/Toaster'
 import { ConfirmProvider } from 'share/components/Confirm'
@@ -45,8 +41,6 @@ interface GitChatLayoutProps {
 const RepoPanels = observer(function RepoPanels() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['history', 'detail'],
-    id: 'tinker-git-v3-layout',
-    storage: localStorage,
   })
 
   const {
@@ -54,8 +48,6 @@ const RepoPanels = observer(function RepoPanels() {
     onLayoutChange: onFileBrowserLayoutChange,
   } = useDefaultLayout({
     panelIds: ['fileTree', 'fileViewer'],
-    id: 'tinker-git-files-layout',
-    storage: localStorage,
   })
 
   const {
@@ -63,8 +55,6 @@ const RepoPanels = observer(function RepoPanels() {
     onLayoutChange: onWorkingTreeLayoutChange,
   } = useDefaultLayout({
     panelIds: ['workingTreeSidebar', 'workingTreeDiff'],
-    id: 'tinker-git-working-tree-layout',
-    storage: localStorage,
   })
 
   if (store.viewMode === 'workingTree') {
@@ -150,8 +140,6 @@ const ErrorToast = observer(function ErrorToast() {
 const RepoContent = observer(function RepoContent() {
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['main', 'terminal'],
-    id: 'tinker-git-terminal-layout',
-    storage: localStorage,
   })
 
   return (
@@ -185,8 +173,7 @@ const GitChatLayout = observer(function GitChatLayout({
   const tab = store.activeTab
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     panelIds: ['content', 'chat'],
-    id: `tinker-git-tab-${tab?.id ?? 'default'}`,
-    storage: localStorage,
+    id: `tab-${tab?.id ?? 'default'}`,
   })
 
   if (!tab) return null
