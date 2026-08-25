@@ -14,13 +14,29 @@ import {
   BINARY_EXTS,
   getFileExt,
 } from 'share/lib/fileType'
-import type { GitWorkingTreeFile } from 'share/types/git'
+import type {
+  GitWorkingTreeFile,
+  GitWorkingTreeFileDiffContent,
+} from 'share/types/git'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import EditorTab from './EditorTab'
 
 interface RevealTarget {
   lineNumber: number
   submatches?: tinker.SearchTextSubmatch[]
+}
+
+function isSameDiffContent(
+  a: GitWorkingTreeFileDiffContent | null,
+  b: GitWorkingTreeFileDiffContent
+): boolean {
+  return (
+    !!a &&
+    a.original === b.original &&
+    a.modified === b.modified &&
+    a.isBinary === b.isBinary &&
+    a.isTooLarge === b.isTooLarge
+  )
 }
 
 class Editor {
@@ -92,32 +108,39 @@ class Editor {
       return
     }
 
-    void this.loadGitDiff(tab, file, repoPath, { force: true })
+    // Background working-tree polls should refresh quietly without remounting
+    // the Monaco diff editor when content is unchanged.
+    void this.loadGitDiff(tab, file, repoPath, { silent: true })
   }
 
   private async loadGitDiff(
     tab: EditorTab,
     file: GitWorkingTreeFile,
     repoPath: string,
-    options: { force?: boolean } = {}
+    options: { silent?: boolean } = {}
   ) {
     const loadId = (this.gitDiffLoadIds.get(tab.id) ?? 0) + 1
     this.gitDiffLoadIds.set(tab.id, loadId)
 
     const sameFile =
-      !options.force &&
+      !options.silent &&
       tab.gitFile?.id === file.id &&
       tab.diffContent &&
       !tab.loadingDiff
 
-    tab.gitFile = file
-    tab.filePath = joinPath(repoPath, file.path)
-    tab.title = fileDisplayName(file)
+    if (tab.gitFile?.id !== file.id) {
+      tab.gitFile = file
+      tab.filePath = joinPath(repoPath, file.path)
+      tab.title = fileDisplayName(file)
+    }
 
     if (sameFile) return
 
-    tab.diffContent = null
-    tab.loadingDiff = true
+    const keepShowing = Boolean(options.silent && tab.diffContent)
+    if (!keepShowing) {
+      tab.diffContent = null
+      tab.loadingDiff = true
+    }
     try {
       if (codeEditor.getRepoPath() !== repoPath) {
         await codeEditor.openRepository(repoPath)
@@ -131,17 +154,20 @@ class Editor {
       if (this.gitDiffLoadIds.get(tab.id) !== loadId) return
 
       runInAction(() => {
+        if (isSameDiffContent(tab.diffContent, diff)) return
         tab.diffContent = diff
       })
     } catch (err) {
       if (this.gitDiffLoadIds.get(tab.id) !== loadId) return
 
       console.error('Failed to load git diff:', err)
-      runInAction(() => {
-        tab.diffContent = null
-      })
+      if (!keepShowing) {
+        runInAction(() => {
+          tab.diffContent = null
+        })
+      }
     } finally {
-      if (this.gitDiffLoadIds.get(tab.id) === loadId) {
+      if (this.gitDiffLoadIds.get(tab.id) === loadId && !keepShowing) {
         runInAction(() => {
           tab.loadingDiff = false
         })
