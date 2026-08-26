@@ -1,27 +1,36 @@
+import each from 'licia/each'
+import find from 'licia/find'
+import max from 'licia/max'
+import now from 'licia/now'
+import { setWebmDuration } from 'share/lib/webm'
+
 const MIME_TYPES = [
   'video/webm;codecs=vp9',
   'video/webm;codecs=vp8',
   'video/webm',
 ]
 
+const VIDEO_BITS_PER_SECOND = 16_000_000
+
 function pickMimeType() {
-  for (const type of MIME_TYPES) {
-    if (MediaRecorder.isTypeSupported(type)) return type
-  }
-  return ''
+  return (
+    find(MIME_TYPES, (type) => MediaRecorder.isTypeSupported(type)) ||
+    'video/webm'
+  )
 }
 
 export default class ScreenRecorder {
   private mediaRecorder: MediaRecorder | null = null
   private chunks: Blob[] = []
   private stream: MediaStream | null = null
+  private startedAt = 0
 
   getStream() {
     return this.stream
   }
 
   async start(sourceId: string): Promise<void> {
-    this.cleanup()
+    this.dispose()
 
     this.stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
@@ -29,14 +38,20 @@ export default class ScreenRecorder {
         mandatory: {
           chromeMediaSource: 'desktop',
           chromeMediaSourceId: sourceId,
+          maxWidth: 3840,
+          maxHeight: 2160,
+          maxFrameRate: 60,
         },
       } as MediaTrackConstraints,
     })
 
     const mimeType = pickMimeType()
-    const options: MediaRecorderOptions = mimeType ? { mimeType } : {}
-    this.mediaRecorder = new MediaRecorder(this.stream, options)
+    this.mediaRecorder = new MediaRecorder(this.stream, {
+      mimeType,
+      videoBitsPerSecond: VIDEO_BITS_PER_SECOND,
+    })
     this.chunks = []
+    this.startedAt = now()
 
     this.mediaRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
@@ -47,49 +62,60 @@ export default class ScreenRecorder {
     this.mediaRecorder.start(200)
   }
 
-  pause(): void {
-    if (this.mediaRecorder?.state === 'recording') {
-      this.mediaRecorder.pause()
-    }
-  }
-
-  resume(): void {
-    if (this.mediaRecorder?.state === 'paused') {
-      this.mediaRecorder.resume()
-    }
-  }
-
   async stop(): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      if (!this.mediaRecorder) {
-        reject(new Error('No media recorder'))
-        return
-      }
+    const recorder = this.mediaRecorder
+    if (!recorder) {
+      throw new Error('No media recorder')
+    }
 
-      this.mediaRecorder.onstop = () => {
-        const mimeType = this.mediaRecorder?.mimeType || 'video/webm'
-        const blob = new Blob(this.chunks, { type: mimeType })
-        this.cleanup()
-        resolve(blob)
-      }
+    const mimeType = recorder.mimeType || 'video/webm'
+    const durationMs = max(0, now() - this.startedAt)
 
-      this.mediaRecorder.onerror = () => {
-        this.cleanup()
+    const makeBlob = () => new Blob(this.chunks, { type: mimeType })
+
+    const raw = await new Promise<Blob>((resolve, reject) => {
+      recorder.onstop = () => {
+        resolve(makeBlob())
+      }
+      recorder.onerror = () => {
         reject(new Error('Recording error'))
       }
 
-      if (this.mediaRecorder.state !== 'inactive') {
-        this.mediaRecorder.stop()
+      if (recorder.state !== 'inactive') {
+        try {
+          recorder.requestData()
+        } catch {
+          // ignore
+        }
+        recorder.stop()
+      } else {
+        resolve(makeBlob())
       }
     })
+
+    this.mediaRecorder = null
+
+    const bytes = new Uint8Array(await raw.arrayBuffer())
+    const fixed = setWebmDuration(bytes, durationMs)
+    return new Blob([Uint8Array.from(fixed)], { type: mimeType })
   }
 
-  private cleanup(): void {
-    if (this.stream) {
-      this.stream.getTracks().forEach((track) => track.stop())
-      this.stream = null
+  dispose() {
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try {
+        this.mediaRecorder.stop()
+      } catch {
+        // ignore
+      }
     }
     this.mediaRecorder = null
+
+    if (this.stream) {
+      each(this.stream.getTracks(), (track) => track.stop())
+      this.stream = null
+    }
+
     this.chunks = []
+    this.startedAt = 0
   }
 }

@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useMemo, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { createPlayer } from '@videojs/react'
+import { Video, videoFeatures } from '@videojs/react/video'
+import createUrl from 'licia/createUrl'
+import VideoPlayer from 'share/components/VideoPlayer'
 import store from '../store'
 
 interface VideoPreviewProps {
@@ -13,11 +15,14 @@ export default observer(function VideoPreview({
   stream,
   className = '',
 }: VideoPreviewProps) {
-  const { t } = useTranslation()
   const videoRef = useRef<HTMLVideoElement>(null)
   const previewUrl = useMemo(
-    () => (store.recordedBlob ? URL.createObjectURL(store.recordedBlob) : ''),
+    () => (store.recordedBlob ? createUrl(store.recordedBlob) : ''),
     [store.recordedBlob]
+  )
+  const player = useMemo(
+    () => createPlayer({ features: videoFeatures }),
+    [previewUrl]
   )
 
   useEffect(() => {
@@ -26,55 +31,48 @@ export default observer(function VideoPreview({
     }
   }, [previewUrl])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    if (!video || !stream) return
 
-    if (stream) {
-      video.srcObject = stream
-      video.removeAttribute('src')
-      void video.play().catch(() => {})
-      return
-    }
-
-    video.srcObject = null
-    if (previewUrl) {
-      video.src = previewUrl
-      void video.play().catch(() => {})
-    } else {
+    video.srcObject = stream
+    void video.play().catch(() => {})
+    return () => {
+      video.pause()
+      video.srcObject = null
       video.removeAttribute('src')
       video.load()
     }
-  }, [stream, previewUrl])
+  }, [stream])
 
-  const showThumbnail =
-    !stream && !store.isPreview && !!store.selectedSource?.thumbnail
+  if (stream) {
+    return (
+      <div
+        className={`relative flex items-center justify-center overflow-hidden bg-black ${className}`}
+      >
+        <video
+          ref={videoRef}
+          className="max-w-full max-h-full bg-black"
+          muted
+          playsInline
+        />
+      </div>
+    )
+  }
+
+  if (!previewUrl) return null
+
+  const { Provider, Container } = player
 
   return (
-    <div
-      className={`relative flex items-center justify-center overflow-hidden bg-black ${className}`}
-    >
-      <video
-        ref={videoRef}
-        className={`max-w-full max-h-full bg-black ${
-          stream || store.isPreview ? 'block' : 'hidden'
-        }`}
-        muted={!!stream}
-        playsInline
-        controls={store.isPreview}
-      />
-      {showThumbnail ? (
-        <img
-          src={store.selectedSource!.thumbnail}
-          alt={store.selectedSource!.name}
-          className="max-w-full max-h-full object-contain"
-        />
-      ) : null}
-      {!stream && !store.isPreview && !showThumbnail ? (
-        <span className={`text-sm ${tw.text.tertiary}`}>
-          {t('selectSource')}
-        </span>
-      ) : null}
+    <div className={`overflow-hidden ${className}`}>
+      <Provider>
+        <Container className="h-full">
+          <VideoPlayer>
+            <Video key={previewUrl} src={previewUrl} autoPlay />
+          </VideoPlayer>
+        </Container>
+      </Provider>
     </div>
   )
 })

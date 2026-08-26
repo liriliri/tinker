@@ -2,19 +2,34 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Monitor, PanelTop, RotateCw } from 'lucide-react'
 import { tw } from 'share/theme'
+import { mediaDurationFormat } from 'share/lib/util'
 import {
   Toolbar,
   ToolbarButton,
   ToolbarButtonGroup,
-  ToolbarSeparator,
   ToolbarSpacer,
+  ToolbarTextButton,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import store from '../store'
 
-export default observer(function SourceToolbar() {
+interface ToolbarProps {
+  onStart: () => void
+  onStop: () => void
+  onSave: () => void
+  onReset: () => void
+}
+
+export default observer(function ToolbarComponent({
+  onStart,
+  onStop,
+  onSave,
+  onReset,
+}: ToolbarProps) {
   const { t } = useTranslation()
   const disabled = store.recorderState !== 'idle'
+  const { isRecording, isPreview, canRecord } = store
+  const duration = store.currentRecordingDuration
 
   return (
     <Toolbar>
@@ -38,7 +53,6 @@ export default observer(function SourceToolbar() {
           <PanelTop size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </ToolbarButtonGroup>
-      <ToolbarSeparator />
       <ToolbarButton
         title={t('refresh')}
         disabled={disabled || store.loadingSources}
@@ -47,9 +61,29 @@ export default observer(function SourceToolbar() {
         <RotateCw size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSpacer />
-      <span className={`text-xs px-2 ${tw.text.tertiary}`}>
-        {t(store.sourceType)}
-      </span>
+      {!isPreview && (
+        <span
+          className={`text-sm font-mono tabular-nums px-2 ${tw.text.secondary}`}
+        >
+          {mediaDurationFormat(duration)}
+        </span>
+      )}
+      {isPreview && (
+        <ToolbarTextButton variant="secondary" onClick={onReset}>
+          {t('cancel')}
+        </ToolbarTextButton>
+      )}
+      {isPreview ? (
+        <ToolbarTextButton onClick={onSave}>{t('save')}</ToolbarTextButton>
+      ) : isRecording ? (
+        <ToolbarTextButton variant="secondary" onClick={onStop}>
+          {t('stop')}
+        </ToolbarTextButton>
+      ) : (
+        <ToolbarTextButton disabled={!canRecord} onClick={onStart}>
+          {t('start')}
+        </ToolbarTextButton>
+      )}
     </Toolbar>
   )
 })

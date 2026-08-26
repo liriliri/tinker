@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import BaseStore from 'share/store/Base'
 
 type SourceType = 'screen' | 'window'
-type RecorderState = 'idle' | 'recording' | 'paused' | 'preview'
+type RecorderState = 'idle' | 'recording' | 'preview'
 
 class Store extends BaseStore {
   sourceType: SourceType = 'screen'
@@ -25,16 +25,8 @@ class Store extends BaseStore {
     makeAutoObservable(this)
   }
 
-  get selectedSource() {
-    return find(this.sources, (s) => s.id === this.selectedId) || null
-  }
-
   get isRecording() {
     return this.recorderState === 'recording'
-  }
-
-  get isPaused() {
-    return this.recorderState === 'paused'
   }
 
   get isPreview() {
@@ -45,19 +37,15 @@ class Store extends BaseStore {
     return !!this.selectedId && this.recorderState === 'idle'
   }
 
-  setSourceType(type: SourceType) {
-    if (this.sourceType === type) return
-    this.sourceType = type
-    this.selectedId = ''
-  }
-
   setSelectedId(id: string) {
     if (this.recorderState !== 'idle') return
     this.selectedId = id
   }
 
   async switchSourceType(type: SourceType) {
-    this.setSourceType(type)
+    if (this.sourceType === type) return
+    this.sourceType = type
+    this.selectedId = ''
     await this.loadSources()
   }
 
@@ -67,15 +55,10 @@ class Store extends BaseStore {
       this.sources = await tinker.getCaptureSources({
         types: [this.sourceType],
       })
-      if (
-        this.selectedId &&
-        !find(this.sources, (s) => s.id === this.selectedId)
-      ) {
-        this.selectedId = ''
-      }
-      if (!this.selectedId && this.sources.length > 0) {
-        this.selectedId = this.sources[0].id
-      }
+      this.selectedId =
+        find(this.sources, (s) => s.id === this.selectedId)?.id ||
+        this.sources[0]?.id ||
+        ''
     } catch {
       this.sources = []
       this.selectedId = ''
@@ -91,16 +74,6 @@ class Store extends BaseStore {
     this.recorderState = 'recording'
     this.currentRecordingDuration = 0
     this.recordedBlob = null
-    this.startTimer()
-  }
-
-  pauseRecording() {
-    this.recorderState = 'paused'
-    this.stopTimer()
-  }
-
-  resumeRecording() {
-    this.recorderState = 'recording'
     this.startTimer()
   }
 

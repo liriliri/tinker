@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import dateFormat from 'licia/dateFormat'
 import toast from 'react-hot-toast'
@@ -8,10 +9,9 @@ import { tw } from 'share/theme'
 import renderApp from 'share/lib/renderApp'
 import store from './store'
 import ScreenRecorder from './lib/ScreenRecorder'
-import SourceToolbar from './components/SourceToolbar'
+import Toolbar from './components/Toolbar'
 import SourcePicker from './components/SourcePicker'
 import VideoPreview from './components/VideoPreview'
-import RecorderBar from './components/RecorderBar'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -24,7 +24,9 @@ const App = observer(function App() {
   useEffect(() => {
     void store.loadSources()
     return () => {
-      void recorderRef.current?.stop().catch(() => {})
+      flushSync(() => setLiveStream(null))
+      recorderRef.current?.dispose()
+      recorderRef.current = null
       void tinker.setBackgroundThrottling(true)
     }
   }, [])
@@ -45,26 +47,24 @@ const App = observer(function App() {
   }
 
   const handleStop = async () => {
-    if (!recorderRef.current) return
-    try {
-      const blob = await recorderRef.current.stop()
+    const recorder = recorderRef.current
+    if (!recorder) return
+
+    const release = () => {
+      flushSync(() => setLiveStream(null))
+      recorder.dispose()
       recorderRef.current = null
-      setLiveStream(null)
+    }
+
+    try {
+      const blob = await recorder.stop()
+      release()
       await tinker.setBackgroundThrottling(true)
       store.stopRecording(blob)
     } catch {
+      release()
       toast.error(t('failedToStop'))
     }
-  }
-
-  const handlePause = () => {
-    recorderRef.current?.pause()
-    store.pauseRecording()
-  }
-
-  const handleResume = () => {
-    recorderRef.current?.resume()
-    store.resumeRecording()
   }
 
   const handleSave = async () => {
@@ -78,39 +78,32 @@ const App = observer(function App() {
       const buffer = await store.recordedBlob.arrayBuffer()
       await tinker.writeFile(result.filePath, new Uint8Array(buffer))
       toast.success(t('savedSuccessfully'))
+      store.reset()
     } catch (err) {
       console.error(err)
       toast.error(t('failedToSave'))
     }
   }
 
-  const handleReset = () => {
-    store.reset()
-  }
+  const showPreview = store.isRecording || store.isPreview
 
   return (
     <ToasterProvider>
       <div className={`h-screen flex flex-col ${tw.bg.secondary}`}>
-        <SourceToolbar />
-        <div className="flex-1 flex min-h-0">
-          <SourcePicker
-            className={`w-72 shrink-0 border-r ${tw.border} ${tw.bg.primary}`}
-          />
-          <VideoPreview stream={liveStream} className="flex-1" />
-        </div>
-        <RecorderBar
+        <Toolbar
           onStart={() => void handleStart()}
           onStop={() => void handleStop()}
-          onPause={handlePause}
-          onResume={handleResume}
           onSave={() => void handleSave()}
-          onReset={handleReset}
-          canStart={store.canRecord}
-          isRecording={store.isRecording}
-          isPaused={store.isPaused}
-          isPreview={store.isPreview}
-          duration={store.currentRecordingDuration}
+          onReset={() => store.reset()}
         />
+        {showPreview ? (
+          <VideoPreview
+            stream={liveStream}
+            className={`flex-1 min-h-0 ${tw.bg.primary}`}
+          />
+        ) : (
+          <SourcePicker className={`flex-1 min-h-0 ${tw.bg.primary}`} />
+        )}
       </div>
     </ToasterProvider>
   )

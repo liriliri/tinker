@@ -1,5 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import isEmpty from 'licia/isEmpty'
+import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import store from '../store'
 
@@ -13,19 +15,27 @@ export default observer(function SourcePicker({
   const { t } = useTranslation()
   const disabled = store.recorderState !== 'idle'
 
-  if (store.loadingSources || store.sources.length === 0) {
+  if (store.loadingSources) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <LoadingCircle />
+      </div>
+    )
+  }
+
+  if (isEmpty(store.sources)) {
     return (
       <div
         className={`flex items-center justify-center text-sm ${tw.text.tertiary} ${className}`}
       >
-        {t(store.loadingSources ? 'loadingSources' : 'noSources')}
+        {t('noSources')}
       </div>
     )
   }
 
   return (
-    <div className={`overflow-y-auto p-3 ${className}`}>
-      <div className="grid grid-cols-2 gap-3">
+    <div className={`overflow-y-auto p-4 ${className}`}>
+      <div className="grid grid-cols-3 gap-4">
         {store.sources.map((source) => {
           const selected = source.id === store.selectedId
           return (
@@ -50,19 +60,19 @@ export default observer(function SourcePicker({
                     className="max-w-full max-h-full object-contain"
                   />
                 ) : (
-                  <span className={`text-xs ${tw.text.tertiary}`}>—</span>
+                  <span className={`text-sm ${tw.text.tertiary}`}>—</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 px-2 py-1.5 min-w-0">
+              <div className="flex items-center justify-center gap-2 px-3 py-2.5 min-w-0">
                 {source.appIcon ? (
                   <img
                     src={source.appIcon}
                     alt=""
-                    className="w-4 h-4 shrink-0"
+                    className="w-5 h-5 shrink-0"
                   />
                 ) : null}
                 <span
-                  className={`text-xs truncate ${tw.text.secondary}`}
+                  className={`text-sm truncate ${tw.text.secondary}`}
                   title={source.name}
                 >
                   {source.name}

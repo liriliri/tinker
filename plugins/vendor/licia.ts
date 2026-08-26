@@ -28,6 +28,7 @@ import escape from 'licia/escape'
 import escapeRegExp from 'licia/escapeRegExp'
 import evalCss from 'licia/evalCss'
 import easing from 'licia/easing'
+import every from 'licia/every'
 import fileSize from 'licia/fileSize'
 import fileUrl from 'licia/fileUrl'
 import fill from 'licia/fill'
@@ -73,8 +74,9 @@ import mime from 'licia/mime'
 import min from 'licia/min'
 import ms from 'licia/ms'
 import naturalSort from 'licia/naturalSort'
-import normalizePath from 'licia/normalizePath'
 import noop from 'licia/noop'
+import normalizePath from 'licia/normalizePath'
+import now from 'licia/now'
 import once from 'licia/once'
 import openFile from 'licia/openFile'
 import pluck from 'licia/pluck'
@@ -142,6 +144,7 @@ const licia = {
   escapeRegExp,
   evalCss,
   easing,
+  every,
   fileSize,
   fileUrl,
   fill,
@@ -189,6 +192,7 @@ const licia = {
   naturalSort,
   normalizePath,
   noop,
+  now,
   once,
   openFile,
   pluck,
@@ -260,6 +264,7 @@ export {
   escapeRegExp,
   evalCss,
   easing,
+  every,
   fileSize,
   fileUrl,
   fill,
@@ -307,6 +312,7 @@ export {
   naturalSort,
   normalizePath,
   noop,
+  now,
   once,
   openFile,
   pluck,
