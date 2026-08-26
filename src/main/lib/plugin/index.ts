@@ -7,7 +7,7 @@ import fs from 'fs-extra'
 import startWith from 'licia/startWith'
 import { ipcMain, Notification, session } from 'electron'
 import { getClipboardFilePaths } from '../clipboard'
-import { captureScreen } from '../screen'
+import { captureScreen, getCaptureSources } from './screen'
 import { getFileIcon as getFileIconBuffer } from '../fileIcon'
 import PQueue from 'p-queue'
 import toNum from 'licia/toNum'
@@ -107,6 +107,7 @@ export function init() {
   handleEvent('preparePluginView', preparePluginView)
   handleEvent('getRunningPlugins', getRunningPlugins)
   handleEvent('captureScreen', captureScreen)
+  handleEvent('getCaptureSources', getCaptureSources)
   handleEvent('pluginGetFileIcon', getFileIcon)
   ipcMain.handle('showPluginNotification', (event, body: string) => {
     if (!Notification.isSupported()) {

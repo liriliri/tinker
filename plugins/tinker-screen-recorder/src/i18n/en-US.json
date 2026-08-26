@@ -1,0 +1,20 @@
+{
+  "screen": "Screen",
+  "window": "Window",
+  "refresh": "Refresh",
+  "start": "Start",
+  "stop": "Stop",
+  "pause": "Pause",
+  "resume": "Resume",
+  "save": "Save",
+  "newRecording": "New",
+  "loadingSources": "Loading sources…",
+  "noSources": "No sources found",
+  "selectSource": "Select a screen or window to record",
+  "failedToStart": "Failed to start recording",
+  "failedToStop": "Failed to stop recording",
+  "failedToSave": "Failed to save recording",
+  "savedSuccessfully": "Recording saved",
+  "loadSourcesError": "Failed to get capture sources",
+  "screenPermissionRequired": "Check Screen Recording permission in System Settings"
+}

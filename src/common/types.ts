@@ -107,6 +107,25 @@ export type IpcExportPluginData = (id: string) => void
 export type IpcImportPluginData = IpcExportPluginData
 export type IpcClearPluginData = IpcExportPluginData
 export type IpcCaptureScreen = () => Promise<string>
+
+export interface ICaptureSource {
+  id: string
+  name: string
+  type: 'screen' | 'window'
+  /** PNG data URL; sized to fit within 320×320, keeping source aspect ratio */
+  thumbnail: string
+  /** PNG data URL of the window app icon when available */
+  appIcon: string
+}
+
+export interface IGetCaptureSourcesOptions {
+  types?: Array<'screen' | 'window'>
+}
+
+export type IpcGetCaptureSources = (
+  options?: IGetCaptureSourcesOptions
+) => Promise<ICaptureSource[]>
+
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
 export type IpcSetBackgroundThrottling = (allowed: boolean) => void

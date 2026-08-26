@@ -1,6 +1,12 @@
 import fs from 'fs-extra'
+import { NativeImage } from 'electron'
 
 const ELECTRON_UA_PATTERN = / Electron\/[\d.]+/g
+
+export function imageDataUrl(image?: NativeImage) {
+  if (!image || image.isEmpty()) return ''
+  return image.toDataURL()
+}
 
 export function cleanUserAgent(ua: string): string {
   return ua.replace(ELECTRON_UA_PATTERN, '')

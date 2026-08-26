@@ -3,6 +3,7 @@ import mainObj from './main'
 import nodeObj from 'share/preload/node'
 import {
   IpcCaptureScreen,
+  IpcGetCaptureSources,
   IpcGetAttachedPlugin,
   IpcGetClipboardFilePaths,
   IpcGetFileIcon,
@@ -125,6 +126,7 @@ const tinkerObj = {
     'getClipboardFilePaths'
   ),
   captureScreen: invoke<IpcCaptureScreen>('captureScreen'),
+  getCaptureSources: invoke<IpcGetCaptureSources>('getCaptureSources'),
   getFileIcon: invoke<IpcGetFileIcon>('pluginGetFileIcon'),
   showNotification: invoke<IpcShowPluginNotification>('showPluginNotification'),
   setBackgroundThrottling: invoke<IpcSetBackgroundThrottling>(

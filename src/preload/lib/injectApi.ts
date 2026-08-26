@@ -384,6 +384,7 @@ export function injectApi() {
     openExternal: _tinker.openExternal,
     getClipboardFilePaths: _tinker.getClipboardFilePaths,
     captureScreen: _tinker.captureScreen,
+    getCaptureSources: _tinker.getCaptureSources,
     setTitle: _tinker.setTitle,
     readFile: _tinker.readFile,
     writeFile: _tinker.writeFile,

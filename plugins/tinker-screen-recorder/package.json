@@ -1,0 +1,21 @@
+{
+  "name": "tinker-screen-recorder",
+  "version": "0.1.0",
+  "description": "Screen Recorder Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Screen Recorder",
+    "description": "Record desktop screen or window to video",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "录屏",
+        "description": "录制桌面或窗口为视频"
+      }
+    }
+  }
+}

@@ -27,6 +27,20 @@ declare global {
       isSymbolicLink: boolean
     }
 
+    interface CaptureSource {
+      id: string
+      name: string
+      type: 'screen' | 'window'
+      /** PNG data URL; sized to fit within 320×320, keeping source aspect ratio */
+      thumbnail: string
+      /** PNG data URL of the window app icon when available */
+      appIcon: string
+    }
+
+    interface GetCaptureSourcesOptions {
+      types?: Array<'screen' | 'window'>
+    }
+
     interface FFmpegProgress {
       /** e.g., "1024kbits/s" */
       bitrate: string
@@ -412,6 +426,14 @@ declare global {
 
     /** @returns Data URL of the screenshot, or empty string if canceled or failed */
     captureScreen(): Promise<string>
+
+    /**
+     * List screens and windows that can be captured for screen recording.
+     * Requests OS screen-recording permission when needed (macOS).
+     */
+    getCaptureSources(
+      options?: tinker.GetCaptureSourcesOptions
+    ): Promise<tinker.CaptureSource[]>
 
     /**
      * Get the icon for a file or file extension.
