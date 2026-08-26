@@ -12,7 +12,6 @@ import {
   Eye,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -95,7 +94,6 @@ export default observer(function ToolbarComponent() {
           active={store.viewMode === 'split'}
           onClick={() => store.setViewMode('split')}
           title={t('splitView')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <Columns2 size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -105,7 +103,6 @@ export default observer(function ToolbarComponent() {
           active={store.viewMode === 'editor'}
           onClick={() => store.setViewMode('editor')}
           title={t('editorOnly')}
-          className={`rounded-none border-r ${tw.border}`}
         >
           <FileEdit size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -115,7 +112,6 @@ export default observer(function ToolbarComponent() {
           active={store.viewMode === 'preview'}
           onClick={() => store.setViewMode('preview')}
           title={t('previewOnly')}
-          className="rounded-none rounded-r"
         >
           <Eye size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

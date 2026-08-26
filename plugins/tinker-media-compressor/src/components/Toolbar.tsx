@@ -123,7 +123,6 @@ export default observer(function ToolbarComponent() {
           active={store.mode === 'video'}
           onClick={() => store.setMode('video')}
           title={t('video')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <Video size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -132,7 +131,6 @@ export default observer(function ToolbarComponent() {
           active={store.mode === 'audio'}
           onClick={() => store.setMode('audio')}
           title={t('audio')}
-          className="rounded-none rounded-r"
         >
           <Music size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

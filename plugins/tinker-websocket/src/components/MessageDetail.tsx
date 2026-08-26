@@ -54,7 +54,6 @@ export default observer(function MessageDetail() {
       <Toolbar>
         <ToolbarButtonGroup>
           <ToolbarButton
-            className={`rounded-none rounded-l border-r ${tw.border}`}
             variant="toggle"
             active={!showHex}
             disabled={!msg}
@@ -64,7 +63,6 @@ export default observer(function MessageDetail() {
             <FileText size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
           <ToolbarButton
-            className="rounded-none rounded-r"
             variant="toggle"
             active={showHex}
             disabled={!msg}

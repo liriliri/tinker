@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { AlignJustify, Columns2 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarAiButton,
@@ -36,7 +35,6 @@ export default observer(function ToolbarComponent() {
           active={store.templateId === 'classic'}
           onClick={() => store.setTemplateId('classic')}
           title={t('templateClassic')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <AlignJustify size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -45,7 +43,6 @@ export default observer(function ToolbarComponent() {
           active={store.templateId === 'sidebar'}
           onClick={() => store.setTemplateId('sidebar')}
           title={t('templateSidebar')}
-          className="rounded-none rounded-r"
         >
           <Columns2 size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

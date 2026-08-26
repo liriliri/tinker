@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSpacer,
@@ -49,7 +48,6 @@ export default observer(function ToolbarComponent() {
           active={store.inputType === 'text'}
           onClick={() => store.setInputType('text')}
           title={t('text')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <FileText size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -59,7 +57,6 @@ export default observer(function ToolbarComponent() {
           active={store.inputType === 'file'}
           onClick={() => store.setInputType('file')}
           title={t('file')}
-          className="rounded-none rounded-r"
         >
           <FileIcon size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

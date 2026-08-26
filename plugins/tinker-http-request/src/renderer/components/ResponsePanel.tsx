@@ -122,7 +122,6 @@ const BodyModeToggle = observer(function BodyModeToggle() {
   return (
     <ToolbarButtonGroup>
       <ToolbarButton
-        className={`rounded-none rounded-l border-r ${tw.border}`}
         variant="toggle"
         active={mode === 'preview'}
         onClick={() =>
@@ -135,7 +134,6 @@ const BodyModeToggle = observer(function BodyModeToggle() {
         <PreviewIcon size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarButton
-        className="rounded-none rounded-r"
         variant="toggle"
         active={mode === 'hex'}
         onClick={() =>

@@ -24,7 +24,6 @@ import {
 } from 'share/components/Toolbar'
 import toast from 'react-hot-toast'
 import PathBar from 'share/components/PathBar'
-import { tw } from 'share/theme'
 import type Explorer from '../store/Explorer'
 import store from '../store'
 import { buildRemotePathBreadcrumbs } from '../lib/util'
@@ -153,7 +152,6 @@ export default observer(function ExplorerToolbar({
           active={store.viewMode === 'list'}
           onClick={() => store.setViewMode('list')}
           title={t('viewList')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <List size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -162,7 +160,6 @@ export default observer(function ExplorerToolbar({
           active={store.viewMode === 'grid'}
           onClick={() => store.setViewMode('grid')}
           title={t('viewGrid')}
-          className="rounded-none rounded-r"
         >
           <LayoutGrid size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

@@ -6,9 +6,11 @@ import {
   Plus,
   PanelRight,
   PanelRightClose,
+  Square,
+  Columns3,
+  Calendar,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarSeparator,
@@ -98,11 +100,7 @@ export default observer(function ToolbarComponent({
 
       <ToolbarSpacer />
 
-      <ToolbarButton
-        onClick={handleToday}
-        title={t('today')}
-        className="text-xs leading-none"
-      >
+      <ToolbarButton onClick={handleToday} title={t('today')}>
         {t('today')}
       </ToolbarButton>
 
@@ -112,9 +110,8 @@ export default observer(function ToolbarComponent({
           active={currentView === 'timeGridDay'}
           onClick={() => handleViewChange('timeGridDay')}
           title={t('dayView')}
-          className={`rounded-none rounded-l border-r ${tw.border} text-xs leading-none`}
         >
-          {t('day')}
+          <Square size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
 
         <ToolbarButton
@@ -122,9 +119,8 @@ export default observer(function ToolbarComponent({
           active={currentView === 'timeGridWeek'}
           onClick={() => handleViewChange('timeGridWeek')}
           title={t('weekView')}
-          className={`rounded-none border-r ${tw.border} text-xs leading-none`}
         >
-          {t('week')}
+          <Columns3 size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
 
         <ToolbarButton
@@ -132,9 +128,8 @@ export default observer(function ToolbarComponent({
           active={currentView === 'dayGridMonth'}
           onClick={() => handleViewChange('dayGridMonth')}
           title={t('monthView')}
-          className="rounded-none rounded-r text-xs leading-none"
         >
-          {t('month')}
+          <Calendar size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
       </ToolbarButtonGroup>
 

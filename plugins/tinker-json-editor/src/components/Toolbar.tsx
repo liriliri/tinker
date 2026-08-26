@@ -22,7 +22,6 @@ import {
   ToolbarButton,
   ToolbarButtonGroup,
 } from 'share/components/Toolbar'
-import { tw } from 'share/theme'
 import CopyButton from 'share/components/CopyButton'
 import store from '../store'
 import ExpandIcon from '../assets/expand.svg?react'
@@ -58,7 +57,6 @@ export default observer(function ToolbarComponent() {
           active={store.mode === 'text'}
           onClick={() => store.setMode('text')}
           title={t('textMode')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <FileText size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -68,7 +66,6 @@ export default observer(function ToolbarComponent() {
           active={store.mode === 'tree'}
           onClick={() => store.setMode('tree')}
           title={t('treeMode')}
-          className="rounded-none rounded-r"
         >
           <Network size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

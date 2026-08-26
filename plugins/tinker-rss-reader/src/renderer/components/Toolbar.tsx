@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Plus, PanelLeft, PanelLeftClose, List, LayoutGrid } from 'lucide-react'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   ToolbarButton,
@@ -65,7 +64,6 @@ export default observer(function ToolbarComponent({
           active={store.viewMode === 'list'}
           onClick={() => store.setViewMode('list')}
           title={t('listView')}
-          className={`rounded-none rounded-l border-r ${tw.border}`}
         >
           <List size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>
@@ -74,7 +72,6 @@ export default observer(function ToolbarComponent({
           active={store.viewMode === 'card'}
           onClick={() => store.setViewMode('card')}
           title={t('cardView')}
-          className="rounded-none rounded-r"
         >
           <LayoutGrid size={TOOLBAR_ICON_SIZE} />
         </ToolbarButton>

@@ -8,7 +8,6 @@ import {
   Save,
 } from 'lucide-react'
 import isStrBlank from 'licia/isStrBlank'
-import { tw } from 'share/theme'
 import {
   Toolbar,
   TOOLBAR_ICON_SIZE,
@@ -58,7 +57,6 @@ export default observer(function ToolbarComponent() {
             active={store.inputType === 'text'}
             onClick={() => store.setInputType('text')}
             title={t('text')}
-            className={`rounded-none rounded-l border-r ${tw.border}`}
           >
             <FileText size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
@@ -68,7 +66,6 @@ export default observer(function ToolbarComponent() {
             active={store.inputType === 'file'}
             onClick={() => store.setInputType('file')}
             title={t('file')}
-            className="rounded-none rounded-r"
           >
             <FileIcon size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>

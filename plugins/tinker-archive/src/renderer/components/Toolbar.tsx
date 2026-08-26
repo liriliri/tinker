@@ -24,7 +24,6 @@ import {
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
 import PathBar from 'share/components/PathBar'
-import { tw } from 'share/theme'
 import store from '../store'
 import { promptCreateFolder } from '../lib/contextMenu'
 
@@ -151,7 +150,6 @@ export default observer(function Toolbar() {
               active={store.viewMode === 'list'}
               onClick={() => store.setViewMode('list')}
               title={t('viewList')}
-              className={`rounded-none rounded-l border-r ${tw.border}`}
             >
               <List size={TOOLBAR_ICON_SIZE} />
             </ToolbarButton>
@@ -160,7 +158,6 @@ export default observer(function Toolbar() {
               active={store.viewMode === 'grid'}
               onClick={() => store.setViewMode('grid')}
               title={t('viewGrid')}
-              className="rounded-none rounded-r"
             >
               <LayoutGrid size={TOOLBAR_ICON_SIZE} />
             </ToolbarButton>

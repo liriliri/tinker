@@ -42,17 +42,12 @@ const ToolbarComponent = observer(function ToolbarComponent({ onRun }: Props) {
       </ToolbarButton>
       <ToolbarSeparator />
       <ToolbarButtonGroup>
-        {LAYOUT_BUTTONS.map(({ pos, Icon }, index) => (
+        {LAYOUT_BUTTONS.map(({ pos, Icon }) => (
           <ToolbarButton
             key={pos}
             variant="toggle"
             active={store.layout === pos}
             onClick={() => store.setLayout(pos)}
-            className={`rounded-none ${index === 0 ? 'rounded-l' : ''} ${
-              index === LAYOUT_BUTTONS.length - 1 ? 'rounded-r' : ''
-            } ${
-              index < LAYOUT_BUTTONS.length - 1 ? `border-r ${tw.border}` : ''
-            }`}
           >
             <Icon size={14} />
           </ToolbarButton>
