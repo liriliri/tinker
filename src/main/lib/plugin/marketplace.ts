@@ -260,6 +260,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-gltf-optimizer',
+    name: 'GLTF Optimizer',
+    description: 'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
+    icon: 'tinker-gltf-optimizer.png',
+    locales: {
+      'zh-CN': {
+        name: 'GLTF 优化',
+        description: '使用 Draco、WebP 和网格简化优化 GLB/GLTF 模型',
+      },
+    },
+  },
+  {
     id: 'tinker-hanzi-converter',
     name: 'Hanzi Converter',
     description: 'Chinese character tools for pinyin and conversion',
