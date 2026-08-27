@@ -213,6 +213,7 @@ export function buildFFmpegArgs(
         '0'
       )
     } else {
+      args.push('-fps_mode', 'vfr')
       args.push(...getVideoCodecArgs(codec, ext))
     }
     if (ext === 'mp4' || ext === 'm4v') {

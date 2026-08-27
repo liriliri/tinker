@@ -1,4 +1,4 @@
-import { setWebmDuration } from './webm'
+import fixWebmDuration from 'fix-webm-duration'
 import $css from 'licia/$css'
 import $insert from 'licia/$insert'
 import $remove from 'licia/$remove'
@@ -61,10 +61,12 @@ async function flushRecorder(active: ActiveRecorder) {
   const blob = new Blob(active.chunks, {
     type: active.recorder.mimeType || 'video/webm',
   })
-  const bytes = new Uint8Array(await blob.arrayBuffer())
+  const fixed = await fixWebmDuration(blob, max(0, now() - active.startedAt), {
+    logger: false,
+  })
   await node.writeFile(
     active.filePath,
-    setWebmDuration(bytes, max(0, now() - active.startedAt))
+    new Uint8Array(await fixed.arrayBuffer())
   )
 }
 

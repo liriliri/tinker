@@ -1,8 +1,8 @@
+import fixWebmDuration from 'fix-webm-duration'
 import each from 'licia/each'
 import find from 'licia/find'
 import max from 'licia/max'
 import now from 'licia/now'
-import { setWebmDuration } from 'share/lib/webm'
 
 const MIME_TYPES = [
   'video/webm;codecs=vp9',
@@ -95,9 +95,7 @@ export default class ScreenRecorder {
 
     this.mediaRecorder = null
 
-    const bytes = new Uint8Array(await raw.arrayBuffer())
-    const fixed = setWebmDuration(bytes, durationMs)
-    return new Blob([Uint8Array.from(fixed)], { type: mimeType })
+    return fixWebmDuration(raw, durationMs, { logger: false })
   }
 
   dispose() {

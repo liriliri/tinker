@@ -332,7 +332,6 @@ import {
   getFileCategory,
 } from 'share/lib/util'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
-import { setWebmDuration } from 'share/lib/webm'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import {
   getHolidaysForYearRange,
