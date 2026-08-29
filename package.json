@@ -132,7 +132,7 @@
     "koa-static": "^5.0.0",
     "licia": "^1.49.0",
     "node-pty": "^1.1.0",
-    "pdu-static": "^0.1.0",
+    "pdu-static": "^0.1.1",
     "playwright-core": "^1.62.1",
     "uiohook-napi": "1.5.4",
     "ws": "^8.21.1"
