@@ -1,3 +1,9 @@
+## v2.3.0 (31 Aug 2026)
+
+* feat: add screen recorder
+* feat(code-editor): multiple project windows
+* fix(stickies): popup contextmenu
+
 ## v2.2.1 (23 Aug 2026)
 
 * fix: windows gpu disabled

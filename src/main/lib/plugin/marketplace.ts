@@ -128,6 +128,32 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-chess',
+    name: 'Chess',
+    description:
+      'Play international chess against a friend or a thoughtful computer opponent.',
+    icon: 'tinker-chess.png',
+    locales: {
+      'zh-CN': {
+        name: '国际象棋',
+        description: '和朋友或电脑下一盘国际象棋。',
+      },
+    },
+  },
+  {
+    id: 'tinker-chinese-chess',
+    name: 'Chinese Chess',
+    description:
+      'Play Chinese chess against a friend or a thoughtful computer opponent.',
+    icon: 'tinker-chinese-chess.png',
+    locales: {
+      'zh-CN': {
+        name: '中国象棋',
+        description: '和朋友或电脑下一盘中国象棋。',
+      },
+    },
+  },
+  {
     id: 'tinker-clipboard-sync',
     name: 'Clipboard Sync',
     description: 'Sync clipboard between host and VM via shared files',
@@ -262,12 +288,25 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-gltf-optimizer',
     name: 'GLTF Optimizer',
-    description: 'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
+    description:
+      'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
     icon: 'tinker-gltf-optimizer.png',
     locales: {
       'zh-CN': {
         name: 'GLTF 优化',
         description: '使用 Draco、WebP 和网格简化优化 GLB/GLTF 模型',
+      },
+    },
+  },
+  {
+    id: 'tinker-gomoku',
+    name: 'Gomoku',
+    description: 'Play five in a row against a friend or the computer.',
+    icon: 'tinker-gomoku.png',
+    locales: {
+      'zh-CN': {
+        name: '五子棋',
+        description: '和朋友或电脑对弈，连成五子即可获胜。',
       },
     },
   },
@@ -460,6 +499,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: 'Office',
         description: '打开并编辑 Word、Excel、PowerPoint 文档',
+      },
+    },
+  },
+  {
+    id: 'tinker-reversi',
+    name: 'Reversi',
+    description: 'Capture territory in the classic game of Reversi.',
+    icon: 'tinker-reversi.png',
+    locales: {
+      'zh-CN': {
+        name: '黑白棋',
+        description: '在经典黑白棋中包围并翻转对手的棋子。',
       },
     },
   },
