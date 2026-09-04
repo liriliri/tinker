@@ -9,8 +9,8 @@ import { FilterTab } from './types'
 
 export type { ClipboardType, ClipboardItem, FilterTab }
 
-const STORAGE_FILTER_TAB = 'filter-tab'
-const STORAGE_SEARCH_QUERY = 'search-query'
+const STORAGE_FILTER_TAB = 'filterTab'
+const STORAGE_SEARCH_QUERY = 'searchQuery'
 
 class Store extends BaseStore {
   items: ClipboardItem[] = []

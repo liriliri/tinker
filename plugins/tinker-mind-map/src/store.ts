@@ -6,9 +6,9 @@ import type { MenuItemConstructorOptions } from 'electron'
 import i18n from 'i18next'
 import type { MindMapNode, MindMapInstance } from './types'
 
-const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_FILE_PATH = 'filePath'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
-const STORAGE_MINDMAP_DATA = 'mindmap-data'
+const STORAGE_MINDMAP_DATA = 'mindMapData'
 
 class Store extends BaseStore {
   mindMap: MindMapInstance | null = null

@@ -4,7 +4,7 @@ import BaseStore, { storage } from 'share/store/Base'
 import math, { createScope, formatResult } from './lib/math'
 
 const OPERATORS = ['+', '-', '*', '/', '^']
-const STORAGE_STATE = 'calculator-state'
+const STORAGE_STATE = 'state'
 
 type StoredState = {
   expression: string

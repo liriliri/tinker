@@ -6,7 +6,7 @@ import { Languages } from './lib/formatter/types'
 import formatter from './lib/formatter'
 import { createMcpApi } from './mcp'
 
-const STORAGE_STATE = 'code-formatter-state'
+const STORAGE_STATE = 'state'
 
 type StoredState = {
   input: string

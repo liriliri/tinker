@@ -5,8 +5,8 @@ import type { editor } from 'monaco-editor'
 import BaseStore, { storage } from 'share/store/Base'
 
 const STORAGE_CONTENT = 'content'
-const STORAGE_FILE_PATH = 'file-path'
-const STORAGE_FONT_SIZE = 'font-size'
+const STORAGE_FILE_PATH = 'filePath'
+const STORAGE_FONT_SIZE = 'fontSize'
 
 const DEFAULT_FONT_SIZE = 14
 const MIN_FONT_SIZE = 10

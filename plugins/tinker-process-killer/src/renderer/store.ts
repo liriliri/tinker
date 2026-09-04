@@ -15,7 +15,7 @@ import type { ProcessInfo, NetworkConnection } from '../common/types'
 import type { SortField, SortOrder, ViewMode } from './types'
 import { createMcpApi } from './mcp'
 
-const STORAGE_VIEW_MODE = 'view-mode'
+const STORAGE_VIEW_MODE = 'viewMode'
 
 const defaultAppIcon = isWindows ? defaultWinIcon : defaultIcon
 

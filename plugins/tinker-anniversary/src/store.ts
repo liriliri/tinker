@@ -20,8 +20,8 @@ import type { Anniversary } from './types'
 import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
-const STORAGE_SIDEBAR_OPEN = 'sidebar-open'
-const STORAGE_SHOW_HOLIDAYS = 'show-holidays'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_SHOW_HOLIDAYS = 'showHolidays'
 const DEFAULT_VISIBLE_START = normalizeDateKey(new Date())
 const DEFAULT_VISIBLE_END = DEFAULT_VISIBLE_START
 

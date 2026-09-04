@@ -9,7 +9,7 @@ import i18n from 'i18next'
 import { createMcpApi } from './mcp'
 
 const STORAGE_CONFIGS = 'configs'
-const STORAGE_ACTIVE_IDS = 'active-ids'
+const STORAGE_ACTIVE_IDS = 'activeIds'
 
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)

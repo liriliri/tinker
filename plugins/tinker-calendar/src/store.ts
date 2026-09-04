@@ -17,7 +17,7 @@ import * as db from './lib/db'
 import { createMcpApi } from './mcp'
 import i18n from 'i18next'
 
-const STORAGE_SIDEBAR_OPEN = 'sidebar-open'
+const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const HOLIDAY_COLOR = '#fb923c'
 
 export type CalendarEvent = {

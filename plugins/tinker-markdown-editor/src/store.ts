@@ -6,8 +6,8 @@ import BaseStore, { storage } from 'share/store/Base'
 import { createMcpApi } from './mcp'
 
 const STORAGE_CONTENT = 'content'
-const STORAGE_FILE_PATH = 'file-path'
-const STORAGE_VIEW_MODE = 'view-mode'
+const STORAGE_FILE_PATH = 'filePath'
+const STORAGE_VIEW_MODE = 'viewMode'
 
 export type ViewMode = 'split' | 'editor' | 'preview'
 

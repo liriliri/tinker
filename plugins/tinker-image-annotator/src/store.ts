@@ -13,15 +13,15 @@ import type { ToolType, ShapeType } from './types'
 
 export type { ToolType, ShapeType }
 
-const STORAGE_FOREGROUND = 'foreground-color'
-const STORAGE_BACKGROUND = 'background-color'
+const STORAGE_FOREGROUND = 'foregroundColor'
+const STORAGE_BACKGROUND = 'backgroundColor'
 const STORAGE_TOOL = 'tool'
-const STORAGE_STROKE_WIDTH = 'stroke-width'
-const STORAGE_FONT_SIZE = 'font-size'
-const STORAGE_SHAPE_TYPE = 'shape-type'
-const STORAGE_WATERMARK_ENABLED = 'watermark-enabled'
-const STORAGE_WATERMARK_TEXT = 'watermark-text'
-const STORAGE_WATERMARK_COLOR = 'watermark-color'
+const STORAGE_STROKE_WIDTH = 'strokeWidth'
+const STORAGE_FONT_SIZE = 'fontSize'
+const STORAGE_SHAPE_TYPE = 'shapeType'
+const STORAGE_WATERMARK_ENABLED = 'watermarkEnabled'
+const STORAGE_WATERMARK_TEXT = 'watermarkText'
+const STORAGE_WATERMARK_COLOR = 'watermarkColor'
 const DEFAULT_FOREGROUND_COLOR = THEME_COLORS.text.light.primary
 const DEFAULT_BACKGROUND_COLOR = THEME_COLORS.bg.light.primary
 const DEFAULT_WATERMARK_TEXT = 'Tinker'

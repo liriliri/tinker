@@ -16,7 +16,7 @@ import { KdbxEntry, KdbxGroup } from './types'
 
 export type { KdbxEntry, KdbxGroup }
 
-const STORAGE_RECENT_FILES = 'recent-files'
+const STORAGE_RECENT_FILES = 'recentFiles'
 
 class Store extends BaseStore {
   // Database state

@@ -14,7 +14,7 @@ import { createMcpApi } from './mcp'
 import { DEFAULT_DIAGRAM } from './lib/mermaid'
 
 const STORAGE_CONTENT = 'content'
-const STORAGE_VIEW_MODE = 'view-mode'
+const STORAGE_VIEW_MODE = 'viewMode'
 const STORAGE_DARK_MODE = 'darkMode'
 
 const sessionStorage = new IndexedDbChatStorage('tinker-code-diagram')

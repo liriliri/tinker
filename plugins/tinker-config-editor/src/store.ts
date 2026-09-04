@@ -6,8 +6,8 @@ import BaseStore, { storage } from 'share/store/Base'
 import { getConfigFiles } from './lib/configFiles'
 import type { ConfigFile } from './types'
 
-const STORAGE_FILE_PATH = 'file-path'
-const STORAGE_FONT_SIZE = 'font-size'
+const STORAGE_FILE_PATH = 'filePath'
+const STORAGE_FONT_SIZE = 'fontSize'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 
 const DEFAULT_FONT_SIZE = 14

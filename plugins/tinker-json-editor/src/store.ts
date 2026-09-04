@@ -18,9 +18,9 @@ import { createMcpApi } from './mcp'
 
 type EditorMode = 'text' | 'tree'
 
-const STORAGE_CONTENT = 'tinker-json-editor-content'
-const STORAGE_MODE = 'tinker-json-editor-mode'
-const STORAGE_FILE_PATH = 'file-path'
+const STORAGE_CONTENT = 'content'
+const STORAGE_MODE = 'mode'
+const STORAGE_FILE_PATH = 'filePath'
 
 const sessionStorage = new IndexedDbChatStorage('tinker-json-editor')
 
