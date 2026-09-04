@@ -16,6 +16,7 @@ import each from 'licia/each'
 import { exec } from 'child_process'
 import log from 'share/common/log'
 import { resolveResources, getUserDataPath } from 'share/main/lib/util'
+import isWindows from 'licia/isWindows'
 
 const logger = log('plugin')
 
@@ -56,7 +57,11 @@ async function getNpmGlobalDir(): Promise<string> {
   })
 }
 
-const userPluginDir = getUserDataPath('plugins')
+export const userPluginDir = getUserDataPath('plugins')
+
+const userPluginModulesDir = isWindows
+  ? path.join(userPluginDir, 'node_modules')
+  : path.join(userPluginDir, 'lib', 'node_modules')
 
 async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
   const builtinDir = getBuiltinPluginDir()
@@ -170,7 +175,7 @@ export const getPlugins: IpcGetPlugins = singleton(async (force = false) => {
   }
 
   try {
-    await addNodeModulesDir(getUserDataPath('plugins/node_modules'))
+    await addNodeModulesDir(userPluginModulesDir)
   } catch (e) {
     logger.warn('failed to read user plugin directory:', e)
   }

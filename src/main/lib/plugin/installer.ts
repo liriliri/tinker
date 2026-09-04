@@ -2,15 +2,9 @@ import { spawn } from 'child_process'
 import type { SpawnOptions } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
-import {
-  getUserDataPath,
-  handleEvent,
-  resolveResources,
-} from 'share/main/lib/util'
+import { handleEvent, resolveResources } from 'share/main/lib/util'
 import { getSettingsStore } from '../store'
-import { plugins } from './loader'
-
-const pluginInstallDir = getUserDataPath('plugins')
+import { plugins, userPluginDir } from './loader'
 
 function getNpmCliPath() {
   return path.join(resolveResources('npm'), 'bin/npm-cli.js')
@@ -55,24 +49,20 @@ export function init() {
 }
 
 export async function installPlugin(name: string): Promise<void> {
-  await fs.mkdirs(pluginInstallDir)
+  await fs.mkdirs(userPluginDir)
   const registry = getSettingsStore().get('npmRegistry')
-  await runNpm(
-    [
-      'install',
-      `${name}@latest`,
-      '--prefix',
-      pluginInstallDir,
-      `--registry=${registry}`,
-    ],
-    { cwd: pluginInstallDir }
-  )
+  await runNpm([
+    'install',
+    '-g',
+    `${name}@latest`,
+    '--prefix',
+    userPluginDir,
+    `--registry=${registry}`,
+  ])
 }
 
 export async function uninstallPlugin(name: string): Promise<void> {
-  await runNpm(['uninstall', name, '--prefix', pluginInstallDir], {
-    cwd: pluginInstallDir,
-  })
+  await runNpm(['uninstall', '-g', name, '--prefix', userPluginDir])
 }
 
 export async function checkPluginUpdate(id: string): Promise<string | null> {
