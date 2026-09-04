@@ -128,6 +128,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-checkers',
+    name: 'Checkers',
+    description: 'Play English draughts against a friend or the computer.',
+    icon: 'tinker-checkers.png',
+    locales: {
+      'zh-CN': {
+        name: '英式跳棋',
+        description: '和朋友或电脑下一盘英式跳棋。',
+      },
+    },
+  },
+  {
     id: 'tinker-chess',
     name: 'Chess',
     description:
