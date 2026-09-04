@@ -21,6 +21,128 @@
         "name": "浏览器",
         "description": "网页浏览器，支持多标签页和搜索"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list_tabs": {
+          "description": "List open browser tabs with id, title, URL, loading state, and active flag. Call this before targeting a specific tab."
+        },
+        "activate_tab": {
+          "description": "Focus a browser tab by id so it becomes the active tab in the UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs"
+              }
+            },
+            "required": [
+              "tab_id"
+            ]
+          }
+        },
+        "create_tab": {
+          "description": "Create a new browser tab and focus it. Optionally open a URL or search query in the new tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Optional URL or search query to open in the new tab"
+              }
+            }
+          }
+        },
+        "close_tab": {
+          "description": "Close a browser tab by id. Fails if it is the only remaining tab. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "navigate": {
+          "description": "Navigate a browser tab to a URL or search query. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1,
+                "description": "URL or search query"
+              },
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            },
+            "required": [
+              "url"
+            ]
+          }
+        },
+        "get_page_info": {
+          "description": "Get a tab's page title, URL, and loading state. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "get_page_text": {
+          "description": "Get the visible text content of a tab's web page. Content may be truncated for very long pages. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "get_page_selection": {
+          "description": "Get the text currently selected on a tab's web page, if any. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "get_page_metadata": {
+          "description": "Get page metadata such as meta description, keywords, and Open Graph tags. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

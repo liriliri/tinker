@@ -7,7 +7,7 @@ import { getPluginChatProps } from 'share/lib/aiChat/uiProps'
 import store from '../store'
 import type Terminal from '../store/Terminal'
 import SplitLayout from './SplitLayout'
-import { getToolArgSummary, getVisibleToolMessages } from '../lib/chatTools'
+import { getToolArgSummary, getVisibleToolMessages } from '../mcp'
 
 interface TabContentProps {
   tab: Terminal

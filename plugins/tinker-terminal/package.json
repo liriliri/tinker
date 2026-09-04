@@ -21,6 +21,113 @@
         "name": "终端",
         "description": "终端模拟器，支持 SSH 配置管理"
       }
+    },
+    "mcp": {
+      "tools": {
+        "list_tabs": {
+          "description": "List open terminal tabs with id, title, active state, and active pane id. Call this before targeting a specific tab."
+        },
+        "activate_tab": {
+          "description": "Focus a terminal tab by id so it becomes the active tab in the UI.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs"
+              }
+            },
+            "required": [
+              "tab_id"
+            ]
+          }
+        },
+        "create_tab": {
+          "description": "Create a new local terminal tab and focus it. Returns the new tab id and the updated tab list."
+        },
+        "close_tab": {
+          "description": "Close a terminal tab by id. Fails if it is the only remaining tab. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "get_terminal_info": {
+          "description": "Get a terminal tab's active pane context: tab title, pane title, current working directory, and foreground process name. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "get_selection": {
+          "description": "Get the currently selected text in a terminal tab's active pane, if any. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            }
+          }
+        },
+        "run_command": {
+          "description": "Run a shell command in a terminal tab's active pane by sending it followed by Enter. Output appears in the terminal. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The shell command to execute"
+              },
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            },
+            "required": [
+              "command"
+            ]
+          }
+        },
+        "write_to_terminal": {
+          "description": "Write raw text to a terminal tab's active pane without automatically pressing Enter. Optional tab_id defaults to the active tab.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The text to send to the terminal"
+              },
+              "tab_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Tab id from list_tabs. Defaults to the active tab."
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
     }
   }
 }

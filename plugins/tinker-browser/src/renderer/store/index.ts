@@ -12,6 +12,7 @@ import type { ISite } from '../types'
 import { getAllFavicons, saveFavicon, removeFavicon } from '../lib/db'
 import { createBrowserChat } from '../lib/chat'
 import { registerPageContext, unregisterPageContext } from '../lib/pageContext'
+import { createMcpApi } from '../mcp'
 
 const NEW_TAB_URL = ''
 const DEFAULT_SEARCH_ENGINE = 'https://www.google.com/search?q='
@@ -24,7 +25,9 @@ const STORAGE_DEVTOOLS_POSITION = 'devToolsPosition'
 
 type DevToolsPosition = (typeof DEVTOOLS_POSITIONS)[number]
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   tabs: Browser[] = []
   activeTabId = ''
   addressBarValue = ''
@@ -45,6 +48,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this, {
+      mcp: false,
       webviewRefs: false,
     })
     this.addTab()
@@ -55,7 +59,11 @@ class Store extends BaseStore {
   }
 
   private setupTab(tab: Browser) {
-    tab.chat = createBrowserChat(tab.id, chatPrefsStorage)
+    tab.chat = createBrowserChat(
+      tab.id,
+      chatPrefsStorage,
+      this.mcp.createAgentToolsForTab(tab.id)
+    )
     registerPageContext(tab.id, () => ({
       title: tab.title,
       url: tab.url,
@@ -245,8 +253,8 @@ class Store extends BaseStore {
     this.addressBarFocused = focused
   }
 
-  navigate(input: string) {
-    const tab = this.activeTab
+  navigate(input: string, tabId?: string) {
+    const tab = tabId ? this.getTab(tabId) : this.activeTab
     if (!tab) return
 
     let url = input.trim()
@@ -267,8 +275,10 @@ class Store extends BaseStore {
 
   private commitNavigation(tab: Browser, url: string) {
     tab.url = url
-    this.addressBarValue = url
-    this.addressBarFocused = false
+    if (tab.id === this.activeTabId) {
+      this.addressBarValue = url
+      this.addressBarFocused = false
+    }
     const webview = this.webviewRefs.get(tab.id)
     if (webview) {
       webview.loadURL(url)

@@ -12,6 +12,7 @@ import {
 } from '../lib/db'
 import { createTerminalChat } from '../lib/chat'
 import { registerTabContext, unregisterTabContext } from '../lib/tabContext'
+import { createMcpApi } from '../mcp'
 import type { ILayoutNode, SplitDirection } from '../types'
 import Terminal from './Terminal'
 import { getTerminalSession } from 'share/components/Terminal'
@@ -19,7 +20,9 @@ import { getTerminalSession } from 'share/components/Terminal'
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
-class Store extends BaseStore {
+export class Store extends BaseStore {
+  readonly mcp = createMcpApi(() => this)
+
   tabs: Terminal[] = []
   activeTabId = ''
   activePaneId = ''
@@ -37,6 +40,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this, {
+      mcp: false,
       onDestroyPane: false,
       pendingCwd: false,
       pendingShell: false,
@@ -50,7 +54,11 @@ class Store extends BaseStore {
   }
 
   private setupTab(tab: Terminal) {
-    tab.chat = createTerminalChat(tab.id, chatPrefsStorage)
+    tab.chat = createTerminalChat(
+      tab.id,
+      chatPrefsStorage,
+      this.mcp.createAgentToolsForTab(tab.id)
+    )
     registerTabContext(tab.id, () => ({
       paneId: tab.activePaneId,
       tabTitle: tab.title,
