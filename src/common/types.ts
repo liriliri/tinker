@@ -106,6 +106,7 @@ export type IpcGetClipboardFilePaths = () => string[]
 export type IpcExportPluginData = (id: string) => void
 export type IpcImportPluginData = IpcExportPluginData
 export type IpcClearPluginData = IpcExportPluginData
+export type IpcClearPluginCache = () => Promise<void>
 export type IpcCaptureScreen = () => Promise<string>
 
 export interface ICaptureSource {

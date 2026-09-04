@@ -1,4 +1,4 @@
-import { IpcGetFileIcon } from 'common/types'
+import { IpcGetFileIcon, IpcClearPluginCache } from 'common/types'
 import { handleEvent } from 'share/main/lib/util'
 import { cleanUserAgent } from '../util'
 import * as mcp from '../mcp'
@@ -62,6 +62,12 @@ const getFileIcon: IpcGetFileIcon = async function (filePath) {
   })
 }
 
+const clearPluginCache: IpcClearPluginCache = async function () {
+  const ses = session.fromPartition(PLUGIN_PARTITION)
+  await ses.clearCache()
+  await ses.clearCodeCaches({ urls: [] })
+}
+
 function nodeStreamToWeb(
   stream: NodeJS.ReadableStream
 ): ReadableStream<Uint8Array> {
@@ -104,6 +110,7 @@ export function init() {
   handleEvent('exportPluginData', exportPluginData)
   handleEvent('importPluginData', importPluginData)
   handleEvent('clearPluginData', clearPluginData)
+  handleEvent('clearPluginCache', clearPluginCache)
   handleEvent('preparePluginView', preparePluginView)
   handleEvent('getRunningPlugins', getRunningPlugins)
   handleEvent('captureScreen', captureScreen)

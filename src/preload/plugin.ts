@@ -15,6 +15,7 @@ import {
   IpcOpenPlugin,
   IpcCallMcpTool,
   IpcHasPlugin,
+  IpcClearPluginCache,
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
@@ -182,6 +183,9 @@ const tinkerObj = {
   },
   getSetting: builtinOnly(mainObj.getSettingsStore),
   setSetting: builtinOnly(mainObj.setSettingsStore),
+  clearPluginCache: builtinOnly(
+    invoke<IpcClearPluginCache>('clearPluginCache')
+  ),
   searchFile,
   killSearchFile,
   quitSearchFile,

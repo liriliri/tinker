@@ -406,6 +406,7 @@ export function injectApi() {
     getApps: _tinker.getApps,
     getSetting: _tinker.getSetting,
     setSetting: _tinker.setSetting,
+    clearPluginCache: _tinker.clearPluginCache,
     callAI: _tinker.callAI,
     callAIStream,
     getAIProviders: _tinker.getProviderList,

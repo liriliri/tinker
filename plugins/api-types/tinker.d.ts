@@ -572,6 +572,9 @@ declare global {
     /** Set a setting value by name. Only available to builtin plugins. */
     setSetting(name: string, val: any): Promise<void>
 
+    /** Clear shared plugin session cache. Only available to builtin plugins. */
+    clearPluginCache(): Promise<void>
+
     /**
      * Show a context menu at the specified position.
      * @example
