@@ -1,0 +1,94 @@
+{
+  "name": "tinker-media-splitter",
+  "version": "0.1.0",
+  "description": "Media Splitter Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Media Splitter",
+    "description": "Split audio and video into multiple segments for export",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "音视频分割",
+        "description": "将音视频切分成多段导出"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "open": {
+          "description": "Open an audio or video file for splitting. Same as opening a file in the UI. Returns media duration and metadata needed before setting segments.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Absolute path to an audio or video file"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        "get": {
+          "description": "Get the currently open media, segment list, keyframe-cut setting, and output directory. Call open first."
+        },
+        "set_segments": {
+          "description": "Replace all segments with the given time ranges (seconds). Call open first. Each segment must have end > start within the media duration.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "segments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Segment start time in seconds"
+                    },
+                    "end": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "description": "Segment end time in seconds"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "description": "Segment ranges to keep; replaces the current list"
+              }
+            },
+            "required": [
+              "segments"
+            ]
+          }
+        },
+        "export": {
+          "description": "Lossless-export all finished segments via FFmpeg stream copy. Call open and set_segments first. Returns output file paths. UI uses a configured output directory; MCP can override with outputDirectory.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "outputDirectory": {
+                "type": "string",
+                "description": "Absolute output directory. Empty string writes next to the source file. Defaults to the last used output directory (or source directory when empty)."
+              },
+              "keyframeCut": {
+                "type": "boolean",
+                "description": "When true, seek with -ss before -i (fast, keyframe-aligned). Defaults to the current UI setting."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
