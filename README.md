@@ -351,6 +351,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/resume.png"/></th>
       <th><img src="https://tinker.liriliri.io/video_cropper.png"/></th>
     </tr>
+    <tr>
+      <th>Screen Recorder</th>
+      <th>Media Splitter</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/screen_recorder.png"/></th>
+      <th><img src="https://tinker.liriliri.io/media_splitter.png"/></th>
+    </tr>
   </tbody>
 </table>
 
