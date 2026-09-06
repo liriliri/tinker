@@ -371,6 +371,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-live2d',
+    name: 'Live2D',
+    description: 'Run Live2D models as animated desktop companions',
+    icon: 'tinker-live2d.png',
+    locales: {
+      'zh-CN': {
+        name: 'Live2D 桌宠',
+        description: '在桌面启用 Live2D 动画桌宠',
+      },
+    },
+  },
+  {
     id: 'tinker-lunar-calendar',
     name: 'Lunar Calendar',
     description: 'A perpetual calendar with lunar date support',

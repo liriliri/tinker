@@ -1,3 +1,8 @@
+## v2.4.0 (6 Sep 2026)
+
+* feat: add media splitter
+* feat: clear plugin cache
+
 ## v2.3.0 (31 Aug 2026)
 
 * feat: add screen recorder
