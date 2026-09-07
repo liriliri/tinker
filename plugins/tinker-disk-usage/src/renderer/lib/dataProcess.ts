@@ -59,13 +59,24 @@ export function findParentId(id: string, data: DiskItem): string | undefined {
   return undefined
 }
 
-export function removeNodes(data: DiskItem, ids: Set<string>): void {
-  if (data.children) {
-    data.children = data.children.filter((c) => !ids.has(c.id))
-    for (const child of data.children) {
-      removeNodes(child, ids)
+export function removeNodes(data: DiskItem, ids: Set<string>): number {
+  if (!data.children) return 0
+
+  let removedSize = 0
+  const remaining: DiskItem[] = []
+
+  for (const child of data.children) {
+    if (ids.has(child.id)) {
+      removedSize += child.size
+    } else {
+      removedSize += removeNodes(child, ids)
+      remaining.push(child)
     }
   }
+
+  data.children = remaining
+  data.size -= removedSize
+  return removedSize
 }
 
 export function collectUnloadedLeafDirs(node: DiskItem): DiskItem[] {

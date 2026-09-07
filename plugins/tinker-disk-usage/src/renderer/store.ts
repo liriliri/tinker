@@ -14,7 +14,7 @@ import { createMcpApi } from './mcp'
 
 const STORAGE_MOVE_TO_TRASH = 'moveToTrash'
 
-export type ViewState = 'open' | 'scanning' | 'chart'
+type ViewState = 'open' | 'scanning' | 'chart'
 
 const DEFAULT_MAX_DEPTH = 5
 

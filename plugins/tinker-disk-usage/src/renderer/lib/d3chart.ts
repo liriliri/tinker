@@ -1,10 +1,9 @@
 import * as d3 from 'd3'
 import fileSize from 'licia/fileSize'
-import splitPath from 'licia/splitPath'
 import type { DiskItem } from '../types'
 import { THEME_COLORS } from 'share/theme'
 
-export interface ChartCallbacks {
+interface ChartCallbacks {
   onClickNode: (node: DiskItem) => void
   onExpandNode: (node: DiskItem) => void
   onContextMenuNode: (
@@ -27,93 +26,29 @@ function shouldShow(w: number, h: number): boolean {
   return w > MIN_BOX_DIM && h > MIN_BOX_DIM && w * h > MIN_BOX_AREA
 }
 
+const DIR_COLORS = {
+  light: '#c5ccd4',
+  dark: '#3e464f',
+}
+
+const FILE_COLORS = {
+  light: '#aeb8c4',
+  dark: '#2c343e',
+}
+
+const BOX_BORDER = {
+  light: '#8a929c',
+  dark: '#6e7884',
+}
+
 function getBoxColor(
   d: d3.HierarchyRectangularNode<DiskItem>,
   isDark: boolean
 ): string {
   if (d.data.isDirectory) {
-    return isDark ? '#3a2816' : '#fcebd4'
+    return isDark ? DIR_COLORS.dark : DIR_COLORS.light
   }
-
-  const ext = splitPath(d.data.name).ext.toLowerCase()
-
-  if (isDark) {
-    switch (ext) {
-      case '.js':
-      case '.ts':
-      case '.jsx':
-      case '.tsx':
-      case '.mjs':
-      case '.cjs':
-        return '#2a3a4e'
-      case '.json':
-      case '.yaml':
-      case '.yml':
-      case '.toml':
-        return '#2e3d50'
-      case '.css':
-      case '.scss':
-      case '.less':
-      case '.sass':
-        return '#253d4a'
-      case '.html':
-      case '.htm':
-      case '.xml':
-      case '.svg':
-        return '#2b4050'
-      case '.md':
-      case '.txt':
-      case '.log':
-        return '#2d3a48'
-      case '.png':
-      case '.jpg':
-      case '.jpeg':
-      case '.gif':
-      case '.ico':
-      case '.webp':
-        return '#33394e'
-      default:
-        return '#2e3848'
-    }
-  } else {
-    switch (ext) {
-      case '.js':
-      case '.ts':
-      case '.jsx':
-      case '.tsx':
-      case '.mjs':
-      case '.cjs':
-        return '#d4e6f7'
-      case '.json':
-      case '.yaml':
-      case '.yml':
-      case '.toml':
-        return '#d0e0f0'
-      case '.css':
-      case '.scss':
-      case '.less':
-      case '.sass':
-        return '#c8e0ef'
-      case '.html':
-      case '.htm':
-      case '.xml':
-      case '.svg':
-        return '#cce4f5'
-      case '.md':
-      case '.txt':
-      case '.log':
-        return '#d6e8f4'
-      case '.png':
-      case '.jpg':
-      case '.jpeg':
-      case '.gif':
-      case '.ico':
-      case '.webp':
-        return '#d2dff0'
-      default:
-        return '#d0e2f2'
-    }
-  }
+  return isDark ? FILE_COLORS.dark : FILE_COLORS.light
 }
 
 function filterSmallChildren(
@@ -172,10 +107,8 @@ export function createTreemapChart(
       .round(false)(hierarchy)
 
     filterSmallChildren(root)
-    const allowedIds = new Set(root.descendants().map((n) => n.data.id))
 
     const visibleNodes = root.descendants().filter((d) => {
-      if (!allowedIds.has(d.data.id)) return false
       const w = d.x1 - d.x0
       const h = d.y1 - d.y0
       return shouldShow(w, h)
@@ -187,9 +120,7 @@ export function createTreemapChart(
     const fontColorLight = isDark
       ? THEME_COLORS.text.dark.secondary
       : THEME_COLORS.text.light.secondary
-    const borderColor = isDark
-      ? THEME_COLORS.border.dark
-      : THEME_COLORS.border.light
+    const borderColor = isDark ? BOX_BORDER.dark : BOX_BORDER.light
 
     d3Container
       .selectAll<HTMLDivElement, d3.HierarchyRectangularNode<DiskItem>>(
@@ -201,11 +132,6 @@ export function createTreemapChart(
           const entered = enter
             .append('div')
             .classed(`box ${isFirstRender ? '' : 'animate-in-box'}`, true)
-            .classed('hide-box', (d) => {
-              const w = d.x1 - d.x0
-              const h = d.y1 - d.y0
-              return !shouldShow(w, h)
-            })
             .style('z-index', (d) => String(d.depth))
             .style('width', (d) => `${d.x1 - d.x0}px`)
             .style('height', (d) => `${d.y1 - d.y0}px`)
@@ -272,11 +198,9 @@ export function createTreemapChart(
             .style('top', (d) => `${d.y0}px`)
             .style('left', (d) => `${d.x0}px`)
             .style('background-color', (d) => getBoxColor(d, isDark))
-            .classed('hide-box', (d) => {
-              const w = d.x1 - d.x0
-              const h = d.y1 - d.y0
-              return !shouldShow(w, h)
-            })
+            .style('border', (d) =>
+              d.depth === 0 ? 'none' : `1px solid ${borderColor}`
+            )
             .attr(
               'title',
               (d) =>

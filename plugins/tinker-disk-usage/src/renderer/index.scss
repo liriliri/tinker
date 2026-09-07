@@ -13,13 +13,8 @@ $anim-duration: 400ms;
     cursor: default;
 
     &:hover {
-      border-color: #0fc25e !important; // primary theme color highlight
+      border-color: var(--theme-primary) !important;
     }
-  }
-
-  .hide-box {
-    opacity: 0 !important;
-    border-color: transparent !important;
   }
 
   &.box-transition-position {
