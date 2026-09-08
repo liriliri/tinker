@@ -7,6 +7,7 @@ import store from './store'
 import PieMenuView from './components/PieMenuView'
 import ConfigPanel from './components/ConfigPanel'
 import ActionDialog from './components/ActionDialog'
+import { stopMiddleLongPress } from './lib/middleLongPress'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
 import enUS from './i18n/en-US.json'
@@ -16,7 +17,7 @@ const App = observer(function App() {
   useEffect(() => {
     void store.applyInvokeMode()
     return () => {
-      pieMenu.stopMiddleClickListen()
+      void stopMiddleLongPress()
     }
   }, [])
 

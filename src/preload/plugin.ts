@@ -18,6 +18,8 @@ import {
   IpcClearPluginCache,
   IpcRegisterShortcut,
   IpcUnregisterShortcut,
+  IpcRegisterMouse,
+  IpcUnregisterMouse,
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
@@ -220,6 +222,8 @@ const tinkerObj = {
   getTerminalInfo,
   registerShortcut: invoke<IpcRegisterShortcut>('registerShortcut'),
   unregisterShortcut: invoke<IpcUnregisterShortcut>('unregisterShortcut'),
+  registerMouse: invoke<IpcRegisterMouse>('registerMouse'),
+  unregisterMouse: invoke<IpcUnregisterMouse>('unregisterMouse'),
   t(key: string) {
     return i18n.t(key)
   },

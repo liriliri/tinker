@@ -17,6 +17,10 @@ import {
   openAlwaysOnPieWindow,
   openInvokePieWindow,
 } from './lib/pieWindow'
+import {
+  startMiddleLongPress,
+  stopMiddleLongPress,
+} from './lib/middleLongPress'
 
 const STORAGE_SLOTS = 'slots'
 const STORAGE_INVOKE_MODE = 'invokeMode'
@@ -127,7 +131,7 @@ export class Store extends BaseStore {
   }
 
   async applyInvokeMode() {
-    pieMenu.stopMiddleClickListen()
+    await stopMiddleLongPress()
     closePieWindow()
 
     if (this.invokeMode === 'alwaysOn') {
@@ -135,7 +139,7 @@ export class Store extends BaseStore {
       return
     }
 
-    pieMenu.startMiddleClickListen((point) => {
+    await startMiddleLongPress((point) => {
       openInvokePieWindow(point)
     })
   }

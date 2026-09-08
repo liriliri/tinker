@@ -402,6 +402,31 @@ declare global {
       /** Full path of the current working directory. */
       cwd: string
     }
+
+    type MouseEventName = 'down' | 'up' | 'move' | 'click' | 'wheel'
+
+    type MouseButton =
+      | 'left'
+      | 'right'
+      | 'middle'
+      | 'back'
+      | 'forward'
+      | 'unknown'
+
+    interface MouseEvent {
+      type: MouseEventName
+      button: MouseButton
+      x: number
+      y: number
+      clicks: number
+      altKey: boolean
+      ctrlKey: boolean
+      metaKey: boolean
+      shiftKey: boolean
+      amount?: number
+      direction?: 'vertical' | 'horizontal'
+      rotation?: number
+    }
   }
 
   const tinker: {
@@ -737,6 +762,17 @@ declare global {
     ): Promise<() => void>
 
     unregisterShortcut(accelerator: string): Promise<void>
+
+    /**
+     * Register a global mouse listener. Auto-unregistered when the plugin is
+     * destroyed.
+     */
+    registerMouse(
+      type: tinker.MouseEventName,
+      callback: (event: tinker.MouseEvent) => void
+    ): Promise<() => void>
+
+    unregisterMouse(type: tinker.MouseEventName): Promise<void>
   }
 }
 

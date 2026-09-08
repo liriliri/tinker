@@ -1,31 +1,16 @@
-import { uIOhook, UiohookKey } from 'uiohook-napi'
-import { app, globalShortcut, ipcMain, WebContents } from 'electron'
+import { globalShortcut, ipcMain, WebContents } from 'electron'
 import once from 'licia/once'
-import { getSettingsStore, getMainStore } from './store'
+import { getSettingsStore } from './store'
 import * as main from '../window/main'
-import isMac from 'licia/isMac'
 import log from 'share/common/log'
-import waitUntil from 'licia/waitUntil'
-import { loadMod } from './util'
+import { UiohookKey } from 'uiohook-napi'
+import { ensureStarted, init as initUIOhook, uIOhook } from './uiohook'
 
 const logger = log('shortcut')
 
 const settingsStore = getSettingsStore()
-const mainStore = getMainStore()
-
-type NodeMacPermissions = {
-  getAuthStatus: (type: string) => string
-  askForAccessibilityAccess: () => void
-}
 
 type ShortcutOwner = 'app' | WebContents
-
-let nodeMacPermissions: NodeMacPermissions | null = null
-if (isMac) {
-  loadMod('node-mac-permissions').then((mod) => {
-    nodeMacPermissions = mod
-  })
-}
 
 const callbacks: Record<string, () => void> = {}
 const owners = new Map<string, ShortcutOwner>()
@@ -41,18 +26,51 @@ function isDoubleShortcut(accelerator: string): boolean {
   return true
 }
 
+const DOUBLE_PRESS_INTERVAL = 300
+
+const attachDoubleKeyListeners = once(() => {
+  const keyMap: Record<number, string> = {
+    [UiohookKey.Ctrl]: 'Ctrl',
+    [UiohookKey.CtrlRight]: 'Ctrl',
+  }
+
+  const lastPressTime: Record<string, number> = {}
+  const keyPressed: Record<string, boolean> = {}
+
+  uIOhook.on('keydown', (event) => {
+    const keyName = keyMap[event.keycode]
+    if (!keyName) return
+    if (keyPressed[keyName]) return
+
+    keyPressed[keyName] = true
+    const now = Date.now()
+    const last = lastPressTime[keyName] || 0
+    lastPressTime[keyName] = now
+
+    if (now - last < DOUBLE_PRESS_INTERVAL) {
+      const accelerator = `${keyName}+${keyName}`
+      if (callbacks[accelerator]) {
+        callbacks[accelerator]()
+      }
+      lastPressTime[keyName] = 0
+    }
+  })
+
+  uIOhook.on('keyup', (event) => {
+    const keyName = keyMap[event.keycode]
+    if (!keyName) return
+
+    keyPressed[keyName] = false
+  })
+})
+
 function bindAccelerator(accelerator: string, callback: () => void): boolean {
   logger.info(`register shortcut: ${accelerator}`)
   if (isDoubleShortcut(accelerator)) {
-    if (
-      isMac &&
-      mainStore.get('uIOhookCalled') &&
-      nodeMacPermissions?.getAuthStatus('accessibility') === 'denied'
-    ) {
-      nodeMacPermissions?.askForAccessibilityAccess()
+    attachDoubleKeyListeners()
+    if (!ensureStarted()) {
       return false
     }
-    startUIOhook()
     callbacks[accelerator] = callback
     return true
   }
@@ -166,65 +184,8 @@ function unregisterPluginShortcut(
   unregister(accelerator)
 }
 
-const DOUBLE_PRESS_INTERVAL = 300
-
-const startUIOhook = once(() => {
-  const keyMap: Record<number, string> = {
-    [UiohookKey.Ctrl]: 'Ctrl',
-    [UiohookKey.CtrlRight]: 'Ctrl',
-  }
-
-  const lastPressTime: Record<string, number> = {}
-  const keyPressed: Record<string, boolean> = {}
-
-  uIOhook.on('keydown', (event) => {
-    const keyName = keyMap[event.keycode]
-    if (!keyName) return
-    if (keyPressed[keyName]) return
-
-    keyPressed[keyName] = true
-    const now = Date.now()
-    const last = lastPressTime[keyName] || 0
-    lastPressTime[keyName] = now
-
-    if (now - last < DOUBLE_PRESS_INTERVAL) {
-      const accelerator = `${keyName}+${keyName}`
-      if (callbacks[accelerator]) {
-        callbacks[accelerator]()
-      }
-      lastPressTime[keyName] = 0
-    }
-  })
-
-  uIOhook.on('keyup', (event) => {
-    const keyName = keyMap[event.keycode]
-    if (!keyName) return
-
-    keyPressed[keyName] = false
-  })
-
-  if (isMac && !mainStore.get('uIOhookCalled')) {
-    mainStore.set('uIOhookCalled', true)
-  }
-  setTimeout(() => {
-    uIOhook.start()
-    if (isMac) {
-      const timer = setInterval(() => {
-        const status = nodeMacPermissions?.getAuthStatus('accessibility')
-        if (status === 'denied') {
-          clearInterval(timer)
-          uIOhook.stop()
-        }
-      }, 5000)
-    }
-    app.on('will-quit', () => uIOhook.stop())
-  }, 1000)
-})
-
 export async function init() {
-  if (isMac) {
-    await waitUntil(() => nodeMacPermissions !== null)
-  }
+  await initUIOhook()
   register(settingsStore.get('showShortcut'), () => main.showWin(), 'app')
   settingsStore.on('change', (key, val, oldVal) => {
     if (key === 'showShortcut') {

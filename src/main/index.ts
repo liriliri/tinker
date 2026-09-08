@@ -12,6 +12,7 @@ import noop from 'licia/noop'
 import fixPath from 'fix-path'
 import { getSettingsStore } from './lib/store'
 import * as shortcut from './lib/shortcut'
+import * as mouse from './lib/mouse'
 import * as proxy from './lib/proxy'
 import * as cli from './cli/handler'
 import 'share/main'
@@ -66,6 +67,7 @@ app.on('ready', () => {
     dock.hide()
   }
   shortcut.init()
+  mouse.init()
 })
 
 app.on('window-all-closed', noop)

@@ -75,6 +75,63 @@ export interface IPluginState {
 
 export type IPluginStates = Record<string, IPluginState>
 
+export interface IRunningPlugin {
+  id: string
+  background: boolean
+}
+
+export interface ICaptureSource {
+  id: string
+  name: string
+  type: 'screen' | 'window'
+  /** PNG data URL; sized to fit within 320×320, keeping source aspect ratio */
+  thumbnail: string
+  /** PNG data URL of the window app icon when available */
+  appIcon: string
+}
+
+export interface IGetCaptureSourcesOptions {
+  types?: Array<'screen' | 'window'>
+}
+
+export interface IDownloadOptions {
+  url: string
+  savePath: string
+}
+
+export interface IDownloadProgress {
+  state: string
+  speed: number
+  totalBytes: number
+  receivedBytes: number
+  paused: boolean
+}
+
+export type MouseEventName = 'down' | 'up' | 'move' | 'click' | 'wheel'
+
+export type MouseButton =
+  | 'left'
+  | 'right'
+  | 'middle'
+  | 'back'
+  | 'forward'
+  | 'unknown'
+
+export interface IMouseEvent {
+  type: MouseEventName
+  button: MouseButton
+  x: number
+  y: number
+  clicks: number
+  altKey: boolean
+  ctrlKey: boolean
+  metaKey: boolean
+  shiftKey: boolean
+  amount?: number
+  direction?: 'vertical' | 'horizontal'
+  rotation?: number
+}
+
 export type IpcDragMain = (
   x: number,
   y: number,
@@ -86,10 +143,6 @@ export type IpcHasPlugin = (id: string) => Promise<boolean>
 export type IpcOpenPlugin = (id: string, detached?: boolean) => boolean
 export type IpcClosePlugin = (id: string, destroy?: boolean) => void
 export type IpcDetachPlugin = (id: string) => void
-export interface IRunningPlugin {
-  id: string
-  background: boolean
-}
 export type IpcGetRunningPlugins = () => IRunningPlugin[]
 export type IpcReopenPlugin = IpcDetachPlugin
 export type IpcTogglePluginDevtools = IpcDetachPlugin
@@ -108,25 +161,9 @@ export type IpcImportPluginData = IpcExportPluginData
 export type IpcClearPluginData = IpcExportPluginData
 export type IpcClearPluginCache = () => Promise<void>
 export type IpcCaptureScreen = () => Promise<string>
-
-export interface ICaptureSource {
-  id: string
-  name: string
-  type: 'screen' | 'window'
-  /** PNG data URL; sized to fit within 320×320, keeping source aspect ratio */
-  thumbnail: string
-  /** PNG data URL of the window app icon when available */
-  appIcon: string
-}
-
-export interface IGetCaptureSourcesOptions {
-  types?: Array<'screen' | 'window'>
-}
-
 export type IpcGetCaptureSources = (
   options?: IGetCaptureSourcesOptions
 ) => Promise<ICaptureSource[]>
-
 export type IpcGetFileIcon = (filePath: string) => Promise<string>
 export type IpcShowPluginNotification = (body: string) => void
 export type IpcSetBackgroundThrottling = (allowed: boolean) => void
@@ -142,33 +179,17 @@ export type IpcShowDevTools = (
   srcWebContentsId: number,
   devtoolsWebContentsId: number
 ) => Promise<void>
-
 export type IpcSendDebuggerCommand = (
   webContentsId: number,
   method: string,
   params?: Record<string, unknown>
 ) => Promise<unknown>
-
 export type IpcPluginRecorderStarted = (pluginId: string) => Promise<void>
 export type IpcPluginRecorderStopped = (pluginId: string) => Promise<void>
 export type IpcPluginRecorderError = (
   pluginId: string,
   message: string
 ) => Promise<void>
-
-export interface IDownloadOptions {
-  url: string
-  savePath: string
-}
-
-export interface IDownloadProgress {
-  state: string
-  speed: number
-  totalBytes: number
-  receivedBytes: number
-  paused: boolean
-}
-
 export type IpcStartPluginDownload = (
   downloadId: string,
   options: IDownloadOptions
@@ -177,7 +198,6 @@ export type IpcPausePluginDownload = (downloadId: string) => void
 export type IpcResumePluginDownload = (downloadId: string) => void
 export type IpcCancelPluginDownload = (downloadId: string) => void
 export type IpcGetPluginDownloads = () => Promise<IDownloadProgress[]>
-
 export type IpcCreateTerminal = (
   sessionId: string,
   cols: number,
@@ -197,3 +217,5 @@ export type IpcGetTerminalInfo = (
 ) => Promise<{ processName: string; cwd: string }>
 export type IpcRegisterShortcut = (accelerator: string) => boolean
 export type IpcUnregisterShortcut = (accelerator: string) => void
+export type IpcRegisterMouse = (type: MouseEventName) => boolean
+export type IpcUnregisterMouse = (type: MouseEventName) => void

@@ -1,6 +1,7 @@
 import type { MenuItemConstructorOptions } from 'electron'
 import type types from 'licia/types'
 import uuid from 'licia/uuid'
+import type { IMouseEvent, MouseEventName } from 'common/types'
 
 declare const window: any
 
@@ -23,6 +24,7 @@ const searchTextTasks: types.PlainObj<KillQuitTask> = {}
 const downloadTasks: types.PlainObj<DownloadTask> = {}
 let contextMenuCallbacks: types.PlainObj<types.AnyFn> = {}
 const shortcutCallbacks = new Map<string, () => void>()
+const mouseCallbacks = new Map<MouseEventName, (event: IMouseEvent) => void>()
 
 function runFFmpeg(args: string[], onProgress?: any) {
   const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
@@ -325,6 +327,25 @@ async function unregisterShortcut(accelerator: string): Promise<void> {
   await _tinker.unregisterShortcut(accelerator)
 }
 
+async function registerMouse(
+  type: MouseEventName,
+  callback: (event: IMouseEvent) => void
+): Promise<() => void> {
+  const ok = await _tinker.registerMouse(type)
+  if (!ok) {
+    throw new Error(`Failed to register mouse: ${type}`)
+  }
+  mouseCallbacks.set(type, callback)
+  return () => {
+    void unregisterMouse(type)
+  }
+}
+
+async function unregisterMouse(type: MouseEventName): Promise<void> {
+  mouseCallbacks.delete(type)
+  await _tinker.unregisterMouse(type)
+}
+
 function transOptions(options: MenuItemConstructorOptions[]) {
   const normalizedOptions = Array.isArray(options) ? options : [options]
 
@@ -439,6 +460,8 @@ export function injectApi() {
     registerMcp,
     registerShortcut,
     unregisterShortcut,
+    registerMouse,
+    unregisterMouse,
   }
 
   patchWebview()
@@ -451,5 +474,9 @@ export function injectApi() {
 
   _tinker.on('triggerShortcut', (accelerator: string) => {
     shortcutCallbacks.get(accelerator)?.()
+  })
+
+  _tinker.on('triggerMouse', (type: MouseEventName, event: IMouseEvent) => {
+    mouseCallbacks.get(type)?.(event)
   })
 }
