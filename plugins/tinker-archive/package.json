@@ -1,7 +1,7 @@
 {
   "name": "tinker-archive",
   "version": "0.1.0",
-  "description": "Archive Plugin for TINKER",
+  "description": "View, extract, and create archive files",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Archive",
-    "description": "View, extract, and create archive files",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

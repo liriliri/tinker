@@ -1,7 +1,7 @@
 {
   "name": "tinker-browser",
   "version": "0.1.0",
-  "description": "Browser Plugin for TINKER",
+  "description": "Web browser with multi-tab support and search integration",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Browser",
-    "description": "Web browser with multi-tab support and search integration",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

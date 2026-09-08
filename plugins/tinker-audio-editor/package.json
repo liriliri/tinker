@@ -1,14 +1,13 @@
 {
   "name": "tinker-audio-editor",
   "version": "0.1.0",
-  "description": "Audio Editor Plugin for TINKER",
+  "description": "Multi-format audio editor with waveform visualization",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Audio Editor",
-    "description": "Multi-format audio editor with waveform visualization",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

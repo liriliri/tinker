@@ -1,14 +1,13 @@
 {
   "name": "tinker-base64",
   "version": "0.1.0",
-  "description": "Base64 Encoder/Decoder Plugin for TINKER",
+  "description": "Base64 encoder/decoder for text and files",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Base64",
-    "description": "Base64 encoder/decoder for text and files",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -56,7 +55,9 @@
                 "description": "Absolute path to write decoded bytes. When omitted, decode to UTF-8 text in the UI."
               }
             },
-            "required": ["text"]
+            "required": [
+              "text"
+            ]
           }
         }
       }

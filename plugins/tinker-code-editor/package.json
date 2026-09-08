@@ -1,7 +1,7 @@
 {
   "name": "tinker-code-editor",
   "version": "0.1.0",
-  "description": "Code Editor Plugin for TINKER",
+  "description": "A lightweight code editor with syntax highlighting and multi-tab support",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Code Editor",
-    "description": "A lightweight code editor with syntax highlighting and multi-tab support",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
@@ -35,7 +34,9 @@
                 "description": "Absolute path to the project directory"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         }
       }

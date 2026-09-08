@@ -24,6 +24,14 @@ function getPluginClassName(plugin: IPlugin) {
     .join(' ')
 }
 
+function getPluginTitle(plugin: IPlugin) {
+  const version =
+    !plugin.builtin && plugin.version ? ` (${plugin.version})` : ''
+  const mcp = plugin.mcp ? ' [mcp]' : ''
+  const description = plugin.description ? ` - ${plugin.description}` : ''
+  return `${plugin.id}${version}${mcp}${description}`
+}
+
 export default observer(function PluginList() {
   const icons = useMemo(() => {
     const pluginIcons = map(store.visiblePlugins, (plugin) => ({
@@ -32,7 +40,7 @@ export default observer(function PluginList() {
       name: store.installingPlugins.has(plugin.id)
         ? t('installingPlugin')
         : plugin.name,
-      title: plugin.description,
+      title: getPluginTitle(plugin),
       style: {
         borderRadius: borderRadius + 'px',
         ...(plugin.marketplace ? { opacity: 0.6 } : {}),

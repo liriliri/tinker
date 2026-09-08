@@ -1,7 +1,7 @@
 {
   "name": "tinker-music-player",
   "version": "0.1.0",
-  "description": "Local music player for TINKER",
+  "description": "Play local music files with playlist management",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Music Player",
-    "description": "Play local music files with playlist management",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

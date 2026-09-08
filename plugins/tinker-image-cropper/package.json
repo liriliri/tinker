@@ -1,14 +1,13 @@
 {
   "name": "tinker-image-cropper",
   "version": "0.1.0",
-  "description": "Image Cropper Plugin for TINKER",
+  "description": "Image cropper with rotation, flipping, and aspect ratio controls",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Image Cropper",
-    "description": "Image cropper with rotation, flipping, and aspect ratio controls",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

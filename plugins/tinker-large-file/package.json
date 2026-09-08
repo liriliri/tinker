@@ -1,7 +1,7 @@
 {
   "name": "tinker-large-file",
   "version": "0.1.0",
-  "description": "Large File Cleaner Plugin for TINKER",
+  "description": "Scan and clean large files to free disk space",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Large File Cleaner",
-    "description": "Scan and clean large files to free disk space",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
@@ -35,7 +34,9 @@
                 "description": "Absolute path to the directory to scan"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         },
         "get": {
@@ -45,7 +46,14 @@
             "properties": {
               "filter": {
                 "type": "string",
-                "enum": ["all", "audio", "video", "document", "image", "other"],
+                "enum": [
+                  "all",
+                  "audio",
+                  "video",
+                  "document",
+                  "image",
+                  "other"
+                ],
                 "description": "Optional file-type filter. Defaults to the current UI filter."
               }
             }
@@ -58,7 +66,10 @@
             "properties": {
               "paths": {
                 "type": "array",
-                "items": { "type": "string", "minLength": 1 },
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
                 "minItems": 1,
                 "description": "Absolute file paths to delete from the current scan results"
               },
@@ -67,7 +78,9 @@
                 "description": "Move files to trash instead of permanent delete. Defaults to the current UI setting."
               }
             },
-            "required": ["paths"]
+            "required": [
+              "paths"
+            ]
           }
         }
       }

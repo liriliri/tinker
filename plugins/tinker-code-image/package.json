@@ -1,14 +1,13 @@
 {
   "name": "tinker-code-image",
   "version": "0.1.0",
-  "description": "Code Image Plugin for TINKER",
+  "description": "Generate beautiful images from code snippets",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Code Image",
-    "description": "Generate beautiful images from code snippets",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,7 +1,7 @@
 {
   "name": "tinker-system-monitor",
   "version": "0.1.0",
-  "description": "System Monitor Plugin for TINKER",
+  "description": "Real-time CPU, memory, disk and network usage monitor",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "System Monitor",
-    "description": "Real-time CPU, memory, disk and network usage monitor",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",

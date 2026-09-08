@@ -1,7 +1,7 @@
 {
   "name": "tinker-system-info",
   "version": "0.1.0",
-  "description": "System Information Plugin for TINKER",
+  "description": "System information viewer for hardware and software details",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "System Info",
-    "description": "System information viewer for hardware and software details",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",

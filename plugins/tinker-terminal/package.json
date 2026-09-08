@@ -1,7 +1,7 @@
 {
   "name": "tinker-terminal",
   "version": "0.1.0",
-  "description": "Terminal Plugin for TINKER",
+  "description": "Terminal emulator with SSH configuration management",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Terminal",
-    "description": "Terminal emulator with SSH configuration management",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

@@ -1,14 +1,13 @@
 {
   "name": "tinker-media-converter",
   "version": "0.1.0",
-  "description": "Media Converter Plugin for TINKER",
+  "description": "Batch media format conversion powered by FFmpeg",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Media Converter",
-    "description": "Batch media format conversion powered by FFmpeg",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

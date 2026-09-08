@@ -1,14 +1,13 @@
 {
   "name": "tinker-unit-converter",
   "version": "0.1.0",
-  "description": "Unit Converter Plugin for TINKER",
+  "description": "Unit converter across seven measurement categories",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Unit Converter",
-    "description": "Unit converter across seven measurement categories",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -56,7 +55,9 @@
                 "description": "Target unit key. When omitted, returns all conversions in the category."
               }
             },
-            "required": ["value"]
+            "required": [
+              "value"
+            ]
           }
         },
         "get": {

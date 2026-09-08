@@ -1,14 +1,13 @@
 {
   "name": "tinker-hash",
   "version": "0.1.0",
-  "description": "Hash Plugin for TINKER",
+  "description": "Hash calculator supporting MD5, SHA1, SHA256, and SHA512",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Hash",
-    "description": "Hash calculator supporting MD5, SHA1, SHA256, and SHA512",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-image-compressor",
   "version": "0.1.0",
-  "description": "Image Compressor Plugin for TINKER",
+  "description": "Batch image compression for PNG, JPG, and WebP",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Image Compressor",
-    "description": "Batch image compression for PNG, JPG, and WebP",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

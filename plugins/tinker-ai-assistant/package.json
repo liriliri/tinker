@@ -1,7 +1,7 @@
 {
   "name": "tinker-ai-assistant",
   "version": "0.1.0",
-  "description": "AI Assistant Plugin for TINKER",
+  "description": "AI assistant with tools for file operations, shell commands, and web search",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "AI Assistant",
-    "description": "AI assistant with tools for file operations, shell commands, and web search",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

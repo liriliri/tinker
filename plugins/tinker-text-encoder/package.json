@@ -1,14 +1,13 @@
 {
   "name": "tinker-text-encoder",
   "version": "0.1.0",
-  "description": "Text Encoder Plugin for TINKER",
+  "description": "Text encoding tool for URL, Morse code, and Unicode",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Text Encoder",
-    "description": "Text encoding tool for URL, Morse code, and Unicode",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -30,11 +29,17 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["url", "morse", "unicode"],
+                "enum": [
+                  "url",
+                  "morse",
+                  "unicode"
+                ],
                 "description": "Encoding type. Defaults to the current UI selection."
               }
             },
-            "required": ["text"]
+            "required": [
+              "text"
+            ]
           }
         },
         "decode": {
@@ -49,11 +54,17 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["url", "morse", "unicode"],
+                "enum": [
+                  "url",
+                  "morse",
+                  "unicode"
+                ],
                 "description": "Encoding type. Defaults to the current UI selection."
               }
             },
-            "required": ["text"]
+            "required": [
+              "text"
+            ]
           }
         }
       }

@@ -1,7 +1,7 @@
 {
   "name": "tinker-http-request",
   "version": "0.1.0",
-  "description": "HTTP Request Testing Plugin for TINKER",
+  "description": "HTTP request testing tool similar to Postman",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "HTTP Request",
-    "description": "HTTP request testing tool similar to Postman",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",

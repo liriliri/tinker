@@ -1,14 +1,13 @@
 {
   "name": "tinker-calculation-pad",
   "version": "0.1.0",
-  "description": "Calculation Pad Plugin for TINKER",
+  "description": "Notepad-style calculator for evaluating expressions line by line",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Calculation Pad",
-    "description": "Notepad-style calculator for evaluating expressions line by line",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -30,7 +29,9 @@
                 "description": "Math expression, or multiple expressions separated by newlines"
               }
             },
-            "required": ["expression"]
+            "required": [
+              "expression"
+            ]
           }
         },
         "get": {

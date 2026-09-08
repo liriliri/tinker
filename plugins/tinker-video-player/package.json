@@ -1,14 +1,13 @@
 {
   "name": "tinker-video-player",
   "version": "0.1.0",
-  "description": "Video Player Plugin for TINKER",
+  "description": "Video player with playback controls and playlist history",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Video Player",
-    "description": "Video player with playback controls and playlist history",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {

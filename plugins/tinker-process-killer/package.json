@@ -1,7 +1,7 @@
 {
   "name": "tinker-process-killer",
   "version": "0.1.0",
-  "description": "Process Killer Plugin for TINKER",
+  "description": "Process manager for viewing, searching, and killing processes",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Process Killer",
-    "description": "Process manager for viewing, searching, and killing processes",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",
@@ -35,7 +34,11 @@
               },
               "view": {
                 "type": "string",
-                "enum": ["cpu", "memory", "port"],
+                "enum": [
+                  "cpu",
+                  "memory",
+                  "port"
+                ],
                 "description": "Optional view mode. port only shows processes with listening ports. Defaults to the current UI view."
               }
             }
@@ -52,7 +55,9 @@
                 "description": "Process id to kill"
               }
             },
-            "required": ["pid"]
+            "required": [
+              "pid"
+            ]
           }
         }
       }

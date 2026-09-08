@@ -1,7 +1,7 @@
 {
   "name": "tinker-rss-reader",
   "version": "0.1.0",
-  "description": "RSS Reader Plugin for TINKER",
+  "description": "RSS/Atom feed reader for subscribing and reading articles",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "RSS Reader",
-    "description": "RSS/Atom feed reader for subscribing and reading articles",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

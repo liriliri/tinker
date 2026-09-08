@@ -1,14 +1,13 @@
 {
   "name": "tinker-calculator",
   "version": "0.1.0",
-  "description": "Calculator Plugin for TINKER",
+  "description": "Scientific calculator with basic arithmetic and advanced functions",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Calculator",
-    "description": "Scientific calculator with basic arithmetic and advanced functions",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

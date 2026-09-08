@@ -1,7 +1,7 @@
 {
   "name": "tinker-file-shredder",
   "version": "0.1.0",
-  "description": "File Shredder Plugin for TINKER",
+  "description": "Securely shred files to prevent data recovery",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "File Shredder",
-    "description": "Securely shred files to prevent data recovery",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

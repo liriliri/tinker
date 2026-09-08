@@ -1,7 +1,7 @@
 {
   "name": "tinker-disk-usage",
   "version": "0.1.0",
-  "description": "Disk Usage Plugin for TINKER",
+  "description": "Disk usage analyzer with interactive treemap visualization",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Disk Usage",
-    "description": "Disk usage analyzer with interactive treemap visualization",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
@@ -35,7 +34,9 @@
                 "description": "Absolute path to the directory to scan"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         },
         "get": {
@@ -52,7 +53,9 @@
                 "description": "Absolute path of a directory in the current scan results, or the scan root path"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         }
       }

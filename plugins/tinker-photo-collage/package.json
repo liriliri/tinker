@@ -1,14 +1,13 @@
 {
   "name": "tinker-photo-collage",
   "version": "0.1.0",
-  "description": "Photo Collage Plugin for TINKER",
+  "description": "Photo collage with various grid layouts",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Photo Collage",
-    "description": "Photo collage with various grid layouts",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

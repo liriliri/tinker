@@ -1,7 +1,7 @@
 {
   "name": "tinker-sftp",
   "version": "0.1.0",
-  "description": "SFTP Client Plugin for TINKER",
+  "description": "SFTP client for browsing and transferring remote files",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "SFTP",
-    "description": "SFTP client for browsing and transferring remote files",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

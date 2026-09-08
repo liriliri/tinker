@@ -1,14 +1,13 @@
 {
   "name": "tinker-color",
   "version": "0.1.0",
-  "description": "Color Utilities Plugin for TINKER",
+  "description": "Color picker with format conversion and harmony schemes",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Color",
-    "description": "Color picker with format conversion and harmony schemes",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -34,7 +33,15 @@
               },
               "format": {
                 "type": "string",
-                "enum": ["hex", "rgb", "hsl", "hsv", "cmyk", "lab", "hsi"],
+                "enum": [
+                  "hex",
+                  "rgb",
+                  "hsl",
+                  "hsv",
+                  "cmyk",
+                  "lab",
+                  "hsi"
+                ],
                 "description": "Parse color as this format. Use for comma-separated UI values like \"255, 0, 0\". Optional for CSS colors."
               },
               "alpha": {
@@ -44,7 +51,9 @@
                 "description": "Opacity percent (0-100). Defaults to the current UI value."
               }
             },
-            "required": ["color"]
+            "required": [
+              "color"
+            ]
           }
         }
       }

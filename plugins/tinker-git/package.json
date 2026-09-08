@@ -1,7 +1,7 @@
 {
   "name": "tinker-git",
   "version": "0.1.0",
-  "description": "Git Plugin for TINKER",
+  "description": "View git history and perform common git operations",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Git",
-    "description": "View git history and perform common git operations",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

@@ -1,14 +1,13 @@
 {
   "name": "tinker-json-editor",
   "version": "0.1.0",
-  "description": "JSON Editor Plugin for TINKER",
+  "description": "JSON editor with text and tree modes",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "JSON Editor",
-    "description": "JSON editor with text and tree modes",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

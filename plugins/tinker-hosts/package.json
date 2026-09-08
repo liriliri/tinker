@@ -1,7 +1,7 @@
 {
   "name": "tinker-hosts",
   "version": "0.1.0",
-  "description": "Hosts Manager Plugin for TINKER",
+  "description": "Hosts file manager for switching between configurations",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Switch Hosts",
-    "description": "Hosts file manager for switching between configurations",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
@@ -38,7 +37,9 @@
                 "description": "Config id, or \"system\" for the system hosts file"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         "add": {
@@ -56,7 +57,9 @@
                 "description": "Optional hosts file content"
               }
             },
-            "required": ["name"]
+            "required": [
+              "name"
+            ]
           }
         },
         "update": {
@@ -79,7 +82,9 @@
                 "description": "New hosts file content"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         "delete": {
@@ -93,7 +98,9 @@
                 "description": "Config id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         "toggle": {
@@ -107,7 +114,9 @@
                 "description": "Config id"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         }
       }

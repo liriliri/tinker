@@ -1,14 +1,13 @@
 {
   "name": "tinker-todo",
   "version": "0.1.0",
-  "description": "Todo List Plugin for TINKER",
+  "description": "Todo list using todo.txt format",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Todo",
-    "description": "Todo list using todo.txt format",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

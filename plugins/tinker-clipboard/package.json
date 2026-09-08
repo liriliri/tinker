@@ -1,7 +1,7 @@
 {
   "name": "tinker-clipboard",
   "version": "0.1.0",
-  "description": "Clipboard Manager Plugin for TINKER",
+  "description": "Clipboard history manager for text, images, and files",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Clipboard",
-    "description": "Clipboard history manager for text, images, and files",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

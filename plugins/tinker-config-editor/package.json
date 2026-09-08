@@ -1,14 +1,13 @@
 {
   "name": "tinker-config-editor",
   "version": "0.1.0",
-  "description": "Config File Editor Plugin for TINKER",
+  "description": "Visual editor for system and application config files",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Config Editor",
-    "description": "Visual editor for system and application config files",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

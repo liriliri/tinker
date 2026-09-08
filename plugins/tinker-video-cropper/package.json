@@ -1,14 +1,13 @@
 {
   "name": "tinker-video-cropper",
   "version": "0.1.0",
-  "description": "Video Cropper Plugin for TINKER",
+  "description": "Crop video with region selection, then export via FFmpeg",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Video Cropper",
-    "description": "Crop video with region selection, then export via FFmpeg",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-pomodoro",
   "version": "0.1.0",
-  "description": "Pomodoro Timer Plugin for TINKER",
+  "description": "Pomodoro timer for focused work and break intervals",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Pomodoro",
-    "description": "Pomodoro timer for focused work and break intervals",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

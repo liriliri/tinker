@@ -1,7 +1,7 @@
 {
   "name": "tinker-ai-chat",
   "version": "0.1.0",
-  "description": "AI Assistant Chat Plugin for TINKER",
+  "description": "Multi-session AI chat with various providers and web search",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "AI Chat",
-    "description": "Multi-session AI chat with various providers and web search",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

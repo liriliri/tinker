@@ -1,7 +1,7 @@
 {
   "name": "tinker-file-search",
   "version": "0.1.0",
-  "description": "File Search Plugin for TINKER",
+  "description": "Quick local file search",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "File Search",
-    "description": "Quick local file search",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

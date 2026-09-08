@@ -1,14 +1,13 @@
 {
   "name": "tinker-resume",
   "version": "0.1.0",
-  "description": "Resume Plugin for TINKER",
+  "description": "Fill in resume details, pick a template, and export PDF",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Resume",
-    "description": "Fill in resume details, pick a template, and export PDF",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-markdown-editor",
   "version": "0.1.0",
-  "description": "Markdown Editor Plugin for TINKER",
+  "description": "Markdown editor with live preview and split view",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Markdown Editor",
-    "description": "Markdown editor with live preview and split view",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
@@ -30,7 +29,9 @@
                 "description": "Absolute path to a Markdown file"
               }
             },
-            "required": ["path"]
+            "required": [
+              "path"
+            ]
           }
         },
         "get": {
@@ -46,7 +47,9 @@
                 "description": "The new Markdown content"
               }
             },
-            "required": ["content"]
+            "required": [
+              "content"
+            ]
           }
         },
         "save": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-regexp",
   "version": "0.1.0",
-  "description": "Regular Expression Plugin for TINKER",
+  "description": "Regular expression tester with real-time matching",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "RegExp",
-    "description": "Regular expression tester with real-time matching",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-authenticator",
   "version": "0.1.0",
-  "description": "2FA Authenticator Plugin for TINKER",
+  "description": "2FA authenticator with TOTP generation and QR code scanning",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Authenticator",
-    "description": "2FA authenticator with TOTP generation and QR code scanning",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {

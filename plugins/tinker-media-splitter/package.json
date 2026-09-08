@@ -1,14 +1,13 @@
 {
   "name": "tinker-media-splitter",
   "version": "0.1.0",
-  "description": "Media Splitter Plugin for TINKER",
+  "description": "Split audio and video into multiple segments for export",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Media Splitter",
-    "description": "Split audio and video into multiple segments for export",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,14 +1,13 @@
 {
   "name": "tinker-text-search",
   "version": "0.1.0",
-  "description": "Text Search Plugin for TINKER",
+  "description": "Search text content across files in a directory",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Text Search",
-    "description": "Search text content across files in a directory",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

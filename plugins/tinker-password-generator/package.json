@@ -1,14 +1,13 @@
 {
   "name": "tinker-password-generator",
   "version": "0.1.0",
-  "description": "Password Generator Plugin for TINKER",
+  "description": "Deterministic password generator from passphrase and service name",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Password Generator",
-    "description": "Deterministic password generator from passphrase and service name",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,7 +1,7 @@
 {
   "name": "tinker-cleaner",
   "version": "0.1.0",
-  "description": "System Junk Cleaner Plugin for TINKER",
+  "description": "Scan and clean system junk files to free disk space",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Cleaner",
-    "description": "Scan and clean system junk files to free disk space",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",
@@ -49,7 +48,9 @@
                 "description": "Move files to trash instead of deleting permanently. Defaults to the current UI setting."
               }
             },
-            "required": ["ids"]
+            "required": [
+              "ids"
+            ]
           }
         }
       }

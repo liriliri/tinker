@@ -1,14 +1,13 @@
 {
   "name": "tinker-whiteboard",
   "version": "0.1.0",
-  "description": "Whiteboard Plugin for TINKER",
+  "description": "Whiteboard for freeform drawing powered by tldraw",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Whiteboard",
-    "description": "Whiteboard for freeform drawing powered by tldraw",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,7 +1,7 @@
 {
   "name": "tinker-settings",
   "version": "0.1.0",
-  "description": "Settings Plugin for TINKER",
+  "description": "Application settings and preferences",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
@@ -9,7 +9,6 @@
   "devDependencies": {},
   "tinker": {
     "name": "Settings",
-    "description": "Application settings and preferences",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

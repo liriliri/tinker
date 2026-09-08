@@ -1,7 +1,7 @@
 {
   "name": "tinker-web-runner",
   "version": "0.1.0",
-  "description": "Web Runner Plugin for TINKER",
+  "description": "Frontend code playground for writing and running HTML/CSS/JS",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Web Runner",
-    "description": "Frontend code playground for writing and running HTML/CSS/JS",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

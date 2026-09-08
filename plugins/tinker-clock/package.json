@@ -1,14 +1,13 @@
 {
   "name": "tinker-clock",
   "version": "0.1.0",
-  "description": "Clock Plugin for TINKER",
+  "description": "Clock with flip, analog, and digital styles and timezone support",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts"
   },
   "tinker": {
     "name": "Clock",
-    "description": "Clock with flip, analog, and digital styles and timezone support",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
