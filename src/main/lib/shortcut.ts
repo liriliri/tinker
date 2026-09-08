@@ -1,5 +1,5 @@
 import { uIOhook, UiohookKey } from 'uiohook-napi'
-import { app, globalShortcut } from 'electron'
+import { app, globalShortcut, ipcMain, WebContents } from 'electron'
 import once from 'licia/once'
 import { getSettingsStore, getMainStore } from './store'
 import * as main from '../window/main'
@@ -18,6 +18,8 @@ type NodeMacPermissions = {
   askForAccessibilityAccess: () => void
 }
 
+type ShortcutOwner = 'app' | WebContents
+
 let nodeMacPermissions: NodeMacPermissions | null = null
 if (isMac) {
   loadMod('node-mac-permissions').then((mod) => {
@@ -26,32 +28,9 @@ if (isMac) {
 }
 
 const callbacks: Record<string, () => void> = {}
-
-function register(accelerator: string, callback: () => void) {
-  logger.info(`register shortcut: ${accelerator}`)
-  if (isDoubleShortcut(accelerator)) {
-    if (
-      isMac &&
-      mainStore.get('uIOhookCalled') &&
-      nodeMacPermissions?.getAuthStatus('accessibility') === 'denied'
-    ) {
-      nodeMacPermissions?.askForAccessibilityAccess()
-    } else {
-      startUIOhook()
-      callbacks[accelerator] = callback
-    }
-  } else {
-    globalShortcut.register(accelerator, callback)
-  }
-}
-
-function unregister(accelerator: string) {
-  if (isDoubleShortcut(accelerator)) {
-    delete callbacks[accelerator]
-  } else {
-    globalShortcut.unregister(accelerator)
-  }
-}
+const owners = new Map<string, ShortcutOwner>()
+const pluginAccelerators = new Map<WebContents, Set<string>>()
+const destroyedHooked = new WeakSet<WebContents>()
 
 function isDoubleShortcut(accelerator: string): boolean {
   const [mod, key] = accelerator.split('+')
@@ -60,6 +39,131 @@ function isDoubleShortcut(accelerator: string): boolean {
   }
 
   return true
+}
+
+function bindAccelerator(accelerator: string, callback: () => void): boolean {
+  logger.info(`register shortcut: ${accelerator}`)
+  if (isDoubleShortcut(accelerator)) {
+    if (
+      isMac &&
+      mainStore.get('uIOhookCalled') &&
+      nodeMacPermissions?.getAuthStatus('accessibility') === 'denied'
+    ) {
+      nodeMacPermissions?.askForAccessibilityAccess()
+      return false
+    }
+    startUIOhook()
+    callbacks[accelerator] = callback
+    return true
+  }
+
+  return globalShortcut.register(accelerator, callback)
+}
+
+function unbindAccelerator(accelerator: string) {
+  if (isDoubleShortcut(accelerator)) {
+    delete callbacks[accelerator]
+  } else {
+    globalShortcut.unregister(accelerator)
+  }
+}
+
+function register(
+  accelerator: string,
+  callback: () => void,
+  owner: ShortcutOwner = 'app'
+): boolean {
+  const existing = owners.get(accelerator)
+  if (existing !== undefined && existing !== owner) {
+    if (owner !== 'app') {
+      return false
+    }
+    detachOwner(accelerator, existing)
+    unbindAccelerator(accelerator)
+  } else if (existing === owner) {
+    unbindAccelerator(accelerator)
+  }
+
+  if (!bindAccelerator(accelerator, callback)) {
+    return false
+  }
+
+  owners.set(accelerator, owner)
+  if (owner !== 'app') {
+    let set = pluginAccelerators.get(owner)
+    if (!set) {
+      set = new Set()
+      pluginAccelerators.set(owner, set)
+    }
+    set.add(accelerator)
+  }
+
+  return true
+}
+
+function detachOwner(accelerator: string, owner: ShortcutOwner) {
+  owners.delete(accelerator)
+  if (owner !== 'app') {
+    pluginAccelerators.get(owner)?.delete(accelerator)
+  }
+}
+
+function unregister(accelerator: string) {
+  const owner = owners.get(accelerator)
+  if (owner !== undefined) {
+    detachOwner(accelerator, owner)
+  }
+  unbindAccelerator(accelerator)
+}
+
+function ensureDestroyedCleanup(webContents: WebContents) {
+  if (destroyedHooked.has(webContents)) {
+    return
+  }
+  destroyedHooked.add(webContents)
+  webContents.once('destroyed', () => {
+    unregisterPluginShortcuts(webContents)
+  })
+}
+
+function unregisterPluginShortcuts(webContents: WebContents) {
+  const set = pluginAccelerators.get(webContents)
+  if (!set) {
+    return
+  }
+  for (const accelerator of [...set]) {
+    unregister(accelerator)
+  }
+  pluginAccelerators.delete(webContents)
+}
+
+function registerPluginShortcut(
+  accelerator: string,
+  webContents: WebContents
+): boolean {
+  const ok = register(
+    accelerator,
+    () => {
+      if (!webContents.isDestroyed()) {
+        webContents.send('triggerShortcut', accelerator)
+      }
+    },
+    webContents
+  )
+  if (ok) {
+    ensureDestroyedCleanup(webContents)
+  }
+  return ok
+}
+
+function unregisterPluginShortcut(
+  accelerator: string,
+  webContents: WebContents
+) {
+  if (owners.get(accelerator) !== webContents) {
+    return
+  }
+  unregister(accelerator)
 }
 
 const DOUBLE_PRESS_INTERVAL = 300
@@ -121,11 +225,18 @@ export async function init() {
   if (isMac) {
     await waitUntil(() => nodeMacPermissions !== null)
   }
-  register(settingsStore.get('showShortcut'), () => main.showWin())
+  register(settingsStore.get('showShortcut'), () => main.showWin(), 'app')
   settingsStore.on('change', (key, val, oldVal) => {
     if (key === 'showShortcut') {
       unregister(oldVal)
-      register(val, () => main.showWin())
+      register(val, () => main.showWin(), 'app')
     }
+  })
+
+  ipcMain.handle('registerShortcut', (event, accelerator: string) => {
+    return registerPluginShortcut(accelerator, event.sender)
+  })
+  ipcMain.handle('unregisterShortcut', (event, accelerator: string) => {
+    unregisterPluginShortcut(accelerator, event.sender)
   })
 }

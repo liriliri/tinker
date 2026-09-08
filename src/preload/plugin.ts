@@ -16,6 +16,8 @@ import {
   IpcCallMcpTool,
   IpcHasPlugin,
   IpcClearPluginCache,
+  IpcRegisterShortcut,
+  IpcUnregisterShortcut,
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
@@ -181,6 +183,18 @@ const tinkerObj = {
   async getApps() {
     return await mainObj.getApps()
   },
+  async getPlugins() {
+    const plugins = await mainObj.getPlugins()
+    return plugins
+      .filter((plugin) => !plugin.marketplace)
+      .map((plugin) => ({
+        id: plugin.id,
+        name: plugin.name,
+        description: plugin.description,
+        icon: plugin.icon,
+        builtin: !!plugin.builtin,
+      }))
+  },
   getSetting: builtinOnly(mainObj.getSettingsStore),
   setSetting: builtinOnly(mainObj.setSettingsStore),
   clearPluginCache: builtinOnly(
@@ -204,6 +218,8 @@ const tinkerObj = {
   onTerminalClose,
   onTerminalInput,
   getTerminalInfo,
+  registerShortcut: invoke<IpcRegisterShortcut>('registerShortcut'),
+  unregisterShortcut: invoke<IpcUnregisterShortcut>('unregisterShortcut'),
   t(key: string) {
     return i18n.t(key)
   },

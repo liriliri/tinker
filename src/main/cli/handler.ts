@@ -144,6 +144,10 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
       case 'quit':
         setTimeout(() => app.quit(), 100)
         return success(req)
+      case 'relaunch':
+        app.relaunch()
+        setTimeout(() => app.quit(), 100)
+        return success(req)
       case 'list': {
         const data = await listPlugins()
         return success(req, data)

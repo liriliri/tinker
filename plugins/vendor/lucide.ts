@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  AlertTriangle,
   AlignJustify,
   AlignVerticalDistributeCenter,
   AlignVerticalJustifyCenter,
@@ -72,6 +73,7 @@ import {
   ImageOff,
   ImagePlus,
   KeyRound,
+  Keyboard,
   LayoutGrid,
   Link,
   List,
@@ -148,6 +150,7 @@ import {
   WandSparkles,
   Wifi,
   X,
+  Zap,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
@@ -156,6 +159,7 @@ const g = globalThis as Record<string, unknown>
 
 const lucideReact = {
   AlertCircle,
+  AlertTriangle,
   AlignJustify,
   AlignVerticalDistributeCenter,
   AlignVerticalJustifyCenter,
@@ -228,6 +232,7 @@ const lucideReact = {
   ImageOff,
   ImagePlus,
   KeyRound,
+  Keyboard,
   LayoutGrid,
   Link,
   List,
@@ -304,6 +309,7 @@ const lucideReact = {
   WandSparkles,
   Wifi,
   X,
+  Zap,
   ZoomIn,
   ZoomOut,
 }
@@ -312,6 +318,7 @@ g.lucideReact = lucideReact
 
 export {
   AlertCircle,
+  AlertTriangle,
   AlignJustify,
   AlignVerticalDistributeCenter,
   AlignVerticalJustifyCenter,
@@ -384,6 +391,7 @@ export {
   ImageOff,
   ImagePlus,
   KeyRound,
+  Keyboard,
   LayoutGrid,
   Link,
   List,
@@ -460,6 +468,7 @@ export {
   WandSparkles,
   Wifi,
   X,
+  Zap,
   ZoomIn,
   ZoomOut,
 }

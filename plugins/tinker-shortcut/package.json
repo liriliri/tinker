@@ -1,0 +1,181 @@
+{
+  "name": "tinker-shortcut",
+  "version": "0.1.0",
+  "description": "Global shortcut manager for binding hotkeys to shell commands",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
+    "dev:renderer": "vite build --watch --config ../vite.config.ts",
+    "dev:preload": "vite build --watch --config ../vite.preload.ts",
+    "build": "concurrently \"npm run build:renderer\" \"npm run build:preload\"",
+    "build:renderer": "vite build --config ../vite.config.ts",
+    "build:preload": "vite build --config ../vite.preload.ts"
+  },
+  "tinker": {
+    "name": "Shortcut",
+    "icon": "icon.png",
+    "main": "dist/renderer/index.html",
+    "preload": "dist/preload/index.js",
+    "locales": {
+      "zh-CN": {
+        "name": "快捷键",
+        "description": "全局快捷键管理，绑定热键执行命令"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "List all shortcut actions with id, name, shortcut, type, command/path/url, enabled state, and whether the shortcut failed to register."
+        },
+        "get": {
+          "description": "Get one shortcut action by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Action id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "add": {
+          "description": "Create a shortcut action. type is command (shell), app (application path), directory (folder path), url, or plugin (plugin id). command holds the shell command, app path, directory path, URL, or plugin id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Display name"
+              },
+              "shortcut": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Electron accelerator, e.g. Command+Shift+K or Ctrl+Alt+T"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "command",
+                  "app",
+                  "directory",
+                  "url",
+                  "plugin"
+                ],
+                "description": "Action type"
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Shell command, application path, directory path, URL, or plugin id"
+              },
+              "enabled": {
+                "type": "boolean",
+                "description": "Whether the shortcut is enabled (default true)"
+              },
+              "appIcon": {
+                "type": "string",
+                "description": "Optional icon path when type is app or plugin"
+              }
+            },
+            "required": [
+              "name",
+              "shortcut",
+              "type",
+              "command"
+            ]
+          }
+        },
+        "update": {
+          "description": "Update a shortcut action by id. Only provided fields are changed.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Action id"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New display name"
+              },
+              "shortcut": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New Electron accelerator"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "command",
+                  "app",
+                  "directory",
+                  "url",
+                  "plugin"
+                ],
+                "description": "New action type"
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New shell command, application path, directory path, URL, or plugin id"
+              },
+              "enabled": {
+                "type": "boolean",
+                "description": "Whether the shortcut is enabled"
+              },
+              "appIcon": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Icon path when type is app or plugin, or null to clear"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "delete": {
+          "description": "Delete a shortcut action by id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Action id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "toggle": {
+          "description": "Toggle whether a shortcut action is enabled.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Action id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -195,3 +195,5 @@ export type IpcDestroyTerminal = (sessionId: string) => void
 export type IpcGetTerminalInfo = (
   sessionId: string
 ) => Promise<{ processName: string; cwd: string }>
+export type IpcRegisterShortcut = (accelerator: string) => boolean
+export type IpcUnregisterShortcut = (accelerator: string) => void

@@ -60,7 +60,14 @@ The server fetches tool definitions from the plugin package, exposes them via `l
 ### Recover from stale state
 
 ```bash
-tinker restart <plugin>
+tinker restart <plugin>              # stuck / stale plugin window
+```
+
+After changing `tinker.mcp.tools` in `package.json`:
+
+```bash
+tinker relaunch
+tinker open <plugin>
 tinker tools <plugin>
 tinker call <plugin> --tool <name> --args '{}'
 ```

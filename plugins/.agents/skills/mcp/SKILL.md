@@ -110,10 +110,11 @@ cd <plugin-name> && npm run build
 cd <plugin-name> && npx tsc --noEmit 2>&1 | rg "mcp\.ts" || true
 ```
 
-Live tool checks in this repo must use **`./bin/tinker-dev`** from the tinker-utm root (see `.agents/skills/tinker-dev/SKILL.md`). Do **not** use the packaged `tinker` CLI while developing here.
+Live tool checks in this repo must use **`./bin/tinker-dev`** from the tinker repo root (see `.agents/skills/tinker-dev/SKILL.md`). Do **not** use the packaged `tinker` CLI while developing here.
 
 ```bash
-# from tinker-utm repo root
+# from tinker repo root
+./bin/tinker-dev relaunch   # after package.json MCP changes
 ./bin/tinker-dev open <plugin>
 ./bin/tinker-dev tools <plugin>
 ./bin/tinker-dev call <plugin> --tool <name> --args '{}'

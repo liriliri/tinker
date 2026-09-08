@@ -165,6 +165,14 @@ declare global {
       path: string
     }
 
+    interface PluginInfo {
+      id: string
+      name: string
+      description: string
+      icon: string
+      builtin: boolean
+    }
+
     interface AiModel {
       name: string
       capabilities?: string[]
@@ -460,7 +468,7 @@ declare global {
     /**
      * Open another plugin in a detached window.
      * If the plugin is already running, focuses the existing window instead.
-     * @param id - Plugin id (e.g. 'json-editor')
+     * @param id - Plugin id (e.g. 'tinker-json-editor')
      */
     openPlugin(id: string): Promise<void>
 
@@ -565,6 +573,9 @@ declare global {
 
     /** Get a list of installed applications. */
     getApps(): Promise<tinker.AppInfo[]>
+
+    /** Get a list of installed plugins. */
+    getPlugins(): Promise<tinker.PluginInfo[]>
 
     /** Get a setting value by name. Only available to builtin plugins. */
     getSetting(name: string): Promise<any>
@@ -715,6 +726,17 @@ declare global {
         args: Record<string, unknown>
       ) => unknown | Promise<unknown>
     }): void
+
+    /**
+     * Register a global keyboard shortcut (Electron globalShortcut / uIOhook
+     * double-tap modifiers). Auto-unregistered when the plugin is destroyed.
+     */
+    registerShortcut(
+      accelerator: string,
+      callback: () => void
+    ): Promise<() => void>
+
+    unregisterShortcut(accelerator: string): Promise<void>
   }
 }
 

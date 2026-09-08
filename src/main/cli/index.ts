@@ -207,6 +207,13 @@ program
     executeCommand('quit')
   })
 
+program
+  .command('relaunch')
+  .description('Relaunch the Tinker app')
+  .action(() => {
+    executeCommand('relaunch')
+  })
+
 registerListCommand(program, executeCommand)
 registerMcpCommands(program, executeCommand)
 registerUiCommands(program, executeCommand)

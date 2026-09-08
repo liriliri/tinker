@@ -22,6 +22,7 @@ const searchFileTasks: types.PlainObj<KillQuitTask> = {}
 const searchTextTasks: types.PlainObj<KillQuitTask> = {}
 const downloadTasks: types.PlainObj<DownloadTask> = {}
 let contextMenuCallbacks: types.PlainObj<types.AnyFn> = {}
+const shortcutCallbacks = new Map<string, () => void>()
 
 function runFFmpeg(args: string[], onProgress?: any) {
   const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
@@ -305,6 +306,25 @@ function registerMcp(api: {
   }
 }
 
+async function registerShortcut(
+  accelerator: string,
+  callback: () => void
+): Promise<() => void> {
+  const ok = await _tinker.registerShortcut(accelerator)
+  if (!ok) {
+    throw new Error(`Failed to register shortcut: ${accelerator}`)
+  }
+  shortcutCallbacks.set(accelerator, callback)
+  return () => {
+    void unregisterShortcut(accelerator)
+  }
+}
+
+async function unregisterShortcut(accelerator: string): Promise<void> {
+  shortcutCallbacks.delete(accelerator)
+  await _tinker.unregisterShortcut(accelerator)
+}
+
 function transOptions(options: MenuItemConstructorOptions[]) {
   const normalizedOptions = Array.isArray(options) ? options : [options]
 
@@ -404,6 +424,7 @@ export function injectApi() {
     showContextMenu,
     getMediaInfo: _tinker.getMediaInfo,
     getApps: _tinker.getApps,
+    getPlugins: _tinker.getPlugins,
     getSetting: _tinker.getSetting,
     setSetting: _tinker.setSetting,
     clearPluginCache: _tinker.clearPluginCache,
@@ -416,6 +437,8 @@ export function injectApi() {
     getDownloads,
     createTerminal,
     registerMcp,
+    registerShortcut,
+    unregisterShortcut,
   }
 
   patchWebview()
@@ -424,5 +447,9 @@ export function injectApi() {
     if (contextMenuCallbacks[id]) {
       contextMenuCallbacks[id]()
     }
+  })
+
+  _tinker.on('triggerShortcut', (accelerator: string) => {
+    shortcutCallbacks.get(accelerator)?.()
   })
 }
