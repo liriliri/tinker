@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import store from '../store'
 import PieMenuView from './PieMenuView'
 
-export interface FloatingPieProps {
+interface FloatingPieProps {
   onClose: () => void
   dismissOnAction: boolean
   draggable: boolean

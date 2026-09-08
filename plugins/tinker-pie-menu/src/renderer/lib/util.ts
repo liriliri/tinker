@@ -37,7 +37,7 @@ export function normalizeSlots(raw: unknown): Slots {
   return slots
 }
 
-export function normalizeSlotAction(
+function normalizeSlotAction(
   raw: Partial<SlotAction> & { id: string }
 ): SlotAction {
   const action = defaults(

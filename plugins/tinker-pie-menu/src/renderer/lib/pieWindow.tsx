@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import FloatingPie from '../components/FloatingPie'
 
-export const PIE_WINDOW_SIZE = 300
+const PIE_WINDOW_SIZE = 300
 
 let pieWindow: Window | null = null
 let invokeModeActive = false

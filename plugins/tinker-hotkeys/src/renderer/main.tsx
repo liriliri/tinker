@@ -20,7 +20,7 @@ const App = observer(function App() {
         >
           <Toolbar />
           <OverlayScrollbars defer className="flex-1 min-h-0">
-            <div className="p-3">
+            <div className="p-3 min-h-full box-border flex flex-col">
               <ActionList />
             </div>
           </OverlayScrollbars>

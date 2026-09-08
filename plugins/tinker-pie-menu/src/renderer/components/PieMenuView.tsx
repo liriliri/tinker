@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import fileUrl from 'licia/fileUrl'
-import isStrBlank from 'licia/isStrBlank'
 import { THEME_COLORS, tw } from 'share/theme'
 import { Folder, Globe, Monitor, Package, Plus, Terminal } from 'lucide-react'
 import type { SlotAction, Slots } from '../types'
@@ -14,7 +13,7 @@ import {
 } from '../lib/util'
 import store from '../store'
 
-export interface PieMenuViewProps {
+interface PieMenuViewProps {
   slots: Slots
   selectedIndex?: number | null
   onSelectSlot?: (index: number) => void
@@ -23,19 +22,18 @@ export interface PieMenuViewProps {
   centerDraggable?: boolean
 }
 
-function SlotGlyph({
-  action,
-  selected,
-}: {
+interface SlotGlyphProps {
   action: SlotAction | null
   selected: boolean
-}) {
-  const iconClass = selected ? 'text-white' : tw.text.secondary
+}
+
+function SlotGlyph({ action, selected }: SlotGlyphProps) {
+  const iconClass = selected ? tw.primary.text : tw.text.secondary
   if (!action) {
     return (
       <Plus
         size={14}
-        className={selected ? 'text-white/80' : tw.text.tertiary}
+        className={selected ? tw.primary.text : tw.text.tertiary}
       />
     )
   }
@@ -79,6 +77,8 @@ export default observer(function PieMenuView({
   const innerR = size * 0.18
   const iconR = (innerR + outerR) / 2
   const mode = store.isDark ? 'dark' : 'light'
+  const sliceFill = THEME_COLORS.bg[mode].primary
+  const selectedFill = `${THEME_COLORS.primary}33`
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -87,25 +87,19 @@ export default observer(function PieMenuView({
           const { start, end, mid } = slotAngles(index)
           const action = slots[index]
           const selected = selectedIndex === index
-          const filled = !!action && !isStrBlank(action.command)
           const disabled = action ? !action.enabled : false
           const pos = polarToCartesian(cx, cy, iconR, mid)
-          let fill: string = THEME_COLORS.bg[mode].tertiary
-          if (selected) {
-            fill = THEME_COLORS.primary
-          } else if (filled) {
-            fill = THEME_COLORS.bg[mode].secondary
-          }
 
           return (
             <g key={index} opacity={disabled ? 0.45 : 1}>
               <path
                 d={donutSlicePath(cx, cy, innerR, outerR, start, end)}
-                fill={fill}
-                stroke={THEME_COLORS.border[mode]}
-                strokeWidth={1}
                 className="cursor-pointer"
-                style={{ opacity: selected ? 0.9 : 0.95 }}
+                fill={selected ? selectedFill : sliceFill}
+                stroke={
+                  selected ? THEME_COLORS.primary : THEME_COLORS.border[mode]
+                }
+                strokeWidth={selected ? 2 : 1}
                 onClick={() => onSelectSlot?.(index)}
               />
               <foreignObject
@@ -120,7 +114,7 @@ export default observer(function PieMenuView({
                   {action && (
                     <span
                       className={`text-[9px] leading-none max-w-[36px] truncate ${
-                        selected ? 'text-white' : tw.text.secondary
+                        selected ? tw.primary.text : tw.text.secondary
                       }`}
                     >
                       {action.name}
@@ -134,9 +128,9 @@ export default observer(function PieMenuView({
       </svg>
       <button
         type="button"
-        className={`absolute rounded-full flex items-center justify-center border-2 ${
+        className={`absolute rounded-full flex items-center justify-center border-2 shadow-md ${
           tw.primary.border
-        } ${tw.bg.primary} shadow-md ${
+        } ${tw.bg.primary} ${
           onCenterClick ? 'cursor-pointer' : 'cursor-default'
         }`}
         style={{

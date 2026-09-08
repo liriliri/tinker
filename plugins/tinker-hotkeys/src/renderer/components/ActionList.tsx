@@ -146,7 +146,7 @@ interface EmptyStateProps {
 function EmptyState({ message }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center h-full gap-2 ${tw.text.tertiary}`}
+      className={`flex-1 flex flex-col items-center justify-center gap-2 ${tw.text.tertiary}`}
     >
       <Keyboard size={40} />
       <p className="text-sm">{message}</p>

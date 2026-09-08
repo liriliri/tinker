@@ -5,23 +5,16 @@ import isStrBlank from 'licia/isStrBlank'
 import isEmpty from 'licia/isEmpty'
 import fileUrl from 'licia/fileUrl'
 import trim from 'licia/trim'
-import Dialog, { DialogButton } from 'share/components/Dialog'
+import { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
 import FileInput from 'share/components/FileInput'
 import { tw } from 'share/theme'
 import toast from 'react-hot-toast'
-import { Monitor, Package } from 'lucide-react'
+import { Monitor, Package, Play, Trash2 } from 'lucide-react'
+import { confirm } from 'share/components/Confirm'
 import type { ActionType, SlotActionInput } from '../types'
 import { actionUsesIcon, filterByName, folderName } from '../lib/util'
 import store from '../store'
-
-const ADD_TITLE: Record<ActionType, string> = {
-  command: 'addCommand',
-  plugin: 'addPlugin',
-  app: 'addApp',
-  directory: 'addDirectory',
-  url: 'addUrl',
-}
 
 const REQUIRED_MSG: Record<ActionType, string> = {
   command: 'commandRequired',
@@ -74,7 +67,7 @@ function ItemPicker({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label className={`text-sm font-medium ${tw.text.secondary}`}>
+      <label className={`text-xs font-medium ${tw.text.secondary}`}>
         {label}
       </label>
       <div
@@ -151,10 +144,10 @@ function ItemPicker({
   )
 }
 
-export default observer(function ActionDialog() {
+export default observer(function ActionForm() {
   const { t } = useTranslation()
   const editing = store.selectedAction
-  const type = store.dialogType
+  const type = editing ? editing.type : store.formType
   const [form, setForm] = useState<SlotActionInput>({
     name: '',
     command: '',
@@ -169,8 +162,7 @@ export default observer(function ActionDialog() {
   const [loadingPlugins, setLoadingPlugins] = useState(false)
 
   useEffect(() => {
-    if (!store.showDialog) return
-    if (editing && editing.type === type) {
+    if (editing) {
       setForm({
         name: editing.name,
         command: editing.command,
@@ -189,47 +181,42 @@ export default observer(function ActionDialog() {
     }
     setAppQuery('')
     setPluginQuery('')
-  }, [store.showDialog, editing, type])
+  }, [store.selectedSlot, editing?.id, type, store.isAdding])
 
   useEffect(() => {
-    if (!store.showDialog || type !== 'app') return
+    if (type !== 'app' && type !== 'plugin') return
     let cancelled = false
-    setLoadingApps(true)
-    void tinker.getApps().then((list) => {
-      if (cancelled) return
-      setApps(
-        list.map((app) => ({
-          key: app.path,
-          name: app.name,
-          icon: app.icon,
-        }))
-      )
-      setLoadingApps(false)
-    })
+    const isApp = type === 'app'
+    const setLoading = isApp ? setLoadingApps : setLoadingPlugins
+    setLoading(true)
+    void (async () => {
+      if (isApp) {
+        const list = await tinker.getApps()
+        if (cancelled) return
+        setApps(
+          list.map((app) => ({
+            key: app.path,
+            name: app.name,
+            icon: app.icon,
+          }))
+        )
+      } else {
+        const list = await tinker.getPlugins()
+        if (cancelled) return
+        setPlugins(
+          list.map((plugin) => ({
+            key: plugin.id,
+            name: plugin.name,
+            icon: plugin.icon,
+          }))
+        )
+      }
+      setLoading(false)
+    })()
     return () => {
       cancelled = true
     }
-  }, [store.showDialog, type])
-
-  useEffect(() => {
-    if (!store.showDialog || type !== 'plugin') return
-    let cancelled = false
-    setLoadingPlugins(true)
-    void tinker.getPlugins().then((list) => {
-      if (cancelled) return
-      setPlugins(
-        list.map((plugin) => ({
-          key: plugin.id,
-          name: plugin.name,
-          icon: plugin.icon,
-        }))
-      )
-      setLoadingPlugins(false)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [store.showDialog, type])
+  }, [type, store.selectedSlot])
 
   function set<
     K extends keyof SlotActionInput
@@ -275,102 +262,140 @@ export default observer(function ActionDialog() {
     const input: SlotActionInput = {
       name: trim(form.name),
       command: trim(form.command),
-      enabled: form.enabled,
+      enabled: editing ? editing.enabled : form.enabled,
       type,
       appIcon: actionUsesIcon(type) ? form.appIcon : undefined,
     }
 
     await store.setSlot(store.selectedSlot, input)
     toast.success(editing ? t('actionUpdated') : t('actionAdded'))
-    store.closeDialog()
+    store.closeForm()
+  }
+
+  async function handleClear() {
+    const name =
+      editing?.name || t('slotLabel', { index: store.selectedSlot + 1 })
+    const ok = await confirm({
+      title: t('deleteConfirm', { name }),
+    })
+    if (ok) {
+      await store.clearSlot(store.selectedSlot)
+      store.closeForm()
+    }
   }
 
   return (
-    <Dialog
-      open={store.showDialog}
-      onClose={() => store.closeDialog()}
-      title={editing ? t('editAction') : t(ADD_TITLE[type])}
-      showClose
+    <div
+      className={`flex flex-col gap-3 ${
+        editing && !editing.enabled ? 'opacity-50' : ''
+      }`}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs font-medium ${tw.text.secondary}`}>
+          {t('name')}
+        </label>
+        <TextInput
+          value={form.name}
+          onChange={(e) => set('name', e.target.value)}
+          placeholder={t('namePlaceholder')}
+        />
+      </div>
+      {type === 'command' || type === 'url' ? (
         <div className="flex flex-col gap-1.5">
-          <label className={`text-sm font-medium ${tw.text.secondary}`}>
-            {t('name')}
+          <label className={`text-xs font-medium ${tw.text.secondary}`}>
+            {type === 'url' ? t('url') : t('command')}
           </label>
           <TextInput
-            value={form.name}
-            onChange={(e) => set('name', e.target.value)}
-            placeholder={t('namePlaceholder')}
+            value={form.command}
+            onChange={(e) => set('command', e.target.value)}
+            placeholder={
+              type === 'url' ? t('urlPlaceholder') : t('commandPlaceholder')
+            }
+            className="font-mono text-xs"
           />
         </div>
-        {type === 'command' || type === 'url' ? (
-          <div className="flex flex-col gap-1.5">
-            <label className={`text-sm font-medium ${tw.text.secondary}`}>
-              {type === 'url' ? t('url') : t('command')}
-            </label>
-            <TextInput
-              value={form.command}
-              onChange={(e) => set('command', e.target.value)}
-              placeholder={
-                type === 'url' ? t('urlPlaceholder') : t('commandPlaceholder')
-              }
-              className="font-mono text-xs"
-            />
-          </div>
-        ) : type === 'directory' ? (
-          <div className="flex flex-col gap-1.5">
-            <label className={`text-sm font-medium ${tw.text.secondary}`}>
-              {t('directory')}
-            </label>
-            <FileInput
-              value={form.command}
-              onChange={(e) => set('command', e.target.value)}
-              onBrowse={() => void browseDirectory()}
-              placeholder={t('directoryPlaceholder')}
-              inputClassName="font-mono text-xs"
-            />
-          </div>
-        ) : type === 'plugin' ? (
-          <ItemPicker
-            label={t('plugin')}
-            selectedKey={form.command}
-            selectedName={form.name}
-            selectedIcon={form.appIcon}
-            placeholder={t('selectPluginPlaceholder')}
-            searchPlaceholder={t('searchPlugins')}
-            loadingLabel={t('loadingPlugins')}
-            emptyLabel={t('noPlugins')}
-            items={plugins}
-            query={pluginQuery}
-            onQueryChange={setPluginQuery}
-            loading={loadingPlugins}
-            FallbackIcon={Package}
-            onSelect={(item) => selectItem(item, 'plugin')}
+      ) : type === 'directory' ? (
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-xs font-medium ${tw.text.secondary}`}>
+            {t('directory')}
+          </label>
+          <FileInput
+            value={form.command}
+            onChange={(e) => set('command', e.target.value)}
+            onBrowse={() => void browseDirectory()}
+            placeholder={t('directoryPlaceholder')}
+            inputClassName="font-mono text-xs"
           />
-        ) : (
-          <ItemPicker
-            label={t('application')}
-            selectedKey={form.command}
-            selectedName={form.name}
-            selectedIcon={form.appIcon}
-            placeholder={t('selectAppPlaceholder')}
-            searchPlaceholder={t('searchApps')}
-            loadingLabel={t('loadingApps')}
-            emptyLabel={t('noApps')}
-            items={apps}
-            query={appQuery}
-            onQueryChange={setAppQuery}
-            loading={loadingApps}
-            FallbackIcon={Monitor}
-            onSelect={(item) => selectItem(item, 'app')}
-          />
+        </div>
+      ) : type === 'plugin' ? (
+        <ItemPicker
+          label={t('plugin')}
+          selectedKey={form.command}
+          selectedName={form.name}
+          selectedIcon={form.appIcon}
+          placeholder={t('selectPluginPlaceholder')}
+          searchPlaceholder={t('searchPlugins')}
+          loadingLabel={t('loadingPlugins')}
+          emptyLabel={t('noPlugins')}
+          items={plugins}
+          query={pluginQuery}
+          onQueryChange={setPluginQuery}
+          loading={loadingPlugins}
+          FallbackIcon={Package}
+          onSelect={(item) => selectItem(item, 'plugin')}
+        />
+      ) : (
+        <ItemPicker
+          label={t('application')}
+          selectedKey={form.command}
+          selectedName={form.name}
+          selectedIcon={form.appIcon}
+          placeholder={t('selectAppPlaceholder')}
+          searchPlaceholder={t('searchApps')}
+          loadingLabel={t('loadingApps')}
+          emptyLabel={t('noApps')}
+          items={apps}
+          query={appQuery}
+          onQueryChange={setAppQuery}
+          loading={loadingApps}
+          FallbackIcon={Monitor}
+          onSelect={(item) => selectItem(item, 'app')}
+        />
+      )}
+      <div className="flex items-center gap-2 pt-1">
+        {editing && (
+          <>
+            <button
+              type="button"
+              className={`p-1.5 rounded ${tw.hover} ${tw.text.secondary}`}
+              title={t('run')}
+              onClick={() => void store.runSlot(store.selectedSlot)}
+            >
+              <Play size={14} />
+            </button>
+            <button
+              type="button"
+              className={`p-1.5 rounded ${tw.hover} ${tw.text.secondary}`}
+              title={t('delete')}
+              onClick={() => void handleClear()}
+            >
+              <Trash2 size={14} />
+            </button>
+            <div className="flex-1" />
+          </>
         )}
-        <div className="flex justify-end gap-2 pt-1">
-          <DialogButton onClick={() => void handleSubmit()}>
-            {t('save')}
-          </DialogButton>
-        </div>
+        {!editing && (
+          <>
+            <DialogButton variant="text" onClick={() => store.closeForm()}>
+              {t('cancel')}
+            </DialogButton>
+            <div className="flex-1" />
+          </>
+        )}
+        <DialogButton onClick={() => void handleSubmit()}>
+          {t('save')}
+        </DialogButton>
       </div>
-    </Dialog>
+    </div>
   )
 })

@@ -27,12 +27,12 @@ const STORAGE_INVOKE_MODE = 'invokeMode'
 
 const INVOKE_MODES: InvokeMode[] = ['alwaysOn', 'middleClick']
 
-export class Store extends BaseStore {
+class Store extends BaseStore {
   slots: Slots = emptySlots()
   invokeMode: InvokeMode = 'alwaysOn'
   selectedSlot = 0
-  dialogType: ActionType = 'command'
-  showDialog = false
+  formType: ActionType = 'command'
+  isAdding = false
 
   constructor() {
     super()
@@ -62,26 +62,20 @@ export class Store extends BaseStore {
   selectSlot(index: number) {
     if (index < 0 || index >= SLOT_COUNT) return
     this.selectedSlot = index
+    this.isAdding = false
   }
 
   get selectedAction(): SlotAction | null {
     return this.slots[this.selectedSlot] ?? null
   }
 
-  openAddDialog(type: ActionType = 'command') {
-    this.dialogType = type
-    this.showDialog = true
+  openAddForm(type: ActionType = 'command') {
+    this.formType = type
+    this.isAdding = true
   }
 
-  openEditDialog() {
-    const action = this.selectedAction
-    if (!action) return
-    this.dialogType = action.type
-    this.showDialog = true
-  }
-
-  closeDialog() {
-    this.showDialog = false
+  closeForm() {
+    this.isAdding = false
   }
 
   async setSlot(index: number, input: SlotActionInput) {
