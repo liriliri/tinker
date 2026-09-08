@@ -1,7 +1,7 @@
 {
   "name": "tinker-shortcut",
   "version": "0.1.0",
-  "description": "Global shortcut manager for binding hotkeys to shell commands",
+  "description": "Global shortcut manager for binding hotkeys to custom actions",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -18,7 +18,7 @@
     "locales": {
       "zh-CN": {
         "name": "快捷键",
-        "description": "全局快捷键管理，绑定热键执行命令"
+        "description": "全局快捷键管理，绑定热键执行自定义操作"
       }
     },
     "mcp": {

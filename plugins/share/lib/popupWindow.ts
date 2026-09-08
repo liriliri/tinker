@@ -7,6 +7,8 @@ export interface PopupWindowOptions {
   height: number
   minWidth?: number
   minHeight?: number
+  x?: number
+  y?: number
   alwaysOnTop?: boolean
   resizable?: boolean
   webviewTag?: boolean
@@ -34,6 +36,8 @@ export function openPopupWindow(
     height,
     minWidth,
     minHeight,
+    x,
+    y,
     alwaysOnTop = true,
     resizable = true,
     webviewTag,
@@ -57,6 +61,8 @@ export function openPopupWindow(
 
   const actualWidth = savedBounds?.width ?? width
   const actualHeight = savedBounds?.height ?? height
+  const left = x ?? savedBounds?.x
+  const top = y ?? savedBounds?.y
 
   const features = [
     `width=${actualWidth}`,
@@ -68,8 +74,8 @@ export function openPopupWindow(
     'frame=no',
     webviewTag ? 'webviewTag=true' : '',
     transparent ? 'transparent=true' : '',
-    savedBounds ? `left=${savedBounds.x}` : '',
-    savedBounds ? `top=${savedBounds.y}` : '',
+    left != null ? `left=${left}` : '',
+    top != null ? `top=${top}` : '',
   ]
     .filter(Boolean)
     .join(',')
