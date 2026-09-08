@@ -92,7 +92,7 @@ const ActionRow = observer(function ActionRow({ action }: ActionProps) {
           {unbound && (
             <span
               className="inline-flex items-center gap-1 text-amber-500"
-              title={t('shortcutUnbound')}
+              title={t('hotkeyUnbound')}
             >
               <AlertTriangle size={12} />
             </span>
@@ -103,7 +103,7 @@ const ActionRow = observer(function ActionRow({ action }: ActionProps) {
         >
           <span className="inline-flex items-center gap-1 shrink-0">
             <Keyboard size={12} />
-            <span className="font-mono">{action.shortcut}</span>
+            <span className="font-mono">{action.hotkey}</span>
           </span>
           <span className="font-mono truncate">{action.command}</span>
         </div>

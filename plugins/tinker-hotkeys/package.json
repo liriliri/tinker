@@ -1,7 +1,7 @@
 {
-  "name": "tinker-shortcut",
+  "name": "tinker-hotkeys",
   "version": "0.1.0",
-  "description": "Global shortcut manager for binding hotkeys to custom actions",
+  "description": "Global hotkey manager for binding keys to custom actions",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -11,7 +11,7 @@
     "build:preload": "vite build --config ../vite.preload.ts"
   },
   "tinker": {
-    "name": "Shortcut",
+    "name": "Hotkeys",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
@@ -24,10 +24,10 @@
     "mcp": {
       "tools": {
         "list": {
-          "description": "List all shortcut actions with id, name, shortcut, type, command/path/url, enabled state, and whether the shortcut failed to register."
+          "description": "List all hotkey actions with id, name, hotkey, type, command/path/url, enabled state, and whether the hotkey failed to register."
         },
         "get": {
-          "description": "Get one shortcut action by id.",
+          "description": "Get one hotkey action by id.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -43,7 +43,7 @@
           }
         },
         "add": {
-          "description": "Create a shortcut action. type is command (shell), app (application path), directory (folder path), url, or plugin (plugin id). command holds the shell command, app path, directory path, URL, or plugin id.",
+          "description": "Create a hotkey action. type is command (shell), app (application path), directory (folder path), url, or plugin (plugin id). command holds the shell command, app path, directory path, URL, or plugin id.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -52,7 +52,7 @@
                 "minLength": 1,
                 "description": "Display name"
               },
-              "shortcut": {
+              "hotkey": {
                 "type": "string",
                 "minLength": 1,
                 "description": "Electron accelerator, e.g. Command+Shift+K or Ctrl+Alt+T"
@@ -75,7 +75,7 @@
               },
               "enabled": {
                 "type": "boolean",
-                "description": "Whether the shortcut is enabled (default true)"
+                "description": "Whether the hotkey is enabled (default true)"
               },
               "appIcon": {
                 "type": "string",
@@ -84,14 +84,14 @@
             },
             "required": [
               "name",
-              "shortcut",
+              "hotkey",
               "type",
               "command"
             ]
           }
         },
         "update": {
-          "description": "Update a shortcut action by id. Only provided fields are changed.",
+          "description": "Update a hotkey action by id. Only provided fields are changed.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -105,7 +105,7 @@
                 "minLength": 1,
                 "description": "New display name"
               },
-              "shortcut": {
+              "hotkey": {
                 "type": "string",
                 "minLength": 1,
                 "description": "New Electron accelerator"
@@ -128,7 +128,7 @@
               },
               "enabled": {
                 "type": "boolean",
-                "description": "Whether the shortcut is enabled"
+                "description": "Whether the hotkey is enabled"
               },
               "appIcon": {
                 "type": [
@@ -144,7 +144,7 @@
           }
         },
         "delete": {
-          "description": "Delete a shortcut action by id.",
+          "description": "Delete a hotkey action by id.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -160,7 +160,7 @@
           }
         },
         "toggle": {
-          "description": "Toggle whether a shortcut action is enabled.",
+          "description": "Toggle whether a hotkey action is enabled.",
           "inputSchema": {
             "type": "object",
             "properties": {

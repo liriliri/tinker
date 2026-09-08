@@ -5,7 +5,7 @@ export type FilterTab = 'all' | ActionType
 export interface Action {
   id: string
   name: string
-  shortcut: string
+  hotkey: string
   enabled: boolean
   type: ActionType
   command: string

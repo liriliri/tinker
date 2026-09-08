@@ -16,12 +16,18 @@ const ACTION_TYPES: ActionType[] = [
   'url',
 ]
 
-export function normalizeAction(raw: Partial<Action> & { id: string }): Action {
+export function normalizeAction(
+  raw: Partial<Action> & { id: string; shortcut?: string }
+): Action {
+  const { shortcut: legacyShortcut, ...rest } = raw
   const action = defaults(
-    { ...raw },
+    {
+      ...rest,
+      hotkey: rest.hotkey || legacyShortcut || '',
+    },
     {
       name: '',
-      shortcut: '',
+      hotkey: '',
       enabled: true,
       type: 'command' as ActionType,
       command: '',

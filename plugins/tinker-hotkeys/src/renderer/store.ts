@@ -41,7 +41,7 @@ export class Store extends BaseStore {
     super()
     makeAutoObservable(this)
     this.load()
-    void this.syncShortcuts()
+    void this.syncHotkeys()
   }
 
   private load() {
@@ -80,7 +80,7 @@ export class Store extends BaseStore {
     }
     const query = lowerCase(this.searchQuery)
     return filter(result, (action) =>
-      some([action.name, action.shortcut, action.command], (text) =>
+      some([action.name, action.hotkey, action.command], (text) =>
         contain(lowerCase(text), query)
       )
     )
@@ -107,7 +107,7 @@ export class Store extends BaseStore {
     const action: Action = { ...input, id: uuid() }
     this.actions.push(action)
     this.persist()
-    await this.syncShortcuts()
+    await this.syncHotkeys()
     return action
   }
 
@@ -116,13 +116,13 @@ export class Store extends BaseStore {
     if (index < 0) return
     this.actions[index] = { ...input, id }
     this.persist()
-    await this.syncShortcuts()
+    await this.syncHotkeys()
   }
 
   async removeAction(id: string) {
     this.actions = this.actions.filter((a) => a.id !== id)
     this.persist()
-    await this.syncShortcuts()
+    await this.syncHotkeys()
   }
 
   async toggleEnabled(id: string) {
@@ -130,7 +130,7 @@ export class Store extends BaseStore {
     if (!action) return
     action.enabled = !action.enabled
     this.persist()
-    await this.syncShortcuts()
+    await this.syncHotkeys()
   }
 
   async runAction(id: string) {
@@ -149,17 +149,17 @@ export class Store extends BaseStore {
 
     const result =
       action.type === 'app'
-        ? await shortcut.openApp(action.command)
+        ? await hotkeys.openApp(action.command)
         : action.type === 'directory'
-        ? await shortcut.openDirectory(action.command)
-        : await shortcut.execCommand(action.command)
+        ? await hotkeys.openDirectory(action.command)
+        : await hotkeys.execCommand(action.command)
 
     if (result.stderr && !result.stdout) {
       tinker.showNotification(`${action.name}: ${result.stderr}`)
     }
   }
 
-  private async syncShortcuts() {
+  private async syncHotkeys() {
     for (const accelerator of [...registered.keys()]) {
       await tinker.unregisterShortcut(accelerator)
     }
@@ -169,20 +169,20 @@ export class Store extends BaseStore {
     for (const action of this.actions) {
       if (
         !action.enabled ||
-        isStrBlank(action.shortcut) ||
+        isStrBlank(action.hotkey) ||
         isStrBlank(action.command)
       ) {
         continue
       }
-      if (registered.has(action.shortcut)) {
+      if (registered.has(action.hotkey)) {
         unbound.push(action.id)
         continue
       }
       try {
-        await tinker.registerShortcut(action.shortcut, () => {
+        await tinker.registerShortcut(action.hotkey, () => {
           void this.runAction(action.id)
         })
-        registered.set(action.shortcut, action.id)
+        registered.set(action.hotkey, action.id)
       } catch {
         unbound.push(action.id)
       }

@@ -45,8 +45,8 @@ const api = {
   },
 }
 
-contextBridge.exposeInMainWorld('shortcut', api)
+contextBridge.exposeInMainWorld('hotkeys', api)
 
 declare global {
-  const shortcut: typeof api
+  const hotkeys: typeof api
 }

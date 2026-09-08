@@ -14,7 +14,7 @@ import { Monitor, Package } from 'lucide-react'
 import type { ActionInput, ActionType } from '../types'
 import { actionUsesIcon, filterByName, folderName } from '../lib/util'
 import store from '../store'
-import ShortcutInput from './ShortcutInput'
+import HotkeyInput from './HotkeyInput'
 
 const ADD_TITLE: Record<ActionType, string> = {
   command: 'addCommand',
@@ -158,7 +158,7 @@ export default observer(function ActionDialog() {
   const type = store.dialogType
   const [form, setForm] = useState<ActionInput>({
     name: '',
-    shortcut: '',
+    hotkey: '',
     command: '',
     enabled: true,
     type: 'command',
@@ -175,7 +175,7 @@ export default observer(function ActionDialog() {
     if (editing) {
       setForm({
         name: editing.name,
-        shortcut: editing.shortcut,
+        hotkey: editing.hotkey,
         command: editing.command,
         enabled: editing.enabled,
         type: editing.type,
@@ -184,7 +184,7 @@ export default observer(function ActionDialog() {
     } else {
       setForm({
         name: '',
-        shortcut: '',
+        hotkey: '',
         command: '',
         enabled: true,
         type,
@@ -269,8 +269,8 @@ export default observer(function ActionDialog() {
       toast.error(t('nameRequired'))
       return
     }
-    if (isStrBlank(form.shortcut)) {
-      toast.error(t('shortcutRequired'))
+    if (isStrBlank(form.hotkey)) {
+      toast.error(t('hotkeyRequired'))
       return
     }
     if (isStrBlank(form.command)) {
@@ -280,7 +280,7 @@ export default observer(function ActionDialog() {
 
     const input: ActionInput = {
       name: trim(form.name),
-      shortcut: trim(form.shortcut),
+      hotkey: trim(form.hotkey),
       command: trim(form.command),
       enabled: form.enabled,
       type,
@@ -318,11 +318,11 @@ export default observer(function ActionDialog() {
           </div>
           <div className="flex flex-col gap-1.5 min-w-0">
             <label className={`text-sm font-medium ${tw.text.secondary}`}>
-              {t('shortcut')}
+              {t('hotkey')}
             </label>
-            <ShortcutInput
-              value={form.shortcut}
-              onChange={(value) => set('shortcut', value)}
+            <HotkeyInput
+              value={form.hotkey}
+              onChange={(value) => set('hotkey', value)}
             />
           </div>
         </div>

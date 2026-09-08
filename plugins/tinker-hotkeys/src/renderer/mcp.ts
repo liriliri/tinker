@@ -13,7 +13,7 @@ interface IdArgs {
 
 interface AddArgs {
   name: string
-  shortcut: string
+  hotkey: string
   type: ActionType
   command: string
   enabled?: boolean
@@ -23,7 +23,7 @@ interface AddArgs {
 interface UpdateArgs {
   id: string
   name?: string
-  shortcut?: string
+  hotkey?: string
   type?: ActionType
   command?: string
   enabled?: boolean
@@ -45,7 +45,7 @@ function serializeAction(store: Store, action: Action) {
   return {
     id: action.id,
     name: action.name,
-    shortcut: action.shortcut,
+    hotkey: action.hotkey,
     type: action.type,
     command: action.command,
     enabled: action.enabled,
@@ -75,14 +75,14 @@ function get(store: Store, args: IdArgs) {
 
 async function add(store: Store, args: AddArgs) {
   const name = trim(args.name)
-  const shortcut = trim(args.shortcut)
+  const hotkey = trim(args.hotkey)
   const command = trim(args.command)
 
   if (isStrBlank(name)) {
     throw new Error('name is required and cannot be empty.')
   }
-  if (isStrBlank(shortcut)) {
-    throw new Error('shortcut is required and cannot be empty.')
+  if (isStrBlank(hotkey)) {
+    throw new Error('hotkey is required and cannot be empty.')
   }
   if (isStrBlank(command)) {
     throw new Error('command is required and cannot be empty.')
@@ -90,7 +90,7 @@ async function add(store: Store, args: AddArgs) {
 
   const input: ActionInput = {
     name,
-    shortcut,
+    hotkey,
     command,
     type: args.type,
     enabled: args.enabled !== false,
@@ -109,29 +109,27 @@ async function update(store: Store, args: UpdateArgs) {
 
   if (
     isUndef(args.name) &&
-    isUndef(args.shortcut) &&
+    isUndef(args.hotkey) &&
     isUndef(args.type) &&
     isUndef(args.command) &&
     isUndef(args.enabled) &&
     isUndef(args.appIcon)
   ) {
     throw new Error(
-      'Provide name, shortcut, type, command, enabled, and/or appIcon to update.'
+      'Provide name, hotkey, type, command, enabled, and/or appIcon to update.'
     )
   }
 
   const type = args.type ?? existing.type
   const name = !isUndef(args.name) ? trim(args.name) : existing.name
-  const shortcut = !isUndef(args.shortcut)
-    ? trim(args.shortcut)
-    : existing.shortcut
+  const hotkey = !isUndef(args.hotkey) ? trim(args.hotkey) : existing.hotkey
   const command = !isUndef(args.command) ? trim(args.command) : existing.command
 
   if (isStrBlank(name)) {
     throw new Error('name cannot be empty.')
   }
-  if (isStrBlank(shortcut)) {
-    throw new Error('shortcut cannot be empty.')
+  if (isStrBlank(hotkey)) {
+    throw new Error('hotkey cannot be empty.')
   }
   if (isStrBlank(command)) {
     throw new Error('command cannot be empty.')
@@ -146,7 +144,7 @@ async function update(store: Store, args: UpdateArgs) {
 
   const input: ActionInput = {
     name,
-    shortcut,
+    hotkey,
     command,
     type,
     enabled: !isUndef(args.enabled) ? args.enabled : existing.enabled,

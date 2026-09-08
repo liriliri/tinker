@@ -70,7 +70,7 @@ const CODE_TO_ACCELERATOR: Record<string, string> = {
 
 const DOUBLE_TAP_INTERVAL = 400
 
-interface ShortcutInputProps {
+interface HotkeyInputProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
@@ -96,12 +96,12 @@ function getModifierName(code: string): string {
   }
 }
 
-export default function ShortcutInput({
+export default function HotkeyInput({
   value,
   onChange,
   placeholder,
   className = '',
-}: ShortcutInputProps) {
+}: HotkeyInputProps) {
   const { t } = useTranslation()
   const [isRecording, setIsRecording] = useState(false)
   const [recordedKeys, setRecordedKeys] = useState<string[]>([])
@@ -127,10 +127,10 @@ export default function ShortcutInput({
     setRecordedKeys([])
   }, [clearDoubleTapTimer])
 
-  const confirmShortcut = useCallback(
-    (shortcut: string) => {
-      setRecordedKeys(shortcut.split('+'))
-      onChange(shortcut)
+  const confirmHotkey = useCallback(
+    (hotkey: string) => {
+      setRecordedKeys(hotkey.split('+'))
+      onChange(hotkey)
       stopRecording()
     },
     [onChange, stopRecording]
@@ -206,7 +206,7 @@ export default function ShortcutInput({
           time - lastModifierTapRef.current.time < DOUBLE_TAP_INTERVAL
         ) {
           clearDoubleTapTimer()
-          confirmShortcut(`${modifier}+${modifier}`)
+          confirmHotkey(`${modifier}+${modifier}`)
           return
         }
 
@@ -225,7 +225,7 @@ export default function ShortcutInput({
       }
 
       if (recordedKeys.length > 1 && mainKeyPressedRef.current) {
-        confirmShortcut(recordedKeys.join('+'))
+        confirmHotkey(recordedKeys.join('+'))
         return
       }
 
@@ -234,7 +234,7 @@ export default function ShortcutInput({
         mainKeyPressedRef.current &&
         /^F([1-9]|1[0-2])$/.test(recordedKeys[0])
       ) {
-        confirmShortcut(recordedKeys[0])
+        confirmHotkey(recordedKeys[0])
         return
       }
 
@@ -245,13 +245,13 @@ export default function ShortcutInput({
 
       stopRecording()
     },
-    [recordedKeys, confirmShortcut, stopRecording, clearDoubleTapTimer]
+    [recordedKeys, confirmHotkey, stopRecording, clearDoubleTapTimer]
   )
 
   const handleClickOutside = useCallback(
     (e: MouseEvent) => {
       const target = e.target as HTMLElement
-      if (target && target.hasAttribute('data-shortcut-input')) {
+      if (target && target.hasAttribute('data-hotkey-input')) {
         return
       }
       stopRecording()
@@ -276,11 +276,11 @@ export default function ShortcutInput({
     ? !isEmpty(recordedKeys)
       ? recordedKeys.join('+')
       : t('recording')
-    : value || placeholder || t('recordShortcut')
+    : value || placeholder || t('recordHotkey')
 
   return (
     <div
-      data-shortcut-input
+      data-hotkey-input
       className={`w-full px-2.5 py-1.5 text-sm border text-center cursor-pointer select-none transition-all rounded flex items-center justify-center ${
         isRecording
           ? `${tw.primary.border} ${tw.primary.bgFocused} ${tw.primary.text} animate-pulse`
