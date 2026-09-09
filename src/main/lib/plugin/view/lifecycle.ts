@@ -10,6 +10,8 @@ import each from 'licia/each'
 import debounce from 'licia/debounce'
 import isMac from 'licia/isMac'
 import isEmpty from 'licia/isEmpty'
+import sleep from 'licia/sleep'
+import ric from 'licia/ric'
 import { BrowserWindow, WebContents, WebContentsView } from 'electron'
 import * as window from 'share/main/lib/window'
 import * as theme from 'share/main/lib/theme'
@@ -131,8 +133,11 @@ export async function startBackgroundPlugins() {
   }
 
   await getPlugins()
-  for (const id of ids) {
-    openPlugin(id, false, true)
+  for (let i = 0; i < ids.length; i++) {
+    ric(() => openPlugin(ids[i], false, true))
+    if (i < ids.length - 1) {
+      await sleep(1000)
+    }
   }
 }
 

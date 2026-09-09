@@ -228,5 +228,5 @@ export function init() {
       },
     })
   })
-  setTimeout(startBackgroundPlugins, 1000)
+  setTimeout(startBackgroundPlugins, 2000)
 }
