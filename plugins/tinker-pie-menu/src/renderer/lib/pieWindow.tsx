@@ -1,23 +1,30 @@
-import type { ReactNode } from 'react'
 import { openPopupWindow } from 'share/lib/popupWindow'
+import { storage } from 'share/store/Base'
+import isObj from 'licia/isObj'
+import isNum from 'licia/isNum'
 import FloatingPie from '../components/FloatingPie'
-
-const PIE_WINDOW_SIZE = 300
+import { DUAL_PIE_SIZE, type ScreenPoint } from '../types'
 
 let pieWindow: Window | null = null
 let invokeModeActive = false
 
-function renderFloatingPie(
-  onClose: () => void,
-  options: { dismissOnAction: boolean; draggable: boolean }
-): ReactNode {
-  return (
-    <FloatingPie
-      onClose={onClose}
-      dismissOnAction={options.dismissOnAction}
-      draggable={options.draggable}
-    />
-  )
+const PIE_POSITION_KEY = 'pieMenu'
+const PIE_POSITION_STORAGE_KEY = `popupWindow_${PIE_POSITION_KEY}`
+
+const BASE_PIE_WINDOW = {
+  width: DUAL_PIE_SIZE,
+  height: DUAL_PIE_SIZE,
+  resizable: false,
+  transparent: true,
+  alwaysOnTop: true,
+  hasShadow: false,
+} as const
+
+interface SavedBounds {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
 function trackWindow(popup: Window | null, isInvoke: boolean) {
@@ -32,6 +39,25 @@ function trackWindow(popup: Window | null, isInvoke: boolean) {
   })
 }
 
+function readSavedBounds(): SavedBounds | null {
+  const bounds = storage.get(PIE_POSITION_STORAGE_KEY)
+  if (!isObj(bounds)) return null
+  const b = bounds as SavedBounds
+  if (!isNum(b.x) || !isNum(b.y) || !isNum(b.width) || !isNum(b.height)) {
+    return null
+  }
+  return b
+}
+
+function persistPieBounds(x: number, y: number) {
+  storage.set(PIE_POSITION_STORAGE_KEY, {
+    x,
+    y,
+    width: DUAL_PIE_SIZE,
+    height: DUAL_PIE_SIZE,
+  })
+}
+
 export function closePieWindow() {
   if (pieWindow && !pieWindow.closed) {
     pieWindow.close()
@@ -42,33 +68,48 @@ export function closePieWindow() {
 
 export function openAlwaysOnPieWindow() {
   if (pieWindow && !pieWindow.closed && !invokeModeActive) {
-    pieWindow.focus()
     return
   }
   closePieWindow()
+
+  const prev = readSavedBounds()
+  const x = prev
+    ? Math.round(prev.x + prev.width / 2 - DUAL_PIE_SIZE / 2)
+    : undefined
+  const y = prev
+    ? Math.round(prev.y + prev.height / 2 - DUAL_PIE_SIZE / 2)
+    : undefined
+
+  if (x != null && y != null) {
+    persistPieBounds(x, y)
+  }
+
   const popup = openPopupWindow(
     {
-      width: PIE_WINDOW_SIZE,
-      height: PIE_WINDOW_SIZE,
-      resizable: false,
-      transparent: true,
-      alwaysOnTop: true,
-      positionKey: 'pieMenu',
+      ...BASE_PIE_WINDOW,
+      ...(x != null && y != null ? { x, y } : {}),
+      // Avoid "first click focuses, second click acts" on macOS.
+      focusable: false,
+      positionKey: PIE_POSITION_KEY,
     },
-    (_win, onClose) =>
-      renderFloatingPie(onClose, {
-        dismissOnAction: false,
-        draggable: true,
-      })
+    (popupWin, onClose) => (
+      <FloatingPie
+        popup={popupWin}
+        onClose={onClose}
+        dismissOnAction={false}
+        draggable
+      />
+    )
   )
   trackWindow(popup, false)
 }
 
-export function openInvokePieWindow(point: { x: number; y: number }) {
-  const x = Math.round(point.x - PIE_WINDOW_SIZE / 2)
-  const y = Math.round(point.y - PIE_WINDOW_SIZE / 2)
+export function openInvokePieWindow(point: ScreenPoint) {
+  const x = Math.round(point.x - DUAL_PIE_SIZE / 2)
+  const y = Math.round(point.y - DUAL_PIE_SIZE / 2)
 
   if (pieWindow && !pieWindow.closed) {
+    pieWindow.resizeTo(DUAL_PIE_SIZE, DUAL_PIE_SIZE)
     pieWindow.moveTo(x, y)
     pieWindow.focus()
     return
@@ -76,19 +117,18 @@ export function openInvokePieWindow(point: { x: number; y: number }) {
 
   const popup = openPopupWindow(
     {
-      width: PIE_WINDOW_SIZE,
-      height: PIE_WINDOW_SIZE,
-      resizable: false,
-      transparent: true,
-      alwaysOnTop: true,
+      ...BASE_PIE_WINDOW,
       x,
       y,
     },
-    (_win, onClose) =>
-      renderFloatingPie(onClose, {
-        dismissOnAction: true,
-        draggable: false,
-      })
+    (popupWin, onClose) => (
+      <FloatingPie
+        popup={popupWin}
+        onClose={onClose}
+        dismissOnAction
+        draggable={false}
+      />
+    )
   )
   trackWindow(popup, true)
 }

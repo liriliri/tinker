@@ -6,4 +6,4 @@ export {
   moveRecordingCursorTo,
 } from './renderer/cursor'
 
-injectApi()
+injectApi({ context: 'renderer' })

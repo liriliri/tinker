@@ -184,6 +184,11 @@ export type IpcSendDebuggerCommand = (
   method: string,
   params?: Record<string, unknown>
 ) => Promise<unknown>
+export type IpcSetIgnoreMouseEvents = (
+  webContentsId: number,
+  ignore: boolean,
+  options?: { forward?: boolean }
+) => void
 export type IpcPluginRecorderStarted = (pluginId: string) => Promise<void>
 export type IpcPluginRecorderStopped = (pluginId: string) => Promise<void>
 export type IpcPluginRecorderError = (

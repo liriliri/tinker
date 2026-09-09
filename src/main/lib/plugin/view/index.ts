@@ -1,5 +1,5 @@
 export { PLUGIN_PARTITION, pluginViews } from './state'
-export { preparePluginView } from './create'
+export { preparePluginView, setIgnoreMouseEvents } from './create'
 export {
   openPlugin,
   startBackgroundPlugins,

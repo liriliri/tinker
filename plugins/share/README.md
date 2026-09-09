@@ -340,7 +340,7 @@ import {
 } from 'share/lib/holidays' // requires calendar.js vendor
 ```
 
-**Popup window** options: `width`, `height`, `minWidth?`, `minHeight?`, `x?`, `y?`, `alwaysOnTop?`, `resizable?`, `webviewTag?`, `transparent?`, `positionKey?` (persists bounds via Base `storage`). `x`/`y` override the saved position when opening.
+**Popup window** options: `width`, `height`, `minWidth?`, `minHeight?`, `x?`, `y?`, `alwaysOnTop?`, `resizable?`, `webviewTag?`, `transparent?`, `focusable?`, `hasShadow?`, `positionKey?` (persists bounds via Base `storage`). `x`/`y` override the saved position when opening.
 
 **Holidays** — built-in international and Chinese holidays; translations auto-register in `holidays` namespace.
 

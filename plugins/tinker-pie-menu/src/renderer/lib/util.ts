@@ -7,9 +7,16 @@ import lowerCase from 'licia/lowerCase'
 import filter from 'licia/filter'
 import splitPath from 'licia/splitPath'
 import isArr from 'licia/isArr'
+import isObj from 'licia/isObj'
 import map from 'licia/map'
-import type { ActionType, SlotAction, Slots } from '../types'
-import { SLOT_COUNT } from '../types'
+import fill from 'licia/fill'
+import {
+  INNER_SLOT_COUNT,
+  OUTER_SLOT_COUNT,
+  type ActionType,
+  type SlotAction,
+  type Slots,
+} from '../types'
 
 const ACTION_TYPES: ActionType[] = [
   'command',
@@ -19,22 +26,28 @@ const ACTION_TYPES: ActionType[] = [
   'url',
 ]
 
-export function emptySlots(): Slots {
-  return Array.from({ length: SLOT_COUNT }, () => null)
+export function emptySlots(count = INNER_SLOT_COUNT): Slots {
+  return fill(Array(count), null)
 }
 
-export function normalizeSlots(raw: unknown): Slots {
-  const slots = emptySlots()
+function normalizeSlotList(raw: unknown, count: number): Slots {
+  const slots = emptySlots(count)
   if (!isArr(raw)) return slots
-  map(raw.slice(0, SLOT_COUNT), (item, index) => {
-    if (!item || typeof item !== 'object') return
-    const partial = item as Partial<SlotAction> & { id?: string }
-    if (!partial.id) return
+  map(raw.slice(0, count), (item, index) => {
+    if (!isObj(item) || !(item as Partial<SlotAction>).id) return
     slots[index] = normalizeSlotAction(
-      partial as Partial<SlotAction> & { id: string }
+      item as Partial<SlotAction> & { id: string }
     )
   })
   return slots
+}
+
+export function normalizeSlots(raw: unknown): Slots {
+  return normalizeSlotList(raw, INNER_SLOT_COUNT)
+}
+
+export function normalizeOuterSlots(raw: unknown): Slots {
+  return normalizeSlotList(raw, OUTER_SLOT_COUNT)
 }
 
 function normalizeSlotAction(
@@ -114,10 +127,17 @@ export function donutSlicePath(
   ].join(' ')
 }
 
-export function slotAngles(index: number) {
-  const sweep = 360 / SLOT_COUNT
+export function slotAngles(index: number, count = INNER_SLOT_COUNT) {
+  const sweep = 360 / count
   const start = index * sweep
   const end = start + sweep
   const mid = start + sweep / 2
   return { start, end, mid }
+}
+
+export function popupCenter(popup: Window) {
+  return {
+    x: popup.screenX + popup.outerWidth / 2,
+    y: popup.screenY + popup.outerHeight / 2,
+  }
 }

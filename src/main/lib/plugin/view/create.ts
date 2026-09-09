@@ -4,7 +4,12 @@ import each from 'licia/each'
 import contain from 'licia/contain'
 import trim from 'licia/trim'
 import toNum from 'licia/toNum'
-import { BrowserWindow, WebContents, WebContentsView } from 'electron'
+import {
+  BrowserWindow,
+  webContents as electronWebContents,
+  WebContents,
+  WebContentsView,
+} from 'electron'
 import * as window from 'share/main/lib/window'
 import { PLUGIN_PARTITION, findPluginByWebContents } from './state'
 import { applyWindowTheme, markTransparent } from './util'
@@ -31,6 +36,8 @@ const allowedWindowOptions = [
   'alwaysOnTop',
   'resizable',
   'transparent',
+  'focusable',
+  'hasShadow',
 ]
 
 const allowedWebPreferences = ['webviewTag']
@@ -121,6 +128,7 @@ function setupWindowOpenHandler(webContents: WebContents) {
       markTransparent(childWin)
     }
     applyWindowTheme(childWin)
+    webContents.send('popupNewWindow', childWin.webContents.id)
     childWin.on('closed', () => {
       entry.childWindows.delete(childWin)
     })
@@ -176,4 +184,22 @@ export function preparePluginView() {
   if (!preloadPluginView) {
     preloadPluginView = createPluginView()
   }
+}
+
+export function setIgnoreMouseEvents(
+  sender: WebContents,
+  webContentsId: number,
+  ignore: boolean,
+  options?: { forward?: boolean }
+) {
+  const caller = findPluginByWebContents(sender)
+  if (!caller) {
+    throw new Error('Unauthorized')
+  }
+  const target = electronWebContents.fromId(webContentsId)
+  const win = target && BrowserWindow.fromWebContents(target)
+  if (!win || !caller.entry.childWindows.has(win)) {
+    throw new Error('Unauthorized')
+  }
+  win.setIgnoreMouseEvents(ignore, options)
 }

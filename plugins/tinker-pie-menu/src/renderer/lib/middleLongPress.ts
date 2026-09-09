@@ -1,11 +1,14 @@
+import each from 'licia/each'
+import type { ScreenPoint } from '../types'
+
 const LONG_PRESS_MS = 450
 const MOVE_TOLERANCE_SQ = 100
 
-type PointHandler = (point: { x: number; y: number }) => void
+type PointHandler = (point: ScreenPoint) => void
 
 let disposers: Array<() => void> = []
 let pressTimer: ReturnType<typeof setTimeout> | null = null
-let pressPoint: { x: number; y: number } | null = null
+let pressPoint: ScreenPoint | null = null
 
 function clearPressTimer() {
   if (pressTimer) {
@@ -51,7 +54,5 @@ export async function stopMiddleLongPress() {
   clearPressTimer()
   const current = disposers
   disposers = []
-  for (const dispose of current) {
-    dispose()
-  }
+  each(current, (dispose) => dispose())
 }

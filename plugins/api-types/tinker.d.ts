@@ -754,25 +754,29 @@ declare global {
 
     /**
      * Register a global keyboard shortcut (Electron globalShortcut / uIOhook
-     * double-tap modifiers). Auto-unregistered when the plugin is destroyed.
+     * double-tap modifiers). Returns an `off` function to remove this shortcut.
+     * Auto-unregistered when the plugin is destroyed.
      */
     registerShortcut(
       accelerator: string,
       callback: () => void
     ): Promise<() => void>
 
-    unregisterShortcut(accelerator: string): Promise<void>
-
     /**
-     * Register a global mouse listener. Auto-unregistered when the plugin is
-     * destroyed.
+     * Register a global mouse listener. Returns an `off` function to remove
+     * this listener. Auto-unregistered when the plugin is destroyed.
      */
     registerMouse(
       type: tinker.MouseEventName,
       callback: (event: tinker.MouseEvent) => void
     ): Promise<() => void>
+  }
 
-    unregisterMouse(type: tinker.MouseEventName): Promise<void>
+  interface Window {
+    setIgnoreMouseEvents?(
+      ignore: boolean,
+      options?: { forward?: boolean }
+    ): Promise<void>
   }
 }
 

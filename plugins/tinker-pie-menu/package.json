@@ -1,7 +1,7 @@
 {
   "name": "tinker-pie-menu",
   "version": "0.1.0",
-  "description": "Floating pie menu with eight radial actions, always-on or middle-click invoke",
+  "description": "Floating pie menu with radial actions; always-on ball or middle-click invoke, optional dual ring",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:preload\"",
     "dev:renderer": "vite build --watch --config ../vite.config.ts",
@@ -12,14 +12,13 @@
   },
   "tinker": {
     "name": "Pie Menu",
-    "description": "Floating ball with an eight-slot pie menu; stay on screen or invoke with middle-click",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "locales": {
       "zh-CN": {
         "name": "悬浮球",
-        "description": "八扇区悬浮球菜单，可常驻或中键唤起"
+        "description": "径向悬浮饼菜单，可常驻或中键唤起，支持双环扇区"
       }
     }
   }

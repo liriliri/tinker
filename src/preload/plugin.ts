@@ -20,6 +20,7 @@ import {
   IpcUnregisterShortcut,
   IpcRegisterMouse,
   IpcUnregisterMouse,
+  IpcSetIgnoreMouseEvents,
   IPlugin,
 } from 'common/types'
 import { pathToFileURL } from 'url'
@@ -83,7 +84,7 @@ let plugin: IPlugin | null = null
 async function preparePlugin(p: IPlugin) {
   plugin = p
   if (p.preload) {
-    injectApi()
+    injectApi({ context: 'preload' })
     await import(pathToFileURL(p.preload).href)
   }
 }
@@ -224,6 +225,7 @@ const tinkerObj = {
   unregisterShortcut: invoke<IpcUnregisterShortcut>('unregisterShortcut'),
   registerMouse: invoke<IpcRegisterMouse>('registerMouse'),
   unregisterMouse: invoke<IpcUnregisterMouse>('unregisterMouse'),
+  setIgnoreMouseEvents: invoke<IpcSetIgnoreMouseEvents>('setIgnoreMouseEvents'),
   t(key: string) {
     return i18n.t(key)
   },

@@ -24,7 +24,10 @@ const searchTextTasks: types.PlainObj<KillQuitTask> = {}
 const downloadTasks: types.PlainObj<DownloadTask> = {}
 let contextMenuCallbacks: types.PlainObj<types.AnyFn> = {}
 const shortcutCallbacks = new Map<string, () => void>()
-const mouseCallbacks = new Map<MouseEventName, (event: IMouseEvent) => void>()
+const mouseCallbacks = new Map<
+  MouseEventName,
+  Set<(event: IMouseEvent) => void>
+>()
 
 function runFFmpeg(args: string[], onProgress?: any) {
   const { promise, taskId } = _tinker.runFFmpeg(args, onProgress)
@@ -318,13 +321,10 @@ async function registerShortcut(
   }
   shortcutCallbacks.set(accelerator, callback)
   return () => {
-    void unregisterShortcut(accelerator)
+    if (shortcutCallbacks.get(accelerator) !== callback) return
+    shortcutCallbacks.delete(accelerator)
+    void _tinker.unregisterShortcut(accelerator)
   }
-}
-
-async function unregisterShortcut(accelerator: string): Promise<void> {
-  shortcutCallbacks.delete(accelerator)
-  await _tinker.unregisterShortcut(accelerator)
 }
 
 async function registerMouse(
@@ -335,15 +335,21 @@ async function registerMouse(
   if (!ok) {
     throw new Error(`Failed to register mouse: ${type}`)
   }
-  mouseCallbacks.set(type, callback)
-  return () => {
-    void unregisterMouse(type)
+  let set = mouseCallbacks.get(type)
+  if (!set) {
+    set = new Set()
+    mouseCallbacks.set(type, set)
   }
-}
-
-async function unregisterMouse(type: MouseEventName): Promise<void> {
-  mouseCallbacks.delete(type)
-  await _tinker.unregisterMouse(type)
+  set.add(callback)
+  return () => {
+    set!.delete(callback)
+    // Only tear down if this set is still the active one (avoids racing a
+    // newer registerMouse that replaced/reused the type after size hit 0).
+    if (set!.size === 0 && mouseCallbacks.get(type) === set) {
+      mouseCallbacks.delete(type)
+      void _tinker.unregisterMouse(type)
+    }
+  }
 }
 
 function transOptions(options: MenuItemConstructorOptions[]) {
@@ -415,7 +421,43 @@ function patchWebview() {
   })
 }
 
-export function injectApi() {
+let windowOpenPatched = false
+function patchWindowOpen() {
+  if (windowOpenPatched) return
+  windowOpenPatched = true
+
+  const pendingIds: number[] = []
+  const waiters: Array<(id: number) => void> = []
+
+  _tinker.on('popupNewWindow', (webContentsId: number) => {
+    const waiter = waiters.shift()
+    if (waiter) waiter(webContentsId)
+    else pendingIds.push(webContentsId)
+  })
+
+  const rawOpen = window.open.bind(window)
+  window.open = (
+    url?: string | URL,
+    target?: string,
+    features?: string
+  ): Window | null => {
+    const popup = rawOpen(url, target, features)
+    if (!popup) return null
+
+    const idPromise =
+      pendingIds.length > 0
+        ? Promise.resolve(pendingIds.shift()!)
+        : new Promise<number>((resolve) => waiters.push(resolve))
+
+    popup.setIgnoreMouseEvents = (ignore, options) =>
+      idPromise.then((id) => _tinker.setIgnoreMouseEvents(id, ignore, options))
+
+    return popup
+  }
+}
+
+export function injectApi(options?: { context?: 'preload' | 'renderer' }) {
+  const context = options?.context ?? 'renderer'
   window.tinker = {
     getTheme: _tinker.getTheme,
     getLanguage: _tinker.getLanguage,
@@ -459,12 +501,13 @@ export function injectApi() {
     createTerminal,
     registerMcp,
     registerShortcut,
-    unregisterShortcut,
     registerMouse,
-    unregisterMouse,
   }
 
-  patchWebview()
+  if (context === 'renderer') {
+    patchWebview()
+    patchWindowOpen()
+  }
 
   _tinker.on('clickContextMenu', (id: string) => {
     if (contextMenuCallbacks[id]) {
@@ -477,6 +520,10 @@ export function injectApi() {
   })
 
   _tinker.on('triggerMouse', (type: MouseEventName, event: IMouseEvent) => {
-    mouseCallbacks.get(type)?.(event)
+    const set = mouseCallbacks.get(type)
+    if (!set) return
+    for (const callback of [...set]) {
+      callback(event)
+    }
   })
 }

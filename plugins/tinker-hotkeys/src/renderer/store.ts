@@ -24,7 +24,7 @@ const FILTER_TABS: FilterTab[] = [
   'url',
 ]
 
-const registered = new Map<string, string>()
+const registered = new Map<string, () => void>()
 
 export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)
@@ -160,8 +160,8 @@ export class Store extends BaseStore {
   }
 
   private async syncHotkeys() {
-    for (const accelerator of [...registered.keys()]) {
-      await tinker.unregisterShortcut(accelerator)
+    for (const off of [...registered.values()]) {
+      off()
     }
     registered.clear()
 
@@ -179,10 +179,10 @@ export class Store extends BaseStore {
         continue
       }
       try {
-        await tinker.registerShortcut(action.hotkey, () => {
+        const off = await tinker.registerShortcut(action.hotkey, () => {
           void this.runAction(action.id)
         })
-        registered.set(action.hotkey, action.id)
+        registered.set(action.hotkey, off)
       } catch {
         unbound.push(action.id)
       }

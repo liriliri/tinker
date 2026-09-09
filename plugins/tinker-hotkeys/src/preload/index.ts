@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, shell } from 'electron'
 import { exec } from 'child_process'
 import isMac from 'licia/isMac'
 import isWindows from 'licia/isWindows'
@@ -32,16 +32,11 @@ const api = {
     return api.execCommand(cmd)
   },
 
-  openDirectory(dirPath: string): Promise<{ stdout: string; stderr: string }> {
-    let cmd: string
-    if (isMac) {
-      cmd = `open ${quote(dirPath)}`
-    } else if (isWindows) {
-      cmd = `explorer ${quote(dirPath)}`
-    } else {
-      cmd = `xdg-open ${quote(dirPath)}`
-    }
-    return api.execCommand(cmd)
+  async openDirectory(
+    dirPath: string
+  ): Promise<{ stdout: string; stderr: string }> {
+    const error = await shell.openPath(dirPath)
+    return { stdout: '', stderr: error }
   },
 }
 

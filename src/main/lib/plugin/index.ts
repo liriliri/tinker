@@ -41,6 +41,7 @@ import {
   startBackgroundPlugins,
   callMcpTool,
   getWebContentsPlugin,
+  setIgnoreMouseEvents,
 } from './view'
 
 export {
@@ -105,6 +106,11 @@ export function init() {
   handleEvent('togglePluginDevtools', togglePluginDevtools)
   ipcMain.handle('showPluginContextMenu', (event, x, y, options) =>
     showPluginContextMenu(event.sender, x, y, options)
+  )
+  ipcMain.handle(
+    'setIgnoreMouseEvents',
+    (event, webContentsId, ignore, options) =>
+      setIgnoreMouseEvents(event.sender, webContentsId, ignore, options)
   )
   handleEvent('getClipboardFilePaths', getClipboardFilePaths)
   handleEvent('exportPluginData', exportPluginData)

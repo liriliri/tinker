@@ -4,25 +4,12 @@ import { useState, useEffect, type ComponentType } from 'react'
 import isStrBlank from 'licia/isStrBlank'
 import isEmpty from 'licia/isEmpty'
 import fileUrl from 'licia/fileUrl'
-import trim from 'licia/trim'
-import { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
 import FileInput from 'share/components/FileInput'
 import { tw } from 'share/theme'
-import toast from 'react-hot-toast'
-import { Monitor, Package, Play, Trash2 } from 'lucide-react'
-import { confirm } from 'share/components/Confirm'
-import type { ActionType, SlotActionInput } from '../types'
-import { actionUsesIcon, filterByName, folderName } from '../lib/util'
+import { Monitor, Package } from 'lucide-react'
+import { filterByName, folderName } from '../lib/util'
 import store from '../store'
-
-const REQUIRED_MSG: Record<ActionType, string> = {
-  command: 'commandRequired',
-  plugin: 'pluginRequired',
-  app: 'appRequired',
-  directory: 'directoryRequired',
-  url: 'urlRequired',
-}
 
 interface PickerItem {
   key: string
@@ -66,12 +53,12 @@ function ItemPicker({
   const filtered = filterByName(items, query)
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className={`text-xs font-medium ${tw.text.secondary}`}>
+    <div className="flex flex-col gap-1.5 flex-1 min-h-0">
+      <label className={`text-xs font-medium shrink-0 ${tw.text.secondary}`}>
         {label}
       </label>
       <div
-        className={`flex items-center gap-2 px-2.5 py-1.5 rounded border ${tw.border} ${tw.bg.primary} mb-1 min-h-[34px]`}
+        className={`flex items-center gap-2 px-2.5 py-1.5 rounded border ${tw.border} ${tw.bg.primary} mb-1 min-h-[34px] shrink-0`}
       >
         {selectedKey ? (
           <>
@@ -95,13 +82,15 @@ function ItemPicker({
           <span className={`text-xs ${tw.text.tertiary}`}>{placeholder}</span>
         )}
       </div>
-      <TextInput
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        placeholder={searchPlaceholder}
-      />
+      <div className="shrink-0">
+        <TextInput
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          placeholder={searchPlaceholder}
+        />
+      </div>
       <div
-        className={`h-36 overflow-y-auto rounded border ${tw.border} ${tw.bg.primary}`}
+        className={`flex-1 min-h-0 overflow-y-auto rounded border ${tw.border} ${tw.bg.primary}`}
       >
         {loading ? (
           <p className={`text-xs px-3 py-4 text-center ${tw.text.tertiary}`}>
@@ -146,14 +135,7 @@ function ItemPicker({
 
 export default observer(function ActionForm() {
   const { t } = useTranslation()
-  const editing = store.selectedAction
-  const type = editing ? editing.type : store.formType
-  const [form, setForm] = useState<SlotActionInput>({
-    name: '',
-    command: '',
-    enabled: true,
-    type: 'command',
-  })
+  const action = store.selectedAction
   const [apps, setApps] = useState<PickerItem[]>([])
   const [appQuery, setAppQuery] = useState('')
   const [loadingApps, setLoadingApps] = useState(false)
@@ -161,27 +143,12 @@ export default observer(function ActionForm() {
   const [pluginQuery, setPluginQuery] = useState('')
   const [loadingPlugins, setLoadingPlugins] = useState(false)
 
+  const type = action?.type
+
   useEffect(() => {
-    if (editing) {
-      setForm({
-        name: editing.name,
-        command: editing.command,
-        enabled: editing.enabled,
-        type: editing.type,
-        appIcon: editing.appIcon,
-      })
-    } else {
-      setForm({
-        name: '',
-        command: '',
-        enabled: true,
-        type,
-        appIcon: undefined,
-      })
-    }
     setAppQuery('')
     setPluginQuery('')
-  }, [store.selectedSlot, editing?.id, type, store.isAdding])
+  }, [store.selectedSlot, store.selectedRing, action?.id])
 
   useEffect(() => {
     if (type !== 'app' && type !== 'plugin') return
@@ -216,22 +183,21 @@ export default observer(function ActionForm() {
     return () => {
       cancelled = true
     }
-  }, [type, store.selectedSlot])
+  }, [type, store.selectedSlot, store.selectedRing])
 
-  function set<
-    K extends keyof SlotActionInput
-  >(key: K, value: SlotActionInput[K]) {
-    setForm((f) => ({ ...f, [key]: value }))
+  if (!action || !type) return null
+
+  function patch(partial: Parameters<typeof store.patchSlot>[1]) {
+    store.patchSlot(store.selectedSlot, partial)
   }
 
   function selectItem(item: PickerItem, itemType: 'app' | 'plugin') {
-    setForm((f) => ({
-      ...f,
-      name: isStrBlank(f.name) ? item.name : f.name,
+    patch({
+      name: isStrBlank(action!.name) ? item.name : action!.name,
       command: item.key,
       appIcon: item.icon,
       type: itemType,
-    }))
+    })
   }
 
   async function browseDirectory() {
@@ -240,74 +206,38 @@ export default observer(function ActionForm() {
     })
     const [dirPath] = result.filePaths
     if (result.canceled || !dirPath) return
-    setForm((f) => ({
-      ...f,
-      name: isStrBlank(f.name) ? folderName(dirPath) : f.name,
+    patch({
+      name: isStrBlank(action!.name) ? folderName(dirPath) : action!.name,
       command: dirPath,
       type: 'directory',
       appIcon: undefined,
-    }))
-  }
-
-  async function handleSubmit() {
-    if (isStrBlank(form.name)) {
-      toast.error(t('nameRequired'))
-      return
-    }
-    if (isStrBlank(form.command)) {
-      toast.error(t(REQUIRED_MSG[type]))
-      return
-    }
-
-    const input: SlotActionInput = {
-      name: trim(form.name),
-      command: trim(form.command),
-      enabled: editing ? editing.enabled : form.enabled,
-      type,
-      appIcon: actionUsesIcon(type) ? form.appIcon : undefined,
-    }
-
-    await store.setSlot(store.selectedSlot, input)
-    toast.success(editing ? t('actionUpdated') : t('actionAdded'))
-    store.closeForm()
-  }
-
-  async function handleClear() {
-    const name =
-      editing?.name || t('slotLabel', { index: store.selectedSlot + 1 })
-    const ok = await confirm({
-      title: t('deleteConfirm', { name }),
     })
-    if (ok) {
-      await store.clearSlot(store.selectedSlot)
-      store.closeForm()
-    }
   }
 
   return (
     <div
-      className={`flex flex-col gap-3 ${
-        editing && !editing.enabled ? 'opacity-50' : ''
+      className={`h-full min-h-0 flex flex-col gap-3 ${
+        action.enabled ? '' : 'opacity-50'
       }`}
     >
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 shrink-0">
         <label className={`text-xs font-medium ${tw.text.secondary}`}>
           {t('name')}
         </label>
         <TextInput
-          value={form.name}
-          onChange={(e) => set('name', e.target.value)}
+          value={action.name}
+          onChange={(e) => patch({ name: e.target.value })}
           placeholder={t('namePlaceholder')}
         />
       </div>
       {type === 'command' || type === 'url' ? (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 shrink-0">
           <label className={`text-xs font-medium ${tw.text.secondary}`}>
             {type === 'url' ? t('url') : t('command')}
           </label>
           <TextInput
-            value={form.command}
-            onChange={(e) => set('command', e.target.value)}
+            value={action.command}
+            onChange={(e) => patch({ command: e.target.value })}
             placeholder={
               type === 'url' ? t('urlPlaceholder') : t('commandPlaceholder')
             }
@@ -315,13 +245,13 @@ export default observer(function ActionForm() {
           />
         </div>
       ) : type === 'directory' ? (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 shrink-0">
           <label className={`text-xs font-medium ${tw.text.secondary}`}>
             {t('directory')}
           </label>
           <FileInput
-            value={form.command}
-            onChange={(e) => set('command', e.target.value)}
+            value={action.command}
+            onChange={(e) => patch({ command: e.target.value })}
             onBrowse={() => void browseDirectory()}
             placeholder={t('directoryPlaceholder')}
             inputClassName="font-mono text-xs"
@@ -330,9 +260,9 @@ export default observer(function ActionForm() {
       ) : type === 'plugin' ? (
         <ItemPicker
           label={t('plugin')}
-          selectedKey={form.command}
-          selectedName={form.name}
-          selectedIcon={form.appIcon}
+          selectedKey={action.command}
+          selectedName={action.name}
+          selectedIcon={action.appIcon}
           placeholder={t('selectPluginPlaceholder')}
           searchPlaceholder={t('searchPlugins')}
           loadingLabel={t('loadingPlugins')}
@@ -347,9 +277,9 @@ export default observer(function ActionForm() {
       ) : (
         <ItemPicker
           label={t('application')}
-          selectedKey={form.command}
-          selectedName={form.name}
-          selectedIcon={form.appIcon}
+          selectedKey={action.command}
+          selectedName={action.name}
+          selectedIcon={action.appIcon}
           placeholder={t('selectAppPlaceholder')}
           searchPlaceholder={t('searchApps')}
           loadingLabel={t('loadingApps')}
@@ -362,40 +292,6 @@ export default observer(function ActionForm() {
           onSelect={(item) => selectItem(item, 'app')}
         />
       )}
-      <div className="flex items-center gap-2 pt-1">
-        {editing && (
-          <>
-            <button
-              type="button"
-              className={`p-1.5 rounded ${tw.hover} ${tw.text.secondary}`}
-              title={t('run')}
-              onClick={() => void store.runSlot(store.selectedSlot)}
-            >
-              <Play size={14} />
-            </button>
-            <button
-              type="button"
-              className={`p-1.5 rounded ${tw.hover} ${tw.text.secondary}`}
-              title={t('delete')}
-              onClick={() => void handleClear()}
-            >
-              <Trash2 size={14} />
-            </button>
-            <div className="flex-1" />
-          </>
-        )}
-        {!editing && (
-          <>
-            <DialogButton variant="text" onClick={() => store.closeForm()}>
-              {t('cancel')}
-            </DialogButton>
-            <div className="flex-1" />
-          </>
-        )}
-        <DialogButton onClick={() => void handleSubmit()}>
-          {t('save')}
-        </DialogButton>
-      </div>
     </div>
   )
 })
