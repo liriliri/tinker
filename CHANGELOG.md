@@ -1,3 +1,10 @@
+## v2.5.0 (10 Sep 2026)
+
+* feat: add hotkeys
+* feat: add pie menu
+* feat: registerShortcut tinker api
+* feat: registerMouse tinker api
+
 ## v2.4.0 (6 Sep 2026)
 
 * feat: add media splitter
