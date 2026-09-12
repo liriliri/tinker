@@ -27,10 +27,13 @@ import { tw } from 'share/theme'
 import { RefObject, useState } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
 import className from 'licia/className'
+import delay from 'licia/delay'
+import startWith from 'licia/startWith'
 import store from '../store'
 import CropSizeDialog from './CropSizeDialog'
 import ResizeImageDialog from './ResizeImageDialog'
 import ImageResizeIcon from '../assets/image-resize.svg?react'
+import { resizeImageOnCanvas } from '../lib/util'
 
 interface ToolbarProps {
   onCrop?: () => void
@@ -65,7 +68,7 @@ export default observer(function ToolbarComponent({
       const items = await navigator.clipboard.read()
       for (const item of items) {
         for (const type of item.types) {
-          if (type.startsWith('image/')) {
+          if (startWith(type, 'image/')) {
             const blob = await item.getType(type)
             return new File([blob], 'clipboard.png', { type })
           }
@@ -112,7 +115,7 @@ export default observer(function ToolbarComponent({
     try {
       await store.copyImage()
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      delay(() => setCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy image:', err)
     }
@@ -179,32 +182,9 @@ export default observer(function ToolbarComponent({
     if (!store.image) return
 
     try {
-      const img = new Image()
-      img.src = store.image.originalUrl
-
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve()
-        img.onerror = () => reject(new Error('Failed to load image'))
-      })
-
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-
-      ctx.drawImage(img, 0, 0, width, height)
-
-      const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob(resolve)
-      })
-
-      if (!blob) return
-
-      const dataUrl = canvas.toDataURL()
-
-      store.setCroppedImage(blob, dataUrl, width, height)
-      store.applyCroppedImage()
+      store.applyCanvasResult(
+        await resizeImageOnCanvas(store.image.originalUrl, width, height)
+      )
     } catch (err) {
       console.error('Failed to resize image:', err)
     }
@@ -279,10 +259,8 @@ export default observer(function ToolbarComponent({
 
       <ToolbarSpacer />
 
-      {/* Image dimensions info and controls */}
       {store.hasImage && (
         <>
-          {/* Crop box dimensions */}
           <ToolbarButton
             onClick={() => setShowSizeDialog(true)}
             disabled={store.cropBoxWidth <= 0 || store.cropBoxHeight <= 0}
@@ -293,7 +271,6 @@ export default observer(function ToolbarComponent({
               : '-'}
           </ToolbarButton>
 
-          {/* Aspect Ratio Select */}
           <div className="flex gap-2 items-center">
             <Select
               value={store.aspectRatio ?? 0}
@@ -318,7 +295,6 @@ export default observer(function ToolbarComponent({
 
           <ToolbarSeparator />
 
-          {/* Rotate and Zoom Controls */}
           <ToolbarButton onClick={handleRotateLeft} title={t('rotateLeft')}>
             <RotateCcw size={TOOLBAR_ICON_SIZE} />
           </ToolbarButton>
@@ -351,7 +327,6 @@ export default observer(function ToolbarComponent({
 
           <ToolbarSeparator />
 
-          {/* Crop Button */}
           <ToolbarTextButton onClick={onCrop}>
             <div className="flex items-center gap-1.5">
               <Crop size={TOOLBAR_ICON_SIZE} />
@@ -361,7 +336,6 @@ export default observer(function ToolbarComponent({
         </>
       )}
 
-      {/* Crop Size Dialog */}
       <CropSizeDialog
         open={showSizeDialog}
         onClose={() => setShowSizeDialog(false)}
@@ -372,7 +346,6 @@ export default observer(function ToolbarComponent({
         maxHeight={store.image?.height || 0}
       />
 
-      {/* Resize Image Dialog */}
       <ResizeImageDialog
         open={showResizeDialog}
         onClose={() => setShowResizeDialog(false)}

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Cropper, CropperRef } from 'react-advanced-cropper'
-import { RefObject } from 'react'
+import { RefObject, useEffect } from 'react'
 import { tw } from 'share/theme'
 import store from '../store'
 
@@ -8,9 +8,55 @@ interface ImageCropperProps {
   cropperRef: RefObject<CropperRef | null>
 }
 
+const NUDGE_STEP = 1
+
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName
+  return (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    target.isContentEditable
+  )
+}
+
 export default observer(function ImageCropper({
   cropperRef,
 }: ImageCropperProps) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const cropper = cropperRef.current
+      if (!cropper || isEditableTarget(e.target)) return
+
+      let left = 0
+      let top = 0
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          left = -NUDGE_STEP
+          break
+        case 'ArrowRight':
+          left = NUDGE_STEP
+          break
+        case 'ArrowUp':
+          top = -NUDGE_STEP
+          break
+        case 'ArrowDown':
+          top = NUDGE_STEP
+          break
+        default:
+          return
+      }
+
+      e.preventDefault()
+      cropper.moveCoordinates({ left, top })
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [cropperRef])
+
   if (!store.image) return null
 
   const handleChange = (cropper: CropperRef) => {

@@ -2,12 +2,14 @@ import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { CropperRef } from 'react-advanced-cropper'
 import { useTranslation } from 'react-i18next'
+import startWith from 'licia/startWith'
 import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageCropper from './components/ImageCropper'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
+import { exportCanvas, HIGH_QUALITY_DRAW_OPTIONS } from './lib/util'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
@@ -29,7 +31,7 @@ const App = observer(function App() {
     if (!files || files.length === 0) return
 
     const file = files[0]
-    if (!file.type.startsWith('image/')) {
+    if (!startWith(file.type, 'image/')) {
       console.warn('Only image files are supported')
       return
     }
@@ -42,20 +44,18 @@ const App = observer(function App() {
     }
   }
 
-  const handleCrop = () => {
+  const handleCrop = async () => {
     const cropper = cropperRef.current
     if (!cropper) return
 
-    const canvas = cropper.getCanvas()
+    const canvas = cropper.getCanvas(HIGH_QUALITY_DRAW_OPTIONS)
     if (!canvas) return
 
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const dataUrl = canvas.toDataURL()
-        store.setCroppedImage(blob, dataUrl, canvas.width, canvas.height)
-        store.applyCroppedImage()
-      }
-    })
+    try {
+      store.applyCanvasResult(await exportCanvas(canvas))
+    } catch (err) {
+      console.error('Failed to crop image:', err)
+    }
   }
 
   return (
@@ -66,7 +66,6 @@ const App = observer(function App() {
     >
       <Toolbar onCrop={handleCrop} cropperRef={cropperRef} />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {!store.hasImage ? (
           <ImageOpen

@@ -1,10 +1,15 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore, { storage } from 'share/store/Base'
 import { openImageFile } from 'share/lib/util'
+import clone from 'licia/clone'
+import now from 'licia/now'
+import toBool from 'licia/toBool'
+import toStr from 'licia/toStr'
+import type { CanvasExportResult } from './lib/util'
 import { createMcpApi } from './mcp'
 
 const STORAGE_OVERWRITE = 'overwriteOriginal'
-export interface ImageInfo {
+interface ImageInfo {
   fileName: string
   filePath?: string
   originalUrl: string
@@ -22,7 +27,6 @@ export class Store extends BaseStore {
   readonly mcp = createMcpApi(() => this)
 
   image: ImageInfo | null = null
-  isLoading: boolean = false
 
   croppedBlob: Blob | null = null
   croppedDataUrl: string = ''
@@ -48,13 +52,13 @@ export class Store extends BaseStore {
   private loadOverwriteSetting() {
     const savedOverwrite = storage.get(STORAGE_OVERWRITE)
     if (savedOverwrite !== null) {
-      this.overwriteOriginal = savedOverwrite === 'true'
+      this.overwriteOriginal = toBool(savedOverwrite)
     }
   }
 
   setOverwriteOriginal(overwrite: boolean) {
     this.overwriteOriginal = overwrite
-    storage.set(STORAGE_OVERWRITE, String(overwrite))
+    storage.set(STORAGE_OVERWRITE, toStr(overwrite))
   }
 
   setAspectRatio(ratio: number | null) {
@@ -75,8 +79,6 @@ export class Store extends BaseStore {
 
   async loadImage(file: File, filePath?: string) {
     try {
-      this.isLoading = true
-
       const img = new Image()
       const url = URL.createObjectURL(file)
 
@@ -104,15 +106,12 @@ export class Store extends BaseStore {
         height: img.height,
       }
 
-      this.croppedBlob = null
-      this.croppedDataUrl = ''
-      this.croppedWidth = 0
-      this.croppedHeight = 0
+      this.clearCroppedImage()
 
       this.history = [
         {
-          imageInfo: { ...this.image },
-          timestamp: Date.now(),
+          imageInfo: clone(this.image),
+          timestamp: now(),
         },
       ]
       this.historyIndex = 0
@@ -120,19 +119,40 @@ export class Store extends BaseStore {
     } catch (err) {
       console.error('Failed to load image:', err)
       throw err
-    } finally {
-      this.isLoading = false
     }
   }
 
-  setCroppedImage(blob: Blob, dataUrl: string, width: number, height: number) {
+  private setCroppedImage(
+    blob: Blob,
+    dataUrl: string,
+    width: number,
+    height: number
+  ) {
     this.croppedBlob = blob
     this.croppedDataUrl = dataUrl
     this.croppedWidth = width
     this.croppedHeight = height
   }
 
-  applyCroppedImage() {
+  applyCanvasResult(result: CanvasExportResult) {
+    this.setCroppedImage(
+      result.blob,
+      result.dataUrl,
+      result.width,
+      result.height
+    )
+    this.applyCroppedImage()
+    this.setCropBoxSize(result.width, result.height)
+  }
+
+  private clearCroppedImage() {
+    this.croppedBlob = null
+    this.croppedDataUrl = ''
+    this.croppedWidth = 0
+    this.croppedHeight = 0
+  }
+
+  private applyCroppedImage() {
     if (!this.croppedBlob || !this.croppedDataUrl || !this.image) return
 
     const oldUrl = this.image.originalUrl
@@ -156,15 +176,12 @@ export class Store extends BaseStore {
     }
 
     this.history.push({
-      imageInfo: { ...this.image },
-      timestamp: Date.now(),
+      imageInfo: clone(this.image),
+      timestamp: now(),
     })
     this.historyIndex = this.history.length - 1
 
-    this.croppedBlob = null
-    this.croppedDataUrl = ''
-    this.croppedWidth = 0
-    this.croppedHeight = 0
+    this.clearCroppedImage()
 
     this.isSaved = false
   }
@@ -236,13 +253,8 @@ export class Store extends BaseStore {
 
     this.historyIndex--
     const state = this.history[this.historyIndex]
-    this.image = { ...state.imageInfo }
-
-    this.croppedBlob = null
-    this.croppedDataUrl = ''
-    this.croppedWidth = 0
-    this.croppedHeight = 0
-
+    this.image = clone(state.imageInfo)
+    this.clearCroppedImage()
     this.isSaved = false
   }
 
@@ -251,13 +263,8 @@ export class Store extends BaseStore {
 
     this.historyIndex++
     const state = this.history[this.historyIndex]
-    this.image = { ...state.imageInfo }
-
-    this.croppedBlob = null
-    this.croppedDataUrl = ''
-    this.croppedWidth = 0
-    this.croppedHeight = 0
-
+    this.image = clone(state.imageInfo)
+    this.clearCroppedImage()
     this.isSaved = false
   }
 

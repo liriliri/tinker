@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import TextInput from 'share/components/TextInput'
+import clamp from 'licia/clamp'
 import isStrBlank from 'licia/isStrBlank'
+import toInt from 'licia/toInt'
+import toStr from 'licia/toStr'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 
@@ -25,29 +28,28 @@ export default function CropSizeDialog({
   maxHeight,
 }: CropSizeDialogProps) {
   const { t } = useTranslation()
-  const [width, setWidth] = useState(String(Math.round(currentWidth)))
-  const [height, setHeight] = useState(String(Math.round(currentHeight)))
+  const [width, setWidth] = useState(toStr(Math.round(currentWidth)))
+  const [height, setHeight] = useState(toStr(Math.round(currentHeight)))
 
   useEffect(() => {
     if (open) {
-      setWidth(String(Math.round(currentWidth)))
-      setHeight(String(Math.round(currentHeight)))
+      setWidth(toStr(Math.round(currentWidth)))
+      setHeight(toStr(Math.round(currentHeight)))
     }
   }, [open, currentWidth, currentHeight])
 
+  const parsedWidth = toInt(width)
+  const parsedHeight = toInt(height)
+  const isValid =
+    !isStrBlank(width) &&
+    !isStrBlank(height) &&
+    parsedWidth > 0 &&
+    parsedHeight > 0
+
   const handleConfirm = () => {
-    const w = parseInt(width, 10)
-    const h = parseInt(height, 10)
+    if (!isValid) return
 
-    if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
-      return
-    }
-
-    // Clamp to max dimensions
-    const finalWidth = Math.min(w, maxWidth)
-    const finalHeight = Math.min(h, maxHeight)
-
-    onConfirm(finalWidth, finalHeight)
+    onConfirm(clamp(parsedWidth, maxWidth), clamp(parsedHeight, maxHeight))
     onClose()
   }
 
@@ -57,14 +59,6 @@ export default function CropSizeDialog({
       handleConfirm()
     }
   }
-
-  const isValid =
-    !isStrBlank(width) &&
-    !isStrBlank(height) &&
-    !isNaN(parseInt(width, 10)) &&
-    !isNaN(parseInt(height, 10)) &&
-    parseInt(width, 10) > 0 &&
-    parseInt(height, 10) > 0
 
   return (
     <Dialog open={open} onClose={onClose} title={t('setCropSize')} showClose>

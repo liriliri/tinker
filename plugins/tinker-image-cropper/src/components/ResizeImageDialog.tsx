@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Checkbox from 'share/components/Checkbox'
 import TextInput from 'share/components/TextInput'
+import isStrBlank from 'licia/isStrBlank'
+import toInt from 'licia/toInt'
+import toStr from 'licia/toStr'
 import { useTranslation } from 'react-i18next'
 import { tw } from 'share/theme'
 
@@ -21,8 +24,8 @@ export default function ResizeImageDialog({
   currentHeight,
 }: ResizeImageDialogProps) {
   const { t } = useTranslation()
-  const [width, setWidth] = useState(String(Math.round(currentWidth)))
-  const [height, setHeight] = useState(String(Math.round(currentHeight)))
+  const [width, setWidth] = useState(toStr(Math.round(currentWidth)))
+  const [height, setHeight] = useState(toStr(Math.round(currentHeight)))
   const [keepAspectRatio, setKeepAspectRatio] = useState(true)
   const [aspectRatio, setAspectRatio] = useState(1)
 
@@ -30,42 +33,43 @@ export default function ResizeImageDialog({
     if (open) {
       const w = Math.round(currentWidth)
       const h = Math.round(currentHeight)
-      setWidth(String(w))
-      setHeight(String(h))
+      setWidth(toStr(w))
+      setHeight(toStr(h))
       setAspectRatio(h > 0 ? w / h : 1)
       setKeepAspectRatio(true)
     }
   }, [open, currentWidth, currentHeight])
 
+  const parsedWidth = toInt(width)
+  const parsedHeight = toInt(height)
+  const isValid =
+    !isStrBlank(width) &&
+    !isStrBlank(height) &&
+    parsedWidth > 0 &&
+    parsedHeight > 0
+
   const handleWidthChange = (value: string) => {
     setWidth(value)
 
-    if (keepAspectRatio && !isNaN(parseInt(value, 10))) {
-      const w = parseInt(value, 10)
-      const h = Math.round(w / aspectRatio)
-      setHeight(String(h))
+    const w = toInt(value)
+    if (keepAspectRatio && !isStrBlank(value) && w > 0) {
+      setHeight(toStr(Math.round(w / aspectRatio)))
     }
   }
 
   const handleHeightChange = (value: string) => {
     setHeight(value)
 
-    if (keepAspectRatio && !isNaN(parseInt(value, 10))) {
-      const h = parseInt(value, 10)
-      const w = Math.round(h * aspectRatio)
-      setWidth(String(w))
+    const h = toInt(value)
+    if (keepAspectRatio && !isStrBlank(value) && h > 0) {
+      setWidth(toStr(Math.round(h * aspectRatio)))
     }
   }
 
   const handleConfirm = () => {
-    const w = parseInt(width, 10)
-    const h = parseInt(height, 10)
+    if (!isValid) return
 
-    if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
-      return
-    }
-
-    onConfirm(w, h)
+    onConfirm(parsedWidth, parsedHeight)
     onClose()
   }
 
@@ -75,14 +79,6 @@ export default function ResizeImageDialog({
       handleConfirm()
     }
   }
-
-  const isValid =
-    width.trim() !== '' &&
-    height.trim() !== '' &&
-    !isNaN(parseInt(width, 10)) &&
-    !isNaN(parseInt(height, 10)) &&
-    parseInt(width, 10) > 0 &&
-    parseInt(height, 10) > 0
 
   return (
     <Dialog open={open} onClose={onClose} title={t('resizeImage')} showClose>

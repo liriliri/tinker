@@ -1,4 +1,5 @@
 import splitPath from 'licia/splitPath'
+import isUndef from 'licia/isUndef'
 import {
   createPluginMcpApi,
   type McpJsonValue,
@@ -7,6 +8,7 @@ import {
 import { fileExists } from 'share/lib/util'
 import type { Store } from './store'
 import pkg from '../package.json'
+import { cropImageOnCanvas, resizeImageOnCanvas } from './lib/util'
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
@@ -75,93 +77,6 @@ function getImage(store: Store) {
   return serializeImage(store)
 }
 
-async function loadImageElement(imageUrl: string) {
-  const img = new Image()
-  img.src = imageUrl
-
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve()
-    img.onerror = () => reject(new Error('Failed to load image'))
-  })
-
-  return img
-}
-
-async function exportCanvas(
-  canvas: HTMLCanvasElement,
-  width: number,
-  height: number
-) {
-  const blob = await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((result) => {
-      if (result) {
-        resolve(result)
-      } else {
-        reject(new Error('Failed to export image'))
-      }
-    })
-  })
-
-  return {
-    blob,
-    dataUrl: canvas.toDataURL(),
-    width,
-    height,
-  }
-}
-
-async function cropImageOnCanvas(
-  imageUrl: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-) {
-  const img = await loadImageElement(imageUrl)
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    throw new Error('Failed to create canvas context')
-  }
-
-  ctx.drawImage(img, x, y, width, height, 0, 0, width, height)
-  return exportCanvas(canvas, width, height)
-}
-
-async function resizeImageOnCanvas(
-  imageUrl: string,
-  width: number,
-  height: number
-) {
-  const img = await loadImageElement(imageUrl)
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    throw new Error('Failed to create canvas context')
-  }
-
-  ctx.drawImage(img, 0, 0, width, height)
-  return exportCanvas(canvas, width, height)
-}
-
-function applyCanvasResult(
-  store: Store,
-  result: { blob: Blob; dataUrl: string; width: number; height: number }
-) {
-  store.setCroppedImage(
-    result.blob,
-    result.dataUrl,
-    result.width,
-    result.height
-  )
-  store.applyCroppedImage()
-  store.setCropBoxSize(result.width, result.height)
-}
-
 async function cropImage(
   store: Store,
   args: { x: number; y: number; width: number; height: number }
@@ -193,7 +108,7 @@ async function cropImage(
     height
   )
 
-  applyCanvasResult(store, cropped)
+  store.applyCanvasResult(cropped)
 
   return {
     crop: { x, y, width, height },
@@ -214,19 +129,14 @@ async function resizeImage(
     store.originalAspectRatio ?? store.image!.width / store.image!.height
 
   if (keepAspectRatio) {
-    if (width !== undefined && height === undefined) {
+    if (!isUndef(width) && isUndef(height)) {
       height = Math.round(width / aspectRatio)
-    } else if (height !== undefined && width === undefined) {
+    } else if (!isUndef(height) && isUndef(width)) {
       width = Math.round(height * aspectRatio)
     }
   }
 
-  if (
-    width === undefined ||
-    height === undefined ||
-    width <= 0 ||
-    height <= 0
-  ) {
+  if (isUndef(width) || isUndef(height) || width <= 0 || height <= 0) {
     throw new Error(
       'width and height are required. With keepAspectRatio true, provide either width or height.'
     )
@@ -238,7 +148,7 @@ async function resizeImage(
     height
   )
 
-  applyCanvasResult(store, resized)
+  store.applyCanvasResult(resized)
 
   return {
     resize: { width, height, keepAspectRatio },
