@@ -38,6 +38,13 @@ export default defineConfig(async (): Promise<UserConfig> => {
       hmr: false,
       port: 8080,
       cors: true,
+      watch: {
+        ignored: [
+          '**/plugins/**',
+          '**/tinker-plugins/**',
+          '**/tinker-games/**',
+        ],
+      },
     },
     define: {
       PRODUCT_NAME: JSON.stringify(pkg.productName),

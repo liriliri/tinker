@@ -1,5 +1,6 @@
 import { ipcMain, screen, WebContents } from 'electron'
 import contain from 'licia/contain'
+import isMac from 'licia/isMac'
 import log from 'share/common/log'
 import {
   WheelDirection,
@@ -36,7 +37,8 @@ function mapButton(button: unknown): MouseButton {
 }
 
 function baseFields(event: UiohookMouseEvent | UiohookWheelEvent) {
-  const { x, y } = screen.screenToDipPoint({ x: event.x, y: event.y })
+  const point = { x: event.x, y: event.y }
+  const { x, y } = isMac ? point : screen.screenToDipPoint(point)
   return {
     x,
     y,
