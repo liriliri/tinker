@@ -38,6 +38,7 @@ const allowedWindowOptions = [
   'transparent',
   'focusable',
   'hasShadow',
+  'skipTaskbar',
 ]
 
 const allowedWebPreferences = ['webviewTag']

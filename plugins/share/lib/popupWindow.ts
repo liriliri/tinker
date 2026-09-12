@@ -16,6 +16,7 @@ export interface PopupWindowOptions {
   /** When false, clicks do not steal focus (good for always-on floating widgets). */
   focusable?: boolean
   hasShadow?: boolean
+  skipTaskbar?: boolean
   positionKey?: string
 }
 
@@ -47,6 +48,7 @@ export function openPopupWindow(
     transparent = false,
     focusable = true,
     hasShadow = true,
+    skipTaskbar = true,
     positionKey,
   } = options
 
@@ -81,6 +83,7 @@ export function openPopupWindow(
     transparent ? 'transparent=true' : '',
     `focusable=${focusable ? 'yes' : 'no'}`,
     `hasShadow=${hasShadow ? 'yes' : 'no'}`,
+    `skipTaskbar=${skipTaskbar ? 'yes' : 'no'}`,
     left != null ? `left=${left}` : '',
     top != null ? `top=${top}` : '',
   ]
