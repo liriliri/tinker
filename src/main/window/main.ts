@@ -7,6 +7,7 @@ import * as window from 'share/main/lib/window'
 import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 import * as dock from '../lib/dock'
 import { getSettingsStore, getMainStore } from '../lib/store'
+import isWindows from 'licia/isWindows'
 
 const settingsStore = getSettingsStore()
 const mainStore = getMainStore()
@@ -16,7 +17,14 @@ let win: BrowserWindow | null = null
 export function showWin() {
   if (win) {
     win.show()
-    win.focus()
+    // Windows blocks focus stealing; briefly raise always-on-top to force foreground
+    if (isWindows) {
+      win.setAlwaysOnTop(true)
+      win.focus()
+      win.setAlwaysOnTop(false)
+    } else {
+      win.focus()
+    }
     return
   }
 
