@@ -43,6 +43,14 @@ function isPublicPath(path: string) {
   return contain(publicPaths, path) || startWith(path, '/p/')
 }
 
+// Basic Auth credentials are base64-encoded, not encrypted, so only accept
+// them over a secure channel or a local loopback connection.
+function isTrustedConnection(ctx: Koa.Context) {
+  return (
+    ctx.secure || contain(['127.0.0.1', '::1', '::ffff:127.0.0.1'], ctx.ip)
+  )
+}
+
 export function createApp(auth?: HttpAuth) {
   const app = new Koa()
   const router = new Router()
