@@ -1,4 +1,4 @@
-import { ipcMain, WebContents } from 'electron'
+import { ipcMain, screen, WebContents } from 'electron'
 import contain from 'licia/contain'
 import log from 'share/common/log'
 import {
@@ -36,9 +36,10 @@ function mapButton(button: unknown): MouseButton {
 }
 
 function baseFields(event: UiohookMouseEvent | UiohookWheelEvent) {
+  const { x, y } = screen.screenToDipPoint({ x: event.x, y: event.y })
   return {
-    x: event.x,
-    y: event.y,
+    x,
+    y,
     clicks: event.clicks,
     altKey: event.altKey,
     ctrlKey: event.ctrlKey,

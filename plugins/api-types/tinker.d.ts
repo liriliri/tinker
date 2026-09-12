@@ -416,6 +416,7 @@ declare global {
     interface MouseEvent {
       type: MouseEventName
       button: MouseButton
+      /** DIP, same space as `window.screenX/Y`. */
       x: number
       y: number
       clicks: number

@@ -97,7 +97,7 @@ class Store extends BaseStore {
     this.theme = theme ?? 'system'
     this.language = language ?? 'system'
     this.useNativeTitlebar = useNativeTitlebar ?? false
-    this.hardwareAcceleration = hardwareAcceleration ?? false
+    this.hardwareAcceleration = hardwareAcceleration ?? true
     this.openAtLogin = openAtLogin ?? false
     this.silentStart = silentStart ?? false
     this.showShortcut = showShortcut ?? 'Alt+Space'
