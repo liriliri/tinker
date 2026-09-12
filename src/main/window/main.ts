@@ -8,6 +8,7 @@ import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
 import * as dock from '../lib/dock'
 import { getSettingsStore, getMainStore } from '../lib/store'
 import isWindows from 'licia/isWindows'
+import * as tracing from '../lib/tracing'
 
 const settingsStore = getSettingsStore()
 const mainStore = getMainStore()
@@ -30,11 +31,13 @@ export function showWin() {
 
   initIpc()
 
+  tracing.begin('createWindow')
   win = window.create({
     name: 'main',
     skipTaskbar: true,
     titlebar: false,
   })
+  tracing.end()
 
   win.on('close', () => {
     if (win) {
@@ -85,7 +88,16 @@ export function showWin() {
     }
   })
 
+  win.once('ready-to-show', () => {
+    tracing.instant('ready-to-show')
+  })
+
+  win.once('show', () => {
+    tracing.notifyFirstShow()
+  })
+
   dock.hide()
+  tracing.beginLoadPage()
   window.loadPage(win)
 }
 

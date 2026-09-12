@@ -78,14 +78,14 @@ function updateContextMenu(show = false) {
       {
         type: 'separator',
       },
+      {
+        label: t('openUserDataDir'),
+        click() {
+          shell.openPath(getUserDataPath(''))
+        },
+      },
       ...(isDev()
         ? [
-            {
-              label: t('openUserDataDir'),
-              click() {
-                shell.openPath(getUserDataPath(''))
-              },
-            },
             {
               label: t('debugMainProcess'),
               click() {

@@ -1,3 +1,4 @@
+import * as tracing from './lib/tracing'
 import { app, Menu, protocol } from 'electron'
 import log from 'share/common/log'
 import * as tray from './lib/tray'
@@ -17,8 +18,12 @@ import * as proxy from './lib/proxy'
 import * as cli from './cli/handler'
 import 'share/main'
 
+tracing.markImportsDone()
+
 const logger = log('main')
 logger.info('start', process.argv)
+
+tracing.begin('before-ready')
 
 fixPath()
 
@@ -52,22 +57,40 @@ protocol.registerSchemesAsPrivileged([
 cli.init()
 
 app.on('ready', () => {
+  tracing.end() // before-ready (includes share/main ready handlers)
   logger.info('app ready')
+
+  tracing.begin('main-ready')
 
   Menu.setApplicationMenu(null)
   autoLaunch.init()
   terminal.init()
   proxy.init()
+
+  tracing.begin('plugin.init')
   plugin.init()
+  tracing.end()
+
   application.init()
-  tray.init()
-  if (!autoLaunch.wasOpenedAtLogin() && !settingsStore.get('silentStart')) {
+
+  const trayId = tracing.asyncBegin('tray.init')
+  const trayReady = tray.init().finally(() => tracing.asyncEnd(trayId))
+
+  const silentStart =
+    autoLaunch.wasOpenedAtLogin() || settingsStore.get('silentStart')
+
+  if (!silentStart) {
     main.showWin()
+    tracing.finishAfter(tracing.waitFirstShow(), trayReady)
   } else {
     dock.hide()
+    tracing.finishAfter(trayReady)
   }
+
   shortcut.init()
   mouse.init()
+
+  tracing.end() // main-ready
 })
 
 app.on('window-all-closed', noop)
