@@ -10,12 +10,12 @@ import * as terminal from 'share/main/window/terminal'
 import * as autoLaunch from 'share/main/lib/autoLaunch'
 import * as dock from './lib/dock'
 import noop from 'licia/noop'
-import fixPath from 'fix-path'
 import { getSettingsStore } from './lib/store'
 import * as shortcut from './lib/shortcut'
 import * as mouse from './lib/mouse'
 import * as proxy from './lib/proxy'
 import * as cli from './cli/handler'
+import { startFixPath } from './lib/fixPath'
 import 'share/main'
 
 tracing.markImportsDone()
@@ -24,8 +24,6 @@ const logger = log('main')
 logger.info('start', process.argv)
 
 tracing.begin('before-ready')
-
-fixPath()
 
 const settingsStore = getSettingsStore()
 
@@ -57,8 +55,10 @@ protocol.registerSchemesAsPrivileged([
 cli.init()
 
 app.on('ready', () => {
-  tracing.end() // before-ready (includes share/main ready handlers)
+  tracing.end()
   logger.info('app ready')
+
+  startFixPath()
 
   tracing.begin('main-ready')
 
@@ -90,7 +90,7 @@ app.on('ready', () => {
   shortcut.init()
   mouse.init()
 
-  tracing.end() // main-ready
+  tracing.end()
 })
 
 app.on('window-all-closed', noop)

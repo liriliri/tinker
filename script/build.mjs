@@ -28,9 +28,9 @@ delete pkg.optionalDependencies
 delete pkg.scripts
 delete pkg.workspaces
 pkg.scripts = {
-  start: 'electron main/index.js',
+  start: 'electron main/bootstrap.js',
 }
-pkg.main = 'main/index.js'
+pkg.main = 'main/bootstrap.js'
 
 const vendorPkg = await fs.readJson('plugins/vendor/package.json')
 each(vendorPkg.dependencies, (version, name) => {

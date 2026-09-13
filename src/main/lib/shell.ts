@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import isMac from 'licia/isMac'
 import isWindows from 'licia/isWindows'
 import { t } from 'common/util'
-import { exec } from 'share/main/lib/util'
+import { exec } from './fixPath'
 
 const CLI_NAME = 'tinker'
 

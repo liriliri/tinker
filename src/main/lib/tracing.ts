@@ -2,17 +2,23 @@ import Tracing from 'licia/Tracing'
 import fs from 'fs-extra'
 import path from 'path'
 import log from 'share/common/log'
-import { getUserDataPath } from 'share/main/lib/util'
+import { logsDir } from './log'
+
+declare global {
+  var __startupTracer: Tracing | undefined
+}
 
 const logger = log('tracing')
 
 const CAT = 'startup'
-const logsDir = getUserDataPath('data/logs')
 
-const tracer = new Tracing({
-  processName: 'tinker-main',
-  threadName: 'main',
-})
+const startedInBootstrap = !!global.__startupTracer
+const tracer =
+  global.__startupTracer ||
+  new Tracing({
+    processName: 'tinker-main',
+    threadName: 'main',
+  })
 
 let finished = false
 let loadPageId: string | null = null
@@ -21,12 +27,10 @@ const firstShow = new Promise<void>((resolve) => {
   resolveFirstShow = resolve
 })
 
-fs.mkdirp(logsDir).catch((err) => {
-  logger.warn('failed to create logs dir', err)
-})
-
-tracer.start(CAT)
-tracer.begin(CAT, 'imports')
+if (!startedInBootstrap) {
+  tracer.start(CAT)
+  tracer.begin(CAT, 'imports')
+}
 
 function ensureActive() {
   return !finished

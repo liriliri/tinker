@@ -13,10 +13,10 @@ import map from 'licia/map'
 import identity from 'licia/identity'
 import replaceAll from 'licia/replaceAll'
 import each from 'licia/each'
-import { exec } from 'child_process'
 import log from 'share/common/log'
 import { resolveResources, getUserDataPath } from 'share/main/lib/util'
 import isWindows from 'licia/isWindows'
+import { exec } from '../fixPath'
 
 const logger = log('plugin')
 
@@ -46,15 +46,7 @@ function normalizePluginId(id: string) {
 }
 
 async function getNpmGlobalDir(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    exec('npm root -g', (error: Error | null, stdout: string) => {
-      if (error) {
-        reject(error)
-        return
-      }
-      resolve(stdout.trim())
-    })
-  })
+  return (await exec('npm root -g')).trim()
 }
 
 export const userPluginDir = getUserDataPath('plugins')

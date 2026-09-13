@@ -1,7 +1,7 @@
 import { createRequire } from 'module'
 import os from 'os'
 import path from 'path'
-import { chromium, type Browser } from 'playwright-core'
+import type { Browser } from 'playwright-core'
 import contain from 'licia/contain'
 import isFinite from 'licia/isFinite'
 import isNum from 'licia/isNum'
@@ -15,9 +15,9 @@ import {
   moveRecordingCursorTo,
 } from './recorder'
 
-const require = createRequire(__filename)
-// Playwright ships BrowserBackend via coreBundle (not a public package export).
-const pwTools = require('playwright-core/lib/coreBundle').tools as {
+const nodeRequire = createRequire(__filename)
+
+type PwTools = {
   BrowserBackend: any
   browserTools: any[]
   generateHelpJSON: () => {
@@ -34,8 +34,31 @@ const pwTools = require('playwright-core/lib/coreBundle').tools as {
   parseResponse: (result: any) => { text?: string; isError?: boolean }
 }
 
-const { BrowserBackend, browserTools, generateHelpJSON, parseResponse } =
-  pwTools
+let pwTools: PwTools | undefined
+let chromium: typeof import('playwright-core').chromium | undefined
+let helpJson: ReturnType<PwTools['generateHelpJSON']> | undefined
+
+function getPwTools() {
+  if (!pwTools) {
+    // Playwright ships BrowserBackend via coreBundle (not a public package export).
+    pwTools = nodeRequire('playwright-core/lib/coreBundle').tools as PwTools
+  }
+  return pwTools
+}
+
+function getChromium() {
+  if (!chromium) {
+    chromium = nodeRequire('playwright-core').chromium
+  }
+  return chromium
+}
+
+function getHelpJson() {
+  if (!helpJson) {
+    helpJson = getPwTools().generateHelpJSON()
+  }
+  return helpJson
+}
 
 /**
  * CLI→tool map adapted from Playwright
@@ -254,7 +277,6 @@ interface UiSession {
 
 const sessions = new Map<string, UiSession>()
 const connecting = new Map<string, Promise<UiSession>>()
-const helpJson = generateHelpJSON()
 
 onPluginInspectStop((pluginId) => {
   void disposeUiSession(pluginId)
@@ -279,7 +301,9 @@ async function ensureInspect(pluginId: string) {
 
 async function connectSession(pluginId: string): Promise<UiSession> {
   const httpUrl = await ensureInspect(pluginId)
-  const browser = await chromium.connectOverCDP(httpUrl, { noDefaults: true })
+  const browser = await getChromium().connectOverCDP(httpUrl, {
+    noDefaults: true,
+  })
 
   let context = browser.contexts()[0]
   for (let i = 0; i < 30 && (!context || context.pages().length === 0); i++) {
@@ -291,6 +315,7 @@ async function connectSession(pluginId: string): Promise<UiSession> {
     throw new Error(`No page found for plugin: ${pluginId}`)
   }
 
+  const { BrowserBackend, browserTools } = getPwTools()
   const outputDir = uiOutputDir(pluginId)
   const backend = new BrowserBackend(
     {
@@ -408,7 +433,8 @@ function bindPlaywrightCliArgs(
   positional: string[],
   options: Record<string, unknown> = {}
 ): Record<string, unknown> {
-  const schema = helpJson.commands[action]
+  const help = getHelpJson()
+  const schema = help.commands[action]
   const args: Record<string, unknown> = {}
 
   if (schema?.args?.length) {
@@ -431,7 +457,7 @@ function bindPlaywrightCliArgs(
     const kebab = key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
     const flagKind =
       schema?.flags?.[kebab] ||
-      (helpJson.booleanOptions.includes(kebab) ? 'boolean' : 'string')
+      (help.booleanOptions.includes(kebab) ? 'boolean' : 'string')
     args[kebab] = coerceValue(kebab, value, flagKind)
   }
 
@@ -450,7 +476,7 @@ function formatToolResult(result: {
   content: Array<{ type: string; text?: string }>
   isError?: boolean
 }): string {
-  const parsed = parseResponse(result)
+  const parsed = getPwTools().parseResponse(result)
   if (parsed.isError || result.isError) {
     throw new Error(parsed.text || 'UI command failed')
   }
