@@ -238,6 +238,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-electron-screencast',
+    name: 'Electron Screencast',
+    description: 'LAN screencast server for remote Electron app control',
+    icon: 'tinker-electron-screencast.png',
+    locales: {
+      'zh-CN': {
+        name: 'Electron 投屏',
+        description: '局域网投屏服务，远程操控 Electron 应用',
+      },
+    },
+  },
+  {
     id: 'tinker-emoji',
     name: 'Emoji',
     description: 'Search and copy emojis quickly',

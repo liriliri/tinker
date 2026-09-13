@@ -1,3 +1,9 @@
+## v3.0.0 (13 Sep 2026)
+
+* fix: registerMouse windows x y
+* perf: optimize startup time
+* chore: bump electron to 37
+
 ## v2.5.0 (10 Sep 2026)
 
 * feat: add hotkeys
