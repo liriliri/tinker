@@ -22,6 +22,8 @@ const directRequireModules = [
   'extract-file-icon',
   'registry-js',
   'node-mac-permissions',
+  'licia/isWindows',
+  'licia/isMac',
 ]
 
 function lazyImportWrap(): Plugin {
