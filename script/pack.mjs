@@ -5,29 +5,6 @@ cd('dist')
 
 const pkg = await fs.readJson('package.json')
 
-const currentPlatform = `${process.platform}-${process.arch}`
-
-const nativeModulesWithPrebuilds = {
-  'node-pty': ['darwin-arm64', 'darwin-x64', 'win32-arm64', 'win32-x64'],
-  'uiohook-napi': [
-    'darwin-arm64',
-    'darwin-x64',
-    'linux-arm64',
-    'linux-x64',
-    'win32-x64',
-  ],
-}
-
-const prebuildExclusions = []
-for (const [pkg, platforms] of Object.entries(nativeModulesWithPrebuilds)) {
-  const exclude = platforms.filter((p) => p !== currentPlatform)
-  if (exclude.length > 0) {
-    prebuildExclusions.push(
-      `!node_modules/${pkg}/prebuilds/{${exclude.join(',')}}`
-    )
-  }
-}
-
 let publishChannel = '${productName}-latest'
 if (isMac && process.arch !== 'arm64') {
   publishChannel = '${productName}-latest-${arch}'
@@ -38,22 +15,7 @@ const config = {
   directories: {
     output: `../release/${pkg.version}`,
   },
-  files: [
-    'main',
-    'preload',
-    'renderer',
-    'plugins',
-
-    '!node_modules/**/*.{map,ts,md,flow,yml,yaml,cs,gyp,gypi,h,c,html,Makefile}',
-    '!node_modules/**/*LICENSE*',
-    '!node_modules/**/*license*',
-    '!node_modules/**/*eslint*',
-    '!node_modules/**/*test*',
-    '!node_modules/**/.vscode',
-    '!node_modules/cpu-features',
-    '!node_modules/nan',
-    ...prebuildExclusions,
-  ],
+  files: ['main', 'preload', 'renderer', 'plugins'],
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: [
     {
