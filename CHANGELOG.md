@@ -1,3 +1,7 @@
+## v3.0.1 (14 Sep 2026)
+
+* fix(terminal): unable to create pty
+
 ## v3.0.0 (13 Sep 2026)
 
 * fix: registerMouse windows x y
