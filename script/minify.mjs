@@ -4,8 +4,6 @@ import path from 'path'
 
 const RM_PACKAGES = ['cpu-features', 'nan']
 
-const NATIVE_MODULES_WITH_PREBUILDS = ['node-pty', 'uiohook-napi']
-
 const REMAIN_EXTENSIONS = {
   cjs: true,
   js: true,
@@ -22,18 +20,182 @@ const REMAIN_EXTENSIONS = {
   sh: true,
 }
 
-const FORCE_REMAIN_PATTERNS = [
-  /(^|\/)bin\//,
-  /\/prebuilds\//,
-  /ffmpeg-static\/ffmpeg$/,
-  /file-icon\/file-icon$/,
-  /pdu-static[^/]*\/pdu$/,
-  /playwright-core\/lib\/xdg-open$/,
-]
+const FORCE_REMAIN_PATTERNS = [/(^|\/)bin\//, /playwright-core\/lib\/xdg-open$/]
+
+// Whitelist relative to package root. Unlisted native packages are left untouched.
+const NATIVE_MODULE_KEEP = {
+  'node-pty': [
+    'package.json',
+    'lib/**/*.js',
+    'build/Release/pty.node',
+    'build/Release/spawn-helper',
+    'build/Release/*.node',
+    'build/Release/*.dll',
+    'build/Release/*.exe',
+    'build/Release/conpty/**',
+  ],
+  'uiohook-napi': ['package.json', 'dist/index.js', 'build/Release/*.node'],
+  'node-mac-permissions': ['package.json', 'index.js', 'build/Release/*.node'],
+  'extract-file-icon': [
+    'package.json',
+    'dist/index.js',
+    'build/Release/*.node',
+  ],
+  'registry-js': ['package.json', 'dist/lib/**/*.js', 'build/Release/*.node'],
+  'ffmpeg-static': ['package.json', 'index.js', 'ffmpeg'],
+  'file-icon': ['package.json', 'index.js', 'file-icon'],
+  'pdu-static': ['package.json', 'index.js', 'pdu'],
+  '@vscode/ripgrep': ['package.json', 'lib/index.js', 'bin/rg'],
+}
+
+const PLATFORM_ONLY_PACKAGES = {
+  darwin: ['node-mac-permissions', 'file-icon'],
+  win32: ['registry-js', 'extract-file-icon'],
+}
+
+const CURRENT_PLATFORM = `${process.platform}-${process.arch}`
+
+const PKG_GLOB = {
+  nodir: true,
+  absolute: true,
+  dot: true,
+  follow: false,
+  ignore: ['**/node_modules/**'],
+}
+
+function posixRel(from, to) {
+  return path.relative(from, to).replace(/\\/g, '/')
+}
 
 function shouldForceRemain(relativePath) {
   const normalized = relativePath.replace(/\\/g, '/')
   return FORCE_REMAIN_PATTERNS.some((pattern) => pattern.test(normalized))
+}
+
+function getNativeKeep(pkgName) {
+  if (NATIVE_MODULE_KEEP[pkgName]) return NATIVE_MODULE_KEEP[pkgName]
+  if (pkgName.startsWith('pdu-static')) return NATIVE_MODULE_KEEP['pdu-static']
+  return null
+}
+
+function currentPduPackageName() {
+  if (process.platform === 'darwin') {
+    return process.arch === 'arm64'
+      ? 'pdu-static-darwin-arm64'
+      : 'pdu-static-darwin'
+  }
+  if (process.platform === 'linux') return 'pdu-static-linux'
+  if (process.platform === 'win32') return 'pdu-static-win32'
+  return null
+}
+
+function shouldRemovePlatformPackage(pkgName) {
+  for (const [platform, names] of Object.entries(PLATFORM_ONLY_PACKAGES)) {
+    if (names.includes(pkgName) && process.platform !== platform) return true
+  }
+  if (pkgName.startsWith('pdu-static-')) {
+    return pkgName !== currentPduPackageName()
+  }
+  return false
+}
+
+async function listPackageDirs(nodeModulesDir) {
+  const result = []
+  if (!(await fs.exists(nodeModulesDir))) return result
+
+  for (const name of await fs.readdir(nodeModulesDir)) {
+    if (name.startsWith('.')) continue
+    const full = path.join(nodeModulesDir, name)
+    if (!(await fs.lstat(full).catch(() => null))?.isDirectory()) continue
+
+    if (name.startsWith('@')) {
+      for (const scoped of await fs.readdir(full)) {
+        const scopedDir = path.join(full, scoped)
+        if ((await fs.lstat(scopedDir).catch(() => null))?.isDirectory()) {
+          result.push({ name: `${name}/${scoped}`, dir: scopedDir })
+        }
+      }
+    } else {
+      result.push({ name, dir: full })
+    }
+  }
+  return result
+}
+
+async function isNativePackage(pkgName, pkgDir) {
+  if (getNativeKeep(pkgName)) return true
+  if (await fs.exists(path.join(pkgDir, 'binding.gyp'))) return true
+  if (await fs.exists(path.join(pkgDir, 'prebuilds'))) return true
+  const nodes = await glob('**/*.node', {
+    cwd: pkgDir,
+    nodir: true,
+    ignore: ['**/node_modules/**'],
+  })
+  return nodes.length > 0
+}
+
+async function slimByKeep(pkgDir, patterns) {
+  const keep = new Set()
+  for (const pattern of patterns) {
+    for (const file of await glob(pattern, { cwd: pkgDir, ...PKG_GLOB })) {
+      const rel = posixRel(pkgDir, file)
+      if (rel.endsWith('.test.js') || rel.includes('/test/')) continue
+      keep.add(path.normalize(file))
+    }
+  }
+
+  let count = 0
+  for (const file of await glob('**/*', { cwd: pkgDir, ...PKG_GLOB })) {
+    if (keep.has(path.normalize(file))) continue
+    await fs.remove(file)
+    count++
+  }
+  return count
+}
+
+async function rmOtherPlatformPrebuilds(pkgName, pkgDir) {
+  const prebuildsDir = path.join(pkgDir, 'prebuilds')
+  if (!(await fs.exists(prebuildsDir))) return
+
+  for (const platform of await fs.readdir(prebuildsDir)) {
+    if (platform === CURRENT_PLATFORM) continue
+    console.log(`rmPrebuild: ${pkgName}/prebuilds/${platform}`)
+    await fs.remove(path.join(prebuildsDir, platform))
+  }
+}
+
+async function prepareNativeModules(nodeModulesDir) {
+  const nativeNames = new Set()
+  if (!(await fs.exists(nodeModulesDir))) return nativeNames
+
+  for (const { name, dir } of await listPackageDirs(nodeModulesDir)) {
+    if (shouldRemovePlatformPackage(name)) {
+      console.log(`rmPlatformPkg: ${name}`)
+      await fs.remove(dir)
+      continue
+    }
+
+    await rmOtherPlatformPrebuilds(name, dir)
+
+    if (!(await isNativePackage(name, dir))) continue
+    nativeNames.add(name)
+
+    const keep = getNativeKeep(name)
+    if (!keep) continue
+
+    const count = await slimByKeep(dir, keep)
+    console.log(`native keep: ${name} removed ${count} files`)
+  }
+
+  return nativeNames
+}
+
+function isUnderNativePackage(relativePath, nativeNames) {
+  const rel = relativePath.replace(/\\/g, '/')
+  for (const name of nativeNames) {
+    if (rel === name || rel.startsWith(name + '/')) return true
+  }
+  return false
 }
 
 async function rmPackages(dirPath, names = RM_PACKAGES) {
@@ -56,25 +218,7 @@ async function rmPackages(dirPath, names = RM_PACKAGES) {
   }
 }
 
-async function rmOtherPlatformPrebuilds(dirPath) {
-  if (!(await fs.exists(dirPath))) return
-
-  const currentPlatform = `${process.platform}-${process.arch}`
-
-  for (const pkg of NATIVE_MODULES_WITH_PREBUILDS) {
-    const prebuildsDir = path.join(dirPath, pkg, 'prebuilds')
-    if (!(await fs.exists(prebuildsDir))) continue
-
-    for (const name of await fs.readdir(prebuildsDir)) {
-      if (name === currentPlatform) continue
-      const target = path.join(prebuildsDir, name)
-      console.log(`rmPrebuild: ${path.relative(dirPath, target)}`)
-      await fs.remove(target)
-    }
-  }
-}
-
-async function slim(dirPath) {
+async function slim(dirPath, nativeNames = new Set()) {
   if (!(await fs.exists(dirPath))) {
     console.log(`slim skip, not found: ${dirPath}`)
     return
@@ -91,6 +235,8 @@ async function slim(dirPath) {
 
   for (const file of files) {
     const relativePath = path.relative(dirPath, file)
+    if (isUnderNativePackage(relativePath, nativeNames)) continue
+
     const ext = path.extname(relativePath).replace(/^\./, '')
     if (REMAIN_EXTENSIONS[ext]) continue
     if (!ext && shouldForceRemain(relativePath)) continue
@@ -221,7 +367,11 @@ async function minifyJs(dirPath) {
 
 async function compact(dirPath) {
   console.log(`\n=== ${dirPath} ===`)
-  await slim(dirPath)
+  const nativeNames =
+    path.basename(dirPath) === 'node_modules'
+      ? await prepareNativeModules(dirPath)
+      : new Set()
+  await slim(dirPath, nativeNames)
   await stringifyJSON(dirPath)
   await minifyJs(dirPath)
 }
@@ -229,6 +379,5 @@ async function compact(dirPath) {
 cd('dist')
 
 await rmPackages('node_modules')
-await rmOtherPlatformPrebuilds('node_modules')
 await compact('node_modules')
 await compact('resources/npm')

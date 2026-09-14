@@ -16,6 +16,7 @@ const config = {
     output: `../release/${pkg.version}`,
   },
   files: ['main', 'preload', 'renderer', 'plugins'],
+  npmRebuild: false,
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   extraResources: [
     {

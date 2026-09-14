@@ -112,4 +112,5 @@ await fs.writeJson('package.json', pkg, {
   spaces: 2,
 })
 
-await $`npm i --production`
+await $`npm i --omit=dev`
+await $`../node_modules/.bin/electron-builder install-app-deps`
