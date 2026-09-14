@@ -22,19 +22,25 @@ const REMAIN_EXTENSIONS = {
 
 const FORCE_REMAIN_PATTERNS = [/(^|\/)bin\//, /playwright-core\/lib\/xdg-open$/]
 
-// Whitelist relative to package root. Unlisted native packages are left untouched.
+const CURRENT_PLATFORM = `${process.platform}-${process.arch}`
+
 const NATIVE_MODULE_KEEP = {
-  'node-pty': [
-    'package.json',
-    'lib/**/*.js',
-    'build/Release/pty.node',
-    'build/Release/spawn-helper',
-    'build/Release/*.node',
-    'build/Release/*.dll',
-    'build/Release/*.exe',
-    'build/Release/conpty/**',
-  ],
-  'uiohook-napi': ['package.json', 'dist/index.js', 'build/Release/*.node'],
+  'node-pty': {
+    always: ['package.json', 'lib/**/*.js'],
+    build: [
+      'build/Release/spawn-helper',
+      'build/Release/*.node',
+      'build/Release/*.dll',
+      'build/Release/*.exe',
+      'build/Release/conpty/**',
+    ],
+    prebuilds: [`prebuilds/${CURRENT_PLATFORM}/**`],
+  },
+  'uiohook-napi': {
+    always: ['package.json', 'dist/index.js'],
+    build: ['build/Release/*.node'],
+    prebuilds: [`prebuilds/${CURRENT_PLATFORM}/**`],
+  },
   'node-mac-permissions': ['package.json', 'index.js', 'build/Release/*.node'],
   'extract-file-icon': [
     'package.json',
@@ -42,18 +48,11 @@ const NATIVE_MODULE_KEEP = {
     'build/Release/*.node',
   ],
   'registry-js': ['package.json', 'dist/lib/**/*.js', 'build/Release/*.node'],
-  'ffmpeg-static': ['package.json', 'index.js', 'ffmpeg'],
+  'ffmpeg-static': ['package.json', 'index.js', 'ffmpeg', 'ffmpeg.exe'],
   'file-icon': ['package.json', 'index.js', 'file-icon'],
-  'pdu-static': ['package.json', 'index.js', 'pdu'],
-  '@vscode/ripgrep': ['package.json', 'lib/index.js', 'bin/rg'],
+  'pdu-static': ['package.json', 'index.js', 'pdu', 'pdu.exe'],
+  '@vscode/ripgrep': ['package.json', 'lib/index.js', 'bin/rg', 'bin/rg.exe'],
 }
-
-const PLATFORM_ONLY_PACKAGES = {
-  darwin: ['node-mac-permissions', 'file-icon'],
-  win32: ['registry-js', 'extract-file-icon'],
-}
-
-const CURRENT_PLATFORM = `${process.platform}-${process.arch}`
 
 const PKG_GLOB = {
   nodir: true,
@@ -72,10 +71,24 @@ function shouldForceRemain(relativePath) {
   return FORCE_REMAIN_PATTERNS.some((pattern) => pattern.test(normalized))
 }
 
-function getNativeKeep(pkgName) {
+function getNativeKeepConfig(pkgName) {
   if (NATIVE_MODULE_KEEP[pkgName]) return NATIVE_MODULE_KEEP[pkgName]
   if (pkgName.startsWith('pdu-static')) return NATIVE_MODULE_KEEP['pdu-static']
   return null
+}
+
+async function resolveNativeKeep(pkgDir, config) {
+  if (Array.isArray(config)) return config
+
+  const releaseNodes = await glob('build/Release/*.node', {
+    cwd: pkgDir,
+    nodir: true,
+    ignore: ['**/node_modules/**'],
+  })
+  return [
+    ...config.always,
+    ...(releaseNodes.length > 0 ? config.build : config.prebuilds),
+  ]
 }
 
 function currentPduPackageName() {
@@ -90,13 +103,8 @@ function currentPduPackageName() {
 }
 
 function shouldRemovePlatformPackage(pkgName) {
-  for (const [platform, names] of Object.entries(PLATFORM_ONLY_PACKAGES)) {
-    if (names.includes(pkgName) && process.platform !== platform) return true
-  }
-  if (pkgName.startsWith('pdu-static-')) {
-    return pkgName !== currentPduPackageName()
-  }
-  return false
+  if (!pkgName.startsWith('pdu-static-')) return false
+  return pkgName !== currentPduPackageName()
 }
 
 async function listPackageDirs(nodeModulesDir) {
@@ -122,8 +130,7 @@ async function listPackageDirs(nodeModulesDir) {
   return result
 }
 
-async function isNativePackage(pkgName, pkgDir) {
-  if (getNativeKeep(pkgName)) return true
+async function isNativePackage(pkgDir) {
   if (await fs.exists(path.join(pkgDir, 'binding.gyp'))) return true
   if (await fs.exists(path.join(pkgDir, 'prebuilds'))) return true
   const nodes = await glob('**/*.node', {
@@ -175,16 +182,17 @@ async function prepareNativeModules(nodeModulesDir) {
       continue
     }
 
-    await rmOtherPlatformPrebuilds(name, dir)
+    const config = getNativeKeepConfig(name)
+    if (config) {
+      nativeNames.add(name)
+      const count = await slimByKeep(dir, await resolveNativeKeep(dir, config))
+      console.log(`native keep: ${name} removed ${count} files`)
+      continue
+    }
 
-    if (!(await isNativePackage(name, dir))) continue
+    if (!(await isNativePackage(dir))) continue
     nativeNames.add(name)
-
-    const keep = getNativeKeep(name)
-    if (!keep) continue
-
-    const count = await slimByKeep(dir, keep)
-    console.log(`native keep: ${name} removed ${count} files`)
+    await rmOtherPlatformPrebuilds(name, dir)
   }
 
   return nativeNames
