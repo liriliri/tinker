@@ -320,7 +320,7 @@ class Store extends BaseStore {
     const showMarketplace = await main.getSettingsStore('showMarketplace')
     const [plugins, apps] = await Promise.all([
       main.getPlugins(force),
-      searchLocalApps !== false ? main.getApps(force) : [],
+      searchLocalApps === true ? main.getApps(force) : [],
     ])
     runInAction(() => {
       this.showMarketplace = showMarketplace !== false

@@ -17,7 +17,7 @@ class Store extends BaseStore {
   silentStart: boolean = false
   showShortcut: string = 'Alt+Space'
   autoHide: boolean = false
-  searchLocalApps: boolean = true
+  searchLocalApps: boolean = false
   aiProviders: AiProvider[] = []
   npmRegistry: string = 'https://registry.npmmirror.com'
   showMarketplace: boolean = true
@@ -102,7 +102,7 @@ class Store extends BaseStore {
     this.silentStart = silentStart ?? false
     this.showShortcut = showShortcut ?? 'Alt+Space'
     this.autoHide = autoHide ?? false
-    this.searchLocalApps = searchLocalApps ?? true
+    this.searchLocalApps = searchLocalApps ?? false
     const parsed: AiProvider[] = aiProvidersRaw
       ? JSON.parse(aiProvidersRaw)
       : []
