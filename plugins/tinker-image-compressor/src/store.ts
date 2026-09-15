@@ -11,6 +11,7 @@ import BaseStore, { storage } from 'share/store/Base'
 import {
   buildFfmpegArgs,
   clampQuality,
+  DEFAULT_QUALITY,
   detectImageFormat,
   getCompressionRatio,
   getFormatExtension,
@@ -28,7 +29,7 @@ export class Store extends BaseStore {
 
   images: ImageItem[] = []
 
-  quality: number = 80
+  quality: number = DEFAULT_QUALITY
   isCustomQuality: boolean = false
   overwriteOriginal: boolean = true
   keepExif: boolean = false
@@ -49,12 +50,12 @@ export class Store extends BaseStore {
 
   private loadQuality() {
     const savedQuality = storage.get(STORAGE_QUALITY)
-    if (savedQuality !== null) {
+    if (savedQuality != null) {
       this.quality = clampQuality(toNum(savedQuality))
     }
 
     const savedIsCustomQuality = storage.get(STORAGE_IS_CUSTOM_QUALITY)
-    if (savedIsCustomQuality !== null) {
+    if (savedIsCustomQuality != null) {
       this.isCustomQuality = savedIsCustomQuality === 'true'
     } else {
       this.isCustomQuality = !PRESET_QUALITIES.includes(this.quality)
@@ -63,14 +64,14 @@ export class Store extends BaseStore {
 
   private loadOverwriteSetting() {
     const savedOverwrite = storage.get(STORAGE_OVERWRITE)
-    if (savedOverwrite !== null) {
+    if (savedOverwrite != null) {
       this.overwriteOriginal = savedOverwrite === 'true'
     }
   }
 
   private loadKeepExifSetting() {
     const saved = storage.get(STORAGE_KEEP_EXIF)
-    if (saved !== null) {
+    if (saved != null) {
       this.keepExif = saved === 'true'
     }
   }

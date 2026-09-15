@@ -3,18 +3,22 @@ import type { ImageFormat } from '../types'
 
 export const MIN_QUALITY = 1
 export const MAX_QUALITY = 99
+export const DEFAULT_QUALITY = 80
 
 export const QUALITY_PRESETS = [
   { labelKey: 'qualityVeryLow', value: 20 },
   { labelKey: 'qualityLow', value: 40 },
   { labelKey: 'qualityMedium', value: 60 },
-  { labelKey: 'qualityHigh', value: 80 },
+  { labelKey: 'qualityHigh', value: DEFAULT_QUALITY },
   { labelKey: 'qualityExcellent', value: 95 },
 ]
 
 export const PRESET_QUALITIES = QUALITY_PRESETS.map((preset) => preset.value)
 
 export function clampQuality(quality: number): number {
+  if (!Number.isFinite(quality)) {
+    return DEFAULT_QUALITY
+  }
   return clamp(quality, MIN_QUALITY, MAX_QUALITY)
 }
 
