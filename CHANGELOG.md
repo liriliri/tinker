@@ -1,3 +1,8 @@
+## v3.0.2 (16 Sep 2026)
+
+* feat(image-compressor): use popup window for comparison
+* fix: windows cli chinese output
+
 ## v3.0.1 (14 Sep 2026)
 
 * fix(terminal): unable to create pty
