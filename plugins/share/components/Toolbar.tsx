@@ -10,6 +10,7 @@ import { Search, X } from 'lucide-react'
 import AiIcon from '../assets/ai.svg?react'
 import type { MenuItemConstructorOptions } from 'electron'
 import { tw } from '../theme'
+import { useAutoFocus } from '../hooks/useAutoFocus'
 
 interface ToolbarProps {
   children: ReactNode
@@ -291,6 +292,7 @@ interface ToolbarSearchProps {
   dropdownItems?: ToolbarSearchDropdownItem[]
   onDropdownSelect?: (item: ToolbarSearchDropdownItem) => void
   shortcut?: string
+  autoFocus?: boolean
 }
 
 export function ToolbarSearch({
@@ -301,6 +303,7 @@ export function ToolbarSearch({
   dropdownItems,
   onDropdownSelect,
   shortcut,
+  autoFocus = false,
 }: ToolbarSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isFocused, setIsFocused] = useState(false)
@@ -309,6 +312,8 @@ export function ToolbarSearch({
 
   const showDropdown =
     isFocused && value.trim() && dropdownItems && dropdownItems.length > 0
+
+  useAutoFocus(inputRef, autoFocus)
 
   useEffect(() => {
     setActiveIndex(-1)

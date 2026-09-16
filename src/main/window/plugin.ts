@@ -1,5 +1,10 @@
 import { IPlugin } from 'common/types'
-import { closePlugin, getAttachedPlugin, layoutPlugin } from '../lib/plugin'
+import {
+  closePlugin,
+  getAttachedPlugin,
+  focusAttachedPluginView,
+  layoutPlugin,
+} from '../lib/plugin'
 import * as window from 'share/main/lib/window'
 import * as dock from '../lib/dock'
 
@@ -34,6 +39,10 @@ export function showWin(plugin: IPlugin) {
 
   win.on('show', () => {
     dock.show()
+  })
+
+  win.on('focus', () => {
+    focusAttachedPluginView(win)
   })
 
   window.loadPage(win, {

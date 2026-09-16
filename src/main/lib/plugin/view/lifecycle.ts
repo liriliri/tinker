@@ -274,6 +274,14 @@ export function getAttachedPlugin(win: BrowserWindow): IPlugin | undefined {
   }
 }
 
+export function focusAttachedPluginView(win: BrowserWindow) {
+  const plugin = getAttachedPlugin(win)
+  if (!plugin) return
+  const entry = pluginViews[plugin.id]
+  if (!entry?.view || entry.view.webContents.isDestroyed()) return
+  entry.view.webContents.focus()
+}
+
 export function getWebContentsPlugin(
   webContents: WebContents
 ): IPlugin | undefined {

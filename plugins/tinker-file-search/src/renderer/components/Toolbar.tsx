@@ -20,6 +20,7 @@ export default observer(function ToolbarComponent() {
         value={store.query}
         onChange={(value) => store.setQuery(value)}
         placeholder={t('searchPlaceholder')}
+        autoFocus
       />
       {store.searching && <LoadingCircle className="w-5 h-5 ml-1" />}
       <ToolbarSpacer />

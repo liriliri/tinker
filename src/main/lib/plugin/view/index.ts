@@ -12,6 +12,7 @@ export {
   detachPlugin,
   getAttachedPlugin,
   getWebContentsPlugin,
+  focusAttachedPluginView,
   layoutPlugin,
 } from './lifecycle'
 export {

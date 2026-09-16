@@ -48,6 +48,7 @@ export {
   closePlugin,
   detachPlugin,
   getAttachedPlugin,
+  focusAttachedPluginView,
   layoutPlugin,
 } from './view'
 
