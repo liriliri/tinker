@@ -18,6 +18,7 @@ import {
   PRESET_QUALITIES,
 } from './lib/compress'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
+import { resolveSavePath } from 'share/lib/util'
 import { createMcpApi } from './mcp'
 
 const STORAGE_QUALITY = 'quality'
@@ -299,7 +300,10 @@ export class Store extends BaseStore {
 
         const extension = getFormatExtension(image.originalFormat)
         const fileName = image.fileName.replace(/\.[^.]+$/, `.${extension}`)
-        const filePath = `${directory}/${fileName}`
+        const filePath = await resolveSavePath(
+          `${directory}/${fileName}`,
+          'compressed'
+        )
 
         let buffer: Uint8Array
         if (!this.isCompressedSmaller(image) && image.filePath) {

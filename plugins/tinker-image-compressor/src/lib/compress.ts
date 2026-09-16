@@ -4,6 +4,7 @@ import type { ImageFormat } from '../types'
 export const MIN_QUALITY = 1
 export const MAX_QUALITY = 99
 export const DEFAULT_QUALITY = 80
+const PNG_LOSSLESS_QUALITY = 80
 
 export const QUALITY_PRESETS = [
   { labelKey: 'qualityVeryLow', value: 20 },
@@ -20,6 +21,12 @@ export function clampQuality(quality: number): number {
     return DEFAULT_QUALITY
   }
   return clamp(quality, MIN_QUALITY, MAX_QUALITY)
+}
+
+function pngCompressionLevel(quality: number): number {
+  const t =
+    (quality - PNG_LOSSLESS_QUALITY) / (MAX_QUALITY - PNG_LOSSLESS_QUALITY)
+  return Math.round(9 - t * 3)
 }
 
 interface FfmpegArgsOptions {
@@ -77,14 +84,25 @@ export function buildFfmpegArgs({
       break
 
     case 'png':
-      {
-        const maxColors = Math.max(16, Math.round((quality / 100) * 256))
+      if (quality >= PNG_LOSSLESS_QUALITY) {
+        args.push(
+          '-compression_level',
+          String(pngCompressionLevel(quality)),
+          '-pred',
+          'mixed'
+        )
+      } else {
+        const maxColors = Math.max(
+          16,
+          Math.round((quality / PNG_LOSSLESS_QUALITY) * 256)
+        )
         args.push(
           '-vf',
-          `split[a][b];[a]palettegen=max_colors=${maxColors}:stats_mode=single[p];[b][p]paletteuse=dither=sierra2_4a`
+          `split[a][b];[a]palettegen=max_colors=${maxColors}:stats_mode=single[p];[b][p]paletteuse=dither=sierra2_4a`,
+          '-compression_level',
+          '9'
         )
       }
-      args.push('-compression_level', '9')
       break
 
     case 'webp':

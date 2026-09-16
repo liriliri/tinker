@@ -63,8 +63,5 @@
         }
       }
     }
-  },
-  "devDependencies": {
-    "@img-comparison-slider/react": "^8.0.2"
   }
 }

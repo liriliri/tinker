@@ -6,144 +6,105 @@ argument-hint: <plugin-name-or-file-path>
 
 # Lint Plugin Code
 
-Review a Tinker plugin's source code and report any violations of the project's coding standards defined in `AGENTS.md`.
+Check a Tinker plugin against `AGENTS.md` standards. Report every violation with path and line.
 
 ## Arguments
 
-- `plugin-name-or-file-path`: plugin folder name (e.g. `tinker-hash`) or a specific file path to check
+- `plugin-name-or-file-path`: plugin folder (e.g. `tinker-hash`) or a specific file
 
 ## Checklist
 
-Go through each category below and report violations with file path and line number.
+### 1. Naming
 
-### 1. Naming Conventions
+- Plugin folder: `tinker-` + kebab-case
+- Components: PascalCase files/ids (`Toolbar.tsx`, `const Toolbar = observer(...)`)
+- `store.ts`, `index.scss` (lowercase)
+- Functions/vars: camelCase; constants: UPPER_SNAKE_CASE; types: PascalCase
+- **Exception (do not flag)**: local component colliding with an import may use `Component` suffix (e.g. `ToolbarComponent`)
 
-- Plugin folder: kebab-case with `tinker-` prefix
-- Component files: PascalCase (e.g. `Toolbar.tsx`)
-- Store file: `store.ts` (lowercase)
-- Style file: `index.scss`
-- React components: PascalCase identifiers (`const Toolbar = observer(...)`)
-- Functions/variables: camelCase
-- Constants: UPPER_SNAKE_CASE
-- Types/interfaces: PascalCase
-- **Exception**: If a component name would conflict with an imported identifier (e.g. a local `Toolbar` component that also imports `Toolbar` from `share/components/Toolbar`), suffix the local component with `Component` (e.g. `ToolbarComponent`). This is intentional and should NOT be reported as a violation.
+### 2. Store
 
-### 2. Store Structure
-
-- Store class must extend `BaseStore` from `share/store/Base`
-- Constructor must call `super()` before `makeAutoObservable(this)`
-- Export a singleton instance: `export default new Store()`
+- Extends `BaseStore` from `share/store/Base`
+- `super()` before `makeAutoObservable(this)`
+- Singleton: `export default new Store()`
 
 ### 3. Theme & Colors
 
-- Never hardcode literal color values (e.g. `#0fc25e`, `#e0e0e0`, `rgb(...)`)
-- Tailwind color classes (e.g. `bg-green-500`, `text-gray-800`) are allowed
-- Always use `tw.*` utilities from `share/theme` for theme-aware colors (primary, border, background, etc.)
-- Import must be: `import { tw, THEME_COLORS } from 'share/theme'`
+- No hardcoded colors (`#…`, `rgb(…)`, etc.); Tailwind palette classes OK
+- Theme colors via `tw.*` / `THEME_COLORS` from `share/theme`
+- Import form: `import { tw, THEME_COLORS } from 'share/theme'`
 
-### 4. Component Patterns
+### 4. Components
 
-- Components that access store must be wrapped with `observer()`
-- All component props must have an interface definition
-- Avoid creating new objects/arrays inline in JSX render — use MobX computed properties
+- Store access → wrap with `observer()`
+- Props need an interface
+- No inline object/array creation in JSX render — prefer MobX computed
 
-### 5. Library and Utilities (`lib/` directory)
+### 5. `lib/`
 
-- External wrappers, utility functions, business logic must live in `src/lib/`
-- Forbidden directory names for utilities: `src/utils/`, `src/helpers/`
-- Logic in `store.ts` that has no dependency on store state or MobX should be extracted to `src/lib/`. Candidates: pure functions, data transformation, algorithm helpers, API wrappers
-- Never create `src/lib/index.ts` as a catch-all. Name files by their purpose (e.g. `util.ts`, `math.ts`). When unsure of the name, use `lib/util.ts`
-- Do not add a new `src/lib/*.ts` file for a handful of helpers. Put small utilities in `src/lib/util.ts`. A dedicated file is allowed only when it is a clear domain with substantial code (for example PDF export, sample data, or menu normalization)
+- Utils / wrappers / non-UI business logic → `src/lib/` (not `utils/` or `helpers/`)
+- Pure logic in `store.ts` (no store/MobX dependency) → move to `lib/`
+- No `src/lib/index.ts` barrel; name by purpose (`util.ts`, `math.ts`; default to `lib/util.ts` if unsure)
+- Small helpers go in `lib/util.ts`; new `lib/*.ts` only for a substantial domain (e.g. PDF export)
 
-### 6. React Hooks (`hooks/` directory)
+### 6. Hooks
 
-- Custom React hooks must live in `src/hooks/` (or `src/renderer/hooks/`), not in `lib/`
+- Custom hooks in `src/hooks/` or `src/renderer/hooks/`, not `lib/`
 
 ### 7. TypeScript
 
-- No `any` types — use proper types or union types
-- Types/interfaces referenced in more than one file must be extracted:
-  - Plugins with `src/renderer/` directory: extract to `src/renderer/types.ts`
-  - Simple plugins without `src/renderer/` directory: extract to `src/types.ts`
-  - Types/interfaces shared between `preload` and `renderer` must be extracted to `src/common/types.ts`
-- Each file must import types directly from the source file where they are defined — **never import a type just to re-export it** (e.g. `import type { Foo } from './types'; export type { Foo }` in an unrelated file is forbidden)
+- No `any`
+- Multi-file types: `src/renderer/types.ts` (if `src/renderer/` exists), else `src/types.ts`; preload+renderer shared → `src/common/types.ts`
+- Import types from their defining file — never re-export through an unrelated file
 
-### 8. Internationalization
+### 8. i18n
 
-- UI strings must use `t()` from `react-i18next`, not hardcoded strings
-- i18n files must exist: `src/i18n/en-US.json`, `src/i18n/zh-CN.json`
-- i18n keys must use camelCase naming — no dots (`.`) or other symbols (e.g. use `categoryAll` not `category.all`, `ruleSysTmp` not `rule.sysTmp`)
+- UI copy via `t()`; files: `src/i18n/en-US.json`, `zh-CN.json`
+- Keys: camelCase only (no `.` / symbols)
 
-### 9. Code Comments
+### 9. Comments
 
-- All comments must be in English
-- No redundant comments that restate what the code does (e.g. `// Set loading state` before `this.isLoading = true`)
-- Comments should explain "why", not "what"
+- English only
+- Explain **why**, never **what** (flag e.g. `// Set loading` above `this.isLoading = true`)
 
-### 10. SCSS Usage
+### 10. SCSS
 
-- SCSS (`index.scss`) should only be used for third-party library style overrides
-- Application styles must use Tailwind CSS classes
-- Hardcoded colors inside third-party library style overrides in SCSS are allowed
+- `index.scss` only for third-party overrides; app UI uses Tailwind
+- Hardcoded colors allowed only inside those third-party overrides
 
 ### 11. Icons
 
-- Use `lucide-react` for icons: `import { Copy } from 'lucide-react'`
-- Custom SVG: `import Icon from '../assets/icon.svg?react'`
-- Toolbar icons must use the `TOOLBAR_ICON_SIZE` constant
+- `lucide-react` (or `*.svg?react` for custom)
+- Toolbar icons: `TOOLBAR_ICON_SIZE`
 
-## Output Format
-
-For each violation found, output:
+## Output
 
 ```
-[Category] file/path:line — description of violation
+[Category] file/path:line — description
 ```
 
-Example:
-```
-[Theme] src/components/Toolbar.tsx:12 — hardcoded color `#0fc25e`, use tw.primary.bg instead
-[Naming] src/components/toolbar.tsx — component file should be PascalCase: Toolbar.tsx
-[Store] src/store.ts:5 — Store must extend BaseStore from `share/store/Base`
-[Library] src/lib/visible.ts — 4-line helper; move `visibleItems` into `src/lib/util.ts`
-[Comments] src/App.tsx:34 — comment in Chinese, must use English
-```
+Examples: `[Theme] …`, `[Naming] …`, `[Store] …`, `[Library] …`, `[Comments] …`
 
-If no violations are found, report: **No violations found.**
+If clean: **No violations found.**
+
+Also report total count and which categories failed.
 
 ## Steps
 
-1. Identify the target: if a plugin name is given, glob all `.ts`, `.tsx`, `.scss` files under `<plugin-name>/src/`. If a file path is given, check that file only.
-2. Read each file and check against the checklist above.
-3. Report all violations grouped by category, including total violation count and which categories had issues.
-4. Run prettier and eslint on the plugin (replace `<plugin-name>` with the actual folder name):
-
-**IMPORTANT**:
-- `lsla` is a **global command** — use it directly, do NOT use `npx prettier`
-- `eslint` lives at the **Tinker monorepo root** (`../node_modules/.bin/eslint` relative to the current workspace) — do NOT look elsewhere, do NOT use `npx eslint`
-- Both commands must run from the **Tinker monorepo root** (`../` relative to the current workspace). Plugins live under `plugins/` at that root.
+1. Target = all `src/**/*.{ts,tsx,scss}` under the plugin, or the given file only.
+2. Read and check every checklist item.
+3. Report violations, then fix tooling issues as below.
+4. From **Tinker monorepo root** (`../` from `plugins/`):
 
 ```bash
 cd .. && lsla prettier "plugins/<plugin-name>/src/**/*.{ts,tsx,json,scss}" --write
 cd .. && node_modules/.bin/eslint "plugins/<plugin-name>/src/**/*.{ts,tsx}"
 ```
 
-If eslint reports errors, fix them by editing the relevant files, then re-run eslint to confirm all errors are resolved.
+- Use global `lsla` (not `npx prettier`); eslint at repo-root `node_modules/.bin/eslint` (not `npx eslint`)
+- Fix eslint errors and re-run until clean
 
-5. Run the build to ensure there are no compilation errors (run from the plugin directory in the current workspace):
+5. From the plugin dir: `npm run build` — fix until it succeeds.
+6. From the plugin dir: `npx tsc --noEmit` — fix until clean.
 
-```bash
-cd <plugin-name> && npm run build
-```
-
-If the build fails, fix the errors, then re-run the build to confirm it succeeds.
-
-6. Run TypeScript type checking (run from the plugin directory in the current workspace):
-
-```bash
-cd <plugin-name> && npx tsc --noEmit
-```
-
-**IMPORTANT**: Only fix errors in files that are tracked by git. Never touch files under `references/` directories or any file listed in `.gitignore` — these are reference materials only.
-
-If there are TypeScript errors, fix them, then re-run to confirm all errors are resolved.
+**Only fix git-tracked files.** Never edit `references/` or `.gitignore`d files.

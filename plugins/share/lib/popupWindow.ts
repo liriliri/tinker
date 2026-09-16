@@ -11,6 +11,7 @@ export interface PopupWindowOptions {
   y?: number
   alwaysOnTop?: boolean
   resizable?: boolean
+  frame?: boolean
   webviewTag?: boolean
   transparent?: boolean
   /** When false, clicks do not steal focus (good for always-on floating widgets). */
@@ -44,6 +45,7 @@ export function openPopupWindow(
     y,
     alwaysOnTop = true,
     resizable = true,
+    frame = false,
     webviewTag,
     transparent = false,
     focusable = true,
@@ -78,7 +80,7 @@ export function openPopupWindow(
     minHeight != null ? `minHeight=${minHeight}` : '',
     `alwaysOnTop=${alwaysOnTop}`,
     `resizable=${resizable ? 'yes' : 'no'}`,
-    'frame=no',
+    `frame=${frame ? 'yes' : 'no'}`,
     webviewTag ? 'webviewTag=true' : '',
     transparent ? 'transparent=true' : '',
     `focusable=${focusable ? 'yes' : 'no'}`,

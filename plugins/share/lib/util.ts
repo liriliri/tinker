@@ -69,11 +69,19 @@ export async function isDiskNodeDirectory(
   }
 }
 
-export async function resolveSavePath(filePath: string): Promise<string> {
+export async function resolveSavePath(
+  filePath: string,
+  suffix?: string
+): Promise<string> {
   if (!(await fileExists(filePath))) return filePath
 
   const { dir, name, ext } = splitPath(filePath)
   const base = `${dir}${name.slice(0, name.length - ext.length)}`
+
+  if (suffix) {
+    const suffixPath = `${base}-${suffix}${ext}`
+    if (!(await fileExists(suffixPath))) return suffixPath
+  }
 
   const hourPath = `${base}-${dateFormat('yyyymmddHH')}${ext}`
   if (!(await fileExists(hourPath))) return hourPath

@@ -7,6 +7,7 @@ import { LoadingCircle } from 'share/components/Loading'
 import store from '../store'
 import { getCheckboardStyle } from '../lib/checkboard'
 import { getCompressionRatio } from '../lib/compress'
+import { openCompareWindow } from './CompareWindow'
 import { MenuItemConstructorOptions } from 'electron'
 
 export default observer(function ImageList() {
@@ -29,7 +30,7 @@ export default observer(function ImageList() {
     if (image.compressedUrl) {
       menuItems.push({
         label: t('compareImages'),
-        click: () => store.setCompareImageId(imageId),
+        click: () => openCompareWindow(imageId),
       })
     }
 

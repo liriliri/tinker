@@ -4,7 +4,6 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageList from './components/ImageList'
-import CompareModal from './components/CompareModal'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -62,8 +61,6 @@ const App = observer(function App() {
           <ImageList />
         )}
       </div>
-
-      <CompareModal />
     </div>
   )
 })

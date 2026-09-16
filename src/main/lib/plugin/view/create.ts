@@ -35,6 +35,7 @@ const allowedWindowOptions = [
   'minHeight',
   'alwaysOnTop',
   'resizable',
+  'frame',
   'transparent',
   'focusable',
   'hasShadow',

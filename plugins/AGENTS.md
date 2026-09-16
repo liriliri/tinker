@@ -42,7 +42,7 @@ Third-party libraries are pre-built as global scripts in the `vendor/` directory
 
 See `share/README.md` for Store patterns, component conventions, and full API documentation.
 
-**Important**: When updating `share/`, synchronously update `share/README.md`
+**Important**: When updating `share/`, update `share/README.md` only if the change affects how plugins use the API.
 
 ## Tailwind CSS & Theme
 
