@@ -40,6 +40,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
       cors: true,
       watch: {
         ignored: [
+          '**/node_modules/**',
+          '**/references/**',
           '**/plugins/**',
           '**/tinker-plugins/**',
           '**/tinker-games/**',
