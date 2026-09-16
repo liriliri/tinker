@@ -14,6 +14,7 @@ import { parseInspectAddress } from '../lib/plugin/inspect'
 import { runUiCommand, disposeAllUiSessions } from '../lib/plugin/ui'
 import { startHttp, stopHttp, resolveHttpAddress } from '../lib/http'
 import { startServer, stopServer, IpcRequest, IpcResponse } from './ipc'
+import { hasOpenArgTool } from './util'
 
 function success(req: IpcRequest, data?: unknown): IpcResponse {
   return { id: req.id, success: true, data }
@@ -121,6 +122,23 @@ async function handleIpcRequest(req: IpcRequest): Promise<IpcResponse> {
         if (typeof result !== 'string') return result
         openPlugin(result, true, !!req.data?.headless)
         const inspectUrl = await startInspectIfNeeded(req, result)
+
+        const arg = req.data?.arg
+        if (
+          typeof arg === 'string' &&
+          arg &&
+          hasOpenArgTool(plugins[result]?.mcp?.tools)
+        ) {
+          try {
+            const openResult = await callPluginMcpTool(result, 'open', { arg })
+            if (!inspectUrl) {
+              return success(req, openResult)
+            }
+          } catch (err: any) {
+            return fail(req, err.message || String(err))
+          }
+        }
+
         return success(req, inspectUrl ? { inspectUrl } : undefined)
       }
       case 'close': {

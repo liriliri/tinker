@@ -23,14 +23,14 @@
           "inputSchema": {
             "type": "object",
             "properties": {
-              "path": {
+              "arg": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Absolute path to a video file (MP4, WebM, MOV, MKV, and similar)"
+                "description": "Path to a video file (MP4, WebM, MOV, MKV, and similar)"
               }
             },
             "required": [
-              "path"
+              "arg"
             ]
           }
         },

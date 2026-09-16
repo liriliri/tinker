@@ -23,14 +23,14 @@
           "inputSchema": {
             "type": "object",
             "properties": {
-              "path": {
+              "arg": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Absolute path to an audio or video file"
+                "description": "Path to an audio or video file"
               }
             },
             "required": [
-              "path"
+              "arg"
             ]
           }
         },

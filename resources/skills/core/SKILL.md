@@ -40,7 +40,7 @@ Tags: `[builtin]`, `[mcp]` (programmatic tools — see **mcp**), `[background]` 
 ## Plugin lifecycle
 
 ```bash
-tinker open <plugin>                              # detached window
+tinker open <plugin> [arg]                        # optional arg → MCP open({ arg }) if supported
 tinker open <plugin> --headless                   # no window (needs Run in Background)
 tinker open <plugin> --inspect                    # per-plugin CDP (see **debug**)
 tinker close <plugin>
@@ -53,6 +53,8 @@ tinker quit
 ```
 
 `open` / `restart` succeed even when the plugin was not running. `close` fails if it is not running.
+
+Optional `[arg]`: relative paths that exist are resolved; other strings pass through. Without an `open({ arg })` tool, the arg is ignored.
 
 `--headless` requires **Run in Background** (right-click the plugin → checkbox); otherwise open fails.
 
@@ -87,7 +89,7 @@ tinker data clear json-editor --yes
 | `tinker list <plugin>…` | Details for one or more plugins |
 | `tinker list` | Full catalog (avoid for agents; may truncate) |
 | `tinker ps` | Running plugins with PIDs |
-| `tinker open <plugin>` | Open plugin window |
+| `tinker open <plugin> [arg]` | Open plugin; optional arg seeds MCP `open({ arg })` if supported |
 | `tinker open <plugin> --headless` | Background open (no window) |
 | `tinker open <plugin> --inspect` | Per-plugin CDP (see **debug**) |
 | `tinker close / restart <plugin>` | Close or restart |

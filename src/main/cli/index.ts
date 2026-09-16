@@ -10,7 +10,7 @@ import { registerUiCommands } from './ui'
 import { registerDataCommands } from './data'
 import { runSkills } from './skills'
 import { registerListCommand } from './list'
-import { normalizePluginId } from './util'
+import { normalizePluginId, resolveOpenArg } from './util'
 
 interface ExecuteCommandOptions {
   format?: (data: unknown) => void
@@ -99,8 +99,10 @@ function withInspectData(
 }
 
 program
-  .command('open <plugin>')
-  .description('Open a plugin in a detached window')
+  .command('open <plugin> [arg]')
+  .description(
+    'Open a plugin; optional arg seeds MCP open({ arg }) when supported'
+  )
   .option('--headless', 'Open the plugin in the background without a window')
   .option(
     '--inspect [address]',
@@ -109,18 +111,17 @@ program
   .action(
     (
       pluginName: string,
+      arg: string | undefined,
       opts: { headless?: boolean; inspect?: string | true }
     ) => {
-      executeCommand(
-        'open',
-        withInspectData(
-          {
-            id: normalizePluginId(pluginName),
-            headless: opts.headless,
-          },
-          opts.inspect
-        )
-      )
+      const data: Record<string, unknown> = {
+        id: normalizePluginId(pluginName),
+        headless: opts.headless,
+      }
+      if (arg !== undefined) {
+        data.arg = resolveOpenArg(arg)
+      }
+      executeCommand('open', withInspectData(data, opts.inspect))
     }
   )
 

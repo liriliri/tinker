@@ -51,6 +51,7 @@ function defaultArgSummary(
   for (const key of [
     'command',
     'content',
+    'arg',
     'path',
     'query',
     'url',

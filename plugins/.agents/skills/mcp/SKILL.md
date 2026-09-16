@@ -36,6 +36,29 @@ Pick granularity by plugin shape — not by toolbar button count.
 
 Don't expose one MCP tool per toolbar control (e.g. cropper rotate/flip/undo). If headless save is blocked by a dialog, add an optional path arg to the existing `save*` method — don't invent a separate MCP-only API.
 
+### CLI seed: `open({ arg })`
+
+Plugins that can be seeded from the CLI should expose:
+
+```json
+"open": {
+  "description": "…",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "arg": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Path or opaque string from CLI"
+      }
+    },
+    "required": ["arg"]
+  }
+}
+```
+
+`tinker open <plugin> [arg]` opens the plugin, then calls this tool when present. Relative paths that exist are resolved by the CLI; other strings are passed through. Prefer `arg` (not `path`) for this entrypoint so non-path strings work.
+
 ## Implement
 
 ### 1. `package.json`

@@ -23,14 +23,14 @@
           "inputSchema": {
             "type": "object",
             "properties": {
-              "path": {
+              "arg": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Absolute path to a JSON file"
+                "description": "Path to a JSON file"
               }
             },
             "required": [
-              "path"
+              "arg"
             ]
           }
         },

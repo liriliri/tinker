@@ -61,15 +61,16 @@ function requireImage(store: Store) {
   }
 }
 
-async function openImage(store: Store, args: { path: string }) {
-  if (!(await fileExists(args.path))) {
-    throw new Error(`Image file not found: ${args.path}`)
+async function openImage(store: Store, args: { arg: string }) {
+  const path = args.arg
+  if (!(await fileExists(path))) {
+    throw new Error(`Image file not found: ${path}`)
   }
 
-  const buffer = await tinker.readFile(args.path)
-  const fileName = splitPath(args.path).name
+  const buffer = await tinker.readFile(path)
+  const fileName = splitPath(path).name
   const file = new File([buffer], fileName, { type: 'image/*' })
-  await store.loadImage(file, args.path)
+  await store.loadImage(file, path)
   return serializeImage(store)
 }
 

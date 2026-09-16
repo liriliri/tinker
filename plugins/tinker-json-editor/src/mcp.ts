@@ -20,6 +20,7 @@ export function getToolArgSummary(
 ): string {
   switch (name) {
     case 'open':
+      return (args.arg as string) || ''
     case 'save':
       return (args.path as string) || ''
     case 'set':
@@ -42,13 +43,14 @@ function get(store: Store) {
   }
 }
 
-async function openJson(store: Store, args: { path: string }) {
-  if (!(await fileExists(args.path))) {
-    throw new Error(`JSON file not found: ${args.path}`)
+async function openJson(store: Store, args: { arg: string }) {
+  const path = args.arg
+  if (!(await fileExists(path))) {
+    throw new Error(`JSON file not found: ${path}`)
   }
 
-  const content = await tinker.readFile(args.path, 'utf-8')
-  store.loadFromFile(content, args.path)
+  const content = await tinker.readFile(path, 'utf-8')
+  store.loadFromFile(content, path)
   return get(store)
 }
 

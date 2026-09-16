@@ -9,7 +9,7 @@ import type { Store } from './store'
 import pkg from '../../package.json'
 
 interface OpenArgs {
-  path: string
+  arg: string
 }
 
 interface CreateArgs {
@@ -73,16 +73,17 @@ function normalizeDirPath(dirPath: string): string {
 }
 
 async function openArchive(store: Store, args: OpenArgs) {
-  if (!(await fileExists(args.path))) {
-    throw new Error(`Archive not found: ${args.path}`)
+  const path = args.arg
+  if (!(await fileExists(path))) {
+    throw new Error(`Archive not found: ${path}`)
   }
-  if (!endWith(lowerCase(args.path), '.zip')) {
+  if (!endWith(lowerCase(path), '.zip')) {
     throw new Error('Only .zip archives are supported.')
   }
 
-  const ok = await store.openArchivePath(args.path)
+  const ok = await store.openArchivePath(path)
   if (!ok) {
-    throw new Error(`Failed to open archive: ${args.path}`)
+    throw new Error(`Failed to open archive: ${path}`)
   }
 
   return serialize(store)

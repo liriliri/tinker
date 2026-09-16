@@ -9,7 +9,7 @@ import type { Store } from './store'
 import pkg from '../package.json'
 
 interface OpenVideoArgs {
-  path: string
+  arg: string
 }
 
 interface CropVideoArgs {
@@ -62,15 +62,16 @@ function requireVideo(store: Store) {
 }
 
 async function openVideo(store: Store, args: OpenVideoArgs) {
+  const path = args.arg
   if (store.isExporting) {
     throw new Error('Cannot open a video while exporting.')
   }
 
-  if (!(await fileExists(args.path))) {
-    throw new Error(`Video file not found: ${args.path}`)
+  if (!(await fileExists(path))) {
+    throw new Error(`Video file not found: ${path}`)
   }
 
-  await store.loadVideo(args.path)
+  await store.loadVideo(path)
   return serializeVideo(store)
 }
 

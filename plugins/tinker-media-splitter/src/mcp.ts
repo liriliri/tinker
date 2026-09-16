@@ -6,7 +6,7 @@ import { clampSegmentTimes, isZeroLengthSegment } from './lib/segments'
 import pkg from '../package.json'
 
 interface OpenArgs {
-  path: string
+  arg: string
 }
 
 interface SegmentRangeArgs {
@@ -79,17 +79,18 @@ function serializeState(store: Store) {
 }
 
 async function openMedia(store: Store, args: OpenArgs) {
+  const path = args.arg
   if (store.isExporting) {
     throw new Error('Cannot open media while exporting.')
   }
-  if (!(await fileExists(args.path))) {
-    throw new Error(`Media file not found: ${args.path}`)
+  if (!(await fileExists(path))) {
+    throw new Error(`Media file not found: ${path}`)
   }
-  if (!isMediaFileName(args.path)) {
+  if (!isMediaFileName(path)) {
     throw new Error('Only audio and video files are supported.')
   }
 
-  await store.loadMedia(args.path)
+  await store.loadMedia(path)
   return serializeState(store)
 }
 

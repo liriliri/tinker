@@ -10,6 +10,15 @@ Plugins can expose [MCP](https://modelcontextprotocol.io) tools via `tinker.mcp.
 
 Plugins with MCP are tagged `[mcp]` in `tinker list <plugin>` output. The plugin **must be running** before any tool call (`tinker open <plugin>`).
 
+For plugins that declare MCP tool `open` with an `arg` property, you can seed content in one step:
+
+```bash
+tinker open code-editor .
+tinker open json-editor ./data.json
+```
+
+If the plugin has no `open({ arg })` tool, the optional arg is ignored.
+
 No `[mcp]` tag → no `tools` / `call` API. Use the **ui** skill instead (see [When MCP is not available](#when-mcp-is-not-available)).
 
 ## The MCP loop

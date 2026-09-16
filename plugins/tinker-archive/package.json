@@ -28,14 +28,14 @@
           "inputSchema": {
             "type": "object",
             "properties": {
-              "path": {
+              "arg": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Absolute path to a .zip file"
+                "description": "Path to a .zip file"
               }
             },
             "required": [
-              "path"
+              "arg"
             ]
           }
         },
