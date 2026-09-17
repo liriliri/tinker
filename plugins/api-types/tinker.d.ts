@@ -428,6 +428,19 @@ declare global {
       direction?: 'vertical' | 'horizontal'
       rotation?: number
     }
+
+    type KeyboardEventName = 'down' | 'up'
+
+    interface KeyboardEvent {
+      type: KeyboardEventName
+      keycode: number
+      key: string
+      repeat: boolean
+      altKey: boolean
+      ctrlKey: boolean
+      metaKey: boolean
+      shiftKey: boolean
+    }
   }
 
   const tinker: {
@@ -770,6 +783,15 @@ declare global {
     registerMouse(
       type: tinker.MouseEventName,
       callback: (event: tinker.MouseEvent) => void
+    ): Promise<() => void>
+
+    /**
+     * Register a global keyboard listener. Returns an `off` function to remove
+     * this listener. Auto-unregistered when the plugin is destroyed.
+     */
+    registerKeyboard(
+      type: tinker.KeyboardEventName,
+      callback: (event: tinker.KeyboardEvent) => void
     ): Promise<() => void>
   }
 

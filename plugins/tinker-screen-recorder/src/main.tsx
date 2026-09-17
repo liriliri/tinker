@@ -27,6 +27,7 @@ const App = observer(function App() {
       flushSync(() => setLiveStream(null))
       recorderRef.current?.dispose()
       recorderRef.current = null
+      store.closeKeyOverlay()
       void tinker.setBackgroundThrottling(true)
     }
   }, [])

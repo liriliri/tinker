@@ -1,9 +1,14 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import find from 'licia/find'
 import isMac from 'licia/isMac'
 import i18n from 'i18next'
 import toast from 'react-hot-toast'
 import BaseStore from 'share/store/Base'
+import {
+  closeKeyOverlayWindow,
+  getKeyOverlayWindow,
+  openKeyOverlayWindow,
+} from './lib/keyOverlayWindow'
 
 type SourceType = 'screen' | 'window'
 type RecorderState = 'idle' | 'recording' | 'preview'
@@ -17,6 +22,7 @@ class Store extends BaseStore {
   recorderState: RecorderState = 'idle'
   currentRecordingDuration = 0
   recordedBlob: Blob | null = null
+  keyOverlayOpen = false
 
   private recordingTimer: ReturnType<typeof setInterval> | null = null
 
@@ -88,6 +94,38 @@ class Store extends BaseStore {
     this.currentRecordingDuration = 0
     this.recordedBlob = null
     this.stopTimer()
+  }
+
+  async toggleKeyOverlay() {
+    if (getKeyOverlayWindow()) {
+      this.closeKeyOverlay()
+      return
+    }
+
+    const win = openKeyOverlayWindow(() => {
+      runInAction(() => {
+        this.keyOverlayOpen = false
+      })
+      this.syncBackgroundThrottling()
+    })
+    if (!win) {
+      toast.error(
+        i18n.t(isMac ? 'keyOverlayPermissionRequired' : 'keyOverlayFailed')
+      )
+      return
+    }
+    this.keyOverlayOpen = true
+    await tinker.setBackgroundThrottling(false)
+  }
+
+  closeKeyOverlay() {
+    closeKeyOverlayWindow()
+  }
+
+  private syncBackgroundThrottling() {
+    if (!this.isRecording && !this.keyOverlayOpen) {
+      void tinker.setBackgroundThrottling(true)
+    }
   }
 
   private startTimer() {

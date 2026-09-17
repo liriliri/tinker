@@ -132,6 +132,19 @@ export interface IMouseEvent {
   rotation?: number
 }
 
+export type KeyboardEventName = 'down' | 'up'
+
+export interface IKeyboardEvent {
+  type: KeyboardEventName
+  keycode: number
+  key: string
+  repeat: boolean
+  altKey: boolean
+  ctrlKey: boolean
+  metaKey: boolean
+  shiftKey: boolean
+}
+
 export type IpcDragMain = (
   x: number,
   y: number,
@@ -224,3 +237,5 @@ export type IpcRegisterShortcut = (accelerator: string) => boolean
 export type IpcUnregisterShortcut = (accelerator: string) => void
 export type IpcRegisterMouse = (type: MouseEventName) => boolean
 export type IpcUnregisterMouse = (type: MouseEventName) => void
+export type IpcRegisterKeyboard = (type: KeyboardEventName) => boolean
+export type IpcUnregisterKeyboard = (type: KeyboardEventName) => void

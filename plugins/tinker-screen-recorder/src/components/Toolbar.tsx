@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { Monitor, PanelTop, RotateCw } from 'lucide-react'
+import { Keyboard, Monitor, PanelTop, RotateCw } from 'lucide-react'
 import { tw } from 'share/theme'
 import { mediaDurationFormat } from 'share/lib/util'
 import {
@@ -28,7 +28,7 @@ export default observer(function ToolbarComponent({
 }: ToolbarProps) {
   const { t } = useTranslation()
   const disabled = store.recorderState !== 'idle'
-  const { isRecording, isPreview, canRecord } = store
+  const { isRecording, isPreview, canRecord, keyOverlayOpen } = store
   const duration = store.currentRecordingDuration
 
   return (
@@ -59,6 +59,14 @@ export default observer(function ToolbarComponent({
         onClick={() => void store.loadSources()}
       >
         <RotateCw size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
+      <ToolbarButton
+        title={t('keyOverlay')}
+        variant="toggle"
+        active={keyOverlayOpen}
+        onClick={() => void store.toggleKeyOverlay()}
+      >
+        <Keyboard size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       <ToolbarSpacer />
       {!isPreview && (

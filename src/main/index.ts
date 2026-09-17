@@ -13,6 +13,7 @@ import noop from 'licia/noop'
 import { getSettingsStore } from './lib/store'
 import * as shortcut from './lib/shortcut'
 import * as mouse from './lib/mouse'
+import * as keyboard from './lib/keyboard'
 import * as proxy from './lib/proxy'
 import * as cli from './cli/handler'
 import { startFixPath } from './lib/fixPath'
@@ -89,6 +90,7 @@ app.on('ready', () => {
 
   shortcut.init()
   mouse.init()
+  keyboard.init()
 
   tracing.end()
 })

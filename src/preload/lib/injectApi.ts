@@ -1,7 +1,12 @@
 import type { MenuItemConstructorOptions } from 'electron'
 import type types from 'licia/types'
 import uuid from 'licia/uuid'
-import type { IMouseEvent, MouseEventName } from 'common/types'
+import type {
+  IKeyboardEvent,
+  IMouseEvent,
+  KeyboardEventName,
+  MouseEventName,
+} from 'common/types'
 
 declare const window: any
 
@@ -27,6 +32,10 @@ const shortcutCallbacks = new Map<string, () => void>()
 const mouseCallbacks = new Map<
   MouseEventName,
   Set<(event: IMouseEvent) => void>
+>()
+const keyboardCallbacks = new Map<
+  KeyboardEventName,
+  Set<(event: IKeyboardEvent) => void>
 >()
 
 function runFFmpeg(args: string[], onProgress?: any) {
@@ -352,6 +361,29 @@ async function registerMouse(
   }
 }
 
+async function registerKeyboard(
+  type: KeyboardEventName,
+  callback: (event: IKeyboardEvent) => void
+): Promise<() => void> {
+  const ok = await _tinker.registerKeyboard(type)
+  if (!ok) {
+    throw new Error(`Failed to register keyboard: ${type}`)
+  }
+  let set = keyboardCallbacks.get(type)
+  if (!set) {
+    set = new Set()
+    keyboardCallbacks.set(type, set)
+  }
+  set.add(callback)
+  return () => {
+    set!.delete(callback)
+    if (set!.size === 0 && keyboardCallbacks.get(type) === set) {
+      keyboardCallbacks.delete(type)
+      void _tinker.unregisterKeyboard(type)
+    }
+  }
+}
+
 function transOptions(options: MenuItemConstructorOptions[]) {
   const normalizedOptions = Array.isArray(options) ? options : [options]
 
@@ -502,6 +534,7 @@ export function injectApi(options?: { context?: 'preload' | 'renderer' }) {
     registerMcp,
     registerShortcut,
     registerMouse,
+    registerKeyboard,
   }
 
   if (context === 'renderer') {
@@ -526,4 +559,15 @@ export function injectApi(options?: { context?: 'preload' | 'renderer' }) {
       callback(event)
     }
   })
+
+  _tinker.on(
+    'triggerKeyboard',
+    (type: KeyboardEventName, event: IKeyboardEvent) => {
+      const set = keyboardCallbacks.get(type)
+      if (!set) return
+      for (const callback of [...set]) {
+        callback(event)
+      }
+    }
+  )
 }

@@ -19,6 +19,7 @@ export interface PopupWindowOptions {
   hasShadow?: boolean
   skipTaskbar?: boolean
   positionKey?: string
+  closeOnEscape?: boolean
 }
 
 interface PopupBounds {
@@ -52,6 +53,7 @@ export function openPopupWindow(
     hasShadow = true,
     skipTaskbar = true,
     positionKey,
+    closeOnEscape = true,
   } = options
 
   let savedBounds: PopupBounds | null = null
@@ -121,9 +123,11 @@ export function openPopupWindow(
   const root = createRoot(container)
   root.render(render(popup, () => popup.close()))
 
-  popup.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') popup.close()
-  })
+  if (closeOnEscape) {
+    popup.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') popup.close()
+    })
+  }
 
   const unsubscribe = tinker.on('changeTheme', async () => {
     if (popup.closed) return

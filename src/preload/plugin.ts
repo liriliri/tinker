@@ -20,6 +20,8 @@ import {
   IpcUnregisterShortcut,
   IpcRegisterMouse,
   IpcUnregisterMouse,
+  IpcRegisterKeyboard,
+  IpcUnregisterKeyboard,
   IpcSetIgnoreMouseEvents,
   IPlugin,
 } from 'common/types'
@@ -225,6 +227,8 @@ const tinkerObj = {
   unregisterShortcut: invoke<IpcUnregisterShortcut>('unregisterShortcut'),
   registerMouse: invoke<IpcRegisterMouse>('registerMouse'),
   unregisterMouse: invoke<IpcUnregisterMouse>('unregisterMouse'),
+  registerKeyboard: invoke<IpcRegisterKeyboard>('registerKeyboard'),
+  unregisterKeyboard: invoke<IpcUnregisterKeyboard>('unregisterKeyboard'),
   setIgnoreMouseEvents: invoke<IpcSetIgnoreMouseEvents>('setIgnoreMouseEvents'),
   t(key: string) {
     return i18n.t(key)
