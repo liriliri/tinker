@@ -101,6 +101,14 @@ export function openPlugin(
       win.webContents.send('updatePluginTitle', title)
     }
   })
+  // @ts-ignore
+  pluginView.webContents.on('close', (event) => {
+    if (!pluginViews[id]) {
+      return
+    }
+    event.preventDefault()
+    void closePlugin(id)
+  })
 
   if (background) {
     setPluginView(id, pluginView, null)
@@ -200,8 +208,8 @@ export const closePlugin: IpcClosePlugin = async function (id, destroy) {
   for (const childWin of [...entry.childWindows]) {
     childWin.close()
   }
-  view.webContents.close()
   delete pluginViews[id]
+  view.webContents.close()
 
   if (win && !isMainWin) {
     win.close()
