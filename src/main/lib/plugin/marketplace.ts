@@ -551,6 +551,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-search-all',
+    name: 'Search All',
+    description: 'Unified search across files, apps, and plugins',
+    icon: 'tinker-search-all.png',
+    locales: {
+      'zh-CN': {
+        name: '全局搜索',
+        description: '统一搜索文件、应用、插件',
+      },
+    },
+  },
+  {
     id: 'tinker-sudoku',
     name: 'Sudoku',
     description: 'Fill the grid so every row, column, and box contains 1–9.',

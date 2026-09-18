@@ -25,5 +25,9 @@ export function show() {
     return
   }
 
+  if (app.dock.isVisible()) {
+    return
+  }
+
   app.dock.show()
 }
