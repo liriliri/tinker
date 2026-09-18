@@ -16,13 +16,14 @@ export default observer(function Screencast({ pluginId }: ScreencastProps) {
   const [isFullscreen, setIsFullscreen] = useState(fullscreen.isActive())
   const {
     canvasRef,
-    pasteText,
+    pullFocusedInput,
+    pushFocusedInput,
     onMouse,
     onWheel,
     onKeyDown,
     onKeyUp,
     onPaste,
-  } = useScreencast(pluginId)
+  } = useScreencast(pluginId, (value) => setText(value ?? ''))
 
   useEffect(() => {
     const onChange = () => setIsFullscreen(fullscreen.isActive())
@@ -31,13 +32,6 @@ export default observer(function Screencast({ pluginId }: ScreencastProps) {
       fullscreen.off('change', onChange)
     }
   }, [])
-
-  const sendText = () => {
-    if (!store.screencastActive) return
-    if (!text) return
-    pasteText(text)
-    setText('')
-  }
 
   return (
     <div ref={rootRef} className={Style.root}>
@@ -78,32 +72,36 @@ export default observer(function Screencast({ pluginId }: ScreencastProps) {
           onContextMenu={(e) => e.preventDefault()}
         />
         {!store.screencastActive ? (
-          <div className={Style.glasspane}>{t('notActive')}</div>
+          <div className={Style.glasspane}>
+            <div className={Style.inactive}>
+              <span>{t('notActive')}</span>
+              <button
+                type="button"
+                className={Style.activate}
+                disabled={store.busy}
+                onClick={() => store.activatePlugin()}
+              >
+                {store.openingId === pluginId ? t('opening') : t('activate')}
+              </button>
+            </div>
+          </div>
         ) : null}
       </div>
-      <form
-        className={Style.composer}
-        onSubmit={(event) => {
-          event.preventDefault()
-          sendText()
-        }}
-      >
+      <div className={Style.composer}>
         <input
           className={Style.input}
           type="text"
           value={text}
           placeholder={t('inputText')}
           disabled={!store.screencastActive}
-          onChange={(event) => setText(event.target.value)}
+          onFocus={() => pullFocusedInput()}
+          onChange={(event) => {
+            const value = event.target.value
+            setText(value)
+            pushFocusedInput(value)
+          }}
         />
-        <button
-          className={Style.send}
-          type="submit"
-          disabled={!store.screencastActive || !text}
-        >
-          {t('send')}
-        </button>
-      </form>
+      </div>
     </div>
   )
 })

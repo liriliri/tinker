@@ -5,19 +5,34 @@ import keys from 'licia/keys'
 import map from 'licia/map'
 import contain from 'licia/contain'
 import startWith from 'licia/startWith'
-import { pluginViews } from '../plugin/view'
-import { plugins } from '../plugin/loader'
+import filter from 'licia/filter'
+import { openPlugin, closePlugin, pluginViews } from '../plugin/view'
+import { getPlugins, plugins } from '../plugin/loader'
+import { getMainStore } from '../store'
 import { isDev } from 'share/common/util'
 import { getTheme } from 'share/main/lib/util'
 import * as language from 'share/main/lib/language'
 import { getRendererRoot, loadAppHtml } from './static'
 import { checkBasicAuth, HttpAuth } from './auth'
 
-function listRunningPlugins() {
-  return map(keys(pluginViews), (id) => ({
-    id,
-    name: plugins[id]?.name || id,
-  }))
+async function listPlugins() {
+  await getPlugins()
+  const pluginStates = getMainStore().get('pluginStates') || {}
+  const items = map(
+    filter(keys(plugins), (id) => !pluginStates[id]?.hidden),
+    (id) => ({
+      id,
+      name: plugins[id]?.name || id,
+      running: !!pluginViews[id],
+    })
+  )
+
+  return items.sort((a, b) => {
+    if (a.running !== b.running) {
+      return a.running ? -1 : 1
+    }
+    return a.name.localeCompare(b.name)
+  })
 }
 
 async function sendAppHtml(ctx: Koa.Context) {
@@ -73,9 +88,40 @@ export function createApp(auth?: HttpAuth) {
     ctx.body = { required: !!auth }
   })
 
-  router.get('/api/plugins', (ctx) => {
+  router.get('/api/plugins', async (ctx) => {
     ctx.set('Cache-Control', 'no-cache')
-    ctx.body = listRunningPlugins()
+    ctx.body = await listPlugins()
+  })
+
+  router.post('/api/plugins/:id/open', async (ctx) => {
+    await getPlugins()
+    const id = ctx.params.id
+    if (!plugins[id]) {
+      ctx.status = 404
+      ctx.body = { error: 'Plugin not found' }
+      return
+    }
+    openPlugin(id)
+    ctx.body = {
+      id,
+      name: plugins[id].name || id,
+      running: true,
+    }
+  })
+
+  router.post('/api/plugins/:id/close', async (ctx) => {
+    const id = ctx.params.id
+    if (!pluginViews[id]) {
+      ctx.status = 404
+      ctx.body = { error: 'Plugin is not running' }
+      return
+    }
+    await closePlugin(id, true)
+    ctx.body = {
+      id,
+      name: plugins[id]?.name || id,
+      running: false,
+    }
   })
 
   router.get('/api/theme', (ctx) => {

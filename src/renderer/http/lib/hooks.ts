@@ -24,7 +24,10 @@ import {
   touchCanvasOffset,
 } from './screencast'
 
-export function useScreencast(pluginId: string) {
+export function useScreencast(
+  pluginId: string,
+  onInputText?: (text: string | null) => void
+) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
@@ -33,6 +36,8 @@ export function useScreencast(pluginId: string) {
   const offsetTopRef = useRef(0)
   const activeOffsetTopRef = useRef<number | null>(null)
   const touchModeRef = useRef(isTouchClient())
+  const onInputTextRef = useRef(onInputText)
+  onInputTextRef.current = onInputText
 
   const paint = useCallback(() => {
     const canvas = canvasRef.current
@@ -126,6 +131,7 @@ export function useScreencast(pluginId: string) {
         metadata?: FrameMetadata
         message?: string
         visible?: boolean
+        text?: string | null
       }
       try {
         msg = JSON.parse(String(event.data))
@@ -144,6 +150,10 @@ export function useScreencast(pluginId: string) {
       }
       if (msg.type === 'visibility') {
         store.setScreencastActive(!!msg.visible)
+        return
+      }
+      if (msg.type === 'inputText') {
+        onInputTextRef.current?.(msg.text ?? null)
         return
       }
       if (msg.type === 'error') {
@@ -269,9 +279,20 @@ export function useScreencast(pluginId: string) {
     [send]
   )
 
+  const pullFocusedInput = useCallback(() => {
+    send({ type: 'getInputText' })
+  }, [send])
+
+  const pushFocusedInput = useCallback(
+    (value: string) => {
+      send({ type: 'setInputText', text: value })
+    },
+    [send]
+  )
+
   const onMouse = (event: MouseEvent<HTMLCanvasElement>) => {
     // Ignore compatibility mouse events synthesized from touch.
-    if (event.nativeEvent.sourceCapabilities?.firesTouchEvents) return
+    if ((event.nativeEvent as any).sourceCapabilities?.firesTouchEvents) return
     event.preventDefault()
     if (!store.screencastActive) return
     const canvas = canvasRef.current
@@ -381,6 +402,8 @@ export function useScreencast(pluginId: string) {
   return {
     canvasRef,
     pasteText,
+    pullFocusedInput,
+    pushFocusedInput,
     onMouse,
     onWheel,
     onKeyDown,

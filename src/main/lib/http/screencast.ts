@@ -161,6 +161,68 @@ async function setTouchMode(session: PluginSession, enabled: boolean) {
   session.touchMode = enabled
 }
 
+async function evaluate(session: PluginSession, expression: string) {
+  if (
+    session.webContents.isDestroyed() ||
+    !session.webContents.debugger.isAttached()
+  ) {
+    return null
+  }
+  const result = await session.webContents.debugger.sendCommand(
+    'Runtime.evaluate',
+    {
+      expression,
+      returnByValue: true,
+    }
+  )
+  return result?.result?.value ?? null
+}
+
+async function getFocusedInputText(session: PluginSession) {
+  return evaluate(
+    session,
+    `(() => {
+      const el = document.activeElement
+      if (!el) return null
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        if (el.type === 'password') return ''
+        return el.value
+      }
+      if (el.isContentEditable) return el.innerText
+      return null
+    })()`
+  )
+}
+
+async function setFocusedInputText(session: PluginSession, text: string) {
+  const value = JSON.stringify(text)
+  return evaluate(
+    session,
+    `((text) => {
+      const el = document.activeElement
+      if (!el) return false
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        const proto =
+          el instanceof HTMLInputElement
+            ? HTMLInputElement.prototype
+            : HTMLTextAreaElement.prototype
+        const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
+        if (setter) setter.call(el, text)
+        else el.value = text
+        el.dispatchEvent(new Event('input', { bubbles: true }))
+        return true
+      }
+      if (el.isContentEditable) {
+        el.focus()
+        document.execCommand('selectAll', false)
+        document.execCommand('insertText', false, text)
+        return true
+      }
+      return false
+    })(${value})`
+  )
+}
+
 function disposePluginSession(pluginId: string) {
   const session = pluginSessions.get(pluginId)
   if (!session) return
@@ -279,7 +341,11 @@ function getOrCreateSession(pluginId: string): PluginSession {
   return session
 }
 
-async function handleClientMessage(session: PluginSession, raw: string) {
+async function handleClientMessage(
+  session: PluginSession,
+  raw: string,
+  ws: WebSocket
+) {
   let msg: {
     type?: string
     width?: number
@@ -324,6 +390,20 @@ async function handleClientMessage(session: PluginSession, raw: string) {
     return
   }
 
+  if (msg.type === 'getInputText') {
+    const text = await getFocusedInputText(session)
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'inputText', text }))
+    }
+    return
+  }
+
+  if (msg.type === 'setInputText') {
+    if (!isStr(msg.text)) return
+    await setFocusedInputText(session, msg.text)
+    return
+  }
+
   if (msg.type === 'mouse') {
     const typeMap: Record<string, string> = {
       mousedown: 'mousePressed',
@@ -349,7 +429,7 @@ async function handleClientMessage(session: PluginSession, raw: string) {
         buttons: 0,
         clickCount: 0,
       }
-    )
+    ) as Record<string, unknown>
     if (type === 'mouseWheel') {
       params.deltaX = toNum(msg.deltaX) || 0
       params.deltaY = toNum(msg.deltaY) || 0
@@ -448,16 +528,18 @@ export function handleUpgrade(
     broadcastVisibility(session)
 
     ws.on('message', (raw) => {
-      void handleClientMessage(session, raw.toString()).catch((err: any) => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(
-            JSON.stringify({
-              type: 'error',
-              message: err?.message || String(err),
-            })
-          )
+      void handleClientMessage(session, raw.toString(), ws).catch(
+        (err: any) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(
+              JSON.stringify({
+                type: 'error',
+                message: err?.message || String(err),
+              })
+            )
+          }
         }
-      })
+      )
     })
 
     ws.on('close', () => {
