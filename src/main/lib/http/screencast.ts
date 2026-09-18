@@ -213,9 +213,8 @@ async function setFocusedInputText(session: PluginSession, text: string) {
         return true
       }
       if (el.isContentEditable) {
-        el.focus()
-        document.execCommand('selectAll', false)
-        document.execCommand('insertText', false, text)
+        el.textContent = text
+        el.dispatchEvent(new Event('input', { bubbles: true }))
         return true
       }
       return false
