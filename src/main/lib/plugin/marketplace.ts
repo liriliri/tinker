@@ -612,6 +612,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-tcp-tunnel',
+    name: 'TCP Tunnel',
+    description: 'Expose local TCP ports through a public relay',
+    icon: 'tinker-tcp-tunnel.png',
+    locales: {
+      'zh-CN': {
+        name: 'TCP 隧道',
+        description: '通过公网中继暴露本地 TCP 端口',
+      },
+    },
+  },
+  {
     id: 'tinker-token-usage',
     name: 'Token Usage',
     description: 'Track token usage statistics for AI coding tools',
