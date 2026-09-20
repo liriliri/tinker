@@ -99,9 +99,10 @@ import startWith from 'licia/startWith'
 import stripHtmlTag from 'licia/stripHtmlTag'
 import strToBytes from 'licia/strToBytes'
 import sum from 'licia/sum'
+import toBool from 'licia/toBool'
+import toDate from 'licia/toDate'
 import toInt from 'licia/toInt'
 import toNum from 'licia/toNum'
-import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
 import trim from 'licia/trim'
 import truncate from 'licia/truncate'
@@ -215,9 +216,10 @@ const licia = {
   stripHtmlTag,
   strToBytes,
   sum,
+  toBool,
+  toDate,
   toInt,
   toNum,
-  toBool,
   toStr,
   trim,
   truncate,
@@ -335,9 +337,10 @@ export {
   stripHtmlTag,
   strToBytes,
   sum,
+  toBool,
+  toDate,
   toInt,
   toNum,
-  toBool,
   toStr,
   trim,
   truncate,

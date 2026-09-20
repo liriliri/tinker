@@ -1,0 +1,172 @@
+{
+  "name": "tinker-habit",
+  "version": "0.1.0",
+  "description": "Habit check-in tracker Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Habit",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "description": "Track habits with weekday, weekly, or monthly schedules and view check-ins on a month calendar",
+    "locales": {
+      "zh-CN": {
+        "name": "习惯打卡",
+        "description": "习惯打卡，支持按周几、每周次数或每月次数设置，月视图查看打卡与完成率"
+      }
+    },
+    "mcp": {
+      "tools": {
+        "list": {
+          "description": "List habits with schedule, status, period progress, and completion rate."
+        },
+        "add": {
+          "description": "Add a habit. scheduleType is weekdays (specific days), weekly (count per week), or monthly (count per month).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Habit title"
+              },
+              "scheduleType": {
+                "type": "string",
+                "enum": ["weekdays", "weekly", "monthly"],
+                "description": "Schedule type"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6
+                },
+                "description": "Days of week (0=Sun … 6=Sat) when scheduleType is weekdays"
+              },
+              "weeklyTarget": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7,
+                "description": "Times per week when scheduleType is weekly"
+              },
+              "monthlyTarget": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 31,
+                "description": "Times per month when scheduleType is monthly"
+              },
+              "color": {
+                "type": "string",
+                "description": "Optional habit color hex"
+              }
+            },
+            "required": ["title", "scheduleType"]
+          }
+        },
+        "update": {
+          "description": "Update a habit by id. Omitted fields keep current values.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Habit id"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "New title"
+              },
+              "scheduleType": {
+                "type": "string",
+                "enum": ["weekdays", "weekly", "monthly"],
+                "description": "Schedule type"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6
+                },
+                "description": "Days of week (0=Sun … 6=Sat)"
+              },
+              "weeklyTarget": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7,
+                "description": "Times per week"
+              },
+              "monthlyTarget": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 31,
+                "description": "Times per month"
+              },
+              "color": {
+                "type": "string",
+                "description": "Habit color hex"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "check_in": {
+          "description": "Toggle or set a check-in for a habit on a date (YYYY-MM-DD). Defaults to today.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Habit id"
+              },
+              "date": {
+                "type": "string",
+                "minLength": 10,
+                "description": "Date YYYY-MM-DD (default today)"
+              },
+              "checked": {
+                "type": "boolean",
+                "description": "Force checked state; omit to toggle"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "end": {
+          "description": "End a habit. Keeps check-in history but stops further check-ins.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Habit id"
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "delete": {
+          "description": "Delete a habit and all of its check-in records.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Habit id"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      }
+    }
+  }
+}
