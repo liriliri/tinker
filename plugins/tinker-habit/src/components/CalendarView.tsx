@@ -69,7 +69,7 @@ const CalendarView = observer(({ calendarRef }: CalendarViewProps) => {
         expandRows={true}
         fixedWeekCount={false}
         firstDay={1}
-        dayMaxEvents={4}
+        dayMaxEvents={true}
         events={store.calendarEvents}
         locale={calendarLocale}
         editable={false}
