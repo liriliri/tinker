@@ -1,3 +1,10 @@
+## v3.1.0 (22 Sep 2026)
+
+* feat: add habit
+* feat(file-search): input auto focus 
+* feat: improve http remote
+* feat: registerKeyboard api
+
 ## v3.0.2 (16 Sep 2026)
 
 * feat(image-compressor): use popup window for comparison
