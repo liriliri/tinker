@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import Radio from 'share/components/Radio'
 import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
 import store from '../store'
@@ -53,15 +54,13 @@ export default observer(function CharacterTypesTable({
             </th>
             {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
-                <input
-                  type="radio"
+                <Radio
                   name={char.key}
                   checked={char.state === 'required'}
                   onChange={() => {
                     char.setter('required')
                     onInputChange()
                   }}
-                  className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                 />
               </td>
             ))}
@@ -76,15 +75,13 @@ export default observer(function CharacterTypesTable({
             </th>
             {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
-                <input
-                  type="radio"
+                <Radio
                   name={char.key}
                   checked={char.state === 'allowed'}
                   onChange={() => {
                     char.setter('allowed')
                     onInputChange()
                   }}
-                  className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                 />
               </td>
             ))}
@@ -99,15 +96,13 @@ export default observer(function CharacterTypesTable({
             </th>
             {store.charTypes.map((char) => (
               <td key={char.key} className="px-4 py-3 text-center">
-                <input
-                  type="radio"
+                <Radio
                   name={char.key}
                   checked={char.state === 'forbidden'}
                   onChange={() => {
                     char.setter('forbidden')
                     onInputChange()
                   }}
-                  className={`w-4 h-4 cursor-pointer ${tw.primary.accent}`}
                 />
               </td>
             ))}

@@ -68,6 +68,7 @@ import { ToasterProvider } from 'share/components/Toaster'
 import toast from 'react-hot-toast'
 import Select from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
+import Radio from 'share/components/Radio'
 import Switch from 'share/components/Switch'
 import Slider, { AdjustmentSlider } from 'share/components/Slider'
 import ScanDirsModal from 'share/components/ScanDirsModal'
@@ -92,6 +93,7 @@ Simple components — import and use directly:
 | TabBar                            | `share/components/TabBar`         |
 | StatusBar                         | `share/components/StatusBar`      |
 | Switch                            | `share/components/Switch`         |
+| Radio                             | `share/components/Radio`          |
 | DarkModeSwitch                    | `share/components/DarkModeSwitch` |
 | FileOpen / FolderOpen / ImageOpen | `share/components/FileOpen` etc.  |
 | FileIcon                          | `share/components/FileIcon`       |
