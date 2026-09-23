@@ -128,6 +128,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-bongo-cat',
+    name: 'Bongo Cat',
+    description: 'Desktop pet that reacts to keyboard and mouse input',
+    icon: 'tinker-bongo-cat.png',
+    locales: {
+      'zh-CN': {
+        name: 'Bongo Cat',
+        description: '跟随键盘与鼠标敲击的桌面猫咪',
+      },
+    },
+  },
+  {
     id: 'tinker-checkers',
     name: 'Checkers',
     description: 'Play English draughts against a friend or the computer.',
