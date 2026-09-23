@@ -744,6 +744,18 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-voice-clone',
+    name: 'Voice Clone',
+    description: 'Clone voices and synthesize speech locally with audio.cpp',
+    icon: 'tinker-voice-clone.png',
+    locales: {
+      'zh-CN': {
+        name: '音色克隆',
+        description: '使用 audio.cpp 在本地克隆音色并合成语音',
+      },
+    },
+  },
+  {
     id: 'tinker-wallpaper',
     name: 'Wallpaper',
     description: 'Search, preview and set desktop wallpapers',
