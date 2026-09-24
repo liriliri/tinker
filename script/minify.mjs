@@ -4,6 +4,13 @@ import path from 'path'
 
 const RM_PACKAGES = ['cpu-features', 'nan']
 
+const RM_PACKAGE_PATHS = {
+  'playwright-core': ['lib/vite'],
+  '@modelcontextprotocol/sdk': ['dist/esm'],
+  glob: ['dist/esm'],
+  chokidar: ['esm'],
+}
+
 const REMAIN_EXTENSIONS = {
   cjs: true,
   js: true,
@@ -52,6 +59,7 @@ const NATIVE_MODULE_KEEP = {
   'file-icon': ['package.json', 'index.js', 'file-icon'],
   'pdu-static': ['package.json', 'index.js', 'pdu', 'pdu.exe'],
   '@vscode/ripgrep': ['package.json', 'lib/index.js', 'bin/rg', 'bin/rg.exe'],
+  ssh2: ['package.json', 'lib/**/*.js', '**/*.node'],
 }
 
 const PKG_GLOB = {
@@ -226,6 +234,21 @@ async function rmPackages(dirPath, names = RM_PACKAGES) {
   }
 }
 
+async function rmPackagePaths(dirPath, map = RM_PACKAGE_PATHS) {
+  if (!(await fs.exists(dirPath))) return
+
+  for (const [name, rels] of Object.entries(map)) {
+    const dir = path.join(dirPath, ...name.split('/'))
+    if (!(await fs.exists(dir))) continue
+    for (const rel of rels) {
+      const target = path.join(dir, rel)
+      if (!(await fs.exists(target))) continue
+      console.log(`rmPackagePaths: ${path.relative(dirPath, target)}`)
+      await fs.remove(target)
+    }
+  }
+}
+
 async function slim(dirPath, nativeNames = new Set()) {
   if (!(await fs.exists(dirPath))) {
     console.log(`slim skip, not found: ${dirPath}`)
@@ -264,6 +287,27 @@ async function slim(dirPath, nativeNames = new Set()) {
   )
 }
 
+const PACKAGE_JSON_KEEP = [
+  'name',
+  'version',
+  'type',
+  'main',
+  'module',
+  'browser',
+  'exports',
+  'imports',
+  'bin',
+  'sideEffects',
+]
+
+function slimPackageJson(pkg) {
+  const result = {}
+  for (const key of PACKAGE_JSON_KEEP) {
+    if (key in pkg) result[key] = pkg[key]
+  }
+  return result
+}
+
 async function stringifyJSON(dirPath) {
   if (!(await fs.exists(dirPath))) return
 
@@ -287,7 +331,11 @@ async function stringifyJSON(dirPath) {
     const content = await fs.readFile(file, 'utf8')
     try {
       originSize += content.length
-      const result = JSON.stringify(JSON.parse(content))
+      let data = JSON.parse(content)
+      if (path.basename(file) === 'package.json') {
+        data = slimPackageJson(data)
+      }
+      const result = JSON.stringify(data)
       compressedSize += result.length
       if (result.length < content.length) {
         await fs.writeFile(file, result)
@@ -387,5 +435,6 @@ async function compact(dirPath) {
 cd('dist')
 
 await rmPackages('node_modules')
+await rmPackagePaths('node_modules')
 await compact('node_modules')
 await compact('resources/npm')

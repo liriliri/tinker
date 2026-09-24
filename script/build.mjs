@@ -55,7 +55,8 @@ for (let i = 0, len = files.length; i < len; i++) {
       if (pkg.embedded === false) {
         continue
       }
-      await fs.copy('plugins/' + file.name, 'dist/plugins/' + file.name, {
+      const pluginSrc = 'plugins/' + file.name
+      await fs.copy(pluginSrc, 'dist/plugins/' + file.name, {
         filter(src) {
           const basename = path.basename(src)
 
@@ -72,6 +73,10 @@ for (let i = 0, len = files.length; i < len; i++) {
               basename
             )
           ) {
+            return false
+          }
+
+          if (path.relative(pluginSrc, src) === 'index.html') {
             return false
           }
 
