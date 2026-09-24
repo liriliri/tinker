@@ -24,8 +24,6 @@ tracing.markImportsDone()
 const logger = log('main')
 logger.info('start', process.argv)
 
-tracing.begin('before-ready')
-
 const settingsStore = getSettingsStore()
 
 if (!settingsStore.get('hardwareAcceleration')) {
@@ -55,44 +53,37 @@ protocol.registerSchemesAsPrivileged([
 
 cli.init()
 
+tracing.begin('wait-app-ready')
+
 app.on('ready', () => {
   tracing.end()
   logger.info('app ready')
 
   startFixPath()
 
-  tracing.begin('main-ready')
-
   Menu.setApplicationMenu(null)
   autoLaunch.init()
   terminal.init()
   proxy.init()
-
-  tracing.begin('plugin.init')
   plugin.init()
-  tracing.end()
-
   application.init()
 
-  const trayId = tracing.asyncBegin('tray.init')
-  const trayReady = tray.init().finally(() => tracing.asyncEnd(trayId))
+  tray.init()
 
   const silentStart =
     autoLaunch.wasOpenedAtLogin() || settingsStore.get('silentStart')
 
   if (!silentStart) {
     main.showWin()
-    tracing.finishAfter(tracing.waitFirstShow(), trayReady)
+    tracing.finishAfter(tracing.waitFirstShow())
   } else {
     dock.hide()
-    tracing.finishAfter(trayReady)
+    tracing.finishAfter()
   }
 
   shortcut.init()
   mouse.init()
   keyboard.init()
-
-  tracing.end()
 })
 
 app.on('window-all-closed', noop)

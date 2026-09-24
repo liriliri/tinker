@@ -23,14 +23,10 @@ import { installCli, isCliInstalled } from './shell'
 
 const logger = log('tray')
 let tray: Tray | null = null
-let cliInstalled = false
-let skillInstalled = false
+let cliInstalled = true
+let skillInstalled = true
 
-export async function init() {
-  ;[cliInstalled, skillInstalled] = await Promise.all([
-    isCliInstalled(),
-    isSkillInstalled(),
-  ])
+export function init() {
   const iconPath = isMac ? 'tray-template.png' : 'tray.png'
   const icon = nativeImage.createFromPath(resolveResources(iconPath))
   if (isMac) {
@@ -51,6 +47,16 @@ export async function init() {
     })
     updateContextMenu()
   }
+
+  void Promise.all([isCliInstalled(), isSkillInstalled()]).then(
+    ([cli, skill]) => {
+      cliInstalled = cli
+      skillInstalled = skill
+      if (!isMac) {
+        updateContextMenu()
+      }
+    }
+  )
 }
 
 function updateContextMenu(show = false) {

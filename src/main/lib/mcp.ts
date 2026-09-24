@@ -12,7 +12,7 @@ import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
 import type { McpServerConfig } from 'common/types'
 import once from 'licia/once'
 
-const ajv = new Ajv({ allErrors: true })
+const getAjv = once(() => new Ajv({ allErrors: true }))
 const validatorCache = new Map<string, ValidateFunction>()
 
 export function validateMcpToolArgs(
@@ -24,7 +24,7 @@ export function validateMcpToolArgs(
 
   let validate = validatorCache.get(cacheKey)
   if (!validate) {
-    validate = ajv.compile(schema)
+    validate = getAjv().compile(schema)
     validatorCache.set(cacheKey, validate)
   }
 

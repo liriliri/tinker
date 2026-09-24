@@ -85,7 +85,7 @@ async function getAppsFromSystemProfiler(): Promise<IApp[]> {
       })
     }
 
-    return discoveredApps
+    return structuredClone(discoveredApps)
   } catch (e) {
     logger.warn('failed to get apps from system_profiler:', e)
     return []
