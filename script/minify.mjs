@@ -287,29 +287,6 @@ async function slim(dirPath, nativeNames = new Set()) {
   )
 }
 
-const PACKAGE_JSON_KEEP = [
-  'name',
-  'version',
-  'type',
-  'main',
-  'module',
-  'browser',
-  'exports',
-  'imports',
-  'bin',
-  'sideEffects',
-  'dependencies',
-  'optionalDependencies',
-]
-
-function slimPackageJson(pkg) {
-  const result = {}
-  for (const key of PACKAGE_JSON_KEEP) {
-    if (key in pkg) result[key] = pkg[key]
-  }
-  return result
-}
-
 async function stringifyJSON(dirPath) {
   if (!(await fs.exists(dirPath))) return
 
@@ -333,11 +310,7 @@ async function stringifyJSON(dirPath) {
     const content = await fs.readFile(file, 'utf8')
     try {
       originSize += content.length
-      let data = JSON.parse(content)
-      if (path.basename(file) === 'package.json') {
-        data = slimPackageJson(data)
-      }
-      const result = JSON.stringify(data)
+      const result = JSON.stringify(JSON.parse(content))
       compressedSize += result.length
       if (result.length < content.length) {
         await fs.writeFile(file, result)
