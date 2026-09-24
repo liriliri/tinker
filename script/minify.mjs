@@ -298,6 +298,8 @@ const PACKAGE_JSON_KEEP = [
   'imports',
   'bin',
   'sideEffects',
+  'dependencies',
+  'optionalDependencies',
 ]
 
 function slimPackageJson(pkg) {
