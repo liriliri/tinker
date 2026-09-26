@@ -15,10 +15,14 @@ $pin-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 .container {
   position: absolute;
   top: 50px;
-  bottom: 0;
+  bottom: 32px;
   left: 0;
   right: 0;
   overflow: auto;
+
+  &.no-tabs {
+    bottom: 0;
+  }
 }
 
 .scrollbar {

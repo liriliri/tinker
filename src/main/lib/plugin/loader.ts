@@ -1,4 +1,9 @@
-import { IpcGetPlugins, IPlugin, IRawPlugin } from 'common/types'
+import {
+  IpcGetPlugins,
+  IPlugin,
+  IRawPlugin,
+  isPluginCategory,
+} from 'common/types'
 import { marketplacePlugins } from './marketplace'
 import singleton from 'licia/singleton'
 import { isDev } from 'share/common/util'
@@ -76,6 +81,9 @@ async function loadPlugin(id: string, dir: string): Promise<IPlugin> {
     version: pkg.version,
     mcp: rawPlugin.mcp,
   }
+  if (isPluginCategory(rawPlugin.category)) {
+    plugin.category = rawPlugin.category
+  }
   if (plugin.icon) {
     const iconPath = path.join(dir, plugin.icon)
     if (await fs.pathExists(iconPath)) {
@@ -118,7 +126,7 @@ function loadMarketplacePlugins(): IPlugin[] {
       }
     }
 
-    result.push({
+    const plugin: IPlugin = {
       id: mp.id,
       name,
       description,
@@ -130,7 +138,11 @@ function loadMarketplacePlugins(): IPlugin[] {
       builtin: false,
       historyApiFallback: false,
       marketplace: true,
-    })
+    }
+    if (isPluginCategory(mp.category)) {
+      plugin.category = mp.category
+    }
+    result.push(plugin)
   }
 
   return result

@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Base64",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

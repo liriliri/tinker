@@ -9,6 +9,7 @@
   "devDependencies": {},
   "tinker": {
     "name": "Settings",
+    "category": "system",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

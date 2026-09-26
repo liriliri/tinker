@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Reader",
+    "category": "productivity",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

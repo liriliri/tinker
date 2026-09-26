@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Code Image",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

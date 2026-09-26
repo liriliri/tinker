@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Resume",
+    "category": "productivity",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -1,5 +1,12 @@
-import { IApp, IPlugin, IPluginStates, IRunningPlugin } from 'common/types'
-import { action, makeObservable, observable, runInAction } from 'mobx'
+import {
+  IApp,
+  IPlugin,
+  IPluginStates,
+  IRunningPlugin,
+  isPluginCategory,
+  PluginCategoryFilter,
+} from 'common/types'
+import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import BaseStore from 'share/renderer/store/BaseStore'
 import contain from 'licia/contain'
 import lowerCase from 'licia/lowerCase'
@@ -17,6 +24,7 @@ import { t } from 'common/util'
 const storage = new LocalStore('main')
 const STORAGE_KEY_PLUGINS = 'plugins'
 const STORAGE_KEY_APPS = 'apps'
+const STORAGE_KEY_CATEGORY = 'category'
 
 class Store extends BaseStore {
   plugins: IPlugin[] = []
@@ -25,6 +33,7 @@ class Store extends BaseStore {
   visibleApps: IApp[] = []
   plugin: IPlugin | null = null
   filter = ''
+  category: PluginCategoryFilter = 'all'
   pluginStates: IPluginStates = {}
   installingPlugins: Set<string> = new Set()
   showMarketplace: boolean = true
@@ -36,12 +45,15 @@ class Store extends BaseStore {
       visiblePlugins: observable,
       visibleApps: observable,
       filter: observable,
+      category: observable,
       plugin: observable,
       pluginStates: observable,
       installingPlugins: observable,
       showMarketplace: observable,
       runningPlugins: observable,
       setFilter: action,
+      setCategory: action,
+      showCategoryTabs: computed,
       hidePlugin: action,
       unhidePlugin: action,
       pinPlugin: action,
@@ -56,6 +68,7 @@ class Store extends BaseStore {
     })
 
     this.loadCache()
+    this.loadCategory()
     this.loadPluginStates()
     this.loadRunningPlugins()
     main.preparePluginView()
@@ -65,6 +78,14 @@ class Store extends BaseStore {
   setFilter(filter: string) {
     this.filter = filter
     this.applyFilter()
+  }
+  setCategory(category: PluginCategoryFilter) {
+    this.category = category
+    storage.set(STORAGE_KEY_CATEGORY, category)
+    this.applyFilter()
+  }
+  get showCategoryTabs() {
+    return !this.plugin && !trim(this.filter)
   }
   openPlugin(id: string, detached = false) {
     const plugin = this.getPlugin(id)
@@ -336,21 +357,20 @@ class Store extends BaseStore {
   private applyFilter() {
     const filter = trim(this.filter)
     if (!filter) {
-      const filtered = this.plugins.filter(
-        (plugin) => !this.pluginStates[plugin.id]?.hidden
+      const filtered = this.plugins.filter((plugin) => {
+        if (this.pluginStates[plugin.id]?.hidden) {
+          return false
+        }
+        if (this.category !== 'all' && plugin.category !== this.category) {
+          return false
+        }
+        return true
+      })
+      this.visiblePlugins = this.sortVisiblePlugins(
+        filtered,
+        this.showMarketplace
       )
-      const installed = filtered.filter((plugin) => !plugin.marketplace)
-      const marketplace = this.showMarketplace
-        ? filtered.filter((plugin) => plugin.marketplace)
-        : []
-      const pinned = installed.filter(
-        (plugin) => this.pluginStates[plugin.id]?.pinned
-      )
-      const unpinned = installed.filter(
-        (plugin) => !this.pluginStates[plugin.id]?.pinned
-      )
-      this.visiblePlugins = [...pinned, ...unpinned, ...marketplace]
-      this.visibleApps = this.apps
+      this.visibleApps = this.category === 'all' ? this.apps : []
       return
     }
 
@@ -360,16 +380,27 @@ class Store extends BaseStore {
         pinyinMatch(plugin.name, filter) ||
         contain(plugin.id.replace(/-/g, ''), lowerFilter)
     )
-    const installed = matched.filter((plugin) => !plugin.marketplace)
-    const marketplace = matched.filter((plugin) => plugin.marketplace)
+    this.visiblePlugins = this.sortVisiblePlugins(matched, true)
+    this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
+  }
+  private sortVisiblePlugins(plugins: IPlugin[], includeMarketplace: boolean) {
+    const installed = plugins.filter((plugin) => !plugin.marketplace)
+    const marketplace = includeMarketplace
+      ? plugins.filter((plugin) => plugin.marketplace)
+      : []
     const pinned = installed.filter(
       (plugin) => this.pluginStates[plugin.id]?.pinned
     )
     const unpinned = installed.filter(
       (plugin) => !this.pluginStates[plugin.id]?.pinned
     )
-    this.visiblePlugins = [...pinned, ...unpinned, ...marketplace]
-    this.visibleApps = this.apps.filter((app) => pinyinMatch(app.name, filter))
+    return [...pinned, ...unpinned, ...marketplace]
+  }
+  private loadCategory() {
+    const category = storage.get(STORAGE_KEY_CATEGORY)
+    if (category === 'all' || isPluginCategory(category)) {
+      this.category = category
+    }
   }
   private async loadPluginStates() {
     const plugins = await main.getMainStore('pluginStates')

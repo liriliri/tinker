@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Hotkeys",
+    "category": "system",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

@@ -67,5 +67,12 @@
   "disconnected": "已断开",
   "wsFailed": "WebSocket 连接失败",
   "unknownError": "未知错误",
-  "loadPluginsErr": "加载插件失败（{{status}}）"
+  "loadPluginsErr": "加载插件失败（{{status}}）",
+  "categoryAll": "全部",
+  "categoryDev": "开发",
+  "categoryFile": "文件",
+  "categoryMedia": "多媒体",
+  "categoryProductivity": "效率",
+  "categorySystem": "系统",
+  "categoryFun": "娱乐"
 }

@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "File Explorer",
+    "category": "file",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

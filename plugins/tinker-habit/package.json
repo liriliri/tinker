@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Habit",
+    "category": "productivity",
     "icon": "icon.png",
     "main": "dist/index.html",
     "description": "Track habits with weekday, weekly, or monthly schedules and view check-ins on a month calendar",

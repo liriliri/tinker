@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Music Player",
+    "category": "media",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

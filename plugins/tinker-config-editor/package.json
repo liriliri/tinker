@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Config Editor",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

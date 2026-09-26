@@ -1,8 +1,11 @@
+import type { PluginCategory } from 'common/types'
+
 export interface IMarketplacePlugin {
   id: string
   name: string
   description: string
   icon: string
+  category?: PluginCategory
   locales?: Record<string, { name?: string; description?: string }>
 }
 

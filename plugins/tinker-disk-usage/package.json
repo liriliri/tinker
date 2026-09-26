@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Disk Usage",
+    "category": "file",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

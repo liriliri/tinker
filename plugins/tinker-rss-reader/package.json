@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "RSS Reader",
+    "category": "productivity",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

@@ -26,6 +26,26 @@ export type McpHttpServerConfig = {
 
 export type McpServerConfig = McpStdioServerConfig | McpHttpServerConfig
 
+export const PLUGIN_CATEGORIES = [
+  'dev',
+  'file',
+  'media',
+  'productivity',
+  'system',
+  'fun',
+] as const
+
+export type PluginCategory = (typeof PLUGIN_CATEGORIES)[number]
+
+export type PluginCategoryFilter = 'all' | PluginCategory
+
+export function isPluginCategory(value: unknown): value is PluginCategory {
+  return (
+    typeof value === 'string' &&
+    (PLUGIN_CATEGORIES as readonly string[]).includes(value)
+  )
+}
+
 export interface IRawPlugin {
   name: string
   description?: string
@@ -34,6 +54,7 @@ export interface IRawPlugin {
   preload?: string
   server?: boolean
   historyApiFallback?: boolean
+  category?: PluginCategory
   locales?: types.PlainObj<{
     name?: string
     description?: string
@@ -56,6 +77,7 @@ export interface IPlugin {
   marketplace?: boolean
   userInstalled?: boolean
   version?: string
+  category?: PluginCategory
   mcp?: IPluginMcp
 }
 

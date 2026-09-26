@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Timestamp Converter",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

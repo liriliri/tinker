@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "HTTP Request",
+    "category": "dev",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",

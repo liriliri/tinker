@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Video Cropper",
+    "category": "media",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

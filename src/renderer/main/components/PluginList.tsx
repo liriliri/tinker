@@ -233,7 +233,11 @@ export default observer(function PluginList() {
   }
 
   return (
-    <div className={Style.container}>
+    <div
+      className={`${Style.container}${
+        store.showCategoryTabs ? '' : ` ${Style.noTabs}`
+      }`}
+    >
       {isEmpty(icons) && store.filter ? (
         <div className={Style.noResult}>{t('noResult')}</div>
       ) : null}

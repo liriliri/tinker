@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Media Compressor",
+    "category": "media",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

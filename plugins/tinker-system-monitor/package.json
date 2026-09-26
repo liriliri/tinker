@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "System Monitor",
+    "category": "system",
     "main": "dist/renderer/index.html",
     "icon": "icon.png",
     "preload": "dist/preload/index.js",

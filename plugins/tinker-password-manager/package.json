@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Password Manager",
+    "category": "productivity",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "locales": {

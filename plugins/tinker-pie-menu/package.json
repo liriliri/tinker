@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Pie Menu",
+    "category": "system",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

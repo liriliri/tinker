@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Terminal",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",

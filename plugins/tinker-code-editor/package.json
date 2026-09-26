@@ -12,6 +12,7 @@
   },
   "tinker": {
     "name": "Code Editor",
+    "category": "dev",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
     "icon": "icon.png",

@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Media Converter",
+    "category": "media",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

@@ -67,5 +67,12 @@
   "disconnected": "Disconnected",
   "wsFailed": "WebSocket connection failed",
   "unknownError": "Unknown error",
-  "loadPluginsErr": "Failed to load plugins ({{status}})"
+  "loadPluginsErr": "Failed to load plugins ({{status}})",
+  "categoryAll": "All",
+  "categoryDev": "Dev",
+  "categoryFile": "Files",
+  "categoryMedia": "Media",
+  "categoryProductivity": "Productivity",
+  "categorySystem": "System",
+  "categoryFun": "Fun"
 }

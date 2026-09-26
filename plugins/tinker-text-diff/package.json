@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Text Diff",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

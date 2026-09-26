@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Float",
+    "category": "system",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {

@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Authenticator",
+    "category": "productivity",
     "main": "dist/index.html",
     "icon": "icon.png",
     "locales": {

@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "Photo Develop",
+    "category": "media",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {

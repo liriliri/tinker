@@ -8,6 +8,7 @@
   },
   "tinker": {
     "name": "PDF",
+    "category": "productivity",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
