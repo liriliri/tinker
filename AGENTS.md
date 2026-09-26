@@ -51,4 +51,4 @@ Events from main to renderer: `window.sendTo(name, channel, ...args)` → preloa
 
 Plugins live in `plugins/`. Built-in plugins are bundled in `dist/plugins/`. External plugins are discovered from npm global packages prefixed with `tinker-`.
 
-Each plugin defines a `tinker` field in its `package.json` (IRawPlugin) specifying entry point, icon, preload script, locale overrides, and optional `category` (`dev` | `file` | `media` | `productivity` | `system` | `fun`).
+Each plugin defines a `tinker` field in its `package.json` (IRawPlugin) specifying entry point, icon, preload script, locale overrides, and optional `category` (`dev` | `file` | `media` | `productivity` | `system` | `entertainment`).

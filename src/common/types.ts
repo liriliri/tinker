@@ -32,7 +32,7 @@ export const PLUGIN_CATEGORIES = [
   'media',
   'productivity',
   'system',
-  'fun',
+  'entertainment',
 ] as const
 
 export type PluginCategory = (typeof PLUGIN_CATEGORIES)[number]
