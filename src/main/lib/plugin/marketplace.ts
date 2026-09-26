@@ -15,6 +15,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: '2048',
     description: 'Join the numbers and get to the 2048 tile!',
     icon: 'tinker-2048.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '2048',
@@ -99,6 +100,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Ball Maze',
     description: 'Roll the ball through the maze and find the exit!',
     icon: 'tinker-ball-maze.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '滚球迷宫',
@@ -147,6 +149,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Checkers',
     description: 'Play English draughts against a friend or the computer.',
     icon: 'tinker-checkers.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '英式跳棋',
@@ -160,6 +163,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     description:
       'Play international chess against a friend or a thoughtful computer opponent.',
     icon: 'tinker-chess.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '国际象棋',
@@ -173,6 +177,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     description:
       'Play Chinese chess against a friend or a thoughtful computer opponent.',
     icon: 'tinker-chinese-chess.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '中国象棋',
@@ -342,6 +347,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Gomoku',
     description: 'Play five in a row against a friend or the computer.',
     icon: 'tinker-gomoku.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '五子棋',
@@ -474,6 +480,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Minesweeper',
     description: 'Clear the minefield without detonating a bomb!',
     icon: 'tinker-minesweeper.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '扫雷',
@@ -558,6 +565,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Reversi',
     description: 'Capture territory in the classic game of Reversi.',
     icon: 'tinker-reversi.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '黑白棋',
@@ -582,6 +590,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Sudoku',
     description: 'Fill the grid so every row, column, and box contains 1–9.',
     icon: 'tinker-sudoku.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '数独',
@@ -595,6 +604,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     description:
       'Build complete suits from King to Ace in this classic card game.',
     icon: 'tinker-spider-solitaire.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '蜘蛛纸牌',
@@ -679,6 +689,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Trap the Cat',
     description: 'Click dots to trap the cat before it escapes!',
     icon: 'tinker-trap-the-cat.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '圈小猫',
