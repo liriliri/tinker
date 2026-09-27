@@ -558,7 +558,7 @@ declare global {
 
     /**
      * Register an event listener.
-     * @param event - e.g., 'changeTheme', 'changeLanguage'
+     * @param event - e.g., 'changeTheme'
      * @returns Unsubscribe function
      */
     on(event: string, callback: (...args: any[]) => void): () => void

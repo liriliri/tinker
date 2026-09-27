@@ -26,32 +26,36 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-3d-viewer',
     name: '3D Viewer',
-    description: 'Preview 3D models',
+    description: 'Preview and export 3D models (GLB, glTF, OBJ, FBX, STL, and more)',
     icon: 'tinker-3d-viewer.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '3D 预览',
-        description: '预览 3D 模型',
+        description: '预览并导出 GLB、glTF、OBJ、FBX、STL 等 3D 模型',
       },
     },
   },
   {
     id: 'tinker-agent-notification',
     name: 'Agent Notification',
-    description: 'Configure notification sounds for coding agents',
+    description:
+      'Configure notification sounds for coding agents like Claude, Cursor, and Codex',
     icon: 'tinker-agent-notification.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'Agent 提示音',
-        description: '为编码 Agent 配置提示音',
+        description: '为 Claude、Cursor、Codex 等编码 Agent 配置提示音',
       },
     },
   },
   {
     id: 'tinker-agent-pet',
     name: 'Agent Pet',
-    description: 'Browse Petdex pets and run an animated desktop companion',
+    description: 'Browse, install, and run Petdex pets as an animated desktop companion',
     icon: 'tinker-agent-pet.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'Agent 桌宠',
@@ -62,12 +66,13 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-agent-skills',
     name: 'Agent Skills',
-    description: 'Browse and manage local agent skills',
+    description: 'Browse and manage local agent skills for Claude, Codex, and more',
     icon: 'tinker-agent-skills.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'Agent 技能',
-        description: '浏览和管理本地 Agent 技能',
+        description: '浏览和管理 Claude、Codex 等本地 Agent 技能',
       },
     },
   },
@@ -76,6 +81,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Aquarium',
     description: 'Desktop aquarium fish tank simulation',
     icon: 'tinker-aquarium.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '水族箱',
@@ -88,10 +94,24 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Audio Transcriber',
     description: 'Transcribe audio from long media files',
     icon: 'tinker-audio-transcriber.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '音频转录',
         description: '将超长音频/影片音轨转写为文本',
+      },
+    },
+  },
+  {
+    id: 'tinker-avd',
+    name: 'AVD',
+    description: 'List, start, and stop local Android Virtual Devices',
+    icon: 'tinker-avd.png',
+    category: 'dev',
+    locales: {
+      'zh-CN': {
+        name: 'AVD 管理',
+        description: '查找、启动和关闭本机 Android 虚拟设备',
       },
     },
   },
@@ -113,6 +133,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Background Remover',
     description: 'Remove image backgrounds locally with AI',
     icon: 'tinker-bg-remover.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '抠图',
@@ -125,6 +146,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Bilibili Downloader',
     description: 'Download Bilibili videos with quality selection',
     icon: 'tinker-bilibili-downloader.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: 'B站视频下载',
@@ -135,8 +157,9 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-bongo-cat',
     name: 'Bongo Cat',
-    description: 'Desktop pet that reacts to keyboard and mouse input',
+    description: 'Desktop pet that reacts to keyboard and mouse',
     icon: 'tinker-bongo-cat.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'Bongo Cat',
@@ -174,8 +197,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-chinese-chess',
     name: 'Chinese Chess',
-    description:
-      'Play Chinese chess against a friend or a thoughtful computer opponent.',
+    description: 'Play Chinese chess against a friend or a thoughtful computer opponent.',
     icon: 'tinker-chinese-chess.png',
     category: 'entertainment',
     locales: {
@@ -190,6 +212,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Clipboard Sync',
     description: 'Sync clipboard between host and VM via shared files',
     icon: 'tinker-clipboard-sync.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '剪贴板同步',
@@ -200,8 +223,9 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-coding-agent',
     name: 'Coding Agent',
-    description: 'A GUI coding agent for editing and coding tasks',
+    description: 'GUI coding agent for editing and coding tasks',
     icon: 'tinker-coding-agent.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: '编程助手',
@@ -214,6 +238,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Color Background',
     description: 'Generate colorful abstract backgrounds',
     icon: 'tinker-color-bg.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '炫彩背景',
@@ -226,6 +251,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Dictionary',
     description: 'Look up word definitions and translations',
     icon: 'tinker-dictionary.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '词典',
@@ -238,6 +264,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'DOS',
     description: 'Run DOS programs and games',
     icon: 'tinker-dos.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'DOS',
@@ -250,6 +277,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Electron Debug',
     description: 'Remote debugger for Electron applications',
     icon: 'tinker-electron-debug.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'Electron 调试',
@@ -262,6 +290,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Electron Screencast',
     description: 'LAN screencast server for remote Electron app control',
     icon: 'tinker-electron-screencast.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'Electron 投屏',
@@ -274,6 +303,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Emoji',
     description: 'Search and copy emojis quickly',
     icon: 'tinker-emoji.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: 'Emoji',
@@ -286,6 +316,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Currency Exchange',
     description: 'Currency exchange rate calculator',
     icon: 'tinker-exchange.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '汇率换算',
@@ -298,6 +329,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Gamepad',
     description: 'Test and visualize gamepad inputs',
     icon: 'tinker-gamepad.png',
+    category: 'system',
     locales: {
       'zh-CN': {
         name: '手柄测试',
@@ -310,6 +342,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'GBA',
     description: 'Play Game Boy Advance ROMs',
     icon: 'tinker-gba.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'GBA',
@@ -318,27 +351,28 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
-    id: 'tinker-gold-price',
-    name: 'Gold Price',
-    description: 'Query gold prices',
-    icon: 'tinker-gold-price.png',
-    locales: {
-      'zh-CN': {
-        name: '金价',
-        description: '查询黄金价格',
-      },
-    },
-  },
-  {
     id: 'tinker-gltf-optimizer',
     name: 'GLTF Optimizer',
-    description:
-      'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
+    description: 'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
     icon: 'tinker-gltf-optimizer.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: 'GLTF 优化',
         description: '使用 Draco、WebP 和网格简化优化 GLB/GLTF 模型',
+      },
+    },
+  },
+  {
+    id: 'tinker-gold-price',
+    name: 'Gold Price',
+    description: 'Query gold prices',
+    icon: 'tinker-gold-price.png',
+    category: 'productivity',
+    locales: {
+      'zh-CN': {
+        name: '金价',
+        description: '查询黄金价格',
       },
     },
   },
@@ -360,6 +394,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Hanzi Converter',
     description: 'Chinese character tools for pinyin and conversion',
     icon: 'tinker-hanzi-converter.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '汉字转换',
@@ -372,6 +407,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'IP Info',
     description: 'View LAN/public IP, latency and DNS exits',
     icon: 'tinker-ip-info.png',
+    category: 'system',
     locales: {
       'zh-CN': {
         name: 'IP 信息',
@@ -384,6 +420,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'JS13K Games',
     description: 'Play curated JS13K games',
     icon: 'tinker-js13k.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'JS13K 游戏',
@@ -394,8 +431,9 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-life-progress',
     name: 'Life Progress',
-    description: 'Visualize life, month, and day progress',
+    description: 'Visualize life, year, month, week, and day progress',
     icon: 'tinker-life-progress.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '人生进度',
@@ -408,6 +446,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Live2D',
     description: 'Run Live2D models as animated desktop companions',
     icon: 'tinker-live2d.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'Live2D 桌宠',
@@ -418,12 +457,14 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-lunar-calendar',
     name: 'Lunar Calendar',
-    description: 'A perpetual calendar with lunar date support',
+    description:
+      'A perpetual calendar with lunar dates, solar terms, Chinese holidays, and almanac details (gan-zhi, yi/ji, chong/sha)',
     icon: 'tinker-lunar-calendar.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '万年历',
-        description: '支持农历的万年历',
+        description: '支持农历、节气、法定节假日与黄历宜忌（干支、冲煞等）的万年历',
       },
     },
   },
@@ -432,6 +473,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Mailbox',
     description: 'Email client for reading and sending mail',
     icon: 'tinker-mailbox.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '邮箱',
@@ -442,12 +484,13 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-map',
     name: 'Map',
-    description: 'Explore maps, search locations and manage bookmarks',
+    description: 'Search places, get current location and manage bookmarks',
     icon: 'tinker-map.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '地图',
-        description: '浏览地图、搜索地点和管理标注',
+        description: '搜索地点、获取当前位置和管理标注',
       },
     },
   },
@@ -456,6 +499,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Markdown Live',
     description: 'A WYSIWYG markdown editor with live editing',
     icon: 'tinker-markdown-live.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: 'Markdown 实时编辑',
@@ -468,10 +512,24 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'MBTI Test',
     description: 'MBTI personality type test',
     icon: 'tinker-mbti-test.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'MBTI 人格测试',
         description: 'MBTI 十六型人格测试工具',
+      },
+    },
+  },
+  {
+    id: 'tinker-meme',
+    name: 'Meme',
+    description: 'Search and browse memes',
+    icon: 'tinker-meme.png',
+    category: 'productivity',
+    locales: {
+      'zh-CN': {
+        name: '表情包',
+        description: '搜索表情包',
       },
     },
   },
@@ -489,22 +547,11 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
-    id: 'tinker-meme',
-    name: 'Meme',
-    description: 'Search and browse memes',
-    icon: 'tinker-meme.png',
-    locales: {
-      'zh-CN': {
-        name: '表情包',
-        description: '搜索表情包',
-      },
-    },
-  },
-  {
     id: 'tinker-mouse-tester',
     name: 'Mouse Tester',
     description: 'Test and visualize mouse inputs',
     icon: 'tinker-mouse-tester.png',
+    category: 'system',
     locales: {
       'zh-CN': {
         name: '鼠标测试',
@@ -517,6 +564,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'N64',
     description: 'Play N64 ROMs with save state support',
     icon: 'tinker-n64.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: 'N64',
@@ -529,6 +577,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'NES',
     description: 'Play NES ROMs with save state support',
     icon: 'tinker-nes.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '红白机',
@@ -541,6 +590,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'OCR',
     description: 'Recognize text from images using Tesseract.js',
     icon: 'tinker-ocr.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: 'OCR 识别',
@@ -553,6 +603,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Office',
     description: 'Open and edit Word, Excel, and PowerPoint documents',
     icon: 'tinker-office.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: 'Office',
@@ -578,10 +629,37 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Search All',
     description: 'Unified search across files, apps, and plugins',
     icon: 'tinker-search-all.png',
+    category: 'system',
     locales: {
       'zh-CN': {
         name: '全局搜索',
         description: '统一搜索文件、应用、插件',
+      },
+    },
+  },
+  {
+    id: 'tinker-spider-solitaire',
+    name: 'Spider Solitaire',
+    description: 'Build complete suits from King to Ace in this classic card game.',
+    icon: 'tinker-spider-solitaire.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '蜘蛛纸牌',
+        description: '经典纸牌游戏，凑齐 K 到 A 的同花顺即可获胜。',
+      },
+    },
+  },
+  {
+    id: 'tinker-stock',
+    name: 'Stock',
+    description: 'View real-time stock information',
+    icon: 'tinker-stock.png',
+    category: 'productivity',
+    locales: {
+      'zh-CN': {
+        name: '股票',
+        description: '查看股票实时信息',
       },
     },
   },
@@ -599,36 +677,11 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
-    id: 'tinker-spider-solitaire',
-    name: 'Spider Solitaire',
-    description:
-      'Build complete suits from King to Ace in this classic card game.',
-    icon: 'tinker-spider-solitaire.png',
-    category: 'entertainment',
-    locales: {
-      'zh-CN': {
-        name: '蜘蛛纸牌',
-        description: '经典纸牌游戏，凑齐 K 到 A 的同花顺即可获胜。',
-      },
-    },
-  },
-  {
-    id: 'tinker-stock',
-    name: 'Stock',
-    description: 'View real-time stock information',
-    icon: 'tinker-stock.png',
-    locales: {
-      'zh-CN': {
-        name: '股票',
-        description: '查看股票实时信息',
-      },
-    },
-  },
-  {
     id: 'tinker-svg-editor',
     name: 'SVG Editor',
     description: 'Draw and edit SVG vector graphics, with PNG export',
     icon: 'tinker-svg-editor.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: 'SVG 编辑',
@@ -641,6 +694,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'TCP Tunnel',
     description: 'Expose local TCP ports through a public relay',
     icon: 'tinker-tcp-tunnel.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'TCP 隧道',
@@ -653,6 +707,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Token Usage',
     description: 'Track token usage statistics for AI coding tools',
     icon: 'tinker-token-usage.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'Token 统计',
@@ -665,22 +720,11 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Translate',
     description: 'Translate text with multiple translation services',
     icon: 'tinker-translate.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '翻译',
         description: '使用多种翻译服务翻译文本',
-      },
-    },
-  },
-  {
-    id: 'tinker-trending',
-    name: 'Trending',
-    description: 'Browse trending topics from multiple platforms',
-    icon: 'tinker-trending.png',
-    locales: {
-      'zh-CN': {
-        name: '热搜榜',
-        description: '浏览多个平台的热搜榜',
       },
     },
   },
@@ -698,10 +742,24 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-trending',
+    name: 'Trending',
+    description: 'Browse trending topics from multiple platforms',
+    icon: 'tinker-trending.png',
+    category: 'productivity',
+    locales: {
+      'zh-CN': {
+        name: '热搜榜',
+        description: '浏览多个平台的热搜榜',
+      },
+    },
+  },
+  {
     id: 'tinker-tts',
     name: 'Text to Speech',
     description: 'Convert text to speech with Microsoft Edge TTS',
     icon: 'tinker-tts.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '语音合成',
@@ -714,6 +772,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Typing Test',
     description: 'Test and improve your typing speed',
     icon: 'tinker-typing-test.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '打字测速',
@@ -722,22 +781,11 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
-    id: 'tinker-avd',
-    name: 'AVD',
-    description: 'List, start and stop local Android Virtual Devices',
-    icon: 'tinker-avd.png',
-    locales: {
-      'zh-CN': {
-        name: 'AVD 管理',
-        description: '查找、启动和关闭本机 Android 虚拟设备',
-      },
-    },
-  },
-  {
     id: 'tinker-video-converter',
     name: 'Video Converter',
     description: 'Convert video formats with FFmpeg',
     icon: 'tinker-video-converter.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '视频转换',
@@ -750,6 +798,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Video Downloader',
     description: 'Download videos with yt-dlp',
     icon: 'tinker-video-downloader.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '视频下载',
@@ -762,6 +811,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Voice Clone',
     description: 'Clone voices and synthesize speech locally with audio.cpp',
     icon: 'tinker-voice-clone.png',
+    category: 'media',
     locales: {
       'zh-CN': {
         name: '音色克隆',
@@ -774,6 +824,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Wallpaper',
     description: 'Search, preview and set desktop wallpapers',
     icon: 'tinker-wallpaper.png',
+    category: 'system',
     locales: {
       'zh-CN': {
         name: '壁纸',
@@ -786,6 +837,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'Weather',
     description: 'Check real-time weather and forecasts',
     icon: 'tinker-weather.png',
+    category: 'productivity',
     locales: {
       'zh-CN': {
         name: '天气',
@@ -798,6 +850,7 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     name: 'White Noise',
     description: 'Play ambient white noise with visual effects',
     icon: 'tinker-white-noise.png',
+    category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '白噪音',
@@ -808,12 +861,13 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-whois',
     name: 'WHOIS',
-    description: 'Query WHOIS information for domains and IPs',
+    description: 'Query WHOIS information for domains, IPs, and ASNs',
     icon: 'tinker-whois.png',
+    category: 'dev',
     locales: {
       'zh-CN': {
         name: 'WHOIS 查询',
-        description: '查询域名和 IP 的 WHOIS 信息',
+        description: '查询域名、IP 和 ASN 的 WHOIS 信息',
       },
     },
   },
