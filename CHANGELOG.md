@@ -1,3 +1,8 @@
+## v3.2.0 (27 Sep 2026)
+
+* feat: category
+* perf: reduce startup memory and show tray sooner
+
 ## v3.1.0 (22 Sep 2026)
 
 * feat: add habit
