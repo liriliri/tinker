@@ -8,7 +8,7 @@
   },
   "tinker": {
     "name": "Color",
-    "category": "media",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
