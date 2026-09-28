@@ -384,7 +384,7 @@ You can find a selection of high-quality third-party tools already packaged [her
 
 ## Web Plugins
 
-If you want to add existing web tools to TINKER, TINKER supports wrapping URLs into plugins directly. In the [tinker-web](https://github.com/liriliri/tinker-web) repository, you can find some pre-packaged web applications that are also installed via npm commands. For example: `npm i -g tinker-deepseek`. Note that these web applications do not support offline use.
+Web apps wrapped as plugins are maintained at [tinker-web](https://github.com/liriliri/tinker-web). Install them via [npm](https://www.npmjs.com/) packages. For example: `npm i -g tinker-deepseek`.
 
 ## Related Projects
 
