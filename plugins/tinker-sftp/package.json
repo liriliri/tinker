@@ -12,7 +12,7 @@
   },
   "tinker": {
     "name": "SFTP",
-    "category": "file",
+    "category": "dev",
     "icon": "icon.png",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
