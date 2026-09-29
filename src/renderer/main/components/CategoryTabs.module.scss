@@ -1,18 +1,39 @@
 @use '../../theme' as *;
 
-.container {
+.wrapper {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+  -webkit-app-region: no-drag;
+}
+
+.container {
+  pointer-events: auto;
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 2px;
-  height: 32px;
-  padding: 0 #{$padding-x-s}px;
+  height: 36px;
+  max-width: calc(100% - 24px);
+  padding: 4px;
   overflow-x: auto;
-  -webkit-app-region: no-drag;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-bg-container) 72%, transparent);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--box-shadow);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -21,10 +42,10 @@
 
 .indicator {
   position: absolute;
-  top: 5px;
+  top: 4px;
   left: 0;
-  height: 22px;
-  border-radius: #{$border-radius-s-m}px;
+  height: 28px;
+  border-radius: 999px;
   background: var(--color-primary-bg);
   opacity: 0;
   pointer-events: none;
@@ -40,10 +61,10 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  height: 22px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 12px;
   border: none;
-  border-radius: #{$border-radius-s-m}px;
+  border-radius: 999px;
   background: transparent;
   color: var(--color-text-secondary);
   font-size: #{$font-size-s-m}px;

@@ -26,7 +26,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-3d-viewer',
     name: '3D Viewer',
-    description: 'Preview and export 3D models (GLB, glTF, OBJ, FBX, STL, and more)',
+    description:
+      'Preview and export 3D models (GLB, glTF, OBJ, FBX, STL, and more)',
     icon: 'tinker-3d-viewer.png',
     category: 'media',
     locales: {
@@ -53,7 +54,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-agent-pet',
     name: 'Agent Pet',
-    description: 'Browse, install, and run Petdex pets as an animated desktop companion',
+    description:
+      'Browse, install, and run Petdex pets as an animated desktop companion',
     icon: 'tinker-agent-pet.png',
     category: 'entertainment',
     locales: {
@@ -66,7 +68,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-agent-skills',
     name: 'Agent Skills',
-    description: 'Browse and manage local agent skills for Claude, Codex, and more',
+    description:
+      'Browse and manage local agent skills for Claude, Codex, and more',
     icon: 'tinker-agent-skills.png',
     category: 'dev',
     locales: {
@@ -197,7 +200,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-chinese-chess',
     name: 'Chinese Chess',
-    description: 'Play Chinese chess against a friend or a thoughtful computer opponent.',
+    description:
+      'Play Chinese chess against a friend or a thoughtful computer opponent.',
     icon: 'tinker-chinese-chess.png',
     category: 'entertainment',
     locales: {
@@ -243,6 +247,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: '炫彩背景',
         description: '生成彩色抽象背景图',
+      },
+    },
+  },
+  {
+    id: 'tinker-cpu-ranking',
+    name: 'CPU Ranking',
+    description: 'Browse desktop and laptop CPU performance rankings',
+    icon: 'tinker-cpu-ranking.png',
+    category: 'system',
+    locales: {
+      'zh-CN': {
+        name: 'CPU 天梯',
+        description: '查看桌面与笔记本 CPU 性能天梯图',
       },
     },
   },
@@ -353,7 +370,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-gltf-optimizer',
     name: 'GLTF Optimizer',
-    description: 'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
+    description:
+      'Optimize GLB and GLTF models with Draco, WebP, and mesh simplify',
     icon: 'tinker-gltf-optimizer.png',
     category: 'media',
     locales: {
@@ -386,6 +404,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: '五子棋',
         description: '和朋友或电脑对弈，连成五子即可获胜。',
+      },
+    },
+  },
+  {
+    id: 'tinker-gpu-ranking',
+    name: 'GPU Ranking',
+    description: 'Browse desktop and laptop GPU performance rankings',
+    icon: 'tinker-gpu-ranking.png',
+    category: 'system',
+    locales: {
+      'zh-CN': {
+        name: 'GPU 天梯',
+        description: '查看桌面与笔记本 GPU 性能天梯图',
       },
     },
   },
@@ -464,7 +495,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     locales: {
       'zh-CN': {
         name: '万年历',
-        description: '支持农历、节气、法定节假日与黄历宜忌（干支、冲煞等）的万年历',
+        description:
+          '支持农历、节气、法定节假日与黄历宜忌（干支、冲煞等）的万年历',
       },
     },
   },
@@ -638,15 +670,43 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-screen-tester',
+    name: 'Screen Tester',
+    description:
+      'Test screen for dead pixels, backlight bleed, and color issues',
+    icon: 'tinker-screen-tester.png',
+    category: 'system',
+    locales: {
+      'zh-CN': {
+        name: '屏幕测试',
+        description: '全屏检测屏幕坏点、漏光与色阶问题',
+      },
+    },
+  },
+  {
     id: 'tinker-spider-solitaire',
     name: 'Spider Solitaire',
-    description: 'Build complete suits from King to Ace in this classic card game.',
+    description:
+      'Build complete suits from King to Ace in this classic card game.',
     icon: 'tinker-spider-solitaire.png',
     category: 'entertainment',
     locales: {
       'zh-CN': {
         name: '蜘蛛纸牌',
         description: '经典纸牌游戏，凑齐 K 到 A 的同花顺即可获胜。',
+      },
+    },
+  },
+  {
+    id: 'tinker-speed-test',
+    name: 'Speed Test',
+    description: 'Test network latency, download and upload speed',
+    icon: 'tinker-speed-test.png',
+    category: 'system',
+    locales: {
+      'zh-CN': {
+        name: '网速测试',
+        description: '测试网络延迟、下载与上传速度',
       },
     },
   },

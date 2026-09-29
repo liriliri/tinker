@@ -49,35 +49,37 @@ export default observer(function CategoryTabs() {
   }
 
   return (
-    <div className={Style.container} ref={containerRef}>
-      <div
-        className={`${Style.indicator}${
-          indicator.ready ? ` ${Style.ready}` : ''
-        }`}
-        style={{
-          transform: `translateX(${indicator.left}px)`,
-          width: indicator.width,
-        }}
-      />
-      {map(TABS, (id) => (
-        <button
-          key={id}
-          type="button"
-          ref={(el) => {
-            if (el) {
-              tabRefs.current[id] = el
-            } else {
-              delete tabRefs.current[id]
-            }
-          }}
-          className={`${Style.tab}${
-            store.category === id ? ` ${Style.active}` : ''
+    <div className={Style.wrapper}>
+      <div className={Style.container} ref={containerRef}>
+        <div
+          className={`${Style.indicator}${
+            indicator.ready ? ` ${Style.ready}` : ''
           }`}
-          onClick={() => store.setCategory(id)}
-        >
-          {t(`category${capitalize(id)}`)}
-        </button>
-      ))}
+          style={{
+            transform: `translateX(${indicator.left}px)`,
+            width: indicator.width,
+          }}
+        />
+        {map(TABS, (id) => (
+          <button
+            key={id}
+            type="button"
+            ref={(el) => {
+              if (el) {
+                tabRefs.current[id] = el
+              } else {
+                delete tabRefs.current[id]
+              }
+            }}
+            className={`${Style.tab}${
+              store.category === id ? ` ${Style.active}` : ''
+            }`}
+            onClick={() => store.setCategory(id)}
+          >
+            {t(`category${capitalize(id)}`)}
+          </button>
+        ))}
+      </div>
     </div>
   )
 })
