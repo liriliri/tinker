@@ -460,6 +460,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-jump-jump',
+    name: 'Jump Jump',
+    description: 'Hold to charge, release to jump — land on the next platform!',
+    icon: 'tinker-jump-jump.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '跳一跳',
+        description: '长按蓄力，松手起跳，落上下一个台子！',
+      },
+    },
+  },
+  {
     id: 'tinker-lan-share',
     name: 'Lan Share',
     description: 'Share files over LAN via HTTP',
