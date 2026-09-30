@@ -185,10 +185,10 @@ class Store extends BaseStore {
     const { dir, name } = splitPath(item.filePath)
 
     if (this.outputDir) {
-      return resolveSavePath(`${this.outputDir}/${name}`)
+      return resolveSavePath(`${this.outputDir}/${name}`, 'compressed')
     }
 
-    return resolveSavePath(`${dir}${name}`)
+    return resolveSavePath(`${dir}${name}`, 'compressed')
   }
 
   async openMediaDialog() {

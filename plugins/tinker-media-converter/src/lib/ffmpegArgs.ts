@@ -246,8 +246,8 @@ export async function getOutputPath(
   const outExt = '.' + (fmt?.ext ?? outputFormat)
 
   if (outputDir) {
-    return resolveSavePath(`${outputDir}/${baseName}${outExt}`)
+    return resolveSavePath(`${outputDir}/${baseName}${outExt}`, 'converted')
   }
 
-  return resolveSavePath(`${dir}${baseName}${outExt}`)
+  return resolveSavePath(`${dir}${baseName}${outExt}`, 'converted')
 }
