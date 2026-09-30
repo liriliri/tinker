@@ -37,7 +37,7 @@ export const PLUGIN_CATEGORIES = [
 
 export type PluginCategory = (typeof PLUGIN_CATEGORIES)[number]
 
-export type PluginCategoryFilter = 'all' | PluginCategory
+export type PluginCategoryFilter = 'all' | PluginCategory | 'apps'
 
 export function isPluginCategory(value: unknown): value is PluginCategory {
   return (

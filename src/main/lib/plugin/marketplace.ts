@@ -460,6 +460,20 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-lan-share',
+    name: 'Lan Share',
+    description: 'Share files over LAN via HTTP',
+    icon: 'tinker-lan-share.png',
+    category: 'file',
+    locales: {
+      'zh-CN': {
+        name: '局域网分享',
+        description:
+          '在局域网内创建 HTTP 文件分享服务，其他设备可通过浏览器访问',
+      },
+    },
+  },
+  {
     id: 'tinker-life-progress',
     name: 'Life Progress',
     description: 'Visualize life, year, month, week, and day progress',

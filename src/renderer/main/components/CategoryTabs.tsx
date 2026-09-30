@@ -7,8 +7,6 @@ import map from 'licia/map'
 import store from '../store'
 import Style from './CategoryTabs.module.scss'
 
-const TABS: PluginCategoryFilter[] = ['all', ...PLUGIN_CATEGORIES]
-
 export default observer(function CategoryTabs() {
   const containerRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<
@@ -19,6 +17,10 @@ export default observer(function CategoryTabs() {
     width: 0,
     ready: false,
   })
+
+  const tabs: PluginCategoryFilter[] = store.searchLocalApps
+    ? ['all', 'apps', ...PLUGIN_CATEGORIES]
+    : ['all', ...PLUGIN_CATEGORIES]
 
   const updateIndicator = () => {
     const tab = tabRefs.current[store.category]
@@ -42,7 +44,7 @@ export default observer(function CategoryTabs() {
     const observer = new ResizeObserver(() => updateIndicator())
     observer.observe(container)
     return () => observer.disconnect()
-  }, [store.category, store.showCategoryTabs])
+  }, [store.category, store.showCategoryTabs, store.searchLocalApps])
 
   if (!store.showCategoryTabs) {
     return null
@@ -60,7 +62,7 @@ export default observer(function CategoryTabs() {
             width: indicator.width,
           }}
         />
-        {map(TABS, (id) => (
+        {map(tabs, (id) => (
           <button
             key={id}
             type="button"

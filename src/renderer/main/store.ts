@@ -37,6 +37,7 @@ class Store extends BaseStore {
   pluginStates: IPluginStates = {}
   installingPlugins: Set<string> = new Set()
   showMarketplace: boolean = true
+  searchLocalApps: boolean = false
   runningPlugins: Record<string, { background: boolean }> = {}
   constructor() {
     super()
@@ -50,6 +51,7 @@ class Store extends BaseStore {
       pluginStates: observable,
       installingPlugins: observable,
       showMarketplace: observable,
+      searchLocalApps: observable,
       runningPlugins: observable,
       setFilter: action,
       setCategory: action,
@@ -339,14 +341,20 @@ class Store extends BaseStore {
   async refresh(force = false) {
     const searchLocalApps = await main.getSettingsStore('searchLocalApps')
     const showMarketplace = await main.getSettingsStore('showMarketplace')
+    const enabled = searchLocalApps === true
     const [plugins, apps] = await Promise.all([
       main.getPlugins(force),
-      searchLocalApps === true ? main.getApps(force) : [],
+      enabled ? main.getApps(force) : [],
     ])
     runInAction(() => {
       this.showMarketplace = showMarketplace !== false
+      this.searchLocalApps = enabled
       this.plugins = sortByName(plugins)
       this.apps = sortByName(apps)
+      if (!enabled && this.category === 'apps') {
+        this.category = 'all'
+        storage.set(STORAGE_KEY_CATEGORY, 'all')
+      }
       this.applyFilter()
     })
     this.saveCache()
@@ -357,6 +365,11 @@ class Store extends BaseStore {
   private applyFilter() {
     const filter = trim(this.filter)
     if (!filter) {
+      if (this.category === 'apps') {
+        this.visiblePlugins = []
+        this.visibleApps = this.apps
+        return
+      }
       const filtered = this.plugins.filter((plugin) => {
         if (this.pluginStates[plugin.id]?.hidden) {
           return false
@@ -398,8 +411,16 @@ class Store extends BaseStore {
   }
   private loadCategory() {
     const category = storage.get(STORAGE_KEY_CATEGORY)
+    if (category === 'apps') {
+      if (this.searchLocalApps) {
+        this.category = 'apps'
+        this.applyFilter()
+      }
+      return
+    }
     if (category === 'all' || isPluginCategory(category)) {
       this.category = category
+      this.applyFilter()
     }
   }
   private async loadPluginStates() {
@@ -443,6 +464,7 @@ class Store extends BaseStore {
     runInAction(() => {
       this.plugins = sortByName(plugins)
       this.apps = sortByName(apps)
+      this.searchLocalApps = apps.length > 0
       this.applyFilter()
     })
   }
