@@ -1,3 +1,8 @@
+## v3.3.0 (1 Oct 2026)
+
+* feat: add webapp
+* feat: improve category bar styling
+
 ## v3.2.0 (27 Sep 2026)
 
 * feat: category
