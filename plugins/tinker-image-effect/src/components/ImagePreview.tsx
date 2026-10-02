@@ -385,7 +385,7 @@ const ImagePreview = observer(function ImagePreview() {
       onPointerCancel={handlePointerUp}
       onDoubleClick={handleDoubleClick}
     >
-      {store.isLoading && (
+      {(store.isLoading || store.isAiApplying) && (
         <div className="absolute inset-0 z-20 flex items-center justify-center">
           <LoadingCircle className="w-8 h-8" />
         </div>

@@ -222,6 +222,53 @@ declare global {
       abort(): void
     }
 
+    interface AiImageModel {
+      name: string
+    }
+
+    interface AiImageProviderInfo {
+      name: string
+      models: AiImageModel[]
+    }
+
+    type AiImageInput =
+      | string
+      | { path: string }
+      | { data: string; mimeType?: string }
+
+    interface GenerateImageOption {
+      provider?: string
+      model?: string
+      prompt: string
+      size?: string
+      count?: number
+      quality?: string
+      outputFormat?: 'png' | 'jpeg' | 'webp'
+      transparent?: boolean
+      outputPath?: string
+    }
+
+    interface EditImageOption extends GenerateImageOption {
+      image: AiImageInput
+      referenceImages?: AiImageInput[]
+    }
+
+    interface GeneratedImage {
+      path: string
+      mimeType: string
+      bytes: number
+    }
+
+    interface GenerateImageResult {
+      images: GeneratedImage[]
+      provider: string
+      model: string
+    }
+
+    interface GenerateImageTask extends Promise<GenerateImageResult> {
+      abort(): void
+    }
+
     interface DownloadOptions {
       /** Download URL */
       url: string
@@ -673,6 +720,26 @@ declare global {
 
     /** Get the list of configured AI providers (name and models only). */
     getAIProviders(): Promise<tinker.AiProviderInfo[]>
+
+    /** Get configured image providers (name and models only). */
+    getAIImageProviders(): Promise<tinker.AiImageProviderInfo[]>
+
+    /**
+     * @example
+     * const task = tinker.generateImage({ prompt: 'a cat', size: '1024x1024' })
+     * const result = await task
+     * task.abort()
+     */
+    generateImage(option: tinker.GenerateImageOption): tinker.GenerateImageTask
+
+    /**
+     * @example
+     * const result = await tinker.editImage({
+     *   prompt: 'make it watercolor',
+     *   image: '/path/to/input.png',
+     * })
+     */
+    editImage(option: tinker.EditImageOption): tinker.GenerateImageTask
 
     /**
      * Start a file download.

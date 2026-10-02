@@ -118,6 +118,28 @@ const EffectParams = observer(function EffectParams() {
     )
   }
 
+  if (store.effectId === 'ai') {
+    return (
+      <div className="flex h-full min-h-0 flex-col gap-3">
+        <textarea
+          className={`min-h-0 flex-1 w-full resize-none px-2.5 py-1.5 text-sm border rounded ${tw.border} ${tw.bg.input} ${tw.text.primary} ${tw.primary.focusBorder} focus:outline-none focus:ring-1 ${tw.primary.focusRing}`}
+          value={store.params.ai.prompt}
+          placeholder={t('aiPromptPlaceholder')}
+          disabled={store.isAiApplying}
+          onChange={(e) => store.setAiParam('prompt', e.target.value)}
+        />
+        <button
+          type="button"
+          className={`shrink-0 w-full px-3 py-1.5 text-sm rounded text-white disabled:opacity-50 disabled:cursor-not-allowed ${tw.primary.bg} ${tw.primary.bgHover}`}
+          disabled={!store.canApplyAi}
+          onClick={() => void store.applyAiEffect()}
+        >
+          {store.isAiApplying ? t('aiApplying') : t('aiApply')}
+        </button>
+      </div>
+    )
+  }
+
   return (
     <>
       <AdjustmentSlider

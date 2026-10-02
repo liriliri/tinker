@@ -22,6 +22,11 @@ function renderEffect(
     throw new Error('Failed to get canvas context')
   }
 
+  if (effectId === 'ai') {
+    ctx.drawImage(source, 0, 0)
+    return
+  }
+
   if (effectId === 'pixelate') {
     const result = applyPixelate(source, params.pixelate)
     ctx.putImageData(result, 0, 0)
@@ -96,6 +101,50 @@ export class EffectRenderer {
     renderEffect(this.sourceCanvas, this.canvas, effectId, params)
   }
 
+  async loadPreviewFromUrl(url: string): Promise<{
+    width: number
+    height: number
+  }> {
+    const image = await this.loadHtmlImage(url)
+    const width = image.naturalWidth
+    const height = image.naturalHeight
+    this.canvas.width = width
+    this.canvas.height = height
+    const ctx = this.canvas.getContext('2d')
+    if (!ctx) {
+      throw new Error('Failed to get canvas context')
+    }
+    ctx.drawImage(image, 0, 0)
+    return { width, height }
+  }
+
+  async getSourceDataUrl(
+    mimeType = 'image/png',
+    quality?: number
+  ): Promise<string> {
+    if (!this.sourceCanvas) {
+      throw new Error('No image loaded')
+    }
+
+    return new Promise((resolve, reject) => {
+      this.sourceCanvas!.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Failed to export source image'))
+            return
+          }
+          const reader = new FileReader()
+          reader.onload = () => resolve(String(reader.result || ''))
+          reader.onerror = () =>
+            reject(new Error('Failed to read source image'))
+          reader.readAsDataURL(blob)
+        },
+        mimeType,
+        quality
+      )
+    })
+  }
+
   async exportBlob(
     effectId: EffectId,
     params: EffectParamsMap,
@@ -105,10 +154,26 @@ export class EffectRenderer {
       throw new Error('No image loaded')
     }
 
+    const quality = mimeType === 'image/jpeg' ? 0.92 : undefined
+
+    if (effectId === 'ai') {
+      return new Promise((resolve, reject) => {
+        this.canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Failed to export image'))
+              return
+            }
+            resolve(blob)
+          },
+          mimeType,
+          quality
+        )
+      })
+    }
+
     const exportCanvas = document.createElement('canvas')
     renderEffect(this.sourceCanvas, exportCanvas, effectId, params)
-
-    const quality = mimeType === 'image/jpeg' ? 0.92 : undefined
 
     return new Promise((resolve, reject) => {
       exportCanvas.toBlob(

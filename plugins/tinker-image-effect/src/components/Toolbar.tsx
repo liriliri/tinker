@@ -12,18 +12,18 @@ import {
   ToolbarButton,
 } from 'share/components/Toolbar'
 import store from '../store'
-import { EFFECTS, type EffectId } from '../types'
+import { type EffectId } from '../types'
 
 const ToolbarComponent = observer(function ToolbarComponent() {
   const { t, i18n } = useTranslation()
 
   const effectOptions = useMemo(
     () =>
-      EFFECTS.map((effect) => ({
+      store.availableEffects.map((effect) => ({
         value: effect.id,
         label: t(effect.nameKey),
       })),
-    [t, i18n.language]
+    [t, i18n.language, store.availableEffects]
   )
 
   const handleOpenImage = async () => {
@@ -69,7 +69,7 @@ const ToolbarComponent = observer(function ToolbarComponent() {
       <ToolbarSpacer />
 
       <Select<EffectId>
-        className="w-24"
+        className="w-28"
         value={store.effectId}
         onChange={(value) => store.setEffect(value)}
         options={effectOptions}

@@ -37,6 +37,7 @@ import { searchFile, killSearchFile, quitSearchFile } from './lib/search'
 import { searchText, killSearchText, quitSearchText } from './lib/ripgrep'
 import { saveData as saveDataUtil, loadData as loadDataUtil } from './lib/data'
 import { callAI, callAIStream, abortAI, getProviderList } from './lib/ai/index'
+import { generateImage, editImage, getImageProviderList } from './lib/ai/image'
 import {
   startDownload,
   pauseDownload,
@@ -215,6 +216,9 @@ const tinkerObj = {
   callAIStream,
   abortAI,
   getProviderList,
+  generateImage,
+  editImage,
+  getImageProviderList,
   createTerminal,
   writeTerminal,
   resizeTerminal,

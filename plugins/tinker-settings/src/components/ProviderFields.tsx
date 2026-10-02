@@ -17,15 +17,26 @@ import map from 'licia/map'
 import trim from 'licia/trim'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
-import type { AiProvider } from '../types'
+import type { AiImageProvider, AiMode, AiProvider } from '../types'
 import { fetchOpenAiModels } from '../lib/aiProvider'
 
 interface ProviderFieldsProps {
-  value: AiProvider
-  onChange: (patch: Partial<AiProvider>) => void
+  mode: AiMode
+  value: AiProvider | AiImageProvider
+  onChange: (patch: Partial<AiProvider | AiImageProvider>) => void
+}
+
+function modelPlaceholder(mode: AiMode, apiType: string): string {
+  if (mode === 'image') {
+    if (apiType === 'gemini') return 'gemini-3.1-flash-image'
+    if (apiType === 'seedream') return 'doubao-seedream-5-0-pro-260628'
+    return 'gpt-image-1'
+  }
+  return apiType === 'claude' ? 'claude-opus-4-5' : 'gpt-4o'
 }
 
 export default function ProviderFields({
+  mode,
   value,
   onChange,
 }: ProviderFieldsProps) {
@@ -36,8 +47,8 @@ export default function ProviderFields({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [updating, setUpdating] = useState(false)
 
-  const isClaude = value.apiType === 'claude'
-  const canUpdateModels = value.apiType === 'openai'
+  const placeholder = modelPlaceholder(mode, value.apiType)
+  const canUpdateModels = mode === 'chat' && value.apiType === 'openai'
 
   const handleModelIdChange = (index: number, name: string) => {
     onChange({
@@ -172,7 +183,7 @@ export default function ProviderFields({
                 handleAddModel()
               }
             }}
-            placeholder={isClaude ? 'claude-opus-4-5' : 'gpt-4o'}
+            placeholder={placeholder}
             className="flex-1 text-sm"
           />
           <button
@@ -208,7 +219,7 @@ export default function ProviderFields({
                 <TextInput
                   value={model.name}
                   onChange={(e) => handleModelIdChange(index, e.target.value)}
-                  placeholder={isClaude ? 'claude-opus-4-5' : 'gpt-4o'}
+                  placeholder={placeholder}
                   className="flex-1 text-sm"
                 />
                 <button

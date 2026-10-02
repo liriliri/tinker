@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
@@ -11,61 +11,98 @@ import TextInput from 'share/components/TextInput'
 import Dialog, { DialogButton } from 'share/components/Dialog'
 import Select from 'share/components/Select'
 import store from '../store'
-import type { ApiType } from '../types'
+import type { AiMode, ApiType, ImageApiType } from '../types'
 import {
   API_TYPE_DEFAULT_URL,
   CUSTOM_PRESET_ID,
+  IMAGE_API_TYPE_DEFAULT_URL,
+  IMAGE_PRESETS,
   POPULAR_PRESETS,
 } from '../lib/aiProvider'
 
 interface AddProviderDialogProps {
+  mode: AiMode
   open: boolean
   onClose: () => void
 }
 
 export default observer(function AddProviderDialog({
+  mode,
   open,
   onClose,
 }: AddProviderDialogProps) {
   const { t } = useTranslation()
+  const isImage = mode === 'image'
   const [presetId, setPresetId] = useState(CUSTOM_PRESET_ID)
   const [name, setName] = useState('')
-  const [apiType, setApiType] = useState<ApiType>('openai')
+  const [apiType, setApiType] = useState<string>('openai')
   const [apiUrl, setApiUrl] = useState('')
 
   const isCustom = presetId === CUSTOM_PRESET_ID
 
-  const presetOptions = useMemo(
-    () => [
-      { value: CUSTOM_PRESET_ID, label: t('customProvider') },
-      ...map(POPULAR_PRESETS, (p) => ({ value: p.id, label: p.name })),
-    ],
-    [t]
-  )
-
-  const apiTypeOptions = useMemo(
-    () => [
-      { value: 'openai', label: t('openaiFormat') },
-      { value: 'claude', label: t('claudeFormat') },
-    ],
-    [t]
-  )
-
-  const reset = () => {
+  useEffect(() => {
+    if (!open) return
     setPresetId(CUSTOM_PRESET_ID)
     setName('')
     setApiType('openai')
     setApiUrl('')
-  }
+  }, [open, mode])
+
+  const presetOptions = useMemo(() => {
+    const custom = { value: CUSTOM_PRESET_ID, label: t('customProvider') }
+    if (isImage) {
+      return [
+        custom,
+        ...map(IMAGE_PRESETS, (p) => ({
+          value: p.id,
+          label: p.name,
+        })),
+      ]
+    }
+    return [
+      custom,
+      ...map(POPULAR_PRESETS, (p) => ({
+        value: p.id,
+        label: p.name,
+      })),
+    ]
+  }, [isImage, t])
+
+  const apiTypeOptions = useMemo(
+    () =>
+      isImage
+        ? [
+            { value: 'openai', label: t('openaiFormat') },
+            { value: 'gemini', label: t('geminiFormat') },
+            { value: 'seedream', label: t('seedreamFormat') },
+          ]
+        : [
+            { value: 'openai', label: t('openaiFormat') },
+            { value: 'claude', label: t('claudeFormat') },
+          ],
+    [isImage, t]
+  )
+
+  const defaultUrl = isImage
+    ? IMAGE_API_TYPE_DEFAULT_URL[apiType as ImageApiType] ||
+      IMAGE_API_TYPE_DEFAULT_URL.openai
+    : API_TYPE_DEFAULT_URL[apiType as ApiType] || API_TYPE_DEFAULT_URL.openai
 
   const handleClose = () => {
-    reset()
     onClose()
   }
 
   const handlePresetChange = (value: string) => {
     setPresetId(value)
     if (value === CUSTOM_PRESET_ID) return
+    if (isImage) {
+      const preset = find(IMAGE_PRESETS, (p) => p.id === value)
+      if (!preset) return
+      setName(preset.name)
+      setApiType(preset.apiType)
+      setApiUrl(preset.apiUrl)
+      return
+    }
     const preset = find(POPULAR_PRESETS, (p) => p.id === value)
     if (!preset) return
     setName(preset.name)
@@ -75,10 +112,18 @@ export default observer(function AddProviderDialog({
 
   const handleApiTypeChange = (value: string) => {
     if (!isCustom) return
-    const next = value as ApiType
-    setApiType(next)
+    setApiType(value)
     if (isStrBlank(apiUrl)) {
-      setApiUrl(API_TYPE_DEFAULT_URL[next])
+      if (isImage) {
+        setApiUrl(
+          IMAGE_API_TYPE_DEFAULT_URL[value as ImageApiType] ||
+            IMAGE_API_TYPE_DEFAULT_URL.openai
+        )
+      } else {
+        setApiUrl(
+          API_TYPE_DEFAULT_URL[value as ApiType] || API_TYPE_DEFAULT_URL.openai
+        )
+      }
     }
   }
 
@@ -93,17 +138,31 @@ export default observer(function AddProviderDialog({
       toast.error(t('apiUrlRequired'))
       return
     }
-    if (find(store.aiProviders, (p) => p.name === trimmedName)) {
-      toast.error(t('providerNameExists'))
-      return
+    if (isImage) {
+      if (find(store.aiImageProviders, (p) => p.name === trimmedName)) {
+        toast.error(t('providerNameExists'))
+        return
+      }
+      await store.addAiImageProvider({
+        name: trimmedName,
+        apiType: apiType as ImageApiType,
+        apiUrl: trimmedUrl,
+        apiKey: '',
+        models: [],
+      })
+    } else {
+      if (find(store.aiProviders, (p) => p.name === trimmedName)) {
+        toast.error(t('providerNameExists'))
+        return
+      }
+      await store.addAiProvider({
+        name: trimmedName,
+        apiType: apiType as ApiType,
+        apiUrl: trimmedUrl,
+        apiKey: '',
+        models: [],
+      })
     }
-    await store.addAiProvider({
-      name: trimmedName,
-      apiType,
-      apiUrl: trimmedUrl,
-      apiKey: '',
-      models: [],
-    })
     toast.success(t('providerAdded'))
     handleClose()
   }
@@ -150,7 +209,7 @@ export default observer(function AddProviderDialog({
           <TextInput
             value={apiUrl}
             onChange={(e) => setApiUrl(e.target.value)}
-            placeholder={API_TYPE_DEFAULT_URL[apiType]}
+            placeholder={defaultUrl}
             readOnly={!isCustom}
             className={isCustom ? '' : `${tw.text.secondary} cursor-default`}
           />

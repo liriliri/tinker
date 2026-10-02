@@ -7,7 +7,7 @@ import lowerCase from 'licia/lowerCase'
 import map from 'licia/map'
 import some from 'licia/some'
 import trim from 'licia/trim'
-import type { ApiType, AiModel } from '../types'
+import type { ApiType, AiModel, ImageApiType } from '../types'
 
 export interface ProviderPreset {
   id: string
@@ -16,11 +16,24 @@ export interface ProviderPreset {
   apiUrl: string
 }
 
+export interface ImageProviderPreset {
+  id: string
+  name: string
+  apiType: ImageApiType
+  apiUrl: string
+}
+
 export const CUSTOM_PRESET_ID = 'custom'
 
 export const API_TYPE_DEFAULT_URL: Record<ApiType, string> = {
   openai: 'https://api.openai.com/v1',
   claude: 'https://api.anthropic.com',
+}
+
+export const IMAGE_API_TYPE_DEFAULT_URL: Record<ImageApiType, string> = {
+  openai: 'https://api.openai.com/v1',
+  gemini: 'https://generativelanguage.googleapis.com/v1beta',
+  seedream: 'https://ark.cn-beijing.volces.com/api/v3',
 }
 
 export const POPULAR_PRESETS: ProviderPreset[] = [
@@ -47,6 +60,27 @@ export const POPULAR_PRESETS: ProviderPreset[] = [
     name: 'OpenRouter',
     apiType: 'openai',
     apiUrl: 'https://openrouter.ai/api/v1',
+  },
+]
+
+export const IMAGE_PRESETS: ImageProviderPreset[] = [
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    apiType: 'openai',
+    apiUrl: IMAGE_API_TYPE_DEFAULT_URL.openai,
+  },
+  {
+    id: 'gemini',
+    name: 'Nano Banana',
+    apiType: 'gemini',
+    apiUrl: IMAGE_API_TYPE_DEFAULT_URL.gemini,
+  },
+  {
+    id: 'seedream',
+    name: 'Seedream',
+    apiType: 'seedream',
+    apiUrl: IMAGE_API_TYPE_DEFAULT_URL.seedream,
   },
 ]
 

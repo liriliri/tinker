@@ -1,4 +1,6 @@
 type ApiType = 'openai' | 'claude'
+type ImageApiType = 'openai' | 'gemini' | 'seedream'
+type AiMode = 'chat' | 'image'
 
 type Section = 'general' | 'ai' | 'plugin'
 
@@ -17,4 +19,25 @@ interface AiProvider {
   apiType: ApiType
 }
 
-export type { ApiType, Section, AiModel, AiProvider }
+interface AiImageModel {
+  name: string
+}
+
+interface AiImageProvider {
+  name: string
+  apiUrl: string
+  apiKey: string
+  models: AiImageModel[]
+  apiType: ImageApiType
+}
+
+export type {
+  ApiType,
+  ImageApiType,
+  AiMode,
+  Section,
+  AiModel,
+  AiProvider,
+  AiImageModel,
+  AiImageProvider,
+}

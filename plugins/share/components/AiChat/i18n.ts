@@ -21,6 +21,9 @@ const enUS = {
   searching: 'Searching',
   searchResults: 'results',
   searchFailed: 'Search failed',
+  generatingImage: 'Generating image',
+  generatedImages: 'images',
+  generateImageFailed: 'Image generation failed',
   running: 'Running',
   toolCall: 'Tool Call',
 }
@@ -44,6 +47,9 @@ const zhCN = {
   searching: '正在搜索',
   searchResults: '条结果',
   searchFailed: '搜索失败',
+  generatingImage: '正在生图',
+  generatedImages: '张图片',
+  generateImageFailed: '生图失败',
   running: '运行中',
   toolCall: '工具调用',
 }

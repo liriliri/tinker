@@ -5,7 +5,7 @@ export interface ImageInfo {
   height: number
 }
 
-export type EffectId = 'sketch' | 'pixelate' | 'ascii'
+export type EffectId = 'sketch' | 'pixelate' | 'ascii' | 'ai'
 
 export interface SketchParams {
   thickness: number
@@ -44,10 +44,15 @@ export interface AsciiParams {
   charset: AsciiCharset
 }
 
+export interface AiParams {
+  prompt: string
+}
+
 export interface EffectParamsMap {
   sketch: SketchParams
   pixelate: PixelateParams
   ascii: AsciiParams
+  ai: AiParams
 }
 
 interface EffectDefinition {
@@ -59,7 +64,12 @@ export const EFFECTS: EffectDefinition[] = [
   { id: 'sketch', nameKey: 'effectSketch' },
   { id: 'pixelate', nameKey: 'effectPixelate' },
   { id: 'ascii', nameKey: 'effectAscii' },
+  { id: 'ai', nameKey: 'effectAi' },
 ]
+
+export const DEFAULT_AI_PARAMS: AiParams = {
+  prompt: '',
+}
 
 export const ASCII_CHARSET_OPTIONS: {
   value: AsciiCharset

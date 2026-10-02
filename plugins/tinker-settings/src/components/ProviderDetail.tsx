@@ -7,18 +7,24 @@ import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import store from '../store'
-import type { AiProvider } from '../types'
+import type { AiImageProvider, AiMode, AiProvider } from '../types'
 import ProviderFields from './ProviderFields'
 
-export default observer(function ProviderDetail() {
-  const { t } = useTranslation()
-  const [form, setForm] = useState<AiProvider | null>(null)
+interface ProviderDetailProps {
+  mode: AiMode
+}
 
-  const provider = store.selectedProvider
+export default observer(function ProviderDetail({ mode }: ProviderDetailProps) {
+  const { t } = useTranslation()
+  const isImage = mode === 'image'
+  const provider = isImage
+    ? store.selectedImageProvider
+    : store.selectedProvider
+  const [form, setForm] = useState<AiProvider | AiImageProvider | null>(null)
 
   useEffect(() => {
     setForm(provider ? { ...provider } : null)
-  }, [provider?.name])
+  }, [provider?.name, mode])
 
   if (!provider || !form) {
     return (
@@ -30,16 +36,24 @@ export default observer(function ProviderDetail() {
     )
   }
 
-  const handleChange = (patch: Partial<AiProvider>) => {
+  const handleChange = (patch: Partial<AiProvider | AiImageProvider>) => {
     const next = { ...form, ...patch }
     setForm(next)
     if (patch.models !== undefined) {
-      void store.updateAiProvider(next)
+      if (isImage) {
+        void store.updateAiImageProvider(next as AiImageProvider)
+      } else {
+        void store.updateAiProvider(next as AiProvider)
+      }
     }
   }
 
   const handleBlur = () => {
-    store.updateAiProvider(form)
+    if (isImage) {
+      void store.updateAiImageProvider(form as AiImageProvider)
+    } else {
+      void store.updateAiProvider(form as AiProvider)
+    }
   }
 
   const handleDelete = async () => {
@@ -50,7 +64,11 @@ export default observer(function ProviderDetail() {
       cancelText: t('cancel'),
     })
     if (!confirmed) return
-    await store.deleteAiProvider(provider.name)
+    if (isImage) {
+      await store.deleteAiImageProvider(provider.name)
+    } else {
+      await store.deleteAiProvider(provider.name)
+    }
     toast.success(t('providerDeleted'))
   }
 
@@ -68,7 +86,7 @@ export default observer(function ProviderDetail() {
           </button>
         </div>
         <div onBlur={handleBlur}>
-          <ProviderFields value={form} onChange={handleChange} />
+          <ProviderFields mode={mode} value={form} onChange={handleChange} />
         </div>
       </div>
     </OverlayScrollbars>

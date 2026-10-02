@@ -6,7 +6,7 @@ import findIdx from 'licia/findIdx'
 import map from 'licia/map'
 import remove from 'licia/remove'
 import BaseStore from 'share/store/Base'
-import type { AiProvider, Section } from './types'
+import type { AiImageProvider, AiMode, AiProvider, Section } from './types'
 
 class Store extends BaseStore {
   theme: string = 'system'
@@ -19,6 +19,7 @@ class Store extends BaseStore {
   autoHide: boolean = false
   searchLocalApps: boolean = false
   aiProviders: AiProvider[] = []
+  aiImageProviders: AiImageProvider[] = []
   npmRegistry: string = 'https://registry.npmmirror.com'
   showMarketplace: boolean = true
   proxyMode: string = 'system'
@@ -30,7 +31,9 @@ class Store extends BaseStore {
 
   isLoading: boolean = true
   currentSection: Section = 'general'
+  aiMode: AiMode = 'chat'
   selectedProviderName: string | null = null
+  selectedImageProviderName: string | null = null
 
   constructor() {
     super()
@@ -40,16 +43,34 @@ class Store extends BaseStore {
   setCurrentSection(section: Section) {
     this.currentSection = section
     this.selectedProviderName = null
+    this.selectedImageProviderName = null
+  }
+
+  setAiMode(mode: AiMode) {
+    this.aiMode = mode
   }
 
   setSelectedProviderName(name: string | null) {
     this.selectedProviderName = name
   }
 
+  setSelectedImageProviderName(name: string | null) {
+    this.selectedImageProviderName = name
+  }
+
   get selectedProvider(): AiProvider | null {
     return (
       find(this.aiProviders, (p) => p.name === this.selectedProviderName) ??
       null
+    )
+  }
+
+  get selectedImageProvider(): AiImageProvider | null {
+    return (
+      find(
+        this.aiImageProviders,
+        (p) => p.name === this.selectedImageProviderName
+      ) ?? null
     )
   }
 
@@ -65,6 +86,7 @@ class Store extends BaseStore {
       autoHide,
       searchLocalApps,
       aiProvidersRaw,
+      aiImageProvidersRaw,
       npmRegistry,
       showMarketplace,
       proxyMode,
@@ -84,6 +106,7 @@ class Store extends BaseStore {
       tinker.getSetting('autoHide'),
       tinker.getSetting('searchLocalApps'),
       tinker.getSetting('aiProviders'),
+      tinker.getSetting('aiImageProviders'),
       tinker.getSetting('npmRegistry'),
       tinker.getSetting('showMarketplace'),
       tinker.getSetting('proxyMode'),
@@ -107,6 +130,12 @@ class Store extends BaseStore {
       ? JSON.parse(aiProvidersRaw)
       : []
     this.aiProviders = map(parsed, (p) =>
+      defaults({ ...p }, { apiType: 'openai', models: [] })
+    )
+    const parsedImage: AiImageProvider[] = aiImageProvidersRaw
+      ? JSON.parse(aiImageProvidersRaw)
+      : []
+    this.aiImageProviders = map(parsedImage, (p) =>
       defaults({ ...p }, { apiType: 'openai', models: [] })
     )
     this.npmRegistry = npmRegistry ?? 'https://registry.npmmirror.com'
@@ -233,6 +262,38 @@ class Store extends BaseStore {
     const [item] = this.aiProviders.splice(fromIndex, 1)
     this.aiProviders.splice(toIndex, 0, item)
     await this.saveAiProviders()
+  }
+
+  private async saveAiImageProviders() {
+    await tinker.setSetting(
+      'aiImageProviders',
+      JSON.stringify(this.aiImageProviders)
+    )
+  }
+
+  async addAiImageProvider(provider: AiImageProvider) {
+    this.aiImageProviders.push(provider)
+    await this.saveAiImageProviders()
+  }
+
+  async updateAiImageProvider(provider: AiImageProvider) {
+    const idx = findIdx(this.aiImageProviders, (p) => p.name === provider.name)
+    if (idx !== -1) this.aiImageProviders[idx] = provider
+    await this.saveAiImageProviders()
+  }
+
+  async deleteAiImageProvider(name: string) {
+    remove(this.aiImageProviders, (p) => p.name === name)
+    if (this.selectedImageProviderName === name) {
+      this.selectedImageProviderName = null
+    }
+    await this.saveAiImageProviders()
+  }
+
+  async reorderAiImageProviders(fromIndex: number, toIndex: number) {
+    const [item] = this.aiImageProviders.splice(fromIndex, 1)
+    this.aiImageProviders.splice(toIndex, 0, item)
+    await this.saveAiImageProviders()
   }
 }
 

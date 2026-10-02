@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+  shape-rendering="geometricPrecision" viewBox="0 0 24 24" class="icon-mIQszM">
+  <g clip-path="url(#arkIcon_svg__a)">
+    <mask id="arkIcon_svg__b" width="7" height="11" x="0" y="12" maskUnits="userSpaceOnUse"
+      style="mask-type: luminance;">
+      <path fill="#fff" d="M.348 22.254h6.344L3.819 13.22a.318.318 0 0 0-.606 0z"></path>
+    </mask>
+    <g mask="url(#arkIcon_svg__b)">
+      <path fill="#00DCFF" d="M7.041 12.604H0v10.004h7.041z"></path>
+    </g>
+    <mask id="arkIcon_svg__c" width="9" height="12" x="15" y="11" maskUnits="userSpaceOnUse"
+      style="mask-type: luminance;">
+      <path fill="#fff" d="M15.773 22.266h7.362l-3.377-10.642a.318.318 0 0 0-.607 0z"></path>
+    </mask>
+    <g mask="url(#arkIcon_svg__c)">
+      <path fill="#00DCFF" d="M23.489 11.008h-8.06v11.611h8.06z"></path>
+    </g>
+    <mask id="arkIcon_svg__d" width="14" height="22" x="7" y="1" maskUnits="userSpaceOnUse"
+      style="mask-type: luminance;">
+      <path fill="#fff"
+        d="M7.012 22.265h13.58L14.105 1.956a.315.315 0 0 0-.4-.205.32.32 0 0 0-.206.205z"></path>
+    </mask>
+    <g mask="url(#arkIcon_svg__d)">
+      <path fill="#006AFF" d="M20.946 1.34H6.668v21.279h14.278z"></path>
+    </g>
+    <mask id="arkIcon_svg__e" width="12" height="17" x="2" y="6" maskUnits="userSpaceOnUse"
+      style="mask-type: luminance;">
+      <path fill="#fff"
+        d="M2.886 22.267h10.28L8.328 7.113a.315.315 0 0 0-.401-.206.32.32 0 0 0-.206.206L2.883 22.267z"></path>
+    </mask>
+    <g mask="url(#arkIcon_svg__e)">
+      <path fill="#006AFF" d="M13.516 6.496H2.539v16.125h10.977z"></path>
+    </g>
+    <mask id="arkIcon_svg__f" width="10" height="14" x="5" y="9" maskUnits="userSpaceOnUse"
+      style="mask-type: luminance;">
+      <path fill="#fff" d="M5.734 22.267h8.694L10.384 9.68a.315.315 0 0 0-.603 0L5.738 22.267z"></path>
+    </mask>
+    <g mask="url(#arkIcon_svg__f)">
+      <path fill="#00DCFF" d="M14.785 9.066h-9.39v13.555h9.39z"></path>
+    </g>
+  </g>
+  <defs>
+    <clipPath id="arkIcon_svg__a">
+      <path fill="#fff" d="M0 0h24v24H0z"></path>
+    </clipPath>
+  </defs>
+</svg>

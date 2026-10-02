@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import contain from 'licia/contain'
 import filter from 'licia/filter'
@@ -19,9 +19,12 @@ import {
   IRowDragItem,
 } from 'ag-grid-community'
 import store from '../store'
+import type { AiMode } from '../types'
 import AddProviderDialog from './AddProviderDialog'
 import ClaudeIcon from '../assets/claude.svg?react'
+import NanoBananaIcon from '../assets/nano-banana.svg?react'
 import OpenAIIcon from '../assets/openai.svg?react'
+import SeedreamIcon from '../assets/seedream.svg?react'
 
 interface RowData {
   name: string
@@ -30,29 +33,42 @@ interface RowData {
   apiType: string
 }
 
-const ProviderNameCell = ({ data }: ICellRendererParams<RowData>) => {
-  if (!data) return null
-  const Icon = data.apiType === 'claude' ? ClaudeIcon : OpenAIIcon
-  return (
-    <div className="flex items-center gap-2">
-      <Icon className="w-4 h-4 flex-shrink-0" />
-      <span className="truncate">{data.name}</span>
-    </div>
-  )
-}
-
 interface AiSectionProps {
+  mode: AiMode
   search: string
   addOpen: boolean
   onAddClose: () => void
 }
 
+function ProviderNameCell({ data }: ICellRendererParams<RowData>) {
+  if (!data) return null
+  let icon: ReactNode
+  if (data.apiType === 'claude') {
+    icon = <ClaudeIcon className="w-4 h-4 flex-shrink-0" />
+  } else if (data.apiType === 'gemini') {
+    icon = <NanoBananaIcon className="w-4 h-4 flex-shrink-0" />
+  } else if (data.apiType === 'seedream') {
+    icon = <SeedreamIcon className="w-4 h-4 flex-shrink-0" />
+  } else {
+    icon = <OpenAIIcon className="w-4 h-4 flex-shrink-0" />
+  }
+  return (
+    <div className="flex items-center gap-2">
+      {icon}
+      <span className="truncate">{data.name}</span>
+    </div>
+  )
+}
+
 export default observer(function AiSection({
+  mode,
   search,
   addOpen,
   onAddClose,
 }: AiSectionProps) {
   const { t } = useTranslation()
+  const isImage = mode === 'image'
+  const keyword = lowerCase(trim(search))
 
   const columnDefs: ColDef<RowData>[] = useMemo(
     () => [
@@ -79,30 +95,43 @@ export default observer(function AiSection({
     [t]
   )
 
-  const keyword = lowerCase(trim(search))
-  const rowData: RowData[] = map(
-    filter(
-      store.aiProviders,
-      (p) =>
-        isEmpty(keyword) ||
-        contain(lowerCase(p.name), keyword) ||
-        some(p.models, (m) => contain(lowerCase(m.name), keyword)) ||
-        contain(lowerCase(p.apiUrl), keyword)
-    ),
-    (p) => ({
-      name: p.name,
-      defaultModel: p.models[0]?.name ?? '',
-      apiUrl: p.apiUrl,
-      apiType: p.apiType,
-    })
-  )
+  const matchesSearch = (p: {
+    name: string
+    apiUrl: string
+    models: Array<{ name: string }>
+  }) =>
+    isEmpty(keyword) ||
+    contain(lowerCase(p.name), keyword) ||
+    some(p.models, (m) => contain(lowerCase(m.name), keyword)) ||
+    contain(lowerCase(p.apiUrl), keyword)
+
+  const toRow = (p: {
+    name: string
+    apiUrl: string
+    apiType: string
+    models: Array<{ name: string }>
+  }): RowData => ({
+    name: p.name,
+    defaultModel: p.models[0]?.name ?? '',
+    apiUrl: p.apiUrl,
+    apiType: p.apiType,
+  })
+
+  const rowData: RowData[] = isImage
+    ? map(filter(store.aiImageProviders, matchesSearch), toRow)
+    : map(filter(store.aiProviders, matchesSearch), toRow)
 
   const onSelectionChanged = useCallback(
     (event: SelectionChangedEvent<RowData>) => {
       const rows = event.api.getSelectedRows()
-      if (rows[0]) store.setSelectedProviderName(rows[0].name)
+      if (!rows[0]) return
+      if (isImage) {
+        store.setSelectedImageProviderName(rows[0].name)
+      } else {
+        store.setSelectedProviderName(rows[0].name)
+      }
     },
-    []
+    [isImage]
   )
 
   const getRowId = useCallback(
@@ -110,20 +139,42 @@ export default observer(function AiSection({
     []
   )
 
-  const onRowDragEnd = useCallback((event: RowDragEndEvent<RowData>) => {
-    const { node, overNode } = event
-    if (!overNode || node.id === overNode.id) return
-    const fromName = node.data?.name
-    const toName = overNode.data?.name
-    if (!fromName || !toName) return
-    const fromIndex = findIdx(store.aiProviders, (p) => p.name === fromName)
-    const toIndex = findIdx(store.aiProviders, (p) => p.name === toName)
-    if (fromIndex !== -1 && toIndex !== -1) {
-      store.reorderAiProviders(fromIndex, toIndex)
-    }
-  }, [])
+  const onRowDragEnd = useCallback(
+    (event: RowDragEndEvent<RowData>) => {
+      const { node, overNode } = event
+      if (!overNode || node.id === overNode.id) return
+      const fromName = node.data?.name
+      const toName = overNode.data?.name
+      if (!fromName || !toName) return
+      if (isImage) {
+        const fromIndex = findIdx(
+          store.aiImageProviders,
+          (p) => p.name === fromName
+        )
+        const toIndex = findIdx(
+          store.aiImageProviders,
+          (p) => p.name === toName
+        )
+        if (fromIndex !== -1 && toIndex !== -1) {
+          void store.reorderAiImageProviders(fromIndex, toIndex)
+        }
+        return
+      }
+      const fromIndex = findIdx(store.aiProviders, (p) => p.name === fromName)
+      const toIndex = findIdx(store.aiProviders, (p) => p.name === toName)
+      if (fromIndex !== -1 && toIndex !== -1) {
+        void store.reorderAiProviders(fromIndex, toIndex)
+      }
+    },
+    [isImage]
+  )
 
-  const localeText = useMemo(() => ({ noRowsToShow: t('noProviders') }), [t])
+  const localeText = useMemo(
+    () => ({
+      noRowsToShow: isImage ? t('noImageProviders') : t('noProviders'),
+    }),
+    [isImage, t]
+  )
 
   return (
     <div className="h-full overflow-hidden">
@@ -148,7 +199,7 @@ export default observer(function AiSection({
         localeText={localeText}
       />
 
-      <AddProviderDialog open={addOpen} onClose={onAddClose} />
+      <AddProviderDialog mode={mode} open={addOpen} onClose={onAddClose} />
     </div>
   )
 })

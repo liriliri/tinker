@@ -11,7 +11,7 @@ import SessionList from './components/SessionList'
 import {
   getAiChatVisibleToolMessages,
   getToolArgSummary,
-  renderSearchToolMessage,
+  renderToolMessage,
 } from './lib/chatTools'
 import store from './store'
 import './index.scss'
@@ -45,7 +45,7 @@ const App = observer(function App() {
                     emptyHint={t('chatEmptyHint')}
                     getToolArgSummary={getToolArgSummary}
                     getVisibleToolMessages={getAiChatVisibleToolMessages}
-                    renderToolMessage={renderSearchToolMessage}
+                    renderToolMessage={renderToolMessage}
                     onSend={() => store.sendMessage()}
                     onStop={() => store.abortGeneration()}
                     onClearMessages={() => store.clearActiveMessages()}

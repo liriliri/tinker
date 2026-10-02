@@ -31,11 +31,17 @@ const EffectPanel = observer(function EffectPanel() {
           />
         </div>
       )}
-      <OverlayScrollbars defer className="min-h-0 flex-1">
-        <div className="px-3 py-3">
+      {store.effectId === 'ai' ? (
+        <div className="min-h-0 flex-1 flex flex-col px-3 py-3">
           <EffectParams />
         </div>
-      </OverlayScrollbars>
+      ) : (
+        <OverlayScrollbars defer className="min-h-0 flex-1">
+          <div className="px-3 py-3">
+            <EffectParams />
+          </div>
+        </OverlayScrollbars>
+      )}
     </div>
   )
 })

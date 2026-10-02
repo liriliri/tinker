@@ -4,8 +4,10 @@ import clone from 'licia/clone'
 import contain from 'licia/contain'
 import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
+import fileUrl from 'licia/fileUrl'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
+import isStrBlank from 'licia/isStrBlank'
 import splitPath from 'licia/splitPath'
 import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
@@ -20,7 +22,9 @@ import { DEFAULT_SKETCH_PARAMS } from './lib/sketch'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
 import { createMcpApi } from './mcp'
 import {
+  DEFAULT_AI_PARAMS,
   EFFECTS,
+  type AiParams,
   type AsciiParams,
   type EffectId,
   type EffectParamsMap,
@@ -39,6 +43,7 @@ function createDefaultEffectParams(): EffectParamsMap {
     sketch: clone(DEFAULT_SKETCH_PARAMS),
     pixelate: clone(DEFAULT_PIXELATE_PARAMS),
     ascii: clone(DEFAULT_ASCII_PARAMS),
+    ai: clone(DEFAULT_AI_PARAMS),
   }
 }
 
@@ -50,12 +55,15 @@ export class Store extends BaseStore {
   params: EffectParamsMap = createDefaultEffectParams()
   previewVersion = 0
   isLoading = false
+  isAiApplying = false
   isSaved = false
   overwriteOriginal = false
+  hasAiImageProvider = false
 
   private renderer: EffectRenderer | null = null
   private renderFrame: number | null = null
   private jpegExifSegment: Uint8Array | null = null
+  private aiResultPath: string | null = null
   private readonly debouncedRender = debounce(() => {
     this.scheduleRender()
   }, RENDER_DEBOUNCE_MS)
@@ -68,6 +76,7 @@ export class Store extends BaseStore {
       debouncedRender: false,
     } as Record<string, false>)
     this.bindEvent()
+    void this.refreshAiImageProviders()
   }
 
   private bindEvent() {
@@ -77,6 +86,33 @@ export class Store extends BaseStore {
         tinker.setTitle(fileName || '')
       }
     )
+  }
+
+  async refreshAiImageProviders() {
+    try {
+      const providers = await tinker.getAIImageProviders()
+      runInAction(() => {
+        this.hasAiImageProvider = providers.length > 0
+        if (this.effectId === 'ai' && !this.hasAiImageProvider) {
+          this.effectId = 'sketch'
+          storage.set(STORAGE_EFFECT_ID, 'sketch')
+        }
+      })
+    } catch (err) {
+      console.error('Failed to load AI image providers:', err)
+      runInAction(() => {
+        this.hasAiImageProvider = false
+        if (this.effectId === 'ai') {
+          this.effectId = 'sketch'
+          storage.set(STORAGE_EFFECT_ID, 'sketch')
+        }
+      })
+    }
+  }
+
+  get availableEffects() {
+    if (this.hasAiImageProvider) return EFFECTS
+    return EFFECTS.filter((effect) => effect.id !== 'ai')
   }
 
   initRenderer() {
@@ -103,6 +139,7 @@ export class Store extends BaseStore {
 
     try {
       this.isLoading = true
+      this.aiResultPath = null
       const sourceBuffer = filePath
         ? new Uint8Array(await tinker.readFile(filePath))
         : new Uint8Array(await file.arrayBuffer())
@@ -146,8 +183,12 @@ export class Store extends BaseStore {
 
   setEffect(effectId: EffectId) {
     if (this.effectId === effectId) return
+    if (effectId === 'ai' && !this.hasAiImageProvider) return
     this.effectId = effectId
     storage.set(STORAGE_EFFECT_ID, effectId)
+    if (effectId !== 'ai') {
+      this.aiResultPath = null
+    }
     this.applyStateChange()
   }
 
@@ -178,6 +219,69 @@ export class Store extends BaseStore {
     this.applyParamChange()
   }
 
+  setAiParam<K extends keyof AiParams>(key: K, value: AiParams[K]) {
+    this.params = {
+      ...this.params,
+      ai: { ...this.params.ai, [key]: value },
+    }
+    this.isSaved = false
+  }
+
+  get canApplyAi() {
+    return (
+      this.hasImage &&
+      this.hasAiImageProvider &&
+      this.effectId === 'ai' &&
+      !this.isAiApplying &&
+      !isStrBlank(this.params.ai.prompt)
+    )
+  }
+
+  async applyAiEffect() {
+    if (!this.canApplyAi || !this.renderer?.hasImage) return
+
+    const prompt = this.params.ai.prompt.trim()
+    try {
+      this.isAiApplying = true
+      const imageInput = this.image?.filePath
+        ? this.image.filePath
+        : await this.renderer.getSourceDataUrl('image/png')
+
+      const result = await tinker.editImage({
+        prompt,
+        image: imageInput,
+      })
+      const output = result.images[0]
+      if (!output?.path) {
+        throw new Error('No image returned')
+      }
+
+      const preview = await this.renderer.loadPreviewFromUrl(
+        fileUrl(output.path)
+      )
+      runInAction(() => {
+        this.aiResultPath = output.path
+        this.isSaved = false
+        if (this.image) {
+          this.image = {
+            ...this.image,
+            width: preview.width,
+            height: preview.height,
+          }
+        }
+        this.previewVersion++
+      })
+    } catch (err) {
+      const message = isErr(err) ? err.message : toStr(err)
+      toast.error(i18n.t('aiApplyFailed', { message }))
+      console.error('Failed to apply AI effect:', err)
+    } finally {
+      runInAction(() => {
+        this.isAiApplying = false
+      })
+    }
+  }
+
   private applyStateChange() {
     this.isSaved = false
     this.scheduleRender()
@@ -204,6 +308,7 @@ export class Store extends BaseStore {
 
   scheduleRender() {
     if (!this.renderer?.hasImage) return
+    if (this.effectId === 'ai' && this.aiResultPath) return
 
     if (this.renderFrame !== null) {
       cancelAnimationFrame(this.renderFrame)
@@ -217,6 +322,7 @@ export class Store extends BaseStore {
 
   drawPreview() {
     if (!this.renderer?.hasImage) return
+    if (this.effectId === 'ai' && this.aiResultPath) return
     this.renderer.render(this.effectId, this.params)
     this.previewVersion++
   }
@@ -251,23 +357,28 @@ export class Store extends BaseStore {
       const ext = getFileExt(savePath) || 'png'
       const mimeType = getMimeTypeFromPath(savePath) || 'image/png'
 
-      const blob = await this.renderer.exportBlob(
-        this.effectId,
-        this.params,
-        mimeType
-      )
-      let output = new Uint8Array(await blob.arrayBuffer())
+      if (this.effectId === 'ai' && this.aiResultPath) {
+        const bytes = new Uint8Array(await tinker.readFile(this.aiResultPath))
+        await tinker.writeFile(savePath, bytes)
+      } else {
+        const blob = await this.renderer.exportBlob(
+          this.effectId,
+          this.params,
+          mimeType
+        )
+        let output = new Uint8Array(await blob.arrayBuffer())
 
-      if (
-        (ext === 'jpg' || ext === 'jpeg') &&
-        this.jpegExifSegment &&
-        output[0] === 0xff &&
-        output[1] === 0xd8
-      ) {
-        output = injectJpegExif(output, this.jpegExifSegment)
+        if (
+          (ext === 'jpg' || ext === 'jpeg') &&
+          this.jpegExifSegment &&
+          output[0] === 0xff &&
+          output[1] === 0xd8
+        ) {
+          output = injectJpegExif(output, this.jpegExifSegment)
+        }
+
+        await tinker.writeFile(savePath, output)
       }
-
-      await tinker.writeFile(savePath, output)
 
       runInAction(() => {
         this.isSaved = true
@@ -304,6 +415,10 @@ export class Store extends BaseStore {
   }
 
   get hasChanges() {
+    if (this.effectId === 'ai') {
+      return !!this.aiResultPath
+    }
+
     return !isEqual(
       { effectId: this.effectId, params: this.params },
       {
