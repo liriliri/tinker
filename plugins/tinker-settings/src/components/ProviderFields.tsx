@@ -1,6 +1,15 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff, Plus, Trash2, GripVertical } from 'lucide-react'
+import toast from 'react-hot-toast'
+import {
+  Eye,
+  EyeOff,
+  Plus,
+  Trash2,
+  GripVertical,
+  RotateCw,
+  Loader2,
+} from 'lucide-react'
 import filter from 'licia/filter'
 import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
@@ -9,6 +18,7 @@ import trim from 'licia/trim'
 import { tw } from 'share/theme'
 import TextInput from 'share/components/TextInput'
 import type { AiProvider } from '../types'
+import { fetchOpenAiModels } from '../lib/aiProvider'
 
 interface ProviderFieldsProps {
   value: AiProvider
@@ -24,8 +34,10 @@ export default function ProviderFields({
   const [newModelId, setNewModelId] = useState('')
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [updating, setUpdating] = useState(false)
 
   const isClaude = value.apiType === 'claude'
+  const canUpdateModels = value.apiType === 'openai'
 
   const handleModelIdChange = (index: number, name: string) => {
     onChange({
@@ -72,6 +84,27 @@ export default function ProviderFields({
     setDragOverIndex(null)
   }
 
+  const handleUpdateModels = async () => {
+    if (isStrBlank(value.apiKey)) {
+      toast.error(t('apiKeyRequired'))
+      return
+    }
+    if (isStrBlank(value.apiUrl)) {
+      toast.error(t('apiUrlRequired'))
+      return
+    }
+    setUpdating(true)
+    try {
+      const models = await fetchOpenAiModels(value.apiUrl, value.apiKey)
+      onChange({ models })
+      toast.success(t('modelsUpdated'))
+    } catch {
+      toast.error(t('updateModelsFailed'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1.5">
@@ -80,10 +113,8 @@ export default function ProviderFields({
         </label>
         <TextInput
           value={value.apiUrl}
-          onChange={(e) => onChange({ apiUrl: e.target.value })}
-          placeholder={
-            isClaude ? 'https://api.anthropic.com' : 'https://api.openai.com/v1'
-          }
+          readOnly
+          className={`${tw.text.secondary} cursor-default`}
         />
       </div>
 
@@ -111,9 +142,26 @@ export default function ProviderFields({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-medium ${tw.text.secondary}`}>
-          {t('models')}
-        </label>
+        <div className="flex items-center justify-between gap-2">
+          <label className={`text-xs font-medium ${tw.text.secondary}`}>
+            {t('models')}
+          </label>
+          {canUpdateModels && (
+            <button
+              type="button"
+              onClick={handleUpdateModels}
+              disabled={updating}
+              className={`flex-shrink-0 p-1 rounded ${tw.hover} ${tw.text.secondary} disabled:opacity-50`}
+              title={t('updateModels')}
+            >
+              {updating ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <RotateCw size={13} />
+              )}
+            </button>
+          )}
+        </div>
         <div className="flex gap-2">
           <TextInput
             value={newModelId}

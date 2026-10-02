@@ -31,7 +31,11 @@ export default observer(function ProviderDetail() {
   }
 
   const handleChange = (patch: Partial<AiProvider>) => {
-    setForm({ ...form, ...patch })
+    const next = { ...form, ...patch }
+    setForm(next)
+    if (patch.models !== undefined) {
+      void store.updateAiProvider(next)
+    }
   }
 
   const handleBlur = () => {

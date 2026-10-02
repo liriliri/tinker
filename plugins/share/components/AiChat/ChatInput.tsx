@@ -62,10 +62,8 @@ export default function ChatInput({
           className={`w-full resize-none bg-transparent px-3 pt-3 pb-1 text-sm outline-none ${tw.text.primary}`}
         />
 
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          {extra}
-
-          <div className="flex-1" />
+        <div className="flex min-w-0 items-center gap-2 px-2 py-1.5">
+          <div className="flex min-w-0 flex-1 items-center gap-1">{extra}</div>
 
           {isGenerating ? (
             <button
