@@ -6,8 +6,14 @@ import type {
 } from './types'
 
 export function normalizeImageApiType(value: unknown): AiImageApiType {
-  if (value === 'gemini') return 'gemini'
-  if (value === 'seedream') return 'seedream'
+  if (
+    value === 'gemini' ||
+    value === 'volcengine' ||
+    value === 'openrouter' ||
+    value === 'openai'
+  ) {
+    return value
+  }
   return 'openai'
 }
 

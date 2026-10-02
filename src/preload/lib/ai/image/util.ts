@@ -31,12 +31,12 @@ export interface RawGeneratedImage {
 }
 
 const SIZE_RE = /^\d{2,5}x\d{2,5}$/i
-const SEEDREAM_SIZE_RE = /^[1234]K$/i
+const VOLCENGINE_SIZE_RE = /^[1234]K$/i
 
 export function normalizeImageBaseUrl(value: string): string {
   return String(value || '')
     .trim()
-    .replace(/\/(?:images\/(?:generations|edits)|interactions)\/?$/i, '')
+    .replace(/\/(?:images(?:\/(?:generations|edits))?|interactions)\/?$/i, '')
     .replace(/\/+$/, '')
 }
 
@@ -49,10 +49,10 @@ export function resolveImageModel(
   return name
 }
 
-function resolveSeedreamSize(size?: string): string {
+function resolveVolcengineSize(size?: string): string {
   const value = String(size || '').trim()
   if (!value) return '2K'
-  if (SEEDREAM_SIZE_RE.test(value)) return value.toUpperCase()
+  if (VOLCENGINE_SIZE_RE.test(value)) return value.toUpperCase()
   if (SIZE_RE.test(value)) return value
   return '2K'
 }
@@ -61,13 +61,13 @@ export function resolveImageParams(
   option: GenerateImageOption,
   apiType: AiImageApiType
 ): ImageCallParams {
-  if (apiType === 'seedream') {
+  if (apiType === 'volcengine') {
     let outputFormat: 'png' | 'jpeg' | 'webp' = 'jpeg'
     if (option.outputFormat === 'png' || option.outputFormat === 'jpeg') {
       outputFormat = option.outputFormat
     }
     return {
-      size: resolveSeedreamSize(option.size),
+      size: resolveVolcengineSize(option.size),
       count: 1,
       outputFormat,
       transparent: false,
@@ -81,12 +81,13 @@ export function resolveImageParams(
   if (option.outputFormat === 'jpeg' || option.outputFormat === 'webp') {
     outputFormat = option.outputFormat
   }
-  if (apiType === 'gemini' && outputFormat === 'webp') {
+  const singleImage = apiType === 'gemini' || apiType === 'openrouter'
+  if (singleImage && outputFormat === 'webp') {
     outputFormat = 'png'
   }
   return {
     size,
-    count: apiType === 'gemini' ? 1 : count,
+    count: singleImage ? 1 : count,
     quality: option.quality,
     outputFormat,
     transparent: Boolean(option.transparent) && outputFormat !== 'jpeg',

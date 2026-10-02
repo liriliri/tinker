@@ -2,7 +2,8 @@ import isStrBlank from 'licia/isStrBlank'
 import uuid from 'licia/uuid'
 import { callGeminiImages } from './gemini'
 import { callOpenAiImages } from './openai'
-import { callSeedreamImages } from './seedream'
+import { callOpenRouterImages } from './openrouter'
+import { callVolcengineImages } from './volcengine'
 import {
   findImageProvider,
   getImageProviderList,
@@ -40,6 +41,13 @@ export { getImageProviderList }
 
 const abortControllers = new Map<string, AbortController>()
 
+const IMAGE_CALLERS = {
+  gemini: callGeminiImages,
+  volcengine: callVolcengineImages,
+  openrouter: callOpenRouterImages,
+  openai: callOpenAiImages,
+} as const
+
 async function callImageProvider(
   provider: AiImageProvider,
   model: string,
@@ -48,13 +56,8 @@ async function callImageProvider(
   inputs: ResolvedImageInput[] | null,
   signal?: AbortSignal
 ): Promise<RawGeneratedImage[]> {
-  if (provider.apiType === 'gemini') {
-    return callGeminiImages(provider, model, prompt, params, inputs, signal)
-  }
-  if (provider.apiType === 'seedream') {
-    return callSeedreamImages(provider, model, prompt, params, inputs, signal)
-  }
-  return callOpenAiImages(provider, model, prompt, params, inputs, signal)
+  const apiType = normalizeImageApiType(provider.apiType)
+  return IMAGE_CALLERS[apiType](provider, model, prompt, params, inputs, signal)
 }
 
 async function runGenerate(

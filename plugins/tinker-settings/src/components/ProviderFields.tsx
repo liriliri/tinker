@@ -28,9 +28,12 @@ interface ProviderFieldsProps {
 
 function modelPlaceholder(mode: AiMode, apiType: string): string {
   if (mode === 'image') {
-    if (apiType === 'gemini') return 'gemini-3.1-flash-image'
-    if (apiType === 'seedream') return 'doubao-seedream-5-0-pro-260628'
-    return 'gpt-image-1'
+    const placeholders: Record<string, string> = {
+      gemini: 'gemini-3.1-flash-image',
+      volcengine: 'doubao-seedream-5-0-pro-260628',
+      openrouter: 'google/gemini-3.1-flash-image',
+    }
+    return placeholders[apiType] || 'gpt-image-1'
   }
   return apiType === 'claude' ? 'claude-opus-4-5' : 'gpt-4o'
 }

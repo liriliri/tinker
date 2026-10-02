@@ -48,16 +48,19 @@ export default observer(function AddProviderDialog({
     setApiUrl('')
   }, [open, mode])
 
+  const imageApiTypeOptions = useMemo(
+    () =>
+      map(IMAGE_PRESETS, (p) => ({
+        value: p.apiType,
+        label: t(`${p.apiType}Format`),
+      })),
+    [t]
+  )
+
   const presetOptions = useMemo(() => {
     const custom = { value: CUSTOM_PRESET_ID, label: t('customProvider') }
     if (isImage) {
-      return [
-        custom,
-        ...map(IMAGE_PRESETS, (p) => ({
-          value: p.id,
-          label: p.name,
-        })),
-      ]
+      return [custom, ...imageApiTypeOptions]
     }
     return [
       custom,
@@ -66,21 +69,17 @@ export default observer(function AddProviderDialog({
         label: p.name,
       })),
     ]
-  }, [isImage, t])
+  }, [imageApiTypeOptions, isImage, t])
 
   const apiTypeOptions = useMemo(
     () =>
       isImage
-        ? [
-            { value: 'openai', label: t('openaiFormat') },
-            { value: 'gemini', label: t('geminiFormat') },
-            { value: 'seedream', label: t('seedreamFormat') },
-          ]
+        ? imageApiTypeOptions
         : [
             { value: 'openai', label: t('openaiFormat') },
             { value: 'claude', label: t('claudeFormat') },
           ],
-    [isImage, t]
+    [imageApiTypeOptions, isImage, t]
   )
 
   const defaultUrl = isImage
@@ -96,9 +95,9 @@ export default observer(function AddProviderDialog({
     setPresetId(value)
     if (value === CUSTOM_PRESET_ID) return
     if (isImage) {
-      const preset = find(IMAGE_PRESETS, (p) => p.id === value)
+      const preset = find(IMAGE_PRESETS, (p) => p.apiType === value)
       if (!preset) return
-      setName(preset.name)
+      setName(t(`${preset.apiType}Format`))
       setApiType(preset.apiType)
       setApiUrl(preset.apiUrl)
       return

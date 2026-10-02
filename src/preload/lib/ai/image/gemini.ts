@@ -98,7 +98,7 @@ export async function callGeminiImages(
 
   if (!outputs.length) {
     throw new Error(
-      'Gemini returned no image; confirm the model supports Nano Banana'
+      'Gemini returned no image; confirm the model supports image output'
     )
   }
   return outputs

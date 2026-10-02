@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useMemo, useCallback, type ReactNode } from 'react'
+import { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import contain from 'licia/contain'
 import filter from 'licia/filter'
@@ -20,11 +20,13 @@ import {
 } from 'ag-grid-community'
 import store from '../store'
 import type { AiMode } from '../types'
+import { resolveProviderBrand, type ProviderBrand } from '../lib/aiProvider'
 import AddProviderDialog from './AddProviderDialog'
 import ClaudeIcon from '../assets/claude.svg?react'
-import NanoBananaIcon from '../assets/nano-banana.svg?react'
+import GeminiIcon from '../assets/gemini.svg?react'
 import OpenAIIcon from '../assets/openai.svg?react'
-import SeedreamIcon from '../assets/seedream.svg?react'
+import OpenRouterIcon from '../assets/openrouter.svg?react'
+import VolcengineIcon from '../assets/volcengine.svg?react'
 
 interface RowData {
   name: string
@@ -40,21 +42,20 @@ interface AiSectionProps {
   onAddClose: () => void
 }
 
+const PROVIDER_ICONS: Record<ProviderBrand, typeof OpenAIIcon> = {
+  openai: OpenAIIcon,
+  claude: ClaudeIcon,
+  gemini: GeminiIcon,
+  volcengine: VolcengineIcon,
+  openrouter: OpenRouterIcon,
+}
+
 function ProviderNameCell({ data }: ICellRendererParams<RowData>) {
   if (!data) return null
-  let icon: ReactNode
-  if (data.apiType === 'claude') {
-    icon = <ClaudeIcon className="w-4 h-4 flex-shrink-0" />
-  } else if (data.apiType === 'gemini') {
-    icon = <NanoBananaIcon className="w-4 h-4 flex-shrink-0" />
-  } else if (data.apiType === 'seedream') {
-    icon = <SeedreamIcon className="w-4 h-4 flex-shrink-0" />
-  } else {
-    icon = <OpenAIIcon className="w-4 h-4 flex-shrink-0" />
-  }
+  const Icon = PROVIDER_ICONS[resolveProviderBrand(data.apiUrl, data.apiType)]
   return (
     <div className="flex items-center gap-2">
-      {icon}
+      <Icon className="w-4 h-4 flex-shrink-0" />
       <span className="truncate">{data.name}</span>
     </div>
   )

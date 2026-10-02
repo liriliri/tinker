@@ -1,4 +1,4 @@
-export type AiImageApiType = 'openai' | 'gemini' | 'seedream'
+export type AiImageApiType = 'openai' | 'gemini' | 'volcengine' | 'openrouter'
 
 export interface AiImageModel {
   name: string

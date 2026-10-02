@@ -1,5 +1,5 @@
 type ApiType = 'openai' | 'claude'
-type ImageApiType = 'openai' | 'gemini' | 'seedream'
+type ImageApiType = 'openai' | 'gemini' | 'volcengine' | 'openrouter'
 type AiMode = 'chat' | 'image'
 
 type Section = 'general' | 'ai' | 'plugin'
