@@ -1,4 +1,5 @@
 import { Children, Fragment, KeyboardEvent, ReactNode } from 'react'
+import map from 'licia/map'
 import { tw } from 'share/theme'
 
 interface SectionProps {
@@ -15,7 +16,7 @@ export default function Section({ title, children }: SectionProps) {
         {title}
       </h2>
       <section className={`rounded-md border ${tw.border} ${tw.bg.secondary}`}>
-        {items.map((child, i) => (
+        {map(items, (child, i) => (
           <Fragment key={i}>
             {i > 0 && <div className={`h-px ${tw.bg.border}`} />}
             {child}

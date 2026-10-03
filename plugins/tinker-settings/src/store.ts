@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import clamp from 'licia/clamp'
+import clone from 'licia/clone'
 import defaults from 'licia/defaults'
 import find from 'licia/find'
 import findIdx from 'licia/findIdx'
@@ -130,13 +131,13 @@ class Store extends BaseStore {
       ? JSON.parse(aiProvidersRaw)
       : []
     this.aiProviders = map(parsed, (p) =>
-      defaults({ ...p }, { apiType: 'openai', models: [] })
+      defaults(clone(p), { apiType: 'openai', models: [] })
     )
     const parsedImage: AiImageProvider[] = aiImageProvidersRaw
       ? JSON.parse(aiImageProvidersRaw)
       : []
     this.aiImageProviders = map(parsedImage, (p) =>
-      defaults({ ...p }, { apiType: 'openai', models: [] })
+      defaults(clone(p), { apiType: 'openai', models: [] })
     )
     this.npmRegistry = npmRegistry ?? 'https://registry.npmmirror.com'
     this.showMarketplace = showMarketplace !== false
@@ -235,19 +236,28 @@ class Store extends BaseStore {
     await tinker.setSetting('httpPassword', value)
   }
 
-  private async saveAiProviders() {
-    await tinker.setSetting('aiProviders', JSON.stringify(this.aiProviders))
+  private async saveProviders(key: 'aiProviders' | 'aiImageProviders') {
+    await tinker.setSetting(key, JSON.stringify(this[key]))
+  }
+
+  private updateNamed<T extends { name: string }>(list: T[], item: T) {
+    const idx = findIdx(list, (p) => p.name === item.name)
+    if (idx !== -1) list[idx] = item
+  }
+
+  private reorderList<T>(list: T[], fromIndex: number, toIndex: number) {
+    const [item] = list.splice(fromIndex, 1)
+    list.splice(toIndex, 0, item)
   }
 
   async addAiProvider(provider: AiProvider) {
     this.aiProviders.push(provider)
-    await this.saveAiProviders()
+    await this.saveProviders('aiProviders')
   }
 
   async updateAiProvider(provider: AiProvider) {
-    const idx = findIdx(this.aiProviders, (p) => p.name === provider.name)
-    if (idx !== -1) this.aiProviders[idx] = provider
-    await this.saveAiProviders()
+    this.updateNamed(this.aiProviders, provider)
+    await this.saveProviders('aiProviders')
   }
 
   async deleteAiProvider(name: string) {
@@ -255,31 +265,22 @@ class Store extends BaseStore {
     if (this.selectedProviderName === name) {
       this.selectedProviderName = null
     }
-    await this.saveAiProviders()
+    await this.saveProviders('aiProviders')
   }
 
   async reorderAiProviders(fromIndex: number, toIndex: number) {
-    const [item] = this.aiProviders.splice(fromIndex, 1)
-    this.aiProviders.splice(toIndex, 0, item)
-    await this.saveAiProviders()
-  }
-
-  private async saveAiImageProviders() {
-    await tinker.setSetting(
-      'aiImageProviders',
-      JSON.stringify(this.aiImageProviders)
-    )
+    this.reorderList(this.aiProviders, fromIndex, toIndex)
+    await this.saveProviders('aiProviders')
   }
 
   async addAiImageProvider(provider: AiImageProvider) {
     this.aiImageProviders.push(provider)
-    await this.saveAiImageProviders()
+    await this.saveProviders('aiImageProviders')
   }
 
   async updateAiImageProvider(provider: AiImageProvider) {
-    const idx = findIdx(this.aiImageProviders, (p) => p.name === provider.name)
-    if (idx !== -1) this.aiImageProviders[idx] = provider
-    await this.saveAiImageProviders()
+    this.updateNamed(this.aiImageProviders, provider)
+    await this.saveProviders('aiImageProviders')
   }
 
   async deleteAiImageProvider(name: string) {
@@ -287,13 +288,12 @@ class Store extends BaseStore {
     if (this.selectedImageProviderName === name) {
       this.selectedImageProviderName = null
     }
-    await this.saveAiImageProviders()
+    await this.saveProviders('aiImageProviders')
   }
 
   async reorderAiImageProviders(fromIndex: number, toIndex: number) {
-    const [item] = this.aiImageProviders.splice(fromIndex, 1)
-    this.aiImageProviders.splice(toIndex, 0, item)
-    await this.saveAiImageProviders()
+    this.reorderList(this.aiImageProviders, fromIndex, toIndex)
+    await this.saveProviders('aiImageProviders')
   }
 }
 

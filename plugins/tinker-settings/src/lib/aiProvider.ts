@@ -1,29 +1,32 @@
 import contain from 'licia/contain'
 import filter from 'licia/filter'
 import isArr from 'licia/isArr'
+import isObj from 'licia/isObj'
 import isStr from 'licia/isStr'
 import isStrBlank from 'licia/isStrBlank'
+import keys from 'licia/keys'
 import lowerCase from 'licia/lowerCase'
 import map from 'licia/map'
+import rtrim from 'licia/rtrim'
 import some from 'licia/some'
 import trim from 'licia/trim'
 import type { ApiType, AiModel, ImageApiType } from '../types'
 
-export interface ProviderPreset {
+interface ProviderPreset {
   id: string
   name: string
   apiType: ApiType
   apiUrl: string
 }
 
-export interface ImageProviderPreset {
+interface ImageProviderPreset {
   apiType: ImageApiType
   apiUrl: string
 }
 
 export const CUSTOM_PRESET_ID = 'custom'
 
-export const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1'
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1'
 
 export const API_TYPE_DEFAULT_URL: Record<ApiType, string> = {
   openai: 'https://api.openai.com/v1',
@@ -64,12 +67,13 @@ export const POPULAR_PRESETS: ProviderPreset[] = [
   },
 ]
 
-export const IMAGE_PRESETS: ImageProviderPreset[] = (
-  Object.keys(IMAGE_API_TYPE_DEFAULT_URL) as ImageApiType[]
-).map((apiType) => ({
-  apiType,
-  apiUrl: IMAGE_API_TYPE_DEFAULT_URL[apiType],
-}))
+export const IMAGE_PRESETS: ImageProviderPreset[] = map(
+  keys(IMAGE_API_TYPE_DEFAULT_URL) as ImageApiType[],
+  (apiType) => ({
+    apiType,
+    apiUrl: IMAGE_API_TYPE_DEFAULT_URL[apiType],
+  })
+)
 
 export type ProviderBrand =
   | 'openai'
@@ -119,7 +123,7 @@ export async function fetchOpenAiModels(
   apiUrl: string,
   apiKey: string
 ): Promise<AiModel[]> {
-  const url = `${trim(apiUrl).replace(/\/+$/, '')}/models`
+  const url = `${rtrim(trim(apiUrl), '/')}/models`
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -134,7 +138,7 @@ export async function fetchOpenAiModels(
   }
   return map(
     filter(json.data, (item) => {
-      if (!item || typeof item !== 'object') return false
+      if (!isObj(item) || isArr(item)) return false
       const id = (item as { id?: unknown }).id
       return isStr(id) && !isStrBlank(id) && !shouldSkipModel(id)
     }),

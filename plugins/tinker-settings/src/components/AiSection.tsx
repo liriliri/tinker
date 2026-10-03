@@ -50,6 +50,21 @@ const PROVIDER_ICONS: Record<ProviderBrand, typeof OpenAIIcon> = {
   openrouter: OpenRouterIcon,
 }
 
+const DEFAULT_COL_DEF = { sortable: false }
+
+const ROW_SELECTION = {
+  mode: 'singleRow' as const,
+  checkboxes: false,
+  enableClickSelection: true,
+}
+
+interface ProviderLike {
+  name: string
+  apiUrl: string
+  apiType: string
+  models: Array<{ name: string }>
+}
+
 function ProviderNameCell({ data }: ICellRendererParams<RowData>) {
   if (!data) return null
   const Icon = PROVIDER_ICONS[resolveProviderBrand(data.apiUrl, data.apiType)]
@@ -96,31 +111,21 @@ export default observer(function AiSection({
     [t]
   )
 
-  const matchesSearch = (p: {
-    name: string
-    apiUrl: string
-    models: Array<{ name: string }>
-  }) =>
+  const matchesSearch = (p: ProviderLike) =>
     isEmpty(keyword) ||
     contain(lowerCase(p.name), keyword) ||
     some(p.models, (m) => contain(lowerCase(m.name), keyword)) ||
     contain(lowerCase(p.apiUrl), keyword)
 
-  const toRow = (p: {
-    name: string
-    apiUrl: string
-    apiType: string
-    models: Array<{ name: string }>
-  }): RowData => ({
+  const toRow = (p: ProviderLike): RowData => ({
     name: p.name,
     defaultModel: p.models[0]?.name ?? '',
     apiUrl: p.apiUrl,
     apiType: p.apiType,
   })
 
-  const rowData: RowData[] = isImage
-    ? map(filter(store.aiImageProviders, matchesSearch), toRow)
-    : map(filter(store.aiProviders, matchesSearch), toRow)
+  const providers = isImage ? store.aiImageProviders : store.aiProviders
+  const rowData: RowData[] = map(filter(providers, matchesSearch), toRow)
 
   const onSelectionChanged = useCallback(
     (event: SelectionChangedEvent<RowData>) => {
@@ -147,23 +152,15 @@ export default observer(function AiSection({
       const fromName = node.data?.name
       const toName = overNode.data?.name
       if (!fromName || !toName) return
+      const list: Array<{ name: string }> = isImage
+        ? store.aiImageProviders
+        : store.aiProviders
+      const fromIndex = findIdx(list, (p) => p.name === fromName)
+      const toIndex = findIdx(list, (p) => p.name === toName)
+      if (fromIndex === -1 || toIndex === -1) return
       if (isImage) {
-        const fromIndex = findIdx(
-          store.aiImageProviders,
-          (p) => p.name === fromName
-        )
-        const toIndex = findIdx(
-          store.aiImageProviders,
-          (p) => p.name === toName
-        )
-        if (fromIndex !== -1 && toIndex !== -1) {
-          void store.reorderAiImageProviders(fromIndex, toIndex)
-        }
-        return
-      }
-      const fromIndex = findIdx(store.aiProviders, (p) => p.name === fromName)
-      const toIndex = findIdx(store.aiProviders, (p) => p.name === toName)
-      if (fromIndex !== -1 && toIndex !== -1) {
+        void store.reorderAiImageProviders(fromIndex, toIndex)
+      } else {
         void store.reorderAiProviders(fromIndex, toIndex)
       }
     },
@@ -183,12 +180,8 @@ export default observer(function AiSection({
         isDark={store.isDark}
         columnDefs={columnDefs}
         rowData={rowData}
-        defaultColDef={{ sortable: false }}
-        rowSelection={{
-          mode: 'singleRow',
-          checkboxes: false,
-          enableClickSelection: true,
-        }}
+        defaultColDef={DEFAULT_COL_DEF}
+        rowSelection={ROW_SELECTION}
         onSelectionChanged={onSelectionChanged}
         getRowId={getRowId}
         animateRows={false}

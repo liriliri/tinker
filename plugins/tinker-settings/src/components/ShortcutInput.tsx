@@ -187,21 +187,18 @@ export default function ShortcutInput({
       const isModifierKey = contain(MODIFIER_CODES, e.code)
 
       if (isModifierKey && !mainKeyPressedRef.current) {
-        // Only modifier key released, no main key pressed
         const modifier = getModifierName(e.code)
         if (!modifier) {
           stopRecording()
           return
         }
 
-        // Check if any modifiers still active
         if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) {
           return
         }
 
         const now = Date.now()
 
-        // Check for double-tap
         if (
           lastModifierTapRef.current &&
           lastModifierTapRef.current.modifier === modifier &&
@@ -212,7 +209,6 @@ export default function ShortcutInput({
           return
         }
 
-        // First tap, wait for second
         lastModifierTapRef.current = { modifier, time: now }
         setRecordedKeys(['...'])
 
@@ -227,13 +223,11 @@ export default function ShortcutInput({
         return
       }
 
-      // Normal shortcut: at least one modifier + one main key
       if (recordedKeys.length > 1 && mainKeyPressedRef.current) {
         confirmShortcut(recordedKeys.join('+'))
         return
       }
 
-      // Single function key
       if (
         recordedKeys.length === 1 &&
         mainKeyPressedRef.current &&
@@ -243,7 +237,6 @@ export default function ShortcutInput({
         return
       }
 
-      // Escape cancels recording
       if (e.code === 'Escape') {
         stopRecording()
         return
@@ -251,12 +244,17 @@ export default function ShortcutInput({
 
       stopRecording()
     },
-    [recordedKeys, confirmShortcut, stopRecording, clearDoubleTapTimer]
+    [
+      recordedKeys,
+      confirmShortcut,
+      stopRecording,
+      clearDoubleTapTimer,
+      isRecording,
+    ]
   )
 
   const handleClickOutside = useCallback(
     (e: MouseEvent) => {
-      // Only stop if clicking outside the input element
       const target = e.target as HTMLElement
       if (target && target.hasAttribute('data-shortcut-input')) {
         return

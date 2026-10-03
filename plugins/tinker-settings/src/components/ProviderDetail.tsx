@@ -3,9 +3,17 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { Trash2 } from 'lucide-react'
+import clone from 'licia/clone'
+import extend from 'licia/extend'
 import { tw } from 'share/theme'
 import { confirm } from 'share/components/Confirm'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import store from '../store'
 import type { AiImageProvider, AiMode, AiProvider } from '../types'
 import ProviderFields from './ProviderFields'
@@ -23,7 +31,7 @@ export default observer(function ProviderDetail({ mode }: ProviderDetailProps) {
   const [form, setForm] = useState<AiProvider | AiImageProvider | null>(null)
 
   useEffect(() => {
-    setForm(provider ? { ...provider } : null)
+    setForm(provider ? clone(provider) : null)
   }, [provider?.name, mode])
 
   if (!provider || !form) {
@@ -36,24 +44,24 @@ export default observer(function ProviderDetail({ mode }: ProviderDetailProps) {
     )
   }
 
+  const saveProvider = (next: AiProvider | AiImageProvider) => {
+    if (isImage) {
+      void store.updateAiImageProvider(next as AiImageProvider)
+    } else {
+      void store.updateAiProvider(next as AiProvider)
+    }
+  }
+
   const handleChange = (patch: Partial<AiProvider | AiImageProvider>) => {
-    const next = { ...form, ...patch }
+    const next = extend(clone(form), patch)
     setForm(next)
     if (patch.models !== undefined) {
-      if (isImage) {
-        void store.updateAiImageProvider(next as AiImageProvider)
-      } else {
-        void store.updateAiProvider(next as AiProvider)
-      }
+      saveProvider(next)
     }
   }
 
   const handleBlur = () => {
-    if (isImage) {
-      void store.updateAiImageProvider(form as AiImageProvider)
-    } else {
-      void store.updateAiProvider(form as AiProvider)
-    }
+    saveProvider(form)
   }
 
   const handleDelete = async () => {
@@ -73,22 +81,21 @@ export default observer(function ProviderDetail({ mode }: ProviderDetailProps) {
   }
 
   return (
-    <OverlayScrollbars defer className={`h-full min-h-0 ${tw.bg.tertiary}`}>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-base font-semibold truncate">{provider.name}</h2>
-          <button
-            onClick={handleDelete}
-            className={`p-2 rounded ${tw.hover} text-red-600 dark:text-red-400 flex-shrink-0`}
-            title={t('delete')}
-          >
-            <Trash2 size={16} />
-          </button>
+    <div className={`h-full flex flex-col min-h-0 ${tw.bg.tertiary}`}>
+      <Toolbar>
+        <div className="text-xs font-semibold px-2 truncate min-w-0">
+          {provider.name}
         </div>
-        <div onBlur={handleBlur}>
+        <ToolbarSpacer />
+        <ToolbarButton onClick={handleDelete} title={t('delete')}>
+          <Trash2 size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </Toolbar>
+      <OverlayScrollbars defer className="flex-1 min-h-0">
+        <div className="p-4" onBlur={handleBlur}>
           <ProviderFields mode={mode} value={form} onChange={handleChange} />
         </div>
-      </div>
-    </OverlayScrollbars>
+      </OverlayScrollbars>
+    </div>
   )
 })

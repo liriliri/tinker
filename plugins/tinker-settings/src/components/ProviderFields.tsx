@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type DragEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import {
@@ -10,6 +10,9 @@ import {
   RotateCw,
   Loader2,
 } from 'lucide-react'
+import clone from 'licia/clone'
+import concat from 'licia/concat'
+import extend from 'licia/extend'
 import filter from 'licia/filter'
 import isEmpty from 'licia/isEmpty'
 import isStrBlank from 'licia/isStrBlank'
@@ -55,14 +58,16 @@ export default function ProviderFields({
 
   const handleModelIdChange = (index: number, name: string) => {
     onChange({
-      models: map(value.models, (m, i) => (i === index ? { ...m, name } : m)),
+      models: map(value.models, (m, i) =>
+        i === index ? extend(clone(m), { name }) : m
+      ),
     })
   }
 
   const handleAddModel = () => {
     const name = trim(newModelId)
     if (isStrBlank(name)) return
-    onChange({ models: [...value.models, { name }] })
+    onChange({ models: concat(value.models, [{ name }]) })
     setNewModelId('')
   }
 
@@ -74,7 +79,7 @@ export default function ProviderFields({
     setDragIndex(index)
   }
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: DragEvent, index: number) => {
     e.preventDefault()
     setDragOverIndex(index)
   }
@@ -85,7 +90,7 @@ export default function ProviderFields({
       setDragOverIndex(null)
       return
     }
-    const models = [...value.models]
+    const models = clone(value.models)
     const [moved] = models.splice(dragIndex, 1)
     models.splice(targetIndex, 0, moved)
     onChange({ models })
@@ -200,7 +205,7 @@ export default function ProviderFields({
         </div>
         {!isEmpty(value.models) && (
           <div className={`rounded border ${tw.border} divide-y ${tw.divide}`}>
-            {value.models.map((model, index) => (
+            {map(value.models, (model, index) => (
               <div
                 key={index}
                 onDragOver={(e) => handleDragOver(e, index)}

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import concat from 'licia/concat'
 import find from 'licia/find'
 import isStrBlank from 'licia/isStrBlank'
 import map from 'licia/map'
@@ -60,15 +61,15 @@ export default observer(function AddProviderDialog({
   const presetOptions = useMemo(() => {
     const custom = { value: CUSTOM_PRESET_ID, label: t('customProvider') }
     if (isImage) {
-      return [custom, ...imageApiTypeOptions]
+      return concat([custom], imageApiTypeOptions)
     }
-    return [
-      custom,
-      ...map(POPULAR_PRESETS, (p) => ({
+    return concat(
+      [custom],
+      map(POPULAR_PRESETS, (p) => ({
         value: p.id,
         label: p.name,
-      })),
-    ]
+      }))
+    )
   }, [imageApiTypeOptions, isImage, t])
 
   const apiTypeOptions = useMemo(
@@ -82,14 +83,11 @@ export default observer(function AddProviderDialog({
     [imageApiTypeOptions, isImage, t]
   )
 
-  const defaultUrl = isImage
-    ? IMAGE_API_TYPE_DEFAULT_URL[apiType as ImageApiType] ||
-      IMAGE_API_TYPE_DEFAULT_URL.openai
-    : API_TYPE_DEFAULT_URL[apiType as ApiType] || API_TYPE_DEFAULT_URL.openai
-
-  const handleClose = () => {
-    onClose()
-  }
+  const defaultUrls = isImage
+    ? IMAGE_API_TYPE_DEFAULT_URL
+    : API_TYPE_DEFAULT_URL
+  const defaultUrl =
+    defaultUrls[apiType as keyof typeof defaultUrls] || defaultUrls.openai
 
   const handlePresetChange = (value: string) => {
     setPresetId(value)
@@ -113,16 +111,9 @@ export default observer(function AddProviderDialog({
     if (!isCustom) return
     setApiType(value)
     if (isStrBlank(apiUrl)) {
-      if (isImage) {
-        setApiUrl(
-          IMAGE_API_TYPE_DEFAULT_URL[value as ImageApiType] ||
-            IMAGE_API_TYPE_DEFAULT_URL.openai
-        )
-      } else {
-        setApiUrl(
-          API_TYPE_DEFAULT_URL[value as ApiType] || API_TYPE_DEFAULT_URL.openai
-        )
-      }
+      setApiUrl(
+        defaultUrls[value as keyof typeof defaultUrls] || defaultUrls.openai
+      )
     }
   }
 
@@ -137,11 +128,14 @@ export default observer(function AddProviderDialog({
       toast.error(t('apiUrlRequired'))
       return
     }
+    const existing = isImage
+      ? find(store.aiImageProviders, (p) => p.name === trimmedName)
+      : find(store.aiProviders, (p) => p.name === trimmedName)
+    if (existing) {
+      toast.error(t('providerNameExists'))
+      return
+    }
     if (isImage) {
-      if (find(store.aiImageProviders, (p) => p.name === trimmedName)) {
-        toast.error(t('providerNameExists'))
-        return
-      }
       await store.addAiImageProvider({
         name: trimmedName,
         apiType: apiType as ImageApiType,
@@ -150,10 +144,6 @@ export default observer(function AddProviderDialog({
         models: [],
       })
     } else {
-      if (find(store.aiProviders, (p) => p.name === trimmedName)) {
-        toast.error(t('providerNameExists'))
-        return
-      }
       await store.addAiProvider({
         name: trimmedName,
         apiType: apiType as ApiType,
@@ -163,16 +153,11 @@ export default observer(function AddProviderDialog({
       })
     }
     toast.success(t('providerAdded'))
-    handleClose()
+    onClose()
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      title={t('addProvider')}
-      showClose
-    >
+    <Dialog open={open} onClose={onClose} title={t('addProvider')} showClose>
       <div className="flex flex-col gap-4">
         <Select
           value={presetId}

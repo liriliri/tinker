@@ -38,6 +38,5 @@ export type {
   Section,
   AiModel,
   AiProvider,
-  AiImageModel,
   AiImageProvider,
 }
