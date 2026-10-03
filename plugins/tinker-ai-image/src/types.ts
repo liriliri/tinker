@@ -17,6 +17,12 @@ export interface GenTask {
   count: number
 }
 
+export interface ReferenceImageTab {
+  id: string
+  title: string
+  path: string
+}
+
 export interface GenSettings {
   prompt: string
   provider: string
@@ -46,3 +52,4 @@ export const IMAGE_COUNT_MIN = 1
 export const IMAGE_COUNT_MAX = 4
 export const IMAGE_LIST_ITEM_SIZE_MIN = 50
 export const IMAGE_LIST_ITEM_SIZE_MAX = 256
+export const REFERENCE_IMAGE_MAX = 4

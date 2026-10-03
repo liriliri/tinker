@@ -3,11 +3,13 @@ import { Group, Panel, Separator } from 'react-resizable-panels'
 import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import { tw } from 'share/theme'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
+import store from '../store'
 import PromptToolbar from './PromptToolbar'
 import Prompt from './Prompt'
 import Generate from './Generate'
 import GenOptions from './GenOptions'
 import InitImage from './InitImage'
+import ReferenceImages from './ReferenceImages'
 
 export default observer(function Sidebar() {
   const layout = useDefaultLayout({
@@ -38,6 +40,7 @@ export default observer(function Sidebar() {
             <div className="p-3 space-y-4">
               <GenOptions />
               <InitImage />
+              {store.initImagePath ? <ReferenceImages /> : null}
             </div>
           </OverlayScrollbars>
         </Panel>

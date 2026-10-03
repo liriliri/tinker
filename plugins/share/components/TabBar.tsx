@@ -210,15 +210,20 @@ function Tab({
         />
       )}
       <div className="flex items-center overflow-hidden flex-1 min-w-0 ml-2.5">
-        <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-          {isLoading ? (
-            <Loader2 size={14} className={`animate-spin ${tw.text.tertiary}`} />
-          ) : (
-            icon
-          )}
-        </div>
+        {(isLoading || icon) && (
+          <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center mr-2.5">
+            {isLoading ? (
+              <Loader2
+                size={14}
+                className={`animate-spin ${tw.text.tertiary}`}
+              />
+            ) : (
+              icon
+            )}
+          </div>
+        )}
         <span
-          className={`text-xs truncate flex-1 min-w-0 ml-2.5 ${
+          className={`text-xs truncate flex-1 min-w-0 ${
             isActive ? tw.text.primary : tw.text.secondary
           }`}
         >

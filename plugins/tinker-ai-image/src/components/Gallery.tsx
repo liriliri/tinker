@@ -35,6 +35,7 @@ import {
   saveImageAs,
   showImageMenu,
 } from '../lib/gallery'
+import { AI_IMAGE_PATH_MIME } from '../lib/util'
 import store from '../store'
 import { IMAGE_LIST_ITEM_SIZE_MAX, IMAGE_LIST_ITEM_SIZE_MIN } from '../types'
 
@@ -210,9 +211,14 @@ export const ImageList = observer(function ImageList() {
                 <button
                   key={image.id}
                   type="button"
+                  draggable
                   style={itemStyle}
                   onClick={() => store.selectImage(image.id)}
                   onContextMenu={(e) => showImageMenu(e, image)}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData(AI_IMAGE_PATH_MIME, image.path)
+                    e.dataTransfer.effectAllowed = 'copy'
+                  }}
                   className={`shrink-0 border-2 overflow-hidden box-border ${
                     selected
                       ? tw.primary.border
@@ -223,7 +229,7 @@ export const ImageList = observer(function ImageList() {
                   <img
                     src={fileUrl(image.path)}
                     alt={image.prompt}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain pointer-events-none"
                     draggable={false}
                   />
                 </button>

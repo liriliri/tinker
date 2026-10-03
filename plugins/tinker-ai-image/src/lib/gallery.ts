@@ -1,6 +1,7 @@
 import type { MenuItemConstructorOptions } from 'electron'
 import type { MouseEvent } from 'react'
 import i18n from 'i18next'
+import map from 'licia/map'
 import max from 'licia/max'
 import splitPath from 'licia/splitPath'
 import toast from 'react-hot-toast'
@@ -75,6 +76,22 @@ export function showImageMenu(e: MouseEvent, image: GalleryImage) {
       label: i18n.t('useAsInit'),
       click: () => void store.setInitImagePath(image.path),
     },
+    ...(store.initImagePath
+      ? [
+          ...map(store.referenceImages, (tab, index) => ({
+            label: `${i18n.t('referenceImage')} ${index + 1}`,
+            click: () => store.setReferenceImagePath(tab.id, image.path),
+          })),
+          ...(store.canAddReferenceImage
+            ? [
+                {
+                  label: i18n.t('addReferenceImage'),
+                  click: () => store.addReferenceImage(image.path),
+                },
+              ]
+            : []),
+        ]
+      : []),
     { type: 'separator' },
     {
       label: i18n.t('delete'),

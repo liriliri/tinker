@@ -24,6 +24,7 @@ import {
   getErrorMessage,
   loadImageSize,
   parseSizeString,
+  pickAiImagePath,
 } from './lib/util'
 import {
   DEFAULT_SETTINGS,
@@ -31,9 +32,11 @@ import {
   IMAGE_COUNT_MIN,
   IMAGE_LIST_ITEM_SIZE_MAX,
   IMAGE_LIST_ITEM_SIZE_MIN,
+  REFERENCE_IMAGE_MAX,
   type GalleryImage,
   type GenSettings,
   type GenTask,
+  type ReferenceImageTab,
 } from './types'
 
 const STORAGE_SETTINGS = 'settings'
@@ -58,6 +61,8 @@ class Store extends BaseStore {
   images: GalleryImage[] = []
   selectedImageId = ''
   initImagePath = ''
+  referenceImages: ReferenceImageTab[] = []
+  activeReferenceId = ''
   tasks: GenTask[] = []
   hasAI = false
   isOptimizingPrompt = false
@@ -67,6 +72,7 @@ class Store extends BaseStore {
   constructor() {
     super()
     makeAutoObservable(this)
+    this.addReferenceImage()
     this.loadStorage()
     void this.refreshProviders()
     void initAiChatAvailability(storage).then(({ hasAI }) => {
@@ -109,6 +115,25 @@ class Store extends BaseStore {
 
   get size(): string {
     return formatSize(this.width, this.height)
+  }
+
+  get filledReferenceImages(): string[] {
+    return filter(
+      map(this.referenceImages, (tab) => tab.path),
+      (path) => !isStrBlank(path)
+    )
+  }
+
+  get selectedReferenceImage(): ReferenceImageTab | null {
+    return (
+      find(this.referenceImages, (tab) => tab.id === this.activeReferenceId) ??
+      this.referenceImages[0] ??
+      null
+    )
+  }
+
+  get canAddReferenceImage(): boolean {
+    return this.referenceImages.length < REFERENCE_IMAGE_MAX
   }
 
   get isBusy(): boolean {
@@ -225,7 +250,7 @@ class Store extends BaseStore {
 
     try {
       const task = this.initImagePath
-        ? "Improve the user's prompt so it clearly describes how to edit the reference image."
+        ? "Improve the user's prompt so it clearly describes how to edit the init image, using any extra reference images as style or content guidance when relevant."
         : "Improve the user's prompt to be more detailed, vivid, and effective for image models."
       const systemPrompt = `You are an expert at writing prompts for AI image ${
         this.initImagePath ? 'editing' : 'generation'
@@ -352,18 +377,71 @@ class Store extends BaseStore {
   }
 
   async chooseInitImage() {
-    const result = await tinker.showOpenDialog({
-      properties: ['openFile'],
-      filters: [
-        {
-          name: 'Images',
-          extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'],
-        },
-      ],
-    })
-    if (!result.canceled && result.filePaths[0]) {
-      await this.setInitImagePath(result.filePaths[0])
+    const path = await pickAiImagePath()
+    if (path) await this.setInitImagePath(path)
+  }
+
+  selectReferenceImage(id: string) {
+    if (find(this.referenceImages, (tab) => tab.id === id)) {
+      this.activeReferenceId = id
     }
+  }
+
+  addReferenceImage(path = '') {
+    if (!this.canAddReferenceImage) return
+    const tab: ReferenceImageTab = {
+      id: uuid(),
+      title: `${this.referenceImages.length + 1}`,
+      path,
+    }
+    this.referenceImages = [...this.referenceImages, tab]
+    this.activeReferenceId = tab.id
+  }
+
+  closeReferenceImage(id: string) {
+    if (this.referenceImages.length <= 1) return
+    const index = this.referenceImages.findIndex((tab) => tab.id === id)
+    if (index === -1) return
+    this.referenceImages = filter(this.referenceImages, (tab) => tab.id !== id)
+    if (this.activeReferenceId === id) {
+      const next =
+        this.referenceImages[Math.min(index, this.referenceImages.length - 1)]
+      this.activeReferenceId = next.id
+    }
+  }
+
+  moveReferenceImage(fromIndex: number, toIndex: number) {
+    if (
+      fromIndex === toIndex ||
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.referenceImages.length ||
+      toIndex >= this.referenceImages.length
+    ) {
+      return
+    }
+    const next = [...this.referenceImages]
+    const [tab] = next.splice(fromIndex, 1)
+    next.splice(toIndex, 0, tab)
+    this.referenceImages = next
+  }
+
+  setReferenceImagePath(id: string, path: string) {
+    const index = this.referenceImages.findIndex((tab) => tab.id === id)
+    if (index === -1) return
+    this.referenceImages = map(this.referenceImages, (tab, i) =>
+      i === index ? { ...tab, path } : tab
+    )
+    this.activeReferenceId = id
+  }
+
+  clearReferenceImage(id = this.activeReferenceId) {
+    this.setReferenceImagePath(id, '')
+  }
+
+  async chooseReferenceImage(id = this.activeReferenceId) {
+    const path = await pickAiImagePath()
+    if (path) this.setReferenceImagePath(id, path)
   }
 
   removeImage(id: string) {
@@ -454,10 +532,12 @@ class Store extends BaseStore {
       outputPath: this.outputDir || undefined,
     }
 
+    const refs = this.filledReferenceImages
     const imageTask = this.initImagePath
       ? tinker.editImage({
           ...option,
           image: this.initImagePath,
+          ...(isEmpty(refs) ? {} : { referenceImages: refs }),
         })
       : tinker.generateImage(option)
 

@@ -7,7 +7,44 @@ import max from 'licia/max'
 import min from 'licia/min'
 import promisify from 'licia/promisify'
 import trim from 'licia/trim'
+import { getFileExt } from 'share/lib/fileType'
 import { DEFAULT_SETTINGS, IMAGE_SIZE_MAX, IMAGE_SIZE_MIN } from '../types'
+
+export const AI_IMAGE_PATH_MIME = 'application/x-tinker-ai-image-path'
+
+export const AI_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif']
+
+const SUPPORTED_IMAGE_EXTS = new Set(AI_IMAGE_EXTENSIONS)
+
+function isSupportedAiImagePath(path: string): boolean {
+  return SUPPORTED_IMAGE_EXTS.has(getFileExt(path))
+}
+
+export function getDroppedAiImagePath(dataTransfer: DataTransfer): string {
+  const fromApp = trim(dataTransfer.getData(AI_IMAGE_PATH_MIME))
+  if (fromApp && isSupportedAiImagePath(fromApp)) return fromApp
+
+  const { files } = dataTransfer
+  for (let i = 0; i < files.length; i++) {
+    const filePath = tinker.getPathForFile(files[i])
+    if (filePath && isSupportedAiImagePath(filePath)) return filePath
+  }
+  return ''
+}
+
+export async function pickAiImagePath(): Promise<string> {
+  const result = await tinker.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      {
+        name: 'Images',
+        extensions: AI_IMAGE_EXTENSIONS,
+      },
+    ],
+  })
+  if (result.canceled || !result.filePaths[0]) return ''
+  return result.filePaths[0]
+}
 
 const loadImgAsync = promisify(loadImg)
 
