@@ -2,7 +2,8 @@ import type { AiImageProvider } from './types'
 import {
   collectGeneratedOutputs,
   normalizeImageBaseUrl,
-  outputMimeType,
+  OUTPUT_FORMAT,
+  OUTPUT_MIME,
   readProviderError,
   type ImageCallParams,
   type RawGeneratedImage,
@@ -18,7 +19,6 @@ export async function callOpenAiImages(
   signal?: AbortSignal
 ): Promise<RawGeneratedImage[]> {
   const baseUrl = normalizeImageBaseUrl(provider.apiUrl)
-  const mimeType = outputMimeType(params.outputFormat)
   const headers: Record<string, string> = {
     Authorization: `Bearer ${provider.apiKey}`,
   }
@@ -31,8 +31,7 @@ export async function callOpenAiImages(
     form.append('prompt', prompt)
     form.append('n', String(params.count))
     form.append('size', params.size)
-    form.append('output_format', params.outputFormat)
-    form.append('background', params.transparent ? 'transparent' : 'opaque')
+    form.append('output_format', OUTPUT_FORMAT)
     for (const [index, image] of inputs.entries()) {
       const blob = new Blob([new Uint8Array(image.buffer)], {
         type: image.mimeType,
@@ -57,10 +56,8 @@ export async function callOpenAiImages(
       n: params.count,
       size: params.size,
       response_format: 'b64_json',
-      output_format: params.outputFormat,
-      background: params.transparent ? 'transparent' : 'opaque',
+      output_format: OUTPUT_FORMAT,
     }
-    if (params.quality) body.quality = params.quality
     response = await fetch(`${baseUrl}/images/generations`, {
       method: 'POST',
       headers,
@@ -76,5 +73,5 @@ export async function callOpenAiImages(
   const payload = (await response.json().catch(() => ({}))) as {
     data?: Array<{ b64_json?: string; url?: string }>
   }
-  return collectGeneratedOutputs(payload, mimeType, signal)
+  return collectGeneratedOutputs(payload, OUTPUT_MIME, signal)
 }

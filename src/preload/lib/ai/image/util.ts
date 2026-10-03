@@ -20,10 +20,10 @@ export interface ResolvedImageInput {
 export interface ImageCallParams {
   size: string
   count: number
-  quality?: string
-  outputFormat: 'png' | 'jpeg' | 'webp'
-  transparent: boolean
 }
+
+export const OUTPUT_FORMAT = 'png' as const
+export const OUTPUT_MIME = 'image/png'
 
 export interface RawGeneratedImage {
   bytes: Buffer
@@ -61,36 +61,20 @@ export function resolveImageParams(
   option: GenerateImageOption,
   apiType: AiImageApiType
 ): ImageCallParams {
+  const count = Math.max(1, Math.min(4, Math.floor(option.count || 1)))
+
   if (apiType === 'volcengine') {
-    let outputFormat: 'png' | 'jpeg' | 'webp' = 'jpeg'
-    if (option.outputFormat === 'png' || option.outputFormat === 'jpeg') {
-      outputFormat = option.outputFormat
-    }
     return {
       size: resolveVolcengineSize(option.size),
-      count: 1,
-      outputFormat,
-      transparent: false,
+      count,
     }
   }
 
   const size =
     option.size && SIZE_RE.test(option.size) ? option.size : '1024x1024'
-  const count = Math.max(1, Math.min(4, Math.floor(option.count || 1)))
-  let outputFormat: 'png' | 'jpeg' | 'webp' = 'png'
-  if (option.outputFormat === 'jpeg' || option.outputFormat === 'webp') {
-    outputFormat = option.outputFormat
-  }
-  const singleImage = apiType === 'gemini' || apiType === 'openrouter'
-  if (singleImage && outputFormat === 'webp') {
-    outputFormat = 'png'
-  }
   return {
     size,
-    count: singleImage ? 1 : count,
-    quality: option.quality,
-    outputFormat,
-    transparent: Boolean(option.transparent) && outputFormat !== 'jpeg',
+    count,
   }
 }
 
@@ -216,12 +200,6 @@ export function aspectRatioForSize(size: string): string {
   const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a)
   const d = gcd(width, height) || 1
   return `${width / d}:${height / d}`
-}
-
-export function outputMimeType(format: 'png' | 'jpeg' | 'webp'): string {
-  if (format === 'jpeg') return 'image/jpeg'
-  if (format === 'webp') return 'image/webp'
-  return 'image/png'
 }
 
 const IMAGE_FILE_EXT_RE = /\.(png|jpe?g|webp|gif)$/i

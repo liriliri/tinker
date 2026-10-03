@@ -14,7 +14,6 @@ import type {
   EditImageOption,
   GenerateImageOption,
   GenerateImageResult,
-  GenerateImageTask,
 } from './types'
 import {
   resolveImageInputs,
@@ -57,7 +56,31 @@ async function callImageProvider(
   signal?: AbortSignal
 ): Promise<RawGeneratedImage[]> {
   const apiType = normalizeImageApiType(provider.apiType)
-  return IMAGE_CALLERS[apiType](provider, model, prompt, params, inputs, signal)
+  const caller = IMAGE_CALLERS[apiType]
+  // Gemini / OpenRouter / Volcengine only return one image per request.
+  const singleImage =
+    apiType === 'gemini' || apiType === 'openrouter' || apiType === 'volcengine'
+
+  if (!singleImage || params.count <= 1) {
+    return caller(provider, model, prompt, params, inputs, signal)
+  }
+
+  const outputs: RawGeneratedImage[] = []
+  for (let i = 0; i < params.count; i++) {
+    if (signal?.aborted) {
+      throw new DOMException('Request aborted', 'AbortError')
+    }
+    const batch = await caller(
+      provider,
+      model,
+      prompt,
+      { ...params, count: 1 },
+      inputs,
+      signal
+    )
+    outputs.push(...batch)
+  }
+  return outputs
 }
 
 async function runGenerate(
@@ -93,7 +116,7 @@ async function runGenerate(
 
 function createImageTask(
   run: (signal: AbortSignal) => Promise<GenerateImageResult>
-): GenerateImageTask {
+): { promise: Promise<GenerateImageResult>; requestId: string } {
   const requestId = uuid()
   const controller = new AbortController()
   abortControllers.set(requestId, controller)
@@ -109,24 +132,22 @@ function createImageTask(
     } finally {
       abortControllers.delete(requestId)
     }
-  })() as GenerateImageTask
+  })()
 
-  promise.abort = () => {
-    const current = abortControllers.get(requestId)
-    if (current) {
-      current.abort()
-      abortControllers.delete(requestId)
-    }
-  }
-
-  return promise
+  return { promise, requestId }
 }
 
-export function generateImage(option: GenerateImageOption): GenerateImageTask {
+export function generateImage(option: GenerateImageOption): {
+  promise: Promise<GenerateImageResult>
+  requestId: string
+} {
   return createImageTask((signal) => runGenerate(option, null, signal))
 }
 
-export function editImage(option: EditImageOption): GenerateImageTask {
+export function editImage(option: EditImageOption): {
+  promise: Promise<GenerateImageResult>
+  requestId: string
+} {
   return createImageTask(async (signal) => {
     const inputs = await resolveImageInputs(
       option.image,
@@ -134,4 +155,12 @@ export function editImage(option: EditImageOption): GenerateImageTask {
     )
     return runGenerate(option, inputs, signal)
   })
+}
+
+export function abortImage(requestId: string): void {
+  const controller = abortControllers.get(requestId)
+  if (controller) {
+    controller.abort()
+    abortControllers.delete(requestId)
+  }
 }

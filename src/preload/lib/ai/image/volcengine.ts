@@ -2,7 +2,8 @@ import type { AiImageProvider } from './types'
 import {
   collectGeneratedOutputs,
   normalizeImageBaseUrl,
-  outputMimeType,
+  OUTPUT_FORMAT,
+  OUTPUT_MIME,
   readProviderError,
   toImageDataUrl,
   type ImageCallParams,
@@ -19,16 +20,13 @@ export async function callVolcengineImages(
   signal?: AbortSignal
 ): Promise<RawGeneratedImage[]> {
   const baseUrl = normalizeImageBaseUrl(provider.apiUrl)
-  const mimeType = outputMimeType(params.outputFormat)
   const body: Record<string, unknown> = {
     model,
     prompt,
     size: params.size,
     response_format: 'b64_json',
     watermark: false,
-  }
-  if (params.outputFormat === 'png' || params.outputFormat === 'jpeg') {
-    body.output_format = params.outputFormat
+    output_format: OUTPUT_FORMAT,
   }
   if (inputs?.length) {
     body.image =
@@ -54,5 +52,5 @@ export async function callVolcengineImages(
   const payload = (await response.json().catch(() => ({}))) as {
     data?: Array<{ b64_json?: string; url?: string }>
   }
-  return collectGeneratedOutputs(payload, mimeType, signal)
+  return collectGeneratedOutputs(payload, OUTPUT_MIME, signal)
 }

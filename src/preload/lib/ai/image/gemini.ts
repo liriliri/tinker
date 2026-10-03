@@ -2,7 +2,7 @@ import type { AiImageProvider } from './types'
 import {
   aspectRatioForSize,
   normalizeImageBaseUrl,
-  outputMimeType,
+  OUTPUT_MIME,
   readProviderError,
   type ImageCallParams,
   type RawGeneratedImage,
@@ -46,7 +46,6 @@ export async function callGeminiImages(
   signal?: AbortSignal
 ): Promise<RawGeneratedImage[]> {
   const baseUrl = normalizeImageBaseUrl(provider.apiUrl)
-  const mimeType = outputMimeType(params.outputFormat)
   const input =
     inputs && inputs.length
       ? [
@@ -70,7 +69,7 @@ export async function callGeminiImages(
       input,
       response_format: {
         type: 'image',
-        mime_type: mimeType,
+        mime_type: OUTPUT_MIME,
         aspect_ratio: aspectRatioForSize(params.size),
       },
     }),
@@ -92,7 +91,7 @@ export async function callGeminiImages(
     if (!item?.data) continue
     outputs.push({
       bytes: Buffer.from(item.data, 'base64'),
-      mimeType: item.mime_type || item.mimeType || mimeType,
+      mimeType: item.mime_type || item.mimeType || OUTPUT_MIME,
     })
   }
 

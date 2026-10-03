@@ -141,6 +141,28 @@ function callAIStream(option: any, onChunk: any) {
   return extendedPromise
 }
 
+function generateImage(option: any) {
+  const { promise, requestId } = _tinker.generateImage(option)
+
+  const extendedPromise = promise as any
+  extendedPromise.abort = function () {
+    _tinker.abortImage(requestId)
+  }
+
+  return extendedPromise
+}
+
+function editImage(option: any) {
+  const { promise, requestId } = _tinker.editImage(option)
+
+  const extendedPromise = promise as any
+  extendedPromise.abort = function () {
+    _tinker.abortImage(requestId)
+  }
+
+  return extendedPromise
+}
+
 function wrapDownloadTask(
   dl: any,
   promise: Promise<void>,
@@ -526,8 +548,8 @@ export function injectApi(options?: { context?: 'preload' | 'renderer' }) {
     callAI: _tinker.callAI,
     callAIStream,
     getAIProviders: _tinker.getProviderList,
-    generateImage: _tinker.generateImage,
-    editImage: _tinker.editImage,
+    generateImage,
+    editImage,
     getAIImageProviders: _tinker.getImageProviderList,
     searchFile,
     searchText,

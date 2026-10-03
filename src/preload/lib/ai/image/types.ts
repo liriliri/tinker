@@ -28,9 +28,6 @@ export interface GenerateImageOption {
   prompt: string
   size?: string
   count?: number
-  quality?: string
-  outputFormat?: 'png' | 'jpeg' | 'webp'
-  transparent?: boolean
   outputPath?: string
 }
 

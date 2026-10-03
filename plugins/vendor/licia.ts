@@ -86,6 +86,7 @@ import query from 'licia/query'
 import randomBytes from 'licia/randomBytes'
 import randomItem from 'licia/randomItem'
 import range from 'licia/range'
+import reduce from 'licia/reduce'
 import remove from 'licia/remove'
 import replaceAll from 'licia/replaceAll'
 import rtrim from 'licia/rtrim'
@@ -203,6 +204,7 @@ const licia = {
   randomBytes,
   randomItem,
   range,
+  reduce,
   remove,
   replaceAll,
   rtrim,
@@ -324,6 +326,7 @@ export {
   randomBytes,
   randomItem,
   range,
+  reduce,
   remove,
   replaceAll,
   rtrim,

@@ -1,0 +1,22 @@
+{
+  "name": "tinker-ai-image",
+  "version": "0.1.0",
+  "description": "AI Image Plugin for TINKER",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "AI Image",
+    "category": "media",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "description": "Generate images with AI using configured image providers",
+    "locales": {
+      "zh-CN": {
+        "name": "AI 生图",
+        "description": "使用已配置的 AI 生图接口生成图片"
+      }
+    }
+  }
+}
