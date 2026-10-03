@@ -1,4 +1,7 @@
 import { useEffect, useRef } from 'react'
+import each from 'licia/each'
+import map from 'licia/map'
+import max from 'licia/max'
 import { tw } from 'share/theme'
 import { PALETTE_HEX } from '../lib/pixelate'
 import { PIXEL_PALETTE_OPTIONS, type PixelPaletteId } from '../types'
@@ -42,8 +45,8 @@ function PaletteStrip({ colors }: PaletteStripProps) {
       if (cssW <= 0 || cssH <= 0) return
 
       const dpr = window.devicePixelRatio || 1
-      const pixelW = Math.max(1, Math.round(cssW * dpr))
-      const pixelH = Math.max(1, Math.round(cssH * dpr))
+      const pixelW = max(1, Math.round(cssW * dpr))
+      const pixelH = max(1, Math.round(cssH * dpr))
       canvas.width = pixelW
       canvas.height = pixelH
       canvas.style.width = `${cssW}px`
@@ -55,12 +58,12 @@ function PaletteStrip({ colors }: PaletteStripProps) {
       // Draw in device pixels so top/bottom edges stay flush.
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       let x = 0
-      for (let i = 0; i < visibleColors.length; i++) {
+      each(visibleColors, (color, i) => {
         const nextX = Math.round(((i + 1) * pixelW) / visibleColors.length)
-        ctx.fillStyle = visibleColors[i]
-        ctx.fillRect(x, 0, Math.max(1, nextX - x), pixelH)
+        ctx.fillStyle = color
+        ctx.fillRect(x, 0, max(1, nextX - x), pixelH)
         x = nextX
-      }
+      })
     }
 
     draw()
@@ -108,7 +111,7 @@ export default function PalettePicker({
 }: PalettePickerProps) {
   return (
     <div className="grid grid-cols-2 gap-1.5">
-      {PIXEL_PALETTE_OPTIONS.map((option) => (
+      {map(PIXEL_PALETTE_OPTIONS, (option) => (
         <PaletteSwatch
           key={option.value}
           id={option.value}

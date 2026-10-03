@@ -1,11 +1,13 @@
+import each from 'licia/each'
+import isUndef from 'licia/isUndef'
 import splitPath from 'licia/splitPath'
 import { createPluginMcpApi, type PluginMcp } from 'share/lib/mcp'
 import { fileExists } from 'share/lib/util'
 import type { Store } from './store'
 import type {
-  AsciiCharset,
+  AsciiParams,
   EffectId,
-  PixelPaletteId,
+  PixelateParams,
   SketchParams,
 } from './types'
 import pkg from '../package.json'
@@ -15,19 +17,28 @@ type EffectArgs = {
   overwriteOriginal?: boolean
   save?: boolean
   outputPath?: string
-  thickness?: number
-  brightness?: number
-  detail?: number
-  deepen?: number
-  pixelSize?: number
-  paletteEnabled?: boolean
-  palette?: PixelPaletteId
-  outline?: boolean
-  cellSize?: number
-  contrast?: number
-  invert?: boolean
-  charset?: AsciiCharset
-}
+} & Partial<SketchParams> &
+  Partial<PixelateParams> &
+  Partial<AsciiParams>
+
+const SKETCH_KEYS: Array<keyof SketchParams> = [
+  'thickness',
+  'brightness',
+  'detail',
+  'deepen',
+]
+const PIXELATE_KEYS: Array<keyof PixelateParams> = [
+  'pixelSize',
+  'paletteEnabled',
+  'palette',
+  'outline',
+]
+const ASCII_KEYS: Array<keyof AsciiParams> = [
+  'cellSize',
+  'contrast',
+  'invert',
+  'charset',
+]
 
 export function createMcpApi(getStore: () => Store): PluginMcp {
   return createPluginMcpApi(getStore, pkg, {
@@ -51,19 +62,27 @@ async function applyEffect(store: Store, effect: EffectId, args: EffectArgs) {
       throw new Error('outputPath is required when overwriteOriginal is false.')
     }
 
-    if (!(await fileExists(splitPath(outputPath).dir))) {
-      throw new Error(
-        `Output directory not found: ${splitPath(outputPath).dir}`
-      )
+    const outputDir = splitPath(outputPath).dir
+    if (!(await fileExists(outputDir))) {
+      throw new Error(`Output directory not found: ${outputDir}`)
     }
   }
 
   if (effect === 'sketch') {
-    applySketchParams(store, args)
+    each(SKETCH_KEYS, (key) => {
+      const value = args[key]
+      if (!isUndef(value)) store.setSketchParam(key, value)
+    })
   } else if (effect === 'pixelate') {
-    applyPixelateParams(store, args)
+    each(PIXELATE_KEYS, (key) => {
+      const value = args[key]
+      if (!isUndef(value)) store.setPixelateParam(key, value)
+    })
   } else {
-    applyAsciiParams(store, args)
+    each(ASCII_KEYS, (key) => {
+      const value = args[key]
+      if (!isUndef(value)) store.setAsciiParam(key, value)
+    })
   }
 
   store.setOverwriteOriginal(overwriteOriginal)
@@ -93,50 +112,5 @@ async function applyEffect(store: Store, effect: EffectId, args: EffectArgs) {
           height: store.image.height,
         }
       : null,
-  }
-}
-
-function applySketchParams(store: Store, args: EffectArgs) {
-  const keys: Array<keyof SketchParams> = [
-    'thickness',
-    'brightness',
-    'detail',
-    'deepen',
-  ]
-  for (const key of keys) {
-    const value = args[key]
-    if (value !== undefined) {
-      store.setSketchParam(key, value)
-    }
-  }
-}
-
-function applyPixelateParams(store: Store, args: EffectArgs) {
-  if (args.pixelSize !== undefined) {
-    store.setPixelateParam('pixelSize', args.pixelSize)
-  }
-  if (args.paletteEnabled !== undefined) {
-    store.setPixelateParam('paletteEnabled', args.paletteEnabled)
-  }
-  if (args.palette !== undefined) {
-    store.setPixelateParam('palette', args.palette)
-  }
-  if (args.outline !== undefined) {
-    store.setPixelateParam('outline', args.outline)
-  }
-}
-
-function applyAsciiParams(store: Store, args: EffectArgs) {
-  if (args.cellSize !== undefined) {
-    store.setAsciiParam('cellSize', args.cellSize)
-  }
-  if (args.contrast !== undefined) {
-    store.setAsciiParam('contrast', args.contrast)
-  }
-  if (args.invert !== undefined) {
-    store.setAsciiParam('invert', args.invert)
-  }
-  if (args.charset !== undefined) {
-    store.setAsciiParam('charset', args.charset)
   }
 }

@@ -6,6 +6,26 @@ import { applySketch } from './sketch'
 
 const MAX_PREVIEW_DIMENSION = 4096
 
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  mimeType: string,
+  quality?: number
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('Failed to export image'))
+          return
+        }
+        resolve(blob)
+      },
+      mimeType,
+      quality
+    )
+  })
+}
+
 function renderEffect(
   source: HTMLCanvasElement,
   target: HTMLCanvasElement,
@@ -126,22 +146,12 @@ export class EffectRenderer {
       throw new Error('No image loaded')
     }
 
+    const blob = await canvasToBlob(this.sourceCanvas, mimeType, quality)
     return new Promise((resolve, reject) => {
-      this.sourceCanvas!.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error('Failed to export source image'))
-            return
-          }
-          const reader = new FileReader()
-          reader.onload = () => resolve(String(reader.result || ''))
-          reader.onerror = () =>
-            reject(new Error('Failed to read source image'))
-          reader.readAsDataURL(blob)
-        },
-        mimeType,
-        quality
-      )
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('Failed to read source image'))
+      reader.readAsDataURL(blob)
     })
   }
 
@@ -157,37 +167,12 @@ export class EffectRenderer {
     const quality = mimeType === 'image/jpeg' ? 0.92 : undefined
 
     if (effectId === 'ai') {
-      return new Promise((resolve, reject) => {
-        this.canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              reject(new Error('Failed to export image'))
-              return
-            }
-            resolve(blob)
-          },
-          mimeType,
-          quality
-        )
-      })
+      return canvasToBlob(this.canvas, mimeType, quality)
     }
 
     const exportCanvas = document.createElement('canvas')
     renderEffect(this.sourceCanvas, exportCanvas, effectId, params)
-
-    return new Promise((resolve, reject) => {
-      exportCanvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error('Failed to export image'))
-            return
-          }
-          resolve(blob)
-        },
-        mimeType,
-        quality
-      )
-    })
+    return canvasToBlob(exportCanvas, mimeType, quality)
   }
 
   dispose() {

@@ -1,6 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
+import { type DragEvent } from 'react'
+import isEmpty from 'licia/isEmpty'
 import startWith from 'licia/startWith'
+import toArr from 'licia/toArr'
 import { tw } from 'share/theme'
 import ImageOpen from 'share/components/ImageOpen'
 import store from './store'
@@ -16,17 +19,17 @@ import zhCN from './i18n/zh-CN.json'
 const App = observer(function App() {
   const { t } = useTranslation()
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = async (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const files = e.dataTransfer.files
-    if (!files || files.length === 0) return
+    const files = toArr(e.dataTransfer.files)
+    if (isEmpty(files)) return
 
     const file = files[0]
     if (!startWith(file.type, 'image/')) {

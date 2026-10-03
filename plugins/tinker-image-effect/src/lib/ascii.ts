@@ -1,4 +1,6 @@
 import clamp from 'licia/clamp'
+import max from 'licia/max'
+import min from 'licia/min'
 import type { AsciiCharset, AsciiParams } from '../types'
 import { getLuma } from './util'
 
@@ -47,7 +49,7 @@ export function applyAscii(
   params: AsciiParams
 ): void {
   const { width, height, data } = imageData
-  const cell = Math.max(4, Math.round(params.cellSize))
+  const cell = max(4, Math.round(params.cellSize))
   const chars = ASCII_CHARSETS[params.charset]
   const contrastMapped = (params.contrast - 50) * 2.5
   const paper = params.invert ? ASCII_PAPER_LIGHT : ASCII_PAPER_DARK
@@ -62,8 +64,8 @@ export function applyAscii(
 
   for (let y = 0; y < height; y += cell) {
     for (let x = 0; x < width; x += cell) {
-      const blockW = Math.min(cell, width - x)
-      const blockH = Math.min(cell, height - y)
+      const blockW = min(cell, width - x)
+      const blockH = min(cell, height - y)
       let luma = 0
       let count = 0
 
@@ -79,7 +81,7 @@ export function applyAscii(
       brightness = applyContrast(brightness, contrastMapped)
       if (params.invert) brightness = 255 - brightness
 
-      const index = Math.min(
+      const index = min(
         chars.length - 1,
         Math.floor((brightness / 255) * chars.length)
       )

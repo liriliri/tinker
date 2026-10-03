@@ -1,6 +1,7 @@
 import Color from 'licia/Color'
 import map from 'licia/map'
 import mapObj from 'licia/mapObj'
+import max from 'licia/max'
 import type { PixelPaletteId, PixelateParams } from '../types'
 
 export const DEFAULT_PIXELATE_PARAMS: PixelateParams = {
@@ -176,9 +177,9 @@ export function applyPixelate(
 ): ImageData {
   const width = source.width
   const height = source.height
-  const size = Math.max(2, Math.round(params.pixelSize))
-  const cellsX = Math.max(1, Math.round(width / size))
-  const cellsY = Math.max(1, Math.round(height / size))
+  const size = max(2, Math.round(params.pixelSize))
+  const cellsX = max(1, Math.round(width / size))
+  const cellsY = max(1, Math.round(height / size))
 
   const small = document.createElement('canvas')
   small.width = cellsX

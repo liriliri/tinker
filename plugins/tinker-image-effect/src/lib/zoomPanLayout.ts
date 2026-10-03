@@ -1,4 +1,5 @@
 import clamp from 'licia/clamp'
+import min from 'licia/min'
 
 export const PREVIEW_FIT_AREA = 0.9
 
@@ -27,8 +28,8 @@ export function computeFitRect(
     width = height * aspectRatio
   }
 
-  width = Math.min(width * area, naturalWidth)
-  height = Math.min(height * area, naturalHeight)
+  width = min(width * area, naturalWidth)
+  height = min(height * area, naturalHeight)
 
   return {
     left: (containerWidth - width) / 2,

@@ -4,13 +4,17 @@ import clone from 'licia/clone'
 import contain from 'licia/contain'
 import dateFormat from 'licia/dateFormat'
 import debounce from 'licia/debounce'
+import extend from 'licia/extend'
 import fileUrl from 'licia/fileUrl'
+import filter from 'licia/filter'
 import isEqual from 'licia/isEqual'
 import isErr from 'licia/isErr'
 import isStrBlank from 'licia/isStrBlank'
+import pluck from 'licia/pluck'
 import splitPath from 'licia/splitPath'
 import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
+import trim from 'licia/trim'
 import toast from 'react-hot-toast'
 import BaseStore, { storage } from 'share/store/Base'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
@@ -36,7 +40,8 @@ import {
 const STORAGE_OVERWRITE = 'overwriteOriginal'
 const STORAGE_EFFECT_ID = 'effectId'
 const RENDER_DEBOUNCE_MS = 200
-const EFFECT_IDS = EFFECTS.map((effect) => effect.id)
+const EFFECT_IDS = pluck(EFFECTS, 'id') as EffectId[]
+const DEFAULT_EFFECT_PARAMS = createDefaultEffectParams()
 
 function createDefaultEffectParams(): EffectParamsMap {
   return {
@@ -93,26 +98,26 @@ export class Store extends BaseStore {
       const providers = await tinker.getAIImageProviders()
       runInAction(() => {
         this.hasAiImageProvider = providers.length > 0
-        if (this.effectId === 'ai' && !this.hasAiImageProvider) {
-          this.effectId = 'sketch'
-          storage.set(STORAGE_EFFECT_ID, 'sketch')
-        }
+        this.disableAiIfUnavailable()
       })
     } catch (err) {
       console.error('Failed to load AI image providers:', err)
       runInAction(() => {
         this.hasAiImageProvider = false
-        if (this.effectId === 'ai') {
-          this.effectId = 'sketch'
-          storage.set(STORAGE_EFFECT_ID, 'sketch')
-        }
+        this.disableAiIfUnavailable()
       })
     }
   }
 
+  private disableAiIfUnavailable() {
+    if (this.effectId !== 'ai' || this.hasAiImageProvider) return
+    this.effectId = 'sketch'
+    storage.set(STORAGE_EFFECT_ID, 'sketch')
+  }
+
   get availableEffects() {
     if (this.hasAiImageProvider) return EFFECTS
-    return EFFECTS.filter((effect) => effect.id !== 'ai')
+    return filter(EFFECTS, (effect) => effect.id !== 'ai')
   }
 
   initRenderer() {
@@ -192,11 +197,17 @@ export class Store extends BaseStore {
     this.applyStateChange()
   }
 
+  private patchParams<E extends keyof EffectParamsMap>(
+    effect: E,
+    patch: Partial<EffectParamsMap[E]>
+  ) {
+    this.params = extend(clone(this.params), {
+      [effect]: extend(clone(this.params[effect]), patch),
+    }) as EffectParamsMap
+  }
+
   setSketchParam<K extends keyof SketchParams>(key: K, value: SketchParams[K]) {
-    this.params = {
-      ...this.params,
-      sketch: { ...this.params.sketch, [key]: value },
-    }
+    this.patchParams('sketch', { [key]: value } as Partial<SketchParams>)
     this.applyParamChange()
   }
 
@@ -204,26 +215,17 @@ export class Store extends BaseStore {
     key: K,
     value: PixelateParams[K]
   ) {
-    this.params = {
-      ...this.params,
-      pixelate: { ...this.params.pixelate, [key]: value },
-    }
+    this.patchParams('pixelate', { [key]: value } as Partial<PixelateParams>)
     this.applyParamChange()
   }
 
   setAsciiParam<K extends keyof AsciiParams>(key: K, value: AsciiParams[K]) {
-    this.params = {
-      ...this.params,
-      ascii: { ...this.params.ascii, [key]: value },
-    }
+    this.patchParams('ascii', { [key]: value } as Partial<AsciiParams>)
     this.applyParamChange()
   }
 
   setAiParam<K extends keyof AiParams>(key: K, value: AiParams[K]) {
-    this.params = {
-      ...this.params,
-      ai: { ...this.params.ai, [key]: value },
-    }
+    this.patchParams('ai', { [key]: value } as Partial<AiParams>)
     this.isSaved = false
   }
 
@@ -240,7 +242,7 @@ export class Store extends BaseStore {
   async applyAiEffect() {
     if (!this.canApplyAi || !this.renderer?.hasImage) return
 
-    const prompt = this.params.ai.prompt.trim()
+    const prompt = trim(this.params.ai.prompt)
     try {
       this.isAiApplying = true
       const imageInput = this.image?.filePath
@@ -263,11 +265,10 @@ export class Store extends BaseStore {
         this.aiResultPath = output.path
         this.isSaved = false
         if (this.image) {
-          this.image = {
-            ...this.image,
+          this.image = extend(clone(this.image), {
             width: preview.width,
             height: preview.height,
-          }
+          })
         }
         this.previewVersion++
       })
@@ -423,7 +424,7 @@ export class Store extends BaseStore {
       { effectId: this.effectId, params: this.params },
       {
         effectId: 'sketch' as EffectId,
-        params: createDefaultEffectParams(),
+        params: DEFAULT_EFFECT_PARAMS,
       }
     )
   }

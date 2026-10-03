@@ -1,3 +1,5 @@
+import max from 'licia/max'
+
 export function getLuma(r: number, g: number, b: number): number {
   return 0.299 * r + 0.587 * g + 0.114 * b
 }
@@ -7,15 +9,15 @@ export function computeWorkingDimensions(
   height: number,
   maxDimension: number
 ): { width: number; height: number; scale: number } {
-  const longEdge = Math.max(width, height)
+  const longEdge = max(width, height)
   if (longEdge <= maxDimension) {
     return { width, height, scale: 1 }
   }
 
   const scale = maxDimension / longEdge
   return {
-    width: Math.max(1, Math.round(width * scale)),
-    height: Math.max(1, Math.round(height * scale)),
+    width: max(1, Math.round(width * scale)),
+    height: max(1, Math.round(height * scale)),
     scale,
   }
 }

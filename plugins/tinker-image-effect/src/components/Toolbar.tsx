@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen, Save } from 'lucide-react'
+import map from 'licia/map'
 import Checkbox from 'share/components/Checkbox'
 import Select from 'share/components/Select'
 import {
@@ -19,7 +20,7 @@ const ToolbarComponent = observer(function ToolbarComponent() {
 
   const effectOptions = useMemo(
     () =>
-      store.availableEffects.map((effect) => ({
+      map(store.availableEffects, (effect) => ({
         value: effect.id,
         label: t(effect.nameKey),
       })),

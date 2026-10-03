@@ -1,4 +1,5 @@
 import clamp from 'licia/clamp'
+import max from 'licia/max'
 import type { SketchParams } from '../types'
 import { getLuma } from './util'
 
@@ -119,11 +120,11 @@ export function applySketch(
     inverted[p] = 255 - gray[p]
   }
 
-  const thickness = Math.max(1, Math.round(params.thickness))
+  const thickness = max(1, Math.round(params.thickness))
   const blurred = gaussBlurGray(inverted, width, height, thickness)
 
   const detailThreshold = 205 + params.detail
-  const deepen = Math.max(0, Math.round(params.deepen))
+  const deepen = max(0, Math.round(params.deepen))
   const brightness = params.brightness
   const result = new Float32Array(gray.length)
 

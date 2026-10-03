@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import each from 'licia/each'
 import { AdjustmentSlider } from 'share/components/Slider'
 import Switch from 'share/components/Switch'
 import { tw } from 'share/theme'
@@ -16,14 +17,29 @@ import {
 import { PIXEL_PALETTE_OPTIONS, type PixelPaletteId } from '../types'
 import PalettePicker from './PalettePicker'
 
+interface ParamSwitchProps {
+  label: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+}
+
+function ParamSwitch({ label, checked, onChange }: ParamSwitchProps) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <div className={`text-sm select-none ${tw.text.primary}`}>{label}</div>
+      <Switch checked={checked} onChange={onChange} />
+    </div>
+  )
+}
+
 const EffectParams = observer(function EffectParams() {
   const { t, i18n } = useTranslation()
 
   const paletteLabels = useMemo(() => {
     const labels = {} as Record<PixelPaletteId, string>
-    for (const option of PIXEL_PALETTE_OPTIONS) {
+    each(PIXEL_PALETTE_OPTIONS, (option) => {
       labels[option.value] = t(option.labelKey)
-    }
+    })
     return labels
   }, [t, i18n.language])
 
@@ -85,11 +101,9 @@ const EffectParams = observer(function EffectParams() {
           onChange={(value) => store.setPixelateParam('pixelSize', value)}
         />
         <div className="mb-3">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className={`text-sm select-none ${tw.text.primary}`}>
-              {t('palette')}
-            </div>
-            <Switch
+          <div className="mb-2">
+            <ParamSwitch
+              label={t('palette')}
               checked={paletteEnabled}
               onChange={(checked) =>
                 store.setPixelateParam('paletteEnabled', checked)
@@ -105,15 +119,11 @@ const EffectParams = observer(function EffectParams() {
             labels={paletteLabels}
           />
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <div className={`text-sm select-none ${tw.text.primary}`}>
-            {t('outline')}
-          </div>
-          <Switch
-            checked={store.params.pixelate.outline}
-            onChange={(checked) => store.setPixelateParam('outline', checked)}
-          />
-        </div>
+        <ParamSwitch
+          label={t('outline')}
+          checked={store.params.pixelate.outline}
+          onChange={(checked) => store.setPixelateParam('outline', checked)}
+        />
       </>
     )
   }
@@ -160,15 +170,11 @@ const EffectParams = observer(function EffectParams() {
         defaultValue={CONTRAST_RANGE.default}
         onChange={(value) => store.setAsciiParam('contrast', value)}
       />
-      <div className="flex items-center justify-between gap-2">
-        <div className={`text-sm select-none ${tw.text.primary}`}>
-          {t('invert')}
-        </div>
-        <Switch
-          checked={store.params.ascii.invert}
-          onChange={(checked) => store.setAsciiParam('invert', checked)}
-        />
-      </div>
+      <ParamSwitch
+        label={t('invert')}
+        checked={store.params.ascii.invert}
+        onChange={(checked) => store.setAsciiParam('invert', checked)}
+      />
     </>
   )
 })

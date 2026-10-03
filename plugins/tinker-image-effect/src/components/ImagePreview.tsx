@@ -1,7 +1,17 @@
 import clamp from 'licia/clamp'
+import clone from 'licia/clone'
 import debounce from 'licia/debounce'
+import extend from 'licia/extend'
+import now from 'licia/now'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type MouseEvent,
+  type PointerEvent,
+} from 'react'
 import { LoadingCircle } from 'share/components/Loading'
 import { tw } from 'share/theme'
 import {
@@ -75,7 +85,6 @@ const ImagePreview = observer(function ImagePreview() {
   const ratioTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const transform = useRef<ImageTransform>(createEmptyTransform())
   const isReady = useRef(false)
-  const fitRatioRef = useRef(1)
   const rafId = useRef<number | null>(null)
   const animationId = useRef<number | null>(null)
   const imageKeyRef = useRef('')
@@ -139,13 +148,11 @@ const ImagePreview = observer(function ImagePreview() {
     if (!cw || !ch) return
 
     const rect = computeFitRect(nw, nh, cw, ch, PREVIEW_FIT_AREA)
-    fitRatioRef.current = rect.width / nw
 
-    transform.current = {
-      ...transform.current,
+    extend(transform.current, {
       rect,
-      ratio: fitRatioRef.current,
-    }
+      ratio: rect.width / nw,
+    })
 
     scheduleLayout()
   }, [scheduleLayout])
@@ -157,11 +164,11 @@ const ImagePreview = observer(function ImagePreview() {
   const animateToRect = useCallback(
     (targetRect: ImageRect, onComplete?: () => void) => {
       stopAnimation()
-      const startRect = { ...transform.current.rect }
-      const startTime = performance.now()
+      const startRect = clone(transform.current.rect)
+      const startTime = now()
 
-      const step = (now: number) => {
-        const progress = clamp((now - startTime) / ANIMATION_DURATION, 0, 1)
+      const step = () => {
+        const progress = clamp((now() - startTime) / ANIMATION_DURATION, 0, 1)
         const eased = 1 - (1 - progress) ** 3
         transform.current.rect = lerpRect(startRect, targetRect, eased)
         scheduleLayout()
@@ -291,7 +298,7 @@ const ImagePreview = observer(function ImagePreview() {
   const dragOrigin = useRef({ left: 0, top: 0 })
 
   const handlePointerDown = useCallback(
-    (event: React.PointerEvent) => {
+    (event: PointerEvent) => {
       if (event.button !== 0 || !isReady.current) return
       stopAnimation()
       isDragging.current = true
@@ -306,7 +313,7 @@ const ImagePreview = observer(function ImagePreview() {
   )
 
   const handlePointerMove = useCallback(
-    (event: React.PointerEvent) => {
+    (event: PointerEvent) => {
       if (!isDragging.current) return
       transform.current.rect.left =
         dragOrigin.current.left + (event.clientX - dragStart.current.x)
@@ -317,14 +324,14 @@ const ImagePreview = observer(function ImagePreview() {
     [scheduleLayout]
   )
 
-  const handlePointerUp = useCallback((event: React.PointerEvent) => {
+  const handlePointerUp = useCallback((event: PointerEvent) => {
     if (!isDragging.current) return
     isDragging.current = false
     containerRef.current?.releasePointerCapture(event.pointerId)
   }, [])
 
   const handleDoubleClick = useCallback(
-    (event: React.MouseEvent) => {
+    (event: MouseEvent) => {
       if (!isReady.current || !containerRef.current) return
 
       const { naturalWidth: nw, naturalHeight: nh, ratio } = transform.current
@@ -343,12 +350,10 @@ const ImagePreview = observer(function ImagePreview() {
         zoomTo(1, { x: pointerX, y: pointerY }, true)
       } else {
         animateToRect(fitRect, () => {
-          fitRatioRef.current = fitRatio
-          transform.current = {
-            ...transform.current,
+          extend(transform.current, {
             rect: fitRect,
             ratio: fitRatio,
-          }
+          })
         })
       }
     },
