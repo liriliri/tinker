@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import store from '../store'
+import IconList from 'luna-icon-list'
 import LunaIconList from 'luna-icon-list/react'
 import LunaScrollbar from 'luna-scrollbar/react'
 import map from 'licia/map'
@@ -14,6 +15,16 @@ import { t } from 'common/util'
 import concat from 'licia/concat'
 import isEmpty from 'licia/isEmpty'
 import { IPlugin } from 'common/types'
+
+let iconList: IconList | null = null
+
+export function focusIcons() {
+  if (!iconList?.select(0)) {
+    return false
+  }
+  iconList.focus()
+  return true
+}
 
 function getPluginClassName(plugin: IPlugin) {
   return [
@@ -30,6 +41,17 @@ function getPluginTitle(plugin: IPlugin) {
   const mcp = plugin.mcp ? ' [mcp]' : ''
   const description = plugin.description ? ` - ${plugin.description}` : ''
   return `${plugin.id}${version}${mcp}${description}`
+}
+
+function openIcon(data: any, detach?: boolean) {
+  if (data.plugin) {
+    store.openPlugin(
+      data.plugin.id,
+      detach ?? store.isPluginAutoDetach(data.plugin.id)
+    )
+  } else {
+    store.openApp(data.app.path)
+  }
 }
 
 export default observer(function PluginList() {
@@ -243,25 +265,9 @@ export default observer(function PluginList() {
       ) : null}
       <LunaScrollbar className={Style.scrollbar}>
         <LunaIconList
-          onClick={(e: any, icon) => {
-            const data = icon.data as any
-            if (data.plugin) {
-              store.openPlugin(
-                data.plugin.id,
-                store.isPluginAutoDetach(data.plugin.id)
-              )
-            } else {
-              store.openApp(data.app.path)
-            }
-          }}
-          onDoubleClick={(e: any, icon) => {
-            const data = icon.data as any
-            if (data.plugin) {
-              store.openPlugin(data.plugin.id, true)
-            } else {
-              store.openApp(data.app.path)
-            }
-          }}
+          onCreate={(instance) => (iconList = instance)}
+          onClick={(_e, icon) => openIcon(icon.data)}
+          onDoubleClick={(_e, icon) => openIcon(icon.data, true)}
           onContextMenu={(e: any, icon) => {
             onContextMenu(e, icon.data)
           }}

@@ -7,6 +7,7 @@ import store from '../store'
 import fileUrl from 'licia/fileUrl'
 import isEmpty from 'licia/isEmpty'
 import contextMenu from 'share/renderer/lib/contextMenu'
+import { focusIcons } from './PluginList'
 
 export default observer(function Titlebar() {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -145,7 +146,18 @@ export default observer(function Titlebar() {
 
   const onInputKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key !== 'Enter' || store.plugin) {
+      if (store.plugin) {
+        return
+      }
+
+      if (e.key === 'ArrowDown') {
+        if (focusIcons()) {
+          e.preventDefault()
+        }
+        return
+      }
+
+      if (e.key !== 'Enter') {
         return
       }
       if (store.visiblePlugins.length > 0) {
