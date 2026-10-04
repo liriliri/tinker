@@ -1,0 +1,28 @@
+{
+  "name": "tinker-screenshot-mockup",
+  "version": "0.1.0",
+  "description": "Beautify screenshots with device frames and backgrounds",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "Screenshot Mockup",
+    "category": "media",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "截图美化",
+        "description": "为截图添加设备边框和背景，快速生成商店展示图"
+      }
+    }
+  },
+  "devDependencies": {
+    "@leafer-in/editor": "^2.0.0",
+    "@leafer-in/export": "^2.0.0",
+    "@leafer-in/view": "^2.0.0",
+    "@leafer-in/viewport": "^2.0.0",
+    "leafer-ui": "^2.0.0"
+  }
+}
