@@ -30,7 +30,7 @@ function bundlePluginRenderer(mode: string): Plugin {
         watch: watch ? {} : null,
         outDir: 'dist/preload',
         emptyOutDir: false,
-        minify: mode === 'development' ? false : 'esbuild',
+        minify: mode === 'development' ? false : 'oxc',
         lib: {
           entry,
           name: '_tinkerRenderer',
@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist/preload',
     emptyOutDir: false,
-    minify: mode === 'development' ? false : 'esbuild',
+    minify: mode === 'development' ? false : 'oxc',
     lib: {
       entry: [
         resolve(__dirname, 'src/preload/index.ts'),

@@ -61,7 +61,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   return {
     build: {
       outDir: 'dist/main',
-      minify: mode === 'development' ? false : 'esbuild',
+      minify: mode === 'development' ? false : 'oxc',
       lib: {
         entry: {
           bootstrap: resolve(__dirname, 'src/main/bootstrap.ts'),
