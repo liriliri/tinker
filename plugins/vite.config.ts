@@ -29,13 +29,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern',
-        },
-      },
-    },
     resolve: {
       alias: {
         share: path.join(cwd, '../share/'),
