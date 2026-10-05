@@ -240,6 +240,7 @@ function createConfig(
         entry: path.resolve(__dirname, entry || `${name}.ts`),
         name: globalsName,
         fileName: () => `${name}.js`,
+        cssFileName: 'style',
         formats: ['iife'],
       },
       rollupOptions: {
