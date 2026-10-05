@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { FolderOpen, Plus } from 'lucide-react'
+import isEmpty from 'licia/isEmpty'
 import Welcome from 'share/components/Welcome'
 import store from '../store'
 import { prompt } from 'share/components/Prompt'
@@ -13,7 +14,7 @@ export default observer(function PwdMgrWelcome() {
   const handleNewDatabase = async () => {
     const name = await prompt({
       title: t('newDatabase'),
-      defaultValue: 'My Database',
+      defaultValue: t('newDatabase'),
     })
 
     if (!name) return
@@ -44,7 +45,7 @@ export default observer(function PwdMgrWelcome() {
       properties: ['openFile'],
     })
 
-    if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+    if (result.canceled || isEmpty(result.filePaths)) {
       return
     }
 

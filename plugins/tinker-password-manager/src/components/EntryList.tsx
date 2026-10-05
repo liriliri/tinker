@@ -8,6 +8,7 @@ import {
   SelectionChangedEvent,
   GetRowIdParams,
 } from 'ag-grid-community'
+import map from 'licia/map'
 import { useMemo, useCallback } from 'react'
 
 interface RowData {
@@ -47,14 +48,16 @@ export default observer(function EntryList() {
     [t]
   )
 
-  const rowData = useMemo(() => {
-    return store.filteredEntries.map((entry) => ({
-      id: entry.uuid,
-      title: entry.title,
-      username: entry.username,
-      url: entry.url,
-    }))
-  }, [store.filteredEntries])
+  const rowData = useMemo(
+    () =>
+      map(store.filteredEntries, (entry) => ({
+        id: entry.uuid,
+        title: entry.title,
+        username: entry.username,
+        url: entry.url,
+      })),
+    [store.filteredEntries]
+  )
 
   const onSelectionChanged = useCallback(
     (event: SelectionChangedEvent<RowData>) => {
@@ -78,6 +81,15 @@ export default observer(function EntryList() {
     [t]
   )
 
+  const rowSelection = useMemo(
+    () => ({
+      mode: 'singleRow' as const,
+      checkboxes: false,
+      enableClickSelection: true,
+    }),
+    []
+  )
+
   if (!store.selectedGroupId) {
     return (
       <div
@@ -93,11 +105,7 @@ export default observer(function EntryList() {
       isDark={store.isDark}
       columnDefs={columnDefs}
       rowData={rowData}
-      rowSelection={{
-        mode: 'singleRow',
-        checkboxes: false,
-        enableClickSelection: true,
-      }}
+      rowSelection={rowSelection}
       onSelectionChanged={onSelectionChanged}
       getRowId={getRowId}
       animateRows={true}

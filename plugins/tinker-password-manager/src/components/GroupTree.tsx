@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Folder } from 'lucide-react'
 import { tw } from 'share/theme'
 import className from 'licia/className'
+import map from 'licia/map'
 import Tree, { TreeNodeData } from 'share/components/Tree'
 import store from '../store'
 import { KdbxGroup } from '../types'
@@ -21,7 +22,7 @@ function groupToNode(group: KdbxGroup, isRoot: boolean): GroupNodeData {
     label: group.name,
     entryCount: group.entries.length,
     isRoot,
-    children: group.groups.map((g) => groupToNode(g, false)),
+    children: map(group.groups, (g) => groupToNode(g, false)),
   }
 }
 

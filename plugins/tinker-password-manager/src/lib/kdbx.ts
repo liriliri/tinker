@@ -1,37 +1,29 @@
 import * as kdbxweb from 'kdbxweb'
+import flatten from 'licia/flatten'
+import isStr from 'licia/isStr'
+import map from 'licia/map'
+import toStr from 'licia/toStr'
 import { KdbxEntry, KdbxGroup } from '../types'
 
-export type { KdbxEntry, KdbxGroup }
-
 export function convertGroup(kdbxGroup: kdbxweb.KdbxGroup): KdbxGroup {
-  const group: KdbxGroup = {
+  return {
     uuid: kdbxGroup.uuid.id,
     name: kdbxGroup.name ?? '',
     icon: kdbxGroup.icon ?? 0,
-    entries: [],
-    groups: [],
+    entries: map(kdbxGroup.entries, convertEntry),
+    groups: map(kdbxGroup.groups, convertGroup),
   }
-
-  kdbxGroup.entries.forEach((entry) => {
-    group.entries.push(convertEntry(entry))
-  })
-
-  kdbxGroup.groups.forEach((subGroup) => {
-    group.groups.push(convertGroup(subGroup))
-  })
-
-  return group
 }
 
-export function convertEntry(kdbxEntry: kdbxweb.KdbxEntry): KdbxEntry {
+function convertEntry(kdbxEntry: kdbxweb.KdbxEntry): KdbxEntry {
   const getFieldValue = (fieldName: string): string => {
     const value = kdbxEntry.fields.get(fieldName)
     if (!value) return ''
-    if (typeof value === 'string') return value
+    if (isStr(value)) return value
     if (value instanceof kdbxweb.ProtectedValue) {
       return value.getText() || ''
     }
-    return String(value)
+    return toStr(value)
   }
 
   const getPasswordValue = (): kdbxweb.ProtectedValue => {
@@ -63,11 +55,7 @@ export function convertEntry(kdbxEntry: kdbxweb.KdbxEntry): KdbxEntry {
 }
 
 export function flattenGroups(group: KdbxGroup): KdbxGroup[] {
-  const result: KdbxGroup[] = [group]
-  group.groups.forEach((subGroup) => {
-    result.push(...flattenGroups(subGroup))
-  })
-  return result
+  return [group, ...flatten(map(group.groups, flattenGroups))]
 }
 
 export function findKdbxGroup(

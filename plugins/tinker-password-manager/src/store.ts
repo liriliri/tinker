@@ -1,6 +1,12 @@
 import { makeAutoObservable, reaction } from 'mobx'
+import contain from 'licia/contain'
+import filter from 'licia/filter'
 import find from 'licia/find'
+import flatten from 'licia/flatten'
+import isArrBuffer from 'licia/isArrBuffer'
 import lowerCase from 'licia/lowerCase'
+import map from 'licia/map'
+import safeGet from 'licia/safeGet'
 import splitPath from 'licia/splitPath'
 import BaseStore, { storage } from 'share/store/Base'
 import * as kdbxweb from 'kdbxweb'
@@ -14,30 +20,24 @@ import {
 } from './lib/kdbx'
 import { KdbxEntry, KdbxGroup } from './types'
 
-export type { KdbxEntry, KdbxGroup }
-
 const STORAGE_RECENT_FILES = 'recentFiles'
 
 class Store extends BaseStore {
-  // Database state
   db: kdbxweb.Kdbx | null = null
   dbPath: string = ''
   dbName: string = ''
   isLocked: boolean = true
   isModified: boolean = false
 
-  // UI state
   selectedGroupId: string | null = null
   selectedEntryId: string | null = null
   searchQuery: string = ''
   showPassword: boolean = false
 
-  // Groups and entries
   rootGroup: KdbxGroup | null = null
   groups: KdbxGroup[] = []
   filteredEntries: KdbxEntry[] = []
 
-  // Recent files
   recentFiles: string[] = []
 
   constructor() {
@@ -48,7 +48,6 @@ class Store extends BaseStore {
   }
 
   private bindEvent() {
-    // Automatically update title when dbName changes
     reaction(
       () => this.dbName,
       (dbName) => {
@@ -71,17 +70,16 @@ class Store extends BaseStore {
   addRecentFile(path: string) {
     this.recentFiles = [
       path,
-      ...this.recentFiles.filter((p) => p !== path),
+      ...filter(this.recentFiles, (p) => p !== path),
     ].slice(0, 5)
     this.saveRecentFiles()
   }
 
   removeRecentFile(path: string) {
-    this.recentFiles = this.recentFiles.filter((p) => p !== path)
+    this.recentFiles = filter(this.recentFiles, (p) => p !== path)
     this.saveRecentFiles()
   }
 
-  // Database operations
   async createDatabase(name: string, password: string) {
     try {
       const credentials = new kdbxweb.Credentials(
@@ -89,7 +87,7 @@ class Store extends BaseStore {
       )
       this.db = kdbxweb.Kdbx.create(credentials, name)
 
-      // Use AES-KDF instead of Argon2 to avoid "argon2 not implemented" error
+      // AES-KDF: Argon2 is not implemented in the browser build
       this.db.header.setKdf(kdbxweb.Consts.KdfId.Aes)
 
       this.dbName = name
@@ -109,13 +107,12 @@ class Store extends BaseStore {
   ) {
     try {
       const fileData = await tinker.readFile(path)
-      const buffer =
-        fileData instanceof ArrayBuffer
-          ? fileData
-          : fileData.buffer.slice(
-              fileData.byteOffset,
-              fileData.byteOffset + fileData.byteLength
-            )
+      const buffer = isArrBuffer(fileData)
+        ? fileData
+        : fileData.buffer.slice(
+            fileData.byteOffset,
+            fileData.byteOffset + fileData.byteLength
+          )
       const credentials = new kdbxweb.Credentials(
         kdbxweb.ProtectedValue.fromString(password),
         keyFileData
@@ -129,10 +126,7 @@ class Store extends BaseStore {
       this.addRecentFile(path)
       this.readDatabase()
     } catch (error: unknown) {
-      if (
-        (error as { code?: string }).code ===
-        kdbxweb.Consts.ErrorCodes.InvalidKey
-      ) {
+      if (safeGet(error, 'code') === kdbxweb.Consts.ErrorCodes.InvalidKey) {
         toast.error(i18n.t('invalidPassword'))
       } else {
         toast.error(i18n.t('failedToOpenDatabase'))
@@ -157,7 +151,6 @@ class Store extends BaseStore {
         await tinker.writeFile(this.dbPath, new Uint8Array(data))
         this.isModified = false
       } else {
-        // Save as new file
         const result = await tinker.showSaveDialog({
           defaultPath: this.dbName + '.kdbx',
           filters: [{ name: 'KeePass Database', extensions: ['kdbx'] }],
@@ -177,35 +170,6 @@ class Store extends BaseStore {
     }
   }
 
-  async saveAsDatabase() {
-    if (!this.db) return
-
-    try {
-      const result = await tinker.showSaveDialog({
-        defaultPath: this.dbName + '.kdbx',
-        filters: [{ name: 'KeePass Database', extensions: ['kdbx'] }],
-      })
-
-      if (result && !result.canceled && result.filePath) {
-        this.db.cleanup({
-          historyRules: true,
-          customIcons: true,
-          binaries: true,
-        })
-
-        const data = await this.db.save()
-        await tinker.writeFile(result.filePath, new Uint8Array(data))
-        this.dbPath = result.filePath
-        this.dbName = splitPath(result.filePath).name || 'Database'
-        this.isModified = false
-        this.addRecentFile(result.filePath)
-      }
-    } catch (error) {
-      toast.error(i18n.t('failedToSaveDatabase'))
-      console.error('Failed to save database:', error)
-    }
-  }
-
   lockDatabase() {
     this.db = null
     this.isLocked = true
@@ -216,23 +180,9 @@ class Store extends BaseStore {
     this.selectedEntryId = null
   }
 
-  closeDatabase() {
-    this.db = null
-    this.dbPath = ''
-    this.dbName = ''
-    this.isLocked = true
-    this.isModified = false
-    this.rootGroup = null
-    this.groups = []
-    this.filteredEntries = []
-    this.selectedGroupId = null
-    this.selectedEntryId = null
-  }
-
   private readDatabase() {
     if (!this.db) return
 
-    // Save current selection
     const currentGroupId = this.selectedGroupId
     const currentEntryId = this.selectedEntryId
 
@@ -240,7 +190,6 @@ class Store extends BaseStore {
     this.rootGroup = convertGroup(defaultGroup)
     this.groups = flattenGroups(this.rootGroup)
 
-    // Restore selection
     if (currentGroupId) {
       this.selectGroup(currentGroupId)
       if (currentEntryId) {
@@ -251,7 +200,6 @@ class Store extends BaseStore {
     }
   }
 
-  // UI operations
   selectGroup(groupId: string) {
     this.selectedGroupId = groupId
     this.selectedEntryId = null
@@ -266,7 +214,7 @@ class Store extends BaseStore {
   setSearchQuery(query: string) {
     this.searchQuery = query
     if (query && this.groups.length > 0) {
-      // Select root group when searching
+      // Search spans all groups; pin selection to root so the list stays coherent
       this.selectedGroupId = this.groups[0].uuid
       this.selectedEntryId = null
     }
@@ -276,18 +224,15 @@ class Store extends BaseStore {
   private updateFilteredEntries() {
     if (this.searchQuery) {
       const query = lowerCase(this.searchQuery)
-      const allEntries: KdbxEntry[] = []
+      const allEntries = flatten(map(this.groups, (group) => group.entries))
 
-      this.groups.forEach((group) => {
-        allEntries.push(...group.entries)
-      })
-
-      this.filteredEntries = allEntries.filter(
+      this.filteredEntries = filter(
+        allEntries,
         (entry) =>
-          lowerCase(entry.title).includes(query) ||
-          lowerCase(entry.username).includes(query) ||
-          lowerCase(entry.url).includes(query) ||
-          lowerCase(entry.notes).includes(query)
+          contain(lowerCase(entry.title), query) ||
+          contain(lowerCase(entry.username), query) ||
+          contain(lowerCase(entry.url), query) ||
+          contain(lowerCase(entry.notes), query)
       )
       return
     }
@@ -305,7 +250,6 @@ class Store extends BaseStore {
     this.showPassword = !this.showPassword
   }
 
-  // Entry operations
   createEntry(groupId: string, title: string) {
     if (!this.db) return
 
@@ -350,7 +294,6 @@ class Store extends BaseStore {
     this.selectedEntryId = null
   }
 
-  // Group operations
   createGroup(parentGroupId: string, name: string) {
     if (!this.db) return
 
@@ -396,13 +339,6 @@ class Store extends BaseStore {
         this.filteredEntries,
         (entry) => entry.uuid === this.selectedEntryId
       ) || null
-    )
-  }
-
-  get selectedGroup(): KdbxGroup | null {
-    if (!this.selectedGroupId) return null
-    return (
-      find(this.groups, (group) => group.uuid === this.selectedGroupId) || null
     )
   }
 }

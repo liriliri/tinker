@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, Trash2 } from 'lucide-react'
 import TextInput from 'share/components/TextInput'
 import { tw } from 'share/theme'
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSpacer,
+  TOOLBAR_ICON_SIZE,
+} from 'share/components/Toolbar'
 import store from '../store'
 import CopyButton from 'share/components/CopyButton'
 import { confirm } from 'share/components/Confirm'
@@ -54,19 +60,17 @@ export default observer(function EntryDetail() {
     : '••••••••'
 
   return (
-    <div className={`h-full overflow-y-auto ${tw.bg.tertiary}`}>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-base font-semibold truncate">{entry.title}</h2>
-          <button
-            onClick={handleDelete}
-            className={`p-2 rounded ${tw.hover} text-red-600 dark:text-red-400 flex-shrink-0`}
-            title={t('deleteEntry')}
-          >
-            <Trash2 size={16} />
-          </button>
+    <div className={`h-full flex flex-col min-h-0 ${tw.bg.tertiary}`}>
+      <Toolbar>
+        <div className="text-xs font-semibold px-2 truncate min-w-0">
+          {entry.title}
         </div>
-
+        <ToolbarSpacer />
+        <ToolbarButton onClick={handleDelete} title={t('deleteEntry')}>
+          <Trash2 size={TOOLBAR_ICON_SIZE} />
+        </ToolbarButton>
+      </Toolbar>
+      <div className="flex-1 min-h-0 overflow-y-auto p-4">
         <div className="space-y-4">
           <div className="flex flex-col gap-1.5">
             <label className={`text-xs font-medium ${tw.text.secondary}`}>

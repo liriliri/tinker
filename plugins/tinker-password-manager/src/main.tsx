@@ -49,7 +49,6 @@ const App = observer(function App() {
                   defaultLayout={defaultLayout}
                   onLayoutChange={onLayoutChange}
                 >
-                  {/* Left Panel - Groups */}
                   <Panel id="left" minSize={200}>
                     <div
                       className={`h-full ${tw.bg.tertiary} overflow-y-auto overflow-x-hidden`}
@@ -60,7 +59,6 @@ const App = observer(function App() {
 
                   <Separator />
 
-                  {/* Center Panel - Entry List */}
                   <Panel id="center" minSize={300}>
                     <div className="h-full overflow-hidden">
                       <EntryList />
@@ -69,7 +67,6 @@ const App = observer(function App() {
 
                   <Separator />
 
-                  {/* Right Panel - Entry Detail */}
                   <Panel id="right" minSize={300}>
                     <div className="h-full overflow-hidden">
                       <EntryDetail />

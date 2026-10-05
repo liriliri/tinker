@@ -1,9 +1,6 @@
 {
   "welcomeTitle": "欢迎使用密码管理器",
   "welcomeDescription": "安全存储和管理您的密码，基于 KeePass 实现。",
-  "open": "打开",
-  "removeFromRecent": "从最近记录中移除",
-  "fileNotFound": "文件未找到",
   "newDatabase": "新建数据库",
   "openDatabase": "打开数据库",
   "saveDatabase": "保存数据库",

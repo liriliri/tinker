@@ -4,6 +4,7 @@ import { Save, X, Plus, FolderPlus, Folder } from 'lucide-react'
 import {
   Toolbar as ToolbarComponent,
   ToolbarSeparator,
+  ToolbarSpacer,
   ToolbarSearch,
   TOOLBAR_ICON_SIZE,
   ToolbarButton,
@@ -27,7 +28,7 @@ export default observer(function Toolbar() {
 
     const title = await prompt({
       title: t('newEntry'),
-      defaultValue: 'New Entry',
+      defaultValue: t('newEntry'),
     })
 
     if (!title) return
@@ -40,7 +41,7 @@ export default observer(function Toolbar() {
 
     const name = await prompt({
       title: t('newGroup'),
-      defaultValue: 'New Group',
+      defaultValue: t('newGroup'),
     })
 
     if (!name) return
@@ -99,11 +100,11 @@ export default observer(function Toolbar() {
         className="-ml-2"
       />
 
-      <div className="flex items-center gap-2 ml-auto">
-        <ToolbarButton onClick={handleLock} title={t('lockDatabase')}>
-          <X size={TOOLBAR_ICON_SIZE} />
-        </ToolbarButton>
-      </div>
+      <ToolbarSpacer />
+
+      <ToolbarButton onClick={handleLock} title={t('lockDatabase')}>
+        <X size={TOOLBAR_ICON_SIZE} />
+      </ToolbarButton>
     </ToolbarComponent>
   )
 })

@@ -41,6 +41,7 @@ import fullscreen from 'licia/fullscreen'
 import has from 'licia/has'
 import hex from 'licia/hex'
 import isArr from 'licia/isArr'
+import isArrBuffer from 'licia/isArrBuffer'
 import isBool from 'licia/isBool'
 import isDataUrl from 'licia/isDataUrl'
 import isEmpty from 'licia/isEmpty'
@@ -90,6 +91,7 @@ import reduce from 'licia/reduce'
 import remove from 'licia/remove'
 import replaceAll from 'licia/replaceAll'
 import rtrim from 'licia/rtrim'
+import safeGet from 'licia/safeGet'
 import shuffle from 'licia/shuffle'
 import sleep from 'licia/sleep'
 import snakeCase from 'licia/snakeCase'
@@ -159,6 +161,7 @@ const licia = {
   has,
   hex,
   isArr,
+  isArrBuffer,
   isBool,
   isDataUrl,
   isEmpty,
@@ -208,6 +211,7 @@ const licia = {
   remove,
   replaceAll,
   rtrim,
+  safeGet,
   shuffle,
   sleep,
   snakeCase,
@@ -281,6 +285,7 @@ export {
   has,
   hex,
   isArr,
+  isArrBuffer,
   isBool,
   isDataUrl,
   isEmpty,
@@ -330,6 +335,7 @@ export {
   remove,
   replaceAll,
   rtrim,
+  safeGet,
   shuffle,
   sleep,
   snakeCase,

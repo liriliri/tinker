@@ -1,9 +1,6 @@
 {
   "welcomeTitle": "Welcome to Password Manager",
   "welcomeDescription": "Securely store and manage your passwords, powered by KeePass.",
-  "open": "Open",
-  "removeFromRecent": "Remove from Recent",
-  "fileNotFound": "File not found",
   "newDatabase": "New Database",
   "openDatabase": "Open Database",
   "saveDatabase": "Save Database",
