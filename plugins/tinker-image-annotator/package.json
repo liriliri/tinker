@@ -17,16 +17,5 @@
         "description": "图片标注，支持绘图、形状和文本工具"
       }
     }
-  },
-  "devDependencies": {
-    "@leafer-in/editor": "^2.0.0",
-    "@leafer-in/export": "^2.0.0",
-    "@leafer-in/resize": "^2.0.0",
-    "@leafer-in/scroll": "^2.0.0",
-    "@leafer-in/text-editor": "^2.0.0",
-    "@leafer-in/view": "^2.0.0",
-    "@leafer-in/viewport": "^2.0.0",
-    "leafer-ui": "^2.0.0",
-    "leafer-x-easy-snap": "^1.11.0"
   }
 }

@@ -17,12 +17,5 @@
         "description": "为截图添加设备边框和背景，快速生成商店展示图"
       }
     }
-  },
-  "devDependencies": {
-    "@leafer-in/editor": "^2.0.0",
-    "@leafer-in/export": "^2.0.0",
-    "@leafer-in/view": "^2.0.0",
-    "@leafer-in/viewport": "^2.0.0",
-    "leafer-ui": "^2.0.0"
   }
 }

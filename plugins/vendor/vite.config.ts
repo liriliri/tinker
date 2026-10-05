@@ -4,6 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
 import * as lucide from './lucide'
+import manualGlobalsExports from './exports'
 import keys from 'licia/keys'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -74,6 +75,15 @@ const globals: Record<string, string> = {
   '@fullcalendar/interaction': 'fullcalendarInteraction',
   '@fullcalendar/core/locales/zh-cn': 'fullcalendarLocaleZhcn',
   'js-calendar-converter': 'jsCalendarConverter',
+  'leafer-ui': 'leaferUi',
+  '@leafer-in/resize': 'leaferInResize',
+  '@leafer-in/editor': 'leaferInEditor',
+  '@leafer-in/export': 'leaferInExport',
+  '@leafer-in/scroll': 'leaferInScroll',
+  '@leafer-in/text-editor': 'leaferInTextEditor',
+  '@leafer-in/view': 'leaferInView',
+  '@leafer-in/viewport': 'leaferInViewport',
+  'leafer-x-easy-snap': 'leaferXEasySnap',
 }
 
 export const shareExternal = ['systeminformation']
@@ -88,32 +98,7 @@ const shareComponentsDir = path.resolve(__dirname, '../share/components')
 
 const globalsExports: Record<string, string[]> = {
   'lucide-react': keys(lucide),
-  '@xterm/xterm': ['Terminal'],
-  '@xterm/addon-fit': ['FitAddon'],
-  '@xterm/addon-web-links': ['WebLinksAddon'],
-  codemirror: [],
-  'pdfjs-dist': [],
-  'overlayscrollbars-react': [
-    'OverlayScrollbarsComponent',
-    'useOverlayScrollbars',
-  ],
-  '@fullcalendar/core': [
-    'Calendar',
-    'createPlugin',
-    'formatDate',
-    'formatRange',
-    'globalLocales',
-    'globalPlugins',
-    'sliceEvents',
-    'version',
-    'JsonRequestError',
-  ],
-  '@fullcalendar/react': [],
-  '@fullcalendar/daygrid': [],
-  '@fullcalendar/timegrid': [],
-  '@fullcalendar/interaction': ['Draggable', 'ThirdPartyDraggable'],
-  '@fullcalendar/core/locales/zh-cn': [],
-  'js-calendar-converter': [],
+  ...manualGlobalsExports,
 }
 
 function moduleKeys(id: string) {
@@ -455,6 +440,10 @@ export default defineConfig(({ mode }) => {
     return createConfig('calendar', 'PluginVendorCalendar', {
       external: ['react', 'react-dom', 'react/jsx-runtime'],
     })
+  }
+
+  if (target === 'leaferui') {
+    return createConfig('leaferui', 'PluginVendorLeaferUi')
   }
 
   return createConfig('react', 'PluginVendorReact')

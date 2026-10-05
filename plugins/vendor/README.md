@@ -24,5 +24,6 @@ Pre-built third-party libraries loaded as global scripts. Add `<script src="/ven
 | `cryptojs.js` | `crypto-js` |
 | `overlayscrollbars/overlayscrollbars.js` | `overlayscrollbars-react` (`OverlayScrollbarsComponent`, `useOverlayScrollbars`) |
 | `calendar.js` | `@fullcalendar/core`, `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`, `js-calendar-converter` |
+| `leaferui.js` | `leafer-ui`, `@leafer-in/editor`, `@leafer-in/export`, `@leafer-in/resize`, `@leafer-in/scroll`, `@leafer-in/text-editor`, `@leafer-in/view`, `@leafer-in/viewport`, `leafer-x-easy-snap` |
 
 See `vite.config.ts` for the full mapping of module names to global variable names.
