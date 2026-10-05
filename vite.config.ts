@@ -4,13 +4,14 @@ import fs from 'fs-extra'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 export const alias = {
   common: path.resolve(__dirname, 'src/common'),
   share: path.resolve(__dirname, 'src/share'),
 }
 
 export default defineConfig(async (): Promise<UserConfig> => {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const pkg = await fs.readJSON(path.resolve(__dirname, 'package.json'))
   return {
     base: '',

@@ -1,9 +1,12 @@
 import { defineConfig, Plugin, build as viteBuild, InlineConfig } from 'vite'
-import { resolve } from 'path'
+import path, { resolve } from 'path'
 import { builtinModules } from 'node:module'
 import fs from 'fs-extra'
+import { fileURLToPath } from 'url'
 import keys from 'licia/keys'
 import { alias } from './vite.config'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const pkg = fs.readJSONSync(resolve(__dirname, 'package.json'))
 const external = builtinModules.filter((e) => !e.startsWith('_'))
@@ -76,6 +79,9 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       external: (id) =>
         external.some((pkg) => id === pkg || id.startsWith(pkg + '/')),
+      output: {
+        chunkFileNames: '[name]-[hash].js',
+      },
     },
   },
   resolve: {

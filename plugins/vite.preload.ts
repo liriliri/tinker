@@ -2,7 +2,10 @@ import { defineConfig, UserConfig } from 'vite'
 import { builtinModules } from 'node:module'
 import fs from 'fs-extra'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import keys from 'licia/keys'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const rootPkg = fs.readJSONSync(path.resolve(__dirname, '../package.json'))
 const vendorPkg = fs.readJSONSync(
@@ -19,8 +22,7 @@ external.push(
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const cwd = process.cwd()
-  const pkgPath = path.join(cwd, 'package.json')
-  const pkg = require(pkgPath)
+  const pkg = await fs.readJSON(path.join(cwd, 'package.json'))
 
   return {
     root: cwd,

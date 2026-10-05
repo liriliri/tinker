@@ -3,8 +3,11 @@ import { resolve } from 'path'
 import { builtinModules } from 'node:module'
 import fs from 'fs-extra'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import keys from 'licia/keys'
 import { alias } from './vite.config'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const pkg = fs.readJSONSync(path.resolve(__dirname, 'package.json'))
 const external = builtinModules.filter((e) => !e.startsWith('_'))
@@ -42,6 +45,17 @@ function lazyImportWrap(): Plugin {
   }
 }
 
+function writeDistPackageJson(): Plugin {
+  return {
+    name: 'write-dist-package-json',
+    writeBundle() {
+      fs.writeJSONSync(path.resolve(__dirname, 'dist/package.json'), {
+        type: 'commonjs',
+      })
+    },
+  }
+}
+
 export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   const pkg = await fs.readJSON(path.resolve(__dirname, 'package.json'))
   return {
@@ -56,10 +70,14 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
         },
         name: 'Main',
         formats: ['cjs'],
+        fileName: (_format, entryName) => `${entryName}.js`,
       },
       rollupOptions: {
         external: (id) =>
           external.some((pkg) => id === pkg || id.startsWith(pkg + '/')),
+        output: {
+          chunkFileNames: '[name]-[hash].js',
+        },
       },
     },
     resolve: {
@@ -70,6 +88,6 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       PRODUCT_NAME: JSON.stringify(pkg.productName),
       VERSION: JSON.stringify(pkg.version),
     },
-    plugins: [lazyImportWrap()],
+    plugins: [lazyImportWrap(), writeDistPackageJson()],
   }
 })

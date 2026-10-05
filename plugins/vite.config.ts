@@ -1,4 +1,5 @@
 import { defineConfig, UserConfig } from 'vite'
+import fs from 'fs-extra'
 import path from 'path'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
@@ -6,8 +7,7 @@ import { shareDeps, globalsExternalPlugin } from './vendor/vite.config'
 
 export default defineConfig(async (): Promise<UserConfig> => {
   const cwd = process.cwd()
-  const pkgPath = path.join(cwd, 'package.json')
-  const pkg = require(pkgPath)
+  const pkg = await fs.readJSON(path.join(cwd, 'package.json'))
 
   return {
     root: cwd,

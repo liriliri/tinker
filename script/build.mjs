@@ -27,6 +27,7 @@ each(optionalDependencies, (name) => {
 delete pkg.optionalDependencies
 delete pkg.scripts
 delete pkg.workspaces
+delete pkg.type
 pkg.scripts = {
   start: 'electron main/bootstrap.js',
 }
