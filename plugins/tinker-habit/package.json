@@ -68,7 +68,7 @@
           }
         },
         "update": {
-          "description": "Update a habit by id. Omitted fields keep current values.",
+          "description": "Update a habit by id. Omitted fields keep current values. Ended habits cannot be edited.",
           "inputSchema": {
             "type": "object",
             "properties": {

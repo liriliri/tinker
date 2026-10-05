@@ -82,6 +82,10 @@ export class Store extends BaseStore {
   }
 
   openHabitDialog(habitId?: string) {
+    if (habitId) {
+      const habit = this.getHabitById(habitId)
+      if (!habit || habit.endedAt) return
+    }
     this.editingHabitId = habitId || null
     this.dialogOpen = true
   }
@@ -106,9 +110,11 @@ export class Store extends BaseStore {
     if (idx === -1) return
 
     const existing = this.habits[idx]
+    if (existing.endedAt) return
+
     const updated: Habit = {
       ...toHabit(id, data, existing.createdAt),
-      endedAt: existing.endedAt,
+      endedAt: null,
     }
 
     this.habits = map(this.habits, (item, i) => (i === idx ? updated : item))

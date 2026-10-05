@@ -103,6 +103,11 @@ function addHabit(store: Store, args: HabitArgs) {
 
 function updateHabit(store: Store, args: HabitArgs & { id: string }) {
   const existing = requireHabit(store, args.id)
+  if (existing.endedAt) {
+    throw new Error(
+      `Habit with id "${args.id}" has ended and cannot be edited.`
+    )
+  }
   const data = parseHabitForm(args, existing)
   store.updateHabit(args.id, data)
   return listHabits(store)

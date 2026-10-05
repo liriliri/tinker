@@ -5,7 +5,7 @@ import className from 'licia/className'
 import contain from 'licia/contain'
 import filter from 'licia/filter'
 import map from 'licia/map'
-import { Check, Calendar, List, Pause, Pencil, Trash2 } from 'lucide-react'
+import { Check, Calendar, List, Pencil, Square, Trash2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
 import { tw } from 'share/theme'
@@ -93,13 +93,12 @@ function HabitRow({ habit, onEdit, onEnd, onDelete }: HabitRowProps) {
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault()
-    const items: MenuItemConstructorOptions[] = [
-      {
+    const items: MenuItemConstructorOptions[] = []
+    if (!ended) {
+      items.push({
         label: t('editHabit'),
         click: onEdit,
-      },
-    ]
-    if (!ended) {
+      })
       items.push({
         label: t('endHabit'),
         click: onEnd,
@@ -115,19 +114,16 @@ function HabitRow({ habit, onEdit, onEnd, onDelete }: HabitRowProps) {
   return (
     <div
       className={className(
-        'rounded-md border px-2.5 py-2',
+        'rounded-md border border-l-4 px-2.5 py-2',
         tw.border,
         tw.bg.primary,
         ended && 'opacity-70'
       )}
+      style={{ borderLeftColor: habit.color }}
       onContextMenu={handleContextMenu}
-      onDoubleClick={onEdit}
+      onDoubleClick={ended ? undefined : onEdit}
     >
       <div className="flex items-start gap-2">
-        <span
-          className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
-          style={{ backgroundColor: habit.color }}
-        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className={`text-sm truncate ${tw.text.primary}`}>
@@ -144,41 +140,27 @@ function HabitRow({ habit, onEdit, onEnd, onDelete }: HabitRowProps) {
           <div className={`text-[11px] mt-0.5 ${tw.text.tertiary}`}>
             {scheduleLabel(habit, t)}
           </div>
-          <div
-            className={`flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] mt-1.5 ${tw.text.secondary}`}
-          >
-            <span>
-              {t('completionRate')}: {formatRate(stats.rate)}
-            </span>
-            <span>
-              {t('streak')}: {stats.streak}
-            </span>
-            <span>
-              {t('periodProgress', {
-                done: stats.period.done,
-                target: stats.period.target,
-              })}
-            </span>
-          </div>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
-          <button
-            type="button"
-            className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
-            title={t('editHabit')}
-            onClick={onEdit}
-          >
-            <Pencil size={14} />
-          </button>
           {!ended && (
-            <button
-              type="button"
-              className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
-              title={t('endHabit')}
-              onClick={onEnd}
-            >
-              <Pause size={14} />
-            </button>
+            <>
+              <button
+                type="button"
+                className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
+                title={t('editHabit')}
+                onClick={onEdit}
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                type="button"
+                className={`p-1 rounded ${tw.hover} ${tw.text.secondary}`}
+                title={t('endHabit')}
+                onClick={onEnd}
+              >
+                <Square size={14} fill="currentColor" />
+              </button>
+            </>
           )}
           <button
             type="button"
@@ -189,6 +171,26 @@ function HabitRow({ habit, onEdit, onEnd, onDelete }: HabitRowProps) {
             <Trash2 size={14} />
           </button>
         </div>
+      </div>
+      <div
+        className={`flex items-baseline justify-between gap-x-3 text-[11px] mt-1.5 ${tw.text.secondary}`}
+      >
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5 min-w-0">
+          <span>
+            {t('completionRate')}: {formatRate(stats.rate)}
+          </span>
+          {habit.scheduleType !== 'weekdays' && (
+            <span>
+              {t('periodProgress', {
+                done: stats.period.done,
+                target: stats.period.target,
+              })}
+            </span>
+          )}
+        </div>
+        <span className="shrink-0">
+          {t('streak')}: {stats.streak}
+        </span>
       </div>
     </div>
   )
