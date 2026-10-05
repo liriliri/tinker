@@ -1,20 +1,29 @@
-import { spawn, exec, ChildProcess } from 'child_process'
+import { spawn, exec, execFile, ChildProcess } from 'child_process'
 import { pathExists, mkdirs, writeFile } from 'fs-extra'
 import { join } from 'path'
 import trim from 'licia/trim'
 import sleep from 'licia/sleep'
 import map from 'licia/map'
 import mainObj from 'share/preload/main'
-import { resolveResources } from '../util'
+import { decodeStr, resolveResources } from '../util'
 import { SearchFileResult } from './index'
 
 const esPath = resolveResources('everything/es.exe')
 const everythingPath = resolveResources('everything/everything.exe')
 
+interface EsJsonItem {
+  filename?: string
+  size?: number
+  date_modified?: number
+}
+
+let ensuring: Promise<void> | null = null
+
 function isEverythingReady(): Promise<boolean> {
   return new Promise((resolve) => {
-    exec(
-      `"${esPath}" -get-everything-version`,
+    execFile(
+      esPath,
+      ['-get-everything-version'],
       { windowsHide: true },
       (error, stdout) => {
         resolve(!error && trim(stdout).length > 0)
@@ -23,21 +32,25 @@ function isEverythingReady(): Promise<boolean> {
   })
 }
 
-async function ensureEverythingRunning(): Promise<void> {
+async function startEverything(): Promise<void> {
   const ready = await isEverythingReady()
   if (ready) return
 
   const userData: string = await mainObj.getPath('userData')
   const dataDir = join(userData, 'data/everything')
   const iniPath = join(dataDir, 'Everything.ini')
+  const dbPath = join(dataDir, 'Everything.db')
 
   if (!(await pathExists(iniPath))) {
     await mkdirs(dataDir)
-    await writeFile(iniPath, '[Everything]\r\nshow_tray_icon=0\r\n')
+    await writeFile(
+      iniPath,
+      `[Everything]\r\nshow_tray_icon=0\r\ndb_location=${dataDir}\r\n`
+    )
   }
 
   exec(
-    `powershell -Command "Start-Process -FilePath '${everythingPath}' -ArgumentList '-startup','-config','${iniPath}' -WindowStyle Hidden"`,
+    `powershell -Command "Start-Process -FilePath '${everythingPath}' -ArgumentList '-startup','-config','${iniPath}','-db','${dbPath}' -Verb RunAs -WindowStyle Hidden"`,
     { windowsHide: true }
   )
 
@@ -47,11 +60,15 @@ async function ensureEverythingRunning(): Promise<void> {
   }
 }
 
-function escapeForCmd(str: string): string {
-  return str.replace(/([\\&|><^])/g, '^$1')
+function ensureEverythingRunning(): Promise<void> {
+  if (!ensuring) {
+    ensuring = startEverything().finally(() => {
+      ensuring = null
+    })
+  }
+  return ensuring
 }
 
-// Convert Windows FILETIME (100ns since 1601-01-01) to Unix timestamp (ms)
 function filetimeToTimestamp(filetime: number): number {
   return Math.floor(filetime / 10000) - 11644473600000
 }
@@ -65,7 +82,6 @@ export async function searchFile(
 ): Promise<{ process: ChildProcess; promise: Promise<SearchFileResult[]> }> {
   await ensureEverythingRunning()
 
-  const escaped = escapeForCmd(query)
   const args = [
     '-json',
     '-size',
@@ -76,35 +92,42 @@ export async function searchFile(
     String(maxResults),
   ]
 
-  if (dirs && dirs.length > 0) {
+  if (dirs) {
     for (const dir of dirs) {
       args.push('-parent-path', dir)
     }
   }
 
-  args.push(escaped)
+  args.push(query)
 
   if (exts && exts.length > 0) {
     args.push(`ext:${exts.join(';')}`)
   }
 
   const esProcess = spawn(esPath, args, { windowsHide: true })
-  let stdoutData = ''
+  const chunks: Buffer[] = []
 
   const promise = new Promise<SearchFileResult[]>((resolve) => {
     esProcess.stdout?.on('data', (data: Buffer) => {
-      stdoutData += data.toString()
+      chunks.push(data)
     })
 
     esProcess.on('close', () => {
       try {
-        const items = JSON.parse(stdoutData)
-        const results: SearchFileResult[] = map(items, (item: any) => ({
-          path: item.filename,
-          size: item.size || 0,
-          dateModified: filetimeToTimestamp(item.date_modified),
-        }))
-        resolve(results)
+        const items = JSON.parse(
+          decodeStr(Buffer.concat(chunks).toString('latin1'))
+        ) as EsJsonItem[]
+        if (!Array.isArray(items)) {
+          resolve([])
+          return
+        }
+        resolve(
+          map(items, (item) => ({
+            path: item.filename || '',
+            size: item.size || 0,
+            dateModified: filetimeToTimestamp(item.date_modified || 0),
+          }))
+        )
       } catch {
         resolve([])
       }
