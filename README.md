@@ -375,6 +375,14 @@ TINKER integrates a rich set of high-quality built-in plugins to help you effici
       <th><img src="https://tinker.liriliri.io/habit.png"/></th>
       <th><img src="https://tinker.liriliri.io/webapp.png"/></th>
     </tr>
+    <tr>
+      <th>AI Image</th>
+      <th>Screenshot Mockup</th>
+    </tr>
+    <tr>
+      <th><img src="https://tinker.liriliri.io/ai_image.png"/></th>
+      <th><img src="https://tinker.liriliri.io/screenshot_mockup.png"/></th>
+    </tr>
   </tbody>
 </table>
 
