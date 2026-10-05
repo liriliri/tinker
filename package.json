@@ -107,7 +107,7 @@
     "shell-path": "^3.1.0",
     "terser": "^5.48.0",
     "typescript-eslint": "^8.39.0",
-    "vite": "npm:rolldown-vite@7.3.1",
+    "vite": "^7.3.6",
     "vite-plugin-svgr": "^4.5.0",
     "zod": "^4.3.6",
     "zx": "^8.8.5"
