@@ -1,3 +1,11 @@
+## v3.4.0 (5 Oct 2026)
+
+* feat: add ai image
+* feat: add screenshot mockup
+* feat: search arrow key icon navigation
+* feat: improve ai model selector
+* fix: windows file search not working
+
 ## v3.3.0 (1 Oct 2026)
 
 * feat: add webapp
