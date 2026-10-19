@@ -8,6 +8,7 @@ import map from 'licia/map'
 import { Check, Calendar, List, Pencil, Square, Trash2 } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
+import { showContextMenu } from 'share/components/ContextMenu'
 import { tw } from 'share/theme'
 import { formatRate, WEEKDAY_ORDER } from '../lib/habit'
 import store from '../store'
@@ -108,7 +109,7 @@ function HabitRow({ habit, onEdit, onEnd, onDelete }: HabitRowProps) {
       label: t('deleteHabit'),
       click: onDelete,
     })
-    tinker.showContextMenu(event.clientX, event.clientY, items)
+    showContextMenu(event.clientX, event.clientY, items)
   }
 
   return (

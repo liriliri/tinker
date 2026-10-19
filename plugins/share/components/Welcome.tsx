@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { tw } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
+import { showContextMenu } from './ContextMenu'
 
 const I18N_NS = 'welcome'
 
@@ -45,7 +46,7 @@ const Welcome: React.FC<WelcomeProps> = ({
 
   const handleContextMenu = (e: React.MouseEvent, path: string) => {
     e.preventDefault()
-    tinker.showContextMenu(e.clientX, e.clientY, [
+    showContextMenu(e.clientX, e.clientY, [
       { label: t('open'), click: () => onOpenRecent(path) },
       { label: t('showInFolder'), click: () => tinker.showItemInPath(path) },
       { type: 'separator' },

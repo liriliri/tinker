@@ -7,6 +7,11 @@ import { EXECUTABLE_EXTS } from './fileType'
 
 const sep = isWindows ? '\\' : '/'
 
+/** True in a plain browser, where the Electron `tinker` global is absent. */
+export function isOnline(): boolean {
+  return typeof tinker === 'undefined'
+}
+
 export function joinPath(...parts: string[]): string {
   return compact(parts).join(sep)
 }

@@ -84,6 +84,7 @@ Simple components — import and use directly:
 
 | Component                         | Import                            |
 | --------------------------------- | --------------------------------- |
+| ContextMenu (`showContextMenu`)   | `share/components/ContextMenu`    |
 | CopyButton                        | `share/components/CopyButton`     |
 | Tooltip                           | `share/components/Tooltip`        |
 | ZoomControls                      | `share/components/ZoomControls`   |

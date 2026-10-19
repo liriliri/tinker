@@ -3,6 +3,7 @@ import type { MenuItemConstructorOptions } from 'electron'
 import { GripVertical } from 'lucide-react'
 import className from 'licia/className'
 import { tw } from '../theme'
+import { showContextMenu } from './ContextMenu'
 
 export interface NavListItem {
   id: string
@@ -48,7 +49,7 @@ export default function NavList({
         const handleContextMenu = (e: React.MouseEvent) => {
           if (!item.menu) return
           e.preventDefault()
-          tinker.showContextMenu(e.clientX, e.clientY, item.menu())
+          showContextMenu(e.clientX, e.clientY, item.menu())
         }
 
         return (

@@ -1,4 +1,5 @@
 import type { MenuItemConstructorOptions } from 'electron'
+import { showContextMenu } from 'share/components/ContextMenu'
 import type { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -35,7 +36,7 @@ export function showStickyEditorContextMenu(
   if (editor.state.selection.empty) return
 
   event.preventDefault()
-  tinker.showContextMenu(event.clientX, event.clientY, [
+  showContextMenu(event.clientX, event.clientY, [
     {
       label: t('bold'),
       type: 'checkbox',

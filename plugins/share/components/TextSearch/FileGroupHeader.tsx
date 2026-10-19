@@ -8,6 +8,7 @@ import type { TextSearchFileGroup } from '../../lib/textSearch'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './i18n'
 import { TEXT_SEARCH_ROW_HEIGHT } from './rows'
+import { showContextMenu } from '../ContextMenu'
 
 interface FileGroupHeaderProps {
   group: TextSearchFileGroup
@@ -28,7 +29,7 @@ function FileGroupHeader({ group, collapsed }: FileGroupHeaderProps) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    tinker.showContextMenu(e.clientX, e.clientY, [
+    showContextMenu(e.clientX, e.clientY, [
       {
         label: t('showInFolder'),
         click: () => onShowInFolder(group.path),

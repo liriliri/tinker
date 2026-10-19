@@ -5,6 +5,7 @@ import truncate from 'licia/truncate'
 import clamp from 'licia/clamp'
 import { tw } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
+import { showContextMenu } from './ContextMenu'
 
 const I18N_NS = 'pathBar'
 
@@ -200,7 +201,7 @@ export default function PathBar({
     const hidden = items.slice(0, startIndex)
     if (hidden.length === 0) return
 
-    tinker.showContextMenu(
+    showContextMenu(
       event.clientX,
       event.clientY,
       hidden.map((item) => ({

@@ -4,7 +4,8 @@
   "description": "Text comparison with side-by-side diff and syntax highlighting",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "build": "vite build --config ../vite.config.ts",
+    "build:web": "npm run build && zx ../../script/web.mjs --copy"
   },
   "tinker": {
     "name": "Text Diff",

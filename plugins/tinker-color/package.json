@@ -4,7 +4,8 @@
   "description": "Color picker with format conversion and harmony schemes",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "build": "vite build --config ../vite.config.ts",
+    "build:web": "npm run build && zx ../../script/web.mjs --copy"
   },
   "tinker": {
     "name": "Color",

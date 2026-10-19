@@ -11,6 +11,7 @@ import AiIcon from '../assets/ai.svg?react'
 import type { MenuItemConstructorOptions } from 'electron'
 import { tw } from '../theme'
 import { useAutoFocus } from '../hooks/useAutoFocus'
+import { showContextMenu } from './ContextMenu'
 
 interface ToolbarProps {
   children: ReactNode
@@ -54,9 +55,9 @@ export function ToolbarButton({
       ? `${tw.primary.bg} text-white ${tw.primary.bgHover}`
       : `${tw.hover} disabled:opacity-30 disabled:cursor-not-allowed`
 
-  const showContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
+  const openMenu = (event: MouseEvent<HTMLButtonElement>) => {
     if (!menu || menu.length === 0) return
-    tinker.showContextMenu(event.clientX, event.clientY, menu)
+    showContextMenu(event.clientX, event.clientY, menu)
   }
 
   const handleMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
@@ -64,7 +65,7 @@ export function ToolbarButton({
       isLongPressRef.current = false
       longPressTimerRef.current = window.setTimeout(() => {
         isLongPressRef.current = true
-        showContextMenu(event)
+        openMenu(event)
       }, longPressDuration)
     }
     onMouseDown?.(event)
@@ -95,14 +96,14 @@ export function ToolbarButton({
     if (onClick) {
       onClick(event)
     } else if (menu) {
-      showContextMenu(event)
+      openMenu(event)
     }
   }
 
   const handleContextMenu = (event: MouseEvent<HTMLButtonElement>) => {
     if (menu) {
       event.preventDefault()
-      showContextMenu(event)
+      openMenu(event)
     }
     onContextMenu?.(event)
   }

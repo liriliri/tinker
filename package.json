@@ -22,6 +22,7 @@
     "build:main": "vite build --config vite.main.ts",
     "build:preload": "vite build --config vite.preload.ts",
     "build:plugin": "cd plugins/vendor && npm run build && cd ../../ && lerna run build",
+    "build:web": "zx script/web.mjs",
     "pack": "zx script/pack.mjs",
     "minify": "zx script/minify.mjs",
     "start": "electron ./dist/main/bootstrap.js --inspect=9229 --remote-debugging-port=9222",

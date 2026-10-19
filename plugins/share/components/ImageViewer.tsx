@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import debounce from 'licia/debounce'
 import clamp from 'licia/clamp'
 import { addI18nNamespace } from '../lib/i18n'
+import { showContextMenu } from './ContextMenu'
 
 const I18N_NS = 'imageViewer'
 
@@ -371,7 +372,7 @@ const ImageViewer = forwardRef<ImageViewerHandle, ImageViewerProps>(
           return
         }
         if (!isLoaded.current) return
-        tinker.showContextMenu(e.clientX, e.clientY, [
+        showContextMenu(e.clientX, e.clientY, [
           { label: t('rotateLeft'), click: () => rotateBy(-90) },
           { label: t('rotateRight'), click: () => rotateBy(90) },
           { type: 'separator' },

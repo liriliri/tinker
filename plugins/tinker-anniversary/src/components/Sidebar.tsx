@@ -6,6 +6,7 @@ import className from 'licia/className'
 import { Heart } from 'lucide-react'
 import { confirm } from 'share/components/Confirm'
 import OverlayScrollbars from 'share/components/OverlayScrollbars'
+import { showContextMenu } from 'share/components/ContextMenu'
 import { tw } from 'share/theme'
 import { HOLIDAYS_NS } from 'share/lib/holidays'
 import { formatAnniversaryDateLabel } from '../lib/anniversary'
@@ -194,7 +195,7 @@ const Sidebar = observer(() => {
         },
       },
     ]
-    tinker.showContextMenu(event.clientX, event.clientY, menuItems)
+    showContextMenu(event.clientX, event.clientY, menuItems)
   }
 
   const formatStartYearLunar = (year: number, lunarLabel: string) =>

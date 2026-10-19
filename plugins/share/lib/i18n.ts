@@ -1,5 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { isOnline } from './util'
 
 interface Locales {
   'en-US': object
@@ -22,6 +23,11 @@ function applyNamespace(
   }
 }
 
+function languageFromIntl() {
+  const locale = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase()
+  return locale.startsWith('zh') ? 'zh-CN' : 'en-US'
+}
+
 export async function initI18n(locales: Locales) {
   i18n.use(initReactI18next).init({
     resources: {
@@ -38,7 +44,7 @@ export async function initI18n(locales: Locales) {
   }
   pendingNamespaces.length = 0
 
-  const language = await tinker.getLanguage()
+  const language = isOnline() ? languageFromIntl() : await tinker.getLanguage()
   i18n.changeLanguage(language)
 }
 

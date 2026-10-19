@@ -6,6 +6,7 @@ import type { TextSearchSegment } from '../../lib/textSearch'
 import { useTextSearchContext } from './context'
 import { TEXT_SEARCH_NS } from './i18n'
 import { TEXT_SEARCH_ROW_HEIGHT } from './rows'
+import { showContextMenu } from '../ContextMenu'
 
 interface MatchLineProps {
   filePath: string
@@ -28,7 +29,7 @@ function MatchLine({ filePath, result, segments, isActive }: MatchLineProps) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    tinker.showContextMenu(e.clientX, e.clientY, [
+    showContextMenu(e.clientX, e.clientY, [
       {
         label: t('copyLine'),
         click: () => {

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { Clock, Eraser, ListX, Loader2, Plus, Unlink, Wifi } from 'lucide-react'
+import { showContextMenu } from 'share/components/ContextMenu'
 import { tw } from 'share/theme'
 import {
   Toolbar,
@@ -52,7 +53,7 @@ export default observer(function ConnectionList() {
     e.preventDefault()
     e.stopPropagation()
     store.selectConnection(id)
-    tinker.showContextMenu(e.clientX, e.clientY, [
+    showContextMenu(e.clientX, e.clientY, [
       {
         label: t('disconnect'),
         enabled: canDisconnect,

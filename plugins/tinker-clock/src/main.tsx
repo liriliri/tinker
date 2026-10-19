@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import fullscreen from 'licia/fullscreen'
+import { showContextMenu } from 'share/components/ContextMenu'
 import { tw } from 'share/theme'
 import store from './store'
 import AnalogClock from './components/AnalogClock'
@@ -17,7 +18,7 @@ const App = observer(function App() {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    tinker.showContextMenu(e.clientX, e.clientY, [
+    showContextMenu(e.clientX, e.clientY, [
       {
         label: t('flipClock'),
         type: 'checkbox',

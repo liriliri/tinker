@@ -12,6 +12,7 @@ import { tw, THEME_COLORS } from '../../theme'
 import { FILE_TREE_NS } from './i18n'
 import InlineInput from './InlineInput'
 import type { ITreeNode, FileTreeProps } from './types'
+import { showContextMenu } from '../ContextMenu'
 
 interface TreeNodeItemProps {
   node: ITreeNode
@@ -196,7 +197,7 @@ function TreeNodeItem({
     )
 
     if (items.length > 0) {
-      tinker.showContextMenu(e.clientX, e.clientY, items)
+      showContextMenu(e.clientX, e.clientY, items)
     }
   }
 
@@ -388,7 +389,7 @@ export default function FileTree({
       items.push({ type: 'separator' }, ...customItems)
     }
 
-    tinker.showContextMenu(e.clientX, e.clientY, items)
+    showContextMenu(e.clientX, e.clientY, items)
   }
 
   const handleRootCreateSubmit = async (name: string) => {

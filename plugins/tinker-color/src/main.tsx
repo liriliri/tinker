@@ -26,11 +26,13 @@ const App = observer(function App() {
 
           {/* Right sidebar - Color Info Blocks */}
           <OverlayScrollbars
-            className={`w-[400px] flex-shrink-0 flex flex-col gap-6 ${tw.bg.tertiary} p-6 shadow-lg border-l ${tw.border}`}
+            className={`w-[400px] flex-shrink-0 ${tw.bg.tertiary} shadow-lg border-l ${tw.border}`}
           >
-            <ColorFormats />
-            <div className={`border-t ${tw.border}`}></div>
-            <ColorSchemes />
+            <div className="flex flex-col gap-6 p-6">
+              <ColorFormats />
+              <div className={`border-t ${tw.border}`} />
+              <ColorSchemes />
+            </div>
           </OverlayScrollbars>
         </div>
       </div>

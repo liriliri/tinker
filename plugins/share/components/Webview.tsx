@@ -15,6 +15,7 @@ import { X, PanelBottom, PanelLeft, PanelRight, LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { tw } from '../theme'
 import { addI18nNamespace } from '../lib/i18n'
+import { showContextMenu } from './ContextMenu'
 
 const I18N_NS = 'webview'
 
@@ -631,7 +632,7 @@ const Webview = forwardRef<WebviewHandle, WebviewProps>(function Webview(
         }
 
         if (items.length > 0) {
-          tinker.showContextMenu(params.x, params.y, items)
+          showContextMenu(params.x, params.y, items)
         }
       })
     }

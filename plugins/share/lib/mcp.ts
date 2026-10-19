@@ -1,4 +1,5 @@
 import type { AgentTool } from './Agent'
+import { isOnline } from './util'
 
 export interface McpToolDefinition {
   description: string
@@ -128,7 +129,9 @@ export function createPluginMcpApi<TStore>(
 }
 
 export function registerPluginMcp(api: PluginMcpHandlers): PluginMcp {
-  tinker.registerMcp({ callTool: api.callTool })
+  if (!isOnline()) {
+    tinker.registerMcp({ callTool: api.callTool })
+  }
 
   return {
     callTool: api.callTool,

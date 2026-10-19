@@ -3,6 +3,7 @@ import { tw } from '../theme'
 import className from 'licia/className'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import type { MenuItemConstructorOptions } from 'electron'
+import { showContextMenu } from './ContextMenu'
 
 export interface TreeNodeData {
   id: string
@@ -44,7 +45,7 @@ function TreeNode<T extends TreeNodeData = TreeNodeData>({
   const handleContextMenu = (e: React.MouseEvent) => {
     if (!menu) return
     e.preventDefault()
-    tinker.showContextMenu(e.clientX, e.clientY, menu(node))
+    showContextMenu(e.clientX, e.clientY, menu(node))
   }
 
   const isActive = activeNodeId === node.id
