@@ -174,7 +174,6 @@ async function writePackage(pluginDir: string, app: PackageFields) {
       name: app.name,
       main: app.url,
       category: app.category,
-      ...(app.description ? { description: app.description } : {}),
       ...(app.icon ? { icon: app.icon } : {}),
     },
     keywords: ['tinker'],

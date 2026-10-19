@@ -1,7 +1,7 @@
 {
   "name": "tinker-habit",
   "version": "0.1.0",
-  "description": "Habit check-in tracker Plugin for TINKER",
+  "description": "Track habits with weekday, weekly, or monthly schedules and view check-ins on a month calendar",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
     "build": "vite build --config ../vite.config.ts",
@@ -12,7 +12,6 @@
     "category": "productivity",
     "icon": "icon.png",
     "main": "dist/index.html",
-    "description": "Track habits with weekday, weekly, or monthly schedules and view check-ins on a month calendar",
     "locales": {
       "zh-CN": {
         "name": "习惯打卡",

@@ -42,10 +42,9 @@ Where `<source>` is either the similar plugin chosen by the user or `tinker-temp
 Edit `tinker-<plugin-name>/package.json`:
 
 - `name` → `"tinker-<plugin-name>"`
-- `description` → `"<Description> Plugin for TINKER"`
+- `description` → short English description of what the plugin does
 - `tinker.name` → Title Case English name
 - `tinker.category` → one of `dev` | `file` | `media` | `productivity` | `system` | `entertainment`
-- `tinker.description` → short English description of what the plugin does
 - `tinker.icon` → `"icon.png"`
 - `tinker.locales.zh-CN.name` → Chinese name (ask if unclear)
 - `tinker.locales.zh-CN.description` → Chinese description

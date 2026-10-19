@@ -12,7 +12,6 @@
   },
   "tinker": {
     "name": "Web Apps",
-    "description": "Add arbitrary websites as Tinker plugins",
     "category": "system",
     "main": "dist/renderer/index.html",
     "preload": "dist/preload/index.js",
