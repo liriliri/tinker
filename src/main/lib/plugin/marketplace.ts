@@ -342,6 +342,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-game-music',
+    name: 'Game Music',
+    description: 'Browse and preview video game MIDI music from VGMusic',
+    icon: 'tinker-game-music.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '游戏音乐',
+        description: '浏览并试听 VGMusic 上的游戏 MIDI 音乐',
+      },
+    },
+  },
+  {
     id: 'tinker-gamepad',
     name: 'Gamepad',
     description: 'Test and visualize gamepad inputs',
@@ -364,6 +377,20 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: 'GBA',
         description: '运行 Game Boy Advance 游戏',
+      },
+    },
+  },
+  {
+    id: 'tinker-geometry-fighter',
+    name: 'Geometry Fighter',
+    description:
+      'Twin-stick geometry shooter — survive escalating swarms, chain multipliers, clear the grid!',
+    icon: 'tinker-geometry-fighter.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '几何战机',
+        description: '双摇杆几何射击——扛住越来越猛的敌潮，叠倍率清场！',
       },
     },
   },
