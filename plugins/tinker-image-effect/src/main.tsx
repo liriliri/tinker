@@ -6,6 +6,7 @@ import startWith from 'licia/startWith'
 import toArr from 'licia/toArr'
 import { tw } from 'share/theme'
 import ImageOpen from 'share/components/ImageOpen'
+import { droppedFilePath } from 'share/lib/util'
 import store from './store'
 import Toolbar from './components/Toolbar'
 import ImagePreview from './components/ImagePreview'
@@ -38,7 +39,7 @@ const App = observer(function App() {
     }
 
     try {
-      const filePath = tinker.getPathForFile(file) || undefined
+      const filePath = droppedFilePath(file)
       await store.loadImage(file, filePath)
     } catch (err) {
       console.error('Failed to load image:', err)

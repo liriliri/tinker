@@ -13,6 +13,22 @@ export function isOnline(): boolean {
   return typeof tinker === 'undefined'
 }
 
+export function droppedFilePath(file: File): string | undefined {
+  if (isOnline()) return
+  return tinker.getPathForFile(file) || undefined
+}
+
+export async function readImageBytes(
+  file: File,
+  filePath?: string
+): Promise<Uint8Array> {
+  if (filePath && !isOnline()) {
+    return new Uint8Array(await tinker.readFile(filePath))
+  }
+
+  return new Uint8Array(await file.arrayBuffer())
+}
+
 export function joinPath(...parts: string[]): string {
   return compact(parts).join(sep)
 }

@@ -12,6 +12,7 @@ import {
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import i18n from 'i18next'
 import dateFormat from 'licia/dateFormat'
+import download from 'licia/download'
 import each from 'licia/each'
 import isBool from 'licia/isBool'
 import isErr from 'licia/isErr'
@@ -21,7 +22,12 @@ import toStr from 'licia/toStr'
 import toast from 'react-hot-toast'
 import BaseStore, { storage } from 'share/store/Base'
 import { getFileExt, getMimeTypeFromPath } from 'share/lib/fileType'
-import { openImageFile, resolveSavePath } from 'share/lib/util'
+import {
+  isOnline,
+  openImageFile,
+  readImageBytes,
+  resolveSavePath,
+} from 'share/lib/util'
 import { WebGLRenderer } from './lib/renderer'
 import { createFilterAdjustments, PHOTO_FILTERS } from './lib/filters'
 import { runWhenIdle } from './lib/idle'
@@ -79,6 +85,7 @@ export class Store extends BaseStore {
     reaction(
       () => this.currentFileName,
       (fileName) => {
+        if (isOnline()) return
         tinker.setTitle(fileName || '')
       }
     )
@@ -108,9 +115,7 @@ export class Store extends BaseStore {
 
     try {
       this.isLoading = true
-      const sourceBuffer = filePath
-        ? new Uint8Array(await tinker.readFile(filePath))
-        : new Uint8Array(await file.arrayBuffer())
+      const sourceBuffer = await readImageBytes(file, filePath)
       this.jpegExifSegment = extractJpegExif(sourceBuffer)
 
       const loadResult = await this.renderer.loadImage(file)
@@ -438,6 +443,16 @@ export class Store extends BaseStore {
     if (!this.image || !this.renderer?.hasImage) return
 
     try {
+      if (isOnline()) {
+        const fileName = splitPath(this.getDefaultSavePath()).name
+        const output = await this.exportOutput(fileName)
+        download(new Blob([output.data]), fileName, output.mimeType)
+        runInAction(() => {
+          this.isSaved = true
+        })
+        return fileName
+      }
+
       let savePath: string
 
       if (this.overwriteOriginal && this.image.filePath) {
@@ -461,22 +476,8 @@ export class Store extends BaseStore {
 
         savePath = await resolveSavePath(result.filePath)
       }
-      const ext = getFileExt(savePath) || 'png'
-      const mimeType = getMimeTypeFromPath(savePath) || 'image/png'
-
-      const blob = await this.renderer.exportBlob(this.adjustments, mimeType)
-      let output = new Uint8Array(await blob.arrayBuffer())
-
-      if (
-        (ext === 'jpg' || ext === 'jpeg') &&
-        this.jpegExifSegment &&
-        output[0] === 0xff &&
-        output[1] === 0xd8
-      ) {
-        output = injectJpegExif(output, this.jpegExifSegment)
-      }
-
-      await tinker.writeFile(savePath, output)
+      const output = await this.exportOutput(savePath)
+      await tinker.writeFile(savePath, output.data)
 
       runInAction(() => {
         this.isSaved = true
@@ -487,6 +488,24 @@ export class Store extends BaseStore {
       console.error('Failed to save image:', err)
       throw err
     }
+  }
+
+  private async exportOutput(filePath: string) {
+    const ext = getFileExt(filePath) || 'png'
+    const mimeType = getMimeTypeFromPath(filePath) || 'image/png'
+    const blob = await this.renderer!.exportBlob(this.adjustments, mimeType)
+    let data = new Uint8Array(await blob.arrayBuffer())
+
+    if (
+      (ext === 'jpg' || ext === 'jpeg') &&
+      this.jpegExifSegment &&
+      data[0] === 0xff &&
+      data[1] === 0xd8
+    ) {
+      data = injectJpegExif(data, this.jpegExifSegment)
+    }
+
+    return { data, mimeType }
   }
 
   private getDefaultSavePath(): string {

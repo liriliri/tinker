@@ -7,6 +7,7 @@ import { tw } from 'share/theme'
 import Toolbar from './components/Toolbar'
 import ImageOpen from 'share/components/ImageOpen'
 import ImageCropper from './components/ImageCropper'
+import { droppedFilePath } from 'share/lib/util'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import { exportCanvas, HIGH_QUALITY_DRAW_OPTIONS } from './lib/util'
@@ -37,7 +38,7 @@ const App = observer(function App() {
     }
 
     try {
-      const filePath = tinker.getPathForFile(file) || undefined
+      const filePath = droppedFilePath(file)
       await store.loadImage(file, filePath)
     } catch (err) {
       console.error('Failed to load image:', err)

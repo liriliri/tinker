@@ -29,6 +29,7 @@ import { CropperRef } from 'react-advanced-cropper'
 import className from 'licia/className'
 import delay from 'licia/delay'
 import startWith from 'licia/startWith'
+import { isOnline } from 'share/lib/util'
 import store from '../store'
 import CropSizeDialog from './CropSizeDialog'
 import ResizeImageDialog from './ResizeImageDialog'
@@ -195,10 +196,14 @@ export default observer(function ToolbarComponent({
       <ToolbarButton
         onClick={handleOpenImage}
         menu={[
-          {
-            label: t('captureScreen'),
-            click: () => handleCaptureScreen(),
-          },
+          ...(!isOnline()
+            ? [
+                {
+                  label: t('captureScreen'),
+                  click: () => handleCaptureScreen(),
+                },
+              ]
+            : []),
           {
             label: t('pasteImage'),
             click: () => handlePasteImage(),
@@ -250,12 +255,14 @@ export default observer(function ToolbarComponent({
         <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <Checkbox
-        checked={store.overwriteOriginal}
-        onChange={handleOverwriteChange}
-      >
-        {t('overwriteOriginal')}
-      </Checkbox>
+      {!isOnline() && (
+        <Checkbox
+          checked={store.overwriteOriginal}
+          onChange={handleOverwriteChange}
+        >
+          {t('overwriteOriginal')}
+        </Checkbox>
+      )}
 
       <ToolbarSpacer />
 

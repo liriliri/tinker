@@ -10,6 +10,7 @@ import {
   ToolbarButton,
   ToolbarLabel,
 } from 'share/components/Toolbar'
+import { isOnline } from 'share/lib/util'
 import store from '../store'
 
 const ToolbarComponent = observer(function ToolbarComponent() {
@@ -65,13 +66,15 @@ const ToolbarComponent = observer(function ToolbarComponent() {
         <Save size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
 
-      <Checkbox
-        checked={store.overwriteOriginal}
-        onChange={(checked) => store.setOverwriteOriginal(checked)}
-        disabled={!store.hasImage || !store.image?.filePath}
-      >
-        {t('overwriteOriginal')}
-      </Checkbox>
+      {!isOnline() && (
+        <Checkbox
+          checked={store.overwriteOriginal}
+          onChange={(checked) => store.setOverwriteOriginal(checked)}
+          disabled={!store.hasImage || !store.image?.filePath}
+        >
+          {t('overwriteOriginal')}
+        </Checkbox>
+      )}
 
       <ToolbarSpacer />
 

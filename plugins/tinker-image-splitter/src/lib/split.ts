@@ -1,6 +1,7 @@
 import clamp from 'licia/clamp'
 import clone from 'licia/clone'
 import fill from 'licia/fill'
+import download from 'licia/download'
 import lpad from 'licia/lpad'
 import splitPath from 'licia/splitPath'
 import sum from 'licia/sum'
@@ -284,18 +285,69 @@ export async function generateCellPreviews(
   })
 }
 
-function canvasToBuffer(canvas: HTMLCanvasElement): Promise<Uint8Array> {
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    canvas.toBlob(async (blob) => {
+    canvas.toBlob((blob) => {
       if (!blob) {
         reject(new Error('Failed to export image'))
         return
       }
 
-      const arrayBuffer = await blob.arrayBuffer()
-      resolve(new Uint8Array(arrayBuffer))
+      resolve(blob)
     }, 'image/png')
   })
+}
+
+function canvasToBuffer(canvas: HTMLCanvasElement): Promise<Uint8Array> {
+  return canvasToBlob(canvas).then(
+    async (blob) => new Uint8Array(await blob.arrayBuffer())
+  )
+}
+
+function splitFileName(baseName: string, index: number, padLength: number) {
+  const { name, ext } = splitPath(baseName)
+  const nameBase = ext ? name.slice(0, name.length - ext.length) : name
+  return `${nameBase}_${lpad(String(index), padLength, '0')}.png`
+}
+
+async function forEachSplitCell(
+  imageUrl: string,
+  cells: CellRect[],
+  baseName: string,
+  visit: (canvas: HTMLCanvasElement, fileName: string) => Promise<void>
+) {
+  const img = await loadImage(imageUrl)
+  const padLength = String(cells.length).length
+
+  for (const cell of cells) {
+    const width = Math.max(1, Math.round(cell.width))
+    const height = Math.max(1, Math.round(cell.height))
+    const canvas = createCellCanvas(img, cell, width, height)
+    if (!canvas) continue
+
+    await visit(canvas, splitFileName(baseName, cell.index, padLength))
+  }
+}
+
+export async function downloadSplitImages(
+  imageUrl: string,
+  cells: CellRect[],
+  baseName: string
+) {
+  const files: { blob: Blob; fileName: string }[] = []
+
+  await forEachSplitCell(
+    imageUrl,
+    cells,
+    baseName,
+    async (canvas, fileName) => {
+      files.push({ blob: await canvasToBlob(canvas), fileName })
+    }
+  )
+
+  for (const file of files) {
+    download(file.blob, file.fileName, 'image/png')
+  }
 }
 
 export async function exportSplitImages(
@@ -304,28 +356,18 @@ export async function exportSplitImages(
   baseName: string,
   outputDir: string
 ): Promise<string[]> {
-  const img = await loadImage(imageUrl)
-  const padLength = String(cells.length).length
-  const { name, ext } = splitPath(baseName)
-  const nameBase = ext ? name.slice(0, name.length - ext.length) : name
   const savedPaths: string[] = []
 
-  for (const cell of cells) {
-    const width = Math.max(1, Math.round(cell.width))
-    const height = Math.max(1, Math.round(cell.height))
-    const canvas = createCellCanvas(img, cell, width, height)
-    if (!canvas) continue
-
-    const buffer = await canvasToBuffer(canvas)
-    const fileName = `${nameBase}_${lpad(
-      String(cell.index),
-      padLength,
-      '0'
-    )}.png`
-    const filePath = joinPath(outputDir, fileName)
-    await tinker.writeFile(filePath, buffer)
-    savedPaths.push(filePath)
-  }
+  await forEachSplitCell(
+    imageUrl,
+    cells,
+    baseName,
+    async (canvas, fileName) => {
+      const filePath = joinPath(outputDir, fileName)
+      await tinker.writeFile(filePath, await canvasToBuffer(canvas))
+      savedPaths.push(filePath)
+    }
+  )
 
   return savedPaths
 }

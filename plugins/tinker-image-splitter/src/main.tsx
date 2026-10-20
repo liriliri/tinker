@@ -5,6 +5,7 @@ import ImageOpen from 'share/components/ImageOpen'
 import Toolbar from './components/Toolbar'
 import Sidebar from './components/Sidebar'
 import SplitCanvas from './components/SplitCanvas'
+import { droppedFilePath } from 'share/lib/util'
 import store from './store'
 import renderApp from 'share/lib/renderApp'
 import './index.scss'
@@ -33,7 +34,7 @@ const App = observer(function App() {
     }
 
     try {
-      const filePath = tinker.getPathForFile(file) || undefined
+      const filePath = droppedFilePath(file)
       await store.loadImage(file, filePath)
     } catch (err) {
       console.error('Failed to load image:', err)

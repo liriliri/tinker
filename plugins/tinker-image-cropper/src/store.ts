@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import BaseStore, { storage } from 'share/store/Base'
-import { openImageFile } from 'share/lib/util'
+import { isOnline, openImageFile } from 'share/lib/util'
 import clone from 'licia/clone'
+import download from 'licia/download'
 import now from 'licia/now'
 import toBool from 'licia/toBool'
 import toStr from 'licia/toStr'
@@ -190,36 +191,43 @@ export class Store extends BaseStore {
     if (!this.image) return
 
     try {
-      let savePath: string
+      const fileName = this.image.fileName.replace(/\.[^.]+$/, '-cropped$&')
+      let savePath = ''
 
-      if (this.overwriteOriginal && this.image.filePath) {
-        savePath = this.image.filePath
-      } else if (outputPath) {
-        savePath = outputPath
-      } else {
-        const result = await tinker.showSaveDialog({
-          defaultPath: this.image.fileName.replace(/\.[^.]+$/, '-cropped$&'),
-          filters: [
-            {
-              name: 'Images',
-              extensions: ['png', 'jpg', 'jpeg', 'webp'],
-            },
-          ],
-        })
+      if (!isOnline()) {
+        if (this.overwriteOriginal && this.image.filePath) {
+          savePath = this.image.filePath
+        } else if (outputPath) {
+          savePath = outputPath
+        } else {
+          const result = await tinker.showSaveDialog({
+            defaultPath: fileName,
+            filters: [
+              {
+                name: 'Images',
+                extensions: ['png', 'jpg', 'jpeg', 'webp'],
+              },
+            ],
+          })
 
-        if (result.canceled || !result.filePath) {
-          return
+          if (result.canceled || !result.filePath) {
+            return
+          }
+
+          savePath = result.filePath
         }
-
-        savePath = result.filePath
       }
 
       const response = await fetch(this.image.originalUrl)
       const blob = await response.blob()
-      const arrayBuffer = await blob.arrayBuffer()
-      const buffer = new Uint8Array(arrayBuffer)
 
-      await tinker.writeFile(savePath, buffer)
+      if (isOnline()) {
+        download(blob, fileName, blob.type || 'image/png')
+        this.isSaved = true
+        return fileName
+      }
+
+      await tinker.writeFile(savePath, new Uint8Array(await blob.arrayBuffer()))
 
       this.isSaved = true
 

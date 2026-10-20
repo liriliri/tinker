@@ -1,12 +1,13 @@
 import { makeAutoObservable } from 'mobx'
 import clamp from 'licia/clamp'
 import BaseStore from 'share/store/Base'
-import { openImageFile } from 'share/lib/util'
+import { isOnline, openImageFile } from 'share/lib/util'
 import { getPresetById } from './lib/presets'
 import {
   clampCropRegion,
   computeCellRects,
   createEqualSizes,
+  downloadSplitImages,
   exportSplitImages,
 } from './lib/split'
 import type { CropRegion, ImageInfo } from './types'
@@ -154,20 +155,31 @@ class Store extends BaseStore {
   async saveSplitImages() {
     if (!this.image || this.cells.length === 0) return
 
-    const result = await tinker.showOpenDialog({
-      properties: ['openDirectory', 'createDirectory'],
-    })
-
-    if (result.canceled || !result.filePaths?.[0]) return
+    let outputDir = ''
+    if (!isOnline()) {
+      const result = await tinker.showOpenDialog({
+        properties: ['openDirectory', 'createDirectory'],
+      })
+      if (result.canceled || !result.filePaths?.[0]) return
+      outputDir = result.filePaths[0]
+    }
 
     try {
       this.isSaving = true
-      await exportSplitImages(
-        this.image.originalUrl,
-        this.cells,
-        this.image.fileName,
-        result.filePaths[0]
-      )
+      if (isOnline()) {
+        await downloadSplitImages(
+          this.image.originalUrl,
+          this.cells,
+          this.image.fileName
+        )
+      } else {
+        await exportSplitImages(
+          this.image.originalUrl,
+          this.cells,
+          this.image.fileName,
+          outputDir
+        )
+      }
     } catch (err) {
       console.error('Failed to save split images:', err)
       throw err
