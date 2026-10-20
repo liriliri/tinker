@@ -4,7 +4,8 @@
   "description": "Base64 encoder/decoder for text and files",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "build": "vite build --config ../vite.config.ts",
+    "build:web": "npm run build && zx ../../script/web.mjs --copy"
   },
   "tinker": {
     "name": "Base64",

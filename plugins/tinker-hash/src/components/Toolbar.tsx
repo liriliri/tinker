@@ -16,6 +16,7 @@ import {
   ToolbarButton,
   ToolbarButtonGroup,
 } from 'share/components/Toolbar'
+import { isOnline } from 'share/lib/util'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -23,17 +24,19 @@ export default observer(function ToolbarComponent() {
 
   const handlePaste = async () => {
     try {
-      const filePaths = await tinker.getClipboardFilePaths()
-
-      if (!isEmpty(filePaths)) {
-        store.setInputType('file')
-        await store.handleFilePath(filePaths[0])
-      } else {
-        const text = await navigator.clipboard.readText()
-        if (text) {
-          store.setInput(text)
-          store.setInputType('text')
+      if (!isOnline()) {
+        const filePaths = await tinker.getClipboardFilePaths()
+        if (!isEmpty(filePaths)) {
+          store.setInputType('file')
+          await store.handleFilePath(filePaths[0])
+          return
         }
+      }
+
+      const text = await navigator.clipboard.readText()
+      if (text) {
+        store.setInput(text)
+        store.setInputType('text')
       }
     } catch (err) {
       console.error('Failed to paste from clipboard:', err)

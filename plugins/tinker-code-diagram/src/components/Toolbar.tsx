@@ -28,8 +28,10 @@ import {
 import CopyButton from 'share/components/CopyButton'
 import DarkModeSwitch from 'share/components/DarkModeSwitch'
 import { alert } from 'share/components/Alert'
+import { isOnline } from 'share/lib/util'
 import store from '../store'
 import {
+  downloadDiagramFile,
   getDiagramBackground,
   getSvgElement,
   writeDiagramFile,
@@ -47,7 +49,14 @@ export default observer(function ToolbarComponent() {
       return
     }
 
+    const backgroundColor = getDiagramBackground(store.darkMode)
+
     try {
+      if (isOnline()) {
+        await downloadDiagramFile(svg, format, backgroundColor)
+        return
+      }
+
       const result = await tinker.showSaveDialog({
         defaultPath: `diagram.${format}`,
         filters: [
@@ -57,12 +66,7 @@ export default observer(function ToolbarComponent() {
       })
       if (result.canceled || !result.filePath) return
 
-      await writeDiagramFile(
-        svg,
-        format,
-        result.filePath,
-        getDiagramBackground(store.darkMode)
-      )
+      await writeDiagramFile(svg, format, result.filePath, backgroundColor)
     } catch (err) {
       await alert({
         title: t('exportFailed'),

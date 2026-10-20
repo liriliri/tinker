@@ -16,6 +16,7 @@ import {
   ToolbarTextButton,
 } from 'share/components/Toolbar'
 import Checkbox from 'share/components/Checkbox'
+import { isOnline } from 'share/lib/util'
 import store from '../store'
 
 export default observer(function ToolbarComponent() {
@@ -23,17 +24,19 @@ export default observer(function ToolbarComponent() {
 
   const handlePaste = async () => {
     try {
-      const filePaths = await tinker.getClipboardFilePaths()
-
-      if (filePaths && filePaths.length > 0) {
-        store.setInputType('file')
-        await store.handleFilePath(filePaths[0])
-      } else {
-        const text = await navigator.clipboard.readText()
-        if (text) {
-          store.setInputText(text)
-          store.setInputType('text')
+      if (!isOnline()) {
+        const filePaths = await tinker.getClipboardFilePaths()
+        if (filePaths && filePaths.length > 0) {
+          store.setInputType('file')
+          await store.handleFilePath(filePaths[0])
+          return
         }
+      }
+
+      const text = await navigator.clipboard.readText()
+      if (text) {
+        store.setInputText(text)
+        store.setInputType('text')
       }
     } catch (err) {
       console.error('Failed to paste from clipboard:', err)
@@ -97,7 +100,7 @@ export default observer(function ToolbarComponent() {
             </ToolbarTextButton>
             <ToolbarTextButton
               onClick={() => store.decodeToFile()}
-              disabled={isStrBlank(store.inputText)}
+              disabled={isOnline() || isStrBlank(store.inputText)}
               className="flex items-center gap-1"
             >
               <Save size={TOOLBAR_ICON_SIZE} />

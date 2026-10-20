@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import type { ReactNode } from 'react'
 import { storage } from 'share/store/Base'
+import { isOnline } from 'share/lib/util'
 
 export interface PopupWindowOptions {
   width: number
@@ -27,6 +28,17 @@ interface PopupBounds {
   y: number
   width: number
   height: number
+}
+
+function watchPopupColorScheme(popup: Window): () => void {
+  const mq = popup.matchMedia('(prefers-color-scheme: dark)')
+  const apply = () => {
+    if (popup.closed) return
+    popup.document.documentElement.classList.toggle('dark', mq.matches)
+  }
+  apply()
+  mq.addEventListener('change', apply)
+  return () => mq.removeEventListener('change', apply)
 }
 
 function getPositionStorageKey(positionKey: string) {
@@ -96,7 +108,9 @@ export function openPopupWindow(
 
   const popup = window.open('', '_blank', features)
   if (!popup) return null
-  ;(popup as unknown as { tinker: typeof tinker }).tinker = tinker
+  if (!isOnline()) {
+    ;(popup as unknown as { tinker: typeof tinker }).tinker = tinker
+  }
 
   const styles = document.querySelectorAll('style, link[rel="stylesheet"]')
   styles.forEach((node) => {
@@ -129,15 +143,16 @@ export function openPopupWindow(
     })
   }
 
-  const unsubscribe = tinker.on('changeTheme', async () => {
-    if (popup.closed) return
-    const theme = await tinker.getTheme()
-    if (theme === 'dark') {
-      popup.document.documentElement.classList.add('dark')
-    } else {
-      popup.document.documentElement.classList.remove('dark')
-    }
-  })
+  const unsubscribe = isOnline()
+    ? watchPopupColorScheme(popup)
+    : tinker.on('changeTheme', async () => {
+        if (popup.closed) return
+        const theme = await tinker.getTheme()
+        popup.document.documentElement.classList.toggle(
+          'dark',
+          theme === 'dark'
+        )
+      })
 
   popup.addEventListener('beforeunload', () => {
     if (positionKey) {

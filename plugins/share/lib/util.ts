@@ -1,6 +1,7 @@
 import durationFormat from 'licia/durationFormat'
 import dateFormat from 'licia/dateFormat'
 import compact from 'licia/compact'
+import openFile from 'licia/openFile'
 import splitPath from 'licia/splitPath'
 import isWindows from 'licia/isWindows'
 import { EXECUTABLE_EXTS } from './fileType'
@@ -27,6 +28,15 @@ export async function openImageFile(options?: {
     title = 'Open Image',
     extensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'],
   } = options || {}
+
+  if (isOnline()) {
+    const files = await openFile({
+      accept: extensions.map((ext) => `.${ext}`).join(','),
+    })
+    const file = files?.[0]
+    if (!file) return null
+    return { file, filePath: file.name }
+  }
 
   const result = await tinker.showOpenDialog({
     title,

@@ -3,7 +3,7 @@ import { Save, Image, ScanLine } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import openFile from 'licia/openFile'
 import toast from 'react-hot-toast'
-import { openImageFile } from 'share/lib/util'
+import { isOnline, openImageFile } from 'share/lib/util'
 import { decodeQRFromUrl } from '../lib/qr'
 import store from '../store'
 import Select from 'share/components/Select'
@@ -194,11 +194,14 @@ export default observer(function ToolbarComponent() {
       </ToolbarButton>
 
       <ToolbarSeparator />
-
       <ToolbarButton
-        onClick={handleScan}
-        menu={[{ label: t('openImage'), click: () => handleOpenImage() }]}
-        title={t('scan')}
+        onClick={isOnline() ? handleOpenImage : handleScan}
+        menu={
+          isOnline()
+            ? undefined
+            : [{ label: t('openImage'), click: () => handleOpenImage() }]
+        }
+        title={isOnline() ? t('openImage') : t('scan')}
       >
         <ScanLine size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>

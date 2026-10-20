@@ -26,7 +26,7 @@ import {
 } from 'share/components/Toolbar'
 import Select, { type SelectOption } from 'share/components/Select'
 import Checkbox from 'share/components/Checkbox'
-import { openImageFile } from 'share/lib/util'
+import { isOnline, openImageFile } from 'share/lib/util'
 import { tw } from 'share/theme'
 import store, { type ShapeType } from '../store'
 
@@ -179,10 +179,14 @@ export default observer(function TopToolbar() {
       <ToolbarButton
         onClick={handleOpenImage}
         menu={[
-          {
-            label: t('captureScreen'),
-            click: () => handleCaptureScreen(),
-          },
+          ...(!isOnline()
+            ? [
+                {
+                  label: t('captureScreen'),
+                  click: () => handleCaptureScreen(),
+                },
+              ]
+            : []),
           {
             label: t('pasteImage'),
             click: () => handlePasteImage(),
@@ -195,10 +199,14 @@ export default observer(function TopToolbar() {
       <ToolbarButton
         onClick={handleInsertImage}
         menu={[
-          {
-            label: t('captureScreen'),
-            click: () => handleInsertScreen(),
-          },
+          ...(!isOnline()
+            ? [
+                {
+                  label: t('captureScreen'),
+                  click: () => handleInsertScreen(),
+                },
+              ]
+            : []),
           {
             label: t('pasteImage'),
             click: () => handlePasteInsertImage(),

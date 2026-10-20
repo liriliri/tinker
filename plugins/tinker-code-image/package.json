@@ -4,7 +4,8 @@
   "description": "Generate beautiful images from code snippets",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "build": "vite build --config ../vite.config.ts",
+    "build:web": "npm run build && zx ../../script/web.mjs --copy"
   },
   "tinker": {
     "name": "Code Image",

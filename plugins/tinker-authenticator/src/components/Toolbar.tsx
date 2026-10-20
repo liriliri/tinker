@@ -10,7 +10,7 @@ import {
 } from 'share/components/Toolbar'
 import { Plus, LockOpen, KeyRound } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { openImageFile } from 'share/lib/util'
+import { isOnline, openImageFile } from 'share/lib/util'
 import { parseOtpAuthUri } from '../lib/totp'
 import { decodeQRFromUrl } from '../lib/qr'
 import store from '../store'
@@ -64,7 +64,9 @@ export default observer(function ToolbarComponent() {
       <ToolbarButton
         onClick={() => store.openAddDialog()}
         menu={[
-          { label: t('scanScreen'), click: () => handleScan() },
+          ...(!isOnline()
+            ? [{ label: t('scanScreen'), click: () => handleScan() }]
+            : []),
           { label: t('openImage'), click: () => handleOpenImage() },
           { label: t('importUri'), click: () => store.openImportDialog() },
         ]}

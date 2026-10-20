@@ -1,5 +1,6 @@
 import convertBin from 'licia/convertBin'
 import dataUrl from 'licia/dataUrl'
+import download from 'licia/download'
 import loadImg from 'licia/loadImg'
 import max from 'licia/max'
 import promisify from 'licia/promisify'
@@ -97,6 +98,20 @@ async function svgToPngBlob(
     throw new Error('Failed to create PNG blob')
   }
   return blob
+}
+
+export async function downloadDiagramFile(
+  svg: SVGSVGElement,
+  format: 'svg' | 'png',
+  backgroundColor: string
+): Promise<void> {
+  if (format === 'svg') {
+    download(serializeSvg(svg, backgroundColor), 'diagram.svg', 'image/svg+xml')
+    return
+  }
+
+  const blob = await svgToPngBlob(svg, backgroundColor)
+  download(blob, 'diagram.png', 'image/png')
 }
 
 export async function writeDiagramFile(

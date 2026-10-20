@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import { isOnline } from '../util'
 
 export interface AiChatProvidersApi {
   providers: tinker.AiProviderInfo[]
@@ -24,6 +25,13 @@ class AiChatProvidersStore implements AiChatProvidersApi {
   }
 
   private async fetchProviders() {
+    if (isOnline()) {
+      runInAction(() => {
+        this.loaded = true
+      })
+      return
+    }
+
     const providers = await tinker.getAIProviders()
     runInAction(() => {
       this.providers = providers

@@ -433,9 +433,12 @@ class Store extends BaseStore {
       if (this.background.type === 'transparent') {
         this.frame.fill = 'transparent'
       }
-      const exportResult = await this.frame.export('png', { pixelRatio: 1 })
-      const data = exportResult.data as string
-      download(data, 'screenshot-mockup.png', 'image/png')
+      const exportResult = await this.frame.export('png', {
+        pixelRatio: 1,
+        blob: true,
+      })
+      if (!exportResult.data) throw new Error('Export failed')
+      download(exportResult.data, 'screenshot-mockup.png', 'image/png')
       toast.success(i18n.t('exportSuccess'))
     } catch (err) {
       console.error(err)

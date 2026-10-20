@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import { isOnline } from 'share/lib/util'
 import BaseStore, { storage } from 'share/store/Base'
 import { formatMs, pad } from './lib/util'
 import i18n from 'i18next'
@@ -193,6 +194,13 @@ class Store extends BaseStore {
     this.cdRunning = true
     this.cdStartTime = performance.now()
     this.cdBaseElapsed = this.cdElapsed
+    if (
+      isOnline() &&
+      typeof Notification !== 'undefined' &&
+      Notification.permission === 'default'
+    ) {
+      void Notification.requestPermission()
+    }
     this.cdTick()
   }
 
@@ -225,13 +233,28 @@ class Store extends BaseStore {
           this.cdCompleted = true
           this.cdRafId = null
           this.playBeep()
-          tinker.showNotification(i18n.t('countdownComplete'))
+          this.notifyCountdownComplete()
         } else {
           this.cdElapsed = elapsed
         }
       })
       if (this.cdRunning) this.cdTick()
     })
+  }
+
+  private notifyCountdownComplete() {
+    const message = i18n.t('countdownComplete')
+    if (!isOnline()) {
+      tinker.showNotification(message)
+      return
+    }
+    if (
+      typeof Notification === 'undefined' ||
+      Notification.permission !== 'granted'
+    ) {
+      return
+    }
+    new Notification(message)
   }
 
   private playBeep() {

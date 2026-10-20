@@ -4,7 +4,8 @@
   "description": "Regular expression tester with real-time matching",
   "scripts": {
     "dev": "vite build --watch --config ../vite.config.ts",
-    "build": "vite build --config ../vite.config.ts"
+    "build": "vite build --config ../vite.config.ts",
+    "build:web": "npm run build && zx ../../script/web.mjs --copy"
   },
   "tinker": {
     "name": "RegExp",
