@@ -8,7 +8,7 @@
   },
   "tinker": {
     "name": "Hex Editor",
-    "category": "dev",
+    "category": "file",
     "icon": "icon.png",
     "main": "dist/index.html",
     "locales": {
