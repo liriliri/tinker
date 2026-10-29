@@ -93,6 +93,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-asar',
+    name: 'Asar Viewer',
+    description: 'Browse and extract Electron asar archives',
+    icon: 'tinker-asar.png',
+    category: 'file',
+    locales: {
+      'zh-CN': {
+        name: 'ASAR 查看器',
+        description: '浏览并解压 Electron asar 文件',
+      },
+    },
+  },
+  {
     id: 'tinker-audio-transcriber',
     name: 'Audio Transcriber',
     description: 'Transcribe audio from long media files',
@@ -474,6 +487,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-jigsaw',
+    name: 'Jigsaw',
+    description: 'Drag the pieces together until the picture is whole again.',
+    icon: 'tinker-jigsaw.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '拼图',
+        description: '把碎片拖回原位，拼出整张图。',
+      },
+    },
+  },
+  {
     id: 'tinker-js13k',
     name: 'JS13K Games',
     description: 'Play curated JS13K games',
@@ -694,6 +720,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: 'Office',
         description: '打开并编辑 Word、Excel、PowerPoint 文档',
+      },
+    },
+  },
+  {
+    id: 'tinker-radio',
+    name: 'Radio',
+    description: 'Search and play internet radio stations',
+    icon: 'tinker-radio.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '电台',
+        description: '搜索并收听网络电台',
       },
     },
   },
