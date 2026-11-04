@@ -737,6 +737,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-remesher',
+    name: 'Remesher',
+    description: 'Quad and isotropic remeshing for GLB models',
+    icon: 'tinker-remesher.png',
+    category: 'media',
+    locales: {
+      'zh-CN': {
+        name: '重拓扑',
+        description: '对 GLB 模型做四边形或各向同性重网格',
+      },
+    },
+  },
+  {
     id: 'tinker-reversi',
     name: 'Reversi',
     description: 'Capture territory in the classic game of Reversi.',
@@ -746,6 +759,20 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: '黑白棋',
         description: '在经典黑白棋中包围并翻转对手的棋子。',
+      },
+    },
+  },
+  {
+    id: 'tinker-rubiks-cube',
+    name: "Rubik's Cube",
+    description:
+      "Drag layers to twist a 3D Rubik's Cube — scramble, time your solve, and chase a new best.",
+    icon: 'tinker-rubiks-cube.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '魔方',
+        description: '拖拽转层玩 3D 魔方，打乱计时，挑战最佳成绩。',
       },
     },
   },
