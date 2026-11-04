@@ -69,6 +69,7 @@
   "unknownError": "Unknown error",
   "loadPluginsErr": "Failed to load plugins ({{status}})",
   "categoryAll": "All",
+  "categoryPinned": "Pinned",
   "categoryDev": "Dev",
   "categoryFile": "File",
   "categoryMedia": "Media",

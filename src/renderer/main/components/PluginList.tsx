@@ -28,7 +28,9 @@ export function focusIcons() {
 
 function getPluginClassName(plugin: IPlugin) {
   return [
-    store.isPluginPinned(plugin.id) && Style.pinned,
+    store.category !== 'pinned' &&
+      store.isPluginPinned(plugin.id) &&
+      Style.pinned,
     store.isPluginRunning(plugin.id) && Style.running,
   ]
     .filter(Boolean)
@@ -84,6 +86,7 @@ export default observer(function PluginList() {
     store.installingPlugins,
     store.runningPlugins,
     store.pluginStates,
+    store.category,
   ])
 
   function onContextMenu(e: PointerEvent, data: any) {

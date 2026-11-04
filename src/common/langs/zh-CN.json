@@ -69,6 +69,7 @@
   "unknownError": "未知错误",
   "loadPluginsErr": "加载插件失败（{{status}}）",
   "categoryAll": "全部",
+  "categoryPinned": "置顶",
   "categoryDev": "开发",
   "categoryFile": "文件",
   "categoryMedia": "多媒体",

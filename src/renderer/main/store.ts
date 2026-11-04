@@ -370,6 +370,17 @@ class Store extends BaseStore {
         this.visibleApps = this.apps
         return
       }
+      if (this.category === 'pinned') {
+        const pinned = this.plugins.filter(
+          (plugin) =>
+            !plugin.marketplace &&
+            !this.pluginStates[plugin.id]?.hidden &&
+            this.pluginStates[plugin.id]?.pinned
+        )
+        this.visiblePlugins = pinned
+        this.visibleApps = []
+        return
+      }
       const filtered = this.plugins.filter((plugin) => {
         if (this.pluginStates[plugin.id]?.hidden) {
           return false
@@ -418,7 +429,11 @@ class Store extends BaseStore {
       }
       return
     }
-    if (category === 'all' || isPluginCategory(category)) {
+    if (
+      category === 'all' ||
+      category === 'pinned' ||
+      isPluginCategory(category)
+    ) {
       this.category = category
       this.applyFilter()
     }

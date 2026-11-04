@@ -19,8 +19,8 @@ export default observer(function CategoryTabs() {
   })
 
   const tabs: PluginCategoryFilter[] = store.searchLocalApps
-    ? ['all', 'apps', ...PLUGIN_CATEGORIES]
-    : ['all', ...PLUGIN_CATEGORIES]
+    ? ['all', 'pinned', 'apps', ...PLUGIN_CATEGORIES]
+    : ['all', 'pinned', ...PLUGIN_CATEGORIES]
 
   const updateIndicator = () => {
     const tab = tabRefs.current[store.category]
