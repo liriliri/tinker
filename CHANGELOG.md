@@ -1,3 +1,7 @@
+## v3.5.0 (4 Nov 2026)
+
+* feat: add pinned tab
+
 ## v3.4.0 (5 Oct 2026)
 
 * feat: add ai image
