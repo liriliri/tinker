@@ -25,7 +25,10 @@ function createPluginStorage(): LocalStore {
   }
 
   if (!w[STORAGE_PROP]) {
-    w[STORAGE_PROP] = new LocalStore(location.host)
+    const match = location.pathname.match(/^\/plugins\/([^/]+)/)
+    w[STORAGE_PROP] = new LocalStore(
+      match ? `tinker-${match[1]}` : location.host
+    )
   }
   return w[STORAGE_PROP]
 }
