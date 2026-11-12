@@ -80,6 +80,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-ai-music',
+    name: 'AI Music',
+    description: 'Local lyrics-to-song plugin for TINKER (ACE-Step via audio.cpp)',
+    icon: 'tinker-ai-music.png',
+    category: 'media',
+    locales: {
+      'zh-CN': {
+        name: 'AI 音乐',
+        description: '使用 ACE-Step 在本地根据风格与歌词生成带人声的歌曲',
+      },
+    },
+  },
+  {
     id: 'tinker-aquarium',
     name: 'Aquarium',
     description: 'Desktop aquarium fish tank simulation',
@@ -698,6 +711,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-node-manager',
+    name: 'Node Manager',
+    description: 'Manage local Node.js versions with fnm',
+    icon: 'tinker-node-manager.png',
+    category: 'dev',
+    locales: {
+      'zh-CN': {
+        name: 'Node 管理',
+        description: '使用 fnm 管理本机 Node.js 版本',
+      },
+    },
+  },
+  {
     id: 'tinker-ocr',
     name: 'OCR',
     description: 'Recognize text from images using Tesseract.js',
@@ -720,6 +746,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: 'Office',
         description: '打开并编辑 Word、Excel、PowerPoint 文档',
+      },
+    },
+  },
+  {
+    id: 'tinker-piano',
+    name: 'Piano',
+    description: 'Virtual piano with Salamander grand piano samples',
+    icon: 'tinker-piano.png',
+    category: 'entertainment',
+    locales: {
+      'zh-CN': {
+        name: '钢琴',
+        description: '可弹奏的虚拟钢琴，使用真实钢琴采样',
       },
     },
   },
@@ -800,6 +839,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
       'zh-CN': {
         name: '屏幕测试',
         description: '全屏检测屏幕坏点、漏光与色阶问题',
+      },
+    },
+  },
+  {
+    id: 'tinker-sound-effect',
+    name: 'Sound Effect',
+    description: 'Local sound effect generation plugin for TINKER (audio.cpp)',
+    icon: 'tinker-sound-effect.png',
+    category: 'media',
+    locales: {
+      'zh-CN': {
+        name: '音效生成',
+        description: '使用 audio.cpp 在本地根据文本生成音效',
       },
     },
   },
