@@ -725,6 +725,20 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-npm',
+    name: 'NPM',
+    description:
+      'Search npm packages, install globally, or download and extract tarballs',
+    icon: 'tinker-npm.png',
+    category: 'dev',
+    locales: {
+      'zh-CN': {
+        name: 'NPM',
+        description: '搜索查看 npm 包信息，全局安装或下载解压到本地',
+      },
+    },
+  },
+  {
     id: 'tinker-ocr',
     name: 'OCR',
     description: 'Recognize text from images using Tesseract.js',
