@@ -18,6 +18,7 @@ import Terminal from './Terminal'
 import { getTerminalSession } from 'share/components/Terminal'
 
 const STORAGE_SIDEBAR_OPEN = 'sidebarOpen'
+const STORAGE_DARK_MODE = 'darkMode'
 const chatPrefsStorage = new LocalStoreChatPrefs(storage)
 
 export class Store extends BaseStore {
@@ -32,6 +33,7 @@ export class Store extends BaseStore {
   pendingSSHConfig: Record<string, ISessionConfig> = {}
   onDestroyPane: ((paneId: string) => void) | null = null
   sidebarOpen: boolean = storage.get(STORAGE_SIDEBAR_OPEN) ?? false
+  darkMode: boolean = storage.get(STORAGE_DARK_MODE) ?? true
   sessions: ISessionFolder[] = []
   hasAI = false
 
@@ -81,6 +83,11 @@ export class Store extends BaseStore {
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen
     storage.set(STORAGE_SIDEBAR_OPEN, this.sidebarOpen)
+  }
+
+  setDarkMode(darkMode: boolean) {
+    this.darkMode = darkMode
+    storage.set(STORAGE_DARK_MODE, this.darkMode)
   }
 
   addTab(afterTabId?: string) {

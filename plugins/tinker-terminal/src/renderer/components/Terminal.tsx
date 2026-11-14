@@ -1,18 +1,15 @@
 import type { MenuItemConstructorOptions } from 'electron'
+import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import SharedTerminal, { destroyTerminal } from 'share/components/Terminal'
 import store from '../store'
 
-function destroyPane(paneId: string) {
-  destroyTerminal(paneId)
-}
-
 interface TerminalProps {
   paneId: string
 }
 
-export default function Terminal({ paneId }: TerminalProps) {
+export default observer(function Terminal({ paneId }: TerminalProps) {
   const { t } = useTranslation()
 
   const createSession = useCallback(
@@ -80,12 +77,12 @@ export default function Terminal({ paneId }: TerminalProps) {
     <SharedTerminal
       id={paneId}
       createSession={createSession}
-      isDark={store.isDark}
+      isDark={store.darkMode}
       onTitleChange={handleTitleChange}
       onFocus={handleFocus}
       extraContextMenuItems={extraContextMenuItems}
     />
   )
-}
+})
 
-store.onDestroyPane = destroyPane
+store.onDestroyPane = destroyTerminal

@@ -1,12 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import {
-  Terminal as TerminalIcon,
-  Columns2,
-  Columns3,
-  Grid2x2,
-} from 'lucide-react'
+import { Terminal as TerminalIcon, Columns2 } from 'lucide-react'
 import { tw } from '../../theme'
 import TabBar from '../TabBar'
+import { ToolbarButton, TOOLBAR_ICON_SIZE } from '../Toolbar'
 import type {
   TerminalPanelProps,
   TerminalPaneLayoutProps,
@@ -69,27 +65,26 @@ export default function TerminalPanel({
           />
         </div>
         <div className="flex-shrink-0 flex items-center justify-center h-full px-1.5">
-          <button
-            className={`p-1.5 rounded transition-colors ${tw.hover}`}
+          <ToolbarButton
             onClick={onSetDualColumns}
+            menu={[
+              {
+                label: t('dualColumns'),
+                click: onSetDualColumns,
+              },
+              {
+                label: t('tripleColumns'),
+                click: onSetTripleColumns,
+              },
+              {
+                label: t('gridLayout'),
+                click: onSetGrid,
+              },
+            ]}
             title={t('dualColumns')}
           >
-            <Columns2 size={14} className={tw.text.secondary} />
-          </button>
-          <button
-            className={`p-1.5 rounded transition-colors ${tw.hover}`}
-            onClick={onSetTripleColumns}
-            title={t('tripleColumns')}
-          >
-            <Columns3 size={14} className={tw.text.secondary} />
-          </button>
-          <button
-            className={`p-1.5 rounded transition-colors ${tw.hover}`}
-            onClick={onSetGrid}
-            title={t('gridLayout')}
-          >
-            <Grid2x2 size={14} className={tw.text.secondary} />
-          </button>
+            <Columns2 size={TOOLBAR_ICON_SIZE} className={tw.text.secondary} />
+          </ToolbarButton>
         </div>
         <div
           className={`absolute bottom-0 left-0 right-0 h-px ${tw.bg.border}`}

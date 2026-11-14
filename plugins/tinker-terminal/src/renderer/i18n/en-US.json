@@ -39,6 +39,8 @@
   "dualColumns": "Dual Columns",
   "tripleColumns": "Triple Columns",
   "gridLayout": "Grid",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
   "chatTitle": "Command Line Assistant",
   "chatInputPlaceholder": "Ask about shell commands...",
   "chatEmptyHint": "I can help you write or explain shell commands"

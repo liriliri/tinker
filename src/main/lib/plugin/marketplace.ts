@@ -82,7 +82,8 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
   {
     id: 'tinker-ai-music',
     name: 'AI Music',
-    description: 'Local lyrics-to-song plugin for TINKER (ACE-Step via audio.cpp)',
+    description:
+      'Local lyrics-to-song plugin for TINKER (ACE-Step via audio.cpp)',
     icon: 'tinker-ai-music.png',
     category: 'media',
     locales: {

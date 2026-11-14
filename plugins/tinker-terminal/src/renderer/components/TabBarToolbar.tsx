@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
-import { Columns2, Columns3, Grid2x2 } from 'lucide-react'
+import { Columns2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import DarkModeSwitch from 'share/components/DarkModeSwitch'
 import {
   Toolbar,
   ToolbarAiButton,
@@ -14,20 +15,31 @@ export default observer(function TabBarToolbar() {
 
   return (
     <Toolbar className="border-b-0 shrink-0">
+      <DarkModeSwitch
+        dark={store.darkMode}
+        onToggle={() => store.setDarkMode(!store.darkMode)}
+        title={store.darkMode ? t('darkMode') : t('lightMode')}
+        className="mr-1"
+      />
       <ToolbarButton
         onClick={() => store.setDualColumns()}
+        menu={[
+          {
+            label: t('dualColumns'),
+            click: () => store.setDualColumns(),
+          },
+          {
+            label: t('tripleColumns'),
+            click: () => store.setTripleColumns(),
+          },
+          {
+            label: t('gridLayout'),
+            click: () => store.setGrid(),
+          },
+        ]}
         title={t('dualColumns')}
       >
         <Columns2 size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={() => store.setTripleColumns()}
-        title={t('tripleColumns')}
-      >
-        <Columns3 size={TOOLBAR_ICON_SIZE} />
-      </ToolbarButton>
-      <ToolbarButton onClick={() => store.setGrid()} title={t('gridLayout')}>
-        <Grid2x2 size={TOOLBAR_ICON_SIZE} />
       </ToolbarButton>
       {store.hasAI && (
         <ToolbarAiButton

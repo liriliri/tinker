@@ -85,6 +85,26 @@ export function destroyTerminal(id: string) {
   instances.delete(id)
 }
 
+function getTerminalColors(isDark: boolean) {
+  const bg = isDark
+    ? THEME_COLORS.bg.dark.primary
+    : THEME_COLORS.bg.light.primary
+  const fg = isDark
+    ? THEME_COLORS.text.dark.primary
+    : THEME_COLORS.text.light.primary
+  return { bg, fg }
+}
+
+function applyTerminalTheme(instance: TerminalInstance, isDark: boolean) {
+  const { bg, fg } = getTerminalColors(isDark)
+  instance.element.style.backgroundColor = bg
+  instance.xterm.options.theme = {
+    background: bg,
+    foreground: fg,
+    cursor: fg,
+  }
+}
+
 function getOrCreateInstance(
   id: string,
   createSession: (cols: number, rows: number) => TerminalSession,
@@ -94,12 +114,7 @@ function getOrCreateInstance(
   const existing = instances.get(id)
   if (existing) return existing
 
-  const bg = isDark
-    ? THEME_COLORS.bg.dark.primary
-    : THEME_COLORS.bg.light.primary
-  const fg = isDark
-    ? THEME_COLORS.text.dark.primary
-    : THEME_COLORS.text.light.primary
+  const { bg, fg } = getTerminalColors(isDark)
 
   const element = document.createElement('div')
   element.className = 'h-full w-full overflow-hidden'
@@ -237,6 +252,12 @@ export default function Terminal({
       }
     }
   }, [id])
+
+  useEffect(() => {
+    const instance = instances.get(id)
+    if (!instance) return
+    applyTerminalTheme(instance, isDark)
+  }, [id, isDark])
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
