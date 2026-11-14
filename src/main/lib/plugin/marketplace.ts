@@ -1067,6 +1067,19 @@ export const marketplacePlugins: IMarketplacePlugin[] = [
     },
   },
   {
+    id: 'tinker-vrm-viewer',
+    name: 'VRM Viewer',
+    description: 'Preview VRM 3D avatar models',
+    icon: 'tinker-vrm-viewer.png',
+    category: 'media',
+    locales: {
+      'zh-CN': {
+        name: 'VRM 预览',
+        description: '预览 VRM 3D 角色模型',
+      },
+    },
+  },
+  {
     id: 'tinker-wallpaper',
     name: 'Wallpaper',
     description: 'Search, preview and set desktop wallpapers',
