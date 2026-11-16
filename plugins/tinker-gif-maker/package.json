@@ -1,0 +1,21 @@
+{
+  "name": "tinker-gif-maker",
+  "version": "0.1.0",
+  "description": "Create GIFs from images or video frames",
+  "scripts": {
+    "dev": "vite build --watch --config ../vite.config.ts",
+    "build": "vite build --config ../vite.config.ts"
+  },
+  "tinker": {
+    "name": "GIF Maker",
+    "category": "media",
+    "icon": "icon.png",
+    "main": "dist/index.html",
+    "locales": {
+      "zh-CN": {
+        "name": "GIF 制作",
+        "description": "从图片或视频帧制作 GIF"
+      }
+    }
+  }
+}
