@@ -1,3 +1,9 @@
+## v3.6.0 (22 Nov 2026)
+
+* feat: add gif maker
+* feat(terminal): dark mode switch
+* fix: show modal and notification above plugin views
+
 ## v3.5.0 (4 Nov 2026)
 
 * feat: add pinned tab
