@@ -26,6 +26,9 @@ function routeModal(type: IOverlayModalType, message: string) {
   })
 }
 
+const origAlert = LunaModal.alert.bind(LunaModal)
+const origConfirm = LunaModal.confirm.bind(LunaModal)
+
 export async function confirm(message: string): Promise<boolean> {
   if (pluginOpen()) {
     const result = await routeModal('confirm', message)
@@ -33,7 +36,7 @@ export async function confirm(message: string): Promise<boolean> {
       return result === true
     }
   }
-  return LunaModal.confirm(message)
+  return origConfirm(message)
 }
 
 export async function alert(message: string): Promise<void> {
@@ -43,5 +46,8 @@ export async function alert(message: string): Promise<void> {
       return
     }
   }
-  await LunaModal.alert(message)
+  await origAlert(message)
 }
+
+LunaModal.alert = alert
+LunaModal.confirm = confirm
