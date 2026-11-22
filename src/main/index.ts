@@ -4,6 +4,7 @@ import log from 'share/common/log'
 import * as tray from './lib/tray'
 import * as main from './window/main'
 import * as plugin from './lib/plugin'
+import * as overlay from './lib/overlay'
 import * as application from './lib/app'
 import * as window from 'share/main/lib/window'
 import * as terminal from 'share/main/window/terminal'
@@ -66,6 +67,7 @@ app.on('ready', () => {
   terminal.init()
   proxy.init()
   plugin.init()
+  overlay.init()
   application.init()
 
   tray.init()

@@ -167,6 +167,21 @@ export interface IKeyboardEvent {
   shiftKey: boolean
 }
 
+export type IOverlayModalType = 'alert' | 'confirm'
+
+export interface IOverlayNotifyOptions {
+  duration?: number
+  icon?: string
+}
+
+export interface IOverlayModalRequest {
+  id: string
+  type: IOverlayModalType
+  message: string
+}
+
+export type IOverlayModalResult = boolean | null
+
 export type IpcDragMain = (
   x: number,
   y: number,
@@ -261,3 +276,16 @@ export type IpcRegisterMouse = (type: MouseEventName) => boolean
 export type IpcUnregisterMouse = (type: MouseEventName) => void
 export type IpcRegisterKeyboard = (type: KeyboardEventName) => boolean
 export type IpcUnregisterKeyboard = (type: KeyboardEventName) => void
+export type IpcOverlayNotify = (
+  content: string,
+  options?: IOverlayNotifyOptions
+) => Promise<boolean>
+export type IpcOverlayModal = (
+  request: IOverlayModalRequest
+) => Promise<IOverlayModalResult | undefined>
+export type IpcOverlayModalResult = (
+  id: string,
+  result: IOverlayModalResult
+) => void
+export type IpcOverlayNotifyDone = () => void
+export type IpcOverlayReady = () => void

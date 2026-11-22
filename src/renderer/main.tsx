@@ -47,6 +47,9 @@ function renderApp() {
       App = lazy(() => import('share/renderer/about/App.js') as Promise<any>)
       title = t('aboutTinker')
       break
+    case 'overlay':
+      App = lazy(() => import('./overlay/App.js') as Promise<any>)
+      break
   }
 
   if (page !== 'plugin') {

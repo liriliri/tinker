@@ -19,6 +19,11 @@ import {
   IpcPluginRecorderStopped,
   IpcReopenPlugin,
   IpcTogglePluginDevtools,
+  IpcOverlayModal,
+  IpcOverlayModalResult,
+  IpcOverlayNotify,
+  IpcOverlayNotifyDone,
+  IpcOverlayReady,
 } from 'common/types'
 import { IpcGetStore, IpcSetStore } from 'share/common/types'
 import mainObj from 'share/preload/main'
@@ -52,4 +57,9 @@ export default Object.assign(mainObj, {
   pluginRecorderError: invoke<IpcPluginRecorderError>('pluginRecorderError'),
   getMainStore: invoke<IpcGetStore>('getMainStore'),
   setMainStore: invoke<IpcSetStore>('setMainStore'),
+  overlayNotify: invoke<IpcOverlayNotify>('overlayNotify'),
+  overlayModal: invoke<IpcOverlayModal>('overlayModal'),
+  overlayModalResult: invoke<IpcOverlayModalResult>('overlayModalResult'),
+  overlayNotifyDone: invoke<IpcOverlayNotifyDone>('overlayNotifyDone'),
+  overlayReady: invoke<IpcOverlayReady>('overlayReady'),
 })

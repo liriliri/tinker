@@ -15,10 +15,9 @@ import trim from 'licia/trim'
 import isArr from 'licia/isArr'
 import isObj from 'licia/isObj'
 import LocalStore from 'licia/LocalStore'
-import LunaModal from 'luna-modal'
 import pkg from '../../../package.json'
 import { sortByName, pinyinMatch, setMainStore } from './lib/util'
-import { notify } from 'share/renderer/lib/util'
+import { notify, confirm, alert } from './lib/overlay'
 import { t } from 'common/util'
 
 const storage = new LocalStore('main')
@@ -115,7 +114,7 @@ class Store extends BaseStore {
   async installAndOpenPlugin(plugin: IPlugin, detached = false) {
     if (this.installingPlugins.has(plugin.id)) return
 
-    const confirmed = await LunaModal.confirm(
+    const confirmed = await confirm(
       t('installPluginConfirm', { name: plugin.name })
     )
     if (!confirmed) return
@@ -140,11 +139,11 @@ class Store extends BaseStore {
         next.delete(plugin.id)
         this.installingPlugins = next
       })
-      await LunaModal.alert(t('installPluginErr'))
+      await alert(t('installPluginErr'))
     }
   }
   async uninstallUserPlugin(plugin: IPlugin) {
-    const confirmed = await LunaModal.confirm(
+    const confirmed = await confirm(
       t('uninstallPluginConfirm', { name: plugin.name })
     )
     if (!confirmed) return
@@ -161,14 +160,14 @@ class Store extends BaseStore {
       await main.uninstallPlugin(plugin.id)
       await this.refresh(true)
     } catch {
-      await LunaModal.alert(t('uninstallPluginErr'))
+      await alert(t('uninstallPluginErr'))
     }
   }
   async checkPluginUpdate(plugin: IPlugin) {
     try {
       const latestVersion = await main.checkPluginUpdate(plugin.id)
       if (latestVersion) {
-        const confirmed = await LunaModal.confirm(
+        const confirmed = await confirm(
           t('pluginUpdateAvailable', { version: latestVersion })
         )
         if (!confirmed) return

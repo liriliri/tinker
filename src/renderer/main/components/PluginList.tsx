@@ -9,8 +9,7 @@ import fileUrl from 'licia/fileUrl'
 import Style from './PluginList.module.scss'
 import { borderRadius } from 'common/theme'
 import contextMenu from 'share/renderer/lib/contextMenu'
-import { notify } from 'share/renderer/lib/util'
-import LunaModal from 'luna-modal'
+import { notify, confirm } from '../lib/overlay'
 import { t } from 'common/util'
 import concat from 'licia/concat'
 import isEmpty from 'licia/isEmpty'
@@ -167,7 +166,7 @@ export default observer(function PluginList() {
         template.push({
           label: t('hide'),
           async click() {
-            const result = await LunaModal.confirm(t('hideConfirm'))
+            const result = await confirm(t('hideConfirm'))
             if (result) {
               store.hidePlugin(plugin.id)
             }
