@@ -1,5 +1,8 @@
+import average from 'licia/average'
 import clamp from 'licia/clamp'
 import contain from 'licia/contain'
+import map from 'licia/map'
+import sortBy from 'licia/sortBy'
 import type { BackgroundConfig } from '../types'
 
 /** Rare pure green used as AI background key for edge flood-fill removal. */
@@ -135,11 +138,11 @@ function keyScore(
 
 function median(values: number[]) {
   if (values.length === 0) return 0
-  const sorted = values.slice().sort((a, b) => a - b)
+  const sorted = sortBy(values, (value) => value)
   const mid = (sorted.length / 2) | 0
   return sorted.length % 2
     ? sorted[mid]
-    : Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+    : Math.round(average(sorted[mid - 1], sorted[mid]))
 }
 
 /** Sample border to recover the actual AI background (rarely pure #00FF00). */
@@ -148,36 +151,31 @@ function estimateKeyColor(
   width: number,
   height: number
 ) {
-  const rs: number[] = []
-  const gs: number[] = []
-  const bs: number[] = []
+  const samples: number[] = []
 
-  const push = (x: number, y: number) => {
+  const collect = (x: number, y: number) => {
     const i = (y * width + x) * 4
-    const r = data[i]
-    const g = data[i + 1]
-    const b = data[i + 2]
-    if (greenDominance(r, g, b) < 12) return
-    rs.push(r)
-    gs.push(g)
-    bs.push(b)
+    if (greenDominance(data[i], data[i + 1], data[i + 2]) < 12) return
+    samples.push(i)
   }
 
   const step = Math.max(1, Math.floor(Math.min(width, height) / 64))
   for (let x = 0; x < width; x += step) {
-    push(x, 0)
-    push(x, height - 1)
+    collect(x, 0)
+    collect(x, height - 1)
   }
   for (let y = step; y < height - 1; y += step) {
-    push(0, y)
-    push(width - 1, y)
+    collect(0, y)
+    collect(width - 1, y)
   }
 
-  if (rs.length < 8) {
+  if (samples.length < 8) {
     return { r: AI_CHROMA_KEY.r, g: AI_CHROMA_KEY.g, b: AI_CHROMA_KEY.b }
   }
 
-  return { r: median(rs), g: median(gs), b: median(bs) }
+  const channel = (offset: number) =>
+    median(map(samples, (i) => data[i + offset]))
+  return { r: channel(0), g: channel(1), b: channel(2) }
 }
 
 function despillPixel(

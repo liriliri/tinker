@@ -35,7 +35,7 @@ import {
   chromaKeyImageFile,
 } from './lib/chromaKey'
 import { buildExportPng, buildExportZip } from './lib/export'
-import { stripExt } from './lib/util'
+import { stripExt, loadHtmlImage } from './lib/util'
 import type {
   BackgroundColorPreset,
   BackgroundConfig,
@@ -496,15 +496,6 @@ class Store extends BaseStore {
   private saveSectionOpenState() {
     storage.set(STORAGE_SECTION_OPEN, this.sectionOpen)
   }
-}
-
-function loadHtmlImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('Failed to load image'))
-    img.src = url
-  })
 }
 
 export default new Store()

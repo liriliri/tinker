@@ -1,14 +1,9 @@
 import clamp from 'licia/clamp'
-import map from 'licia/map'
+import Color from 'licia/Color'
 import { CANVAS_SIZE, type BackgroundConfig, type IconConfig } from '../types'
 
 function hexToRgba(hex: string, opacityPercent: number): string {
-  const raw = hex.replace('#', '')
-  const full =
-    raw.length === 3 ? map(raw.split(''), (c) => c + c).join('') : raw
-  const r = parseInt(full.slice(0, 2), 16)
-  const g = parseInt(full.slice(2, 4), 16)
-  const b = parseInt(full.slice(4, 6), 16)
+  const [r, g, b] = Color.parse(hex).val
   const a = clamp(opacityPercent, 0, 100) / 100
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
@@ -111,13 +106,13 @@ export function drawIcon(
   const radius = (background.rounded / 100) * (plate / 2)
   const ox = (canvasSize - plate) / 2
   const oy = ox
-  const squircle = background.squircle ?? 0
+  const squircle = background.squircle
 
   ctx.clearRect(0, 0, canvasSize, canvasSize)
 
   if (!background.transparent) {
     if (background.useGradient) {
-      const angle = ((background.gradientAngle || 135) * Math.PI) / 180
+      const angle = (background.gradientAngle * Math.PI) / 180
       const cx = ox + plate / 2
       const cy = oy + plate / 2
       const r = (plate / 2) * Math.SQRT2

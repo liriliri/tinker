@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
-import { type DragEvent } from 'react'
 import { tw } from 'share/theme'
 import ImageOpen from 'share/components/ImageOpen'
 import { ToasterProvider } from 'share/components/Toaster'
@@ -8,26 +7,16 @@ import renderApp from 'share/lib/renderApp'
 import store from './store'
 import Preview from './components/Preview'
 import Sidebar from './components/Sidebar'
-import { firstDroppedImage } from './lib/util'
+import { useImageDrop } from './hooks/useImageDrop'
 import './index.scss'
 import enUS from './i18n/en-US.json'
 import zhCN from './i18n/zh-CN.json'
 
 const App = observer(function App() {
   const { t } = useTranslation()
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = async (e: DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const file = firstDroppedImage(e.dataTransfer.files)
-    if (!file) return
-    await store.loadDroppedFile(file)
-  }
+  const { handleDragOver, handleDrop } = useImageDrop((file) => {
+    void store.loadDroppedFile(file)
+  })
 
   return (
     <ToasterProvider>

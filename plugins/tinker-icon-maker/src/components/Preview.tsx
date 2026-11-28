@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import className from 'licia/className'
 import clamp from 'licia/clamp'
 import { tw } from 'share/theme'
 import store from '../store'
+import { ICON_LIMITS } from '../lib/config'
 import { computeContentBox, drawIcon } from '../lib/render'
 import { getCheckboardStyle } from '../lib/checkboard'
 import { CANVAS_SIZE } from '../types'
@@ -109,8 +110,16 @@ const Preview = observer(function Preview() {
     const dx = ((e.clientX - drag.startX) / contentCss) * 100
     const dy = ((e.clientY - drag.startY) / contentCss) * 100
     store.updateIcon({
-      offsetX: clamp(drag.offsetX + dx, -50, 50),
-      offsetY: clamp(drag.offsetY + dy, -50, 50),
+      offsetX: clamp(
+        drag.offsetX + dx,
+        ICON_LIMITS.offsetX.min,
+        ICON_LIMITS.offsetX.max
+      ),
+      offsetY: clamp(
+        drag.offsetY + dy,
+        ICON_LIMITS.offsetY.min,
+        ICON_LIMITS.offsetY.max
+      ),
     })
   }
 
@@ -125,6 +134,11 @@ const Preview = observer(function Preview() {
     store.updateIcon({ offsetX: 0, offsetY: 0 })
   }
 
+  const checkboardStyle = useMemo(
+    () => getCheckboardStyle(store.isDark),
+    [store.isDark]
+  )
+
   return (
     <div className="flex-1 min-w-0 flex flex-col relative">
       <div
@@ -136,7 +150,7 @@ const Preview = observer(function Preview() {
             'rounded-2xl shadow-lg overflow-hidden border',
             tw.border
           )}
-          style={getCheckboardStyle(store.isDark)}
+          style={checkboardStyle}
         >
           <canvas
             ref={canvasRef}

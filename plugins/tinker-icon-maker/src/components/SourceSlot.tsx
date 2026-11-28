@@ -1,39 +1,17 @@
-import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useTranslation } from 'react-i18next'
 import { ImagePlus, X } from 'lucide-react'
 import { tw } from 'share/theme'
-import { firstDroppedImage } from '../lib/util'
+import { useImageDrop } from '../hooks/useImageDrop'
 import store from '../store'
 
 const SourceSlot = observer(function SourceSlot() {
   const { t } = useTranslation()
-  const [dropHighlight, setDropHighlight] = useState(false)
   const source = store.source
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'copy'
-    if (!dropHighlight) setDropHighlight(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-      setDropHighlight(false)
-    }
-  }
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDropHighlight(false)
-    const file = firstDroppedImage(e.dataTransfer.files)
-    if (!file) return
-    await store.loadDroppedFile(file)
-  }
+  const { isDragOver, handleDragOver, handleDragLeave, handleDrop } =
+    useImageDrop((file) => {
+      void store.loadDroppedFile(file)
+    })
 
   return (
     <div
@@ -41,7 +19,7 @@ const SourceSlot = observer(function SourceSlot() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`relative h-40 overflow-hidden rounded border ${
-        dropHighlight
+        isDragOver
           ? `${tw.primary.border} ${tw.bg.secondary}`
           : `${tw.border} ${tw.bg.primary}`
       }`}
