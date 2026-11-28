@@ -336,6 +336,7 @@ import {
   getFileCategory,
 } from 'share/lib/util'
 import { extractJpegExif, injectJpegExif } from 'share/lib/exif'
+import { createZip, type ZipEntry } from 'share/lib/zip'
 import { openPopupWindow } from 'share/lib/popupWindow'
 import {
   getHolidaysForYearRange,
