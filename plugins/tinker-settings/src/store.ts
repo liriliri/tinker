@@ -2,7 +2,6 @@ import { makeAutoObservable } from 'mobx'
 import clamp from 'licia/clamp'
 import clone from 'licia/clone'
 import defaults from 'licia/defaults'
-import find from 'licia/find'
 import findIdx from 'licia/findIdx'
 import map from 'licia/map'
 import remove from 'licia/remove'
@@ -33,8 +32,6 @@ class Store extends BaseStore {
   isLoading: boolean = true
   currentSection: Section = 'general'
   aiMode: AiMode = 'chat'
-  selectedProviderName: string | null = null
-  selectedImageProviderName: string | null = null
 
   constructor() {
     super()
@@ -43,36 +40,10 @@ class Store extends BaseStore {
 
   setCurrentSection(section: Section) {
     this.currentSection = section
-    this.selectedProviderName = null
-    this.selectedImageProviderName = null
   }
 
   setAiMode(mode: AiMode) {
     this.aiMode = mode
-  }
-
-  setSelectedProviderName(name: string | null) {
-    this.selectedProviderName = name
-  }
-
-  setSelectedImageProviderName(name: string | null) {
-    this.selectedImageProviderName = name
-  }
-
-  get selectedProvider(): AiProvider | null {
-    return (
-      find(this.aiProviders, (p) => p.name === this.selectedProviderName) ??
-      null
-    )
-  }
-
-  get selectedImageProvider(): AiImageProvider | null {
-    return (
-      find(
-        this.aiImageProviders,
-        (p) => p.name === this.selectedImageProviderName
-      ) ?? null
-    )
   }
 
   async loadSettings() {
@@ -262,9 +233,6 @@ class Store extends BaseStore {
 
   async deleteAiProvider(name: string) {
     remove(this.aiProviders, (p) => p.name === name)
-    if (this.selectedProviderName === name) {
-      this.selectedProviderName = null
-    }
     await this.saveProviders('aiProviders')
   }
 
@@ -285,9 +253,6 @@ class Store extends BaseStore {
 
   async deleteAiImageProvider(name: string) {
     remove(this.aiImageProviders, (p) => p.name === name)
-    if (this.selectedImageProviderName === name) {
-      this.selectedImageProviderName = null
-    }
     await this.saveProviders('aiImageProviders')
   }
 

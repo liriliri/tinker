@@ -15,6 +15,8 @@ export interface DialogProps {
   title?: string
   children: ReactNode
   className?: string
+  /** Extra classes for the scrollable body (e.g. overflow-hidden for nested panes). */
+  bodyClassName?: string
   showClose?: boolean
 }
 
@@ -29,6 +31,7 @@ export default function Dialog({
   title,
   children,
   className = '',
+  bodyClassName = '',
   showClose = false,
 }: DialogProps) {
   const titleClassName =
@@ -101,7 +104,11 @@ export default function Dialog({
                 } shadow-xl transition-all ${className || 'w-full max-w-md'}`}
               >
                 <div className="p-6 pb-2 flex-shrink-0">{renderHeader()}</div>
-                <div className="p-6 pt-4 overflow-y-auto flex-1 min-h-0">
+                <div
+                  className={`p-6 pt-4 flex-1 min-h-0 ${
+                    bodyClassName || 'overflow-y-auto'
+                  }`}
+                >
                   {children}
                 </div>
               </DialogPanel>

@@ -10,26 +10,27 @@ import {
   ToolbarSpacer,
   TOOLBAR_ICON_SIZE,
 } from 'share/components/Toolbar'
-import { Panel, Group, Separator } from 'react-resizable-panels'
-import { useDefaultLayout } from 'share/hooks/useDefaultLayout'
 import store from '../store'
 import type { AiMode } from '../types'
 import AiSection from './AiSection'
-import ProviderDetail from './ProviderDetail'
+import ProviderEditDialog from './ProviderEditDialog'
 
 export default observer(function AiView() {
   const { t } = useTranslation()
   const [addOpen, setAddOpen] = useState(false)
+  const [editName, setEditName] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const { defaultLayout, onLayoutChange } = useDefaultLayout({
-    panelIds: ['list', 'detail'],
-  })
 
   const handleModeChange = (mode: AiMode) => {
     if (store.aiMode === mode) return
     store.setAiMode(mode)
     setSearch('')
     setAddOpen(false)
+    setEditName(null)
+  }
+
+  const handleAdded = (name: string) => {
+    setEditName(name)
   }
 
   return (
@@ -68,30 +69,22 @@ export default observer(function AiView() {
       </Toolbar>
 
       <div className="flex-1 overflow-hidden">
-        <Group
-          orientation="horizontal"
-          className="h-full"
-          defaultLayout={defaultLayout}
-          onLayoutChange={onLayoutChange}
-        >
-          <Panel id="list" minSize={200}>
-            <div className="h-full overflow-hidden">
-              <AiSection
-                mode={store.aiMode}
-                search={search}
-                addOpen={addOpen}
-                onAddClose={() => setAddOpen(false)}
-              />
-            </div>
-          </Panel>
-          <Separator />
-          <Panel id="detail" minSize={200}>
-            <div className="h-full overflow-hidden">
-              <ProviderDetail mode={store.aiMode} />
-            </div>
-          </Panel>
-        </Group>
+        <AiSection
+          mode={store.aiMode}
+          search={search}
+          addOpen={addOpen}
+          onAddClose={() => setAddOpen(false)}
+          onAdded={handleAdded}
+          onEdit={setEditName}
+        />
       </div>
+
+      <ProviderEditDialog
+        mode={store.aiMode}
+        providerName={editName}
+        open={editName !== null}
+        onClose={() => setEditName(null)}
+      />
     </div>
   )
 })

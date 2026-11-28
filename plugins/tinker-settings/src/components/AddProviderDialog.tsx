@@ -25,12 +25,14 @@ interface AddProviderDialogProps {
   mode: AiMode
   open: boolean
   onClose: () => void
+  onAdded?: (name: string) => void
 }
 
 export default observer(function AddProviderDialog({
   mode,
   open,
   onClose,
+  onAdded,
 }: AddProviderDialogProps) {
   const { t } = useTranslation()
   const isImage = mode === 'image'
@@ -153,6 +155,7 @@ export default observer(function AddProviderDialog({
       })
     }
     toast.success(t('providerAdded'))
+    onAdded?.(trimmedName)
     onClose()
   }
 

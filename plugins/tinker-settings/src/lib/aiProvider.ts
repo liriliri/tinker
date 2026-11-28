@@ -65,6 +65,12 @@ export const POPULAR_PRESETS: ProviderPreset[] = [
     apiType: 'openai',
     apiUrl: OPENROUTER_API_URL,
   },
+  {
+    id: 'minimax',
+    name: 'MiniMax',
+    apiType: 'openai',
+    apiUrl: 'https://api.minimaxi.com/v1',
+  },
 ]
 
 export const IMAGE_PRESETS: ImageProviderPreset[] = map(
@@ -81,6 +87,8 @@ export type ProviderBrand =
   | 'gemini'
   | 'volcengine'
   | 'openrouter'
+  | 'minimax'
+  | 'deepseek'
 
 const API_TYPE_BRAND: Record<string, ProviderBrand> = {
   openai: 'openai',
@@ -101,6 +109,10 @@ export function resolveProviderBrand(
   if (contain(url, 'volces.com') || contain(url, 'volcengine.com')) {
     return 'volcengine'
   }
+  if (contain(url, 'minimaxi.com') || contain(url, 'minimax.io')) {
+    return 'minimax'
+  }
+  if (contain(url, 'deepseek.com')) return 'deepseek'
   if (contain(url, 'openai.com')) return 'openai'
   return API_TYPE_BRAND[apiType] || 'openai'
 }

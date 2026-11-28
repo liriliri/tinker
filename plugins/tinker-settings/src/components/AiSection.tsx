@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import contain from 'licia/contain'
 import filter from 'licia/filter'
 import findIdx from 'licia/findIdx'
@@ -10,11 +11,14 @@ import map from 'licia/map'
 import some from 'licia/some'
 import trim from 'licia/trim'
 import Grid from 'share/components/Grid'
+import { confirm } from 'share/components/Confirm'
+import { showContextMenu } from 'share/components/ContextMenu'
 import {
+  CellContextMenuEvent,
   ColDef,
-  SelectionChangedEvent,
   GetRowIdParams,
   ICellRendererParams,
+  RowClickedEvent,
   RowDragEndEvent,
   IRowDragItem,
 } from 'ag-grid-community'
@@ -23,7 +27,9 @@ import type { AiMode } from '../types'
 import { resolveProviderBrand, type ProviderBrand } from '../lib/aiProvider'
 import AddProviderDialog from './AddProviderDialog'
 import ClaudeIcon from '../assets/claude.svg?react'
+import DeepSeekIcon from '../assets/deepseek.svg?react'
 import GeminiIcon from '../assets/gemini.svg?react'
+import MiniMaxIcon from '../assets/minimax.svg?react'
 import OpenAIIcon from '../assets/openai.svg?react'
 import OpenRouterIcon from '../assets/openrouter.svg?react'
 import VolcengineIcon from '../assets/volcengine.svg?react'
@@ -40,6 +46,8 @@ interface AiSectionProps {
   search: string
   addOpen: boolean
   onAddClose: () => void
+  onAdded: (name: string) => void
+  onEdit: (name: string) => void
 }
 
 const PROVIDER_ICONS: Record<ProviderBrand, typeof OpenAIIcon> = {
@@ -48,15 +56,11 @@ const PROVIDER_ICONS: Record<ProviderBrand, typeof OpenAIIcon> = {
   gemini: GeminiIcon,
   volcengine: VolcengineIcon,
   openrouter: OpenRouterIcon,
+  minimax: MiniMaxIcon,
+  deepseek: DeepSeekIcon,
 }
 
 const DEFAULT_COL_DEF = { sortable: false }
-
-const ROW_SELECTION = {
-  mode: 'singleRow' as const,
-  checkboxes: false,
-  enableClickSelection: true,
-}
 
 interface ProviderLike {
   name: string
@@ -81,6 +85,8 @@ export default observer(function AiSection({
   search,
   addOpen,
   onAddClose,
+  onAdded,
+  onEdit,
 }: AiSectionProps) {
   const { t } = useTranslation()
   const isImage = mode === 'image'
@@ -127,17 +133,55 @@ export default observer(function AiSection({
   const providers = isImage ? store.aiImageProviders : store.aiProviders
   const rowData: RowData[] = map(filter(providers, matchesSearch), toRow)
 
-  const onSelectionChanged = useCallback(
-    (event: SelectionChangedEvent<RowData>) => {
-      const rows = event.api.getSelectedRows()
-      if (!rows[0]) return
-      if (isImage) {
-        store.setSelectedImageProviderName(rows[0].name)
-      } else {
-        store.setSelectedProviderName(rows[0].name)
-      }
+  const onRowClicked = useCallback(
+    (event: RowClickedEvent<RowData>) => {
+      if (!event.data) return
+      const mouse = event.event as MouseEvent | undefined
+      if (mouse && mouse.button !== 0) return
+      onEdit(event.data.name)
     },
-    [isImage]
+    [onEdit]
+  )
+
+  const deleteProvider = useCallback(
+    async (name: string) => {
+      const confirmed = await confirm({
+        title: t('deleteProvider'),
+        message: t('deleteProviderConfirm', { name }),
+        confirmText: t('delete'),
+        cancelText: t('cancel'),
+      })
+      if (!confirmed) return
+      if (isImage) {
+        await store.deleteAiImageProvider(name)
+      } else {
+        await store.deleteAiProvider(name)
+      }
+      toast.success(t('providerDeleted'))
+    },
+    [isImage, t]
+  )
+
+  const onCellContextMenu = useCallback(
+    (event: CellContextMenuEvent<RowData>) => {
+      if (!event.data || !event.event) return
+      const e = event.event as MouseEvent
+      e.preventDefault()
+      const name = event.data.name
+      showContextMenu(e.clientX, e.clientY, [
+        {
+          label: t('edit'),
+          click: () => onEdit(name),
+        },
+        {
+          label: t('delete'),
+          click: () => {
+            void deleteProvider(name)
+          },
+        },
+      ])
+    },
+    [deleteProvider, onEdit, t]
   )
 
   const getRowId = useCallback(
@@ -181,8 +225,8 @@ export default observer(function AiSection({
         columnDefs={columnDefs}
         rowData={rowData}
         defaultColDef={DEFAULT_COL_DEF}
-        rowSelection={ROW_SELECTION}
-        onSelectionChanged={onSelectionChanged}
+        onRowClicked={onRowClicked}
+        onCellContextMenu={onCellContextMenu}
         getRowId={getRowId}
         animateRows={false}
         enableCellTextSelection={false}
@@ -193,7 +237,12 @@ export default observer(function AiSection({
         localeText={localeText}
       />
 
-      <AddProviderDialog mode={mode} open={addOpen} onClose={onAddClose} />
+      <AddProviderDialog
+        mode={mode}
+        open={addOpen}
+        onClose={onAddClose}
+        onAdded={onAdded}
+      />
     </div>
   )
 })
